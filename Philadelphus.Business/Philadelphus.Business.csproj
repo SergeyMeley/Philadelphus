@@ -7,13 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
-    <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\GeneralServices\" />
-    <Folder Include="Services\DbServices\" />
+    <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
+    <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />
   </ItemGroup>
 
 </Project>
