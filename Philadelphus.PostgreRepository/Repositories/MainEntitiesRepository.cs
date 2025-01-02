@@ -18,8 +18,8 @@ namespace Philadelphus.PostgreRepository.Repositories
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             DbMainEntitiesCollection collection = new DbMainEntitiesCollection();
-            collection.Layers = (List<DbTreeRoot>)SelectLayers();
-            collection.Nodes = (List<DbTreeNode>)SelectNodes();
+            collection.TreeRoots = (List<DbTreeRoot>)SelectLayers();
+            collection.TreeNodes = (List<DbTreeNode>)SelectNodes();
             return collection;
         }
         #region [Select]
@@ -31,7 +31,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             {
                 while (reader.Read())
                 {
-                    var record = new DbProject(reader.GetInt32(0), reader.GetString(1));
+                    var record = new DbTreeRepository(reader.GetInt32(0), reader.GetString(1));
                     record.Name = reader.GetString(1);
                     if (!reader.IsDBNull(3))
                     {
