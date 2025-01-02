@@ -14,8 +14,6 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public long EntityId { get; set; }
         public DbAttributeEntry(long id, string name) : base(id, name)
         {
-            Id = id;
-            Name = name;
         }
     }
 }
