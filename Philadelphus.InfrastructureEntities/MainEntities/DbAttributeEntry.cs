@@ -12,7 +12,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public long AttributeValueId { get; set; }
         public long EntityTypeId { get; set; }
         public long EntityId { get; set; }
-        public DbAttributeEntry(long id, string name)
+        public DbAttributeEntry(long id, string name) : base(id, name)
         {
             Id = id;
             Name = name;

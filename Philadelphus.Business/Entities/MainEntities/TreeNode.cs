@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    internal class Element
+    public class TreeNode : MainEntityBase
     {
+        public TreeNode()
+        {
+        }
     }
 }

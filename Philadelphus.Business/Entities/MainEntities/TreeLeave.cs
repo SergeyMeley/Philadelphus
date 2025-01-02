@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class Layer
+    public class TreeLeave
     {
     }
 }

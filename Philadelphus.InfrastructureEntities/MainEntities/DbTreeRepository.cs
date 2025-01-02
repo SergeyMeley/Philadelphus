@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class DbProject : DbEntityBase
+    public class DbTreeRepository : DbEntityBase
     {
         public string DirectoryPath { get; set; }
         public IEnumerable<long> AttributeIds { get; set; }
-        public IEnumerable<long> LayerIds { get; set; }
-        public DbProject(long id, string name)
+        public IEnumerable<long> ChildTreeRootIds { get; set; }
+        public DbTreeRepository(long id, string name) : base(id, name)
         {
-            Id = id;
-            Name = name;
+            AttributeIds = new List<long>();
+            ChildTreeRootIds = new List<long>();
         }
     }
 }

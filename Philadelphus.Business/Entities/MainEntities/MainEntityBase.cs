@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureEntities.MainEntities
+namespace Philadelphus.Business.Entities.MainEntities
 {
-    public interface IDbEntity
+    public abstract class MainEntityBase
     {
         public long Id { get; set; }
         public long Sequence { get; set; }
@@ -26,5 +26,9 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public string UpdatedContentBy { get; set; }
         public string DeletedOn { get; set; }
         public string DeletedBy { get; set; }
+        public MainEntityBase()
+        {
+            
+        }
     }
 }

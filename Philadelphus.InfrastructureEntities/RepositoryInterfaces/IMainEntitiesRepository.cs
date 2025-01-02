@@ -11,28 +11,28 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
     {
         DbMainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]
-        IEnumerable<DbLayer> SelectProjects();
-        IEnumerable<DbLayer> SelectLayers();
-        IEnumerable<DbNode> SelectNodes();
-        IEnumerable<DbNode> SelectElements();
+        IEnumerable<DbTreeRepository> SelectProjects();
+        IEnumerable<DbTreeRoot> SelectLayers();
+        IEnumerable<DbTreeNode> SelectNodes();
+        IEnumerable<DbTreeLeave> SelectElements();
         #endregion
         # region [ Insert ]
-        IEnumerable<DbLayer> InsertProjects(IEnumerable<DbProject> projects);
-        IEnumerable<DbLayer> InsertLayers(IEnumerable<DbLayer> layers);
-        IEnumerable<DbNode> InsertNodes(IEnumerable<DbNode> nodes);
-        IEnumerable<DbNode> InsertElements(IEnumerable<DbElement> elements);
+        int InsertProjects(IEnumerable<DbTreeRepository> projects);
+        int InsertLayers(IEnumerable<DbTreeRoot> layers);
+        int InsertNodes(IEnumerable<DbTreeNode> nodes);
+        int InsertElements(IEnumerable<DbTreeLeave> elements);
         #endregion
         # region [ Delete ]
-        IEnumerable<DbLayer> DeletetProjects(int[] ids);
-        IEnumerable<DbLayer> DeleteLayers(int[] ids);
-        IEnumerable<DbNode> DeleteNodes(int[] ids);
-        IEnumerable<DbNode> DeleteElements(int[] ids);
+        int DeleteProjects(int[] ids);
+        int DeleteLayers(int[] ids);
+        int DeleteNodes(int[] ids);
+        int DeleteElements(int[] ids);
         #endregion
         # region [ Update ]
-        IEnumerable<DbLayer> UpdateProjects(IEnumerable<DbProject> projects);
-        IEnumerable<DbLayer> UpdateLayers(IEnumerable<DbLayer> layers);
-        IEnumerable<DbNode> UpdateNodes(IEnumerable<DbNode> nodes);
-        IEnumerable<DbNode> UpdateElements(IEnumerable<DbElement> elements);
+        int UpdateProjects(IEnumerable<DbTreeRepository> projects);
+        int UpdateLayers(IEnumerable<DbTreeRoot> layers);
+        int UpdateNodes(IEnumerable<DbTreeNode> nodes);
+        int UpdateElements(IEnumerable<DbTreeLeave> elements);
         #endregion
     }
 }

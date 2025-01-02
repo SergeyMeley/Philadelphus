@@ -18,32 +18,14 @@ namespace Philadelphus.PostgreRepository.Repositories
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             DbMainEntitiesCollection collection = new DbMainEntitiesCollection();
-            collection.Layers = (List<DbLayer>)SelectLayers();
-            collection.Nodes = (List<DbNode>)SelectProjects();
+            collection.Layers = (List<DbTreeRoot>)SelectLayers();
+            collection.Nodes = (List<DbTreeNode>)SelectNodes();
             return collection;
         }
-        public IEnumerable<DbLayer> SelectLayers()
+        #region [Select]
+        IEnumerable<DbTreeRepository> IMainEntitiesRepository.SelectProjects()
         {
-            var dataCollection = new List<DbLayer>();
-            using (var cmd = _context.CreateConnection().CreateCommand(""))
-            using (var reader = cmd.ExecuteReaderAsync().Result)
-            {
-                while (reader.Read())
-                {
-                    var record = new DbLayer(reader.GetInt32(0), reader.GetString(1));
-                    record.Name = reader.GetString(1);
-                    if (!reader.IsDBNull(2))
-                    {
-                        record.Description = reader.GetString(2);
-                    }
-                    dataCollection.Add(record);
-                }
-            }
-            return dataCollection;
-        }
-        public IEnumerable<IDbEntity> SelectProjects()
-        {
-            var dataCollection = new List<DbProject>();
+            var dataCollection = new List<DbTreeRepository>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))
             using (var reader = cmd.ExecuteReaderAsync().Result)
             {
@@ -60,13 +42,36 @@ namespace Philadelphus.PostgreRepository.Repositories
             }
             return dataCollection;
         }
-        #region Insert
-        public IEnumerable<IDbEntity> InsertCatalogs()
+        public IEnumerable<DbTreeRoot> SelectLayers()
+        {
+            var dataCollection = new List<DbTreeRoot>();
+            using (var cmd = _context.CreateConnection().CreateCommand(""))
+            using (var reader = cmd.ExecuteReaderAsync().Result)
+            {
+                while (reader.Read())
+                {
+                    var record = new DbTreeRoot(reader.GetInt32(0), reader.GetString(1));
+                    record.Name = reader.GetString(1);
+                    if (!reader.IsDBNull(2))
+                    {
+                        record.Description = reader.GetString(2);
+                    }
+                    dataCollection.Add(record);
+                }
+            }
+            return dataCollection;
+        }
+        public IEnumerable<DbTreeNode> SelectNodes()
         {
             throw new NotImplementedException();
         }
-
-        public bool InsertProject(DbProject project)
+        public IEnumerable<DbTreeLeave> SelectElements()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+        #region [Insert]
+        public int InsertProjects(IEnumerable<DbTreeRepository> projects)
         {
             try
             {
@@ -74,108 +79,58 @@ namespace Philadelphus.PostgreRepository.Repositories
                 {
                     cmd.ExecuteNonQuery();
                 }
-                return true;
+                return 0;
             }
             catch (Exception)
             {
-                return false;
+                return -1;
             }
-
+        }
+        public int InsertLayers(IEnumerable<DbTreeRoot> layers)
+        {
+            throw new NotImplementedException();
+        }
+        public int InsertNodes(IEnumerable<DbTreeNode> nodes)
+        {
+            throw new NotImplementedException();
+        }
+        public int InsertElements(IEnumerable<DbTreeLeave> elements)
+        {
+            throw new NotImplementedException();
         }
         #endregion
-        #region Delete
-        public IEnumerable<IDbEntity> DeleteCatalogs(int[] ids)
+        #region [Delete]
+        public int DeleteProjects(int[] ids)
         {
             throw new NotImplementedException();
         }
-
-        public IEnumerable<IDbEntity> DeleteProjects(int[] ids)
+        public int DeleteLayers(int[] ids)
+        {
+            throw new NotImplementedException();
+        }
+        public int DeleteNodes(int[] ids)
+        {
+            throw new NotImplementedException();
+        }
+        public int DeleteElements(int[] ids)
         {
             throw new NotImplementedException();
         }
         #endregion
-        #region Update
-        public IEnumerable<IDbEntity> UpdateCatalogs()
+        #region [Update]
+        public int UpdateProjects(IEnumerable<DbTreeRepository> projects)
         {
             throw new NotImplementedException();
         }
-
-        public IEnumerable<IDbEntity> UpdateProjects()
+        public int UpdateLayers(IEnumerable<DbTreeRoot> layers)
         {
             throw new NotImplementedException();
         }
-
-        IEnumerable<DbLayer> IMainEntitiesRepository.SelectProjects()
+        public int UpdateNodes(IEnumerable<DbTreeNode> nodes)
         {
             throw new NotImplementedException();
         }
-
-        public IEnumerable<DbNode> SelectNodes()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> SelectElements()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbLayer> InsertProjects(IEnumerable<DbProject> projects)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbLayer> InsertLayers(IEnumerable<DbLayer> layers)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> InsertNodes(IEnumerable<DbNode> nodes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> InsertElements(IEnumerable<DbElement> elements)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbLayer> DeletetProjects(int[] ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbLayer> DeleteLayers(int[] ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> DeleteNodes(int[] ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> DeleteElements(int[] ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbLayer> UpdateProjects(IEnumerable<DbProject> projects)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbLayer> UpdateLayers(IEnumerable<DbLayer> layers)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> UpdateNodes(IEnumerable<DbNode> nodes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbNode> UpdateElements(IEnumerable<DbElement> elements)
+        public int UpdateElements(IEnumerable<DbTreeLeave> elements)
         {
             throw new NotImplementedException();
         }

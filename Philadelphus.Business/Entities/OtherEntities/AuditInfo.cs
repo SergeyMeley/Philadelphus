@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.MainEntities
+namespace Philadelphus.Business.Entities.OtherEntities
 {
-    internal class Node
+    public class AuditInfo
     {
     }
 }
