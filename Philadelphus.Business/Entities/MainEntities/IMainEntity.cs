@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Philadelphus.Business.Entities.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Philadelphus.Business.Entities.MainEntities
 {
     public interface IMainEntity
     {
+        public abstract EntityTypes entityType { get; }
         public long Id { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }

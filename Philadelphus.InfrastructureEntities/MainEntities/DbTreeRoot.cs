@@ -10,7 +10,6 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public class DbTreeRoot : DbEntityBase
     {
         public long ParentTreeRepositoryId { get; set; }
-        public string DirectoryPath { get; set; }
         public IEnumerable<long> AttributeIds { get; set; }
         public IEnumerable<long> ChildTreeNodeIds { get; set; }
         public DbTreeRoot(long id, string name) : base (id, name)

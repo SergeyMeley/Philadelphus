@@ -7,14 +7,15 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class TreesRepository : MainEntityBase
+    public class TreeRepository : MainEntityBase
     {
+        public string DirectoryPath { get; set; }
         public IEnumerable<Attribute> Attributes { get; set; }
-        public IEnumerable<TreeRoot> Trees { get; set; }
-        public TreesRepository()
+        public IEnumerable<TreeRoot> ChildTreeRoots { get; set; }
+        public TreeRepository()
         {
             Attributes = new List<Attribute>();
-            Trees = new List<TreeRoot>();
+            ChildTreeRoots = new List<TreeRoot>();
         }
     }
 }

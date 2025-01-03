@@ -12,12 +12,12 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public long ParentTreeNodeId { get; set; }
         public IEnumerable<long> AttributeIds { get; set; }
         public IEnumerable<long> ChildTreeNodeIds { get; set; }
-        public IEnumerable<long> ChildTreeLeavesIds { get; set; }
+        public IEnumerable<long> ChildTreeLeaveIds { get; set; }
         public DbTreeNode(long id, string name) : base(id, name)
         {
             AttributeIds = new List<long>();
             ChildTreeNodeIds = new List<long>();
-            ChildTreeLeavesIds = new List<long>();
+            ChildTreeLeaveIds = new List<long>();
         }
     }
 }

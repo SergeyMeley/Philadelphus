@@ -8,10 +8,10 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class DbTreeLeave : DbEntityBase
     {
+        public long ParentTreeNodeId { get; set; }
         public string Uuid { get; set; }
         public string Type { get; set; }
         public IEnumerable<long> AttributeIds { get; set; }
-        public long ParentTreeNodeId { get; set; }
         public DbTreeLeave(long id, string name) : base(id, name)
         {
             AttributeIds = new List<long>();
