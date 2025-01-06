@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.WpfApplication", "Philadelphus.WpfApplication\Philadelphus.WpfApplication.csproj", "{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9A5A59A-BBFB-4381-9841-53191A4AF0DE}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,393 @@
+﻿<Window x:Class="Philadelphus.WpfApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Philadelphus.WpfApplication"
+        mc:Ignorable="d"
+        Title="Чубушник"
+        MinHeight="500" MinWidth="1000"
+        WindowState="Maximized">
+    <Window.CommandBindings>
+        <!--<CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
+        <CommandBinding Command="Open" CanExecute="CommonCommandBinding_CanExecute" />
+        <CommandBinding Command="Save" CanExecute="CommonCommandBinding_CanExecute" />-->
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.Background>
+            <SolidColorBrush Color="#FFF1F1F1"/>
+        </Grid.Background>
+        <DockPanel>
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar>
+                    <Button Command="New" Content="Создать репозиторий" />
+                    <Button Command="Open" Content="Открыть существующий" />
+                    <Button Command="Save" Content="Сохранить репозиторий" />
+                </ToolBar>
+                <ToolBar>
+                    <Button Command="Cut" Content="Вырезать" />
+                    <Button Command="Copy" Content="Копировать" />
+                    <Button Command="Paste" Content="Вставить" />
+                </ToolBar>
+                <ToolBar>
+                    <Button Command="" Content="Настройки" />
+                </ToolBar>
+            </ToolBarTray>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="200"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Row="0" Grid.Column="0" Header="Сервисы" Margin="2,2,2,2" Background="White">
+                            <ListBox>
+                                <ListBoxItem Content="Дерево данных"></ListBoxItem>
+                                <ListBoxItem Content="Атрибуты"></ListBoxItem>
+                                <ListBoxItem Content="Отчеты"></ListBoxItem>
+                                <ListBoxItem Content="Настраиваемый отчет"></ListBoxItem>
+                                <ListBoxItem Content="Импорт / экспорт репозитория"></ListBoxItem>
+                                <ListBoxItem Content="Расширения, надстройки"></ListBoxItem>
+                                <ListBoxItem Content="Общие настройки"></ListBoxItem>
+                                <ListBoxItem Content="Настройки репозитория"></ListBoxItem>
+                                <ListBoxItem Content="Администрирование"></ListBoxItem>
+                            </ListBox>
+                        </GroupBox>
+                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                        <GroupBox Grid.Row="2" Grid.Column="0" Header="Надстройки" Margin="2,2,2,2" Background="White">
+                            <ListBox>
+                                <ListBoxItem Content="Git"></ListBoxItem>
+                                <ListBoxItem Content="Расчет трубопроводных элементов"></ListBoxItem>
+                                <ListBoxItem Content="Определение критической точки"></ListBoxItem>
+                                <ListBoxItem Content="Номинальные давления"></ListBoxItem>
+                                <ListBoxItem Content="Допускаемые напряжения"></ListBoxItem>
+                            </ListBox>
+                        </GroupBox>
+                    </Grid>
+                    <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
+                    <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2,2,2,2" Background="White">
+                        <TabControl Margin="2,2,2,2">
+                            <TabItem Header="Дерево данных">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Структура данных" Margin="2,2,2,2" Grid.RowSpan="2">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30"></RowDefinition>
+                                                <RowDefinition Height="3*"></RowDefinition>
+                                                <RowDefinition Height="auto"></RowDefinition>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="2,2,2,2" Grid.ColumnSpan="2">
+                                                <Button Content="+ корень" Margin="2,2,2,2"></Button>
+                                                <Button Content="+ узел" Margin="2,2,2,2"></Button>
+                                                <Button Content="+ лист" Margin="2,2,2,2"></Button>
+                                                <Button Content=" - " Margin="2,2,2,2"></Button>
+                                            </StackPanel>
+                                            <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2,2,2,2" Grid.ColumnSpan="2">
+                                                <TreeView>
+
+                                                </TreeView>
+                                            </GroupBox>
+                                            <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                                            <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2,2,2,2" Grid.ColumnSpan="2">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="30"></RowDefinition>
+                                                        <RowDefinition></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel Orientation="Horizontal" Margin="2,2,2,2">
+                                                        <Button Grid.Row="0" Grid.Column="0" Content=" ↑ " Margin="2,2,2,2"></Button>
+                                                        <Button Grid.Row="0" Grid.Column="0" Content=" ← " Margin="2,2,2,2"></Button>
+                                                    </StackPanel>
+                                                    <ListBox Grid.Row="1" Grid.Column="0" MinHeight="50">
+
+                                                    </ListBox>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
+                                    <Grid Grid.Row="0" Grid.Column="2">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"></RowDefinition>
+                                            <RowDefinition Height="auto"></RowDefinition>
+                                            <RowDefinition Height="*"></RowDefinition>
+                                            <RowDefinition Height="auto"></RowDefinition>
+                                            <RowDefinition Height="*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" Grid.Column="0" Header="Метаданные" Margin="2,2,2,2">
+                                            <DataGrid  Height="auto">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Свойство"></DataGridTextColumn>
+                                                    <DataGridTextColumn Header="Значение"></DataGridTextColumn>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </GroupBox>
+                                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                                        <GroupBox Grid.Row="2" Grid.Column="0" Header="Унаследованные атрибуты" Margin="2,2,2,2">
+                                            <DataGrid  Height="auto">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                    <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
+                                                    <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </GroupBox>
+                                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                                        <GroupBox Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2,2,2,2">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content=" + " Margin="2,2,2,2"></Button>
+                                                    <Button Content=" - " Margin="2,2,2,2"></Button>
+                                                </StackPanel>
+                                                <DataGrid  Height="auto">
+                                                    <DataGrid.Columns>
+                                                        <DataGridComboBoxColumn Header="Атрибут"></DataGridComboBoxColumn>
+                                                        <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                                                        <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                            </StackPanel>
+                                        </GroupBox>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Атрибуты">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Атрибты" Margin="2,2,2,2">
+                                        <DataGrid>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                                <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                                <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                                                <DataGridComboBoxColumn Header="Маска"></DataGridComboBoxColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </GroupBox>
+                                    <GroupBox Grid.Row="0" Grid.Column="1" Header="Значения атрибутов" Margin="2,2,2,2">
+                                        <DataGrid>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                                <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                                <DataGridTemplateColumn Header="Значение"></DataGridTemplateColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Отчеты">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Настройки отчета" Margin="2,2,2,2">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                                <RowDefinition Height="auto"></RowDefinition>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                                <RowDefinition Height="auto"></RowDefinition>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                                <RowDefinition Height="auto"></RowDefinition>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                                <RowDefinition Height="auto"></RowDefinition>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <GroupBox Grid.Row="0" Grid.Column="0" Header="Выбор отчета" Margin="2,2,2,2">
+                                                <Grid Grid.Row="0" Grid.Column="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="20"></RowDefinition>
+                                                        <RowDefinition Height="20"></RowDefinition>
+                                                        <RowDefinition Height="20"></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Группа отчетов" Margin="2,2,2,2"></TextBlock>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Отчет" Margin="2,2,2,2"></TextBlock>
+                                                    <ComboBox  Grid.Row="0" Grid.Column="1" Margin="2,2,2,2"></ComboBox>
+                                                    <ComboBox  Grid.Row="1" Grid.Column="1" Margin="2,2,2,2"></ComboBox>
+                                                </Grid>
+                                            </GroupBox>
+                                            <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                                            <GroupBox Grid.Row="2" Grid.Column="0" Header="Шаблон" Margin="2,2,2,2">
+                                                <StackPanel>
+                                                    <Grid Grid.Row="0" Grid.Column="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Шаблон" Margin="2,2,2,2"></TextBlock>
+                                                        <ComboBox  Grid.Row="0" Grid.Column="1" Margin="2,2,2,2"></ComboBox>
+                                                    </Grid>
+                                                    <Button Content="Сохранить шаблон" Margin="2,2,2,2"></Button>
+                                                    <Button Content="Сохранить новый" Margin="2,2,2,2"></Button>
+                                                </StackPanel>
+                                                
+                                            </GroupBox>
+                                            <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                                            <GroupBox Grid.Row="4" Grid.Column="0" Header="Набор полей" Margin="2,2,2,2">
+                                                <StackPanel>
+                                                    <DataGrid Margin="2,2,2,2">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                            <DataGridComboBoxColumn Header="Значения"></DataGridComboBoxColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Grid.Row="0" Grid.Column="0" Content="Добавить" Margin="2,2,2,2"></Button>
+                                                        <Button Grid.Row="0" Grid.Column="1" Content="Удалить" Margin="2,2,2,2"></Button>
+                                                    </Grid>
+                                                    <Button Content="Сбросить" Margin="2,2,2,2"></Button>
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GridSplitter Grid.Row="5" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                                            <GroupBox Grid.Row="6" Grid.Column="0" Header="Фильтрация результатов" Margin="2,2,2,2">
+                                                <StackPanel>
+                                                    <DataGrid Margin="2,2,2,2">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                            <DataGridComboBoxColumn Header="Значения"></DataGridComboBoxColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                            <ColumnDefinition></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Grid.Row="0" Grid.Column="0" Content="Добавить" Margin="2,2,2,2"></Button>
+                                                        <Button Grid.Row="0" Grid.Column="1" Content="Удалить" Margin="2,2,2,2"></Button>
+                                                    </Grid>
+                                                    <Button Content="Сбросить" Margin="2,2,2,2"></Button>
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GridSplitter Grid.Row="7" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                                            <GroupBox Grid.Row="8" Grid.Column="0" Header="Результат" Margin="2,2,2,2">
+                                                <StackPanel Grid.Row="6" Grid.Column="0">
+                                                    <Button Content="Сформировать отчет" Margin="2,2,2,2"></Button>
+                                                    <Button Content="Экспорт отчета" Margin="2,2,2,2"></Button>
+                                                </StackPanel>
+                                            </GroupBox>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Grid.Row="0" Grid.Column="1" Header="Отчет" Margin="2,2,2,2">
+                                        <DataGrid AutoGenerateColumns="True">
+
+                                        </DataGrid>
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Настраиваемый отчет">
+
+                            </TabItem>
+                            <TabItem Header="Импорт / экспорт">
+
+                            </TabItem>
+                            <TabItem Header="Настройки репозитория">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Репозиторий" Margin="2,2,2,2">
+                                        <ComboBox></ComboBox>
+                                    </GroupBox>
+                                    <Grid Grid.Row="1" Grid.Column="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="300"></ColumnDefinition>
+                                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <GroupBox Grid.Row="0" Grid.Column="0" Header="Параметры репозитория" Margin="2,2,2,2">
+
+                                        </GroupBox>
+                                        <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
+                                        <GroupBox Grid.Row="0" Grid.Column="2" Header="Корни репозитория" Margin="2,2,2,2">
+                                            <StackPanel>
+                                                <GroupBox Header="Собственные корни" Margin="2,2,2,2">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Button Content=" + " Margin="2,2,2,2"></Button>
+                                                            <Button Content=" - " Margin="2,2,2,2"></Button>
+                                                            <Button Content="Скопировать внешний" Margin="2,2,2,2"></Button>
+                                                        </StackPanel>
+                                                        <DataGrid>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                                                <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                                                <DataGridTextColumn Header="Абсолютный путь"></DataGridTextColumn>
+                                                                <DataGridCheckBoxColumn Header="Разрешить наследование"></DataGridCheckBoxColumn>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </StackPanel>
+                                                </GroupBox>
+                                                <GroupBox Header="Внешние корни" Margin="2,2,2,2">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Button Content=" + " Margin="2,2,2,2"></Button>
+                                                            <Button Content=" - " Margin="2,2,2,2"></Button>
+                                                        </StackPanel>
+                                                        <DataGrid>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                                                <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                                                <DataGridTextColumn Header="Репозиторий"></DataGridTextColumn>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </StackPanel>
+                                                </GroupBox>
+                                            </StackPanel>
+                                        </GroupBox>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </GroupBox>
+                </Grid>
+                <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                <GroupBox Grid.Row="2" Grid.Column="0" Header="Сообщения" Margin="2,2,2,2" Background="White">
+                    <DataGrid>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Тип" Width="35"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Время" Width="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Сообщение" Width="auto"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                        <TreeViewItem></TreeViewItem>
+                        <TreeViewItem></TreeViewItem>
+                        <TreeViewItem></TreeViewItem>
+                    </DataGrid>
+                </GroupBox>
+            </Grid>
+
+
+        </DockPanel>
+    </Grid>
+</Window>
