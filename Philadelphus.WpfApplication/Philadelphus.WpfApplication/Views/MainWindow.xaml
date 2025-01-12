@@ -318,7 +318,18 @@
                                         <RowDefinition></RowDefinition>
                                     </Grid.RowDefinitions>
                                     <GroupBox Grid.Row="0" Grid.Column="0" Header="Репозиторий" Margin="2,2,2,2">
-                                        <ComboBox></ComboBox>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="5*"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <ComboBox Grid.Row="0" Grid.Column="0" Margin="2,2,2,2" ItemsSource="{Binding RepositoryList}"></ComboBox>
+                                            <Button Grid.Row="0" Grid.Column="1" Content="Создать" Margin="2,2,2,2"></Button>
+                                            <Button Grid.Row="0" Grid.Column="2" Content="Удалить" Margin="2,2,2,2"></Button>
+                                            <Button Grid.Row="0" Grid.Column="3" Content="Обновить список" Margin="2,2,2,2"></Button>
+                                        </Grid>
                                     </GroupBox>
                                     <Grid Grid.Row="1" Grid.Column="0">
                                         <Grid.ColumnDefinitions>
@@ -327,7 +338,26 @@
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
                                         <GroupBox Grid.Row="0" Grid.Column="0" Header="Параметры репозитория" Margin="2,2,2,2">
-
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition Height="30"></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование"></TextBlock>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание"></TextBlock>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Локальный путь"></TextBlock>
+                                            </Grid>
                                         </GroupBox>
                                         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
                                         <GroupBox Grid.Row="0" Grid.Column="2" Header="Корни репозитория" Margin="2,2,2,2">
@@ -344,7 +374,7 @@
                                                                 <DataGridTextColumn Header="№"></DataGridTextColumn>
                                                                 <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
                                                                 <DataGridTextColumn Header="Абсолютный путь"></DataGridTextColumn>
-                                                                <DataGridCheckBoxColumn Header="Разрешить наследование"></DataGridCheckBoxColumn>
+                                                                <DataGridCheckBoxColumn Header="Может стать внешним"></DataGridCheckBoxColumn>
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </StackPanel>
