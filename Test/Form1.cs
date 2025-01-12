@@ -19,14 +19,14 @@ namespace Test
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            RepositoryListService repositoryListService = new RepositoryListService();
+            DataTreeRepositoryService repositoryListService = new DataTreeRepositoryService();
             TreeRepository treeRepository = new TreeRepository(NewPathTextBox.Text, NewPathTextBox.Text);
             repositoryListService.AddRepository(treeRepository);
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
-            RepositoryListService repositoryListService = new RepositoryListService();
+            DataTreeRepositoryService repositoryListService = new DataTreeRepositoryService();
             
             PathesListBox.Items.Clear();
             var list = repositoryListService.GetRepositoryList();
