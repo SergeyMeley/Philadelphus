@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
-    <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />
   </ItemGroup>
 
 </Project>

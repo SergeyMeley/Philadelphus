@@ -8,9 +8,12 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class DbMainEntitiesCollection
     {
-        public IEnumerable<DbTreeRepository> TreeRepositories { get; set; }
-        public IEnumerable<DbTreeRoot> TreeRoots { get; set; }
-        public IEnumerable<DbTreeNode> TreeNodes { get; set; }
-
+        public IEnumerable<DbTreeRepository> DbTreeRepositories { get; set; }
+        public IEnumerable<DbTreeRoot> DbTreeRoots { get; set; }
+        public IEnumerable<DbTreeNode> DbTreeNodes { get; set; }
+        public IEnumerable<DbTreeLeave> DbTreeLeaves { get; set; }
+        public IEnumerable<DbAttribute> DbAttributes { get; set; }
+        public IEnumerable<DbAttributeEntry> DbAttributeEntries { get; set; }
+        public IEnumerable<DbAttributeValue> DbAttributeValues { get; set; }
     }
 }

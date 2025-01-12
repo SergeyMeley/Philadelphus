@@ -9,8 +9,9 @@ namespace Philadelphus.Business.Entities.MainEntities
 {
     public interface IMainEntity
     {
-        public abstract EntityTypes entityType { get; }
+        public abstract EntityTypes EntityType { get; }
         public long Id { get; set; }
+        public string Path { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }

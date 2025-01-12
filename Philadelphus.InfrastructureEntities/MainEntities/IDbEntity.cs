@@ -9,6 +9,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public interface IDbEntity
     {
         public long Id { get; set; }
+        public string Path { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }

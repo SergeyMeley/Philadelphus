@@ -9,8 +9,9 @@ namespace Philadelphus.Business.Entities.MainEntities
 {
     public abstract class MainEntityBase : IMainEntity
     {
-        public abstract EntityTypes entityType { get; }
+        public abstract EntityTypes EntityType { get; }
         public long Id { get; set; }
+        public string Path { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
@@ -28,6 +29,18 @@ namespace Philadelphus.Business.Entities.MainEntities
         public string UpdatedContentBy { get; set; }
         public string DeletedOn { get; set; }
         public string DeletedBy { get; set; }
+        public MainEntityBase(string name, long id)
+        {
+            Name = name;
+            Id = id;
+            Path = "<empty>";
+        }
+        public MainEntityBase(string name, string path)
+        {
+            Name = name;
+            Id = -1;
+            Path = path;
+        }
         public MainEntityBase()
         {
             

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.PostgreRepository.Repositories
 {
-    public class MainEntitiesRepository : IMainEntitiesRepository
+    public class MainEntitiesRepository //: IMainEntitiesRepository
     {
         private readonly Context _context;
         public MainEntitiesRepository()
@@ -18,12 +18,12 @@ namespace Philadelphus.PostgreRepository.Repositories
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             DbMainEntitiesCollection collection = new DbMainEntitiesCollection();
-            collection.TreeRoots = (List<DbTreeRoot>)SelectLayers();
-            collection.TreeNodes = (List<DbTreeNode>)SelectNodes();
+            collection.DbTreeRoots = (List<DbTreeRoot>)SelectRoots();
+            collection.DbTreeNodes = (List<DbTreeNode>)SelectNodes();
             return collection;
         }
         #region [Select]
-        IEnumerable<DbTreeRepository> IMainEntitiesRepository.SelectProjects()
+        IEnumerable<DbTreeRepository> SelectProjects()
         {
             var dataCollection = new List<DbTreeRepository>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))
@@ -42,7 +42,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             }
             return dataCollection;
         }
-        public IEnumerable<DbTreeRoot> SelectLayers()
+        public IEnumerable<DbTreeRoot> SelectRoots()
         {
             var dataCollection = new List<DbTreeRoot>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))
@@ -65,13 +65,13 @@ namespace Philadelphus.PostgreRepository.Repositories
         {
             throw new NotImplementedException();
         }
-        public IEnumerable<DbTreeLeave> SelectElements()
+        public IEnumerable<DbTreeLeave> SelectLeaves()
         {
             throw new NotImplementedException();
         }
         #endregion
         #region [Insert]
-        public int InsertProjects(IEnumerable<DbTreeRepository> projects)
+        public int InsertRepositories(IEnumerable<DbTreeRepository> projects)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace Philadelphus.PostgreRepository.Repositories
                 return -1;
             }
         }
-        public int InsertLayers(IEnumerable<DbTreeRoot> layers)
+        public int InsertRoots(IEnumerable<DbTreeRoot> layers)
         {
             throw new NotImplementedException();
         }
@@ -94,17 +94,17 @@ namespace Philadelphus.PostgreRepository.Repositories
         {
             throw new NotImplementedException();
         }
-        public int InsertElements(IEnumerable<DbTreeLeave> elements)
+        public int InsertLeaves(IEnumerable<DbTreeLeave> elements)
         {
             throw new NotImplementedException();
         }
         #endregion
         #region [Delete]
-        public int DeleteProjects(int[] ids)
+        public int DeleteRepositories(int[] ids)
         {
             throw new NotImplementedException();
         }
-        public int DeleteLayers(int[] ids)
+        public int DeleteRoots(int[] ids)
         {
             throw new NotImplementedException();
         }
@@ -112,17 +112,17 @@ namespace Philadelphus.PostgreRepository.Repositories
         {
             throw new NotImplementedException();
         }
-        public int DeleteElements(int[] ids)
+        public int DeleteLeaves(int[] ids)
         {
             throw new NotImplementedException();
         }
         #endregion
         #region [Update]
-        public int UpdateProjects(IEnumerable<DbTreeRepository> projects)
+        public int UpdateRepositories(IEnumerable<DbTreeRepository> projects)
         {
             throw new NotImplementedException();
         }
-        public int UpdateLayers(IEnumerable<DbTreeRoot> layers)
+        public int UpdateRoots(IEnumerable<DbTreeRoot> layers)
         {
             throw new NotImplementedException();
         }
@@ -130,7 +130,7 @@ namespace Philadelphus.PostgreRepository.Repositories
         {
             throw new NotImplementedException();
         }
-        public int UpdateElements(IEnumerable<DbTreeLeave> elements)
+        public int UpdateLeaves(IEnumerable<DbTreeLeave> elements)
         {
             throw new NotImplementedException();
         }

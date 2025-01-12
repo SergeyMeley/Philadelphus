@@ -9,13 +9,17 @@ namespace Philadelphus.Business.Entities.MainEntities
 {
     public class TreeLeave : MainEntityBase
     {
-        public override EntityTypes entityType { get => EntityTypes.Leave; }
+        public override EntityTypes EntityType { get => EntityTypes.Leave; }
         public string Uuid { get; set; }
         public string Type { get; set; }
-        public IEnumerable<Attribute> Attributes { get; set; }
-        public TreeLeave(List<Attribute> attributes)
+        public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
+        public TreeLeave(string name, long id) : base(name, id)
         {
-            Attributes = attributes;
+            
+        }
+        public TreeLeave(string name, string path) : base(name, path)
+        {
+            
         }
     }
 }

@@ -5,9 +5,13 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philadelphus.InfrastructureEntities", "Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj", "{98CE8A14-579A-4A2F-8AC2-CCB3AA2983B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Business", "Philadelphus.Business\Philadelphus.Business.csproj", "{73464C87-9B2B-46A4-982D-6E2944F98DD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philadelphus.Business", "Philadelphus.Business\Philadelphus.Business.csproj", "{73464C87-9B2B-46A4-982D-6E2944F98DD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.PostgreRepository", "Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj", "{CA376FC5-ADAE-4A7D-B293-55F2A7998C00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philadelphus.PostgreRepository", "Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj", "{CA376FC5-ADAE-4A7D-B293-55F2A7998C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.WindowsFileSystemRepository", "Philadelphus.WindowsFileSystemRepository\Philadelphus.WindowsFileSystemRepository.csproj", "{14003B37-6549-4B50-952C-CD4C4D70221D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{2A47FA59-EB61-4DE1-AE2D-C2225AB08219}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{CA376FC5-ADAE-4A7D-B293-55F2A7998C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA376FC5-ADAE-4A7D-B293-55F2A7998C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA376FC5-ADAE-4A7D-B293-55F2A7998C00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14003B37-6549-4B50-952C-CD4C4D70221D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14003B37-6549-4B50-952C-CD4C4D70221D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14003B37-6549-4B50-952C-CD4C4D70221D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14003B37-6549-4B50-952C-CD4C4D70221D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A47FA59-EB61-4DE1-AE2D-C2225AB08219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A47FA59-EB61-4DE1-AE2D-C2225AB08219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A47FA59-EB61-4DE1-AE2D-C2225AB08219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A47FA59-EB61-4DE1-AE2D-C2225AB08219}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

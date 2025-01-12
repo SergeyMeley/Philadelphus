@@ -1,9 +1,4 @@
 ﻿using Philadelphus.InfrastructureEntities.MainEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
 {
@@ -11,28 +6,40 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
     {
         DbMainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]
-        IEnumerable<DbTreeRepository> SelectProjects();
-        IEnumerable<DbTreeRoot> SelectLayers();
-        IEnumerable<DbTreeNode> SelectNodes();
-        IEnumerable<DbTreeLeave> SelectElements();
+        public IEnumerable<DbTreeRepository> SelectRepositories(string configPath);
+        public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbAttribute> SelectAttributes(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbAttributeEntry> SelectAttributeEntries(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbAttributeValue> SelectAttributeValues(DbTreeRepository dbTreeRepository);
         #endregion
-        # region [ Insert ]
-        int InsertProjects(IEnumerable<DbTreeRepository> projects);
-        int InsertLayers(IEnumerable<DbTreeRoot> layers);
-        int InsertNodes(IEnumerable<DbTreeNode> nodes);
-        int InsertElements(IEnumerable<DbTreeLeave> elements);
+        #region [ Insert ]
+        public long InsertRepositories(IEnumerable<DbTreeRepository> repositories);
+        public long InsertRoots(IEnumerable<DbTreeRoot> roots);
+        public long InsertNodes(IEnumerable<DbTreeNode> nodes);
+        public long InsertLeaves(IEnumerable<DbTreeLeave> leaves);
+        public long InsertAttributes(IEnumerable<DbAttribute> attributes);
+        public long InsertAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries);
+        public long InsertAttributeValues(IEnumerable<DbAttributeValue> attributeValues);
         #endregion
-        # region [ Delete ]
-        int DeleteProjects(int[] ids);
-        int DeleteLayers(int[] ids);
-        int DeleteNodes(int[] ids);
-        int DeleteElements(int[] ids);
+        #region [ Delete ]
+        public long DeleteRepositories(IEnumerable<DbTreeRepository> repositories);
+        public long DeleteRoots(IEnumerable<DbTreeRoot> roots);
+        public long DeleteNodes(IEnumerable<DbTreeNode> nodes);
+        public long DeleteLeaves(IEnumerable<DbTreeLeave> leaves);
+        public long DeleteAttributes(IEnumerable<DbAttribute> attributes);
+        public long DeleteAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries);
+        public long DeleteAttributeValues(IEnumerable<DbAttributeValue> attributeValues);
         #endregion
-        # region [ Update ]
-        int UpdateProjects(IEnumerable<DbTreeRepository> projects);
-        int UpdateLayers(IEnumerable<DbTreeRoot> layers);
-        int UpdateNodes(IEnumerable<DbTreeNode> nodes);
-        int UpdateElements(IEnumerable<DbTreeLeave> elements);
+        #region [ Update ]
+        public long UpdateRepositories(IEnumerable<DbTreeRepository> repositories);
+        public long UpdateRoots(IEnumerable<DbTreeRoot> roots);
+        public long UpdateNodes(IEnumerable<DbTreeNode> nodes);
+        public long UpdateLeaves(IEnumerable<DbTreeLeave> leaves);
+        public long UpdateAttributes(IEnumerable<DbAttribute> attributes);
+        public long UpdateAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries);
+        public long UpdateAttributeValues(IEnumerable<DbAttributeValue> attributeValues);
         #endregion
     }
-}
+} 

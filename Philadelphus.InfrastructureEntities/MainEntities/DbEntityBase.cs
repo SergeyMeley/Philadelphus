@@ -10,6 +10,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public abstract class DbEntityBase : IDbEntity
     {
         public long Id { get; set; }
+        public string Path { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
@@ -31,6 +32,10 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         {
             Id = id;
             Name = name;
+        }
+        public DbEntityBase()
+        {
+            
         }
     }
 }
