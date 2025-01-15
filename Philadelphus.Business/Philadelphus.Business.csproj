@@ -8,7 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
+    <ProjectReference Include="..\Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />
+    <ProjectReference Include="..\Philadelphus.WindowsFileSystemRepository\Philadelphus.WindowsFileSystemRepository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\DbConnection\" />
   </ItemGroup>
 
 </Project>

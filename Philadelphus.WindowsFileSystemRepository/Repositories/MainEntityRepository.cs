@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
-    public class MainEntitiesRepository : IMainEntitiesRepository
+    public class MainEntityRepository : IMainEntitiesRepository
     {
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {

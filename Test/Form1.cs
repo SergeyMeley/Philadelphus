@@ -21,7 +21,7 @@ namespace Test
         {
             DataTreeRepositoryService repositoryListService = new DataTreeRepositoryService();
             TreeRepository treeRepository = new TreeRepository(NewPathTextBox.Text, NewPathTextBox.Text);
-            repositoryListService.AddRepository(treeRepository);
+            repositoryListService.CreateRepository(treeRepository);
         }
 
         private void LoadButton_Click(object sender, EventArgs e)

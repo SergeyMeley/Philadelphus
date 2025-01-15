@@ -14,6 +14,7 @@ namespace Philadelphus.Business.Entities.MainEntities
     {
         public override EntityTypes EntityType { get => EntityTypes.Root; }
         public string DirectoryPath { get; set; }
+        public InftastructureRepositoryTypes InftastructureRepositoryType { get; set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
         public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
         public TreeRoot(string name, long id) : base(name, id)
@@ -21,10 +22,6 @@ namespace Philadelphus.Business.Entities.MainEntities
 
         }
         public TreeRoot(string name, string path) : base(name, path)
-        {
-
-        }
-        public TreeRoot()
         {
 
         }

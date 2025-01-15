@@ -22,9 +22,5 @@ namespace Philadelphus.Business.Entities.MainEntities
         {
             
         }
-        public TreeRepository()
-        {
-            
-        }
     }
 }

@@ -21,9 +21,5 @@ namespace Philadelphus.Business.Entities.MainEntities
         {
 
         }
-        public Attribute()
-        {
-            
-        }
     }
 }

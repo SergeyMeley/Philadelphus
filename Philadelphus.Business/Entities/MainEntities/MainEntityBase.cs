@@ -41,9 +41,5 @@ namespace Philadelphus.Business.Entities.MainEntities
             Id = -1;
             Path = path;
         }
-        public MainEntityBase()
-        {
-            
-        }
     }
 }
