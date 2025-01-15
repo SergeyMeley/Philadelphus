@@ -9,8 +9,10 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public abstract class DbEntityBase : IDbEntity
     {
+        public Guid Guid { get; set; }
+        public Guid ParentGuid { get; set; }
         public long Id { get; set; }
-        public string Path { get; set; }
+        public string DirectoryPath { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
@@ -28,11 +30,6 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public string UpdatedContentBy { get; set; }
         public string DeletedOn { get; set; }
         public string DeletedBy { get; set; }
-        public DbEntityBase(long id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
         public DbEntityBase()
         {
             

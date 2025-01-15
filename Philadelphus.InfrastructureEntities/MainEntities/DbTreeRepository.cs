@@ -8,11 +8,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class DbTreeRepository : DbEntityBase
     {
-        public List<long> ChildTreeRootIds { get; set; }
-        public DbTreeRepository(long id, string name) : base(id, name)
-        {
-            ChildTreeRootIds = new List<long>();
-        }
+        public List<long> ChildTreeRootIds { get; set; } = new List<long>();
         public DbTreeRepository()
         {
             

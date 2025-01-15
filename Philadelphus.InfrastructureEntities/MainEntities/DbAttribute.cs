@@ -9,10 +9,10 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public class DbAttribute : DbEntityBase
     {
         public string ValueType { get; set; }
-        public IEnumerable<long> ValueIds { get; set; }
-        public DbAttribute(long id, string name) : base(id, name)
+        public List<long> ValueIds { get; set; } = new List<long>();
+        public DbAttribute()
         {
-            ValueIds = new List<long>();
+            
         }
     }
 }

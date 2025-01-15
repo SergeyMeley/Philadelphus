@@ -20,7 +20,8 @@ namespace Test
         private void AddButton_Click(object sender, EventArgs e)
         {
             DataTreeRepositoryService repositoryListService = new DataTreeRepositoryService();
-            TreeRepository treeRepository = new TreeRepository(NewPathTextBox.Text, NewPathTextBox.Text);
+            TreeRepository treeRepository = new TreeRepository(NewPathTextBox.Text, Guid.Empty);
+            treeRepository.DirectoryPath = NewPathTextBox.Text;
             repositoryListService.CreateRepository(treeRepository);
         }
 
@@ -34,7 +35,7 @@ namespace Test
             {
                 foreach (var repo in list)
                 {
-                    PathesListBox.Items.Add(repo.Path);
+                    PathesListBox.Items.Add(repo.DirectoryPath);
                 }
             }
             else 

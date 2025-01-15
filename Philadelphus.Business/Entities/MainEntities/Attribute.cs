@@ -13,11 +13,7 @@ namespace Philadelphus.Business.Entities.MainEntities
         public override EntityTypes EntityType { get => EntityTypes.Attribute; }
         public ValueTypes ValueType { get; set; }
         public IEnumerable<AttributeValue> Values { get; set; } = new List<AttributeValue>();
-        public Attribute(string name, long id) : base(name, id)
-        {
-
-        }
-        public Attribute(string name, string path) : base(name, path)
+        public Attribute(string name, Guid parentGuid) : base(name, parentGuid)
         {
 
         }

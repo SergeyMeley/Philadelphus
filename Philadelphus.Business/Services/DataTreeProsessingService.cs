@@ -72,18 +72,17 @@ namespace Philadelphus.Business.Services
             CurrentRepository = DataTreeRepositoryList.Where(x => x.Name == currentRepository.Name).Last();
             for (int i = 0; i < currentRepository.ChildTreeRoots.Count(); i++)
             {
-                var root = currentRepository.ChildTreeRoots.ToList()[i];
-                root = GetRootContent(root);
+                currentRepository.ChildTreeRoots.ToList()[i] = GetRootContent(currentRepository.ChildTreeRoots.ToList()[i]);
             }
             return CurrentRepository;
         }
         private TreeRoot GetRootContent(TreeRoot treeRoot) 
         {
             IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(treeRoot.InftastructureRepositoryType);
-            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverter.BusinessToDbRepository(CurrentRepository)).Where(x => x.Id == treeRoot.Id);
+            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverter.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
             for (int i = 0; i < treeRoot.ChildTreeNodes.Count(); i++)
             {
-                treeRoot.ChildTreeNodes.ToList()[i] = nodeCollection;
+                //treeRoot.ChildTreeNodes.ToList()[i] = InfrastructureConverter.DbToBusinessNode(nodeCollection);
             }
             return treeRoot;
         }
