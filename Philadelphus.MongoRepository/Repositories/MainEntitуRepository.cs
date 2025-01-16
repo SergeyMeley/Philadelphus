@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
@@ -13,6 +14,7 @@ namespace Philadelphus.MongoRepository.Repositories
 {
     public class MainEntitуRepository : IMainEntitiesRepository
     {
+        public InfrastructureRepositoryTypes InftastructureRepositoryTypes { get; } = InfrastructureRepositoryTypes.MongoDb;
         MongoClient _client;
         IMongoDatabase _database;
         public MainEntitуRepository()

@@ -28,7 +28,7 @@ namespace Test
         private void LoadButton_Click(object sender, EventArgs e)
         {
             DataTreeRepositoryService repositoryListService = new DataTreeRepositoryService();
-            
+
             PathesListBox.Items.Clear();
             var list = repositoryListService.GetRepositoryList();
             if (((List<TreeRepository>)list).Count > 0)
@@ -38,10 +38,15 @@ namespace Test
                     PathesListBox.Items.Add(repo.DirectoryPath);
                 }
             }
-            else 
+            else
             {
                 PathesListBox.Items.Add("Список репозиториев пуст");
             }
+        }
+
+        private void NewPathTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Philadelphus.InfrastructureEntities.MainEntities;
+﻿using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Philadelphus.PostgreRepository.Repositories
 {
     public class MainEntityRepository : IMainEntitiesRepository
     {
+        public InfrastructureRepositoryTypes InftastructureRepositoryTypes { get; } = InfrastructureRepositoryTypes.PostgreSql;
         private readonly Context _context;
         public MainEntityRepository()
         {
@@ -18,7 +20,7 @@ namespace Philadelphus.PostgreRepository.Repositories
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             DbMainEntitiesCollection collection = new DbMainEntitiesCollection();
-            collection.DbTreeRoots = (List<DbTreeRoot>)SelectRoots();
+            //collection.DbTreeRoots = (List<DbTreeRoot>)SelectRoots();
             collection.DbTreeNodes = (List<DbTreeNode>)SelectNodes();
             return collection;
         }
@@ -31,7 +33,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             {
                 while (reader.Read())
                 {
-                    var record = new DbTreeRepository(reader.GetInt32(0), reader.GetString(1));
+                    var record = new DbTreeRepository();
                     record.Name = reader.GetString(1);
                     if (!reader.IsDBNull(3))
                     {
@@ -50,7 +52,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             {
                 while (reader.Read())
                 {
-                    var record = new DbTreeRoot(reader.GetInt32(0), reader.GetString(1));
+                    var record = new DbTreeRoot();
                     record.Name = reader.GetString(1);
                     if (!reader.IsDBNull(2))
                     {

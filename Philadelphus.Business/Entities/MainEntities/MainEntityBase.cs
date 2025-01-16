@@ -10,10 +10,12 @@ namespace Philadelphus.Business.Entities.MainEntities
     public abstract class MainEntityBase : IMainEntity
     {
         public abstract EntityTypes EntityType { get; }
-        public Guid Guid { get; set; }
+        public Guid Guid { get; private set; }
         public Guid ParentGuid { get; set; }
         public long DbId { get; set; }
         public string DirectoryPath { get; set; }
+        public string DirectoryFullPath { get; set; }
+        public string ConfigPath { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
@@ -33,8 +35,16 @@ namespace Philadelphus.Business.Entities.MainEntities
         public string DeletedBy { get; set; }
         public MainEntityBase(string name, Guid parentGuid)
         {
+
             Guid = Guid.NewGuid();
             ParentGuid  = parentGuid;
+            Name = name;
+        }
+        public MainEntityBase(string name, Guid guid, Guid parentGuid)
+        {
+
+            Guid = guid;
+            ParentGuid = parentGuid;
             Name = name;
         }
     }

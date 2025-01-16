@@ -2,7 +2,7 @@
 
 namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
 {
-    public interface IMainEntitiesRepository
+    public interface IMainEntitiesRepository : IInfrastructureRepository
     {
         DbMainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]

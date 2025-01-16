@@ -1,4 +1,5 @@
-﻿using Philadelphus.InfrastructureEntities.MainEntities;
+﻿using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
     public class MainEntityRepository : IMainEntitiesRepository
     {
+        public InfrastructureRepositoryTypes InftastructureRepositoryTypes { get; } = InfrastructureRepositoryTypes.WindowsDirectory;
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             return null;

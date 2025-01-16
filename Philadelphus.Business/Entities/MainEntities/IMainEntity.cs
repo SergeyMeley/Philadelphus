@@ -10,10 +10,12 @@ namespace Philadelphus.Business.Entities.MainEntities
     public interface IMainEntity
     {
         public abstract EntityTypes EntityType { get; }
-        public Guid Guid { get; set; }
+        public Guid Guid { get; }
         public Guid ParentGuid { get; set; }
         public long DbId { get; set; }
         public string DirectoryPath { get; set; }
+        public string DirectoryFullPath { get; set; }
+        public string ConfigPath { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
@@ -11,18 +12,18 @@ namespace Philadelphus.Business.Factories
 {
     internal static class InfrastructureFactory
     {
-        internal static IMainEntitiesRepository CreateMainEntitiesRepositoriesFactory(InftastructureRepositoryTypes repositoryType)
+        internal static IMainEntitiesRepository CreateMainEntitiesRepositoriesFactory(InfrastructureRepositoryTypes repositoryType)
         {
             IMainEntitiesRepository mainEntitiesRepository;
             switch (repositoryType)
             {
-                case InftastructureRepositoryTypes.WindowsDirectory:
+                case InfrastructureRepositoryTypes.WindowsDirectory:
                     mainEntitiesRepository = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
                     break;
-                case InftastructureRepositoryTypes.PostgreSql:
+                case InfrastructureRepositoryTypes.PostgreSql:
                     mainEntitiesRepository = new PostgreRepository.Repositories.MainEntityRepository();
                     break;
-                case InftastructureRepositoryTypes.MongoDb:
+                case InfrastructureRepositoryTypes.MongoDb:
                     mainEntitiesRepository = new MongoRepository.Repositories.MainEntitуRepository();
                     break;
                 default:

@@ -13,7 +13,6 @@ namespace Philadelphus.Business.Helpers
         #region [Database to business entity]
         private static IMainEntity DbToBusinessMainProperties(IDbEntity dbEntity, IMainEntity businessEntity)
         {
-            businessEntity.Guid = dbEntity.Guid;
             businessEntity.ParentGuid = dbEntity.ParentGuid;
             businessEntity.DbId = dbEntity.Id;
             businessEntity.DirectoryPath = dbEntity.DirectoryPath;
@@ -38,8 +37,7 @@ namespace Philadelphus.Business.Helpers
         }
         internal static TreeRepository DbToBusinessRepository(DbTreeRepository repository)
         {
-            var result = (TreeRepository)DbToBusinessMainProperties(repository, new TreeRepository(repository.Name, repository.ParentGuid));
-            result.Guid = Guid.Empty;
+            var result = (TreeRepository)DbToBusinessMainProperties(repository, new TreeRepository(repository.Name, repository.Guid, repository.ParentGuid));
             return result;
         }
         internal static TreeRoot DbToBusinessRoot(DbTreeRoot root)
@@ -50,6 +48,16 @@ namespace Philadelphus.Business.Helpers
         internal static TreeNode DbToBusinessNode(DbTreeNode node)
         {
             var result = (TreeNode)DbToBusinessMainProperties(node, new TreeNode(node.Name, node.ParentGuid));
+            return result;
+        }
+        internal static TreeLeave DbToBusinessLeave(DbTreeLeave leave)
+        {
+            var result = (TreeLeave)DbToBusinessMainProperties(leave, new TreeLeave(leave.Name, leave.ParentGuid));
+            return result;
+        }
+        internal static Entities.MainEntities.Attribute DbToBusinessNode(DbAttribute attribute)
+        {
+            var result = (Entities.MainEntities.Attribute)DbToBusinessMainProperties(attribute, new Entities.MainEntities.Attribute(attribute.Name, attribute.ParentGuid));
             return result;
         }
         #endregion
@@ -82,7 +90,6 @@ namespace Philadelphus.Business.Helpers
         internal static DbTreeRepository BusinessToDbRepository(TreeRepository repository)
         {
             var result = (DbTreeRepository)BusinessToDbMainProperties(repository, new DbTreeRepository());
-            result.Guid = Guid.Empty;
             return result;
         }
         internal static DbTreeRoot BusinessToDbRoot(TreeRoot root)
@@ -93,6 +100,17 @@ namespace Philadelphus.Business.Helpers
         internal static DbTreeNode BusinessToDbNode(TreeNode node)
         {
             var result = (DbTreeNode)BusinessToDbMainProperties(node, new DbTreeNode());
+            return result;
+        }
+        internal static DbTreeLeave BusinessToDbLeave(TreeLeave leave)
+        {
+            var result = (DbTreeLeave)BusinessToDbMainProperties(leave, new DbTreeLeave());
+            result.Guid = Guid.Empty;
+            return result;
+        }
+        internal static DbAttribute BusinessToDbAttribute(Entities.MainEntities.Attribute attribute)
+        {
+            var result = (DbAttribute)BusinessToDbMainProperties(attribute, new DbAttribute());
             return result;
         }
         #endregion

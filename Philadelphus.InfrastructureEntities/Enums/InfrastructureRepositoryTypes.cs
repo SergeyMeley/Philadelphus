@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.Enums
+namespace Philadelphus.InfrastructureEntities.Enums
 {
-    public enum InftastructureRepositoryTypes
+    public enum InfrastructureRepositoryTypes
     {
         WindowsDirectory,
         PostgreSql,

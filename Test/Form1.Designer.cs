@@ -41,6 +41,7 @@
             NewPathTextBox.Name = "NewPathTextBox";
             NewPathTextBox.Size = new Size(392, 46);
             NewPathTextBox.TabIndex = 0;
+            NewPathTextBox.TextChanged += NewPathTextBox_TextChanged;
             // 
             // LoadButton
             // 

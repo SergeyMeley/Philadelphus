@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Philadelphus.Business.Entities.MainEntities
     {
         public override EntityTypes EntityType { get => EntityTypes.Root; }
         public string DirectoryPath { get; set; }
-        public InftastructureRepositoryTypes InftastructureRepositoryType { get; set; }
+        public InfrastructureRepositoryTypes InftastructureRepositoryType { get; set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
         public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
         public TreeRoot(string name, Guid parentGuid) : base(name, parentGuid)
