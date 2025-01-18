@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication"
+        xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
+        d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationViewModel}"
         mc:Ignorable="d"
         Title="Чубушник"
         MinHeight="500" MinWidth="1000"
@@ -325,10 +327,10 @@
                                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
-                                            <ComboBox Grid.Row="0" Grid.Column="0" Margin="2,2,2,2" ItemsSource="{Binding RepositoryList}"></ComboBox>
-                                            <Button Grid.Row="0" Grid.Column="1" Content="Создать" Margin="2,2,2,2"></Button>
+                                            <ComboBox Grid.Row="0" Grid.Column="0" Margin="2,2,2,2" ItemsSource="{Binding TreeRepositories, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTreeRepository}"></ComboBox>
+                                            <Button Grid.Row="0" Grid.Column="1" Content="Создать" Margin="2,2,2,2" Command="{Binding AddNewTreeRepositoryCommand}"></Button>
                                             <Button Grid.Row="0" Grid.Column="2" Content="Удалить" Margin="2,2,2,2"></Button>
-                                            <Button Grid.Row="0" Grid.Column="3" Content="Обновить список" Margin="2,2,2,2"></Button>
+                                            <Button Grid.Row="0" Grid.Column="3" Content="Обновить список" Margin="2,2,2,2" Command="{Binding RefreshRepositoryListCommand}"></Button>
                                         </Grid>
                                     </GroupBox>
                                     <Grid Grid.Row="1" Grid.Column="0">
@@ -354,9 +356,13 @@
                                                     <RowDefinition Height="30"></RowDefinition>
                                                     <RowDefinition></RowDefinition>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование"></TextBlock>
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание"></TextBlock>
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Локальный путь"></TextBlock>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" Margin="2,2,2,2"></TextBlock>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите наименование" Text="{Binding SelectedTreeRepository.Name}" Margin="2,2,2,2"></TextBox>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" Margin="2,2,2,2"></TextBlock>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите описание" Text="{Binding SelectedTreeRepository.Description}" Margin="2,2,2,2"></TextBox>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Локальный путь" Margin="2,2,2,2"></TextBlock>
+                                                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите путь" Text="{Binding SelectedTreeRepository.DirectoryPath}" Margin="2,2,2,2"></TextBox>
+                                                <Button Grid.Row="7" Grid.ColumnSpan="2" Command="{Binding SaveRepository}" Content="Сохранить" Margin="2,2,2,2"></Button>
                                             </Grid>
                                         </GroupBox>
                                         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
