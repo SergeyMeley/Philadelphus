@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class DbAttribute : DbEntityBase
+    public class DbEntityAttribute : DbEntityBase
     {
         public string ValueType { get; set; }
         public List<long> ValueIds { get; set; } = new List<long>();
-        public DbAttribute()
+        public DbEntityAttribute()
         {
             
         }

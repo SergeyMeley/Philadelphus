@@ -34,7 +34,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return null;
         }
-        public IEnumerable<DbAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
         {
             return null;
         }
@@ -64,7 +64,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long InsertAttributes(IEnumerable<DbAttribute> attributes)
+        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             return 0;
         }
@@ -94,7 +94,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long DeleteAttributes(IEnumerable<DbAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             return 0;
         }
@@ -124,7 +124,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long UpdateAttributes(IEnumerable<DbAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             return 0;
         }

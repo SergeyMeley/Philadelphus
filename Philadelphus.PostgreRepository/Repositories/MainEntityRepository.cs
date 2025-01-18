@@ -157,7 +157,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
@@ -192,7 +192,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public long InsertAttributes(IEnumerable<DbAttribute> attributes)
+        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             throw new NotImplementedException();
         }
@@ -227,7 +227,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributes(IEnumerable<DbAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             throw new NotImplementedException();
         }
@@ -262,7 +262,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributes(IEnumerable<DbAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             throw new NotImplementedException();
         }

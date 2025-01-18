@@ -27,7 +27,7 @@ namespace Philadelphus.Business.Services
             }
             set => CurrentRepository = value;
         }
-        public List<TreeRepository> DataTreeRepositoryList { get; } = new List<TreeRepository>();
+        public List<TreeRepository> DataTreeRepositoryList { get; private set; } = new List<TreeRepository>();
         private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
         private XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<DbTreeRepository>));
         public List<TreeRepository> GetRepositoryList()
@@ -45,15 +45,17 @@ namespace Philadelphus.Business.Services
                 if (dbRepositories != null)
                 {
                     var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
-                    foreach (var item in dbRepositories)
-                    {
-                        DataTreeRepositoryList.Add(repositoryInfrastructureConverter.DbToBusinessEntity(item));
-                    }
+                    DataTreeRepositoryList = (List<TreeRepository>)repositoryInfrastructureConverter.DbToBusinessEntityCollection(dbRepositories);
                 }
                 return DataTreeRepositoryList;
             }
         }
-        public void SaveRepository(TreeRepository repository)
+        public TreeRepository CreateRepository()
+        {
+            CurrentRepository = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
+            return CurrentRepository;
+        }
+        public void ModifyRepository(TreeRepository repository)
         {
             GetRepositoryList();
 
@@ -61,15 +63,14 @@ namespace Philadelphus.Business.Services
                 
             using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
             {
-                var result = new List<DbTreeRepository>();
-                var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
                 foreach (var item in DataTreeRepositoryList)
                 {
                     item.DirectoryFullPath = Path.Join(new string[] { item.DirectoryPath, Path.DirectorySeparatorChar.ToString(), item.Name });
                     item.ConfigPath = Path.Join(new string[] { item.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
-                    SaveTreeEntities(item);
-                    result.Add(repositoryInfrastructureConverter.BusinessToDbEntities(item));
                 }
+                SaveTreeEntities(DataTreeRepositoryList);
+                var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
+                var result = repositoryInfrastructureConverter.BusinessToDbEntityCollection(DataTreeRepositoryList);
                 xmlSerializer.Serialize(fs, result);
             }
         }
@@ -151,12 +152,10 @@ namespace Philadelphus.Business.Services
                         infrastructureRepository = null;
                         break;
                 }
-                var list = new List<TreeRepository>();
-                list.Add(currentRepository);
                 var nodeInfrastructureConverter = new NodeInfrastructureConverter();
-                _dbMainEntitiesCollection.DbTreeNodes = infrastructureRepository.SelectNodes(nodeInfrastructureConverter.BusinessToDbEntityCollection(list));
+                _dbMainEntitiesCollection.DbTreeNodes = infrastructureRepository.SelectNodes((DbTreeRepository)nodeInfrastructureConverter.BusinessToDbEntity(currentRepository));
                 var leaveInfrastructureConverter = new LeaveInfrastructureConverter();
-                _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves(leaveInfrastructureConverter.BusinessToDbEntityCollection(list));
+                _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves((DbTreeRepository)nodeInfrastructureConverter.BusinessToDbEntity(currentRepository));
             }
             CurrentRepository = DataTreeRepositoryList.Where(x => x.Guid == currentRepository.Guid).Last();
             using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
@@ -176,29 +175,29 @@ namespace Philadelphus.Business.Services
             }
             for (int i = 0; i < currentRepository.ChildTreeRoots.Count(); i++)
             {
-                currentRepository.ChildTreeRoots.ToList()[i] = GetRootContent(currentRepository.ChildTreeRoots.ToList()[i]);
+                //currentRepository.ChildTreeRoots.ToList()[i] = GetRootContent(currentRepository.ChildTreeRoots.ToList()[i]);
             }
             return CurrentRepository;
         }
-        private TreeRoot GetRootContent(TreeRoot treeRoot) 
-        {
-            IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(treeRoot.InftastructureRepositoryType);
-            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
-            for (int i = 0; i < nodeCollection.Count(); i++)
-            {
-                //treeRoot.ChildTreeNodes.ToList()[i] = InfrastructureConverter.DbToBusinessNode(nodeCollection.ToList()[i]);
-            }
-            return treeRoot;
-        }
-        private TreeNode GetNodeContent(TreeNode treeNode)
-        {
-            IMainEntitiesRepository infrastructureRepository = new MongoRepository.Repositories.MainEntitуRepository();
-            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
-            for (int i = 0; i < nodeCollection.Count(); i++)
-            {
-                treeNode.ChildTreeNodes.ToList()[i] = InfrastructureConverterBase.DbToBusinessNode(nodeCollection.ToList()[i]);
-            }
-            return treeNode;
-        }
+        //private TreeRoot GetRootContent(TreeRoot treeRoot) 
+        //{
+        //    IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(treeRoot.InftastructureRepositoryType);
+        //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
+        //    for (int i = 0; i < nodeCollection.Count(); i++)
+        //    {
+        //        //treeRoot.ChildTreeNodes.ToList()[i] = InfrastructureConverter.DbToBusinessNode(nodeCollection.ToList()[i]);
+        //    }
+        //    return treeRoot;
+        //}
+        //private TreeNode GetNodeContent(TreeNode treeNode)
+        //{
+        //    IMainEntitiesRepository infrastructureRepository = new MongoRepository.Repositories.MainEntitуRepository();
+        //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
+        //    for (int i = 0; i < nodeCollection.Count(); i++)
+        //    {
+        //        treeNode.ChildTreeNodes.ToList()[i] = InfrastructureConverterBase.DbToBusinessNode(nodeCollection.ToList()[i]);
+        //    }
+        //    return treeNode;
+        //}
     }
 }

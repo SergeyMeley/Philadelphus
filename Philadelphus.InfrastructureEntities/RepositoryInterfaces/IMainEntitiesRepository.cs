@@ -10,7 +10,7 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
         public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository);
         public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository);
         public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository);
-        public IEnumerable<DbAttribute> SelectAttributes(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository);
         public IEnumerable<DbAttributeEntry> SelectAttributeEntries(DbTreeRepository dbTreeRepository);
         public IEnumerable<DbAttributeValue> SelectAttributeValues(DbTreeRepository dbTreeRepository);
         #endregion
@@ -19,7 +19,7 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
         public long InsertRoots(IEnumerable<DbTreeRoot> roots);
         public long InsertNodes(IEnumerable<DbTreeNode> nodes);
         public long InsertLeaves(IEnumerable<DbTreeLeave> leaves);
-        public long InsertAttributes(IEnumerable<DbAttribute> attributes);
+        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes);
         public long InsertAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries);
         public long InsertAttributeValues(IEnumerable<DbAttributeValue> attributeValues);
         #endregion
@@ -28,7 +28,7 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
         public long DeleteRoots(IEnumerable<DbTreeRoot> roots);
         public long DeleteNodes(IEnumerable<DbTreeNode> nodes);
         public long DeleteLeaves(IEnumerable<DbTreeLeave> leaves);
-        public long DeleteAttributes(IEnumerable<DbAttribute> attributes);
+        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes);
         public long DeleteAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries);
         public long DeleteAttributeValues(IEnumerable<DbAttributeValue> attributeValues);
         #endregion
@@ -37,7 +37,7 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
         public long UpdateRoots(IEnumerable<DbTreeRoot> roots);
         public long UpdateNodes(IEnumerable<DbTreeNode> nodes);
         public long UpdateLeaves(IEnumerable<DbTreeLeave> leaves);
-        public long UpdateAttributes(IEnumerable<DbAttribute> attributes);
+        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes);
         public long UpdateAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries);
         public long UpdateAttributeValues(IEnumerable<DbAttributeValue> attributeValues);
         #endregion

@@ -12,15 +12,15 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbAttribute)BusinessToDbMainProperties(businessEntity);
+            var result = (DbEntityAttribute)BusinessToDbMainProperties(businessEntity);
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
         {
-            var result = new List<DbAttribute>();
+            var result = new List<DbEntityAttribute>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbAttribute)BusinessToDbMainProperties(businessEntity);
+                var entity = (DbEntityAttribute)BusinessToDbMainProperties(businessEntity);
                 result.Add(entity);
             }
             return result;

@@ -63,9 +63,9 @@ namespace Philadelphus.MongoRepository.Repositories
 
             return result;
         }
-        public IEnumerable<DbAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
         {
-            var result = new List<DbAttribute>();
+            var result = new List<DbEntityAttribute>();
             var repositories = _database.GetCollection<BsonDocument>("attributes");
 
             return result;
@@ -117,7 +117,7 @@ namespace Philadelphus.MongoRepository.Repositories
             long result = new long();
             return result;
         }
-        public long InsertAttributes(IEnumerable<DbAttribute> attributes)
+        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             long result = new long();
             return result;
@@ -154,7 +154,7 @@ namespace Philadelphus.MongoRepository.Repositories
             long result = new long();
             return result;
         }
-        public long DeleteAttributes(IEnumerable<DbAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             long result = new long();
             return result;
@@ -191,7 +191,7 @@ namespace Philadelphus.MongoRepository.Repositories
             long result = new long();
             return result;
         }
-        public long UpdateAttributes(IEnumerable<DbAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
             long result = new long();
             return result;
