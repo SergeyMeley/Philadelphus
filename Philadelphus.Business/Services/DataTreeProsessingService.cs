@@ -2,7 +2,6 @@
 using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Factories;
-using Philadelphus.Business.Helpers;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.Business.Helpers.InfrastructureConverters;
 
 namespace Philadelphus.Business.Services
 {
@@ -28,7 +28,7 @@ namespace Philadelphus.Business.Services
             set => CurrentRepository = value;
         }
         public List<TreeRepository> DataTreeRepositoryList { get; } = new List<TreeRepository>();
-        private DbMainEntitiesCollection _dbMainEntitiesCollection;
+        private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
         private XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<DbTreeRepository>));
         public List<TreeRepository> GetRepositoryList()
         {
@@ -44,15 +44,16 @@ namespace Philadelphus.Business.Services
                 }
                 if (dbRepositories != null)
                 {
+                    var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
                     foreach (var item in dbRepositories)
                     {
-                        DataTreeRepositoryList.Add(InfrastructureConverter.DbToBusinessRepository(item));
+                        DataTreeRepositoryList.Add(repositoryInfrastructureConverter.DbToBusinessEntity(item));
                     }
                 }
                 return DataTreeRepositoryList;
             }
         }
-        public void CreateRepository(TreeRepository repository)
+        public void SaveRepository(TreeRepository repository)
         {
             GetRepositoryList();
 
@@ -61,43 +62,80 @@ namespace Philadelphus.Business.Services
             using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
             {
                 var result = new List<DbTreeRepository>();
+                var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
                 foreach (var item in DataTreeRepositoryList)
                 {
-                    item.DirectoryFullPath = item.DirectoryPath + Path.DirectorySeparatorChar.ToString() + item.Name;
-                    if (!Directory.Exists(item.DirectoryFullPath))
-                    {
-                        try
-                        {
-                            Directory.CreateDirectory(item.DirectoryFullPath);
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    }
-                    item.ConfigPath = item.DirectoryFullPath + Path.DirectorySeparatorChar.ToString() + ".repository";
-                    if (!File.Exists(item.ConfigPath))
-                    {
-                        try
-                        {
-                            File.Create(item.ConfigPath);
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    }
-                    result.Add(InfrastructureConverter.BusinessToDbRepository(item));
+                    item.DirectoryFullPath = Path.Join(new string[] { item.DirectoryPath, Path.DirectorySeparatorChar.ToString(), item.Name });
+                    item.ConfigPath = Path.Join(new string[] { item.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
+                    SaveTreeEntities(item);
+                    result.Add(repositoryInfrastructureConverter.BusinessToDbEntities(item));
                 }
                 xmlSerializer.Serialize(fs, result);
             }
         }
+        public void SaveTreeEntities(IEnumerable<IMainEntity> entities)
+        {
+            foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
+            {
+                var infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(entities.Last().InfrastructureRepositoryType);
+                //RepositoryInfrastructureConverter
+                //var dbEntityList = new List<IDbEntity>();
+                //foreach (var entity in entities.Where(x => x.EntityType == entityType))
+                //{
+                //    //dbEntityList.Add(InfrastructureConverterBase.);
+                //}
+                //switch (entityType)
+                //{
+                //    case EntityTypes.None:
+                //        break;
+                //    case EntityTypes.Repository:
+                //        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)dbEntityList);
+                //        break;
+                //    case EntityTypes.Root:
+                //        infrastructureRepository.UpdateRoots((List<DbTreeRoot>)dbEntityList);
+                //        break;
+                //    case EntityTypes.Node:
+                //        infrastructureRepository.UpdateNodes((List<DbTreeNode>)dbEntityList);
+                //        break;
+                //    case EntityTypes.Leave:
+                //        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)dbEntityList);
+                //        break;
+                //    case EntityTypes.Attribute:
+                //        infrastructureRepository.UpdateAttributes((List<DbAttribute>)dbEntityList);
+                //        break;
+                //    default:
+                //        break;
+                //}
+            }
+            // Проверяем указанный путь. Если его нет, пробуем создать.
+            //if (!Directory.Exists(item.DirectoryFullPath))
+            //{
+            //    try
+            //    {
+            //        Directory.CreateDirectory(item.DirectoryFullPath);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        throw new Exception("Ошибка создания директории, проверьте указанный путь");
+            //    }
+            //    if (!File.Exists(item.ConfigPath))
+            //    {
+            //        try
+            //        {
+            //            File.Create(item.ConfigPath);
+            //        }
+            //        catch (Exception)
+            //        {
+            //            throw new Exception("Ошибка создания элемента, проверьте указанный путь");
+            //        }
+            //    }
+            //}
+        }
         private TreeRepository GetRepositoryContent(TreeRepository currentRepository)
         {
-            _dbMainEntitiesCollection = new DbMainEntitiesCollection();
             foreach (var item in CurrentRepository.InfrastructureRepositories)
             {
-                IInfrastructureRepository infrastructureRepository;
+                IMainEntitiesRepository infrastructureRepository;
                 switch (item.InftastructureRepositoryTypes)
                 {
                     case InfrastructureRepositoryTypes.WindowsDirectory:
@@ -110,8 +148,15 @@ namespace Philadelphus.Business.Services
                         infrastructureRepository = new MongoRepository.Repositories.MainEntitуRepository();
                         break;
                     default:
+                        infrastructureRepository = null;
                         break;
                 }
+                var list = new List<TreeRepository>();
+                list.Add(currentRepository);
+                var nodeInfrastructureConverter = new NodeInfrastructureConverter();
+                _dbMainEntitiesCollection.DbTreeNodes = infrastructureRepository.SelectNodes(nodeInfrastructureConverter.BusinessToDbEntityCollection(list));
+                var leaveInfrastructureConverter = new LeaveInfrastructureConverter();
+                _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves(leaveInfrastructureConverter.BusinessToDbEntityCollection(list));
             }
             CurrentRepository = DataTreeRepositoryList.Where(x => x.Guid == currentRepository.Guid).Last();
             using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
@@ -138,7 +183,7 @@ namespace Philadelphus.Business.Services
         private TreeRoot GetRootContent(TreeRoot treeRoot) 
         {
             IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(treeRoot.InftastructureRepositoryType);
-            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverter.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
+            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
             for (int i = 0; i < nodeCollection.Count(); i++)
             {
                 //treeRoot.ChildTreeNodes.ToList()[i] = InfrastructureConverter.DbToBusinessNode(nodeCollection.ToList()[i]);
@@ -148,10 +193,10 @@ namespace Philadelphus.Business.Services
         private TreeNode GetNodeContent(TreeNode treeNode)
         {
             IMainEntitiesRepository infrastructureRepository = new MongoRepository.Repositories.MainEntitуRepository();
-            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverter.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
+            var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
             for (int i = 0; i < nodeCollection.Count(); i++)
             {
-                treeNode.ChildTreeNodes.ToList()[i] = InfrastructureConverter.DbToBusinessNode(nodeCollection.ToList()[i]);
+                treeNode.ChildTreeNodes.ToList()[i] = InfrastructureConverterBase.DbToBusinessNode(nodeCollection.ToList()[i]);
             }
             return treeNode;
         }

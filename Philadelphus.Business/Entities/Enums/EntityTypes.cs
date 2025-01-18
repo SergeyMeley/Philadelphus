@@ -13,6 +13,6 @@ namespace Philadelphus.Business.Entities.Enums
         Root,
         Node,
         Leave,
-        Attribute
+        Attribute,
     }
 }

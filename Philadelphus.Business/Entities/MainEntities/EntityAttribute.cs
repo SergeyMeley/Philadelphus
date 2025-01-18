@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.InfrastructureEntities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class Attribute : MainEntityBase
+    public class EntityAttribute : MainEntityBase
     {
-        public override EntityTypes EntityType { get => EntityTypes.Attribute; }
+        public override EntityTypes EntityType { get => EntityTypes.None; }
+        public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public ValueTypes ValueType { get; set; }
         public IEnumerable<AttributeValue> Values { get; set; } = new List<AttributeValue>();
-        public Attribute(string name, Guid parentGuid) : base(name, parentGuid)
+        public EntityAttribute(string name, Guid parentGuid) : base(name, parentGuid)
         {
 
         }

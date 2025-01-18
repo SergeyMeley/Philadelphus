@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.InfrastructureEntities.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class AttributeValue
+    public class AttributeValue : MainEntityBase
     {
+        public override EntityTypes EntityType { get => EntityTypes.None; }
+        public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
+        public AttributeValue(string name, Guid parentGuid) : base(name, parentGuid)
+        {
+
+        }
     }
 }

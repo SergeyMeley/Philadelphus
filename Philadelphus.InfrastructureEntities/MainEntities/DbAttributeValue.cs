@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class DbAttributeValue
+    public class DbAttributeValue : DbEntityBase
     {
     }
 }

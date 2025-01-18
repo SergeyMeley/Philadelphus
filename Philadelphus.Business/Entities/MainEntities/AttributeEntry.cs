@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.InfrastructureEntities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,9 @@ namespace Philadelphus.Business.Entities.MainEntities
     public class AttributeEntry : MainEntityBase
     {
         public override EntityTypes EntityType { get => EntityTypes.None; }
-        public Attribute Attribute { get; set; }
-        public AttributeValue AttributeValue { get; set; } = new AttributeValue();
+        public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
+        public EntityAttribute Attribute { get; set; }
+        public AttributeValue AttributeValue { get; set; }
         public long EntityId { get; set; }
         public AttributeEntry(string name, Guid parentGuid) : base(name, parentGuid)
         {

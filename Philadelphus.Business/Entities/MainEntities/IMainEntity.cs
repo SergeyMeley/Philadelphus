@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.InfrastructureEntities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ namespace Philadelphus.Business.Entities.MainEntities
 {
     public interface IMainEntity
     {
-        public abstract EntityTypes EntityType { get; }
+        public EntityTypes EntityType { get; }
+        public InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public Guid Guid { get; }
         public Guid ParentGuid { get; set; }
         public long DbId { get; set; }
