@@ -12,7 +12,7 @@ namespace Philadelphus.Business.Factories
 {
     internal static class InfrastructureFactory
     {
-        internal static IMainEntitiesRepository CreateMainEntitiesRepositoriesFactory(InfrastructureRepositoryTypes repositoryType)
+        internal static IMainEntitiesRepository GetMainEntitiesInfrastructure(InfrastructureRepositoryTypes repositoryType)
         {
             IMainEntitiesRepository mainEntitiesRepository;
             switch (repositoryType)
@@ -27,7 +27,7 @@ namespace Philadelphus.Business.Factories
                     mainEntitiesRepository = new MongoRepository.Repositories.MainEntitуRepository();
                     break;
                 default:
-                    mainEntitiesRepository = null;
+                    throw new Exception($"Неизвестная инфраструктура ({repositoryType.ToString()}), измените настройки и повторите попытку.");
                     break;
             }
             return mainEntitiesRepository;

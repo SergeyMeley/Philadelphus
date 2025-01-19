@@ -9,10 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
+using System.Xml.Serialization;
 
 namespace Philadelphus.Business.Services
 {
@@ -27,111 +26,154 @@ namespace Philadelphus.Business.Services
             }
             set => CurrentRepository = value;
         }
-        public List<TreeRepository> DataTreeRepositoryList { get; private set; } = new List<TreeRepository>();
+        public List<TreeRepository> DataTreeRepositories { get; private set; } = new List<TreeRepository>();
         private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
-        private XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<DbTreeRepository>));
-        public List<TreeRepository> GetRepositoryList()
+        public List<TreeRepository> GetRepositories()
         {
-            using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
+            var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
+            GeneralSettings.RepositoryPathList = (List<string>)infrastructure.SelectRepositoryList(GeneralSettings.RepositoryListPath);
+            if (GeneralSettings.RepositoryPathList != null)
             {
-                var dbRepositories = new List<DbTreeRepository>();
-                try
-                {
-                    dbRepositories = xmlSerializer.Deserialize(fs) as List<DbTreeRepository>;
-                }
-                catch (Exception ex)
-                {
-                }
-                if (dbRepositories != null)
-                {
-                    var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
-                    DataTreeRepositoryList = (List<TreeRepository>)repositoryInfrastructureConverter.DbToBusinessEntityCollection(dbRepositories);
-                }
-                return DataTreeRepositoryList;
+                
+                var dbRepositories = (List<DbTreeRepository>)infrastructure.SelectRepositories(GeneralSettings.RepositoryPathList);
+                var converter = new RepositoryInfrastructureConverter();
+                DataTreeRepositories = converter.DbToBusinessEntityCollection(dbRepositories);
             }
+            return DataTreeRepositories;
         }
+        public List<TreeRepository> AddRepository(TreeRepository repository)
+        {
+            // Добавление пути к папке и файлу репозитория
+            repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
+            repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
+            // Получение текущего списка репозиториев и добавление туда нового
+            DataTreeRepositories = GetRepositories();
+            DataTreeRepositories.Add(repository);
+            // Создания нового репозитория
+            var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
+            using (var repofs = new FileStream(repository.ConfigPath, FileMode.OpenOrCreate))
+            {
+                repositoryXmlSerializer.Serialize(repofs, repository);
+            }
+            // Дополнение списка репозиториев в настроечном файле
+            GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
+            var listXmlSerializer = new XmlSerializer(typeof(List<string>));
+            using (var fs = new FileStream(GeneralSettings.RepositoryListPath, FileMode.OpenOrCreate))
+            {
+                listXmlSerializer.Serialize(fs, GeneralSettings.RepositoryPathList);
+            }
+            return GetRepositories();
+        }
+        public List<TreeRepository> ModifyRepository(TreeRepository repository)
+        {
+            return AddRepository(repository);
+            //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
+            //{
+            //    xmlSerializer.Serialize(fs, RepositoryPathList);
+            //}
+            //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
+            //{
+            //    //var dbRepositories = new List<DbTreeRepository>();
+            //    try
+            //    {
+            //        RepositoryPathList = xmlSerializer.Deserialize(fs) as List<string>;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //    }
+            //    if (RepositoryPathList != null)
+            //    {
+            //        var repositoryXmlSerializer = new XmlSerializer(typeof(List<string>));
+            //        foreach (var item in RepositoryPathList)
+            //        {
+            //        }
+            //        //var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
+            //        //DataTreeRepositories = (List<TreeRepository>)repositoryInfrastructureConverter.DbToBusinessEntityCollection(dbRepositories);
+            //    }
+            //    return GetRepositories();
+            //}
+        }
+        /// <summary>
+        /// Создание нового пустого репозитория.
+        /// </summary>
+        /// <returns></returns>
         public TreeRepository CreateRepository()
         {
             CurrentRepository = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
             return CurrentRepository;
         }
-        public void ModifyRepository(TreeRepository repository)
-        {
-            GetRepositoryList();
-
-            DataTreeRepositoryList.Add(repository);
-                
-            using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
-            {
-                foreach (var item in DataTreeRepositoryList)
-                {
-                    item.DirectoryFullPath = Path.Join(new string[] { item.DirectoryPath, Path.DirectorySeparatorChar.ToString(), item.Name });
-                    item.ConfigPath = Path.Join(new string[] { item.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
-                }
-                SaveTreeEntities(DataTreeRepositoryList);
-                var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
-                var result = repositoryInfrastructureConverter.BusinessToDbEntityCollection(DataTreeRepositoryList);
-                xmlSerializer.Serialize(fs, result);
-            }
-        }
-        public void SaveTreeEntities(IEnumerable<IMainEntity> entities)
+        /// <summary>
+        /// Сохранение измененного репозитория.
+        /// </summary>
+        /// <param name="entity"></param>
+        //public void SaveRepository(TreeRepository repository)
+        //{
+        //    DataTreeRepositories = GetRepositories();
+        //    bool availableInList = false;
+        //    for (int i = 0; i < DataTreeRepositories.Count; i++)
+        //    {
+        //        if (DataTreeRepositories[i].Guid == repository.Guid)
+        //        {
+        //            DataTreeRepositories[i] = repository;
+        //            availableInList = true;
+        //        }
+        //    }
+        //    if (!availableInList)
+        //    {
+        //        DataTreeRepositories.Add(repository);
+        //    }
+        //    foreach (var item in DataTreeRepositories)
+        //    {
+        //        item.DirectoryFullPath = Path.Join(new string[] { item.DirectoryPath, Path.DirectorySeparatorChar.ToString(), item.Name });
+        //        item.ConfigPath = Path.Join(new string[] { item.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
+        //    }
+        //    UpdateEntities(DataTreeRepositories);
+            
+        //}
+        private void UpdateEntities(IEnumerable<IMainEntity> entities)
         {
             foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
             {
-                var infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(entities.Last().InfrastructureRepositoryType);
-                //RepositoryInfrastructureConverter
-                //var dbEntityList = new List<IDbEntity>();
-                //foreach (var entity in entities.Where(x => x.EntityType == entityType))
-                //{
-                //    //dbEntityList.Add(InfrastructureConverterBase.);
-                //}
-                //switch (entityType)
-                //{
-                //    case EntityTypes.None:
-                //        break;
-                //    case EntityTypes.Repository:
-                //        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)dbEntityList);
-                //        break;
-                //    case EntityTypes.Root:
-                //        infrastructureRepository.UpdateRoots((List<DbTreeRoot>)dbEntityList);
-                //        break;
-                //    case EntityTypes.Node:
-                //        infrastructureRepository.UpdateNodes((List<DbTreeNode>)dbEntityList);
-                //        break;
-                //    case EntityTypes.Leave:
-                //        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)dbEntityList);
-                //        break;
-                //    case EntityTypes.Attribute:
-                //        infrastructureRepository.UpdateAttributes((List<DbAttribute>)dbEntityList);
-                //        break;
-                //    default:
-                //        break;
-                //}
+                var infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(entities.Last().InfrastructureRepositoryType);
+                InfrastructureConverterBase converter;
+                switch (entityType)
+                {
+                    case EntityTypes.None:
+                        break;
+                    case EntityTypes.Repository:
+                        converter = new RepositoryInfrastructureConverter();
+                        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)converter.BusinessToDbEntityCollection(entities));
+                        break;
+                    case EntityTypes.Root:
+                        converter = new RootInfrastructureConverter();
+                        infrastructureRepository.UpdateRoots((List<DbTreeRoot>)converter.BusinessToDbEntityCollection(entities));
+                        break;
+                    case EntityTypes.Node:
+                        converter = new NodeInfrastructureConverter();
+                        infrastructureRepository.UpdateNodes((List<DbTreeNode>)converter.BusinessToDbEntityCollection(entities));
+                        break;
+                    case EntityTypes.Leave:
+                        converter = new LeaveInfrastructureConverter();
+                        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)converter.BusinessToDbEntityCollection(entities));
+                        break;
+                    case EntityTypes.Attribute:
+                        converter = new AttributeInfrastructureConverter();
+                        infrastructureRepository.UpdateAttributes((List<DbEntityAttribute>)converter.BusinessToDbEntityCollection(entities));
+                        break;
+                    default:
+                        break;
+                }
             }
-            // Проверяем указанный путь. Если его нет, пробуем создать.
-            //if (!Directory.Exists(item.DirectoryFullPath))
-            //{
-            //    try
-            //    {
-            //        Directory.CreateDirectory(item.DirectoryFullPath);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        throw new Exception("Ошибка создания директории, проверьте указанный путь");
-            //    }
-            //    if (!File.Exists(item.ConfigPath))
-            //    {
-            //        try
-            //        {
-            //            File.Create(item.ConfigPath);
-            //        }
-            //        catch (Exception)
-            //        {
-            //            throw new Exception("Ошибка создания элемента, проверьте указанный путь");
-            //        }
-            //    }
-            //}
         }
+
+
+
+
+
+
+
+
+
         private TreeRepository GetRepositoryContent(TreeRepository currentRepository)
         {
             foreach (var item in CurrentRepository.InfrastructureRepositories)
@@ -157,7 +199,7 @@ namespace Philadelphus.Business.Services
                 var leaveInfrastructureConverter = new LeaveInfrastructureConverter();
                 _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves((DbTreeRepository)nodeInfrastructureConverter.BusinessToDbEntity(currentRepository));
             }
-            CurrentRepository = DataTreeRepositoryList.Where(x => x.Guid == currentRepository.Guid).Last();
+            CurrentRepository = DataTreeRepositories.Where(x => x.Guid == currentRepository.Guid).Last();
             using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
             {
                 //var dbRepository = new DbTreeRepository();
@@ -181,7 +223,7 @@ namespace Philadelphus.Business.Services
         }
         //private TreeRoot GetRootContent(TreeRoot treeRoot) 
         //{
-        //    IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.CreateMainEntitiesRepositoriesFactory(treeRoot.InftastructureRepositoryType);
+        //    IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(treeRoot.InftastructureRepositoryType);
         //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
         //    for (int i = 0; i < nodeCollection.Count(); i++)
         //    {

@@ -6,7 +6,7 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
     {
         DbMainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]
-        public IEnumerable<DbTreeRepository> SelectRepositories(string configPath);
+        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes);
         public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository);
         public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository);
         public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository);

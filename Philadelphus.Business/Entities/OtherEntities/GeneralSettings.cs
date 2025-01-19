@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.OtherEntities
 {
-    public class GeneralSettings
+    public static class GeneralSettings
     {
-        public string RepositoryListPath { get => @"C:\Users\MeleychukSV\Documents\Philadelphus\Repositories.xml"; set => RepositoryListPath = value; }
+        public static string RepositoryListPath { get => @"C:\Users\MeleychukSV\Documents\Philadelphus\Repositories.xml"; set => RepositoryListPath = value; }
+        public static List<string> RepositoryPathList { get; set; } = new List<string>();
     }
 }

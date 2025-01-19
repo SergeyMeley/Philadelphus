@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
@@ -17,10 +18,38 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             return null;
         }
         # region [ Select ]
-        public IEnumerable<DbTreeRepository> SelectRepositories(string configPath)
+        public IEnumerable<string> SelectRepositoryList(string configPath)
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo(configPath);
-            return null;
+            var list = new List<string>();
+            var listXmlSerializer = new XmlSerializer(typeof(List<string>));
+            using (var fs = new FileStream(configPath, FileMode.OpenOrCreate))
+            {
+                try
+                {
+                    list = listXmlSerializer.Deserialize(fs) as List<string>;
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            return list;
+        }
+        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
+        {
+            var list = new List<DbTreeRepository>();
+            foreach (var item in pathes)
+            {
+                if (File.Exists(item))
+                {
+                    var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
+                    using (var repofs = new FileStream(item, FileMode.OpenOrCreate))
+                    {
+                        var repo = repositoryXmlSerializer.Deserialize(repofs) as DbTreeRepository;
+                        list.Add(repo);
+                    }
+                }
+            }
+            return list;
         }
         public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository)
         {
@@ -50,31 +79,58 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         #region [ Insert ]
         public long InsertRepositories(IEnumerable<DbTreeRepository> repositories)
         {
-            return 0;
+            foreach (var item in repositories)
+            {
+                // Проверяем указанный путь.Если его нет, пробуем создать.
+                if (!Directory.Exists(item.DirectoryFullPath))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(item.DirectoryFullPath);
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Ошибка создания директории, проверьте указанный путь");
+                    }
+                    // Проверяем налчие файла.Если его нет, пробуем создать.
+                    if (!File.Exists(item.ConfigPath))
+                    {
+                        try
+                        {
+                            File.Create(item.ConfigPath);
+                        }
+                        catch (Exception)
+                        {
+                            throw new Exception("Ошибка создания элемента, проверьте указанный путь");
+                        }
+                    }
+                }
+            }
+            return repositories.Count();
         }
         public long InsertRoots(IEnumerable<DbTreeRoot> roots)
         {
-            return 0;
+            return roots.Count();
         }
         public long InsertNodes(IEnumerable<DbTreeNode> nodes)
         {
-            return 0;
+            return nodes.Count();
         }
         public long InsertLeaves(IEnumerable<DbTreeLeave> leaves)
         {
-            return 0;
+            return leaves.Count();
         }
         public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
         {
-            return 0;
+            return attributes.Count();
         }
         public long InsertAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
         {
-            return 0;
+            return attributeEntries.Count();
         }
         public long InsertAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
         {
-            return 0;
+            return attributeValues.Count();
         }
         #endregion
         #region [ Delete ]
@@ -110,6 +166,32 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         #region [ Update ]
         public long UpdateRepositories(IEnumerable<DbTreeRepository> repositories)
         {
+            foreach (var item in repositories)
+            {
+                // Проверяем указанный путь.Если его нет, пробуем создать.
+                if (!Directory.Exists(item.DirectoryFullPath))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(item.DirectoryFullPath);
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Ошибка создания директории, проверьте указанный путь");
+                    }
+                    if (!File.Exists(item.ConfigPath))
+                    {
+                        try
+                        {
+                            File.Create(item.ConfigPath);
+                        }
+                        catch (Exception)
+                        {
+                            throw new Exception("Ошибка создания элемента, проверьте указанный путь");
+                        }
+                    }
+                }
+            }
             return 0;
         }
         public long UpdateRoots(IEnumerable<DbTreeRoot> roots)

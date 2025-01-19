@@ -12,6 +12,8 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public Guid ParentGuid { get; set; }
         public long Id { get; set; }
         public string DirectoryPath { get; set; }
+        public string DirectoryFullPath { get; set; }
+        public string ConfigPath { get; set; }
         public long Sequence { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }

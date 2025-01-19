@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
