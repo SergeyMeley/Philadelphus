@@ -63,7 +63,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeRepositoryService();
-                    _treeRepositories = service.GetRepositoryList() ?? new List<TreeRepository>();
+                    _treeRepositories = service.GetRepositories() ?? new List<TreeRepository>();
                     OnPropertyChanged(nameof(TreeRepositories));
                 });
             }
