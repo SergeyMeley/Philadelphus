@@ -1,4 +1,6 @@
-﻿using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeRoot)BusinessToDbMainProperties(businessEntity);
+            var result = (DbTreeRoot)BusinessToDbMainProperties(businessEntity, new DbTreeRoot());
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -20,14 +22,14 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbTreeRoot>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeRoot)BusinessToDbMainProperties(businessEntity);
+                var entity = (DbTreeRoot)BusinessToDbMainProperties(businessEntity, new DbTreeRoot());
                 result.Add(entity);
             }
             return result;
         }
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = (TreeRoot)DbToBusinessMainProperties(dbEntity);
+            var result = (TreeRoot)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
             return result;
         }
         internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
@@ -35,7 +37,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<TreeRoot>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var entity = (TreeRoot)DbToBusinessMainProperties(dbEntity);
+                var entity = (TreeRoot)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
                 result.Add(entity);
             }
             return result;

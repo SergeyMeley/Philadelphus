@@ -14,5 +14,7 @@ namespace Philadelphus.Business.Entities.Enums
         Node,
         Leave,
         Attribute,
+        AttributeEntry,
+        AttributeValue,
     }
 }

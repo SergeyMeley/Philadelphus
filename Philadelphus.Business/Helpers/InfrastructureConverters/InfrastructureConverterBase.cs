@@ -10,9 +10,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public abstract class InfrastructureConverterBase
     {
-        protected static IMainEntity DbToBusinessMainProperties(IDbEntity dbEntity)
+        protected static IMainEntity DbToBusinessMainProperties(IDbEntity dbEntity, IMainEntity businessEntity)
         {
-            IMainEntity businessEntity = null;
             businessEntity.ParentGuid = dbEntity.ParentGuid;
             businessEntity.DbId = dbEntity.Id;
             businessEntity.DirectoryPath = dbEntity.DirectoryPath;
@@ -37,9 +36,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal abstract IMainEntity DbToBusinessEntity(IDbEntity dbEntity);
         internal abstract IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection);
-        protected static IDbEntity BusinessToDbMainProperties(IMainEntity businessEntity)
+        protected static IDbEntity BusinessToDbMainProperties(IMainEntity businessEntity, IDbEntity dbEntity)
         {
-            IDbEntity dbEntity = null;
             dbEntity.Guid = businessEntity.Guid;
             dbEntity.ParentGuid = businessEntity.ParentGuid;
             dbEntity.Id = businessEntity.DbId;

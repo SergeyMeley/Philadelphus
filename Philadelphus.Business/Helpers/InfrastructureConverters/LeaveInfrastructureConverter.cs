@@ -1,4 +1,6 @@
-﻿using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -10,32 +12,32 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class LeaveInfrastructureConverter : InfrastructureConverterBase
     {
-        internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
+        internal override DbTreeLeave BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeLeave)BusinessToDbMainProperties(businessEntity);
+            var result = (DbTreeLeave)BusinessToDbMainProperties(businessEntity, new DbTreeLeave());
             return result;
         }
-        internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
+        internal override List<DbTreeLeave> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
         {
             var result = new List<DbTreeLeave>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeLeave)BusinessToDbMainProperties(businessEntity);
+                var entity = (DbTreeLeave)BusinessToDbMainProperties(businessEntity, new DbTreeLeave());
                 result.Add(entity);
             }
             return result;
         }
-        internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
+        internal override TreeLeave DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = (TreeLeave)DbToBusinessMainProperties(dbEntity);
+            var result = (TreeLeave)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
             return result;
         }
-        internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
+        internal override List<TreeLeave> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
         {
             var result = new List<TreeLeave>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var entity = (TreeLeave)DbToBusinessMainProperties(dbEntity);
+                var entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
                 result.Add(entity);
             }
             return result;
