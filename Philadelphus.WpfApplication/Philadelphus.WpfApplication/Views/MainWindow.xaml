@@ -356,12 +356,14 @@
                                                     <RowDefinition Height="30"></RowDefinition>
                                                     <RowDefinition></RowDefinition>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" Margin="2,2,2,2"></TextBlock>
-                                                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите наименование" Text="{Binding SelectedTreeRepository.Name}" Margin="2,2,2,2"></TextBox>
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" Margin="2,2,2,2"></TextBlock>
-                                                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите описание" Text="{Binding SelectedTreeRepository.Description}" Margin="2,2,2,2"></TextBox>
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Локальный путь" Margin="2,2,2,2"></TextBlock>
-                                                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите путь" Text="{Binding SelectedTreeRepository.DirectoryPath}" Margin="2,2,2,2"></TextBox>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Хранилище данных по умолчанию" Margin="2,2,2,2"></TextBlock>
+                                                <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding InfrastructureRepositories}" Margin="2,2,2,2"></ComboBox>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="2,2,2,2"></TextBlock>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите наименование" Text="{Binding SelectedTreeRepository.Name}" Margin="2,2,2,2"></TextBox>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="2,2,2,2"></TextBlock>
+                                                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите описание" Text="{Binding SelectedTreeRepository.Description}" Margin="2,2,2,2"></TextBox>
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Локальный путь" Margin="2,2,2,2"></TextBlock>
+                                                <TextBox Grid.Row="3" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите путь" Text="{Binding SelectedTreeRepository.DirectoryPath}" Margin="2,2,2,2"></TextBox>
                                                 <Button Grid.Row="7" Grid.ColumnSpan="2" Command="{Binding SaveRepository}" Content="Сохранить" Margin="2,2,2,2"></Button>
                                             </Grid>
                                         </GroupBox>
@@ -379,9 +381,14 @@
                                                             <DataGrid.Columns>
                                                                 <DataGridTextColumn Header="№"></DataGridTextColumn>
                                                                 <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                                                <DataGridComboBoxColumn Header="Хранилище данных" ItemsSource="{Binding InfrastructureRepositories}"></DataGridComboBoxColumn>
                                                                 <DataGridTextColumn Header="Абсолютный путь"></DataGridTextColumn>
+                                                                <DataGridTextColumn Header="Строка подключения"></DataGridTextColumn>
                                                                 <DataGridCheckBoxColumn Header="Может стать внешним"></DataGridCheckBoxColumn>
                                                             </DataGrid.Columns>
+                                                            <RowDefinition>
+                                                                
+                                                            </RowDefinition>
                                                         </DataGrid>
                                                     </StackPanel>
                                                 </GroupBox>

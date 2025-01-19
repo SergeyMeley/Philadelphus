@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.Business.Services;
+using Philadelphus.InfrastructureEntities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +12,13 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     internal class ApplicationViewModel : ViewModelBase
     {
+        public List<InfrastructureRepositoryTypes> InfrastructureRepositories
+        {
+            get
+            {
+               return Enum.GetValues(typeof(InfrastructureRepositoryTypes)).Cast<InfrastructureRepositoryTypes>().ToList();
+            }
+        }
         private TreeRepository _selectedTreeRepository;
         public TreeRepository SelectedTreeRepository 
         { 
@@ -44,7 +52,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeRepositoryService();
-                    service.SaveRepository(_selectedTreeRepository);
+                    service.ModifyRepository(_selectedTreeRepository);
                 });
             }
         }
