@@ -14,7 +14,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public List<long> ChildTreeNodeIds { get; set; } = new List<long>();
         public DbTreeRoot()
         {
-            
+            Guid = Guid.NewGuid();
         }
 }
 }

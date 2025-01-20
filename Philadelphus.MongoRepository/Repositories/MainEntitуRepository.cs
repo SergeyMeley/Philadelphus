@@ -28,26 +28,17 @@ namespace Philadelphus.MongoRepository.Repositories
             return result;
         }
         # region [ Select ]
-        public IEnumerable<DbTreeRepository> SelectRepositories(string configPath)
+        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
         {
             var result = new List<DbTreeRepository>();
             return result;
         }
         public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository)
         {
-            var result = new List<DbTreeRoot>();
-            var roots = _database.GetCollection<BsonDocument>("roots");
-            //result = BsonSerializer.Deserialize<IEnumerable<DbTreeRoot>>(roots);
-            //for (int i = 0; i < roots.Coun; i++)
-            //{
-
-            //}
-            //foreach (var item in roots)
-            //{
-            //    result.Add(BsonSerializer.Deserialize<DbTreeRoot>(item));
-                
-            //}
-            return result;
+            
+            var collection = _database.GetCollection<DbTreeRoot>("roots");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
         public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository)
         {
@@ -93,17 +84,15 @@ namespace Philadelphus.MongoRepository.Repositories
         }
         public long InsertRoots(IEnumerable<DbTreeRoot> roots)
         {
-            var collection = _database.GetCollection<BsonDocument>("roots");
-            if (roots != null)
+            BsonClassMap.RegisterClassMap<DbTreeRoot>(c => { 
+                c.AutoMap(); 
+                c.MapMember(x => x.Guid).SetElementName("ProductID").SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+            });
+            var collection = _database.GetCollection<DbTreeRoot>("roots");
+            foreach (var root in roots)
             {
-                foreach (var item in roots)
-                {
-                    if (item != null)
-                    {
-                        var bson = item.ToBsonDocument();
-                        collection.InsertOne(bson);
-                    }
-                }
+                collection.InsertOne(root);
             }
             return roots.Count();
         }

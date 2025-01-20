@@ -25,7 +25,7 @@ namespace Philadelphus.PostgreRepository.Repositories
             return collection;
         }
         #region [Select]
-        IEnumerable<DbTreeRepository> SelectProjects()
+        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
         {
             var dataCollection = new List<DbTreeRepository>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))

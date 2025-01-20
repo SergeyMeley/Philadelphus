@@ -44,6 +44,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.ParentGuid = businessEntity.ParentGuid;
             dbEntity.Id = businessEntity.DbId;
             dbEntity.DirectoryPath = businessEntity.DirectoryPath;
+            dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;
+            dbEntity.ConfigPath = businessEntity.ConfigPath;
             dbEntity.Sequence = businessEntity.Sequence;
             dbEntity.Name = businessEntity.Name;
             dbEntity.Alias = businessEntity.Alias;

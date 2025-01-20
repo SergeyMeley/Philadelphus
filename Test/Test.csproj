@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Business\Philadelphus.Business.csproj" />
+    <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
+    <ProjectReference Include="..\Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj" />
   </ItemGroup>
 
 </Project>

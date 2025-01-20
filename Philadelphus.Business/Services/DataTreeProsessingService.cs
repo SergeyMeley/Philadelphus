@@ -44,22 +44,25 @@ namespace Philadelphus.Business.Services
         }
         public List<TreeRepository> AddRepository(TreeRepository repository)
         {
-            var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
-            // Добавление пути к папке и файлу репозитория
-            repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
-            repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
-            // Получение текущего списка репозиториев и добавление туда нового
-            DataTreeRepositories = GetRepositories();
-            DataTreeRepositories.Add(repository);
-            // Создания нового репозитория
-            var list = new List<TreeRepository>();
-            list.Add(repository);
-            var converter = new RepositoryInfrastructureConverter();
-            infrastructure.InsertRepositories(converter.BusinessToDbEntityCollection(list));
-            // Дополнение списка репозиториев в настроечном файле
-            GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
-            infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
-            // Получение актуального списка репозиториев
+            if (repository != null)
+            {
+                var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
+                // Добавление пути к папке и файлу репозитория
+                repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
+                repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
+                // Получение текущего списка репозиториев и добавление туда нового
+                DataTreeRepositories = GetRepositories();
+                DataTreeRepositories.Add(repository);
+                // Создания нового репозитория
+                var list = new List<TreeRepository>();
+                list.Add(repository);
+                var converter = new RepositoryInfrastructureConverter();
+                infrastructure.InsertRepositories(converter.BusinessToDbEntityCollection(list));
+                // Дополнение списка репозиториев в настроечном файле
+                GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
+                infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
+                // Получение актуального списка репозиториев
+            }
             return GetRepositories();
         }
         public List<TreeRepository> ModifyRepository(TreeRepository repository)

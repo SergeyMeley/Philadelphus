@@ -44,8 +44,15 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
                     var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
                     using (var repofs = new FileStream(item, FileMode.OpenOrCreate))
                     {
-                        var repo = repositoryXmlSerializer.Deserialize(repofs) as DbTreeRepository;
-                        list.Add(repo);
+                        try
+                        {
+                            var repo = repositoryXmlSerializer.Deserialize(repofs) as DbTreeRepository;
+                            list.Add(repo);
+                        }
+                        catch (Exception)
+                        {
+                            File.Delete(item);
+                        }
                     }
                 }
             }
@@ -101,22 +108,21 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
                     {
                         throw new Exception("Ошибка создания директории, проверьте указанный путь");
                     }
-                    // Проверяем налчие файла.Если его нет, пробуем создать.
-                    if (!File.Exists(item.ConfigPath))
+                }
+                // Проверяем наличие файла. Если его нет, пробуем создать.
+                if (!File.Exists(item.ConfigPath))
+                {
+                    try
                     {
-                        try
+                        var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
+                        using (var repofs = new FileStream(item.ConfigPath, FileMode.OpenOrCreate))
                         {
-                            File.Create(item.ConfigPath);
-                            var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
-                            using (var repofs = new FileStream(item.ConfigPath, FileMode.OpenOrCreate))
-                            {
-                                repositoryXmlSerializer.Serialize(repofs, item);
-                            }
+                            repositoryXmlSerializer.Serialize(repofs, item);
                         }
-                        catch (Exception)
-                        {
-                            throw new Exception("Ошибка создания элемента, проверьте указанный путь");
-                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Ошибка создания элемента, проверьте указанный путь");
                     }
                 }
             }

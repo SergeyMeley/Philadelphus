@@ -34,7 +34,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public string DeletedBy { get; set; }
         public DbEntityBase()
         {
-            
+            Guid = Guid.NewGuid();
         }
     }
 }
