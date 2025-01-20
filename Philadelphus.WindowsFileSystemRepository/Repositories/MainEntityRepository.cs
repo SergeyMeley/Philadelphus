@@ -18,7 +18,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             return null;
         }
         # region [ Select ]
-        public IEnumerable<string> SelectRepositoryList(string configPath)
+        public IEnumerable<string> SelectRepositoryPathes(string configPath)
         {
             var list = new List<string>();
             var listXmlSerializer = new XmlSerializer(typeof(List<string>));
@@ -77,6 +77,15 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         }
         #endregion
         #region [ Insert ]
+        public long InsertRepositoryPathes(string configPath, List<string> inputPathes)
+        {
+            var listXmlSerializer = new XmlSerializer(typeof(List<string>));
+            using (var fs = new FileStream(configPath, FileMode.OpenOrCreate))
+            {
+                listXmlSerializer.Serialize(fs, inputPathes);
+            }
+            return 0;
+        }
         public long InsertRepositories(IEnumerable<DbTreeRepository> repositories)
         {
             foreach (var item in repositories)
@@ -98,6 +107,11 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
                         try
                         {
                             File.Create(item.ConfigPath);
+                            var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
+                            using (var repofs = new FileStream(item.ConfigPath, FileMode.OpenOrCreate))
+                            {
+                                repositoryXmlSerializer.Serialize(repofs, item);
+                            }
                         }
                         catch (Exception)
                         {

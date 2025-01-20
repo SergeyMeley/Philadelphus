@@ -31,10 +31,11 @@ namespace Philadelphus.Business.Services
         public List<TreeRepository> GetRepositories()
         {
             var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
-            GeneralSettings.RepositoryPathList = (List<string>)infrastructure.SelectRepositoryList(GeneralSettings.RepositoryListPath);
+            // Получение списка путей к репозиториям
+            GeneralSettings.RepositoryPathList = (List<string>)infrastructure.SelectRepositoryPathes(GeneralSettings.RepositoryListPath);
+            // Получение репозиториев по всем путям
             if (GeneralSettings.RepositoryPathList != null)
             {
-                
                 var dbRepositories = (List<DbTreeRepository>)infrastructure.SelectRepositories(GeneralSettings.RepositoryPathList);
                 var converter = new RepositoryInfrastructureConverter();
                 DataTreeRepositories = converter.DbToBusinessEntityCollection(dbRepositories);
@@ -43,6 +44,7 @@ namespace Philadelphus.Business.Services
         }
         public List<TreeRepository> AddRepository(TreeRepository repository)
         {
+            var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
             // Добавление пути к папке и файлу репозитория
             repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
             repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
@@ -50,18 +52,14 @@ namespace Philadelphus.Business.Services
             DataTreeRepositories = GetRepositories();
             DataTreeRepositories.Add(repository);
             // Создания нового репозитория
-            var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
-            using (var repofs = new FileStream(repository.ConfigPath, FileMode.OpenOrCreate))
-            {
-                repositoryXmlSerializer.Serialize(repofs, repository);
-            }
+            var list = new List<TreeRepository>();
+            list.Add(repository);
+            var converter = new RepositoryInfrastructureConverter();
+            infrastructure.InsertRepositories(converter.BusinessToDbEntityCollection(list));
             // Дополнение списка репозиториев в настроечном файле
             GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
-            var listXmlSerializer = new XmlSerializer(typeof(List<string>));
-            using (var fs = new FileStream(GeneralSettings.RepositoryListPath, FileMode.OpenOrCreate))
-            {
-                listXmlSerializer.Serialize(fs, GeneralSettings.RepositoryPathList);
-            }
+            infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
+            // Получение актуального списка репозиториев
             return GetRepositories();
         }
         public List<TreeRepository> ModifyRepository(TreeRepository repository)
