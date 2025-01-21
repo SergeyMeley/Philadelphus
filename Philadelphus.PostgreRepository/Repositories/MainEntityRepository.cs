@@ -71,6 +71,21 @@ namespace Philadelphus.PostgreRepository.Repositories
         {
             throw new NotImplementedException();
         }
+        public IEnumerable<DbEntityAttribute> SelectAttributes()
+        {
+            var result = new List<DbEntityAttribute>();
+            return result;
+        }
+        public IEnumerable<DbAttributeEntry> SelectAttributeEntries()
+        {
+            var result = new List<DbAttributeEntry>();
+            return result;
+        }
+        public IEnumerable<DbAttributeValue> SelectAttributeValues()
+        {
+            var result = new List<DbAttributeValue>();
+            return result;
+        }
         #endregion
         #region [Insert]
         public int InsertRepositories(IEnumerable<DbTreeRepository> projects)

@@ -15,7 +15,11 @@ namespace Philadelphus.Business.Entities.MainEntities
         public EntityAttribute Attribute { get; set; }
         public AttributeValue AttributeValue { get; set; }
         public long EntityId { get; set; }
-        public AttributeEntry(string name, Guid parentGuid) : base(name, parentGuid)
+        public AttributeEntry(Guid parentGuid) : base(parentGuid)
+        {
+
+        }
+        public AttributeEntry(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
 
         }

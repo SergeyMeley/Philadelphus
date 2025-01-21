@@ -20,7 +20,11 @@ namespace Philadelphus.Business.Entities.MainEntities
         public string DirectoryPath { get; set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
         public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
-        public TreeRoot(string name, Guid parentGuid) : base(name, parentGuid)
+        public TreeRoot(Guid parentGuid) : base(parentGuid)
+        {
+
+        }
+        public TreeRoot(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
 
         }

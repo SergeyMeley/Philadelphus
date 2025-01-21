@@ -8,9 +8,9 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public interface IDbEntity
     {
-        public Guid Guid { get; set; }
-        public Guid ParentGuid { get; set; }
-        public long Id { get; set; }
+        //public Guid Guid { get; set; }
+        public string ParentGuid { get; set; }
+        //public long Id { get; set; }
         public string DirectoryPath { get; set; }
         public string DirectoryFullPath { get; set; }
         public string ConfigPath { get; set; }

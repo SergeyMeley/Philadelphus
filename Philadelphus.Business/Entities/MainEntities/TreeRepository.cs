@@ -18,11 +18,11 @@ namespace Philadelphus.Business.Entities.MainEntities
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
         public IEnumerable<TreeRoot> ChildTreeRoots { get; set; } = new List<TreeRoot>();
         public IEnumerable<IMainEntitiesRepository> InfrastructureRepositories { get; set; }
-        public TreeRepository(string name, Guid parentGuid) : base(name, parentGuid)
+        public TreeRepository(Guid parentGuid) : base(parentGuid)
         {
             
         }
-        public TreeRepository(string name, Guid guid, Guid parentGuid) : base(name, guid, parentGuid)
+        public TreeRepository(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
 
         }

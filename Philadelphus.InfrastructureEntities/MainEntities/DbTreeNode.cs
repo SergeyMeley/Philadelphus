@@ -8,11 +8,12 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class DbTreeNode : DbEntityBase
     {
-        public long ParentTreeRootId { get; set; }
-        public long ParentTreeNodeId { get; set; }
-        public List<long> AttributeIds { get; set; } = new List<long>();
-        public List<long> ChildTreeNodeIds { get; set; } = new List<long>();
-        public List<long> ChildTreeLeaveIds { get; set; } = new List<long>();
+        public Guid Guid { get; set; }
+        public long ParentTreeRootGuid { get; set; }
+        public long ParentTreeNodeGuid { get; set; }
+        public List<long> AttributeGuids { get; set; } = new List<long>();
+        public List<long> ChildTreeNodeGuids { get; set; } = new List<long>();
+        public List<long> ChildTreeLeaveGuids { get; set; } = new List<long>();
         public DbTreeNode()
         {
 

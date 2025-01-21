@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    
+
     public class DbTreeRoot : DbEntityBase
     {
-        public long ParentTreeRepositoryId { get; set; }
-        public List<long> AttributeIds { get; set; } = new List<long>();
-        public List<long> ChildTreeNodeIds { get; set; } = new List<long>();
+        public Guid Guid { get; set; }
+        public long ParentTreeRepositoryGuid { get; set; }
+        public List<long> AttributeGuids { get; set; } = new List<long>();
+        public List<long> ChildTreeNodeGuids { get; set; } = new List<long>();
         public DbTreeRoot()
         {
-            Guid = Guid.NewGuid();
+            
         }
-}
+    }
 }

@@ -15,9 +15,13 @@ namespace Philadelphus.Business.Entities.MainEntities
         public string Uuid { get; set; }
         public string Type { get; set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        public TreeLeave(string name, Guid parentGuid) : base(name, parentGuid)
+        public TreeLeave(Guid parentGuid) : base(parentGuid)
         {
-            
+
+        }
+        public TreeLeave(Guid guid, Guid parentGuid) : base(guid, parentGuid)
+        {
+
         }
     }
 }

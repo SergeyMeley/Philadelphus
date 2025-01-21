@@ -29,7 +29,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = (EntityAttribute)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+            var result = new EntityAttribute(new Guid(dbEntity.ParentGuid));
+            result = (EntityAttribute)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
             return result;
         }
         internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
@@ -37,7 +38,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<EntityAttribute>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var entity = (EntityAttribute)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+                var entity = new EntityAttribute(new Guid(dbEntity.ParentGuid));
+                entity = (EntityAttribute)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
                 result.Add(entity);
             }
             return result;

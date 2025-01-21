@@ -196,9 +196,9 @@ namespace Philadelphus.Business.Services
                         break;
                 }
                 var nodeInfrastructureConverter = new NodeInfrastructureConverter();
-                _dbMainEntitiesCollection.DbTreeNodes = infrastructureRepository.SelectNodes((DbTreeRepository)nodeInfrastructureConverter.BusinessToDbEntity(currentRepository));
+                _dbMainEntitiesCollection.DbTreeNodes = infrastructureRepository.SelectNodes();
                 var leaveInfrastructureConverter = new LeaveInfrastructureConverter();
-                _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves((DbTreeRepository)nodeInfrastructureConverter.BusinessToDbEntity(currentRepository));
+                _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves();
             }
             CurrentRepository = DataTreeRepositories.Where(x => x.Guid == currentRepository.Guid).Last();
             using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))

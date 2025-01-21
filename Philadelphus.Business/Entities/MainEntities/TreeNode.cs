@@ -17,9 +17,13 @@ namespace Philadelphus.Business.Entities.MainEntities
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
         public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
         public IEnumerable<TreeLeave> ChildTreeLeaves { get; set; } = new List<TreeLeave>();
-        public TreeNode(string name, Guid parentGuid) : base(name, parentGuid)
+        public TreeNode(Guid parentGuid) : base(parentGuid)
         {
-            
+
+        }
+        public TreeNode(Guid guid, Guid parentGuid) : base(guid, parentGuid)
+        {
+
         }
     }
 }

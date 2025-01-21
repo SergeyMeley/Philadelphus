@@ -21,32 +21,25 @@ namespace Test
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            DataTreeRepositoryService repositoryService = new DataTreeRepositoryService();
-            var treeRepository = repositoryService.CreateRepository();
-            treeRepository.DirectoryPath = NewPathTextBox.Text;
+            var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MainEntitóRepository();
+            var entities = new List<DbTreeRoot>();
+            for (int i = 0; i < 5; i++)
+            {
+                entities.Add(new DbTreeRoot());
+            }
+            mainEntityRepository.InsertRoots((List<DbTreeRoot>)entities);
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
+            PathesListBox.Items.Clear();
             var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MainEntitóRepository();
+            var result = mainEntityRepository.SelectRoots();
 
-            var rts = new List<DbTreeRoot>();
-            rts.Add(new DbTreeRoot());
-
-            mainEntityRepository.InsertRoots(rts);
-
-
-            var result = mainEntityRepository.SelectRoots(new Philadelphus.InfrastructureEntities.MainEntities.DbTreeRepository());
-
-            foreach (var root in result)
-            { 
-                PathesListBox.Items.Add(root.Name);
+            foreach (var item in result)
+            {
+                PathesListBox.Items.Add(item.Guid);
             }
-
-
-
-
-
 
             //DataTreeRepositoryService repositoryListService = new DataTreeRepositoryService();
 

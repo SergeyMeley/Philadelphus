@@ -14,7 +14,7 @@ namespace Philadelphus.Business.Entities.MainEntities
         public EntityTypes EntityType { get; }
         public InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public Guid Guid { get; }
-        public Guid ParentGuid { get; set; }
+        public Guid ParentGuid { get; }
         public long DbId { get; set; }
         public string DirectoryPath { get; set; }
         public string DirectoryFullPath { get; set; }

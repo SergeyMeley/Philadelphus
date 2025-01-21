@@ -21,19 +21,24 @@ namespace Philadelphus.Business.Factories
                     mainEntity = null;
                     break;
                 case EntityTypes.Repository:
-                    mainEntity = new TreeRepository("Новый репозиторий", Guid.Empty);
+                    mainEntity = new TreeRepository(Guid.Empty);
+                    mainEntity.Name = "Новый репозиторий";
                     break;
                 case EntityTypes.Root:
-                    mainEntity = new TreeRoot("Новый корень", Guid.Empty);
+                    mainEntity = new TreeRoot(Guid.Empty);
+                    mainEntity.Name = "Новый корень";
                     break;
                 case EntityTypes.Node:
-                    mainEntity = new TreeNode("Новый узел", Guid.Empty);
+                    mainEntity = new TreeNode(Guid.Empty);
+                    mainEntity.Name = "Новый узел";
                     break;
                 case EntityTypes.Leave:
-                    mainEntity = new TreeNode("Новый лист", Guid.Empty);
+                    mainEntity = new TreeNode(Guid.Empty);
+                    mainEntity.Name = "Новый лист";
                     break;
                 case EntityTypes.Attribute:
-                    mainEntity = new TreeNode("Новый атрибут", Guid.Empty);
+                    mainEntity = new TreeNode(Guid.Empty);
+                    mainEntity.Name = "Новый атрибут";
                     break;
                 default:
                     mainEntity = null;

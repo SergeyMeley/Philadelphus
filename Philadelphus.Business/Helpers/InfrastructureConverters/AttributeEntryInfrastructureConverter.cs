@@ -15,6 +15,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
             var result = (DbAttributeEntry)BusinessToDbMainProperties(businessEntity, new DbAttributeEntry());
+            result.Guid = businessEntity.Guid;
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -23,13 +24,15 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             foreach (var businessEntity in businessEntityCollection)
             {
                 var entity = (DbAttributeEntry)BusinessToDbMainProperties(businessEntity, new DbAttributeEntry());
+                entity.Guid = businessEntity.Guid;
                 result.Add(entity);
             }
             return result;
         }
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = (AttributeEntry)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
+            var result = new AttributeEntry(new Guid(dbEntity.ParentGuid));
+            result = (AttributeEntry)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
             return result;
         }
         internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
@@ -37,7 +40,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<AttributeEntry>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var entity = (AttributeEntry)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
+                var entity = new AttributeEntry(new Guid(dbEntity.ParentGuid));
+                entity = (AttributeEntry)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
                 result.Add(entity);
             }
             return result;

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -21,59 +22,114 @@ namespace Philadelphus.MongoRepository.Repositories
         {
             _client = Context.CreateConnection();
             _database = _client.GetDatabase("kubstu_database");
+            Map();
+        }
+        public void Map()
+        {
+            try
+            {
+                BsonClassMap.RegisterClassMap<DbTreeRepository>(c => {
+                    c.AutoMap();
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                });
+            }
+            catch (Exception)
+            {
+            }
+            try
+            {
+                BsonClassMap.RegisterClassMap<DbTreeRoot>(c => {
+                    c.AutoMap();
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                });
+            }
+            catch (Exception)
+            {
+            }
+            try
+            {
+                BsonClassMap.RegisterClassMap<DbTreeNode>(c => {
+                    c.AutoMap();
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                });
+            }
+            catch (Exception)
+            {
+            }
+            try
+            {
+                BsonClassMap.RegisterClassMap<DbTreeLeave>(c => {
+                    c.AutoMap();
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                });
+            }
+            catch (Exception)
+            {
+            }
+            try
+            {
+                BsonClassMap.RegisterClassMap<DbTestEntitie>(c => {
+                    c.AutoMap();
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                });
+            }
+            catch (Exception)
+            {
+            }
         }
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             var result = new DbMainEntitiesCollection();
+            result.DbTreeRoots = SelectRoots();
+            result.DbTreeNodes = SelectNodes();
+            result.DbTreeLeaves = SelectLeaves();
+            result.DbAttributes = SelectAttributes();
+            result.DbAttributeEntries = SelectAttributeEntries();
+            result.DbAttributeValues = SelectAttributeValues();
             return result;
         }
         # region [ Select ]
         public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
         {
-            var result = new List<DbTreeRepository>();
-            return result;
+            var collection = _database.GetCollection<DbTreeRepository>("repositories");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
-        public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbTreeRoot> SelectRoots()
         {
-            
             var collection = _database.GetCollection<DbTreeRoot>("roots");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbTreeNode> SelectNodes()
         {
-            var result = new List<DbTreeNode>();
-            var repositories = _database.GetCollection<BsonDocument>("nodes");
-
-            return result;
+            var collection = _database.GetCollection<DbTreeNode>("nodes");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
-        public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbTreeLeave> SelectLeaves()
         {
-            var result = new List<DbTreeLeave>();
-            var repositories = _database.GetCollection<BsonDocument>("leaves");
-
-            return result;
+            var collection = _database.GetCollection<DbTreeLeave>("leaves");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
-        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbEntityAttribute> SelectAttributes()
         {
-            var result = new List<DbEntityAttribute>();
-            var repositories = _database.GetCollection<BsonDocument>("attributes");
-
-            return result;
+            var collection = _database.GetCollection<DbEntityAttribute>("attributes");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbAttributeEntry> SelectAttributeEntries()
         {
-            var result = new List<DbAttributeEntry>();
-            var repositories = _database.GetCollection<BsonDocument>("attribute_entries");
-
-            return result;
+            var collection = _database.GetCollection<DbAttributeEntry>("attribute_entries");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
-        public IEnumerable<DbAttributeValue> SelectAttributeValues(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbAttributeValue> SelectAttributeValues()
         {
-            var result = new List<DbAttributeValue>();
-            var repositories = _database.GetCollection<BsonDocument>("attribute_values");
-
-            return result;
+            var collection = _database.GetCollection<DbAttributeValue>("attribute_values");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
         }
         #endregion
         #region [ Insert ]
@@ -84,15 +140,10 @@ namespace Philadelphus.MongoRepository.Repositories
         }
         public long InsertRoots(IEnumerable<DbTreeRoot> roots)
         {
-            BsonClassMap.RegisterClassMap<DbTreeRoot>(c => { 
-                c.AutoMap(); 
-                c.MapMember(x => x.Guid).SetElementName("ProductID").SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
-                c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
-            });
             var collection = _database.GetCollection<DbTreeRoot>("roots");
-            foreach (var root in roots)
+            foreach (var item in roots)
             {
-                collection.InsertOne(root);
+                collection.InsertOne(item);
             }
             return roots.Count();
         }
@@ -196,5 +247,23 @@ namespace Philadelphus.MongoRepository.Repositories
             return result;
         }
         #endregion
+
+
+        public List<DbTestEntitie> SelectTest()
+        {
+            var collection = _database.GetCollection<DbTestEntitie>("test");
+            var documents = collection.Find(new BsonDocument()).ToList();
+            return documents;
+        }
+        public long InsertTest(IEnumerable<DbTestEntitie> entitie)
+        {
+            
+            var collection = _database.GetCollection<DbTestEntitie>("test");
+            foreach (var item in entitie)
+            {
+                collection.InsertOne(item);
+            }
+            return entitie.Count();
+        }
     }
 }

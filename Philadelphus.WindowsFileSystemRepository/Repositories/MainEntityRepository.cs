@@ -58,27 +58,27 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             }
             return list;
         }
-        public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbTreeRoot> SelectRoots()
         {
             return null;
         }
-        public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbTreeNode> SelectNodes()
         {
             return null;
         }
-        public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbTreeLeave> SelectLeaves()
         {
             return null;
         }
-        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbEntityAttribute> SelectAttributes()
         {
             return null;
         }
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbAttributeEntry> SelectAttributeEntries()
         {
             return null;
         }
-        public IEnumerable<DbAttributeValue> SelectAttributeValues(DbTreeRepository dbTreeRepository)
+        public IEnumerable<DbAttributeValue> SelectAttributeValues()
         {
             return null;
         }

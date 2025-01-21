@@ -15,7 +15,11 @@ namespace Philadelphus.Business.Entities.MainEntities
         public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public ValueTypes ValueType { get; set; }
         public IEnumerable<AttributeValue> Values { get; set; } = new List<AttributeValue>();
-        public EntityAttribute(string name, Guid parentGuid) : base(name, parentGuid)
+        public EntityAttribute(Guid parentGuid) : base(parentGuid)
+        {
+
+        }
+        public EntityAttribute(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
 
         }

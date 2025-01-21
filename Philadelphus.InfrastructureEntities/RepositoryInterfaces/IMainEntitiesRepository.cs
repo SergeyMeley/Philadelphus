@@ -7,12 +7,12 @@ namespace Philadelphus.InfrastructureEntities.RepositoryInterfaces
         DbMainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]
         public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes);
-        public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository);
-        public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository);
-        public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository);
-        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository);
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries(DbTreeRepository dbTreeRepository);
-        public IEnumerable<DbAttributeValue> SelectAttributeValues(DbTreeRepository dbTreeRepository);
+        public IEnumerable<DbTreeRoot> SelectRoots();
+        public IEnumerable<DbTreeNode> SelectNodes();
+        public IEnumerable<DbTreeLeave> SelectLeaves();
+        public IEnumerable<DbEntityAttribute> SelectAttributes();
+        public IEnumerable<DbAttributeEntry> SelectAttributeEntries();
+        public IEnumerable<DbAttributeValue> SelectAttributeValues();
         #endregion
         #region [ Insert ]
         public long InsertRepositories(IEnumerable<DbTreeRepository> repositories);

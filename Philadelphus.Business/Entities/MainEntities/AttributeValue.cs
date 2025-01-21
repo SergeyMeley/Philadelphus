@@ -12,7 +12,11 @@ namespace Philadelphus.Business.Entities.MainEntities
     {
         public override EntityTypes EntityType { get => EntityTypes.None; }
         public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
-        public AttributeValue(string name, Guid parentGuid) : base(name, parentGuid)
+        public AttributeValue(Guid parentGuid) : base(parentGuid)
+        {
+
+        }
+        public AttributeValue(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
 
         }
