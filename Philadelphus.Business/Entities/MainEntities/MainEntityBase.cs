@@ -12,10 +12,14 @@ namespace Philadelphus.Business.Entities.MainEntities
     public abstract class MainEntityBase : IMainEntity
     {
         public abstract EntityTypes EntityType { get; }
-        public abstract InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
+        public abstract InfrastructureRepositoryTypes InfrastructureRepositoryType { get; } 
         public Guid Guid { get; private set; }
         public Guid ParentGuid { get; private set; }
+        /// <summary>
+        /// Идентификатор экземпляра в текущей базе данных
+        /// </summary>
         public long DbId { get; set; }
+        public IEnumerable<IMainEntity> Childs { get; set; }
         public string DirectoryPath { get; set; }
         public string DirectoryFullPath { get; set; }
         public string ConfigPath { get; set; }

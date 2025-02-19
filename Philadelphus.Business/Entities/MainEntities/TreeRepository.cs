@@ -20,11 +20,11 @@ namespace Philadelphus.Business.Entities.MainEntities
         public IEnumerable<IMainEntitiesRepository> InfrastructureRepositories { get; set; }
         public TreeRepository(Guid parentGuid) : base(parentGuid)
         {
-            
+            Childs = new List<TreeRoot>();
         }
         public TreeRepository(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
-
+            Childs = new List<TreeRoot>();
         }
     }
 }

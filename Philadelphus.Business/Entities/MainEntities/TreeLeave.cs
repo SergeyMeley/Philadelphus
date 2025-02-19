@@ -17,11 +17,11 @@ namespace Philadelphus.Business.Entities.MainEntities
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
         public TreeLeave(Guid parentGuid) : base(parentGuid)
         {
-
+            Childs = new List<IMainEntity>();
         }
         public TreeLeave(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
-
+            Childs = new List<IMainEntity>();
         }
     }
 }

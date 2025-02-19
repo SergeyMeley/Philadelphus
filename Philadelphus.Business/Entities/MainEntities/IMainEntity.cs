@@ -11,11 +11,12 @@ namespace Philadelphus.Business.Entities.MainEntities
 {
     public interface IMainEntity
     {
-        public EntityTypes EntityType { get; }
-        public InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
+        public abstract EntityTypes EntityType { get; }
+        public abstract InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public Guid Guid { get; }
         public Guid ParentGuid { get; }
         public long DbId { get; set; }
+        public IEnumerable<IMainEntity> Childs { get; set; }
         public string DirectoryPath { get; set; }
         public string DirectoryFullPath { get; set; }
         public string ConfigPath { get; set; }

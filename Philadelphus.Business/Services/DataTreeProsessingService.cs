@@ -21,8 +21,7 @@ namespace Philadelphus.Business.Services
         { 
             get
             {
-                GetRepositoryContent(CurrentRepository);
-                return CurrentRepository;
+                return GetRepositoryContent(CurrentRepository);
             }
             set => CurrentRepository = value;
         }
@@ -100,8 +99,22 @@ namespace Philadelphus.Business.Services
         /// <returns></returns>
         public TreeRepository CreateRepository()
         {
-            CurrentRepository = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
-            return CurrentRepository;
+            //Временно
+            var repo = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
+            for (int i = 0; i <= 5; i++)
+            {
+                var root = new TreeRoot(repo.Guid);
+                for (int j = 0; j <= 5; j++)
+                {
+                    var node = new TreeNode(root.Guid);
+                    ((List<TreeNode>)root.Childs).Add(node);
+                }
+                ((List<TreeRoot>)repo.Childs).Add(root);
+            }
+            return repo;
+            //Временно
+            return (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
+            
         }
         /// <summary>
         /// Сохранение измененного репозитория.
