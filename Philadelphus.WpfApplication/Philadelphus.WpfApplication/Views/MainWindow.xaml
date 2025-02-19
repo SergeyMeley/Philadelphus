@@ -87,7 +87,7 @@
                                         <ColumnDefinition Width="auto"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Структура данных" Margin="2,2,2,2" Grid.RowSpan="2">
+                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="2,2,2,2" Grid.RowSpan="2">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="30"></RowDefinition>
@@ -96,14 +96,13 @@
                                                 <RowDefinition Height="*"></RowDefinition>
                                             </Grid.RowDefinitions>
                                             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="2,2,2,2" Grid.ColumnSpan="2">
-                                                <Button Content="+ корень" Margin="2,2,2,2"></Button>
+                                                <Button Content="+ корень" Command="{Binding CreateRootCommand}" Margin="2,2,2,2"></Button>
                                                 <Button Content="+ узел" Margin="2,2,2,2"></Button>
                                                 <Button Content="+ лист" Margin="2,2,2,2"></Button>
                                                 <Button Content=" - " Margin="2,2,2,2"></Button>
                                             </StackPanel>
                                             <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2,2,2,2" Grid.ColumnSpan="2">
-                                                <TreeView>
-
+                                                <TreeView ItemsSource="{Binding CurrentTreeRepository.Childs}" DisplayMemberPath="Guid">
                                                 </TreeView>
                                             </GroupBox>
                                             <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
@@ -133,23 +132,67 @@
                                             <RowDefinition Height="auto"></RowDefinition>
                                             <RowDefinition Height="*"></RowDefinition>
                                         </Grid.RowDefinitions>
-                                        <GroupBox Grid.Row="0" Grid.Column="0" Header="Метаданные" Margin="2,2,2,2">
-                                            <DataGrid  Height="auto">
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="Свойство"></DataGridTextColumn>
-                                                    <DataGridTextColumn Header="Значение"></DataGridTextColumn>
-                                                </DataGrid.Columns>
-                                            </DataGrid>
+                                        <GroupBox Grid.Row="0" Grid.Column="0" Header="Вхождения атрибутов" Margin="2,2,2,2">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <GroupBox  Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2,2,2,2">
+                                                    <DataGrid  Height="auto">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </GroupBox>
+                                                <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                                                <GroupBox  Grid.Row="2" Grid.Column="0" Header="Собственные атрибуты" Margin="2,2,2,2">
+                                                    <DataGrid  Height="auto">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                            <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                                                            <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </GroupBox>
+                                                <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                                                <GroupBox  Grid.Row="4" Grid.Column="0" Header="Внешние атрибуты" Margin="2,2,2,2">
+                                                    <DataGrid  Height="auto">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Источник"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Тип данных"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </GroupBox>
+                                            </Grid>
+                                            
+                                            
                                         </GroupBox>
                                         <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                                        <GroupBox Grid.Row="2" Grid.Column="0" Header="Унаследованные атрибуты" Margin="2,2,2,2">
-                                            <DataGrid  Height="auto">
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
-                                                    <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
-                                                    <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
-                                                </DataGrid.Columns>
-                                            </DataGrid>
+                                        <GroupBox Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2,2,2,2">
+                                            <TabControl>
+                                                <TabItem Header="Одиночное значение">
+                                                    <DataGrid  Height="auto">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                            <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
+                                                            <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </TabItem>
+                                                <TabItem Header="Плоская таблица">
+
+                                                </TabItem>
+                                                <TabItem Header="Кросс-таблица">
+
+                                                </TabItem>
+                                            </TabControl>
+                                            
                                         </GroupBox>
                                         <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                                         <GroupBox Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2,2,2,2">

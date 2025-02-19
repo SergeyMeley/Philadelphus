@@ -1,17 +1,13 @@
 ﻿using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
     internal class ApplicationViewModel : ViewModelBase
     {
+        public IMainEntity SelectedEntity { get; private set; }
         public List<InfrastructureRepositoryTypes> InfrastructureRepositories
         {
             get
@@ -19,40 +15,49 @@ namespace Philadelphus.WpfApplication.ViewModels
                return Enum.GetValues(typeof(InfrastructureRepositoryTypes)).Cast<InfrastructureRepositoryTypes>().ToList();
             }
         }
-        private TreeRepository _selectedTreeRepository;
-        public TreeRepository SelectedTreeRepository 
-        { 
-            get => _selectedTreeRepository; 
+        private TreeRepository _currentTreeRepository;
+        public TreeRepository CurrentTreeRepository 
+        {
+            get
+            {
+                //Временно
+                DataTreeRepositoryService treeRepositoryService = new DataTreeRepositoryService();
+                _currentTreeRepository = treeRepositoryService.CreateRepository();
+                //Временно
+                return _currentTreeRepository;
+            }
             set
             {
-                _selectedTreeRepository = value; 
-                OnPropertyChanged(nameof(SelectedTreeRepository));
+                _currentTreeRepository = value; 
+                OnPropertyChanged(nameof(CurrentTreeRepository));
             }
         }
         private List<TreeRepository> _treeRepositories = new List<TreeRepository>();
         public ObservableCollection<TreeRepository> TreeRepositories { get => new ObservableCollection<TreeRepository>(_treeRepositories); private set => _treeRepositories = value.ToList(); }
+
+        #region [Commands]
         public RelayCommand AddNewTreeRepositoryCommand
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
-                    var repository = new TreeRepository("Новый репозиторий", Guid.Empty);
+                    var repository = new TreeRepository(Guid.Empty);
                     _treeRepositories.Add(repository);
                     OnPropertyChanged(nameof(TreeRepositories));
-                    _selectedTreeRepository = TreeRepositories.Last();
-                    OnPropertyChanged(nameof(SelectedTreeRepository));
+                    _currentTreeRepository = TreeRepositories.Last();
+                    OnPropertyChanged(nameof(CurrentTreeRepository));
                 });
             }
         }
-        public RelayCommand SaveRepository
+        public RelayCommand SaveRepositoryCommand
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeRepositoryService();
-                    service.ModifyRepository(_selectedTreeRepository);
+                    service.ModifyRepository(_currentTreeRepository);
                 });
             }
         }
@@ -68,5 +73,18 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
+        public RelayCommand AddRootCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var service = new DataTreeRepositoryService();
+                    ((List<TreeRoot>)_currentTreeRepository.ChildTreeRoots).Add(new TreeRoot(_currentTreeRepository.Guid));
+                    OnPropertyChanged(nameof(CurrentTreeRepository));
+                });
+            }
+        }
+        #endregion
     }
 }
