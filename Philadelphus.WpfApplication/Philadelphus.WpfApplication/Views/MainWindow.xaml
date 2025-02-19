@@ -116,9 +116,11 @@
                                                         <Button Grid.Row="0" Grid.Column="0" Content=" ↑ " Margin="2,2,2,2"></Button>
                                                         <Button Grid.Row="0" Grid.Column="0" Content=" ← " Margin="2,2,2,2"></Button>
                                                     </StackPanel>
-                                                    <ListBox Grid.Row="1" Grid.Column="0" MinHeight="50">
-
-                                                    </ListBox>
+                                                    <DataGrid Grid.Row="1" Grid.Column="0" MinHeight="50" ItemsSource="{Binding CurrentTreeRepository}">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn></DataGridTextColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
                                                 </Grid>
                                             </GroupBox>
                                         </Grid>
@@ -142,18 +144,25 @@
                                                     <RowDefinition></RowDefinition>
                                                 </Grid.RowDefinitions>
                                                 <GroupBox  Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2,2,2,2">
-                                                    <DataGrid  Height="auto">
-                                                        <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
-                                                        </DataGrid.Columns>
-                                                    </DataGrid>
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Button Content=" + " Margin="2,2,2,2"></Button>
+                                                            <Button Content=" - " Margin="2,2,2,2"></Button>
+                                                        </StackPanel>
+                                                        <DataGrid  Height="auto">
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="Наименование атрибута"></DataGridTextColumn>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </StackPanel>
                                                 </GroupBox>
                                                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
                                                 <GroupBox  Grid.Row="2" Grid.Column="0" Header="Собственные атрибуты" Margin="2,2,2,2">
                                                     <DataGrid  Height="auto">
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Наименование атрибута"></DataGridTextColumn>
                                                             <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                                                            <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
                                                             <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
                                                         </DataGrid.Columns>
                                                     </DataGrid>
@@ -175,41 +184,30 @@
                                         </GroupBox>
                                         <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                                         <GroupBox Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2,2,2,2">
-                                            <TabControl>
-                                                <TabItem Header="Одиночное значение">
-                                                    <DataGrid  Height="auto">
-                                                        <DataGrid.Columns>
-                                                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
-                                                            <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
-                                                            <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
-                                                        </DataGrid.Columns>
-                                                    </DataGrid>
-                                                </TabItem>
-                                                <TabItem Header="Плоская таблица">
-
-                                                </TabItem>
-                                                <TabItem Header="Кросс-таблица">
-
-                                                </TabItem>
-                                            </TabControl>
-                                            
-                                        </GroupBox>
-                                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                                        <GroupBox Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2,2,2,2">
                                             <StackPanel>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Button Content=" + " Margin="2,2,2,2"></Button>
-                                                    <Button Content=" - " Margin="2,2,2,2"></Button>
-                                                </StackPanel>
+                                                <TabControl Visibility="Visible">
+                                                    <TabItem Header="Плоская таблица допустимых значений (для узла)">
+
+                                                    </TabItem>
+                                                    <TabItem Header="Кросс-таблица допустимых значений (для узла)">
+
+                                                    </TabItem>
+                                                    <TabItem Header="Значения дочерних элементов (для узла)">
+                                                        <DataGrid  Height="auto">
+
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                </TabControl>
                                                 <DataGrid  Height="auto">
                                                     <DataGrid.Columns>
-                                                        <DataGridComboBoxColumn Header="Атрибут"></DataGridComboBoxColumn>
-                                                        <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
                                                         <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
+                                                        <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
                                                     </DataGrid.Columns>
                                                 </DataGrid>
                                             </StackPanel>
                                         </GroupBox>
+                                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                                     </Grid>
                                 </Grid>
                             </TabItem>
