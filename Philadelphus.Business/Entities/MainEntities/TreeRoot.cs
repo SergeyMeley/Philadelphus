@@ -19,7 +19,7 @@ namespace Philadelphus.Business.Entities.MainEntities
         public IMainEntitiesRepository Infrastructure { get; private set; }
         public string DirectoryPath { get; set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
+        //public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
         public TreeRoot(Guid parentGuid) : base(parentGuid)
         {
             Childs = new List<TreeNode>();

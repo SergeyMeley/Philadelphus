@@ -15,8 +15,8 @@ namespace Philadelphus.Business.Entities.MainEntities
         public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public IMainEntitiesRepository Infrastructure { get; private set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
-        public IEnumerable<TreeLeave> ChildTreeLeaves { get; set; } = new List<TreeLeave>();
+        //public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
+        //public IEnumerable<TreeLeave> ChildTreeLeaves { get; set; } = new List<TreeLeave>();
         public TreeNode(Guid parentGuid) : base(parentGuid)
         {
             Childs = new List<IMainEntity>();

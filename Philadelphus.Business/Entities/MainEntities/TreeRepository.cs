@@ -16,7 +16,7 @@ namespace Philadelphus.Business.Entities.MainEntities
         public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public IMainEntitiesRepository Infrastructure { get; private set; } = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        public IEnumerable<TreeRoot> ChildTreeRoots { get; set; } = new List<TreeRoot>();
+        //public IEnumerable<TreeRoot> ChildTreeRoots { get; set; } = new List<TreeRoot>();
         public IEnumerable<IMainEntitiesRepository> InfrastructureRepositories { get; set; }
         public TreeRepository(Guid parentGuid) : base(parentGuid)
         {
