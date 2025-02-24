@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication"
         xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationViewModel}"
         mc:Ignorable="d"
         Title="Чубушник"
@@ -102,24 +103,45 @@
                                                 <Button Content=" - " Margin="2,2,2,2"></Button>
                                             </StackPanel>
                                             <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2,2,2,2" Grid.ColumnSpan="2">
-                                                <TreeView ItemsSource="{Binding CurrentTreeRepository.Childs}" DisplayMemberPath="Guid">
+                                                <TreeView Name="MainTreeView" ItemsSource="{Binding CurrentTreeRepository.Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+                                                    <TreeView.ItemTemplate>
+                                                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="{Binding Name}" />
+                                                                <TextBlock Text=" | " />
+                                                                <TextBlock Text="{Binding Guid}" />
+                                                            </StackPanel>
+                                                        </HierarchicalDataTemplate>
+                                                    </TreeView.ItemTemplate>
                                                 </TreeView>
                                             </GroupBox>
                                             <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
                                             <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2,2,2,2" Grid.ColumnSpan="2">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
-                                                        <RowDefinition Height="30"></RowDefinition>
+                                                        <RowDefinition Height="auto"></RowDefinition>
                                                         <RowDefinition></RowDefinition>
                                                     </Grid.RowDefinitions>
-                                                    <StackPanel Orientation="Horizontal" Margin="2,2,2,2">
-                                                        <Button Grid.Row="0" Grid.Column="0" Content=" ↑ " Margin="2,2,2,2"></Button>
-                                                        <Button Grid.Row="0" Grid.Column="0" Content=" ← " Margin="2,2,2,2"></Button>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding SelectedEntity.Name}"></TextBlock>
+                                                        <StackPanel Orientation="Horizontal" Margin="2,2,2,2">
+                                                            <Button Grid.Row="0" Grid.Column="0" Content=" ↑ " Margin="2,2,2,2"></Button>
+                                                            <Button Grid.Row="0" Grid.Column="0" Content=" ← " Margin="2,2,2,2"></Button>
+                                                        </StackPanel>
                                                     </StackPanel>
-                                                    <DataGrid Grid.Row="1" Grid.Column="0" MinHeight="50" ItemsSource="{Binding CurrentTreeRepository}">
+                                                    <DataGrid Grid.Row="1" Grid.Column="0" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
                                                         <DataGrid.Columns>
-                                                            <DataGridTextColumn></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
+                                                            <DataGridCheckBoxColumn Header="Это ссылка" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
+                                                            <DataGridTextColumn Header="Тип элемента" Binding="{Binding EntityType}"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
+                                                            <DataGridTextColumn Header="Код" Binding="{Binding Guid}"></DataGridTextColumn>
                                                         </DataGrid.Columns>
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="MouseDoubleClick">
+                                                                <i:InvokeCommandAction Command="{Binding MyCommand}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
                                                     </DataGrid>
                                                 </Grid>
                                             </GroupBox>
@@ -215,9 +237,8 @@
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Атрибты" Margin="2,2,2,2">
+                                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Атрибуты" Margin="2,2,2,2">
                                         <DataGrid>
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="№"></DataGridTextColumn>
@@ -227,16 +248,35 @@
                                             </DataGrid.Columns>
                                         </DataGrid>
                                     </GroupBox>
-                                    <GroupBox Grid.Row="0" Grid.Column="1" Header="Значения атрибутов" Margin="2,2,2,2">
-                                        <DataGrid>
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="№"></DataGridTextColumn>
-                                                <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
-                                                <DataGridTemplateColumn Header="Значение"></DataGridTemplateColumn>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
-                                    </GroupBox>
                                 </Grid>
+                            </TabItem>
+                            <TabItem Header="Пресеты (стандартные наборы)">
+                                <TabControl Margin="2,2,2,2">
+                                    <TabItem Header="Наборы атрибутов">
+                                        
+                                    </TabItem>
+                                    <TabItem Header="Наборы значений атрибутов">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <GroupBox Grid.Row="0" Grid.Column="0" Header="Перечень пресетов" Margin="2,2,2,2">
+                                                <DataGrid Margin="2,2,2,2">
+
+                                                </DataGrid>
+                                            </GroupBox>
+                                            <GroupBox Grid.Row="1" Grid.Column="0" Header="Содержимое пресета" Margin="2,2,2,2">
+                                                <DataGrid Margin="2,2,2,2">
+
+                                                </DataGrid>
+                                            </GroupBox>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Наборы допустимых значений">
+                                        
+                                    </TabItem>
+                                </TabControl>
                             </TabItem>
                             <TabItem Header="Отчеты">
                                 <Grid>

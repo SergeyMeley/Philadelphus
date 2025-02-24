@@ -1,4 +1,5 @@
-﻿using Philadelphus.WpfApplication.ViewModels;
+﻿using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.WpfApplication.ViewModels;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,10 +18,17 @@ namespace Philadelphus.WpfApplication
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ApplicationViewModel _viewModel = new ApplicationViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new ApplicationViewModel();
+            DataContext = _viewModel;
+            var qwe = MainTreeView.SelectedItem;
+        }
+
+        private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            _viewModel.SelectedEntity = (IMainEntity)MainTreeView.SelectedItem;
         }
     }
 }

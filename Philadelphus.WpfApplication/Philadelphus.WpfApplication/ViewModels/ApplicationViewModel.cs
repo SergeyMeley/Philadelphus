@@ -7,7 +7,16 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     internal class ApplicationViewModel : ViewModelBase
     {
-        public IMainEntity SelectedEntity { get; private set; }
+        private IMainEntity _selectedEntity;
+        public IMainEntity SelectedEntity 
+        {
+            get => _selectedEntity;
+            set
+            {
+                _selectedEntity = value;
+                OnPropertyChanged(nameof(SelectedEntity));
+            }
+        }
         public List<InfrastructureRepositoryTypes> InfrastructureRepositories
         {
             get
@@ -80,7 +89,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeRepositoryService();
-                    ((List<TreeRoot>)_currentTreeRepository.ChildTreeRoots).Add(new TreeRoot(_currentTreeRepository.Guid));
+                    ((List<TreeRoot>)_currentTreeRepository.Childs).Add(new TreeRoot(_currentTreeRepository.Guid));
                     OnPropertyChanged(nameof(CurrentTreeRepository));
                 });
             }
