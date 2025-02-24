@@ -22,11 +22,19 @@ namespace Philadelphus.Business.Entities.MainEntities
         //public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
         public TreeRoot(Guid parentGuid) : base(parentGuid)
         {
-            Childs = new List<TreeNode>();
+            Initialize();
+            ParentGuid = parentGuid;
         }
         public TreeRoot(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
-            Childs = new List<TreeNode>();
+            Initialize();
+            ParentGuid = parentGuid;
+            Guid = guid;
+        }
+        private void Initialize()
+        {
+            Name = "Новый корень";
+            Childs = new List<IMainEntity>();
         }
     }
 }

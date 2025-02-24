@@ -32,6 +32,7 @@
             LoadButton = new Button();
             button2 = new Button();
             PathesListBox = new ListBox();
+            TestButton = new Button();
             SuspendLayout();
             // 
             // NewPathTextBox
@@ -73,11 +74,22 @@
             PathesListBox.TabIndex = 2;
             PathesListBox.SelectedIndexChanged += PathesListBox_SelectedIndexChanged;
             // 
+            // TestButton
+            // 
+            TestButton.Location = new Point(88, 403);
+            TestButton.Name = "TestButton";
+            TestButton.Size = new Size(75, 23);
+            TestButton.TabIndex = 3;
+            TestButton.Text = "TEST";
+            TestButton.UseVisualStyleBackColor = true;
+            TestButton.Click += TestButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(416, 372);
+            ClientSize = new Size(416, 453);
+            Controls.Add(TestButton);
             Controls.Add(PathesListBox);
             Controls.Add(button2);
             Controls.Add(LoadButton);
@@ -94,5 +106,6 @@
         private Button LoadButton;
         private Button button2;
         private ListBox PathesListBox;
+        private Button TestButton;
     }
 }

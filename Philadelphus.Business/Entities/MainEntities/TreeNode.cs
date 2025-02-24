@@ -19,10 +19,18 @@ namespace Philadelphus.Business.Entities.MainEntities
         //public IEnumerable<TreeLeave> ChildTreeLeaves { get; set; } = new List<TreeLeave>();
         public TreeNode(Guid parentGuid) : base(parentGuid)
         {
-            Childs = new List<IMainEntity>();
+            Initialize();
+            ParentGuid = parentGuid;
         }
         public TreeNode(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
+            Initialize();
+            ParentGuid = parentGuid;
+            Guid = guid;
+        }
+        private void Initialize()
+        {
+            Name = "Новый узел";
             Childs = new List<IMainEntity>();
         }
     }

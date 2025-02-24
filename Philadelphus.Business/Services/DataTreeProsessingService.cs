@@ -101,20 +101,26 @@ namespace Philadelphus.Business.Services
         {
             //Временно
             var repo = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
-            for (int i = 0; i <= 5; i++)
+            for (int i = 0; i < 5; i++)
             {
                 var root = new TreeRoot(repo.Guid);
-                for (int j = 0; j <= 5; j++)
+                for (int j = 0; j < 5; j++)
                 {
                     var node = new TreeNode(root.Guid);
-                    ((List<TreeNode>)root.Childs).Add(node);
+                    for (int k = 0; k < 5; k++)
+                    {
+                        var node2 = new TreeNode(root.Guid);
+                        ((List<IMainEntity>)node.Childs).Add(node2);
+                        var leave = new TreeLeave(node.Guid);
+                        ((List<IMainEntity>)node.Childs).Add(leave);
+                    }
+                    ((List<IMainEntity>)root.Childs).Add(node);
                 }
-                ((List<TreeRoot>)repo.Childs).Add(root);
+                ((List<IMainEntity>)repo.Childs).Add(root);
             }
             return repo;
             //Временно
             return (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
-            
         }
         /// <summary>
         /// Сохранение измененного репозитория.
@@ -229,7 +235,7 @@ namespace Philadelphus.Business.Services
 
                 //}
             }
-            for (int i = 0; i < currentRepository.ChildTreeRoots.Count(); i++)
+            for (int i = 0; i < currentRepository.Childs.Count(); i++)
             {
                 //currentRepository.ChildTreeRoots.ToList()[i] = GetRootContent(currentRepository.ChildTreeRoots.ToList()[i]);
             }

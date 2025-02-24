@@ -1,5 +1,6 @@
 using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.Business.Entities.OtherEntities;
+using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.PostgreRepository.Repositories;
@@ -61,6 +62,11 @@ namespace Test
         private void NewPathTextBox_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void TestButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(SequenceHelper.GetLastSequence(new int[] { 1, 2, 9, 101 }).ToString());
         }
     }
 }
