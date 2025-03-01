@@ -97,7 +97,7 @@ namespace Philadelphus.Business.Services
         /// Создание нового пустого репозитория.
         /// </summary>
         /// <returns></returns>
-        public TreeRepository CreateRepository()
+        public TreeRepository CreateSampleRepository()
         {
             //Временно
             var repo = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
