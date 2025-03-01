@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="Philadelphus.WpfApplication.Controls.RepositoryExplorer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Philadelphus.WpfApplication.Controls"
+             xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="2,2,2,2" Grid.ColumnSpan="2">
+                <Button Content="+ корень" Command="{Binding CreateRootCommand}" Margin="2,2,2,2"></Button>
+                <Button Content="+ узел" Margin="2,2,2,2"></Button>
+                <Button Content="+ лист" Margin="2,2,2,2"></Button>
+                <Button Content=" - " Margin="2,2,2,2"></Button>
+            </StackPanel>
+            <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2,2,2,2" Grid.ColumnSpan="2">
+                <TreeView Name="MainTreeView" ItemsSource="{Binding CurrentTreeRepository.Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text=" | " />
+                                <TextBlock Text="{Binding Guid}" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </GroupBox>
+            <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+            <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2,2,2,2" Grid.ColumnSpan="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{Binding SelectedEntity.Name}"></TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="2,2,2,2">
+                            <Button Grid.Row="0" Grid.Column="0" Content=" ↑ " Margin="2,2,2,2"></Button>
+                            <Button Grid.Row="0" Grid.Column="0" Content=" ← " Margin="2,2,2,2"></Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" Grid.Column="0" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
+                            <DataGridCheckBoxColumn Header="Это ссылка" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
+                            <DataGridTextColumn Header="Тип элемента" Binding="{Binding EntityType}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Код" Binding="{Binding Guid}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>

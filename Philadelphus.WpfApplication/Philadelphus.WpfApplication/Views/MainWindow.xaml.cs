@@ -23,12 +23,6 @@ namespace Philadelphus.WpfApplication
         {
             InitializeComponent();
             DataContext = _viewModel;
-            var qwe = MainTreeView.SelectedItem;
-        }
-
-        private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            _viewModel.SelectedEntity = (IMainEntity)MainTreeView.SelectedItem;
         }
     }
 }
