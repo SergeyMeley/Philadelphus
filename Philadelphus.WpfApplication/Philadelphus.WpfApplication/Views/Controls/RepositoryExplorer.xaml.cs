@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Controls
+namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
     /// Логика взаимодействия для RepositoryExplorer.xaml

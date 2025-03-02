@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="Philadelphus.WpfApplication.Views.Controls.RepositorySettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="White">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="Репозиторий" Margin="2,2,2,2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Row="0" Grid.Column="0" Margin="2,2,2,2" ItemsSource="{Binding TreeRepositories, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTreeRepository}"></ComboBox>
+                    <Button Grid.Row="0" Grid.Column="1" Content="Создать" Margin="2,2,2,2" Command="{Binding AddNewTreeRepositoryCommand}"></Button>
+                    <Button Grid.Row="0" Grid.Column="2" Content="Удалить" Margin="2,2,2,2"></Button>
+                    <Button Grid.Row="0" Grid.Column="3" Content="Обновить список" Margin="2,2,2,2" Command="{Binding RefreshRepositoryListCommand}"></Button>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Row="1" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"></ColumnDefinition>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Row="0" Grid.Column="0" Header="Параметры репозитория" Margin="2,2,2,2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Хранилище данных по умолчанию" Margin="2,2,2,2"></TextBlock>
+                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding InfrastructureRepositories}" Margin="2,2,2,2"></ComboBox>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="2,2,2,2"></TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите наименование" Text="{Binding SelectedTreeRepository.Name}" Margin="2,2,2,2"></TextBox>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="2,2,2,2"></TextBlock>
+                        <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите описание" Text="{Binding SelectedTreeRepository.Description}" Margin="2,2,2,2"></TextBox>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Локальный путь" Margin="2,2,2,2"></TextBlock>
+                        <TextBox Grid.Row="3" Grid.Column="1" Style="{StaticResource PlaceholderTextBoxStyle}" Tag="Введите путь" Text="{Binding SelectedTreeRepository.DirectoryPath}" Margin="2,2,2,2"></TextBox>
+                        <Button Grid.Row="7" Grid.ColumnSpan="2" Command="{Binding SaveRepository}" Content="Сохранить" Margin="2,2,2,2"></Button>
+                    </Grid>
+                </GroupBox>
+                <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
+                <GroupBox Grid.Row="0" Grid.Column="2" Header="Корни репозитория" Margin="2,2,2,2">
+                    <StackPanel>
+                        <GroupBox Header="Собственные корни" Margin="2,2,2,2">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content=" + " Margin="2,2,2,2"></Button>
+                                    <Button Content=" - " Margin="2,2,2,2"></Button>
+                                    <Button Content="Скопировать внешний" Margin="2,2,2,2"></Button>
+                                </StackPanel>
+                                <DataGrid>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                        <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                        <DataGridComboBoxColumn Header="Хранилище данных" ItemsSource="{Binding InfrastructureRepositories}"></DataGridComboBoxColumn>
+                                        <DataGridTextColumn Header="Абсолютный путь"></DataGridTextColumn>
+                                        <DataGridTextColumn Header="Строка подключения"></DataGridTextColumn>
+                                        <DataGridCheckBoxColumn Header="Может стать внешним"></DataGridCheckBoxColumn>
+                                    </DataGrid.Columns>
+                                    <RowDefinition>
+
+                                    </RowDefinition>
+                                </DataGrid>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Внешние корни" Margin="2,2,2,2">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content=" + " Margin="2,2,2,2"></Button>
+                                    <Button Content=" - " Margin="2,2,2,2"></Button>
+                                </StackPanel>
+                                <DataGrid>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="№"></DataGridTextColumn>
+                                        <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                        <DataGridTextColumn Header="Репозиторий"></DataGridTextColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
