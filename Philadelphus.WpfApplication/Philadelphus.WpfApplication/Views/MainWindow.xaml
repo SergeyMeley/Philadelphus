@@ -22,20 +22,48 @@
             <SolidColorBrush Color="#FFF1F1F1"/>
         </Grid.Background>
         <DockPanel>
-            <Ribbon DockPanel.Dock="Top" Title="Ribbon Title">
+            <Ribbon DockPanel.Dock="Top" Background="Transparent">
                 <Ribbon.HelpPaneContent>
                     <RibbonButton  />
                 </Ribbon.HelpPaneContent>
                 <Ribbon.QuickAccessToolBar>
                     <RibbonQuickAccessToolBar >
-                        <RibbonButton />
-                        <RibbonButton />
+                        
                     </RibbonQuickAccessToolBar>
                 </Ribbon.QuickAccessToolBar>
                 <Ribbon.ApplicationMenu>
                     <RibbonApplicationMenu>
-                        <RibbonApplicationMenuItem Header="Hello _Ribbon"
-                  x:Name="MenuItem1" />
+                        <!--<RibbonApplicationMenu.SmallImageSource>
+                            <BitmapImage UriSource="C:\Users\MeleychukSV\Downloads\icons8-квадратный-корень-2-64.png" />
+                        </RibbonApplicationMenu.SmallImageSource>-->
+                        <RibbonApplicationMenu.SmallImageSource>
+                            <DrawingImage>
+                                <DrawingImage.Drawing>
+                                    <GlyphRunDrawing ForegroundBrush="White">
+                                        <GlyphRunDrawing.GlyphRun>
+                                            <GlyphRun
+                                                CaretStops="{x:Null}" 
+                                                ClusterMap="{x:Null}" 
+                                                IsSideways="False" 
+                                                GlyphOffsets="{x:Null}" 
+                                                GlyphIndices="41 76 79 72" 
+                                                FontRenderingEmSize="12" 
+                                                DeviceFontName="{x:Null}" 
+                                                AdvanceWidths="5.859375 2.90625 2.90625 6.275390625">
+                                                <GlyphRun.GlyphTypeface>
+                                                    <GlyphTypeface FontUri="C:\WINDOWS\Fonts\SEGOEUI.TTF"/>
+                                                </GlyphRun.GlyphTypeface>
+                                            </GlyphRun>
+                                        </GlyphRunDrawing.GlyphRun>
+                                    </GlyphRunDrawing>
+                                </DrawingImage.Drawing>
+                            </DrawingImage>
+                        </RibbonApplicationMenu.SmallImageSource>
+                        <RibbonApplicationMenuItem Header="Hello _Ribbon" />
+                        <RibbonButton Label="Открыть локальный репозиторий"/>
+                        <RibbonButton Label="Открыть удаленный репозиторий"/>
+                        <RibbonButton Label="Создать пустой репозиторий"/>
+                        <RibbonButton Label="Создать из шаблона"/>
                     </RibbonApplicationMenu>
                 </Ribbon.ApplicationMenu>
                 <RibbonTab Header="Главная">
@@ -44,15 +72,53 @@
                         <RibbonButton Label="Вырезать" />
                         <RibbonButton Label="Вставить" />
                         <RibbonButton Label="Дублировать" />
-                        <RibbonButton Label="Перенести" />
+                        <RibbonButton Label="Переместить" />
                     </RibbonGroup>
+                    <RibbonGroup Header="Общее">
+                        <RibbonSplitButton Label="Добавить элемент">
+                            <RibbonButton Label="Добавить корень"></RibbonButton>
+                            <RibbonButton Label="Добавить узел"></RibbonButton>
+                            <RibbonButton Label="Добавить лист"></RibbonButton>
+                        </RibbonSplitButton>
+                    </RibbonGroup> 
                 </RibbonTab>
                 <RibbonTab Header="Репозиторий">
-                    <RibbonGroup Header="Репозиторий">
-                        <RibbonButton Label="Button1" />
-                        <RibbonButton Label="Button2" />
-                        <RibbonButton Label="Button3" />
-                        <RibbonButton Label="Button4" />
+                    <RibbonGroup Header="Текущий репозиторий">
+                        <!--<RibbonComboBox ItemsSource="{Binding TreeRepositories}" DisplayMemberPath="Name">
+                            <RibbonComboBox.Style>
+                                <Style TargetType="RibbonComboBox" BasedOn="{StaticResource SyncfusionRibbonComboBoxStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="LayoutTransform"  Value="True">
+                                            <Setter Property="Height" Value="25"/>
+                                            <Setter Property="Width" Value="100"/>
+                                            <Setter Property="Margin" Value="2"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </RibbonComboBox.Style>
+                        </RibbonComboBox>-->
+                        <ComboBox ItemsSource="{Binding TreeRepositories}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentTreeRepository}" IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200"></ComboBox>
+                        <RibbonButton Label="Отключить репозиторий" />
+                        <RibbonButton Label="Удалить репозиторий" />
+                    </RibbonGroup>
+                    <RibbonGroup Header="Иерархия репозитория">
+                        <RibbonButton Label="Добавить собственный корень" />
+                        <RibbonButton Label="Добавить внешний корень" />
+                        <RibbonButton Label="Добавить узел" />
+                        <RibbonButton Label="Добавить лист" />
+                        <RibbonButton Label="Удалить элемент" />
+                    </RibbonGroup>
+                    <RibbonGroup Header="Вхождения атрибутов">
+                        <RibbonButton Label="Добавить вхождение" />
+                        <RibbonButton Label="Удалить вхождение" />
+                    </RibbonGroup>
+                    <RibbonGroup Header="Атрибуты">
+                        <RibbonButton Label="Добавить атрибут" />
+                        <RibbonButton Label="Удалить атрибут" />
+                    </RibbonGroup>
+                    <RibbonGroup Header="Пресеты">
+                        <RibbonButton Label="Добавить пресет" />
+                        <RibbonButton Label="Удалить пресет" />
                     </RibbonGroup>
                 </RibbonTab>
                 <RibbonTab Header="Вставка">
@@ -74,6 +140,9 @@
 
                 </RibbonTab>
                 <RibbonTab Header="Справка">
+                    <RibbonGroup>
+                        <RibbonButton Label="О нас"></RibbonButton>
+                    </RibbonGroup>
 
                 </RibbonTab>
             </Ribbon>
@@ -82,7 +151,8 @@
                     <RowDefinition Height="4*"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto" MaxHeight="350"></RowDefinition>
-                    <RowDefinition Height="auto" MinHeight="15"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
@@ -96,7 +166,7 @@
                             <ColumnDefinition Width="auto"></ColumnDefinition>
                             <ColumnDefinition Width="5*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="2,2,2,2">
+                        <Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="2">
                             <Expander.Header>
                                 <TextBlock Text="Навигационная панель">
                                     <TextBlock.LayoutTransform>
@@ -110,7 +180,7 @@
                                     <RowDefinition Height="auto"></RowDefinition>
                                     <RowDefinition Height="*"></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <GroupBox Grid.Row="0" Grid.Column="0" Header="Сервисы" Margin="2,2,2,2" Background="White">
+                                <GroupBox Grid.Row="0" Grid.Column="0" Header="Сервисы" Margin="2" Background="White">
                                     <ListBox>
                                         <ListBoxItem Content="Дерево данных"></ListBoxItem>
                                         <ListBoxItem Content="Атрибуты"></ListBoxItem>
@@ -124,7 +194,7 @@
                                     </ListBox>
                                 </GroupBox>
                                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                                <GroupBox Grid.Row="2" Grid.Column="0" Header="Надстройки" Margin="2,2,2,2" Background="White">
+                                <GroupBox Grid.Row="2" Grid.Column="0" Header="Надстройки" Margin="2" Background="White">
                                     <ListBox>
                                         <ListBoxItem Content="Git"></ListBoxItem>
                                         <ListBoxItem Content="Расчет трубопроводных элементов"></ListBoxItem>
@@ -136,65 +206,9 @@
                             </Grid>
                         </Expander>
                         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
-                        <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2,2,2,2" Background="White">
-                            <TabControl Margin="2,2,2,2">
-                                <TabItem Header="test">
-                                    <Ribbon x:Name="Ribbon" Title="Ribbon Title">
-                                        <Ribbon.HelpPaneContent>
-                                            <RibbonButton  />
-                                        </Ribbon.HelpPaneContent>
-                                        <Ribbon.QuickAccessToolBar>
-                                            <RibbonQuickAccessToolBar >
-                                                <RibbonButton x:Name="QATButton1" />
-                                                <RibbonButton x:Name="QATButton2"  />
-                                            </RibbonQuickAccessToolBar>
-                                        </Ribbon.QuickAccessToolBar>
-                                        <Ribbon.ApplicationMenu>
-                                            <RibbonApplicationMenu>
-                                                <RibbonApplicationMenuItem Header="Hello _Ribbon" />
-                                            </RibbonApplicationMenu>
-                                        </Ribbon.ApplicationMenu>
-                                        <RibbonTab Header="Главная">
-                                            <RibbonGroup Header="Буфер обмена">
-                                                <RibbonButton Label="Копировать" />
-                                                <RibbonButton Label="Вырезать" />
-                                                <RibbonButton Label="Вставить" />
-                                                <RibbonButton Label="Дублировать" />
-                                                <RibbonButton Label="Перенести" />
-                                            </RibbonGroup>
-                                        </RibbonTab>
-                                        <RibbonTab Header="Репозиторий">
-                                            <RibbonGroup Header="Репозиторий">
-                                                <RibbonButton Label="Button1" />
-                                                <RibbonButton Label="Button2" />
-                                                <RibbonButton Label="Button3" />
-                                                <RibbonButton Label="Button4" />
-                                            </RibbonGroup>
-                                        </RibbonTab>
-                                        <RibbonTab Header="Вставка">
-
-                                        </RibbonTab>
-                                        <RibbonTab Header="Рассылки">
-
-                                        </RibbonTab>
-                                        <RibbonTab Header="Вид">
-
-                                        </RibbonTab>
-                                        <RibbonTab Header="Расширения">
-
-                                        </RibbonTab>
-                                        <RibbonTab Header="Администрирование">
-
-                                        </RibbonTab>
-                                        <RibbonTab Header="Настройки">
-
-                                        </RibbonTab>
-                                        <RibbonTab Header="Справка">
-
-                                        </RibbonTab>
-                                    </Ribbon>
-                                </TabItem>
-                                <TabItem Header="Дерево данных">
+                        <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2" Background="White">
+                            <TabControl Margin="2">
+                                <TabItem Header="Репозиторий">
                                     <ctrls:RepositoryExplorer DataContext="{Binding RepositoryExplorerViewModel}"></ctrls:RepositoryExplorer>
                                 </TabItem>
                                 <TabItem Header="Атрибуты">
@@ -221,7 +235,7 @@
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                 </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="2,2,2,2">
+                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="2">
                     <DataGrid>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Тип" Width="35"></DataGridTextColumn>
@@ -233,7 +247,11 @@
                         <TreeViewItem></TreeViewItem>
                     </DataGrid>
                 </Expander>
-                <ProgressBar Grid.Row="3"></ProgressBar>
+                
+                <StatusBar Grid.Row="3">
+                    <TextBlock Text="Приложение запущено"></TextBlock>
+                </StatusBar>
+                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
             </Grid>
         </DockPanel>
     </Grid>

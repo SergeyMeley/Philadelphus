@@ -12,8 +12,9 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public  class RepositoryExplorerViewModel : ViewModelBase
     {
-        public RepositoryExplorerViewModel()
+        public RepositoryExplorerViewModel(TreeRepository treeRepository)
         {
+            _currentTreeRepository = treeRepository;
             //((List<ViewModelBase>)Cache).Add(new RepositoryExplorerViewModel());
         }
         private IMainEntity _selectedEntity;
@@ -33,15 +34,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return Enum.GetValues(typeof(InfrastructureRepositoryTypes)).Cast<InfrastructureRepositoryTypes>().ToList();
             }
         }
-        private TreeRepository _currentTreeRepository;
+        
+
+        private static TreeRepository _currentTreeRepository;
         public TreeRepository CurrentTreeRepository
         {
             get
             {
-                //Временно
-                DataTreeRepositoryService treeRepositoryService = new DataTreeRepositoryService();
-                _currentTreeRepository = treeRepositoryService.CreateSampleRepository();
-                //Временно
                 return _currentTreeRepository;
             }
             set
@@ -50,46 +49,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 OnPropertyChanged(nameof(CurrentTreeRepository));
             }
         }
-
-
         #region [Commands]
-        //public RelayCommand AddNewTreeRepositoryCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(obj =>
-        //        {
-        //            var repository = new TreeRepository(Guid.Empty);
-        //            _treeRepositories.Add(repository);
-        //            OnPropertyChanged(nameof(TreeRepositories));
-        //            _currentTreeRepository = TreeRepositories.Last();
-        //            OnPropertyChanged(nameof(CurrentTreeRepository));
-        //        });
-        //    }
-        //}
-        //public RelayCommand SaveRepositoryCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(obj =>
-        //        {
-        //            var service = new DataTreeRepositoryService();
-        //            service.ModifyRepository(_currentTreeRepository);
-        //        });
-        //    }
-        //}
-        //public RelayCommand RefreshRepositoryListCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(obj =>
-        //        {
-        //            var service = new DataTreeRepositoryService();
-        //            _treeRepositories = service.GetRepositories() ?? new List<TreeRepository>();
-        //            OnPropertyChanged(nameof(TreeRepositories));
-        //        });
-        //    }
-        //}
         public RelayCommand AddRootCommand
         {
             get

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="White">
-        <TabControl Margin="2,2,2,2">
+        <TabControl Margin="2">
             <TabItem Header="Наборы атрибутов">
 
             </TabItem>
@@ -17,13 +17,13 @@
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Перечень пресетов" Margin="2,2,2,2">
-                        <DataGrid Margin="2,2,2,2">
+                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Перечень пресетов" Margin="2">
+                        <DataGrid Margin="2">
 
                         </DataGrid>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Содержимое пресета" Margin="2,2,2,2">
-                        <DataGrid Margin="2,2,2,2">
+                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Содержимое пресета" Margin="2">
+                        <DataGrid Margin="2">
 
                         </DataGrid>
                     </GroupBox>

@@ -5,123 +5,170 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
              xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
+             xmlns:mainentities="clr-namespace:Philadelphus.Business.Entities.MainEntities;assembly=Philadelphus.Business"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="White">
+        <Grid.Resources>
+            
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <ComboBox Grid.Row="0" Grid.Column="0" Margin="2"></ComboBox>
-            <Button Grid.Row="0" Grid.Column="1" Content="Найти репозиторий" Margin="2"></Button>
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="2,2,2,2" Grid.RowSpan="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="2" Grid.RowSpan="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="2" Grid.ColumnSpan="2">
+                    <Button Content="{StaticResource imageModify}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                    <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                    <Button Content="{StaticResource imageNode}"  Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                    <Button Content="{StaticResource imageLeave}"  Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                    <Button Content="{StaticResource imageDelete}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                    <Button Content="{StaticResource imageProtect}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                </StackPanel>
+                <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2" Grid.ColumnSpan="2">
+
+                    <TreeView Name="MainTreeView" ItemsSource="{Binding CurrentTreeRepository.Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+
+                        <TreeView.ItemTemplate>
+                            <!--<HierarchicalDataTemplate Template="{StaticResource ResourceKey=}" DataType="{x:Type mainentities:TreeRoot}" ItemsSource="{Binding Childs}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="24" Height="24" Margin="10,0,10,0" Source="C:\Users\MeleychukSV\Downloads\icons8_icon_repository.png" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                            </HierarchicalDataTemplate>-->
+                        
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
+                                        <Image Width="24" Height="24" Margin="10,0,10,0">
+                                            <Image.Source>
+                                                <BitmapImage UriSource="{Binding EntityType, Converter={StaticResource iconConverter}}"></BitmapImage>
+                                            </Image.Source>
+                                        </Image>
+                                        <StackPanel Margin="0,2,10,2">
+                                            <TextBlock>
+                                                <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
+                                                <Run Text="{Binding Name}" FontStyle="Italic" />
+                                            </TextBlock>
+                                            <TextBlock>
+                                                <Run Text="Guid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
+                                                <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="0.25"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                        <TreeView.Resources>
+                            <!--<HierarchicalDataTemplate DataType="{x:Type mainentities:TreeRoot}" ItemsSource="{Binding Childs}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="24" Height="24" Margin="10,0,10,0" Source="C:\Users\MeleychukSV\Downloads\icons8_icon_repository.png" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type mainentities:TreeNode}" ItemsSource="{Binding Childs}" >
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Margin="3,0" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_node.png" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type mainentities:TreeLeave}" ItemsSource="{Binding Childs}" >
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Margin="3,0" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_leave.png" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                            </HierarchicalDataTemplate>-->
+                        </TreeView.Resources>
+                    </TreeView>
+                </GroupBox>
+                <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2" Grid.ColumnSpan="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Button Content="{StaticResource imageBack}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                                <Button Content="{StaticResource imageUp}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                            </StackPanel>
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                                    <TextBlock Text="Родитель: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
+                                    <TextBox Text="{Binding SelectedEntity.Name, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                                    <TextBlock Text="  "></TextBlock>
+                                    <TextBlock Text="Guid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
+                                    <TextBox Text="{Binding SelectedEntity.Guid, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                                    <Button Content="{StaticResource imageCopy}" Margin="2" Height="20" Width="20" Background="Transparent"></Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                    <TextBlock Text="XXX"></TextBlock>
+                                    <TextBlock Text=" / "></TextBlock>
+                                    <TextBlock Text="{Binding SelectedEntity.Childs.Count, Mode=OneWay}"></TextBlock>
+                                </StackPanel>
+                            </DockPanel>
+                            
+                        </StackPanel>
+                        <DataGrid Grid.Row="1" Grid.Column="0" Margin="2" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
+                                <DataGridCheckBoxColumn Header="Внешний" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
+                                <DataGridTextColumn Header="Тип элемента" IsReadOnly="True" Binding="{Binding EntityType}"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Код" IsReadOnly="True" Binding="{Binding Guid}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+        <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
+        <Grid Grid.Row="0" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="Вхождения атрибутов" Margin="2">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="2,2,2,2" Grid.ColumnSpan="2">
-                        <Button Content="+ корень" Command="{Binding CreateRootCommand}" Margin="2,2,2,2"></Button>
-                        <Button Content="+ узел" Margin="2,2,2,2"></Button>
-                        <Button Content="+ лист" Margin="2,2,2,2"></Button>
-                        <Button Content=" - " Margin="2,2,2,2"></Button>
-                    </StackPanel>
-                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2,2,2,2" Grid.ColumnSpan="2">
-                        <TreeView Name="MainTreeView" ItemsSource="{Binding CurrentTreeRepository.Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
-                            <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Name}" />
-                                        <TextBlock Text=" | " />
-                                        <TextBlock Text="{Binding Guid}" />
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                        </TreeView>
-                    </GroupBox>
-                    <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                    <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2,2,2,2" Grid.ColumnSpan="2">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="{Binding SelectedEntity.Name}"></TextBlock>
-                                <StackPanel Orientation="Horizontal" Margin="2,2,2,2">
-                                    <Button Grid.Row="0" Grid.Column="0" Content=" ↑ " Margin="2,2,2,2"></Button>
-                                    <Button Grid.Row="0" Grid.Column="0" Content=" ← " Margin="2,2,2,2"></Button>
-                                </StackPanel>
-                            </StackPanel>
-                            <DataGrid Grid.Row="1" Grid.Column="0" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
-                                    <DataGridCheckBoxColumn Header="Это ссылка" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
-                                    <DataGridTextColumn Header="Тип элемента" IsReadOnly="True" Binding="{Binding EntityType}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Код" IsReadOnly="True" Binding="{Binding Guid}"></DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
-                    </GroupBox>
-                </Grid>
-            </GroupBox>
-            <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
-            <Grid Grid.Row="0" Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
-                </Grid.RowDefinitions>
-                <GroupBox Grid.Row="0" Grid.Column="0" Header="Вхождения атрибутов" Margin="2,2,2,2">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="*"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="*"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <GroupBox  Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2,2,2,2">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Content=" + " Margin="2,2,2,2"></Button>
-                                    <Button Content=" - " Margin="2,2,2,2"></Button>
-                                </StackPanel>
-                                <DataGrid  Height="auto">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Наименование атрибута"></DataGridTextColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </GroupBox>
-                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                        <GroupBox  Grid.Row="2" Grid.Column="0" Header="Собственные атрибуты" Margin="2,2,2,2">
+                    <GroupBox  Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2">
+                        <StackPanel>
                             <DataGrid  Height="auto">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Наименование атрибута"></DataGridTextColumn>
-                                    <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
-                                    <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Значение" IsReadOnly="True"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </GroupBox>
-                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                        <GroupBox  Grid.Row="4" Grid.Column="0" Header="Внешние атрибуты" Margin="2,2,2,2">
+                        </StackPanel>
+                    </GroupBox>
+                    <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                    <GroupBox  Grid.Row="2" Grid.Column="0" Header="Внешние атрибуты" Margin="2">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{StaticResource imageAdd}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                                <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                            </StackPanel>
                             <DataGrid  Height="auto">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
@@ -130,36 +177,102 @@
                                     <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </GroupBox>
-                    </Grid>
-                </GroupBox>
-                <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <GroupBox Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2,2,2,2">
-                    <StackPanel>
-                        <TabControl Visibility="Visible">
-                            <TabItem Header="Плоская таблица допустимых значений (для узла)">
+                        </StackPanel>
 
-                            </TabItem>
-                            <TabItem Header="Кросс-таблица допустимых значений (для узла)">
+                    </GroupBox>
+                    <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                    <GroupBox  Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{StaticResource imageAdd}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                                <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                            </StackPanel>
+                            <DataGrid  Height="auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                                    <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                                    <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
+                                    <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </GroupBox>
+                    
+                </Grid>
+            </GroupBox>
+            <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+            <GroupBox Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2">
+                <StackPanel>
+                    <TabControl Visibility="Visible">
+                        <TabItem Header="Плоская таблица допустимых значений (для узла)">
+                            <DataGrid  Height="auto">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
 
-                            </TabItem>
-                            <TabItem Header="Значения дочерних элементов (для узла)">
-                                <DataGrid  Height="auto">
+                                </Grid>
+                            </DataGrid>
+                        </TabItem>
+                        <TabItem Header="Кросс-таблица допустимых значений (для узла)">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Grid.Column="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="2"></TextBlock>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="2"></ComboBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="2"></TextBlock>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="2"></ComboBox>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="2"></TextBlock>
+                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="2"></ComboBox>
+                                    </Grid>
+                                </Grid>
+                                <DataGrid></DataGrid>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Значения дочерних элементов (для узла)">
+                            <DataGrid  Height="auto">
 
-                                </DataGrid>
-                            </TabItem>
-                        </TabControl>
-                        <DataGrid  Height="auto">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
-                                <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
-                                <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </GroupBox>
-            </Grid>
+                            </DataGrid>
+                        </TabItem>
+                    </TabControl>
+                    <TabControl Visibility="Visible">
+                        <TabItem Header="Вертикальная таблица (для листа)">
+                            <DataGrid  Height="auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Наименование вхождения"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Значение"></DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </TabItem>
+                        <TabItem Header="Плоская таблица значений (для листа)">
+                            <DataGrid  Height="auto">
+                                
+                            </DataGrid>
+                        </TabItem>
+                    </TabControl>
+                    <DataGrid  Height="auto">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
+                            <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
+                            <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </GroupBox>
         </Grid>
-        
     </Grid>
 </UserControl>

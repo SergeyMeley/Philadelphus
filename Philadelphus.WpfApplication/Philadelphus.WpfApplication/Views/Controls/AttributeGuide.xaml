@@ -11,7 +11,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="Атрибуты" Margin="2,2,2,2">
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="Атрибуты" Margin="2">
                 <DataGrid>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="№"></DataGridTextColumn>
