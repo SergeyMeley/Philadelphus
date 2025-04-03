@@ -13,7 +13,6 @@ namespace Philadelphus.Business.Entities.MainEntities
     public abstract class MainEntityBase : IMainEntity
     {
         public abstract EntityTypes EntityType { get; }
-        public abstract InfrastructureRepositoryTypes InfrastructureRepositoryType { get; } 
         public Guid Guid { get; protected set; }
         public Guid ParentGuid { get; protected set; }
         /// <summary>

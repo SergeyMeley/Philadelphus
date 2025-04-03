@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
+    /// <summary>
+    /// Реализует возможность наличия независимой инфраструктуры (места и способа хранения данных)
+    /// </summary>
     internal interface IIndependentInfrastructure
     {
         public IMainEntitiesRepository Infrastructure { get; }

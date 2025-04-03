@@ -150,11 +150,11 @@ namespace Philadelphus.Business.Services
         //    UpdateEntities(DataTreeRepositories);
             
         //}
-        private void UpdateEntities(IEnumerable<IMainEntity> entities)
+        private void UpdateEntities(IEnumerable<IMainEntity> entities, InfrastructureRepositoryTypes infrastructure)
         {
             foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
             {
-                var infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(entities.Last().InfrastructureRepositoryType);
+                var infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(infrastructure);
                 InfrastructureConverterBase converter;
                 switch (entityType)
                 {

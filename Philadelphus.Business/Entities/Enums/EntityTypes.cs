@@ -16,5 +16,6 @@ namespace Philadelphus.Business.Entities.Enums
         Attribute,
         AttributeEntry,
         AttributeValue,
+        RepositoryElementType,
     }
 }

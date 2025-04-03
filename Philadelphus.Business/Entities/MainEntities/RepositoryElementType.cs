@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class AttributeValue : MainEntityBase
+    public class RepositoryElementType : MainEntityBase
     {
-        public override EntityTypes EntityType { get => EntityTypes.None; }
-        public AttributeValue(Guid parentGuid) : base(parentGuid)
+        public override EntityTypes EntityType => EntityTypes.RepositoryElementType;
+        public RepositoryElementType(Guid parentGuid) : base(parentGuid)
         {
-
+            Name = "TEST TYPE";
         }
-        public AttributeValue(Guid guid, Guid parentGuid) : base(guid, parentGuid)
-        {
 
-        }
     }
 }

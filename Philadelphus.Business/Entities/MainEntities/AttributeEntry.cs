@@ -11,7 +11,6 @@ namespace Philadelphus.Business.Entities.MainEntities
     public class AttributeEntry : MainEntityBase
     {
         public override EntityTypes EntityType { get => EntityTypes.None; }
-        public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public EntityAttribute Attribute { get; set; }
         public AttributeValue AttributeValue { get; set; }
         public long EntityId { get; set; }

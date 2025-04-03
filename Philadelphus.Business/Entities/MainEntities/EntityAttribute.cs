@@ -12,7 +12,6 @@ namespace Philadelphus.Business.Entities.MainEntities
     public class EntityAttribute : MainEntityBase
     {
         public override EntityTypes EntityType { get => EntityTypes.None; }
-        public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public ValueTypes ValueType { get; set; }
         public IEnumerable<AttributeValue> Values { get; set; } = new List<AttributeValue>();
         public EntityAttribute(Guid parentGuid) : base(parentGuid)

@@ -12,11 +12,9 @@ namespace Philadelphus.Business.Entities.MainEntities
     public class TreeNode : MainEntityBase
     {
         public override EntityTypes EntityType { get => EntityTypes.Node; }
-        public override InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public IMainEntitiesRepository Infrastructure { get; private set; }
         public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        //public IEnumerable<TreeNode> ChildTreeNodes { get; set; } = new List<TreeNode>();
-        //public IEnumerable<TreeLeave> ChildTreeLeaves { get; set; } = new List<TreeLeave>();
+        public RepositoryElementType ElementType { get; set; }
         public TreeNode(Guid parentGuid) : base(parentGuid)
         {
             Initialize();
