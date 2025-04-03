@@ -49,8 +49,8 @@
                             </HierarchicalDataTemplate>-->
                         
                             <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" >
+                                <StackPanel Margin="2" Background="Snow">
+                                    <StackPanel Orientation="Horizontal">
                                         <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
                                         <Image Width="24" Height="24" Margin="10,0,10,0">
                                             <Image.Source>
@@ -58,13 +58,27 @@
                                             </Image.Source>
                                         </Image>
                                         <StackPanel Margin="0,2,10,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Тип элемента: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Center"></TextBlock>
+                                                <Grid MinWidth="30" x:Name="ContentPanel" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Rectangle Fill="DeepPink" RadiusX="5" RadiusY="5" Width="{Binding Width,ElementName=textBlock}" Height="{Binding Height,ElementName=textBlock}" Stroke="Black" StrokeThickness="0.5"/>
+                                                    <TextBlock Name="textBlock" Padding="5,0" Text="{Binding ElementType.Name}" FontSize="10" Height="14" Width="Auto" Foreground="Black"/>
+                                                </Grid>
+                                                <Grid VerticalAlignment="Center">
+                                                    <Border BorderThickness="1"></Border>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="Теги: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray"></TextBlock>
+                                                        <TextBlock Text="#xxx1, #xxx2, #xxx3" Foreground="DarkBlue"></TextBlock>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
                                             <TextBlock>
                                                 <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                                                <Run Text="{Binding Name}" FontStyle="Italic" />
+                                                <Run Text="{Binding Name}" FontStyle="Italic"  Foreground="Black"/>
                                             </TextBlock>
                                             <TextBlock>
                                                 <Run Text="Guid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                                                <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic" />
+                                                <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic"  Foreground="Black"/>
                                             </TextBlock>
                                         </StackPanel>
                                     </StackPanel>
