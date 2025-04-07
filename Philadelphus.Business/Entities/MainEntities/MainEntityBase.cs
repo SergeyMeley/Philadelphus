@@ -1,16 +1,10 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public abstract class MainEntityBase : IMainEntity
+    public abstract class MainEntityBase : IMainEntity, IHavingChilds, IHavingParent, ISequencable, ILinkable, ITyped
     {
         public abstract EntityTypes EntityType { get; }
         public Guid Guid { get; protected set; }
@@ -32,11 +26,12 @@ namespace Philadelphus.Business.Entities.MainEntities
         public bool IsOriginal { get; set; }
         public bool IsLegacy { get; set; }
         public AuditInfo AuditInfo { get; private set; }
+        public EntityElementType ElementType { get; set; }
         public MainEntityBase(Guid parentGuid)
         {
 
             Guid = Guid.NewGuid();
-            ParentGuid  = parentGuid;
+            ParentGuid = parentGuid;
         }
         public MainEntityBase(Guid guid, Guid parentGuid)
         {

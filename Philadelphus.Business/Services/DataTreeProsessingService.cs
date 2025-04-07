@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using System.Xml.Serialization;
+using Philadelphus.Business.Entities.Interfaces;
 
 namespace Philadelphus.Business.Services
 {
@@ -121,6 +122,21 @@ namespace Philadelphus.Business.Services
             return repo;
             //Временно
             return (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
+        }
+        private List<EntityAttributeEntry> GetAttributeEntriesSample(IHavingAttributes targetElement)
+        {
+            var result = new List<EntityAttributeEntry>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                var entry = new EntityAttributeEntry(targetElement.Guid);
+                entry.Name = $"Атрибут {i + 1}";
+                entry.Attribute = new EntityAttribute(targetElement.Guid);
+                ((List<EntityAttributeEntry>)targetElement.PersonalAttributes).Add(entry);
+                result.Add(entry);
+            }
+
+            return result;
         }
         /// <summary>
         /// Сохранение измененного репозитория.

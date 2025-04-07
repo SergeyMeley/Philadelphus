@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class RepositoryElementType : MainEntityBase
+    public class EntityElementType : MainEntityBase
     {
         public override EntityTypes EntityType => EntityTypes.RepositoryElementType;
-        public RepositoryElementType(Guid parentGuid) : base(parentGuid)
+        public EntityElementType(Guid parentGuid) : base(parentGuid)
         {
             Name = "TEST TYPE";
         }

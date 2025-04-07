@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;

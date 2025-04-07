@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -14,7 +15,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override DbTreeLeave BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeLeave)BusinessToDbMainProperties(businessEntity, new DbTreeLeave());
+            var result = (DbTreeLeave)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbTreeLeave());
             return result;
         }
         internal override List<DbTreeLeave> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -22,7 +23,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbTreeLeave>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeLeave)BusinessToDbMainProperties(businessEntity, new DbTreeLeave());
+                var entity = (DbTreeLeave)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbTreeLeave());
                 result.Add(entity);
             }
             return result;
@@ -30,7 +31,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         internal override TreeLeave DbToBusinessEntity(IDbEntity dbEntity)
         {
             var result = new TreeLeave(new Guid(dbEntity.ParentGuid));
-            result = (TreeLeave)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+            result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
             return result;
         }
         internal override List<TreeLeave> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
@@ -39,7 +40,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             foreach (var dbEntity in dbEntityCollection)
             {
                 var entity = new TreeLeave(new Guid(dbEntity.ParentGuid));
-                entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+                entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
                 result.Add(entity);
             }
             return result;

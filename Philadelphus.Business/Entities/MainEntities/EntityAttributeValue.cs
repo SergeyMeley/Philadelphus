@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.MainEntities
 {
-    public class AttributeValue : MainEntityBase
+    public class EntityAttributeValue : MainEntityBase
     {
         public override EntityTypes EntityType { get => EntityTypes.None; }
-        public AttributeValue(Guid parentGuid) : base(parentGuid)
+        public EntityAttributeValue(Guid parentGuid) : base(parentGuid)
         {
 
         }
-        public AttributeValue(Guid guid, Guid parentGuid) : base(guid, parentGuid)
+        public EntityAttributeValue(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
 
         }

@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
@@ -13,8 +14,8 @@ namespace Philadelphus.Business.Entities.MainEntities
     {
         public override EntityTypes EntityType { get => EntityTypes.Node; }
         public IMainEntitiesRepository Infrastructure { get; private set; }
-        public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        public RepositoryElementType ElementType { get; set; }
+        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
+        public EntityElementType ElementType { get; set; }
         public TreeNode(Guid parentGuid) : base(parentGuid)
         {
             Initialize();

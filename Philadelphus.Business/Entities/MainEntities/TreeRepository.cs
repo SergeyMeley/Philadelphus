@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
 using System;
@@ -15,9 +16,9 @@ namespace Philadelphus.Business.Entities.MainEntities
         public override EntityTypes EntityType { get => EntityTypes.Repository; }
         public InfrastructureRepositoryTypes DefaultInfrastructureRepositoryType { get; }
         public IMainEntitiesRepository Infrastructure { get; private set; } = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
-        public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
+        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
         public IEnumerable<IMainEntitiesRepository> InfrastructureRepositories { get; set; }
-        public RepositoryElementType ElementType { get; set; }
+        public EntityElementType ElementType { get; set; }
         public TreeRepository(Guid parentGuid) : base(parentGuid)
         {
             Initialize();

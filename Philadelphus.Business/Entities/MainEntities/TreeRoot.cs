@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
@@ -17,20 +18,20 @@ namespace Philadelphus.Business.Entities.MainEntities
         public override EntityTypes EntityType { get => EntityTypes.Root; }
         public InfrastructureRepositoryTypes InfrastructureRepositoryType { get; }
         public IMainEntitiesRepository Infrastructure { get; private set; }
-        public IEnumerable<AttributeEntry> AttributeEntries { get; set; } = new List<AttributeEntry>();
-        public RepositoryElementType ElementType { get; set; }
+        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
+        public EntityElementType ElementType { get; set; }
         public TreeRoot(Guid parentGuid) : base(parentGuid)
         {
             Initialize();
             ParentGuid = parentGuid;
-            ElementType = new RepositoryElementType(Guid);
+            ElementType = new EntityElementType(Guid);
         }
         public TreeRoot(Guid guid, Guid parentGuid) : base(guid, parentGuid)
         {
             Initialize();
             ParentGuid = parentGuid;
             Guid = guid;
-            ElementType = new RepositoryElementType(Guid);
+            ElementType = new EntityElementType(Guid);
         }
         private void Initialize()
         {
