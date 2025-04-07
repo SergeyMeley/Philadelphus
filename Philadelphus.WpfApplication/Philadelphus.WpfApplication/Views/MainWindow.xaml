@@ -97,7 +97,7 @@
                                 </Style>
                             </RibbonComboBox.Style>
                         </RibbonComboBox>-->
-                        <ComboBox ItemsSource="{Binding TreeRepositories}" DisplayMemberPath="Name" SelectedItem="{Binding CurrentTreeRepository}" IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200"></ComboBox>
+                        <ComboBox ItemsSource="{Binding RepositoryExplorerViewModel.TreeRepositories}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryExplorerViewModel.CurrentTreeRepository}" IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200"></ComboBox>
                         <RibbonButton Label="Отключить репозиторий" />
                         <RibbonButton Label="Удалить репозиторий" />
                     </RibbonGroup>

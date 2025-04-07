@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.Interfaces;
 using Philadelphus.WpfApplication.ViewModels;
 using System;
 using System.Collections.Generic;

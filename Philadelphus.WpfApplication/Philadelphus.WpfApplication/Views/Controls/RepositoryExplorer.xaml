@@ -130,14 +130,13 @@
                                     <Button Content="{StaticResource imageCopy}" Margin="2" Height="20" Width="20" Background="Transparent"></Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                                    <TextBlock Text="XXX"></TextBlock>
+                                    <TextBlock Text="{Binding SelectedIndex,ElementName=SelectedElementChildsDataGrid,Converter={StaticResource selectedIndexConverter}}"></TextBlock>
                                     <TextBlock Text=" / "></TextBlock>
-                                    <TextBlock Text="{Binding SelectedEntity.Childs.Count, Mode=OneWay}"></TextBlock>
+                                    <TextBlock Text="{Binding Items.Count,ElementName=SelectedElementChildsDataGrid}"></TextBlock>
                                 </StackPanel>
                             </DockPanel>
-                            
                         </StackPanel>
-                        <DataGrid Grid.Row="1" Grid.Column="0" Margin="2" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
+                        <DataGrid Name="SelectedElementChildsDataGrid"  Grid.Row="1" Grid.Column="0" Margin="2" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
                                 <DataGridCheckBoxColumn Header="Внешний" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
@@ -153,28 +152,32 @@
         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
         <Grid Grid.Row="0" Grid.Column="2">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0" Header="Вхождения атрибутов" Margin="2">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*" MinHeight="150"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*" MinHeight="150"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*" MinHeight="150"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <GroupBox  Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2">
-                        <StackPanel>
-                            <DataGrid  Height="auto">
+                    <GroupBox Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <DataGrid Grid.Row="1" Height="auto" ItemsSource="{Binding CurrentTreeElementProperties}" AutoGenerateColumns="False">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Значение" IsReadOnly="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Наименование" IsReadOnly="True" Binding="{Binding Key}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Значение" IsReadOnly="True" Binding="{Binding Value}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </StackPanel>
+                        </Grid>
                     </GroupBox>
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
                     <GroupBox  Grid.Row="2" Grid.Column="0" Header="Внешние атрибуты" Margin="2">
@@ -192,7 +195,6 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
-
                     </GroupBox>
                     <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
                     <GroupBox  Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2">
@@ -201,17 +203,17 @@
                                 <Button Content="{StaticResource imageAdd}" Margin="2" Height="25" Width="25" Background="Transparent" />
                                 <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
                             </StackPanel>
-                            <DataGrid  Height="auto">
+                            <DataGrid  Height="auto" ItemsSource="{Binding SelectedEntity}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
                                     <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
                                     <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
-                                    <DataGridTextColumn Header="Группы атрибутов"></DataGridTextColumn>
+                                    <DataGridComboBoxColumn Header="Видимость" ItemsSource="{Binding VisabilityList}"></DataGridComboBoxColumn>
+                                    <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
                     </GroupBox>
-                    
                 </Grid>
             </GroupBox>
             <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
