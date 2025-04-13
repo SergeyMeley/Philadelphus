@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Interfaces;
-using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -15,7 +15,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override DbTreeLeave BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeLeave)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbTreeLeave());
+            var result = (DbTreeLeave)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeLeave());
             return result;
         }
         internal override List<DbTreeLeave> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -23,26 +23,27 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbTreeLeave>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeLeave)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbTreeLeave());
+                var entity = (DbTreeLeave)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeLeave());
                 result.Add(entity);
             }
             return result;
         }
         internal override TreeLeave DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = new TreeLeave(new Guid(dbEntity.ParentGuid));
-            result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
-            return result;
+            //var result = new TreeLeave(new Guid(dbEntity.ParentGuid));
+            //result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+            //return result;
+            return null;
         }
         internal override List<TreeLeave> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
         {
             var result = new List<TreeLeave>();
-            foreach (var dbEntity in dbEntityCollection)
-            {
-                var entity = new TreeLeave(new Guid(dbEntity.ParentGuid));
-                entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
-                result.Add(entity);
-            }
+            //foreach (var dbEntity in dbEntityCollection)
+            //{
+            //    var entity = new TreeLeave(new Guid(dbEntity.ParentGuid));
+            //    entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+            //    result.Add(entity);
+            //}
             return result;
         }
     }

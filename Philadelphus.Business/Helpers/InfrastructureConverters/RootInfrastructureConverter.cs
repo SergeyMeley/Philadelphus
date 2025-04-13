@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Interfaces;
-using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -15,7 +15,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeRoot)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbTreeRoot());
+            var result = (DbTreeRoot)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeRoot());
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -23,26 +23,27 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbTreeRoot>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeRoot)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbTreeRoot());
+                var entity = (DbTreeRoot)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeRoot());
                 result.Add(entity);
             }
             return result;
         }
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = new TreeRoot(new Guid(dbEntity.ParentGuid));
-            result = (TreeRoot)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
-            return result;
+            //var result = new TreeRoot(new Guid(dbEntity.ParentGuid));
+            //result = (TreeRoot)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
+            //return result;
+            return null;
         }
         internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
         {
             var result = new List<TreeRoot>();
-            foreach (var dbEntity in dbEntityCollection)
-            {
-                var entity = new TreeRoot(new Guid(dbEntity.ParentGuid));
-                entity = (TreeRoot)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
-                result.Add(entity);
-            }
+            //foreach (var dbEntity in dbEntityCollection)
+            //{
+            //    var entity = new TreeRoot(new Guid(dbEntity.ParentGuid));
+            //    entity = (TreeRoot)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
+            //    result.Add(entity);
+            //}
             return result;
         }
     }

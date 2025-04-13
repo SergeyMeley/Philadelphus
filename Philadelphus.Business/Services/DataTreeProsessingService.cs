@@ -1,9 +1,9 @@
 ﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
+using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,9 @@ using System.Threading.Tasks;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using System.Xml.Serialization;
-using Philadelphus.Business.Entities.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
+using System.Xml.Linq;
 
 namespace Philadelphus.Business.Services
 {
@@ -30,7 +32,7 @@ namespace Philadelphus.Business.Services
         private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
         public List<TreeRepository> GetRepositories()
         {
-            var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
+            var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
             // Получение списка путей к репозиториям
             GeneralSettings.RepositoryPathList = (List<string>)infrastructure.SelectRepositoryPathes(GeneralSettings.RepositoryListPath);
             // Получение репозиториев по всем путям
@@ -46,10 +48,10 @@ namespace Philadelphus.Business.Services
         {
             if (repository != null)
             {
-                var infrastructure = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
+                var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
                 // Добавление пути к папке и файлу репозитория
-                repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
-                repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
+                //repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
+                //repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
                 // Получение текущего списка репозиториев и добавление туда нового
                 DataTreeRepositories = GetRepositories();
                 DataTreeRepositories.Add(repository);
@@ -59,7 +61,7 @@ namespace Philadelphus.Business.Services
                 var converter = new RepositoryInfrastructureConverter();
                 infrastructure.InsertRepositories(converter.BusinessToDbEntityCollection(list));
                 // Дополнение списка репозиториев в настроечном файле
-                GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
+                //GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
                 infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
                 // Получение актуального списка репозиториев
             }
@@ -104,20 +106,24 @@ namespace Philadelphus.Business.Services
             var repo = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
             for (int i = 0; i < 5; i++)
             {
-                var root = new TreeRoot(repo.Guid);
+                var root = new TreeRoot(Guid.NewGuid(), repo);
+                ((List<RepositoryElementBase>)repo.ElementsCollection).Add(root);
                 for (int j = 0; j < 5; j++)
                 {
-                    var node = new TreeNode(root.Guid);
+                    var node = new TreeNode(Guid.NewGuid(), root);
+                    ((List<RepositoryElementBase>)repo.ElementsCollection).Add(node);
                     for (int k = 0; k < 5; k++)
                     {
-                        var node2 = new TreeNode(root.Guid);
-                        ((List<IMainEntity>)node.Childs).Add(node2);
-                        var leave = new TreeLeave(node.Guid);
-                        ((List<IMainEntity>)node.Childs).Add(leave);
+                        var node2 = new TreeNode(Guid.NewGuid(), root);
+                        ((List<RepositoryElementBase>)repo.ElementsCollection).Add(node2);
+                        ((List<IHavingParent>)node.Childs).Add(node2);
+                        var leave = new TreeLeave(Guid.NewGuid(), node);
+                        ((List<RepositoryElementBase>)repo.ElementsCollection).Add(leave);
+                        ((List<IHavingParent>)node.Childs).Add(leave);
                     }
-                    ((List<IMainEntity>)root.Childs).Add(node);
+                    ((List<IHavingParent>)root.Childs).Add(node);
                 }
-                ((List<IMainEntity>)repo.Childs).Add(root);
+                ((List<IHavingParent>)repo.Childs).Add(root);
             }
             return repo;
             //Временно
@@ -127,14 +133,14 @@ namespace Philadelphus.Business.Services
         {
             var result = new List<EntityAttributeEntry>();
 
-            for (int i = 0; i < 20; i++)
-            {
-                var entry = new EntityAttributeEntry(targetElement.Guid);
-                entry.Name = $"Атрибут {i + 1}";
-                entry.Attribute = new EntityAttribute(targetElement.Guid);
-                ((List<EntityAttributeEntry>)targetElement.PersonalAttributes).Add(entry);
-                result.Add(entry);
-            }
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    var entry = new EntityAttributeEntry(targetElement);
+            //    entry.Name = $"Атрибут {i + 1}";
+            //    entry.Attribute = new EntityAttribute(targetElement);
+            //    ((List<EntityAttributeEntry>)targetElement.PersonalAttributes).Add(entry);
+            //    result.Add(entry);
+            //}
 
             return result;
         }
@@ -166,7 +172,7 @@ namespace Philadelphus.Business.Services
         //    UpdateEntities(DataTreeRepositories);
             
         //}
-        private void UpdateEntities(IEnumerable<IMainEntity> entities, InfrastructureRepositoryTypes infrastructure)
+        private void UpdateEntities(IEnumerable<IMainEntity> entities, InfrastructureTypes infrastructure)
         {
             foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
             {
@@ -214,17 +220,17 @@ namespace Philadelphus.Business.Services
         {
             foreach (var item in CurrentRepository.InfrastructureRepositories)
             {
-                IMainEntitiesRepository infrastructureRepository;
+                IMainEntitiesInfrastructure infrastructureRepository;
                 switch (item.InftastructureRepositoryTypes)
                 {
-                    case InfrastructureRepositoryTypes.WindowsDirectory:
-                        infrastructureRepository = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
+                    case InfrastructureTypes.WindowsDirectory:
+                        infrastructureRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
                         break;
-                    case InfrastructureRepositoryTypes.PostgreSql:
-                        infrastructureRepository = new PostgreRepository.Repositories.MainEntityRepository();
+                    case InfrastructureTypes.PostgreSql:
+                        infrastructureRepository = new PostgreInfrastructure.Repositories.PostgreMainEntityInfrastructure();
                         break;
-                    case InfrastructureRepositoryTypes.MongoDb:
-                        infrastructureRepository = new MongoRepository.Repositories.MainEntitуRepository();
+                    case InfrastructureTypes.MongoDb:
+                        infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
                         break;
                     default:
                         infrastructureRepository = null;
@@ -236,21 +242,21 @@ namespace Philadelphus.Business.Services
                 _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves();
             }
             CurrentRepository = DataTreeRepositories.Where(x => x.Guid == currentRepository.Guid).Last();
-            using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
-            {
-                //var dbRepository = new DbTreeRepository();
-                //try
-                //{
-                //    dbRepository.ChildTreeRootIds = xmlSerializer.Deserialize(fs) as List<TreeRoot>;
-                //}
-                //catch (Exception ex)
-                //{
-                //}
-                //if (dbRepository != null)
-                //{
+            //using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
+            //{
+            //    //var dbRepository = new DbTreeRepository();
+            //    //try
+            //    //{
+            //    //    dbRepository.ChildTreeRootIds = xmlSerializer.Deserialize(fs) as List<TreeRoot>;
+            //    //}
+            //    //catch (Exception ex)
+            //    //{
+            //    //}
+            //    //if (dbRepository != null)
+            //    //{
 
-                //}
-            }
+            //    //}
+            //}
             for (int i = 0; i < currentRepository.Childs.Count(); i++)
             {
                 //currentRepository.ChildTreeRoots.ToList()[i] = GetRootContent(currentRepository.ChildTreeRoots.ToList()[i]);
@@ -259,7 +265,7 @@ namespace Philadelphus.Business.Services
         }
         //private TreeRoot GetRootContent(TreeRoot treeRoot) 
         //{
-        //    IMainEntitiesRepository infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(treeRoot.InftastructureRepositoryType);
+        //    IMainEntitiesInfrastructure infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(treeRoot.InftastructureRepositoryType);
         //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
         //    for (int i = 0; i < nodeCollection.Count(); i++)
         //    {
@@ -269,7 +275,7 @@ namespace Philadelphus.Business.Services
         //}
         //private TreeNode GetNodeContent(TreeNode treeNode)
         //{
-        //    IMainEntitiesRepository infrastructureRepository = new MongoRepository.Repositories.MainEntitуRepository();
+        //    IMainEntitiesInfrastructure infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
         //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
         //    for (int i = 0; i < nodeCollection.Count(); i++)
         //    {

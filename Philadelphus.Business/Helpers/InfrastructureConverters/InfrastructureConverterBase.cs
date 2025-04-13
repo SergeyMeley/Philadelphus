@@ -1,5 +1,5 @@
-﻿using Philadelphus.Business.Entities.Interfaces;
-using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -11,11 +11,11 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public abstract class InfrastructureConverterBase
     {
-        protected static IMainEntity DbToBusinessMainProperties(IDbEntity dbEntity, MainEntityBase businessEntity)
+        protected static IMainEntity DbToBusinessMainProperties(IDbEntity dbEntity, RepositoryElementBase businessEntity)
         {
-            businessEntity.DirectoryPath = dbEntity.DirectoryPath;
-            businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
-            businessEntity.ConfigPath = dbEntity.ConfigPath;
+            //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
+            //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
+            //businessEntity.ConfigPath = dbEntity.ConfigPath;
             businessEntity.Sequence = dbEntity.Sequence;
             businessEntity.Name = dbEntity.Name;
             businessEntity.Alias = dbEntity.Alias;
@@ -37,12 +37,12 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal abstract IMainEntity DbToBusinessEntity(IDbEntity dbEntity);
         internal abstract IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection);
-        protected static IDbEntity BusinessToDbMainProperties(MainEntityBase businessEntity, IDbEntity dbEntity)
+        protected static IDbEntity BusinessToDbMainProperties(RepositoryElementBase businessEntity, IDbEntity dbEntity)
         {
-            dbEntity.ParentGuid = businessEntity.ParentGuid.ToString();
-            dbEntity.DirectoryPath = businessEntity.DirectoryPath;
-            dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;
-            dbEntity.ConfigPath = businessEntity.ConfigPath;
+            //dbEntity.ParentGuid = businessEntity.Parent.ToString();
+            //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
+            //dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;
+            //dbEntity.ConfigPath = businessEntity.ConfigPath;
             dbEntity.Sequence = businessEntity.Sequence;
             dbEntity.Name = businessEntity.Name;
             dbEntity.Alias = businessEntity.Alias;

@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Interfaces;
-using Philadelphus.Business.Entities.MainEntities;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -15,7 +16,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbEntityAttribute)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbEntityAttribute());
+            var result = (DbEntityAttribute)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbEntityAttribute());
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -23,26 +24,27 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbEntityAttribute>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbEntityAttribute)BusinessToDbMainProperties((MainEntityBase)businessEntity, new DbEntityAttribute());
+                var entity = (DbEntityAttribute)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbEntityAttribute());
                 result.Add(entity);
             }
             return result;
         }
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
-            var result = new EntityAttribute(new Guid(dbEntity.ParentGuid));
-            result = (EntityAttribute)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
-            return result;
+            //var result = new EntityAttribute(new Guid(dbEntity.ParentGuid));
+            //result = (EntityAttribute)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+            //return result;
+            return null;
         }
         internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
         {
             var result = new List<EntityAttribute>();
-            foreach (var dbEntity in dbEntityCollection)
-            {
-                var entity = new EntityAttribute(new Guid(dbEntity.ParentGuid));
-                entity = (EntityAttribute)DbToBusinessMainProperties(dbEntity, (MainEntityBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
-                result.Add(entity);
-            }
+            //foreach (var dbEntity in dbEntityCollection)
+            //{
+            //    var entity = new EntityAttribute(new Guid(dbEntity.ParentGuid));
+            //    entity = (EntityAttribute)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+            //    result.Add(entity);
+            //}
             return result;
         }
     }

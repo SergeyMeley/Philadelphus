@@ -1,7 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.MainEntities;
 using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.RepositoryInterfaces;
+using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +11,19 @@ namespace Philadelphus.Business.Factories
 {
     internal static class InfrastructureFactory
     {
-        internal static IMainEntitiesRepository GetMainEntitiesInfrastructure(InfrastructureRepositoryTypes repositoryType)
+        internal static IMainEntitiesInfrastructure GetMainEntitiesInfrastructure(InfrastructureTypes repositoryType)
         {
-            IMainEntitiesRepository mainEntitiesRepository;
+            IMainEntitiesInfrastructure mainEntitiesRepository;
             switch (repositoryType)
             {
-                case InfrastructureRepositoryTypes.WindowsDirectory:
-                    mainEntitiesRepository = new WindowsFileSystemRepository.Repositories.MainEntityRepository();
+                case InfrastructureTypes.WindowsDirectory:
+                    mainEntitiesRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
                     break;
-                case InfrastructureRepositoryTypes.PostgreSql:
-                    mainEntitiesRepository = new PostgreRepository.Repositories.MainEntityRepository();
+                case InfrastructureTypes.PostgreSql:
+                    mainEntitiesRepository = new PostgreInfrastructure.Repositories.PostgreMainEntityInfrastructure();
                     break;
-                case InfrastructureRepositoryTypes.MongoDb:
-                    mainEntitiesRepository = new MongoRepository.Repositories.MainEntitуRepository();
+                case InfrastructureTypes.MongoDb:
+                    mainEntitiesRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
                     break;
                 default:
                     throw new Exception($"Неизвестная инфраструктура ({repositoryType.ToString()}), измените настройки и повторите попытку.");

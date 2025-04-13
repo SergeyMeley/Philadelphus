@@ -1,9 +1,5 @@
-using Philadelphus.Business.Entities.MainEntities;
-using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Helpers;
-using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.PostgreRepository.Repositories;
 using System.IO;
 
 namespace Test
@@ -22,7 +18,7 @@ namespace Test
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MainEntitóRepository();
+            var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MongoMainEntitóInfrastructure();
             var entities = new List<DbTreeRoot>();
             for (int i = 0; i < 5; i++)
             {
@@ -34,7 +30,7 @@ namespace Test
         private void LoadButton_Click(object sender, EventArgs e)
         {
             PathesListBox.Items.Clear();
-            var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MainEntitóRepository();
+            var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MongoMainEntitóInfrastructure();
             var result = mainEntityRepository.SelectRoots();
 
             foreach (var item in result)

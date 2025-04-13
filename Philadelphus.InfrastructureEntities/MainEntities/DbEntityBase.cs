@@ -9,6 +9,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public abstract class DbEntityBase : IDbEntity
     {
+        public Guid Guid { get; set; }
         public string ParentGuid { get; set; }
         public string DirectoryPath { get; set; }
         public string DirectoryFullPath { get; set; }

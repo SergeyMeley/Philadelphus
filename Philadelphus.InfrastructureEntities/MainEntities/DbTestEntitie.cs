@@ -9,7 +9,6 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class DbTestEntitie : DbEntityBase
     {
-        public Guid Guid { get; set; }
         public long ParentTreeRepositoryId { get; set; }
         public List<long> AttributeIds { get; set; } = new List<long>();
         public List<long> ChildTreeNodeIds { get; set; } = new List<long>();

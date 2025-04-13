@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.PostgreRepository
+namespace Philadelphus.PostgreInfrastructure
 {
     internal class Context
     {

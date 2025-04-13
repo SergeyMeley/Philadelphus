@@ -8,7 +8,6 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class DbAttributeEntry : DbEntityBase
     {
-        public Guid Guid { get; set; }
         public long AttributeGuid { get; set; }
         public long AttributeValueGuid { get; set; }
         public long EntityTypeGuid { get; set; }

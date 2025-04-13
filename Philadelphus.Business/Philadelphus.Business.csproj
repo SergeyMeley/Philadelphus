@@ -13,8 +13,4 @@
     <ProjectReference Include="..\Philadelphus.WindowsFileSystemRepository\Philadelphus.WindowsFileSystemRepository.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Entities\DbConnection\" />
-  </ItemGroup>
-
 </Project>
