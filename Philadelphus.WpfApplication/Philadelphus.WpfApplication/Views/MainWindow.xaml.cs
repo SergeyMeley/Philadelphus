@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.WpfApplication.ViewModels;
 using System.Text;
 using System.Windows;

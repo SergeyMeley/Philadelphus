@@ -1,5 +1,5 @@
-﻿using Philadelphus.Business.Entities.Interfaces;
-using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using System;
@@ -58,11 +58,11 @@ namespace Philadelphus.WpfApplication.ViewModels
                 OnPropertyChanged(nameof(SelectedEntity));
             }
         }
-        public List<InfrastructureRepositoryTypes> InfrastructureRepositories
+        public List<InfrastructureTypes> InfrastructureTypes
         {
             get
             {
-                return Enum.GetValues(typeof(InfrastructureRepositoryTypes)).Cast<InfrastructureRepositoryTypes>().ToList();
+                return Enum.GetValues(typeof(InfrastructureTypes)).Cast<InfrastructureTypes>().ToList();
             }
         }
         
@@ -108,7 +108,6 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
         private List<string> _visabilityList = new List<string> { "Скрытый (private)", "Всем (public)", "Только наследникам (protected)", "Только элементам корня (internal)" };
-
         public List<string> VisabilityList
         {
             get { return _visabilityList; }
@@ -117,7 +116,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         private Dictionary<string, string> GetProperties(object instance)
         {
             var result = new Dictionary<string, string>();
-            foreach (var prop in instance.GetType().GetProperties())
+            foreach (var prop in instance?.GetType().GetProperties())
             {
                 var name = prop.Name;
                 var value = string.Empty;
@@ -165,9 +164,9 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var service = new DataTreeRepositoryService();
-                    ((List<TreeRoot>)_currentTreeRepository.Childs).Add(new TreeRoot(_currentTreeRepository.Guid));
-                    OnPropertyChanged(nameof(CurrentTreeRepository));
+                    //var service = new DataTreeRepositoryService();
+                    //((List<TreeRoot>)_currentTreeRepository.Childs).Add(new TreeRoot(_currentTreeRepository));
+                    //OnPropertyChanged(nameof(CurrentTreeRepository));
                 });
             }
         }

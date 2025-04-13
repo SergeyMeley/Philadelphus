@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.MainEntities;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using System.Collections.ObjectModel;

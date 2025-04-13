@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.Interfaces;
+﻿using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.WpfApplication.ViewModels;
 using System;
 using System.Collections.Generic;
