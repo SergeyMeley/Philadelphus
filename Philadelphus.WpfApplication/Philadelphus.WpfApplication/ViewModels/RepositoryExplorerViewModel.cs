@@ -158,15 +158,52 @@ namespace Philadelphus.WpfApplication.ViewModels
         }
 
         #region [Commands]
-        public RelayCommand AddRootCommand
+        public RelayCommand CreateRootCommand
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
-                    //var service = new DataTreeRepositoryService();
-                    //((List<TreeRoot>)_currentTreeRepository.Childs).Add(new TreeRoot(_currentTreeRepository));
-                    //OnPropertyChanged(nameof(CurrentTreeRepository));
+                    var service = new DataTreeRepositoryService();
+                    service.InitTreeRoot(_currentTreeRepository);
+                });
+            }
+        }
+        public RelayCommand CreateNodeCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (_selectedEntity.GetType() != typeof(TreeRoot) && _selectedEntity.GetType() != typeof(TreeNode))
+                        return;
+                    var service = new DataTreeRepositoryService();
+                    service.InitTreeNode((IHavingChilds)_selectedEntity);
+                });
+            }
+        }
+        public RelayCommand CreateLeaveCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (_selectedEntity.GetType() != typeof(TreeNode))
+                        return;
+                    var service = new DataTreeRepositoryService();
+                    service.InitTreeLeave((IHavingChilds)_selectedEntity);
+                });
+            }
+        }
+
+        public RelayCommand DeleteElementCommand
+        {
+            get 
+            {
+                return new RelayCommand(obj =>
+                {
+                    var service = new DataTreeRepositoryService();
+                    //service.RemoveElement(_selectedEntity);
                 });
             }
         }
