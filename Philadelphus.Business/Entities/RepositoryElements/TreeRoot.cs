@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Philadelphus.Business.Helpers;
+using System.Collections.ObjectModel;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
@@ -28,13 +29,15 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public TreeRoot(Guid guid, IHavingChilds parent) : base(guid, parent)
         {
             Parent = parent;
+            ParentRepository = (TreeRepository)Parent;
+            ParentRoot = this;
             Guid = guid;
             Initialize();
         }
         private void Initialize()
         {
             List<string> existNames = new List<string>();
-            foreach (var item in Repository.ElementsCollection)
+            foreach (var item in ParentRepository.ElementsCollection)
             {
                 existNames.Add(item.Name);
             }
@@ -43,7 +46,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //    existNames.Add(((IMainEntity)child).Name);
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый корень");
-            Childs = new List<IHavingParent>();
+            Childs = new ObservableCollection<IHavingParent>();
             ElementType = new EntityElementType(Guid.NewGuid(), this);
         }
     }

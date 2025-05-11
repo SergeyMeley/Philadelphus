@@ -8,6 +8,7 @@ using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         private void Initialize()
         {
             Name = NamingHelper.GetNewName(new string[0], "Новый репозиторий");
-            Childs = new List<IHavingParent>();
+            Childs = new ObservableCollection<IHavingParent>();
         }
     }
 }

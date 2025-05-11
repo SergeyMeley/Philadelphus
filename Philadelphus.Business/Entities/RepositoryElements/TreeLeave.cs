@@ -16,17 +16,18 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     {
         public override EntityTypes EntityType { get => EntityTypes.Leave; }
         public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
-        public IHavingChilds Parent { get; private set; }
         public TreeLeave(Guid guid, IHavingChilds parent) : base(guid, parent)
         {
             Parent = parent;
+            ParentRepository = ((RepositoryElementBase)Parent).ParentRepository;
+            ParentRoot = ((RepositoryElementBase)Parent).ParentRoot;
             Guid = guid;
             Initialize();
         }
         private void Initialize()
         {
             List<string> existNames = new List<string>();
-            foreach (var item in Repository.ElementsCollection)
+            foreach (var item in ParentRepository.ElementsCollection)
             {
                 existNames.Add(item.Name);
             }
@@ -35,7 +36,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //    existNames.Add(((IMainEntity)child).Name);
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый лист");
-            //Childs = new List<IHavingParent>();
+            //Childs = new ObservableCollection<IHavingParent>();
             ElementType = new EntityElementType(Guid.NewGuid(), this);
         }
     }

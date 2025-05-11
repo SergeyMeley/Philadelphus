@@ -7,6 +7,7 @@ using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,18 +25,20 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public TreeNode(Guid guid, IHavingChilds parent) : base(guid, parent)
         {
             //Parent = parent;
+            ParentRepository = ((RepositoryElementBase)Parent).ParentRepository;
+            ParentRoot = ((RepositoryElementBase)Parent).ParentRoot;
             Guid = guid;
             Initialize();
         }
         private void Initialize()
         {
             List<string> existNames = new List<string>();
-            foreach (var item in Repository.ElementsCollection)
+            foreach (var item in ParentRepository.ElementsCollection)
             {
                 existNames.Add(item.Name);
             }
             Name = NamingHelper.GetNewName(existNames, "Новый узел");
-            Childs = new List<IHavingParent>();
+            Childs = new ObservableCollection<IHavingParent>();
             ElementType = new EntityElementType(Guid.NewGuid(), this);
         }
     }

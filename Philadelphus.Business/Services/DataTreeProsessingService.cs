@@ -15,6 +15,7 @@ using System.Xml.Serialization;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using System.Xml.Linq;
+using System.Collections.ObjectModel;
 
 namespace Philadelphus.Business.Services
 {
@@ -67,6 +68,41 @@ namespace Philadelphus.Business.Services
             }
             return GetRepositories();
         }
+        public TreeRoot InitTreeRoot(TreeRepository parentElement)
+        {
+            var result = new TreeRoot(Guid.NewGuid(), parentElement);
+            ((List<RepositoryElementBase>)parentElement.ElementsCollection).Add(result);
+            ((ObservableCollection<IHavingParent>)parentElement.Childs).Add(result);
+            return result;
+        }
+        public TreeNode InitTreeNode(IHavingChilds parentElement)
+        {
+            var result = new TreeNode(Guid.NewGuid(), parentElement);
+            ((List<RepositoryElementBase>)result.ParentRepository.ElementsCollection).Add(result);
+            ((ObservableCollection<IHavingParent>)parentElement.Childs).Add(result);
+            return result;
+        }
+        public TreeLeave InitTreeLeave(IHavingChilds parentElement)
+        {
+            var result = new TreeLeave(Guid.NewGuid(), parentElement);
+            ((List<RepositoryElementBase>)result.ParentRepository.ElementsCollection).Add(result);
+            ((ObservableCollection<IHavingParent>)parentElement.Childs).Add(result);
+            return result;
+        }
+
+        public bool RemoveElement<T>(IHavingParent element) where T : IHavingParent, IMainEntity
+        {
+            try
+            {
+                ((ObservableCollection<IHavingParent>)element.Parent.Childs).Remove(element);
+                //(RepositoryElementBase)element
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
         public List<TreeRepository> ModifyRepository(TreeRepository repository)
         {
             return AddRepository(repository);
@@ -116,14 +152,14 @@ namespace Philadelphus.Business.Services
                     {
                         var node2 = new TreeNode(Guid.NewGuid(), root);
                         ((List<RepositoryElementBase>)repo.ElementsCollection).Add(node2);
-                        ((List<IHavingParent>)node.Childs).Add(node2);
+                        ((ObservableCollection<IHavingParent>)node.Childs).Add(node2);
                         var leave = new TreeLeave(Guid.NewGuid(), node);
                         ((List<RepositoryElementBase>)repo.ElementsCollection).Add(leave);
-                        ((List<IHavingParent>)node.Childs).Add(leave);
+                        ((ObservableCollection<IHavingParent>)node.Childs).Add(leave);
                     }
-                    ((List<IHavingParent>)root.Childs).Add(node);
+                    ((ObservableCollection<IHavingParent>)root.Childs).Add(node);
                 }
-                ((List<IHavingParent>)repo.Childs).Add(root);
+                ((ObservableCollection<IHavingParent>)repo.Childs).Add(root);
             }
             return repo;
             //Временно
