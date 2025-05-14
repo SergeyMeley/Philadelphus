@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.WpfApplication.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
 
         private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            ViewModel.SelectedEntity = (IMainEntity)MainTreeView.SelectedItem;
+            ViewModel.SelectedRepositoryMember = (TreeRepositoryMemberBase)MainTreeView.SelectedItem;
         }
     }
 }

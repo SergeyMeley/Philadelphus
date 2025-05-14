@@ -136,7 +136,7 @@
                                 </StackPanel>
                             </DockPanel>
                         </StackPanel>
-                        <DataGrid Name="SelectedElementChildsDataGrid"  Grid.Row="1" Grid.Column="0" Margin="2" MinHeight="50" ItemsSource="{Binding SelectedEntity.Childs}" AutoGenerateColumns="False">
+                        <DataGrid Name="SelectedElementChildsDataGrid"  Grid.Row="1" Grid.Column="0" Margin="2" MinHeight="50" ItemsSource="{Binding SelectedRepositoryMember.Childs}" AutoGenerateColumns="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
                                 <DataGridCheckBoxColumn Header="Внешний" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
@@ -205,16 +205,16 @@
                                 <Button Content="{StaticResource imageAdd}" Margin="2" Height="25" Width="25" Background="Transparent" />
                                 <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
                             </StackPanel>
-                            <DataGrid  Height="auto" ItemsSource="{Binding SelectedEntity}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
-                                    <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
+                            <DataGrid  Height="auto" ItemsSource="{Binding SelectedRepositoryMember.PersonalAttributes}" AutoGenerateColumns="true">
+                                <!--<DataGrid.Columns>
+                                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
+                                    <DataGridComboBoxColumn Header="Тип данных" ItemsSource="{Binding ValueType}"></DataGridComboBoxColumn>
                                     <DataGridCheckBoxColumn Header="Может быть пустым"></DataGridCheckBoxColumn>
                                     <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
                                     <DataGridComboBoxColumn Header="Область видимости" ItemsSource="{Binding VisabilityList}"></DataGridComboBoxColumn>
                                     <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
                                     <DataGridTextColumn Header="Значение" IsReadOnly="True"></DataGridTextColumn>
-                                </DataGrid.Columns>
+                                </DataGrid.Columns>-->
                             </DataGrid>
                         </StackPanel>
                     </GroupBox>

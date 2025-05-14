@@ -46,16 +46,16 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             //((List<ViewModelBase>)Cache).Add(new RepositoryExplorerViewModel());
         }
-        private IMainEntity _selectedEntity;
-        public IMainEntity SelectedEntity
+        private TreeRepositoryMemberBase _selectedRepositoryMember;
+        public TreeRepositoryMemberBase SelectedRepositoryMember
         {
-            get => _selectedEntity;
+            get => _selectedRepositoryMember;
             set
             {
-                _selectedEntity = value;
-                _currentTreeElementProperties = GetProperties(_selectedEntity);
+                _selectedRepositoryMember = value;
+                _currentTreeElementProperties = GetProperties(_selectedRepositoryMember);
                 OnPropertyChanged(nameof(CurrentTreeElementProperties));
-                OnPropertyChanged(nameof(SelectedEntity));
+                OnPropertyChanged(nameof(SelectedRepositoryMember));
             }
         }
         public List<InfrastructureTypes> InfrastructureTypes
@@ -99,9 +99,9 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             get
             {
-                if (_selectedEntity != null)
+                if (_selectedRepositoryMember != null)
                 {
-                    _currentTreeElementProperties = GetProperties(_selectedEntity);
+                    _currentTreeElementProperties = GetProperties(_selectedRepositoryMember);
                 }
                 //OnPropertyChanged(nameof(CurrentTreeElementProperties));
                 return _currentTreeElementProperties;
@@ -175,10 +175,10 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_selectedEntity.GetType() != typeof(TreeRoot) && _selectedEntity.GetType() != typeof(TreeNode))
+                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParent)) == false)
                         return;
                     var service = new DataTreeRepositoryService();
-                    service.InitTreeNode((IHavingChilds)_selectedEntity);
+                    service.InitTreeNode((IParent)_selectedRepositoryMember);
                 });
             }
         }
@@ -188,10 +188,23 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_selectedEntity.GetType() != typeof(TreeNode))
+                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParent)) == false)
                         return;
                     var service = new DataTreeRepositoryService();
-                    service.InitTreeLeave((IHavingChilds)_selectedEntity);
+                    service.InitTreeLeave((IParent)_selectedRepositoryMember);
+                });
+            }
+        }
+        public RelayCommand CreateAttributeCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwner)) == false)
+                        return;
+                    var service = new DataTreeRepositoryService();
+                    service.InitElementAttribute((IContentOwner)_selectedRepositoryMember);
                 });
             }
         }
@@ -203,7 +216,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeRepositoryService();
-                    //service.RemoveElement(_selectedEntity);
+                    service.RemoveElement(_selectedRepositoryMember);
                 });
             }
         }
