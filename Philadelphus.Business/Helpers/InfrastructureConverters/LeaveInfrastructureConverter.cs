@@ -15,7 +15,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override DbTreeLeave BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeLeave)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeLeave());
+            var result = (DbTreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeLeave());
             return result;
         }
         internal override List<DbTreeLeave> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -23,7 +23,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbTreeLeave>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeLeave)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeLeave());
+                var entity = (DbTreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeLeave());
                 result.Add(entity);
             }
             return result;
@@ -31,7 +31,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         internal override TreeLeave DbToBusinessEntity(IDbEntity dbEntity)
         {
             //var result = new TreeLeave(new Guid(dbEntity.ParentGuid));
-            //result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+            //result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
             //return result;
             return null;
         }
@@ -41,7 +41,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //foreach (var dbEntity in dbEntityCollection)
             //{
             //    var entity = new TreeLeave(new Guid(dbEntity.ParentGuid));
-            //    entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+            //    entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
             //    result.Add(entity);
             //}
             return result;

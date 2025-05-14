@@ -16,16 +16,15 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeRepository : MainEntityBase, IHavingOwnStorage, IHavingChilds
+    public class TreeRepository : MainEntityBase, IHavingOwnStorage, IParent
     {
         public override EntityTypes EntityType { get => EntityTypes.Repository; }
         public InfrastructureTypes DefaultInfrastructureRepositoryType { get; }
         public IMainEntitiesInfrastructure Infrastructure { get; private set; } = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
-        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
         public IEnumerable<IMainEntitiesInfrastructure> InfrastructureRepositories { get; set; }
-        public IEnumerable<IDataStorage> DataStorages { get; set; }
-        public IEnumerable<IHavingParent> Childs { get; private set; }
-        public IEnumerable<RepositoryElementBase> ElementsCollection { get; internal set; } = new List<RepositoryElementBase>();
+        //public IEnumerable<IDataStorage> DataStorages { get; set; }
+        public IEnumerable<IChildren> Childs { get; private set; }
+        public IEnumerable<TreeRepositoryMemberBase> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBase>();
         public TreeRepository(Guid guid) : base(guid)
         {
             Guid = guid;
@@ -34,7 +33,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         private void Initialize()
         {
             Name = NamingHelper.GetNewName(new string[0], "Новый репозиторий");
-            Childs = new ObservableCollection<IHavingParent>();
+            Childs = new ObservableCollection<IChildren>();
         }
     }
 }

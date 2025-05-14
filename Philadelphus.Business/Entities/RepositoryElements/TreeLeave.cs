@@ -12,15 +12,15 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeLeave : RepositoryElementBase, IHavingParent
+    public class TreeLeave : TreeRepositoryMemberBase, IChildren, ITreeRootMember
     {
         public override EntityTypes EntityType { get => EntityTypes.Leave; }
-        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
-        public TreeLeave(Guid guid, IHavingChilds parent) : base(guid, parent)
+        public TreeRoot ParentRoot { get; private set; }
+        public TreeLeave(Guid guid, IParent parent) : base(guid, parent)
         {
             Parent = parent;
-            ParentRepository = ((RepositoryElementBase)Parent).ParentRepository;
-            ParentRoot = ((RepositoryElementBase)Parent).ParentRoot;
+            ParentRepository = ((ITreeRepositoryMember)Parent).ParentRepository;
+            ParentRoot = ((ITreeRootMember)Parent).ParentRoot;
             Guid = guid;
             Initialize();
         }
@@ -36,7 +36,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //    existNames.Add(((IMainEntity)child).Name);
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый лист");
-            //Childs = new ObservableCollection<IHavingParent>();
+            //Childs = new ObservableCollection<IChildren>();
             ElementType = new EntityElementType(Guid.NewGuid(), this);
         }
     }

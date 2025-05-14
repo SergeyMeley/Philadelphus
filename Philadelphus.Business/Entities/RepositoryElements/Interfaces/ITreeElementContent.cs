@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    internal interface IHavingContent : ILinkableByGuid
+    internal interface ITreeElementContent
     {
-        public bool HasContent { get; set; }
+        IContentOwner Owner { get; }
     }
 }

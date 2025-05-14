@@ -5,18 +5,17 @@ using Philadelphus.InfrastructureEntities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
 {
-    public class EntityAttribute : RepositoryElementBase
+    public class ElementAttributeValue : MainEntityBase, ITreeElementContent
     {
         public override EntityTypes EntityType { get => EntityTypes.None; }
-        public ValueTypes ValueType { get; set; }
-        public IEnumerable<EntityAttributeValue> Values { get; set; } = new List<EntityAttributeValue>();
-        public EntityAttribute(Guid guid, IHavingChilds parent) : base(guid, parent)
+        public TreeRepositoryMemberBase Owner { get; private set; }
+        IContentOwner ITreeElementContent.Owner => throw new NotImplementedException();
+        public ElementAttributeValue(Guid guid) : base(guid)
         {
 
         }

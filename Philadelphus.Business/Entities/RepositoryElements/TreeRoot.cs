@@ -14,25 +14,31 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Philadelphus.Business.Helpers;
 using System.Collections.ObjectModel;
+using Philadelphus.Business.Services;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeRoot : RepositoryElementBase, IHavingOwnStorage, IHavingParent, IHavingChilds
+    public class TreeRoot : TreeRepositoryMemberBase, IHavingOwnStorage, IChildren, IParent
     {
         public override EntityTypes EntityType { get => EntityTypes.Root; }
         public InfrastructureTypes InfrastructureRepositoryType { get; }
         public IMainEntitiesInfrastructure Infrastructure { get; private set; }
-        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
         public EntityElementType ElementType { get; set; }
-        public IHavingChilds Parent {  get; private set; }
-        public IEnumerable<IHavingParent> Childs { get; set; }
-        public TreeRoot(Guid guid, IHavingChilds parent) : base(guid, parent)
+        public IParent Parent {  get; private set; }
+        public IEnumerable<IChildren> Childs { get; set; }
+        public TreeRoot(Guid guid, IParent parent) : base(guid, parent)
         {
-            Parent = parent;
-            ParentRepository = (TreeRepository)Parent;
-            ParentRoot = this;
-            Guid = guid;
-            Initialize();
+            if (parent.GetType() == typeof(TreeRepository))
+            {
+                Guid = guid;
+                Parent = parent;
+                ParentRepository = (TreeRepository)parent;
+                Initialize();
+            }
+            else
+            {
+                MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Корень может быть добавлен только в репозиторий!"));
+            }
         }
         private void Initialize()
         {
@@ -46,7 +52,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //    existNames.Add(((IMainEntity)child).Name);
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый корень");
-            Childs = new ObservableCollection<IHavingParent>();
+            Childs = new ObservableCollection<IChildren>();
             ElementType = new EntityElementType(Guid.NewGuid(), this);
         }
     }

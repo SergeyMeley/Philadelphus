@@ -16,7 +16,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbEntityAttribute)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbEntityAttribute());
+            var result = (DbEntityAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbEntityAttribute());
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -24,25 +24,25 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbEntityAttribute>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbEntityAttribute)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbEntityAttribute());
+                var entity = (DbEntityAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbEntityAttribute());
                 result.Add(entity);
             }
             return result;
         }
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
-            //var result = new EntityAttribute(new Guid(dbEntity.ParentGuid));
-            //result = (EntityAttribute)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+            //var result = new ElementAttribute(new Guid(dbEntity.ParentGuid));
+            //result = (ElementAttribute)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
             //return result;
             return null;
         }
         internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
         {
-            var result = new List<EntityAttribute>();
+            var result = new List<OLD_ElementAttribute>();
             //foreach (var dbEntity in dbEntityCollection)
             //{
-            //    var entity = new EntityAttribute(new Guid(dbEntity.ParentGuid));
-            //    entity = (EntityAttribute)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+            //    var entity = new ElementAttribute(new Guid(dbEntity.ParentGuid));
+            //    entity = (ElementAttribute)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
             //    result.Add(entity);
             //}
             return result;

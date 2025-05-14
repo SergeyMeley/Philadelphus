@@ -15,7 +15,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
         {
-            var result = (DbTreeRoot)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeRoot());
+            var result = (DbTreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeRoot());
             return result;
         }
         internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
@@ -23,7 +23,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<DbTreeRoot>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeRoot)BusinessToDbMainProperties((RepositoryElementBase)businessEntity, new DbTreeRoot());
+                var entity = (DbTreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeRoot());
                 result.Add(entity);
             }
             return result;
@@ -31,7 +31,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
         {
             //var result = new TreeRoot(new Guid(dbEntity.ParentGuid));
-            //result = (TreeRoot)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
+            //result = (TreeRoot)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
             //return result;
             return null;
         }
@@ -41,7 +41,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //foreach (var dbEntity in dbEntityCollection)
             //{
             //    var entity = new TreeRoot(new Guid(dbEntity.ParentGuid));
-            //    entity = (TreeRoot)DbToBusinessMainProperties(dbEntity, (RepositoryElementBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
+            //    entity = (TreeRoot)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
             //    result.Add(entity);
             //}
             return result;

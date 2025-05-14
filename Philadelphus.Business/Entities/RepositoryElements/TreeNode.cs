@@ -3,32 +3,53 @@ using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using Philadelphus.Business.Helpers;
+using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ZstdSharp;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeNode : RepositoryElementBase, IHavingChilds
+    public class TreeNode : TreeRepositoryMemberBase, IParent, ITreeRootMember
     {
         public override EntityTypes EntityType { get => EntityTypes.Node; }
         public IMainEntitiesInfrastructure Infrastructure { get; private set; }
-        public IEnumerable<EntityAttributeEntry> AttributeEntries { get; set; } = new List<EntityAttributeEntry>();
         public EntityElementType ElementType { get; set; }
-        public IEnumerable<IHavingParent> Childs { get; set; }
-
-        public TreeNode(Guid guid, IHavingChilds parent) : base(guid, parent)
+        public IEnumerable<IChildren> Childs { get; set; }
+        public TreeRoot ParentRoot { get; private set; }
+        public TreeNode(Guid guid, IParent parent) : base(guid, parent)
         {
-            //Parent = parent;
-            ParentRepository = ((RepositoryElementBase)Parent).ParentRepository;
-            ParentRoot = ((RepositoryElementBase)Parent).ParentRoot;
             Guid = guid;
-            Initialize();
+            Parent = parent;
+            if (parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)))
+            {
+                if (parent.GetType() == typeof(TreeRoot))
+                {
+                    ParentRoot = (TreeRoot)parent;
+
+                }
+                else if (parent.GetType().IsAssignableTo(typeof(ITreeRootMember)))
+                {
+                    ParentRoot = ((ITreeRootMember)parent).ParentRoot;
+                    ParentRepository = ((ITreeRootMember)parent).ParentRepository;
+                }
+                else
+                {
+                    MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Узел может быть добавлен только в другой узел или корень!"));
+                }
+                Initialize();
+            }
+            else
+            {
+                MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Узел может быть добавлен только в участника репозитория!"));
+            }
         }
         private void Initialize()
         {
@@ -38,7 +59,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 existNames.Add(item.Name);
             }
             Name = NamingHelper.GetNewName(existNames, "Новый узел");
-            Childs = new ObservableCollection<IHavingParent>();
+            Childs = new ObservableCollection<IChildren>();
             ElementType = new EntityElementType(Guid.NewGuid(), this);
         }
     }
