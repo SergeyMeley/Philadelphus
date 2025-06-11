@@ -30,5 +30,13 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         {
             Guid = guid;
         }
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Name);
+            sb.AppendLine();
+            sb.Append(Guid);
+            return sb.ToString();
+        }
     }
 }
