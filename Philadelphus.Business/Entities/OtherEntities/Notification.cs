@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.OtherEntities
 {
-    public class Message
+    public class Notification
     {
-        public MessageTypes MessageType { get; init; }
+        public NotificationCriticalLevel CriticalLevel { get; init; }
         public string Text { get; init; }
         public DateTime DateTime { get; init; }
-        public Message(MessageTypes type, string text)
+        public Notification(string text, NotificationCriticalLevel criticalLevel)
         {
-            MessageType = type;
+            CriticalLevel = criticalLevel;
             Text = text;
             DateTime = DateTime.Now;
         }

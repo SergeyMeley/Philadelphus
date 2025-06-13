@@ -2,6 +2,7 @@
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
+using Philadelphus.Business.Services;
 using System.Collections.Generic;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
@@ -17,6 +18,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 
         public TreeRepositoryMemberBase(Guid guid, IParent parent) : base(guid)
         {
+            if (parent == null)
+            {
+                NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLevel.Error);
+                return;
+            }
             Parent = parent;
             if (parent.GetType() == typeof(TreeRepository))
             {

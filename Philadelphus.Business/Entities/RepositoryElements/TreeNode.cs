@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
@@ -26,6 +27,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public TreeRoot ParentRoot { get; private set; }
         public TreeNode(Guid guid, IParent parent) : base(guid, parent)
         {
+            if (parent == null)
+            {
+                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                return;
+            }
             Guid = guid;
             Parent = parent;
             if (parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)))
@@ -42,13 +48,13 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 }
                 else
                 {
-                    MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Узел может быть добавлен только в другой узел или корень!"));
+                    NotificationService.Notifications.Add(new Notification("Узел может быть добавлен только в другой узел или корень!", NotificationCriticalLevel.Error));
                 }
                 Initialize();
             }
             else
             {
-                MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Узел может быть добавлен только в участника репозитория!"));
+                NotificationService.Notifications.Add(new Notification("Узел может быть добавлен только в участника репозитория!", NotificationCriticalLevel.Error));
             }
         }
         private void Initialize()

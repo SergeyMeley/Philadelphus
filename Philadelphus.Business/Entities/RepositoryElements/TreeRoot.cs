@@ -4,7 +4,6 @@ using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +14,8 @@ using System.Xml.Linq;
 using Philadelphus.Business.Helpers;
 using System.Collections.ObjectModel;
 using Philadelphus.Business.Services;
+using Philadelphus.InfrastructureEntities.Interfaces;
+using Philadelphus.Business.Entities.OtherEntities;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
@@ -28,6 +29,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IEnumerable<IChildren> Childs { get; set; }
         public TreeRoot(Guid guid, IParent parent) : base(guid, parent)
         {
+            if (parent == null)
+            {
+                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                return;
+            }
             if (parent.GetType() == typeof(TreeRepository))
             {
                 Guid = guid;
@@ -37,7 +43,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             }
             else
             {
-                MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Корень может быть добавлен только в репозиторий!"));
+                NotificationService.Notifications.Add(new Notification("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevel.Error));
             }
         }
         private void Initialize()

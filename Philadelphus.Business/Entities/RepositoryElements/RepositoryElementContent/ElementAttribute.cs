@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
@@ -39,7 +40,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementCon
             }
             else
             {
-                MessageService.Messages.Add(new OtherEntities.Message(MessageTypes.Error, "Атрибут может быть добавлен только участнику репозитория!"));
+                NotificationService.Notifications.Add(new Notification("Атрибут может быть добавлен только участнику репозитория!", NotificationCriticalLevel.Error));
             }
         }
 

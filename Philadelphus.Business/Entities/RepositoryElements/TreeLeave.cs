@@ -3,6 +3,7 @@ using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using Philadelphus.Business.Helpers;
+using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public TreeRoot ParentRoot { get; private set; }
         public TreeLeave(Guid guid, IParent parent) : base(guid, parent)
         {
+            if (parent == null)
+            {
+                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                return;
+            }
             Parent = parent;
             ParentRepository = ((ITreeRepositoryMember)Parent).ParentRepository;
             ParentRoot = ((ITreeRootMember)Parent).ParentRoot;

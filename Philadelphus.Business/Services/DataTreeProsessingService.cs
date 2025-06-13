@@ -3,7 +3,6 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,6 +101,10 @@ namespace Philadelphus.Business.Services
         {
             try
             {
+                if (element == null)
+                {
+                    return false;
+                }
                 ((ObservableCollection<IChildren>)element.Parent.Childs).Remove(element);
                 if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBase)))
                 {
