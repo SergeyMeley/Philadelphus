@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
@@ -164,6 +165,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
+                    
                     var service = new DataTreeRepositoryService();
                     service.InitTreeRoot(_currentTreeRepository);
                 });
@@ -175,7 +177,12 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParent)) == false)
+                    if (_selectedRepositoryMember == null)
+                    {
+                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                        return;
+                    }
+                    if (_selectedRepositoryMember?.GetType().IsAssignableTo(typeof(IParent)) == false)
                         return;
                     var service = new DataTreeRepositoryService();
                     service.InitTreeNode((IParent)_selectedRepositoryMember);
@@ -188,6 +195,11 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
+                    if (_selectedRepositoryMember == null)
+                    {
+                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                        return;
+                    }
                     if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParent)) == false)
                         return;
                     var service = new DataTreeRepositoryService();
@@ -201,6 +213,11 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
+                    if (_selectedRepositoryMember == null)
+                    {
+                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                        return;
+                    }
                     if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwner)) == false)
                         return;
                     var service = new DataTreeRepositoryService();

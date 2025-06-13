@@ -7,6 +7,7 @@
         xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+        xmlns:ntf="clr-namespace:Philadelphus.Business.Services;assembly=Philadelphus.Business"
         d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationViewModel}"
         mc:Ignorable="d"
         Title="Чубушник"
@@ -236,15 +237,12 @@
                 </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                 <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="2">
-                    <DataGrid>
+                    <DataGrid ItemsSource="{Binding Source={x:Static ntf:NotificationService.Notifications}, Mode=OneWay}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Тип" Width="35"></DataGridTextColumn>
                             <DataGridTextColumn Header="Время" Width="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Сообщение" Width="auto"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="auto"></DataGridTextColumn>
                         </DataGrid.Columns>
-                        <TreeViewItem></TreeViewItem>
-                        <TreeViewItem></TreeViewItem>
-                        <TreeViewItem></TreeViewItem>
                     </DataGrid>
                 </Expander>
                 

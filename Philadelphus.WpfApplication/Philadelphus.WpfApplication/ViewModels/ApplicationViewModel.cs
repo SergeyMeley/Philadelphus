@@ -7,7 +7,7 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationViewModel : ViewModelBase
     {
-
+        
         private RepositoryExplorerViewModel _repositoryViewModel = new RepositoryExplorerViewModel();
         public RepositoryExplorerViewModel RepositoryExplorerViewModel { get { return _repositoryViewModel; } }
         private int _currentProgress = 0;
