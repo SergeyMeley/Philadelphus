@@ -83,10 +83,26 @@ namespace Philadelphus.Business.Services
         }
         public TreeLeave InitTreeLeave(IParent parentElement)
         {
-            var result = new TreeLeave(Guid.NewGuid(), parentElement);
-            ((List<TreeRepositoryMemberBase>)result.ParentRepository.ElementsCollection).Add(result);
-            ((ObservableCollection<IChildren>)parentElement.Childs).Add(result);
-            return result;
+            try
+            {
+                if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)) == false || parentElement.GetType() != typeof(TreeNode))
+                {
+                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                    return null;
+                }
+                else
+                {
+                    var result = new TreeLeave(Guid.NewGuid(), parentElement);
+                    ((List<TreeRepositoryMemberBase>)result.ParentRepository.ElementsCollection).Add(result);
+                    ((ObservableCollection<IChildren>)parentElement.Childs).Add(result);
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                throw;
+            }
         }
 
         public ElementAttribute InitElementAttribute(IContentOwner owner)

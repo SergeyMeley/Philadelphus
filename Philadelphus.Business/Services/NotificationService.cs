@@ -12,7 +12,7 @@ namespace Philadelphus.Business.Services
     public static class NotificationService
     {
         public static ObservableCollection<Notification> Notifications { get; private set;  } = new ObservableCollection<Notification>();
-        public static bool SendNotification(string text, NotificationCriticalLevel criticalLevel = NotificationCriticalLevel.Info, NotificationTypes type = NotificationTypes.TextMessage)
+        public static bool SendNotification(string text, NotificationCriticalLevel criticalLevel = NotificationCriticalLevel.Error, NotificationTypes type = NotificationTypes.TextMessage)
         {
             Notification notification = new Notification(text, criticalLevel);
             Notifications.Add(notification);

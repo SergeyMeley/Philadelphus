@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
@@ -19,16 +20,39 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public TreeRoot ParentRoot { get; private set; }
         public TreeLeave(Guid guid, IParent parent) : base(guid, parent)
         {
-            if (parent == null)
+            try
             {
-                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
-                return;
+                if (parent == null)
+                {
+                    string message = "Не выделен родительский элемент!";
+                    NotificationService.SendNotification(message, NotificationCriticalLevel.Warning, NotificationTypes.TextMessage);
+                    throw new Exception(message);
+                }
+                Parent = parent;
+                if (Parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)))
+                {
+                    ParentRepository = ((ITreeRepositoryMember)Parent).ParentRepository;
+                }
+                else if (Parent.GetType() == typeof(TreeRepository))
+                {
+                    ParentRepository = (TreeRepository)Parent;
+                }
+                if (Parent.GetType().IsAssignableTo(typeof(ITreeRootMember)))
+                {
+                    ParentRoot = ((ITreeRootMember)Parent).ParentRoot;
+                }
+                else if (Parent.GetType() == typeof(TreeRoot))
+                {
+                    ParentRoot = (TreeRoot)Parent;
+                }
+                Guid = guid;
+                Initialize();
             }
-            Parent = parent;
-            ParentRepository = ((ITreeRepositoryMember)Parent).ParentRepository;
-            ParentRoot = ((ITreeRootMember)Parent).ParentRoot;
-            Guid = guid;
-            Initialize();
+            catch (Exception ex)
+            {
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                throw;
+            }
         }
         private void Initialize()
         {
