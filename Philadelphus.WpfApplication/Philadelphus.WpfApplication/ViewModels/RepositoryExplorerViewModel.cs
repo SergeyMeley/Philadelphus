@@ -116,8 +116,10 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private Dictionary<string, string> GetProperties(object instance)
         {
+            if (instance == null)
+                return null;
             var result = new Dictionary<string, string>();
-            foreach (var prop in instance?.GetType().GetProperties())
+            foreach (var prop in instance.GetType().GetProperties())
             {
                 var name = prop.Name;
                 var value = string.Empty;
@@ -201,7 +203,10 @@ namespace Philadelphus.WpfApplication.ViewModels
                         return;
                     }
                     if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParent)) == false)
+                    {
+                        NotificationService.SendNotification("Лист можно добавить только в элемент, который может быть родителем.", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
                         return;
+                    }
                     var service = new DataTreeRepositoryService();
                     service.InitTreeLeave((IParent)_selectedRepositoryMember);
                 });

@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.WpfApplication.ViewModels;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +23,7 @@ namespace Philadelphus.WpfApplication
         public MainWindow()
         {
             InitializeComponent();
+            CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
             DataContext = _viewModel;
         }
     }
