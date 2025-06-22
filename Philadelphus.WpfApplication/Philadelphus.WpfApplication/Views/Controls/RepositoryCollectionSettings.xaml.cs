@@ -23,7 +23,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
     {
         public RepositoryCollectionSettings()
         {
-            //InitializeComponent();
+            InitializeComponent();
         }
     }
 }

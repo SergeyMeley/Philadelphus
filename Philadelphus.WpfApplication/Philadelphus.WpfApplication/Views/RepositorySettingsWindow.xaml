@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
         mc:Ignorable="d"
-        Title="RepositorySettingsWindow" Height="450" Width="800">
+        Title="RepositorySettingsWindow"
+        MinHeight="500" MinWidth="1000"
+        WindowState="Maximized">
     <Grid>
         <ctrls:RepositoryCollectionSettings></ctrls:RepositoryCollectionSettings>
     </Grid>

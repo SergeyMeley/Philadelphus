@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.WpfApplication.Views;
 using System;
@@ -23,6 +24,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 _currentRepositoryExplorerVM = value;
                 OnPropertyChanged(nameof(CurrentRepositoryExplorerVM));
+                OnPropertyChanged(nameof(PropertyList));
             }
         }
         private ObservableCollection<RepositoryExplorerViewModel> _treeRepositoriesVMs;
@@ -55,13 +57,22 @@ namespace Philadelphus.WpfApplication.ViewModels
             //    OnPropertyChanged(nameof(TreeRepositoriesVMs));
             //}
         }
+        public Dictionary<string, string>? PropertyList
+        {
+            get
+            {
+                if (_currentRepositoryExplorerVM == null)
+                    return null;
+                return PropertyGridHelper.GetProperties(_currentRepositoryExplorerVM.TreeRepository);
+            }
+        }
         public RelayCommand OpenRepositoryCollectionSettingsWindow
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
-                    var window = new RepositorySettingsWindow();
+                    var window = new RepositorySettingsWindow() { DataContext = this }; 
                     window.Show();
                 });
             }
