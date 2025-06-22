@@ -8,6 +8,6 @@
         mc:Ignorable="d"
         Title="RepositorySettingsWindow" Height="450" Width="800">
     <Grid>
-        <ctrls:RepositorySettings></ctrls:RepositorySettings>
+        <ctrls:RepositoryCollectionSettings></ctrls:RepositoryCollectionSettings>
     </Grid>
 </Window>

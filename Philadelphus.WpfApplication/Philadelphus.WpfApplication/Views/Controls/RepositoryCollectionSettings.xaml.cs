@@ -11,20 +11,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Views
+namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
-    /// Логика взаимодействия для RepositorySettingsWindow.xaml
+    /// Логика взаимодействия для RepositoryCollectionSettings.xaml
     /// </summary>
-    public partial class RepositorySettingsWindow : Window
+    public partial class RepositoryCollectionSettings : UserControl
     {
-        internal RepositoryCollectionViewModel ViewModel { get { return (RepositoryCollectionViewModel)DataContext; } }
-        public RepositorySettingsWindow()
+        public RepositoryCollectionSettings()
         {
-            InitializeComponent();
-            DataContext = ViewModel;
+            //InitializeComponent();
         }
     }
 }

@@ -1,15 +1,30 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.WpfApplication.Views;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationViewModel : ViewModelBase
     {
-        
+        private RepositoryCollectionViewModel _repositoryCollectionViewModel = new RepositoryCollectionViewModel();
+        public RepositoryCollectionViewModel RepositoryCollectionViewModel
+        {
+            get 
+            { 
+                return _repositoryCollectionViewModel; 
+            } 
+        }
+
         private RepositoryExplorerViewModel _repositoryViewModel = new RepositoryExplorerViewModel();
-        public RepositoryExplorerViewModel RepositoryExplorerViewModel { get { return _repositoryViewModel; } }
+        public RepositoryExplorerViewModel RepositoryExplorerViewModel 
+        { 
+            get 
+            { 
+                return _repositoryViewModel; 
+            } 
+        }
         private int _currentProgress = 0;
         public int CurrentProgress 
         {  
@@ -23,7 +38,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 OnPropertyChanged(nameof(CurrentProgress));
             } 
         }
-        #region  [Commands]
+        #region  [Commands]OpenRepositoryCollectionSettingsWindow
         //public RelayCommand AddNewTreeRepositoryCommand
         //{
         //    get
@@ -31,9 +46,9 @@ namespace Philadelphus.WpfApplication.ViewModels
         //        return new RelayCommand(obj =>
         //        {
         //            var repository = new TreeRepository(Guid.Empty);
-        //            _treeRepositories.Add(repository);
-        //            OnPropertyChanged(nameof(TreeRepositories));
-        //            _currentTreeRepository = TreeRepositories.Last();
+        //            _treeRepositoriesVMs.Add(repository);
+        //            OnPropertyChanged(nameof(TreeRepositoriesVMs));
+        //            _currentTreeRepository = TreeRepositoriesVMs.Last();
         //            OnPropertyChanged(nameof(CurrentTreeRepository));
         //        });
         //    }
@@ -56,8 +71,8 @@ namespace Philadelphus.WpfApplication.ViewModels
         //        return new RelayCommand(obj =>
         //        {
         //            var service = new DataTreeRepositoryService();
-        //            _treeRepositories = service.GetRepositories() ?? new List<TreeRepository>();
-        //            OnPropertyChanged(nameof(TreeRepositories));
+        //            _treeRepositoriesVMs = service.GetRepositories() ?? new List<TreeRepository>();
+        //            OnPropertyChanged(nameof(TreeRepositoriesVMs));
         //        });
         //    }
         //}

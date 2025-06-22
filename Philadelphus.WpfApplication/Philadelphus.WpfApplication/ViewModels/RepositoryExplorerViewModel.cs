@@ -15,46 +15,26 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public  class RepositoryExplorerViewModel : ViewModelBase
     {
-        private List<TreeRepository> _treeRepositories;
-        public List<TreeRepository> TreeRepositories
-        {
-            get
+        private TreeRepository _treeRepository;
+        public TreeRepository TreeRepository 
+        { 
+            get 
+            { 
+                return _treeRepository; 
+            } 
+            set
             {
-                if (_treeRepositories == null)
-                {
-                    _treeRepositories = new List<TreeRepository>();
-                    for (int i = 0; i < 5; i++)
-                    {
-
-                        //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
-                        //Временно
-                        DataTreeRepositoryService treeRepositoryService = new DataTreeRepositoryService();
-                        TreeRepository treeRepository = treeRepositoryService.CreateSampleRepository();
-                        //Временно
-                        treeRepository.Name = $"TEST {i}";
-                        _treeRepositories.Add(treeRepository);
-                    }
-                }
-                return _treeRepositories;
-            }
-            private set
-            {
-                _treeRepositories = value.ToList();
-                OnPropertyChanged(nameof(TreeRepositories));
+                _treeRepository = value;
             }
         }
-        public RepositoryExplorerViewModel()
-        {
-            //((List<ViewModelBase>)Cache).Add(new RepositoryExplorerViewModel());
-        }
-        private TreeRepositoryMemberBase _selectedRepositoryMember;
-        public TreeRepositoryMemberBase SelectedRepositoryMember
+        private TreeRepositoryMemberBase? _selectedRepositoryMember;
+        public TreeRepositoryMemberBase? SelectedRepositoryMember
         {
             get => _selectedRepositoryMember;
             set
             {
                 _selectedRepositoryMember = value;
-                _currentTreeElementProperties = GetProperties(_selectedRepositoryMember);
+                _selectedRepositoryMemberProperties = GetProperties(_selectedRepositoryMember);
                 OnPropertyChanged(nameof(CurrentTreeElementProperties));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
             }
@@ -66,46 +46,17 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return Enum.GetValues(typeof(InfrastructureTypes)).Cast<InfrastructureTypes>().ToList();
             }
         }
-        
-
-        private static TreeRepository _currentTreeRepository;
-        public TreeRepository CurrentTreeRepository
-        {
-            get
-            {
-                return _currentTreeRepository;
-            }
-            set
-            {
-                _currentTreeRepository = value;
-                OnPropertyChanged(nameof(CurrentTreeRepository));
-            }
-        }
-        //private static IMainEntity _currentTreeElement;
-        //public IMainEntity CurrentTreeElement
-        //{
-        //    get
-        //    {
-        //        return _currentTreeElement;
-        //    }
-        //    set
-        //    {
-        //        _currentTreeElement = value;
-        //        _currentTreeElementProperties = GetProperties(CurrentTreeElement);
-        //        OnPropertyChanged(nameof(CurrentTreeElement));
-        //    }
-        //}
-        private Dictionary<string, string> _currentTreeElementProperties;
-        public Dictionary<string, string> CurrentTreeElementProperties
+        private Dictionary<string, string>? _selectedRepositoryMemberProperties;
+        public Dictionary<string, string>? CurrentTreeElementProperties
         {
             get
             {
                 if (_selectedRepositoryMember != null)
                 {
-                    _currentTreeElementProperties = GetProperties(_selectedRepositoryMember);
+                    _selectedRepositoryMemberProperties = GetProperties(_selectedRepositoryMember);
                 }
                 //OnPropertyChanged(nameof(CurrentTreeElementProperties));
-                return _currentTreeElementProperties;
+                return _selectedRepositoryMemberProperties;
             }
         }
         private List<string> _visabilityList = new List<string> { "Скрытый (private)", "Всем (public)", "Только наследникам (protected)", "Только элементам корня (internal)" };
@@ -169,7 +120,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     
                     var service = new DataTreeRepositoryService();
-                    service.InitTreeRoot(_currentTreeRepository);
+                    service.InitTreeRoot(_treeRepository);
                 });
             }
         }

@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
-    /// Логика взаимодействия для RepositorySettings.xaml
+    /// Логика взаимодействия для RepositoryDetails.xaml
     /// </summary>
-    public partial class RepositorySettings : UserControl
+    public partial class RepositoryDetails : UserControl
     {
-        public RepositorySettings()
+        public RepositoryDetails()
         {
             InitializeComponent();
         }
