@@ -18,7 +18,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     {
         public override EntityTypes EntityType { get => EntityTypes.Leave; }
         public TreeRoot ParentRoot { get; private set; }
-        public TreeLeave(Guid guid, IParent parent) : base(guid, parent)
+        internal TreeLeave(Guid guid, IParent parent) : base(guid, parent)
         {
             try
             {

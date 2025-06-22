@@ -25,7 +25,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public EntityElementType ElementType { get; set; }
         public IEnumerable<IChildren> Childs { get; set; }
         public TreeRoot ParentRoot { get; private set; }
-        public TreeNode(Guid guid, IParent parent) : base(guid, parent)
+        internal TreeNode(Guid guid, IParent parent) : base(guid, parent)
         {
             if (parent == null)
             {

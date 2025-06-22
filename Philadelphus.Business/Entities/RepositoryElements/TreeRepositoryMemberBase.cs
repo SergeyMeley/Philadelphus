@@ -16,7 +16,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IEnumerable<ElementAttribute> ParentElementAttributes { get; set; } = new List<ElementAttribute>();
         public IEnumerable<ElementAttributeValue> AttributeValues { get; set; } = new List<ElementAttributeValue>();
 
-        public TreeRepositoryMemberBase(Guid guid, IParent parent) : base(guid)
+        internal TreeRepositoryMemberBase(Guid guid, IParent parent) : base(guid)
         {
             if (parent == null)
             {

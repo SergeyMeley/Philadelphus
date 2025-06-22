@@ -21,12 +21,12 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         public IEnumerable<string> SelectRepositoryPathes(string configPath)
         {
             var list = new List<string>();
-            var listXmlSerializer = new XmlSerializer(typeof(List<string>));
+            var serializer = new XmlSerializer(typeof(List<string>));
             using (var fs = new FileStream(configPath, FileMode.OpenOrCreate))
             {
                 try
                 {
-                    list = listXmlSerializer.Deserialize(fs) as List<string>;
+                    list = serializer.Deserialize(fs) as List<string>;
                 }
                 catch (Exception ex)
                 {

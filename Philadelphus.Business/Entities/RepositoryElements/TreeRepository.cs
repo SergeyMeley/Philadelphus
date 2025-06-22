@@ -25,7 +25,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         //public IEnumerable<IDataStorage> DataStorages { get; set; }
         public IEnumerable<IChildren> Childs { get; private set; }
         public IEnumerable<TreeRepositoryMemberBase> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBase>();
-        public TreeRepository(Guid guid) : base(guid)
+        internal TreeRepository(Guid guid) : base(guid)
         {
             Guid = guid;
             Initialize();
