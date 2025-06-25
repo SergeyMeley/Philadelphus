@@ -39,7 +39,7 @@
                         <Button Content="{StaticResource imageProtect}" Margin="2" Height="25" Width="25" Background="Transparent" />
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="2">
-                        <TextBlock VerticalAlignment="Center" Text="Пространство имен "></TextBlock>
+                        <TextBlock VerticalAlignment="Center" Text="Представление "></TextBlock>
                         <ComboBox MinWidth="50">
                             <ComboBoxItem Content="Основной"></ComboBoxItem>
                             <ComboBoxItem Content="По тегам"></ComboBoxItem>

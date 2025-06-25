@@ -10,7 +10,7 @@
         xmlns:ntf="clr-namespace:Philadelphus.Business.Services;assembly=Philadelphus.Business"
         d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationViewModel}"
         mc:Ignorable="d"
-        Title="Чубушник"
+        Title="{Binding Title}"
         MinHeight="500" MinWidth="1000"
         WindowState="Maximized">
     <Window.CommandBindings>

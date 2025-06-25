@@ -19,12 +19,9 @@ namespace Philadelphus.WpfApplication
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ApplicationViewModel _viewModel = new ApplicationViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
-            DataContext = _viewModel;
         }
     }
 }

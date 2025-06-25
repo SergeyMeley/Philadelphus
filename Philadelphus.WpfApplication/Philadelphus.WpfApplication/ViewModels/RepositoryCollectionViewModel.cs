@@ -66,6 +66,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return PropertyGridHelper.GetProperties(_currentRepositoryExplorerVM.TreeRepository);
             }
         }
+        //TODO: Перенести в ApplicationViewModel
         public RelayCommand OpenRepositoryCollectionSettingsWindow
         {
             get

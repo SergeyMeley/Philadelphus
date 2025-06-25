@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using Philadelphus.WpfApplication.ViewModels;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -9,6 +10,11 @@ namespace Philadelphus.WpfApplication
     /// </summary>
     public partial class App : Application
     {
+        ApplicationViewModel viewModel;
+        public App()
+        {
+            viewModel = new ApplicationViewModel();
+        }
     }
 
 }
