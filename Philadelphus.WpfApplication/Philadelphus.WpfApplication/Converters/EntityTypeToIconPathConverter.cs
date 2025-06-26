@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 
 namespace Philadelphus.WpfApplication.Converters
 {
-    public class EntityIconConverter : IValueConverter
+    public class EntityTypeToIconPathConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

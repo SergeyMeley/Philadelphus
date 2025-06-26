@@ -36,8 +36,8 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return title;
             }
         }
-        private RepositoryCollectionViewModel _repositoryCollectionViewModel = new RepositoryCollectionViewModel();
-        public RepositoryCollectionViewModel RepositoryCollectionViewModel
+        private RepositoryCollectionVM _repositoryCollectionViewModel = new RepositoryCollectionVM();
+        public RepositoryCollectionVM RepositoryCollectionViewModel
         {
             get 
             { 

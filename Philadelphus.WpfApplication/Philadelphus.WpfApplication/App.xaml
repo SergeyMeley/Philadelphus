@@ -4,10 +4,12 @@
              xmlns:local="clr-namespace:Philadelphus.WpfApplication"
              xmlns:converters="clr-namespace:Philadelphus.WpfApplication.Converters">
     <Application.Resources>
-        <converters:EntityIconConverter x:Key="iconConverter" />
+        <converters:EntityTypeToIconPathConverter x:Key="iconConverter" />
         <converters:SelectedIndexConverter x:Key="selectedIndexConverter" />
         <converters:EntityTypeConverter x:Key="typeConverter" />
-        
+        <converters:RepresentationToDataGridVisibilityConverter x:Key="representationToDataGridVisibilityConverter" />
+        <converters:RepresentationToStandardGridVisibilityConverter x:Key="representationToStandardGridVisibilityConverter" />
+
         <Image x:Key="imageAdd" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageBack" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageCopy" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>

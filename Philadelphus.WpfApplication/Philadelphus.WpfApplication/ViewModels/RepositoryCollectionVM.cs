@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
+using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
-    public class RepositoryCollectionViewModel : ViewModelBase
+    public class RepositoryCollectionVM : ViewModelBase
     {
         private static RepositoryExplorerViewModel _currentRepositoryExplorerVM = new RepositoryExplorerViewModel();
         public  RepositoryExplorerViewModel CurrentRepositoryExplorerVM 
@@ -56,6 +57,31 @@ namespace Philadelphus.WpfApplication.ViewModels
             //    _treeRepositoriesVMs = value.ToList();
             //    OnPropertyChanged(nameof(TreeRepositoriesVMs));
             //}
+        }
+        public List<string> PropertyGridRepresentationsCollection
+        {
+            get
+            {
+                var list = new List<string>();
+                foreach (var item in Enum.GetNames(typeof(PropertyGridRepresentations)))
+                {
+                    list.Add(item);
+                }
+                return list;
+            }
+        }
+        private PropertyGridRepresentations _propertyGridRepresentation;
+        public PropertyGridRepresentations PropertyGridRepresentation
+        {
+            get
+            {
+                return _propertyGridRepresentation;
+            }
+            set
+            {
+                _propertyGridRepresentation = (PropertyGridRepresentations)value;
+                OnPropertyChanged(nameof(PropertyGridRepresentation));
+            }
         }
         public Dictionary<string, string>? PropertyList
         {

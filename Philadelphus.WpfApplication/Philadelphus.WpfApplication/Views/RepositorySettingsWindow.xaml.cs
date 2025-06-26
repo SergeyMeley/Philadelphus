@@ -20,7 +20,7 @@ namespace Philadelphus.WpfApplication.Views
     /// </summary>
     public partial class RepositorySettingsWindow : Window
     {
-        internal RepositoryCollectionViewModel ViewModel { get { return (RepositoryCollectionViewModel)DataContext; } }
+        internal RepositoryCollectionVM ViewModel { get { return (RepositoryCollectionVM)DataContext; } }
         public RepositorySettingsWindow()
         {
             InitializeComponent();

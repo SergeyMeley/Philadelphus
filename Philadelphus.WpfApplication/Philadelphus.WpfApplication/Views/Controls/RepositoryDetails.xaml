@@ -34,8 +34,12 @@
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Row="0" Grid.Column="0" Header="Параметры репозитория" Margin="2">
                     <StackPanel>
-                        <GroupBox Header="Свойства" DataContext="{Binding CurrentRepositoryExplorerVM.TreeRepository}">
-                            <Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Представление "></TextBlock>
+                            <ComboBox ItemsSource="{Binding PropertyGridRepresentationsCollection}" SelectedItem="{Binding PropertyGridRepresentation}"></ComboBox>
+                        </StackPanel>
+                        <GroupBox Header="Свойства" Visibility="{Binding PropertyGridRepresentation, Converter={StaticResource representationToStandardGridVisibilityConverter}}">
+                            <Grid DataContext="{Binding CurrentRepositoryExplorerVM.TreeRepository}" >
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition></ColumnDefinition>
                                     <ColumnDefinition></ColumnDefinition>
@@ -63,7 +67,7 @@
 
                             </Grid>
                         </GroupBox>
-                        <GroupBox Header="Таблица свойств">
+                        <GroupBox Header="Таблица свойств" Visibility="{Binding PropertyGridRepresentation, Converter={StaticResource representationToDataGridVisibilityConverter}}">
                             <local:PropertyGrid></local:PropertyGrid>
                         </GroupBox>
                         <Button Command="{Binding SaveRepository}" Content="Сохранить" Margin="2"></Button>

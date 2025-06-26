@@ -20,11 +20,9 @@ namespace Philadelphus.WpfApplication.Views
     /// </summary>
     public partial class StartWindow : Window
     {
-        //private ApplicationViewModel _viewModel = new ApplicationViewModel();
         public StartWindow()
         {
             InitializeComponent();
-            //DataContext = _viewModel;
         }
     }
 }

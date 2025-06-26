@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
 {
-    internal enum PropertyGridRepresentations
+    public enum PropertyGridRepresentations
     {
         Grid,
         DataGrid
