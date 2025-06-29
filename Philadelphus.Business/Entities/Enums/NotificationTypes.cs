@@ -11,6 +11,9 @@ namespace Philadelphus.Business.Entities.Enums
         TextMessage,
         ModalWindow,
         PopUpWindow,
-
+        Email,
+        Sms,
+        Call,
+        
     }
 }

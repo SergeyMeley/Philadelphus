@@ -30,43 +30,41 @@ namespace Philadelphus.Business.Services
         }
         public List<TreeRepository> DataTreeRepositories { get; private set; } = new List<TreeRepository>();
         private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
-        public List<TreeRepository> GetRepositoryCollection()
+        public List<TreeRepository> GetRepositoryCollection(IEnumerable<string> repositoryPathes)
         {
             var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
-            // Получение списка путей к репозиториям
-            GeneralSettings.RepositoryPathList = (List<string>)infrastructure.SelectRepositoryPathes(GeneralSettings.RepositoryListPath);
             // Получение репозиториев по всем путям
-            if (GeneralSettings.RepositoryPathList != null)
+            if (repositoryPathes != null)
             {
-                var dbRepositories = (List<DbTreeRepository>)infrastructure.SelectRepositories(GeneralSettings.RepositoryPathList);
+                var dbRepositories = (List<DbTreeRepository>)infrastructure.SelectRepositories(repositoryPathes.ToList());
                 var converter = new RepositoryInfrastructureConverter();
                 DataTreeRepositories = converter.DbToBusinessEntityCollection(dbRepositories);
             }
             return DataTreeRepositories;
         }
-        public List<TreeRepository> AddRepository(TreeRepository repository)
-        {
-            if (repository != null)
-            {
-                var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
-                // Добавление пути к папке и файлу репозитория
-                //repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
-                //repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
-                // Получение текущего списка репозиториев и добавление туда нового
-                DataTreeRepositories = GetRepositoryCollection();
-                DataTreeRepositories.Add(repository);
-                // Создания нового репозитория
-                var list = new List<TreeRepository>();
-                list.Add(repository);
-                var converter = new RepositoryInfrastructureConverter();
-                infrastructure.InsertRepositories(converter.BusinessToDbEntityCollection(list));
-                // Дополнение списка репозиториев в настроечном файле
-                //GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
-                infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
-                // Получение актуального списка репозиториев
-            }
-            return GetRepositoryCollection();
-        }
+        //public List<TreeRepository> AddRepository(TreeRepository repository)
+        //{
+        //    if (repository != null)
+        //    {
+        //        var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
+        //        // Добавление пути к папке и файлу репозитория
+        //        //repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
+        //        //repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
+        //        //// Получение текущего списка репозиториев и добавление туда нового
+        //        //DataTreeRepositories = GetRepositoryCollection();
+        //        //DataTreeRepositories.Add(repository);
+        //        // Создания нового репозитория
+        //        var list = new List<TreeRepository>();
+        //        list.Add(repository);
+        //        var converter = new RepositoryInfrastructureConverter();
+        //        infrastructure.InsertRepositories(converter.BusinessToDbEntityCollection(list));
+        //        // Дополнение списка репозиториев в настроечном файле
+        //        //GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
+        //        //infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
+        //        // Получение актуального списка репозиториев
+        //    }
+        //    return GetRepositoryCollection();
+        //}
         public TreeRoot InitTreeRoot(TreeRepository parentElement)
         {
             var result = new TreeRoot(Guid.NewGuid(), parentElement);
@@ -134,35 +132,35 @@ namespace Philadelphus.Business.Services
                 return false;
             }
         }
-        public List<TreeRepository> ModifyRepository(TreeRepository repository)
-        {
-            return AddRepository(repository);
-            //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
-            //{
-            //    xmlSerializer.Serialize(fs, RepositoryPathList);
-            //}
-            //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
-            //{
-            //    //var dbRepositories = new List<DbTreeRepository>();
-            //    try
-            //    {
-            //        RepositoryPathList = xmlSerializer.Deserialize(fs) as List<string>;
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //    }
-            //    if (RepositoryPathList != null)
-            //    {
-            //        var repositoryXmlSerializer = new XmlSerializer(typeof(List<string>));
-            //        foreach (var item in RepositoryPathList)
-            //        {
-            //        }
-            //        //var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
-            //        //DataTreeRepositories = (List<TreeRepository>)repositoryInfrastructureConverter.DbToBusinessEntityCollection(dbRepositories);
-            //    }
-            //    return GetRepositoryCollection();
-            //}
-        }
+        //public List<TreeRepository> ModifyRepository(TreeRepository repository)
+        //{
+        //    return AddRepository(repository);
+        //    //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
+        //    //{
+        //    //    xmlSerializer.Serialize(fs, RepositoryPathList);
+        //    //}
+        //    //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
+        //    //{
+        //    //    //var dbRepositories = new List<DbTreeRepository>();
+        //    //    try
+        //    //    {
+        //    //        RepositoryPathList = xmlSerializer.Deserialize(fs) as List<string>;
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //    }
+        //    //    if (RepositoryPathList != null)
+        //    //    {
+        //    //        var repositoryXmlSerializer = new XmlSerializer(typeof(List<string>));
+        //    //        foreach (var item in RepositoryPathList)
+        //    //        {
+        //    //        }
+        //    //        //var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
+        //    //        //DataTreeRepositories = (List<TreeRepository>)repositoryInfrastructureConverter.DbToBusinessEntityCollection(dbRepositories);
+        //    //    }
+        //    //    return GetRepositoryCollection();
+        //    //}
+        //}
         /// <summary>
         /// Создание нового пустого репозитория.
         /// </summary>
