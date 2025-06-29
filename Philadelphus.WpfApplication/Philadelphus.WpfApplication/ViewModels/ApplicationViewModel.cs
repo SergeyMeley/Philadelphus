@@ -1,4 +1,7 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.OtherEntities;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Handlers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.WpfApplication.Views;
@@ -12,6 +15,7 @@ namespace Philadelphus.WpfApplication.ViewModels
     {
         private StartWindow _startWindow;
         private MainWindow _mainWindow;
+
         public ApplicationViewModel()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
@@ -19,9 +23,11 @@ namespace Philadelphus.WpfApplication.ViewModels
             _startWindow.Show();
             // ВРЕМЕННО!!!
             RepositoryCollectionViewModel.CurrentRepositoryExplorerVM = RepositoryCollectionViewModel.TreeRepositoriesVMs.FirstOrDefault();
+            SetNotificationHandlers();
             // ВРЕМЕННО!!!
             //_mainWindow = new MainWindow() { DataContext = this };
         }
+
         public string UserName = "Sergey";
         public string Title 
         { 
@@ -36,6 +42,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return title;
             }
         }
+
         private RepositoryCollectionVM _repositoryCollectionViewModel = new RepositoryCollectionVM();
         public RepositoryCollectionVM RepositoryCollectionViewModel
         {
@@ -53,6 +60,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return _repositoryViewModel; 
             } 
         }
+
         private int _currentProgress = 0;
         public int CurrentProgress 
         {  
@@ -66,6 +74,46 @@ namespace Philadelphus.WpfApplication.ViewModels
                 OnPropertyChanged(nameof(CurrentProgress));
             } 
         }
+
+        private bool SetNotificationHandlers()
+        {
+            NotificationService.TextMessageHandler = SendText;
+            bool SendText(Notification notification) 
+            {
+                return true;
+            }
+            NotificationService.SendNotification("Обработчик текстовых сообщений назначен.", criticalLevel: NotificationCriticalLevel.Info, type: NotificationTypes.TextMessage);
+
+            NotificationService.ModalWindowHandler = SendModal;
+            bool SendModal(Notification notification)
+            {
+                MessageBoxImage image;
+                switch (notification.CriticalLevel)
+                {
+                    case NotificationCriticalLevel.Info:
+                        image = MessageBoxImage.Information;
+                        break;
+                    case NotificationCriticalLevel.Warning:
+                        image = MessageBoxImage.Warning;
+                        break;
+                    case NotificationCriticalLevel.Error:
+                        image = MessageBoxImage.Error;
+                        break;
+                    case NotificationCriticalLevel.Alarm:
+                        image = MessageBoxImage.Error;
+                        break;
+                    default:
+                        image = MessageBoxImage.Error;
+                        break;
+                }
+                MessageBox.Show(messageBoxText: notification.Text, caption: notification.CriticalLevel.ToString(), MessageBoxButton.OK, icon: image);
+                return true;
+            }
+            NotificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevel.Info, type: NotificationTypes.ModalWindow);
+
+            return true;
+        }
+
         #region  [Commands]
         public RelayCommand OpenMainWindowCommand
         {

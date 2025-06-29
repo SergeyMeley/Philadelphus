@@ -235,7 +235,7 @@
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                 </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="2">
+                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="2" IsExpanded="True">
                     <DataGrid ItemsSource="{Binding Source={x:Static ntf:NotificationService.Notifications}, Mode=OneWay}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Уровень критичности" Binding="{Binding CriticalLevel}" Width="35"></DataGridTextColumn>

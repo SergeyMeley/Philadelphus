@@ -14,6 +14,10 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class RepositoryCollectionVM : ViewModelBase
     {
+        public RepositoryCollectionVM()
+        {
+            PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
+        }
         private static RepositoryExplorerViewModel _currentRepositoryExplorerVM = new RepositoryExplorerViewModel();
         public  RepositoryExplorerViewModel CurrentRepositoryExplorerVM 
         { 
