@@ -14,7 +14,7 @@ namespace Philadelphus.Business.Entities.OtherEntities
         public NotificationCriticalLevel CriticalLevel { get; init; }
         public string Text { get; init; }
         public DateTime DateTime { get; init; }
-        public Notification(string text, NotificationCriticalLevel criticalLevel)
+        public Notification(string text, NotificationCriticalLevel criticalLevel = NotificationCriticalLevel.Error)
         {
             CriticalLevel = criticalLevel;
             Text = text;
