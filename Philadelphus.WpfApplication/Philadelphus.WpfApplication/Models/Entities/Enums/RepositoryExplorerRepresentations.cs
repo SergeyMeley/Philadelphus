@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
+namespace Philadelphus.WpfApplication.Models.Entities.Enums
 {
-    internal enum  RepositoryExplorerRepresentations
+    internal enum RepositoryExplorerRepresentations
     {
         ByChildren_tree,
         ByContent_tree,

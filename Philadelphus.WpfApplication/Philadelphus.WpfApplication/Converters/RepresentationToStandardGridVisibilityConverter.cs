@@ -1,4 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
+﻿using Philadelphus.WpfApplication.Models.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

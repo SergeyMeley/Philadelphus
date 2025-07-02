@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Handlers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -13,6 +14,19 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationViewModel : ViewModelBase
     {
+        private PopupVM _popupVM;
+        public PopupVM PopupVM 
+        { 
+            get 
+            {
+                if (_popupVM == null)
+                {
+                    _popupVM = new PopupVM();
+                }
+                return _popupVM; 
+            } 
+        }
+
         private StartWindow _startWindow;
         private MainWindow _mainWindow;
 
@@ -109,7 +123,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 MessageBox.Show(messageBoxText: notification.Text, caption: notification.CriticalLevel.ToString(), MessageBoxButton.OK, icon: image);
                 return true;
             }
-            NotificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevel.Info, type: NotificationTypes.ModalWindow);
+            NotificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevel.Info, type: NotificationTypes.TextMessage);
 
             return true;
         }
@@ -124,9 +138,12 @@ namespace Philadelphus.WpfApplication.ViewModels
                     if (_mainWindow == null)
                         _mainWindow = new MainWindow() { DataContext = this };
                     _mainWindow.Show();
+                    
                     //_startWindow.Visibility = Visibility.Hidden;
                     _startWindow.Close();
 
+                    _popupVM.Start();
+                    OnPropertyChanged(nameof(PopupVM));
                 });
             }
         }

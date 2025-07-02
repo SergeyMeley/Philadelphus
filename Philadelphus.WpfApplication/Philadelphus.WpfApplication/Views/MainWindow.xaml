@@ -22,6 +22,24 @@
         <Grid.Background>
             <SolidColorBrush Color="#FFF1F1F1"/>
         </Grid.Background>
+        <Popup DataContext="{Binding PopupVM}" IsOpen="{Binding IsOpen}" Placement="Center"  AllowsTransparency="True" PopupAnimation="Scroll">
+            <StackPanel>
+                <TextBlock Text="{Binding LastNotification.Text}"></TextBlock>
+                <ListBox ItemsSource="{Binding NotificationList}">
+                    <ListBox.ItemTemplate>
+                        <ItemContainerTemplate>
+                            <Border BorderThickness="3" CornerRadius="5" BorderBrush="SlateGray" Background="LightGray">
+                                <StackPanel>
+                                    <TextBlock Foreground="Black" Height="70" Width="200" Padding="10" Text="{Binding Text}"></TextBlock>
+                                </StackPanel>
+                            </Border>
+                           
+                            
+                        </ItemContainerTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Popup>
         <DockPanel>
             <Ribbon DockPanel.Dock="Top" Background="Transparent">
                 <Ribbon.HelpPaneContent>

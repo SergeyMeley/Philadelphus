@@ -1,7 +1,7 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
-using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
+using Philadelphus.WpfApplication.Models.Entities.Enums;
 using Philadelphus.WpfApplication.Views;
 using System;
 using System.Collections.Generic;
