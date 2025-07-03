@@ -22,15 +22,14 @@
         <Grid.Background>
             <SolidColorBrush Color="#FFF1F1F1"/>
         </Grid.Background>
-        <Popup DataContext="{Binding PopupVM}" IsOpen="{Binding IsOpen}" Placement="Center"  AllowsTransparency="True" PopupAnimation="Scroll">
+        <Popup DataContext="{Binding PopupVM}" IsOpen="{Binding IsOpen}" Placement="Top" PlacementTarget="{Binding ElementName=popupTarget}" HorizontalAlignment="Right" HorizontalOffset="-5" VerticalOffset="-5" AllowsTransparency="True" PopupAnimation="Scroll">
             <StackPanel>
-                <TextBlock Text="{Binding LastNotification.Text}"></TextBlock>
                 <ListBox ItemsSource="{Binding NotificationList}">
                     <ListBox.ItemTemplate>
                         <ItemContainerTemplate>
                             <Border BorderThickness="3" CornerRadius="5" BorderBrush="SlateGray" Background="LightGray">
                                 <StackPanel>
-                                    <TextBlock Foreground="Black" Height="70" Width="200" Padding="10" Text="{Binding Text}"></TextBlock>
+                                    <TextBlock Foreground="Black" Height="70" Width="300" Padding="10" Text="{Binding Text}"></TextBlock>
                                 </StackPanel>
                             </Border>
                            
@@ -171,6 +170,7 @@
                     <RowDefinition Height="auto" MaxHeight="350"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="0"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
@@ -262,11 +262,17 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Expander>
-                
-                <StatusBar Grid.Row="3">
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="320"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel x:Name="popupTarget" Grid.Column="1"></StackPanel>
+                </Grid>
+                <StatusBar Grid.Row="4">
                     <TextBlock Text="Приложение запущено"></TextBlock>
                 </StatusBar>
-                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
+                <ProgressBar Grid.Row="5" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
             </Grid>
         </DockPanel>
     </Grid>
