@@ -18,7 +18,11 @@ namespace Philadelphus.WpfApplication.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string path = @"C:\Users\MeleychukSV\Downloads";
+            string path = @"C:\Users\%username%\Downloads";
+            if (Path.Exists(path) ==false) 
+            {
+                path=Path.GetTempPath();
+            }
             string fullPath = string.Empty;
             switch ((EntityTypes)value)
             {
