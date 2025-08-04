@@ -11,7 +11,7 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
 {
     public class PostgreMainEntityInfrastructure : IMainEntitiesInfrastructure
     {
-        public InfrastructureTypes InftastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSql;
+        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSql;
         private readonly Context _context;
         public PostgreMainEntityInfrastructure()
         {

@@ -288,7 +288,7 @@ namespace Philadelphus.Business.Services
             //foreach (var item in CurrentRepository.InfrastructureRepositories)
             //{
             //    IMainEntitiesInfrastructure infrastructureRepository;
-            //    switch (item.InftastructureRepositoryTypes)
+            //    switch (item.InfrastructureRepositoryTypes)
             //    {
             //        case InfrastructureTypes.WindowsDirectory:
             //            infrastructureRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();

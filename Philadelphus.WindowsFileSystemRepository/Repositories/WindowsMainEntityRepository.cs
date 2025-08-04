@@ -12,7 +12,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
     public class WindowsMainEntityRepository : IMainEntitiesInfrastructure
     {
-        public InfrastructureTypes InftastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
+        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
         public DbMainEntitiesCollection GetMainEntitiesCollection()
         {
             return null;

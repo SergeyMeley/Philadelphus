@@ -15,7 +15,7 @@ namespace Philadelphus.MongoRepository.Repositories
 {
     public class MongoMainEntitуInfrastructure : IMainEntitiesInfrastructure
     {
-        public InfrastructureTypes InftastructureRepositoryTypes { get; } = InfrastructureTypes.MongoDb;
+        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.MongoDb;
         MongoClient _client;
         IMongoDatabase _database;
         public MongoMainEntitуInfrastructure()

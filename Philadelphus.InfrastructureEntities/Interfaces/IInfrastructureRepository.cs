@@ -9,6 +9,6 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
 {
     public interface IInfrastructureRepository
     {
-        public InfrastructureTypes InftastructureRepositoryTypes { get; }
+        public InfrastructureTypes InfrastructureRepositoryTypes { get; }
     }
 }
