@@ -22,8 +22,8 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
         private static bool _isOpen;
         public bool IsOpen { get => _isOpen; set => _isOpen = value; }
 
-        private static List<Notification> _notificationList = new List<Notification>();
-        public List<Notification> NotificationList 
+        private static IEnumerable<Notification> _notificationList = new ObservableCollection<Notification>();
+        public IEnumerable<Notification> NotificationList 
         {
             get
             {
@@ -36,44 +36,30 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
                     return null;
                 }
             }
-            set
+            private set
             {
                 _notificationList = value;
                 OnPropertyChanged(nameof(NotificationList));
             }
         }
 
-        private Notification _lastNotification = new Notification("Hello!");
-        public Notification LastNotification 
-        { 
-            get => _lastNotification; 
-            set => _lastNotification = value; 
-        }
-
-        public bool Start()
+        public bool StartReceivingNotifications()
         {
             _isOpen = true;
             OnPropertyChanged(nameof(IsOpen));
-            var popupAddTask = new Task(SendTime);
+            var popupAddTask = new Task(CheckMessages);
             popupAddTask.Start();
             var popupRemoveTask = new Task(CheckLifeTime);
             popupRemoveTask.Start();
             return true;
         }
 
-        private void SendTime()
+        private void CheckMessages()
         {
             while (true)
             {
                 var notification = new Notification(DateTime.Now.ToString());
-                _lastNotification = notification;
-                OnPropertyChanged(nameof(LastNotification));
-                var newList = new List<Notification>(_notificationList);
-                newList.Add(notification);
-                _notificationList = newList;
-                //_notificationList.Add(notification);
-                OnPropertyChanged(nameof(NotificationList));
-                //OnPropertyChanged(nameof(NotificationList.Collection));
+                SendNotification(notification);
                 _lastUpdate = DateTime.Now;
                 Thread.Sleep(_periodicity);
             }
@@ -97,6 +83,17 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
                 _lastUpdate = DateTime.Now;
                 Thread.Sleep((int)Math.Min(_periodicity.TotalSeconds, _lifeTime.TotalSeconds));
             }
+        }
+
+        private bool SendNotification(Notification notification)
+        {
+            var newList = new List<Notification>(_notificationList);
+            newList.Add(notification);
+            _notificationList = newList;
+            //_notificationList.Add(notification);
+            //OnPropertyChanged(nameof(NotificationList));
+            //OnPropertyChanged(nameof(NotificationList.Collection));
+            return true;
         }
     }
 }

@@ -142,7 +142,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     //_startWindow.Visibility = Visibility.Hidden;
                     _startWindow.Close();
 
-                    _popupVM.Start();
+                    _popupVM.StartReceivingNotifications();
                     OnPropertyChanged(nameof(PopupVM));
                 });
             }
