@@ -19,31 +19,31 @@ using Philadelphus.Business.Entities.OtherEntities;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeRoot : TreeRepositoryMemberBase, IHavingOwnStorage, IChildren, IParent
+    public class TreeRootModel : TreeRepositoryMemberBaseModel, IHavingOwnStorageModel, IChildrenModel, IParentModel
     {
-        public override EntityTypes EntityType { get => EntityTypes.Root; }
+        public override EntityTypesModel EntityType { get => EntityTypesModel.Root; }
         public InfrastructureTypes InfrastructureRepositoryType { get; }
         public IMainEntitiesInfrastructure Infrastructure { get; private set; }
-        public EntityElementType ElementType { get; set; }
-        public IParent Parent {  get; private set; }
-        public IEnumerable<IChildren> Childs { get; set; }
-        internal TreeRoot(Guid guid, IParent parent) : base(guid, parent)
+        public EntityElementTypeModel ElementType { get; set; }
+        public IParentModel Parent {  get; private set; }
+        public IEnumerable<IChildrenModel> Childs { get; set; }
+        internal TreeRootModel(Guid guid, IParentModel parent) : base(guid, parent)
         {
             if (parent == null)
             {
-                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLeveModel.Error);
                 return;
             }
-            if (parent.GetType() == typeof(TreeRepository))
+            if (parent.GetType() == typeof(TreeRepositoryModel))
             {
                 Guid = guid;
                 Parent = parent;
-                ParentRepository = (TreeRepository)parent;
+                ParentRepository = (TreeRepositoryModel)parent;
                 Initialize();
             }
             else
             {
-                NotificationService.Notifications.Add(new Notification("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevel.Error));
+                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLeveModel.Error));
             }
         }
         private void Initialize()
@@ -58,8 +58,8 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //    existNames.Add(((IMainEntity)child).Name);
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый корень");
-            Childs = new ObservableCollection<IChildren>();
-            ElementType = new EntityElementType(Guid.NewGuid(), this);
+            Childs = new ObservableCollection<IChildrenModel>();
+            ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
         }
     }
 }

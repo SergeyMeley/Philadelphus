@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    public interface IContentOwner : ILinkableByGuid
+    public interface IContentOwnerModel : ILinkableByGuidModel
     {
         public bool HasContent { get; set; }
-        public IEnumerable<ElementAttribute> PersonalAttributes { get; }
-        public IEnumerable<ElementAttribute> ParentElementAttributes { get; }
-        public IEnumerable<ElementAttributeValue> AttributeValues { get; set; }
+        public IEnumerable<ElementAttributeModel> PersonalAttributes { get; }
+        public IEnumerable<ElementAttributeModel> ParentElementAttributes { get; }
+        public IEnumerable<ElementAttributeValueModel> AttributeValues { get; set; }
     }
 }

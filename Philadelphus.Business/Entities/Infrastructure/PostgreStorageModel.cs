@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.Infrastructure
 {
-    internal class PostgreStorage : IDataStorage
+    internal class PostgreStorageModel : IDataStorageModel
     {
         public Guid Guid { get; }
         public string Name { get; set; }
@@ -18,7 +18,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public IInfrastructureRepository InfrastructureRepository { get; } = new PostgreMainEntityInfrastructure();
         public string ConnectionString { get; }
         public bool IsDefaultStorage { get; set; }
-        public PostgreStorage(Guid guid, string name, string connectionString)
+        public PostgreStorageModel(Guid guid, string name, string connectionString)
         {
             Guid = guid;
             ConnectionString = connectionString;

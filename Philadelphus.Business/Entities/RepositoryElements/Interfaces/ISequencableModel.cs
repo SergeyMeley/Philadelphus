@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    public interface IChildren : ILinkableByGuid
+    public interface ISequencableModel
     {
-        public IParent Parent { get; }
-        //public Guid ParentGuid { get; }
+        public long Sequence { get; set; }
     }
 }

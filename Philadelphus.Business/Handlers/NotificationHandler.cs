@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Handlers
 {
-    public delegate bool NotificationHandler(Notification notification);
+    public delegate bool NotificationHandler(NotificationModel notification);
 }

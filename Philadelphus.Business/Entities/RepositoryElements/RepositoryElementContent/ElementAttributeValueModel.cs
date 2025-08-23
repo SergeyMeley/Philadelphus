@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
 {
-    public class ElementAttributeValue : MainEntityBase, ITreeElementContent
+    public class ElementAttributeValueModel : MainEntityBaseModel, ITreeElementContentModek
     {
-        public override EntityTypes EntityType { get => EntityTypes.None; }
-        public TreeRepositoryMemberBase Owner { get; private set; }
-        IContentOwner ITreeElementContent.Owner => throw new NotImplementedException();
-        public ElementAttributeValue(Guid guid) : base(guid)
+        public override EntityTypesModel EntityType { get => EntityTypesModel.None; }
+        public TreeRepositoryMemberBaseModel Owner { get; private set; }
+        IContentOwnerModel ITreeElementContentModek.Owner => throw new NotImplementedException();
+        public ElementAttributeValueModel(Guid guid) : base(guid)
         {
 
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.ElementProperties
 {
-    public class AuditInfo
+    public class AuditInfoModel
     {
         public bool IsDeleted { get; set; }
         public string CreatedOn { get; set; }

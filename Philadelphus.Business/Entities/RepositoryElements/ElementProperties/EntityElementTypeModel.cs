@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.ElementProperties
 {
-    public class EntityElementType : MainEntityBase
+    public class EntityElementTypeModel : MainEntityBaseModel
     {
-        public override EntityTypes EntityType => EntityTypes.RepositoryElementType;
-        public EntityElementType(Guid guid, ITyped parent) : base(guid)
+        public override EntityTypesModel EntityType => EntityTypesModel.RepositoryElementType;
+        public EntityElementTypeModel(Guid guid, ITypedModel parent) : base(guid)
         {
             Name = "TEST TYPE";
         }

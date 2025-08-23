@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.Infrastructure
 {
-    public interface IDataStorage
+    public interface IDataStorageModel
     {
         public Guid Guid { get; }
         public string Name { get; }

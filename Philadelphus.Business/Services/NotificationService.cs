@@ -19,37 +19,37 @@ namespace Philadelphus.Business.Services
         public static NotificationHandler SmsHandler { get; set; }
         public static NotificationHandler CallHandler { get; set; }
 
-        public static ObservableCollection<Notification> Notifications { get; private set;  } = new ObservableCollection<Notification>();
+        public static ObservableCollection<NotificationModel> Notifications { get; private set;  } = new ObservableCollection<NotificationModel>();
 
-        public static bool SendNotification(string text, NotificationCriticalLevel criticalLevel = NotificationCriticalLevel.Error, NotificationTypes type = NotificationTypes.TextMessage)
+        public static bool SendNotification(string text, NotificationCriticalLeveModel criticalLevel = NotificationCriticalLeveModel.Error, NotificationTypesModel type = NotificationTypesModel.TextMessage)
         {
-            Notification notification = new Notification(text, criticalLevel);
+            NotificationModel notification = new NotificationModel(text, criticalLevel);
             Notifications.Add(notification);
             return notification.TryInvokeHandler(type);
         }
 
-        private static bool TryInvokeHandler(this Notification notification, NotificationTypes type)
+        private static bool TryInvokeHandler(this NotificationModel notification, NotificationTypesModel type)
         {
             NotificationHandler handler = null;
 
             switch (type)
             {
-                case NotificationTypes.TextMessage:
+                case NotificationTypesModel.TextMessage:
                     handler = TextMessageHandler;
                     break;
-                case NotificationTypes.ModalWindow:
+                case NotificationTypesModel.ModalWindow:
                     handler = ModalWindowHandler;
                     break;
-                case NotificationTypes.PopUpWindow:
+                case NotificationTypesModel.PopUpWindow:
                     handler = PopUpWindowHandler;
                     break;
-                case NotificationTypes.Email:
+                case NotificationTypesModel.Email:
                     handler = EmailHandler;
                     break;
-                case NotificationTypes.Sms:
+                case NotificationTypesModel.Sms:
                     handler = SmsHandler;
                     break;
-                case NotificationTypes.Call:
+                case NotificationTypesModel.Call:
                     handler = CallHandler;
                     break;
                 default:
@@ -70,13 +70,13 @@ namespace Philadelphus.Business.Services
 
         private static bool SendMissHandlerNotification()
         {
-            Notification error = new Notification("Не задан требуемый обработчик уведомлений. Осуществляется попытка отправить с повышенным обработчиком", NotificationCriticalLevel.Error);
+            NotificationModel error = new NotificationModel("Не задан требуемый обработчик уведомлений. Осуществляется попытка отправить с повышенным обработчиком", NotificationCriticalLeveModel.Error);
 
             Notifications.Add(error);
 
-            for (int i = 0; i < Enum.GetValues(typeof(NotificationTypes)).Length; i++)
+            for (int i = 0; i < Enum.GetValues(typeof(NotificationTypesModel)).Length; i++)
             {
-                if (error.TryInvokeHandler((NotificationTypes)i))
+                if (error.TryInvokeHandler((NotificationTypesModel)i))
                     return true;
             }
                 

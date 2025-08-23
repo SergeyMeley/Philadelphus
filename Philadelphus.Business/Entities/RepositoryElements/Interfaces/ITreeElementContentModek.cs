@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    internal interface ITreeElementContent
+    internal interface ITreeElementContentModek
     {
-        IContentOwner Owner { get; }
+        IContentOwnerModel Owner { get; }
     }
 }

@@ -1,0 +1,37 @@
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
+using Philadelphus.Business.Services;
+using System.Collections.Generic;
+
+namespace Philadelphus.Business.Entities.RepositoryElements
+{
+    public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IContentOwnerModel, IChildrenModel, ITypedModel, ISequencableModel
+    {
+        public IParentModel Parent { get; protected set; }
+        public TreeRepositoryModel ParentRepository { get; protected set; }
+        public long Sequence { get; set; }
+        public IEnumerable<ElementAttributeModel> PersonalAttributes { get; set; } = new List<ElementAttributeModel>();
+        public IEnumerable<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
+        public IEnumerable<ElementAttributeValueModel> AttributeValues { get; set; } = new List<ElementAttributeValueModel>();
+
+        internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent) : base(guid)
+        {
+            if (parent == null)
+            {
+                NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLeveModel.Error);
+                return;
+            }
+            Parent = parent;
+            if (parent.GetType() == typeof(TreeRepositoryModel))
+            {
+                ParentRepository = (TreeRepositoryModel)parent;
+            }
+            else
+            {
+                ParentRepository = ((TreeRepositoryMemberBaseModel)parent).ParentRepository;
+            }
+        }
+    }
+}

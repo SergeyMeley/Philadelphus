@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.OtherEntities
 {
-    public class Notification
+    public class NotificationModel
     {
-        public NotificationCriticalLevel CriticalLevel { get; init; }
+        public NotificationCriticalLeveModel CriticalLevel { get; init; }
         public string Text { get; init; }
         public DateTime DateTime { get; init; }
-        public Notification(string text, NotificationCriticalLevel criticalLevel = NotificationCriticalLevel.Error)
+        public NotificationModel(string text, NotificationCriticalLeveModel criticalLevel = NotificationCriticalLeveModel.Error)
         {
             CriticalLevel = criticalLevel;
             Text = text;

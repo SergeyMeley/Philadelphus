@@ -14,43 +14,43 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeLeave : TreeRepositoryMemberBase, IChildren, ITreeRootMember
+    public class TreeLeaveModel : TreeRepositoryMemberBaseModel, IChildrenModel, ITreeRootMemberModel
     {
-        public override EntityTypes EntityType { get => EntityTypes.Leave; }
-        public TreeRoot ParentRoot { get; private set; }
-        internal TreeLeave(Guid guid, IParent parent) : base(guid, parent)
+        public override EntityTypesModel EntityType { get => EntityTypesModel.Leave; }
+        public TreeRootModel ParentRoot { get; private set; }
+        internal TreeLeaveModel(Guid guid, IParentModel parent) : base(guid, parent)
         {
             try
             {
                 if (parent == null)
                 {
                     string message = "Не выделен родительский элемент!";
-                    NotificationService.SendNotification(message, NotificationCriticalLevel.Warning, NotificationTypes.TextMessage);
+                    NotificationService.SendNotification(message, NotificationCriticalLeveModel.Warning, NotificationTypesModel.TextMessage);
                     throw new Exception(message);
                 }
                 Parent = parent;
-                if (Parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)))
+                if (Parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
                 {
-                    ParentRepository = ((ITreeRepositoryMember)Parent).ParentRepository;
+                    ParentRepository = ((ITreeRepositoryMemberModel)Parent).ParentRepository;
                 }
-                else if (Parent.GetType() == typeof(TreeRepository))
+                else if (Parent.GetType() == typeof(TreeRepositoryModel))
                 {
-                    ParentRepository = (TreeRepository)Parent;
+                    ParentRepository = (TreeRepositoryModel)Parent;
                 }
-                if (Parent.GetType().IsAssignableTo(typeof(ITreeRootMember)))
+                if (Parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
                 {
-                    ParentRoot = ((ITreeRootMember)Parent).ParentRoot;
+                    ParentRoot = ((ITreeRootMemberModel)Parent).ParentRoot;
                 }
-                else if (Parent.GetType() == typeof(TreeRoot))
+                else if (Parent.GetType() == typeof(TreeRootModel))
                 {
-                    ParentRoot = (TreeRoot)Parent;
+                    ParentRoot = (TreeRootModel)Parent;
                 }
                 Guid = guid;
                 Initialize();
             }
             catch (Exception ex)
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLeveModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый лист");
             //Childs = new ObservableCollection<IChildren>();
-            ElementType = new EntityElementType(Guid.NewGuid(), this);
+            ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
         }
     }
 }

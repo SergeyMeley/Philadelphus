@@ -15,32 +15,32 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
 {
-    public class ElementAttribute : MainEntityBase, ITreeElementContent, ITreeRootMember, ITreeRepositoryMember
+    public class ElementAttributeModel : MainEntityBaseModel, ITreeElementContentModek, ITreeRootMemberModel, ITreeRepositoryMemberModel
     {
-        public override EntityTypes EntityType { get => EntityTypes.None; }
-        public ValueTypes ValueType { get; set; }
-        public IEnumerable<ElementAttributeValue>? ValueList { get; set; }
-        public ElementAttributeValue? AttributeValue { get; set; }
-        public IContentOwner Owner { get; set; }
-        public TreeRoot ParentRoot { get; set; }
-        public TreeRepository ParentRepository { get; set; }
-        public ElementAttribute(Guid guid, IContentOwner owner) : base(guid)
+        public override EntityTypesModel EntityType { get => EntityTypesModel.None; }
+        public ValueTypesModel ValueType { get; set; }
+        public IEnumerable<ElementAttributeValueModel>? ValueList { get; set; }
+        public ElementAttributeValueModel? AttributeValue { get; set; }
+        public IContentOwnerModel Owner { get; set; }
+        public TreeRootModel ParentRoot { get; set; }
+        public TreeRepositoryModel ParentRepository { get; set; }
+        public ElementAttributeModel(Guid guid, IContentOwnerModel owner) : base(guid)
         {
             Guid = guid;
             Owner = owner;
-            if (owner.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)))
+            if (owner.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
             {
-                ParentRepository = ((ITreeRepositoryMember)owner).ParentRepository;
-                if (owner.GetType().IsAssignableTo(typeof(ITreeRootMember)))
+                ParentRepository = ((ITreeRepositoryMemberModel)owner).ParentRepository;
+                if (owner.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
                 {
-                    ParentRoot = ((ITreeRootMember)owner).ParentRoot;
+                    ParentRoot = ((ITreeRootMemberModel)owner).ParentRoot;
                 }
                 else
                 Initialize();
             }
             else
             {
-                NotificationService.Notifications.Add(new Notification("Атрибут может быть добавлен только участнику репозитория!", NotificationCriticalLevel.Error));
+                NotificationService.Notifications.Add(new NotificationModel("Атрибут может быть добавлен только участнику репозитория!", NotificationCriticalLeveModel.Error));
             }
         }
 

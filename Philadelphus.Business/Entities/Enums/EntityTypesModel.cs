@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.Enums
 {
-    public enum EntityTypes
+    public enum EntityTypesModel
     {
         [EnumDescription("-")]
         None = -1,

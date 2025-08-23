@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    public interface ILinkableByGuid
+    public interface ILinkableByGuidModel
     {
         public Guid Guid { get; }
     }

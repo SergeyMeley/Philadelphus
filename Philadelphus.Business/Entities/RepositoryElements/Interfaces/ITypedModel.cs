@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    public interface ISequencable
+    public interface ITypedModel
     {
-        public long Sequence { get; set; }
+        public EntityElementTypeModel ElementType { get; set; }
     }
 }

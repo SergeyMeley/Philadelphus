@@ -10,7 +10,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
     /// <summary>
     /// Реализует возможность наличия независимой инфраструктуры (места и способа хранения данных)
     /// </summary>
-    internal interface IHavingOwnStorage
+    internal interface IHavingOwnStorageModel
     {
         public IMainEntitiesInfrastructure Infrastructure { get; }
     }

@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Services
 {
     public class DataTreeRepositoryService
     {
-        public TreeRepository CurrentRepository 
+        public TreeRepositoryModel CurrentRepository 
         { 
             get
             {
@@ -28,9 +28,9 @@ namespace Philadelphus.Business.Services
             }
             set => CurrentRepository = value;
         }
-        public List<TreeRepository> DataTreeRepositories { get; private set; } = new List<TreeRepository>();
+        public List<TreeRepositoryModel> DataTreeRepositories { get; private set; } = new List<TreeRepositoryModel>();
         private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
-        public List<TreeRepository> GetRepositoryCollection(IEnumerable<string> repositoryPathes)
+        public List<TreeRepositoryModel> GetRepositoryCollection(IEnumerable<string> repositoryPathes)
         {
             var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
             // Получение репозиториев по всем путям
@@ -65,53 +65,53 @@ namespace Philadelphus.Business.Services
         //    }
         //    return GetRepositoryCollection();
         //}
-        public TreeRoot InitTreeRoot(TreeRepository parentElement)
+        public TreeRootModel InitTreeRoot(TreeRepositoryModel parentElement)
         {
-            var result = new TreeRoot(Guid.NewGuid(), parentElement);
-            ((List<TreeRepositoryMemberBase>)parentElement.ElementsCollection).Add(result);
-            ((ObservableCollection<IChildren>)parentElement.Childs).Add(result);
+            var result = new TreeRootModel(Guid.NewGuid(), parentElement);
+            ((List<TreeRepositoryMemberBaseModel>)parentElement.ElementsCollection).Add(result);
+            ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
             return result;
         }
-        public TreeNode InitTreeNode(IParent parentElement)
+        public TreeNodeModel InitTreeNode(IParentModel parentElement)
         {
-            var result = new TreeNode(Guid.NewGuid(), parentElement);
-            ((List<TreeRepositoryMemberBase>)result.ParentRepository.ElementsCollection).Add(result);
-            ((ObservableCollection<IChildren>)parentElement.Childs).Add(result);
+            var result = new TreeNodeModel(Guid.NewGuid(), parentElement);
+            ((List<TreeRepositoryMemberBaseModel>)result.ParentRepository.ElementsCollection).Add(result);
+            ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
             return result;
         }
-        public TreeLeave InitTreeLeave(IParent parentElement)
+        public TreeLeaveModel InitTreeLeave(IParentModel parentElement)
         {
             try
             {
-                if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)) == false || parentElement.GetType() != typeof(TreeNode))
+                if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) == false || parentElement.GetType() != typeof(TreeNodeModel))
                 {
-                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLeveModel.Error, NotificationTypesModel.TextMessage);
                     return null;
                 }
                 else
                 {
-                    var result = new TreeLeave(Guid.NewGuid(), parentElement);
-                    ((List<TreeRepositoryMemberBase>)result.ParentRepository.ElementsCollection).Add(result);
-                    ((ObservableCollection<IChildren>)parentElement.Childs).Add(result);
+                    var result = new TreeLeaveModel(Guid.NewGuid(), parentElement);
+                    ((List<TreeRepositoryMemberBaseModel>)result.ParentRepository.ElementsCollection).Add(result);
+                    ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
                     return result;
                 }
             }
             catch (Exception ex)
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLeveModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
         }
 
-        public ElementAttribute InitElementAttribute(IContentOwner owner)
+        public ElementAttributeModel InitElementAttribute(IContentOwnerModel owner)
         {
-            var result = new ElementAttribute(Guid.NewGuid(), owner);
+            var result = new ElementAttributeModel(Guid.NewGuid(), owner);
             //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
-            ((List<ElementAttribute>)owner.PersonalAttributes).Add(result);
+            ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(result);
             return result;
         }
 
-        public bool RemoveElement(IChildren element)
+        public bool RemoveElement(IChildrenModel element)
         {
             try
             {
@@ -119,10 +119,10 @@ namespace Philadelphus.Business.Services
                 {
                     return false;
                 }
-                ((ObservableCollection<IChildren>)element.Parent.Childs).Remove(element);
-                if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMember)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBase)))
+                ((ObservableCollection<IChildrenModel>)element.Parent.Childs).Remove(element);
+                if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBaseModel)))
                 {
-                    ((List<TreeRepositoryMemberBase>)((ITreeRepositoryMember)element).ParentRepository.ElementsCollection).Remove((TreeRepositoryMemberBase)element);
+                    ((List<TreeRepositoryMemberBaseModel>)((ITreeRepositoryMemberModel)element).ParentRepository.ElementsCollection).Remove((TreeRepositoryMemberBaseModel)element);
                 }
                 //
                 return true;
@@ -165,47 +165,47 @@ namespace Philadelphus.Business.Services
         /// Создание нового пустого репозитория.
         /// </summary>
         /// <returns></returns>
-        public TreeRepository CreateSampleRepository()
+        public TreeRepositoryModel CreateSampleRepository()
         {
             //Временно
-            var repo = (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
+            var repo = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository);
             for (int i = 0; i < 5; i++)
             {
-                var root = new TreeRoot(Guid.NewGuid(), repo);
+                var root = new TreeRootModel(Guid.NewGuid(), repo);
                 GetAttributesSample(root);
-                ((List<TreeRepositoryMemberBase>)repo.ElementsCollection).Add(root);
+                ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(root);
                 for (int j = 0; j < 5; j++)
                 {
-                    var node = new TreeNode(Guid.NewGuid(), root);
+                    var node = new TreeNodeModel(Guid.NewGuid(), root);
                     GetAttributesSample(node);
-                    ((List<TreeRepositoryMemberBase>)repo.ElementsCollection).Add(node);
+                    ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node);
                     for (int k = 0; k < 5; k++)
                     {
-                        var node2 = new TreeNode(Guid.NewGuid(), root);
+                        var node2 = new TreeNodeModel(Guid.NewGuid(), root);
                         GetAttributesSample(node2);
-                        ((List<TreeRepositoryMemberBase>)repo.ElementsCollection).Add(node2);
-                        ((ObservableCollection<IChildren>)node.Childs).Add(node2);
-                        var leave = new TreeLeave(Guid.NewGuid(), node);
+                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node2);
+                        ((ObservableCollection<IChildrenModel>)node.Childs).Add(node2);
+                        var leave = new TreeLeaveModel(Guid.NewGuid(), node);
                         GetAttributesSample(leave);
-                        ((List<TreeRepositoryMemberBase>)repo.ElementsCollection).Add(leave);
-                        ((ObservableCollection<IChildren>)node.Childs).Add(leave);
+                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(leave);
+                        ((ObservableCollection<IChildrenModel>)node.Childs).Add(leave);
                     }
-                    ((ObservableCollection<IChildren>)root.Childs).Add(node);
+                    ((ObservableCollection<IChildrenModel>)root.Childs).Add(node);
                 }
-                ((ObservableCollection<IChildren>)repo.Childs).Add(root);
+                ((ObservableCollection<IChildrenModel>)repo.Childs).Add(root);
             }
             return repo;
             //Временно
-            return (TreeRepository)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository);
+            return (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository);
         }
-        private List<ElementAttribute> GetAttributesSample(IContentOwner owner)
+        private List<ElementAttributeModel> GetAttributesSample(IContentOwnerModel owner)
         {
-            var result = new List<ElementAttribute>();
+            var result = new List<ElementAttributeModel>();
 
             for (int i = 0; i < 20; i++)
             {
-                var entry = new ElementAttribute(Guid.NewGuid(), owner);
-                ((List<ElementAttribute>)owner.PersonalAttributes).Add(entry);
+                var entry = new ElementAttributeModel(Guid.NewGuid(), owner);
+                ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(entry);
                 result.Add(entry);
             }
 
@@ -239,7 +239,7 @@ namespace Philadelphus.Business.Services
         //    UpdateEntities(DataTreeRepositories);
             
         //}
-        private void UpdateEntities(IEnumerable<IMainEntity> entities, InfrastructureTypes infrastructure)
+        private void UpdateEntities(IEnumerable<IMainEntityModel> entities, InfrastructureTypes infrastructure)
         {
             foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
             {
@@ -247,25 +247,25 @@ namespace Philadelphus.Business.Services
                 InfrastructureConverterBase converter;
                 switch (entityType)
                 {
-                    case EntityTypes.None:
+                    case EntityTypesModel.None:
                         break;
-                    case EntityTypes.Repository:
+                    case EntityTypesModel.Repository:
                         converter = new RepositoryInfrastructureConverter();
                         infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)converter.BusinessToDbEntityCollection(entities));
                         break;
-                    case EntityTypes.Root:
+                    case EntityTypesModel.Root:
                         converter = new RootInfrastructureConverter();
                         infrastructureRepository.UpdateRoots((List<DbTreeRoot>)converter.BusinessToDbEntityCollection(entities));
                         break;
-                    case EntityTypes.Node:
+                    case EntityTypesModel.Node:
                         converter = new NodeInfrastructureConverter();
                         infrastructureRepository.UpdateNodes((List<DbTreeNode>)converter.BusinessToDbEntityCollection(entities));
                         break;
-                    case EntityTypes.Leave:
+                    case EntityTypesModel.Leave:
                         converter = new LeaveInfrastructureConverter();
                         infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)converter.BusinessToDbEntityCollection(entities));
                         break;
-                    case EntityTypes.Attribute:
+                    case EntityTypesModel.Attribute:
                         converter = new AttributeInfrastructureConverter();
                         infrastructureRepository.UpdateAttributes((List<DbEntityAttribute>)converter.BusinessToDbEntityCollection(entities));
                         break;
@@ -283,7 +283,7 @@ namespace Philadelphus.Business.Services
 
 
 
-        private TreeRepository GetRepositoryContent(TreeRepository currentRepository)
+        private TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel currentRepository)
         {
             //foreach (var item in CurrentRepository.InfrastructureRepositories)
             //{

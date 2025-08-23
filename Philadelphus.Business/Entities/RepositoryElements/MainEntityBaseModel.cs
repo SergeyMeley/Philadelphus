@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public abstract class MainEntityBase : IMainEntity, ILinkableByGuid
+    public abstract class MainEntityBaseModel : IMainEntityModel, ILinkableByGuidModel
     {
-        public abstract EntityTypes EntityType { get; }
+        public abstract EntityTypesModel EntityType { get; }
         public Guid Guid { get; protected set; }
         //public Guid ParentGuid { get; protected set; }
         /// <summary>
@@ -24,9 +24,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public bool HasContent { get; set; }
         public bool IsOriginal { get; set; }
         public bool IsLegacy { get; set; }
-        public AuditInfo AuditInfo { get; private set; }
-        public EntityElementType ElementType { get; set; }
-        public MainEntityBase(Guid guid)
+        public AuditInfoModel AuditInfo { get; private set; }
+        public EntityElementTypeModel ElementType { get; set; }
+        public MainEntityBaseModel(Guid guid)
         {
             Guid = guid;
         }

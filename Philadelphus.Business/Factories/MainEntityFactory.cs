@@ -12,28 +12,28 @@ namespace Philadelphus.Business.Factories
 {
     internal static class MainEntityFactory
     {
-        internal static IMainEntity CreateMainEntitiesRepositoriesFactory(EntityTypes entityType)
+        internal static IMainEntityModel CreateMainEntitiesRepositoriesFactory(EntityTypesModel entityType)
         {
-            IMainEntity mainEntity;
+            IMainEntityModel mainEntity;
             switch (entityType)
             {
-                case EntityTypes.None:
+                case EntityTypesModel.None:
                     mainEntity = null;
                     break;
-                case EntityTypes.Repository:
-                    mainEntity = new TreeRepository(Guid.NewGuid());
+                case EntityTypesModel.Repository:
+                    mainEntity = new TreeRepositoryModel(Guid.NewGuid());
                     break;
-                case EntityTypes.Root:
-                    mainEntity = new TreeRoot(Guid.NewGuid(), null);
+                case EntityTypesModel.Root:
+                    mainEntity = new TreeRootModel(Guid.NewGuid(), null);
                     break;
-                case EntityTypes.Node:
-                    mainEntity = new TreeNode(Guid.NewGuid(), null);
+                case EntityTypesModel.Node:
+                    mainEntity = new TreeNodeModel(Guid.NewGuid(), null);
                     break;
-                case EntityTypes.Leave:
-                    mainEntity = new TreeNode(Guid.NewGuid(), null);
+                case EntityTypesModel.Leave:
+                    mainEntity = new TreeNodeModel(Guid.NewGuid(), null);
                     break;
-                case EntityTypes.Attribute:
-                    mainEntity = new TreeNode(Guid.NewGuid(), null);
+                case EntityTypesModel.Attribute:
+                    mainEntity = new TreeNodeModel(Guid.NewGuid(), null);
                     break;
                 default:
                     mainEntity = null;

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    public interface IParent : ILinkableByGuid
+    public interface ITreeRootMemberModel : ITreeRepositoryMemberModel
     {
-        IEnumerable<IChildren> Childs { get; }
+        public TreeRootModel ParentRoot { get; }
     }
 }

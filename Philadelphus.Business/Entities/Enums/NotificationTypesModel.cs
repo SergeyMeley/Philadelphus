@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.Enums
 {
-    public enum NotificationCriticalLevel
+    public enum NotificationTypesModel
     {
-        Info,
-        Warning,
-        Error,
-        Alarm
+        TextMessage,
+        ModalWindow,
+        PopUpWindow,
+        Email,
+        Sms,
+        Call,
+        
     }
 }

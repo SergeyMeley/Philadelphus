@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
-    public interface IMainEntity : ILinkableByGuid
+    public interface IMainEntityModel : ILinkableByGuidModel
     {
-        public abstract EntityTypes EntityType { get; }
+        public abstract EntityTypesModel EntityType { get; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Alias { get; set; }
         public string CustomCode { get; set; }
-        public AuditInfo AuditInfo { get; }
+        public AuditInfoModel AuditInfo { get; }
     }
 }

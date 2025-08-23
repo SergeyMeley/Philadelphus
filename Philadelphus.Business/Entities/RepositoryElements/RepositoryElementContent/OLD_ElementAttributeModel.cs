@@ -14,12 +14,12 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementCon
     /// <summary>
     /// OLD
     /// </summary>
-    public class OLD_ElementAttribute : MainEntityBase
+    public class OLD_ElementAttributeModel : MainEntityBaseModel
     {
-        public override EntityTypes EntityType { get => EntityTypes.None; }
-        public ValueTypes ValueType { get; set; }
-        public IEnumerable<ElementAttributeValue> Values { get; set; } = new List<ElementAttributeValue>();
-        public OLD_ElementAttribute(Guid guid, TreeRepositoryMemberBase owner) : base(guid)
+        public override EntityTypesModel EntityType { get => EntityTypesModel.None; }
+        public ValueTypesModel ValueType { get; set; }
+        public IEnumerable<ElementAttributeValueModel> Values { get; set; } = new List<ElementAttributeValueModel>();
+        public OLD_ElementAttributeModel(Guid guid, TreeRepositoryMemberBaseModel owner) : base(guid)
         {
 
         }
