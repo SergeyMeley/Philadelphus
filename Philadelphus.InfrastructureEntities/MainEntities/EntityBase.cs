@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public interface IDbEntity
+    public abstract class EntityBase : IEntity
     {
         public Guid Guid { get; set; }
         public string ParentGuid { get; set; }
-        //public long Id { get; set; }
         public string DirectoryPath { get; set; }
         public string DirectoryFullPath { get; set; }
         public string ConfigPath { get; set; }
@@ -31,5 +31,9 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public string UpdatedContentBy { get; set; }
         public string DeletedOn { get; set; }
         public string DeletedBy { get; set; }
+        public EntityBase()
+        {
+
+        }
     }
 }

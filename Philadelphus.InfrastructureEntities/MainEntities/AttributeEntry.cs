@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class DbAttributeEntry : DbEntityBase
+    public class AttributeEntry : EntityBase
     {
         public long AttributeGuid { get; set; }
         public long AttributeValueGuid { get; set; }
         public long EntityTypeGuid { get; set; }
         public long EntityGuid { get; set; }
-        public DbAttributeEntry()
+        public AttributeEntry()
         {
         }
     }

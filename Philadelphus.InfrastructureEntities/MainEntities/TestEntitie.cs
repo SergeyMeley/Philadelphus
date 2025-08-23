@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class DbTestEntitie : DbEntityBase
+    public class TestEntitie : EntityBase
     {
         public long ParentTreeRepositoryId { get; set; }
         public List<long> AttributeIds { get; set; } = new List<long>();
         public List<long> ChildTreeNodeIds { get; set; } = new List<long>();
-        public DbTestEntitie()
+        public TestEntitie()
         {
             Guid = Guid.NewGuid();
         }

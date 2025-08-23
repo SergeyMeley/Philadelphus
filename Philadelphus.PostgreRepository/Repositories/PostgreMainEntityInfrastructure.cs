@@ -17,23 +17,23 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
         {
             _context = new Context();
         }
-        public DbMainEntitiesCollection GetMainEntitiesCollection()
+        public MainEntitiesCollection GetMainEntitiesCollection()
         {
-            DbMainEntitiesCollection collection = new DbMainEntitiesCollection();
+            MainEntitiesCollection collection = new MainEntitiesCollection();
             //collection.DbTreeRoots = (List<DbTreeRoot>)SelectRoots();
-            collection.DbTreeNodes = (List<DbTreeNode>)SelectNodes();
+            collection.DbTreeNodes = (List<TreeNode>)SelectNodes();
             return collection;
         }
         #region [Select]
-        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
+        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
         {
-            var dataCollection = new List<DbTreeRepository>();
+            var dataCollection = new List<TreeRepository>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))
             using (var reader = cmd.ExecuteReaderAsync().Result)
             {
                 while (reader.Read())
                 {
-                    var record = new DbTreeRepository();
+                    var record = new TreeRepository();
                     record.Name = reader.GetString(1);
                     if (!reader.IsDBNull(3))
                     {
@@ -44,15 +44,15 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             }
             return dataCollection;
         }
-        public IEnumerable<DbTreeRoot> SelectRoots()
+        public IEnumerable<TreeRoot> SelectRoots()
         {
-            var dataCollection = new List<DbTreeRoot>();
+            var dataCollection = new List<TreeRoot>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))
             using (var reader = cmd.ExecuteReaderAsync().Result)
             {
                 while (reader.Read())
                 {
-                    var record = new DbTreeRoot();
+                    var record = new TreeRoot();
                     record.Name = reader.GetString(1);
                     if (!reader.IsDBNull(2))
                     {
@@ -63,32 +63,32 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             }
             return dataCollection;
         }
-        public IEnumerable<DbTreeNode> SelectNodes()
+        public IEnumerable<TreeNode> SelectNodes()
         {
             throw new NotImplementedException();
         }
-        public IEnumerable<DbTreeLeave> SelectLeaves()
+        public IEnumerable<TreeLeave> SelectLeaves()
         {
             throw new NotImplementedException();
         }
-        public IEnumerable<DbEntityAttribute> SelectAttributes()
+        public IEnumerable<EntityAttribute> SelectAttributes()
         {
-            var result = new List<DbEntityAttribute>();
+            var result = new List<EntityAttribute>();
             return result;
         }
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries()
+        public IEnumerable<AttributeEntry> SelectAttributeEntries()
         {
-            var result = new List<DbAttributeEntry>();
+            var result = new List<AttributeEntry>();
             return result;
         }
-        public IEnumerable<DbAttributeValue> SelectAttributeValues()
+        public IEnumerable<AttributeValue> SelectAttributeValues()
         {
-            var result = new List<DbAttributeValue>();
+            var result = new List<AttributeValue>();
             return result;
         }
         #endregion
         #region [Insert]
-        public int InsertRepositories(IEnumerable<DbTreeRepository> projects)
+        public int InsertRepositories(IEnumerable<TreeRepository> projects)
         {
             try
             {
@@ -103,15 +103,15 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
                 return -1;
             }
         }
-        public int InsertRoots(IEnumerable<DbTreeRoot> layers)
+        public int InsertRoots(IEnumerable<TreeRoot> layers)
         {
             throw new NotImplementedException();
         }
-        public int InsertNodes(IEnumerable<DbTreeNode> nodes)
+        public int InsertNodes(IEnumerable<TreeNode> nodes)
         {
             throw new NotImplementedException();
         }
-        public int InsertLeaves(IEnumerable<DbTreeLeave> elements)
+        public int InsertLeaves(IEnumerable<TreeLeave> elements)
         {
             throw new NotImplementedException();
         }
@@ -135,159 +135,159 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
         }
         #endregion
         #region [Update]
-        public int UpdateRepositories(IEnumerable<DbTreeRepository> projects)
+        public int UpdateRepositories(IEnumerable<TreeRepository> projects)
         {
             throw new NotImplementedException();
         }
-        public int UpdateRoots(IEnumerable<DbTreeRoot> layers)
+        public int UpdateRoots(IEnumerable<TreeRoot> layers)
         {
             throw new NotImplementedException();
         }
-        public int UpdateNodes(IEnumerable<DbTreeNode> nodes)
+        public int UpdateNodes(IEnumerable<TreeNode> nodes)
         {
             throw new NotImplementedException();
         }
-        public int UpdateLeaves(IEnumerable<DbTreeLeave> elements)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<DbTreeRepository> SelectRepositories(string configPath)
+        public int UpdateLeaves(IEnumerable<TreeLeave> elements)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbTreeRoot> SelectRoots(DbTreeRepository dbTreeRepository)
+        public IEnumerable<TreeRepository> SelectRepositories(string configPath)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbTreeNode> SelectNodes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<TreeRoot> SelectRoots(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbTreeLeave> SelectLeaves(DbTreeRepository dbTreeRepository)
+        public IEnumerable<TreeNode> SelectNodes(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbEntityAttribute> SelectAttributes(DbTreeRepository dbTreeRepository)
+        public IEnumerable<TreeLeave> SelectLeaves(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries(DbTreeRepository dbTreeRepository)
+        public IEnumerable<EntityAttribute> SelectAttributes(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DbAttributeValue> SelectAttributeValues(DbTreeRepository dbTreeRepository)
+        public IEnumerable<AttributeEntry> SelectAttributeEntries(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.InsertRepositories(IEnumerable<DbTreeRepository> repositories)
+        public IEnumerable<AttributeValue> SelectAttributeValues(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.InsertRoots(IEnumerable<DbTreeRoot> roots)
+        long IMainEntitiesInfrastructure.InsertRepositories(IEnumerable<TreeRepository> repositories)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.InsertNodes(IEnumerable<DbTreeNode> nodes)
+        long IMainEntitiesInfrastructure.InsertRoots(IEnumerable<TreeRoot> roots)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.InsertLeaves(IEnumerable<DbTreeLeave> leaves)
+        long IMainEntitiesInfrastructure.InsertNodes(IEnumerable<TreeNode> nodes)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
+        long IMainEntitiesInfrastructure.InsertLeaves(IEnumerable<TreeLeave> leaves)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long InsertAttributes(IEnumerable<EntityAttribute> attributes)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long InsertAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteRoots(IEnumerable<DbTreeRoot> roots)
+        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteNodes(IEnumerable<DbTreeNode> nodes)
+        public long DeleteRoots(IEnumerable<TreeRoot> roots)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long DeleteNodes(IEnumerable<TreeNode> nodes)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long DeleteLeaves(IEnumerable<TreeLeave> leaves)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long DeleteAttributes(IEnumerable<EntityAttribute> attributes)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.UpdateRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.UpdateRoots(IEnumerable<DbTreeRoot> roots)
+        long IMainEntitiesInfrastructure.UpdateRepositories(IEnumerable<TreeRepository> repositories)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.UpdateNodes(IEnumerable<DbTreeNode> nodes)
+        long IMainEntitiesInfrastructure.UpdateRoots(IEnumerable<TreeRoot> roots)
         {
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.UpdateLeaves(IEnumerable<DbTreeLeave> leaves)
+        long IMainEntitiesInfrastructure.UpdateNodes(IEnumerable<TreeNode> nodes)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes)
+        long IMainEntitiesInfrastructure.UpdateLeaves(IEnumerable<TreeLeave> leaves)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long UpdateAttributes(IEnumerable<EntityAttribute> attributes)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }

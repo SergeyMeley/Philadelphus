@@ -29,14 +29,14 @@ namespace Philadelphus.Business.Services
             set => CurrentRepository = value;
         }
         public List<TreeRepositoryModel> DataTreeRepositories { get; private set; } = new List<TreeRepositoryModel>();
-        private DbMainEntitiesCollection _dbMainEntitiesCollection = new DbMainEntitiesCollection();
+        private MainEntitiesCollection _dbMainEntitiesCollection = new MainEntitiesCollection();
         public List<TreeRepositoryModel> GetRepositoryCollection(IEnumerable<string> repositoryPathes)
         {
             var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
             // Получение репозиториев по всем путям
             if (repositoryPathes != null)
             {
-                var dbRepositories = (List<DbTreeRepository>)infrastructure.SelectRepositories(repositoryPathes.ToList());
+                var dbRepositories = (List<TreeRepository>)infrastructure.SelectRepositories(repositoryPathes.ToList());
                 var converter = new RepositoryInfrastructureConverter();
                 DataTreeRepositories = converter.DbToBusinessEntityCollection(dbRepositories);
             }
@@ -251,23 +251,23 @@ namespace Philadelphus.Business.Services
                         break;
                     case EntityTypesModel.Repository:
                         converter = new RepositoryInfrastructureConverter();
-                        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)converter.BusinessToDbEntityCollection(entities));
+                        infrastructureRepository.UpdateRepositories((List<TreeRepository>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     case EntityTypesModel.Root:
                         converter = new RootInfrastructureConverter();
-                        infrastructureRepository.UpdateRoots((List<DbTreeRoot>)converter.BusinessToDbEntityCollection(entities));
+                        infrastructureRepository.UpdateRoots((List<TreeRoot>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     case EntityTypesModel.Node:
                         converter = new NodeInfrastructureConverter();
-                        infrastructureRepository.UpdateNodes((List<DbTreeNode>)converter.BusinessToDbEntityCollection(entities));
+                        infrastructureRepository.UpdateNodes((List<TreeNode>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     case EntityTypesModel.Leave:
                         converter = new LeaveInfrastructureConverter();
-                        infrastructureRepository.UpdateRepositories((List<DbTreeRepository>)converter.BusinessToDbEntityCollection(entities));
+                        infrastructureRepository.UpdateRepositories((List<TreeRepository>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     case EntityTypesModel.Attribute:
                         converter = new AttributeInfrastructureConverter();
-                        infrastructureRepository.UpdateAttributes((List<DbEntityAttribute>)converter.BusinessToDbEntityCollection(entities));
+                        infrastructureRepository.UpdateAttributes((List<EntityAttribute>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     default:
                         break;

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class DbTreeRepository : DbEntityBase
+    public class TreeRepository : EntityBase
     {
         public List<long> ChildTreeRootGuids { get; set; } = new List<long>();
-        public DbTreeRepository()
+        public TreeRepository()
         {
             
         }

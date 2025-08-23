@@ -11,7 +11,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public abstract class InfrastructureConverterBase
     {
-        protected static IMainEntityModel DbToBusinessMainProperties(IDbEntity dbEntity, TreeRepositoryMemberBaseModel businessEntity)
+        protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, TreeRepositoryMemberBaseModel businessEntity)
         {
             //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
             //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
@@ -35,9 +35,9 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.AuditInfo.DeletedBy = dbEntity.DeletedBy;
             return businessEntity;
         }
-        internal abstract IMainEntityModel DbToBusinessEntity(IDbEntity dbEntity);
-        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection);
-        protected static IDbEntity BusinessToDbMainProperties(TreeRepositoryMemberBaseModel businessEntity, IDbEntity dbEntity)
+        internal abstract IMainEntityModel DbToBusinessEntity(IEntity dbEntity);
+        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection);
+        protected static IEntity BusinessToDbMainProperties(TreeRepositoryMemberBaseModel businessEntity, IEntity dbEntity)
         {
             //dbEntity.ParentGuid = businessEntity.Parent.ToString();
             //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
@@ -62,7 +62,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
         }
-        internal abstract IDbEntity BusinessToDbEntity(IMainEntityModel businessEntity);
-        internal abstract IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
+        internal abstract IEntity BusinessToDbEntity(IMainEntityModel businessEntity);
+        internal abstract IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
     }
 }
