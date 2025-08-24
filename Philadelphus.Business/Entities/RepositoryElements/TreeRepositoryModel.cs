@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Repository; }
         public InfrastructureTypes DefaultInfrastructureRepositoryType { get; }
-        public IMainEntitiesInfrastructure Infrastructure { get; private set; } = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
+        public IMainEntitiesInfrastructure Infrastructure { get; private set; }
         public IEnumerable<IMainEntitiesInfrastructure> InfrastructureRepositories { get; set; }
         //public IEnumerable<IDataStorage> DataStorages { get; set; }
         public IEnumerable<IChildrenModel> Childs { get; private set; }
@@ -35,5 +35,12 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             Name = NamingHelper.GetNewName(new string[0], "Новый репозиторий");
             Childs = new ObservableCollection<IChildrenModel>();
         }
+
+        public bool SetInfrastructureRepository(IMainEntitiesInfrastructure infrastructure)
+        {
+            Infrastructure = infrastructure;
+            return true;
+        }
+
     }
 }

@@ -16,7 +16,7 @@ namespace Philadelphus.Business.Helpers
             do
             {
                 newName = $"{fixPart.Trim()} {index}";
-                if (existNames.Contains(newName) == false)
+                if (existNames == null || existNames.Contains(newName) == false)
                 {
                     IsIndexExist = false;
                 }

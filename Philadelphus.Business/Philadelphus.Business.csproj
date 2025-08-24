@@ -7,12 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LinqToExcel" Version="1.11.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
     <ProjectReference Include="..\Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj" />
+    <ProjectReference Include="..\Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.WindowsFileSystemRepository\Philadelphus.WindowsFileSystemRepository.csproj" />
   </ItemGroup>

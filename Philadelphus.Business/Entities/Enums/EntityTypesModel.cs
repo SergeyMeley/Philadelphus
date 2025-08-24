@@ -1,4 +1,4 @@
-﻿using Remotion.Utilities;
+﻿//using Remotion.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,23 +9,23 @@ namespace Philadelphus.Business.Entities.Enums
 {
     public enum EntityTypesModel
     {
-        [EnumDescription("-")]
+        //[EnumDescription("-")]
         None = -1,
-        [EnumDescription("Репозиторий")]
+        //[EnumDescription("Репозиторий")]
         Repository,
-        [EnumDescription("Корень")]
+        //[EnumDescription("Корень")]
         Root,
-        [EnumDescription("Узел")]
+        //[EnumDescription("Узел")]
         Node,
-        [EnumDescription("Лист")]
+        //[EnumDescription("Лист")]
         Leave,
-        [EnumDescription("Атрибут")]
+        //[EnumDescription("Атрибут")]
         Attribute,
-        [EnumDescription("Вхождение атрибута")]
+        //[EnumDescription("Вхождение атрибута")]
         AttributeEntry,
-        [EnumDescription("Значение атрибута")]
+        //[EnumDescription("Значение атрибута")]
         AttributeValue,
-        [EnumDescription("Тип элемента")]
+        //[EnumDescription("Тип элемента")]
         RepositoryElementType,
     }
 }

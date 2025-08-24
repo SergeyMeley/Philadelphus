@@ -15,10 +15,12 @@ using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
+using Philadelphus.Business.Helpers;
+using Philadelphus.PostgreEfRepository.Repositories;
 
 namespace Philadelphus.Business.Services
 {
-    public class DataTreeRepositoryService
+    public class DataTreeProcessingService
     {
         public TreeRepositoryModel CurrentRepository 
         { 
@@ -42,6 +44,8 @@ namespace Philadelphus.Business.Services
             }
             return DataTreeRepositories;
         }
+
+
         //public List<TreeRepository> AddRepository(TreeRepository repository)
         //{
         //    if (repository != null)
@@ -168,7 +172,7 @@ namespace Philadelphus.Business.Services
         public TreeRepositoryModel CreateSampleRepository()
         {
             //Временно
-            var repo = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository);
+            var repo = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
             for (int i = 0; i < 5; i++)
             {
                 var root = new TreeRootModel(Guid.NewGuid(), repo);
@@ -196,8 +200,34 @@ namespace Philadelphus.Business.Services
             }
             return repo;
             //Временно
-            return (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository);
+            return (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
         }
+
+        public TreeRepositoryModel CreateNewTreeRepository(string name = "")
+        {
+            var result = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
+            result.Name = NamingHelper.GetNewName(null, "Новый репозиторий");
+            //ВРЕМЕННО!!!
+            result.SetInfrastructureRepository(new PostgreEfMainEntitуInfrastructure());
+            //ВРЕМЕННО!!!
+
+            var converter = new RepositoryInfrastructureConverter();
+            result.Infrastructure.InsertRepositories(new List<TreeRepository>() { converter.BusinessToDbEntity(result) });
+            return result;
+        }
+
+        public IEnumerable<TreeRepositoryModel> GetExistTreeRepositories()
+        {
+            var result = new List<TreeRepositoryModel>();
+            return result;
+        }
+
+        public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path)
+        {
+            var result = new List<TreeRepositoryModel>();
+            return result;
+        }
+
         private List<ElementAttributeModel> GetAttributesSample(IContentOwnerModel owner)
         {
             var result = new List<ElementAttributeModel>();

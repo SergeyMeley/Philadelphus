@@ -11,12 +11,11 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public abstract class InfrastructureConverterBase
     {
-        protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, TreeRepositoryMemberBaseModel businessEntity)
+        protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, MainEntityBaseModel businessEntity)
         {
             //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
             //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
             //businessEntity.ConfigPath = dbEntity.ConfigPath;
-            businessEntity.Sequence = dbEntity.Sequence;
             businessEntity.Name = dbEntity.Name;
             businessEntity.Alias = dbEntity.Alias;
             businessEntity.CustomCode = dbEntity.Code;
@@ -37,13 +36,12 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal abstract IMainEntityModel DbToBusinessEntity(IEntity dbEntity);
         internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection);
-        protected static IEntity BusinessToDbMainProperties(TreeRepositoryMemberBaseModel businessEntity, IEntity dbEntity)
+        protected static IEntity BusinessToDbMainProperties(MainEntityBaseModel businessEntity, IEntity dbEntity)
         {
             //dbEntity.ParentGuid = businessEntity.Parent.ToString();
             //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
             //dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;
             //dbEntity.ConfigPath = businessEntity.ConfigPath;
-            dbEntity.Sequence = businessEntity.Sequence;
             dbEntity.Name = businessEntity.Name;
             dbEntity.Alias = businessEntity.Alias;
             dbEntity.Code = businessEntity.CustomCode;

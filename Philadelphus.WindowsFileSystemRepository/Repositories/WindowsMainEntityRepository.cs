@@ -12,7 +12,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
     public class WindowsMainEntityRepository : IMainEntitiesInfrastructure
     {
-        public InfrastructureTypes InftastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
+        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
         public MainEntitiesCollection GetMainEntitiesCollection()
         {
             return null;
@@ -98,33 +98,33 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             foreach (var item in repositories)
             {
                 // Проверяем указанный путь.Если его нет, пробуем создать.
-                if (!Directory.Exists(item.DirectoryFullPath))
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(item.DirectoryFullPath);
-                    }
-                    catch (Exception)
-                    {
-                        throw new Exception("Ошибка создания директории, проверьте указанный путь");
-                    }
-                }
-                // Проверяем наличие файла. Если его нет, пробуем создать.
-                if (!File.Exists(item.ConfigPath))
-                {
-                    try
-                    {
-                        var repositoryXmlSerializer = new XmlSerializer(typeof(TreeRepository));
-                        using (var repofs = new FileStream(item.ConfigPath, FileMode.OpenOrCreate))
-                        {
-                            repositoryXmlSerializer.Serialize(repofs, item);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        throw new Exception("Ошибка создания элемента, проверьте указанный путь");
-                    }
-                }
+                //if (!Directory.Exists(item.DirectoryFullPath))
+                //{
+                //    try
+                //    {
+                //        Directory.CreateDirectory(item.DirectoryFullPath);
+                //    }
+                //    catch (Exception)
+                //    {
+                //        throw new Exception("Ошибка создания директории, проверьте указанный путь");
+                //    }
+                //}
+                //// Проверяем наличие файла. Если его нет, пробуем создать.
+                //if (!File.Exists(item.ConfigPath))
+                //{
+                //    try
+                //    {
+                //        var repositoryXmlSerializer = new XmlSerializer(typeof(TreeRepository));
+                //        using (var repofs = new FileStream(item.ConfigPath, FileMode.OpenOrCreate))
+                //        {
+                //            repositoryXmlSerializer.Serialize(repofs, item);
+                //        }
+                //    }
+                //    catch (Exception)
+                //    {
+                //        throw new Exception("Ошибка создания элемента, проверьте указанный путь");
+                //    }
+                //}
             }
             return repositories.Count();
         }

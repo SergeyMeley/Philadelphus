@@ -10,13 +10,13 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Philadelphus.PostgreEfRepository
 {
-    public partial class PhiladelphusMainContext : DbContext
+    public partial class PhiladelphusContext : DbContext
     {
-        public PhiladelphusMainContext()
+        public PhiladelphusContext()
         {
         }
 
-        public PhiladelphusMainContext(DbContextOptions<PhiladelphusMainContext> options)
+        public PhiladelphusContext(DbContextOptions<PhiladelphusContext> options)
             : base(options)
         {
         }
@@ -44,7 +44,7 @@ namespace Philadelphus.PostgreEfRepository
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
             => optionsBuilder
-            .UseNpgsql("Host=192.168.0.63;Port=5433;Username=postgres;Password=Dniwe2002;Database=philadelphus")
+            .UseNpgsql("Host=192.168.0.64;Port=5433;Username=postgres;Password=Dniwe2002;Database=philadelphus")
             .UseLazyLoadingProxies();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,21 +83,20 @@ namespace Philadelphus.PostgreEfRepository
             //    entity.Property(e => e.Uuid).HasColumnName("uuid");
             //});
 
-            //modelBuilder.Entity<AuditInfo>(entity =>
-            //{
-            //    entity.HasKey(e => e.Id).HasName("audit_info_pkey");
+            modelBuilder.Entity<AuditInfo>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("audit_info_pkey");
 
-            //    entity.ToTable("audit_info");
+                entity.ToTable("audit_info");
 
-            //    entity.Property(e => e.Id).HasColumnName("id");
-            //    entity.Property(e => e.RepositoryElementId).HasColumnName("repository_element_id");
-            //});
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.RepositoryElementId).HasColumnName("repository_element_id");
+            });
 
             modelBuilder.Entity<TreeLeave>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("leave_details_pkey");
-
                 entity.ToTable("leave_details");
+                entity.HasBaseType<EntityBase>();
 
                 entity.Property(e => e.Id).HasColumnName("repository_element_id");
             });
@@ -116,9 +115,8 @@ namespace Philadelphus.PostgreEfRepository
 
             modelBuilder.Entity<TreeNode>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("node_details_pkey");
-
                 entity.ToTable("node_details");
+                entity.HasBaseType<EntityBase>();
 
                 entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.Id).HasColumnName("repository_element_id");
@@ -126,9 +124,8 @@ namespace Philadelphus.PostgreEfRepository
 
             modelBuilder.Entity<TreeRepository>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("repositories_pkey");
-
                 entity.ToTable("repositories");
+                entity.HasBaseType<EntityBase>();
 
                 //entity.Property(e => e.ChildTreeRootGuids).HasColumnName("root_uuids");
                 entity.Property(e => e.Guid).HasColumnName("uuid");
@@ -136,8 +133,6 @@ namespace Philadelphus.PostgreEfRepository
 
             modelBuilder.Entity<EntityBase>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("repository_elements_pkey");
-
                 entity.ToTable("repository_elements");
 
                 entity.Property(e => e.Id).HasColumnName("id");
@@ -146,9 +141,8 @@ namespace Philadelphus.PostgreEfRepository
 
             modelBuilder.Entity<TreeRoot>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("root_details_pkey");
-
                 entity.ToTable("root_details");
+                entity.HasBaseType<EntityBase>();
 
                 entity.Property(e => e.Id).HasColumnName("repository_element_id");
             });

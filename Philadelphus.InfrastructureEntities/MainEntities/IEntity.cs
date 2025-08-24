@@ -9,16 +9,13 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public interface IEntity
     {
         public Guid Guid { get; set; }
-        public string ParentGuid { get; set; }
+        public string? ParentGuid { get; set; }
         //public long Id { get; set; }
-        public string DirectoryPath { get; set; }
-        public string DirectoryFullPath { get; set; }
-        public string ConfigPath { get; set; }
-        public long Sequence { get; set; }
+        public long? Sequence { get; set; }
         public string Name { get; set; }
-        public string Alias { get; set; }
-        public string Code { get; set; }
-        public string Description { get; set; }
+        public string? Alias { get; set; }
+        public string? Code { get; set; }
+        public string? Description { get; set; }
         public bool HasContent { get; set; }
         public bool IsOriginal { get; set; }
         public bool IsLegacy { get; set; }

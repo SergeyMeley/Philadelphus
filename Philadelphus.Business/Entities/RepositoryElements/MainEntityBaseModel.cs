@@ -24,7 +24,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public bool HasContent { get; set; }
         public bool IsOriginal { get; set; }
         public bool IsLegacy { get; set; }
-        public AuditInfoModel AuditInfo { get; private set; }
+        public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
         public EntityElementTypeModel ElementType { get; set; }
         public MainEntityBaseModel(Guid guid)
         {
