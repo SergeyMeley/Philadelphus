@@ -9,6 +9,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public abstract class EntityBase : IEntity
     {
+        public int Id { get; set; }
         public Guid Guid { get; set; }
         public string ParentGuid { get; set; }
         public string DirectoryPath { get; set; }
@@ -22,15 +23,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public bool HasContent { get; set; }
         public bool IsOriginal { get; set; }
         public bool IsLegacy { get; set; }
-        public bool IsDeleted { get; set; }
-        public string CreatedOn { get; set; }
-        public string CreatedBy { get; set; }
-        public string UpdatedOn { get; set; }
-        public string UpdatedBy { get; set; }
-        public string UpdatedContentOn { get; set; }
-        public string UpdatedContentBy { get; set; }
-        public string DeletedOn { get; set; }
-        public string DeletedBy { get; set; }
+        public AuditInfo AuditInfo { get; set; }
         public EntityBase()
         {
 
