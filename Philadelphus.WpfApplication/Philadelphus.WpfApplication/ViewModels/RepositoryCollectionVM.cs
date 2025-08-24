@@ -6,6 +6,7 @@ using Philadelphus.WpfApplication.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                         
                         //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
                         //Временно
-                        DataTreeRepositoryService treeRepositoryService = new DataTreeRepositoryService();
+                        DataTreeProcessingService treeRepositoryService = new DataTreeProcessingService();
                         TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
                         //Временно
                         treeRepository.Name = $"TEST {i}";
@@ -105,6 +106,28 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     var window = new RepositorySettingsWindow() { DataContext = this }; 
                     window.Show();
+                });
+            }
+        }
+        public RelayCommand AddExistRepository
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    DataTreeProcessingService service = new DataTreeProcessingService();
+                    service.AddExistTreeRepository(new DirectoryInfo(""));
+                });
+            }
+        }
+        public RelayCommand CreateNewRepository
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    DataTreeProcessingService service = new DataTreeProcessingService();
+                    service.CreateNewTreeRepository();
                 });
             }
         }

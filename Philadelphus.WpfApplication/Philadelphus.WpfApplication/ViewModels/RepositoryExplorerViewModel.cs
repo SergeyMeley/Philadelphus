@@ -69,7 +69,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     
-                    var service = new DataTreeRepositoryService();
+                    var service = new DataTreeProcessingService();
                     service.InitTreeRoot(_treeRepository);
                 });
             }
@@ -87,7 +87,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     }
                     if (_selectedRepositoryMember?.GetType().IsAssignableTo(typeof(IParentModel)) == false)
                         return;
-                    var service = new DataTreeRepositoryService();
+                    var service = new DataTreeProcessingService();
                     service.InitTreeNode((IParentModel)_selectedRepositoryMember);
                 });
             }
@@ -108,7 +108,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                         NotificationService.SendNotification("Лист можно добавить только в элемент, который может быть родителем.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                         return;
                     }
-                    var service = new DataTreeRepositoryService();
+                    var service = new DataTreeProcessingService();
                     service.InitTreeLeave((IParentModel)_selectedRepositoryMember);
                 });
             }
@@ -126,7 +126,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     }
                     if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwnerModel)) == false)
                         return;
-                    var service = new DataTreeRepositoryService();
+                    var service = new DataTreeProcessingService();
                     service.InitElementAttribute((IContentOwnerModel)_selectedRepositoryMember);
                 });
             }
@@ -138,7 +138,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var service = new DataTreeRepositoryService();
+                    var service = new DataTreeProcessingService();
                     service.RemoveElement(_selectedRepositoryMember);
                 });
             }

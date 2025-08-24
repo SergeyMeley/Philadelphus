@@ -167,7 +167,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         //    {
         //        return new RelayCommand(obj =>
         //        {
-        //            var service = new DataTreeRepositoryService();
+        //            var service = new DataTreeProsessingService();
         //            service.ModifyRepository(_currentTreeRepository);
         //        });
         //    }
@@ -178,7 +178,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         //    {
         //        return new RelayCommand(obj =>
         //        {
-        //            var service = new DataTreeRepositoryService();
+        //            var service = new DataTreeProsessingService();
         //            _treeRepositoriesVMs = service.GetRepositories() ?? new List<TreeRepository>();
         //            OnPropertyChanged(nameof(TreeRepositoriesVMs));
         //        });

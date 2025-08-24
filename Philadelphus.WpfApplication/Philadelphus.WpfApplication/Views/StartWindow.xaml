@@ -14,6 +14,8 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
             <Run Text="Здравствуйте, "></Run>
@@ -22,6 +24,22 @@
             <Run Text="Выберите репозиторий для начала работы"></Run>
         </TextBlock>
         <ComboBox Grid.Row="1" Margin="2" DataContext="{Binding RepositoryCollectionViewModel}" DisplayMemberPath="TreeRepository.Name" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" SelectedValuePath="TreeRepository.Name"></ComboBox>
-        <Button Grid.Row="2" Content="Начать!" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
+        <Grid Grid.Row="2" DataContext="{Binding RepositoryCollectionViewModel}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"></TextBox>
+            <Button Grid.Column="1" Content="Создать репозиторий" Command="{Binding CreateNewRepository}" Margin="2"></Button>
+        </Grid>
+        <Grid Grid.Row="3" DataContext="{Binding RepositoryCollectionViewModel}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"></TextBox>
+            <Button Grid.Column="1" Content="Добавить существующий репозиторий" Command="{Binding AddExistRepository}" Margin="2"></Button>
+        </Grid>
+        <Button Grid.Row="4" Content="Начать!" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
     </Grid>
 </Window>
