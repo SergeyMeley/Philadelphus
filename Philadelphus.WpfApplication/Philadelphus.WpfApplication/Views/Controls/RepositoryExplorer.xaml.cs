@@ -31,7 +31,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
 
         private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            ViewModel.SelectedRepositoryMember = (TreeRepositoryMemberBase)MainTreeView.SelectedItem;
+            ViewModel.SelectedRepositoryMember = (TreeRepositoryMemberBaseModel)MainTreeView.SelectedItem;
         }
     }
 }

@@ -16,8 +16,8 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public  class RepositoryExplorerViewModel : ViewModelBase
     {
-        private TreeRepository _treeRepository;
-        public TreeRepository TreeRepository 
+        private TreeRepositoryModel _treeRepository;
+        public TreeRepositoryModel TreeRepository 
         { 
             get 
             { 
@@ -28,8 +28,8 @@ namespace Philadelphus.WpfApplication.ViewModels
                 _treeRepository = value;
             }
         }
-        private TreeRepositoryMemberBase? _selectedRepositoryMember;
-        public TreeRepositoryMemberBase? SelectedRepositoryMember
+        private TreeRepositoryMemberBaseModel? _selectedRepositoryMember;
+        public TreeRepositoryMemberBaseModel? SelectedRepositoryMember
         {
             get => _selectedRepositoryMember;
             set
@@ -82,13 +82,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_selectedRepositoryMember == null)
                     {
-                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
                     }
-                    if (_selectedRepositoryMember?.GetType().IsAssignableTo(typeof(IParent)) == false)
+                    if (_selectedRepositoryMember?.GetType().IsAssignableTo(typeof(IParentModel)) == false)
                         return;
                     var service = new DataTreeRepositoryService();
-                    service.InitTreeNode((IParent)_selectedRepositoryMember);
+                    service.InitTreeNode((IParentModel)_selectedRepositoryMember);
                 });
             }
         }
@@ -100,16 +100,16 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_selectedRepositoryMember == null)
                     {
-                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
                     }
-                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParent)) == false)
+                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IParentModel)) == false)
                     {
-                        NotificationService.SendNotification("Лист можно добавить только в элемент, который может быть родителем.", NotificationCriticalLevel.Error, NotificationTypes.TextMessage);
+                        NotificationService.SendNotification("Лист можно добавить только в элемент, который может быть родителем.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                         return;
                     }
                     var service = new DataTreeRepositoryService();
-                    service.InitTreeLeave((IParent)_selectedRepositoryMember);
+                    service.InitTreeLeave((IParentModel)_selectedRepositoryMember);
                 });
             }
         }
@@ -121,13 +121,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_selectedRepositoryMember == null)
                     {
-                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevel.Error);
+                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
                     }
-                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwner)) == false)
+                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwnerModel)) == false)
                         return;
                     var service = new DataTreeRepositoryService();
-                    service.InitElementAttribute((IContentOwner)_selectedRepositoryMember);
+                    service.InitElementAttribute((IContentOwnerModel)_selectedRepositoryMember);
                 });
             }
         }

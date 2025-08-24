@@ -47,7 +47,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                         //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
                         //Временно
                         DataTreeRepositoryService treeRepositoryService = new DataTreeRepositoryService();
-                        TreeRepository treeRepository = treeRepositoryService.CreateSampleRepository();
+                        TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
                         //Временно
                         treeRepository.Name = $"TEST {i}";
                         vm.TreeRepository = treeRepository;

@@ -13,7 +13,7 @@ namespace Philadelphus.WpfApplication.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return EntityTypes.Root.ToString();
+            return EntityTypesModel.Root.ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
