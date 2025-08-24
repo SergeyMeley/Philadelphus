@@ -31,7 +31,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         {
             if (parent == null)
             {
-                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLeveModel.Error);
+                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                 return;
             }
             if (parent.GetType() == typeof(TreeRepositoryModel))
@@ -43,7 +43,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             }
             else
             {
-                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLeveModel.Error));
+                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
             }
         }
         private void Initialize()

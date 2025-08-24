@@ -29,7 +29,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         {
             if (parent == null)
             {
-                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLeveModel.Error);
+                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                 return;
             }
             Guid = guid;
@@ -48,13 +48,13 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 }
                 else
                 {
-                    NotificationService.Notifications.Add(new NotificationModel("Узел может быть добавлен только в другой узел или корень!", NotificationCriticalLeveModel.Error));
+                    NotificationService.Notifications.Add(new NotificationModel("Узел может быть добавлен только в другой узел или корень!", NotificationCriticalLevelModel.Error));
                 }
                 Initialize();
             }
             else
             {
-                NotificationService.Notifications.Add(new NotificationModel("Узел может быть добавлен только в участника репозитория!", NotificationCriticalLeveModel.Error));
+                NotificationService.Notifications.Add(new NotificationModel("Узел может быть добавлен только в участника репозитория!", NotificationCriticalLevelModel.Error));
             }
         }
         private void Initialize()

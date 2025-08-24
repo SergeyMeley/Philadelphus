@@ -40,7 +40,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementCon
             }
             else
             {
-                NotificationService.Notifications.Add(new NotificationModel("Атрибут может быть добавлен только участнику репозитория!", NotificationCriticalLeveModel.Error));
+                NotificationService.Notifications.Add(new NotificationModel("Атрибут может быть добавлен только участнику репозитория!", NotificationCriticalLevelModel.Error));
             }
         }
 

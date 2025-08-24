@@ -85,7 +85,7 @@ namespace Philadelphus.Business.Services
             {
                 if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) == false || parentElement.GetType() != typeof(TreeNodeModel))
                 {
-                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLeveModel.Error, NotificationTypesModel.TextMessage);
+                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                     return null;
                 }
                 else
@@ -98,7 +98,7 @@ namespace Philadelphus.Business.Services
             }
             catch (Exception ex)
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLeveModel.Error, NotificationTypesModel.TextMessage);
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
         }

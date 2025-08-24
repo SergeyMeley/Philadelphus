@@ -25,7 +25,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 if (parent == null)
                 {
                     string message = "Не выделен родительский элемент!";
-                    NotificationService.SendNotification(message, NotificationCriticalLeveModel.Warning, NotificationTypesModel.TextMessage);
+                    NotificationService.SendNotification(message, NotificationCriticalLevelModel.Warning, NotificationTypesModel.TextMessage);
                     throw new Exception(message);
                 }
                 Parent = parent;
@@ -50,7 +50,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             }
             catch (Exception ex)
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLeveModel.Error, NotificationTypesModel.TextMessage);
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
         }

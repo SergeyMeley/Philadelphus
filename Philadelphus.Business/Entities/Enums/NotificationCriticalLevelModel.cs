@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.Enums
 {
-    public enum NotificationCriticalLeveModel
+    public enum NotificationCriticalLevelModel
     {
         Info,
         Warning,

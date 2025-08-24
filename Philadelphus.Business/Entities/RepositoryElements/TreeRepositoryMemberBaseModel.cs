@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         {
             if (parent == null)
             {
-                NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLeveModel.Error);
+                NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLevelModel.Error);
                 return;
             }
             Parent = parent;

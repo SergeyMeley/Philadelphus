@@ -21,7 +21,7 @@ namespace Philadelphus.Business.Services
 
         public static ObservableCollection<NotificationModel> Notifications { get; private set;  } = new ObservableCollection<NotificationModel>();
 
-        public static bool SendNotification(string text, NotificationCriticalLeveModel criticalLevel = NotificationCriticalLeveModel.Error, NotificationTypesModel type = NotificationTypesModel.TextMessage)
+        public static bool SendNotification(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error, NotificationTypesModel type = NotificationTypesModel.TextMessage)
         {
             NotificationModel notification = new NotificationModel(text, criticalLevel);
             Notifications.Add(notification);
@@ -70,7 +70,7 @@ namespace Philadelphus.Business.Services
 
         private static bool SendMissHandlerNotification()
         {
-            NotificationModel error = new NotificationModel("Не задан требуемый обработчик уведомлений. Осуществляется попытка отправить с повышенным обработчиком", NotificationCriticalLeveModel.Error);
+            NotificationModel error = new NotificationModel("Не задан требуемый обработчик уведомлений. Осуществляется попытка отправить с повышенным обработчиком", NotificationCriticalLevelModel.Error);
 
             Notifications.Add(error);
 
