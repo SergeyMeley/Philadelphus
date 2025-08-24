@@ -18,20 +18,24 @@ namespace Philadelphus.WpfApplication.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string path = @"C:\Users\MeleychukSV\Downloads";
-            string fullPath = string.Empty;
-            switch ((EntityTypes)value)
+            string path = @"C:\Users\%username%\Downloads";
+            if (Path.Exists(path) ==false) 
             {
-                case EntityTypes.Repository:
+                path=Path.GetTempPath();
+            }
+            string fullPath = string.Empty;
+            switch ((EntityTypesModel)value)
+            {
+                case EntityTypesModel.Repository:
                     fullPath = Path.Combine(path, "icons8_icon_repository.png");
                     break;
-                case EntityTypes.Root:
+                case EntityTypesModel.Root:
                     fullPath = Path.Combine(path, "Flaticon_icon_root2.png");
                     break;
-                case EntityTypes.Node:
+                case EntityTypesModel.Node:
                     fullPath = Path.Combine(path, "Flaticon_icon_node.png");
                     break;
-                case EntityTypes.Leave:
+                case EntityTypesModel.Leave:
                     fullPath = Path.Combine(path, "Flaticon_icon_leave.png");
                     break;
                 default:

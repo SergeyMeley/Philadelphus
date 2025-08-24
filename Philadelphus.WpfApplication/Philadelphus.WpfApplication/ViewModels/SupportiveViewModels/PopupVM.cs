@@ -22,8 +22,8 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
         private static bool _isOpen;
         public bool IsOpen { get => _isOpen; set => _isOpen = value; }
 
-        private static IEnumerable<Notification> _notificationList = new ObservableCollection<Notification>();
-        public IEnumerable<Notification> NotificationList 
+        private static List<NotificationModel> _notificationList = new List<NotificationModel>();
+        public List<NotificationModel> NotificationList 
         {
             get
             {
@@ -43,6 +43,15 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
             }
         }
 
+        private NotificationModel _lastNotification = new NotificationModel("Hello!");
+        public NotificationModel LastNotification 
+        { 
+            get => _lastNotification; 
+            set => _lastNotification = value; 
+        }
+
+        public bool Start()
+        {
         public bool StartReceivingNotifications()
         {
             _isOpen = true;
@@ -58,6 +67,15 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
         {
             while (true)
             {
+                var notification = new NotificationModel(DateTime.Now.ToString());
+                _lastNotification = notification;
+                OnPropertyChanged(nameof(LastNotification));
+                var newList = new List<NotificationModel>(_notificationList);
+                newList.Add(notification);
+                _notificationList = newList;
+                //_notificationList.Add(notification);
+                OnPropertyChanged(nameof(NotificationList));
+                //OnPropertyChanged(nameof(NotificationList.Collection));
                 var notification = new Notification(DateTime.Now.ToString());
                 SendNotification(notification);
                 _lastUpdate = DateTime.Now;
@@ -69,7 +87,7 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
         {
             while (true)
             {
-                var newList = new List<Notification>(_notificationList);
+                var newList = new List<NotificationModel>(_notificationList);
                 foreach (var notification in _notificationList)
                 {
                     var qwe = DateTime.Now - notification.DateTime;

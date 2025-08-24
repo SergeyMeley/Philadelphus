@@ -92,28 +92,28 @@ namespace Philadelphus.WpfApplication.ViewModels
         private bool SetNotificationHandlers()
         {
             NotificationService.TextMessageHandler = SendText;
-            bool SendText(Notification notification) 
+            bool SendText(NotificationModel notification) 
             {
                 return true;
             }
-            NotificationService.SendNotification("Обработчик текстовых сообщений назначен.", criticalLevel: NotificationCriticalLevel.Info, type: NotificationTypes.TextMessage);
+            NotificationService.SendNotification("Обработчик текстовых сообщений назначен.", criticalLevel: NotificationCriticalLevelModel.Info, type: NotificationTypesModel.TextMessage);
 
             NotificationService.ModalWindowHandler = SendModal;
-            bool SendModal(Notification notification)
+            bool SendModal(NotificationModel notification)
             {
                 MessageBoxImage image;
                 switch (notification.CriticalLevel)
                 {
-                    case NotificationCriticalLevel.Info:
+                    case NotificationCriticalLevelModel.Info:
                         image = MessageBoxImage.Information;
                         break;
-                    case NotificationCriticalLevel.Warning:
+                    case NotificationCriticalLevelModel.Warning:
                         image = MessageBoxImage.Warning;
                         break;
-                    case NotificationCriticalLevel.Error:
+                    case NotificationCriticalLevelModel.Error:
                         image = MessageBoxImage.Error;
                         break;
-                    case NotificationCriticalLevel.Alarm:
+                    case NotificationCriticalLevelModel.Alarm:
                         image = MessageBoxImage.Error;
                         break;
                     default:
@@ -123,7 +123,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 MessageBox.Show(messageBoxText: notification.Text, caption: notification.CriticalLevel.ToString(), MessageBoxButton.OK, icon: image);
                 return true;
             }
-            NotificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevel.Info, type: NotificationTypes.TextMessage);
+            NotificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevelModel.Info, type: NotificationTypesModel.TextMessage);
 
             return true;
         }
