@@ -50,8 +50,6 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
             set => _lastNotification = value; 
         }
 
-        public bool Start()
-        {
         public bool StartReceivingNotifications()
         {
             _isOpen = true;
@@ -67,19 +65,19 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
         {
             while (true)
             {
-                var notification = new NotificationModel(DateTime.Now.ToString());
-                _lastNotification = notification;
-                OnPropertyChanged(nameof(LastNotification));
-                var newList = new List<NotificationModel>(_notificationList);
-                newList.Add(notification);
-                _notificationList = newList;
-                //_notificationList.Add(notification);
-                OnPropertyChanged(nameof(NotificationList));
-                //OnPropertyChanged(nameof(NotificationList.Collection));
-                var notification = new Notification(DateTime.Now.ToString());
-                SendNotification(notification);
-                _lastUpdate = DateTime.Now;
-                Thread.Sleep(_periodicity);
+                //var notification = new NotificationModel(DateTime.Now.ToString());
+                //_lastNotification = notification;
+                //OnPropertyChanged(nameof(LastNotification));
+                //var newList = new List<NotificationModel>(_notificationList);
+                //newList.Add(notification);
+                //_notificationList = newList;
+                ////_notificationList.Add(notification);
+                //OnPropertyChanged(nameof(NotificationList));
+                ////OnPropertyChanged(nameof(NotificationList.Collection));
+                //////var notification = new NotificationModel(DateTime.Now.ToString());
+                //SendNotification(notification);
+                //_lastUpdate = DateTime.Now;
+                //Thread.Sleep(_periodicity);
             }
         }
 
@@ -103,9 +101,9 @@ namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
             }
         }
 
-        private bool SendNotification(Notification notification)
+        private bool SendNotification(NotificationModel notification)
         {
-            var newList = new List<Notification>(_notificationList);
+            var newList = new List<NotificationModel>(_notificationList);
             newList.Add(notification);
             _notificationList = newList;
             //_notificationList.Add(notification);
