@@ -9,7 +9,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class TreeRepository : EntityBase
     {
-        public List<long> ChildTreeRootGuids { get; set; } = new List<long>();
+        public List<Guid> ChildTreeRootGuids { get; set; } = new List<Guid>();
         public TreeRepository()
         {
             

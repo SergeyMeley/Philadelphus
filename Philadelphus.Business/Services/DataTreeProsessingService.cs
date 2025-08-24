@@ -267,7 +267,7 @@ namespace Philadelphus.Business.Services
                         break;
                     case EntityTypesModel.Attribute:
                         converter = new AttributeInfrastructureConverter();
-                        infrastructureRepository.UpdateAttributes((List<EntityAttribute>)converter.BusinessToDbEntityCollection(entities));
+                        infrastructureRepository.UpdateAttributes((List<ElementAttribute>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     default:
                         break;

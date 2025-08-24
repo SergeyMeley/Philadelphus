@@ -70,7 +70,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return null;
         }
-        public IEnumerable<EntityAttribute> SelectAttributes()
+        public IEnumerable<ElementAttribute> SelectAttributes()
         {
             return null;
         }
@@ -140,7 +140,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return leaves.Count();
         }
-        public long InsertAttributes(IEnumerable<EntityAttribute> attributes)
+        public long InsertAttributes(IEnumerable<ElementAttribute> attributes)
         {
             return attributes.Count();
         }
@@ -170,7 +170,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long DeleteAttributes(IEnumerable<EntityAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<ElementAttribute> attributes)
         {
             return 0;
         }
@@ -226,7 +226,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long UpdateAttributes(IEnumerable<EntityAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<ElementAttribute> attributes)
         {
             return 0;
         }
