@@ -1,0 +1,42 @@
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Philadelphus.Business.Entities.RepositoryElements
+{
+    public abstract class MainEntityBaseModel : IMainEntityModel, ILinkableByGuidModel
+    {
+        public abstract EntityTypesModel EntityType { get; }
+        public Guid Guid { get; protected set; }
+        //public Guid ParentGuid { get; protected set; }
+        /// <summary>
+        /// Идентификатор экземпляра в текущей базе данных
+        /// </summary>
+        public string Name { get; set; }
+        public string Alias { get; set; }
+        public string CustomCode { get; set; }
+        public string Description { get; set; }
+        public bool HasContent { get; set; }
+        public bool IsOriginal { get; set; }
+        public bool IsLegacy { get; set; }
+        public AuditInfoModel AuditInfo { get; private set; }
+        public EntityElementTypeModel ElementType { get; set; }
+        public MainEntityBaseModel(Guid guid)
+        {
+            Guid = guid;
+        }
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Name);
+            sb.AppendLine();
+            sb.Append(Guid);
+            return sb.ToString();
+        }
+    }
+}

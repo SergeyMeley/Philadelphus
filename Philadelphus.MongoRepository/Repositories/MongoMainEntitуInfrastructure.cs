@@ -28,7 +28,7 @@ namespace Philadelphus.MongoRepository.Repositories
         {
             try
             {
-                BsonClassMap.RegisterClassMap<DbTreeRepository>(c => {
+                BsonClassMap.RegisterClassMap<TreeRepository>(c => {
                     c.AutoMap();
                     c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
                 });
@@ -38,7 +38,7 @@ namespace Philadelphus.MongoRepository.Repositories
             }
             try
             {
-                BsonClassMap.RegisterClassMap<DbTreeRoot>(c => {
+                BsonClassMap.RegisterClassMap<TreeRoot>(c => {
                     c.AutoMap();
                     c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
                 });
@@ -48,7 +48,7 @@ namespace Philadelphus.MongoRepository.Repositories
             }
             try
             {
-                BsonClassMap.RegisterClassMap<DbTreeNode>(c => {
+                BsonClassMap.RegisterClassMap<TreeNode>(c => {
                     c.AutoMap();
                     c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
                 });
@@ -58,7 +58,7 @@ namespace Philadelphus.MongoRepository.Repositories
             }
             try
             {
-                BsonClassMap.RegisterClassMap<DbTreeLeave>(c => {
+                BsonClassMap.RegisterClassMap<TreeLeave>(c => {
                     c.AutoMap();
                     c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
                 });
@@ -68,7 +68,7 @@ namespace Philadelphus.MongoRepository.Repositories
             }
             try
             {
-                BsonClassMap.RegisterClassMap<DbTestEntitie>(c => {
+                BsonClassMap.RegisterClassMap<TestEntitie>(c => {
                     c.AutoMap();
                     c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
                 });
@@ -77,9 +77,9 @@ namespace Philadelphus.MongoRepository.Repositories
             {
             }
         }
-        public DbMainEntitiesCollection GetMainEntitiesCollection()
+        public MainEntitiesCollection GetMainEntitiesCollection()
         {
-            var result = new DbMainEntitiesCollection();
+            var result = new MainEntitiesCollection();
             result.DbTreeRoots = SelectRoots();
             result.DbTreeNodes = SelectNodes();
             result.DbTreeLeaves = SelectLeaves();
@@ -89,159 +89,159 @@ namespace Philadelphus.MongoRepository.Repositories
             return result;
         }
         # region [ Select ]
-        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
+        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
         {
-            var collection = _database.GetCollection<DbTreeRepository>("repositories");
+            var collection = _database.GetCollection<TreeRepository>("repositories");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbTreeRoot> SelectRoots()
+        public IEnumerable<TreeRoot> SelectRoots()
         {
-            var collection = _database.GetCollection<DbTreeRoot>("roots");
+            var collection = _database.GetCollection<TreeRoot>("roots");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbTreeNode> SelectNodes()
+        public IEnumerable<TreeNode> SelectNodes()
         {
-            var collection = _database.GetCollection<DbTreeNode>("nodes");
+            var collection = _database.GetCollection<TreeNode>("nodes");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbTreeLeave> SelectLeaves()
+        public IEnumerable<TreeLeave> SelectLeaves()
         {
-            var collection = _database.GetCollection<DbTreeLeave>("leaves");
+            var collection = _database.GetCollection<TreeLeave>("leaves");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbEntityAttribute> SelectAttributes()
+        public IEnumerable<ElementAttribute> SelectAttributes()
         {
-            var collection = _database.GetCollection<DbEntityAttribute>("attributes");
+            var collection = _database.GetCollection<ElementAttribute>("attributes");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries()
+        public IEnumerable<AttributeEntry> SelectAttributeEntries()
         {
-            var collection = _database.GetCollection<DbAttributeEntry>("attribute_entries");
+            var collection = _database.GetCollection<AttributeEntry>("attribute_entries");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<DbAttributeValue> SelectAttributeValues()
+        public IEnumerable<AttributeValue> SelectAttributeValues()
         {
-            var collection = _database.GetCollection<DbAttributeValue>("attribute_values");
+            var collection = _database.GetCollection<AttributeValue>("attribute_values");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
         #endregion
         #region [ Insert ]
-        public long InsertRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long InsertRepositories(IEnumerable<TreeRepository> repositories)
         {
             long result = new long();
             return result;
         }
-        public long InsertRoots(IEnumerable<DbTreeRoot> roots)
+        public long InsertRoots(IEnumerable<TreeRoot> roots)
         {
-            var collection = _database.GetCollection<DbTreeRoot>("roots");
+            var collection = _database.GetCollection<TreeRoot>("roots");
             foreach (var item in roots)
             {
                 collection.InsertOne(item);
             }
             return roots.Count();
         }
-        public long InsertNodes(IEnumerable<DbTreeNode> nodes)
+        public long InsertNodes(IEnumerable<TreeNode> nodes)
         {
             long result = new long();
             return result;
         }
-        public long InsertLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long InsertLeaves(IEnumerable<TreeLeave> leaves)
         {
             long result = new long();
             return result;
         }
-        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long InsertAttributes(IEnumerable<ElementAttribute> attributes)
         {
             long result = new long();
             return result;
         }
-        public long InsertAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long InsertAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             long result = new long();
             return result;
         }
-        public long InsertAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             long result = new long();
             return result;
         }
         #endregion
         #region [ Delete ]
-        public long DeleteRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
         {
             long result = new long();
             return result;
         }
-        public long DeleteRoots(IEnumerable<DbTreeRoot> roots)
+        public long DeleteRoots(IEnumerable<TreeRoot> roots)
         {
             long result = new long();
             return result;
         }
-        public long DeleteNodes(IEnumerable<DbTreeNode> nodes)
+        public long DeleteNodes(IEnumerable<TreeNode> nodes)
         {
             long result = new long();
             return result;
         }
-        public long DeleteLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long DeleteLeaves(IEnumerable<TreeLeave> leaves)
         {
             long result = new long();
             return result;
         }
-        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<ElementAttribute> attributes)
         {
             long result = new long();
             return result;
         }
-        public long DeleteAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             long result = new long();
             return result;
         }
-        public long DeleteAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             long result = new long();
             return result;
         }
         #endregion
         #region [ Update ]
-        public long UpdateRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long UpdateRepositories(IEnumerable<TreeRepository> repositories)
         {
             long result = new long();
             return result;
         }
-        public long UpdateRoots(IEnumerable<DbTreeRoot> roots)
+        public long UpdateRoots(IEnumerable<TreeRoot> roots)
         {
             long result = new long();
             return result;
         }
-        public long UpdateNodes(IEnumerable<DbTreeNode> nodes)
+        public long UpdateNodes(IEnumerable<TreeNode> nodes)
         {
             long result = new long();
             return result;
         }
-        public long UpdateLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long UpdateLeaves(IEnumerable<TreeLeave> leaves)
         {
             long result = new long();
             return result;
         }
-        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<ElementAttribute> attributes)
         {
             long result = new long();
             return result;
         }
-        public long UpdateAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             long result = new long();
             return result;
         }
-        public long UpdateAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             long result = new long();
             return result;
@@ -249,16 +249,16 @@ namespace Philadelphus.MongoRepository.Repositories
         #endregion
 
 
-        public List<DbTestEntitie> SelectTest()
+        public List<TestEntitie> SelectTest()
         {
-            var collection = _database.GetCollection<DbTestEntitie>("test");
+            var collection = _database.GetCollection<TestEntitie>("test");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public long InsertTest(IEnumerable<DbTestEntitie> entitie)
+        public long InsertTest(IEnumerable<TestEntitie> entitie)
         {
             
-            var collection = _database.GetCollection<DbTestEntitie>("test");
+            var collection = _database.GetCollection<TestEntitie>("test");
             foreach (var item in entitie)
             {
                 collection.InsertOne(item);

@@ -13,34 +13,34 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class RepositoryInfrastructureConverter : InfrastructureConverterBase
     {
-        internal override DbTreeRepository BusinessToDbEntity(IMainEntity businessEntity)
+        internal override TreeRepository BusinessToDbEntity(IMainEntityModel businessEntity)
         {
-            var result = (DbTreeRepository)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeRepository());
+            var result = (TreeRepository)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRepository());
             return result;
         }
-        internal override List<DbTreeRepository> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
+        internal override List<TreeRepository> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
-            var result = new List<DbTreeRepository>();
+            var result = new List<TreeRepository>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeRepository)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeRepository());
+                var entity = (TreeRepository)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRepository());
                 result.Add(entity);
             }
             return result;
         }
-        internal override TreeRepository DbToBusinessEntity(IDbEntity dbEntity)
+        internal override TreeRepositoryModel DbToBusinessEntity(IEntity dbEntity)
         {
-            var result = new TreeRepository(new Guid(dbEntity.ParentGuid));
-            result = (TreeRepository)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository));
+            var result = new TreeRepositoryModel(new Guid(dbEntity.ParentGuid));
+            result = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository));
             return result;
         }
-        internal override List<TreeRepository> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
+        internal override List<TreeRepositoryModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
         {
-            var result = new List<TreeRepository>();
+            var result = new List<TreeRepositoryModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var entity = new TreeRepository(new Guid(dbEntity.ParentGuid));
-                entity = (TreeRepository)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Repository));
+                var entity = new TreeRepositoryModel(new Guid(dbEntity.ParentGuid));
+                entity = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository));
                 result.Add(entity);
             }
             return result;

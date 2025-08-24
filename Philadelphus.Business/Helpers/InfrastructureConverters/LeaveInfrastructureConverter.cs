@@ -13,31 +13,31 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class LeaveInfrastructureConverter : InfrastructureConverterBase
     {
-        internal override DbTreeLeave BusinessToDbEntity(IMainEntity businessEntity)
+        internal override TreeLeave BusinessToDbEntity(IMainEntityModel businessEntity)
         {
-            var result = (DbTreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeLeave());
+            var result = (TreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
             return result;
         }
-        internal override List<DbTreeLeave> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
+        internal override List<TreeLeave> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
-            var result = new List<DbTreeLeave>();
+            var result = new List<TreeLeave>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeLeave());
+                var entity = (TreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
                 result.Add(entity);
             }
             return result;
         }
-        internal override TreeLeave DbToBusinessEntity(IDbEntity dbEntity)
+        internal override TreeLeaveModel DbToBusinessEntity(IEntity dbEntity)
         {
             //var result = new TreeLeave(new Guid(dbEntity.ParentGuid));
             //result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
             //return result;
             return null;
         }
-        internal override List<TreeLeave> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
+        internal override List<TreeLeaveModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
         {
-            var result = new List<TreeLeave>();
+            var result = new List<TreeLeaveModel>();
             //foreach (var dbEntity in dbEntityCollection)
             //{
             //    var entity = new TreeLeave(new Guid(dbEntity.ParentGuid));

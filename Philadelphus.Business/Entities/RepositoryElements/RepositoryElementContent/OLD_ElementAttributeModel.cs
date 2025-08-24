@@ -1,0 +1,27 @@
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.InfrastructureEntities.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Metadata;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
+{
+    /// <summary>
+    /// OLD
+    /// </summary>
+    public class OLD_ElementAttributeModel : MainEntityBaseModel
+    {
+        public override EntityTypesModel EntityType { get => EntityTypesModel.None; }
+        public ValueTypesModel ValueType { get; set; }
+        public IEnumerable<ElementAttributeValueModel> Values { get; set; } = new List<ElementAttributeValueModel>();
+        public OLD_ElementAttributeModel(Guid guid, TreeRepositoryMemberBaseModel owner) : base(guid)
+        {
+
+        }
+    }
+}

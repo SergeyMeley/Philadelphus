@@ -14,31 +14,31 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class AttributeInfrastructureConverter : InfrastructureConverterBase
     {
-        internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
+        internal override IEntity BusinessToDbEntity(IMainEntityModel businessEntity)
         {
-            var result = (DbEntityAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbEntityAttribute());
+            var result = (ElementAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new ElementAttribute());
             return result;
         }
-        internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
+        internal override IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
-            var result = new List<DbEntityAttribute>();
+            var result = new List<ElementAttribute>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbEntityAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbEntityAttribute());
+                var entity = (ElementAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new ElementAttribute());
                 result.Add(entity);
             }
             return result;
         }
-        internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
+        internal override IMainEntityModel DbToBusinessEntity(IEntity dbEntity)
         {
             //var result = new ElementAttribute(new Guid(dbEntity.ParentGuid));
             //result = (ElementAttribute)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
             //return result;
             return null;
         }
-        internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
+        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
         {
-            var result = new List<OLD_ElementAttribute>();
+            var result = new List<OLD_ElementAttributeModel>();
             //foreach (var dbEntity in dbEntityCollection)
             //{
             //    var entity = new ElementAttribute(new Guid(dbEntity.ParentGuid));

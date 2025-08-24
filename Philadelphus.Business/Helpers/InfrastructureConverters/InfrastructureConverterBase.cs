@@ -11,7 +11,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public abstract class InfrastructureConverterBase
     {
-        protected static IMainEntity DbToBusinessMainProperties(IDbEntity dbEntity, TreeRepositoryMemberBase businessEntity)
+        protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, TreeRepositoryMemberBaseModel businessEntity)
         {
             //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
             //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
@@ -24,20 +24,20 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.HasContent = dbEntity.HasContent;
             businessEntity.IsOriginal = dbEntity.IsOriginal;
             businessEntity.IsLegacy = dbEntity.IsLegacy;
-            businessEntity.AuditInfo.IsDeleted = dbEntity.IsDeleted;
-            businessEntity.AuditInfo.CreatedOn = dbEntity.CreatedOn;
-            businessEntity.AuditInfo.CreatedBy = dbEntity.CreatedBy;
-            businessEntity.AuditInfo.UpdatedOn = dbEntity.UpdatedOn;
-            businessEntity.AuditInfo.UpdatedBy = dbEntity.UpdatedBy;
-            businessEntity.AuditInfo.UpdatedContentOn = dbEntity.UpdatedContentOn;
-            businessEntity.AuditInfo.UpdatedContentBy = dbEntity.UpdatedContentBy;
-            businessEntity.AuditInfo.DeletedOn = dbEntity.DeletedOn;
-            businessEntity.AuditInfo.DeletedBy = dbEntity.DeletedBy;
+            businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
+            businessEntity.AuditInfo.CreatedOn = dbEntity.AuditInfo.CreatedOn;
+            businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;
+            businessEntity.AuditInfo.UpdatedOn = dbEntity.AuditInfo.UpdatedOn;
+            businessEntity.AuditInfo.UpdatedBy = dbEntity.AuditInfo.UpdatedBy;
+            businessEntity.AuditInfo.UpdatedContentOn = dbEntity.AuditInfo.UpdatedContentOn;
+            businessEntity.AuditInfo.UpdatedContentBy = dbEntity.AuditInfo.UpdatedContentBy;
+            businessEntity.AuditInfo.DeletedOn = dbEntity.AuditInfo.DeletedOn;
+            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
             return businessEntity;
         }
-        internal abstract IMainEntity DbToBusinessEntity(IDbEntity dbEntity);
-        internal abstract IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection);
-        protected static IDbEntity BusinessToDbMainProperties(TreeRepositoryMemberBase businessEntity, IDbEntity dbEntity)
+        internal abstract IMainEntityModel DbToBusinessEntity(IEntity dbEntity);
+        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection);
+        protected static IEntity BusinessToDbMainProperties(TreeRepositoryMemberBaseModel businessEntity, IEntity dbEntity)
         {
             //dbEntity.ParentGuid = businessEntity.Parent.ToString();
             //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
@@ -51,18 +51,18 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.HasContent = businessEntity.HasContent;
             dbEntity.IsOriginal = businessEntity.IsOriginal;
             dbEntity.IsLegacy = businessEntity.IsLegacy;
-            dbEntity.IsDeleted = businessEntity.AuditInfo.IsDeleted;
-            dbEntity.CreatedOn = businessEntity.AuditInfo.CreatedOn;
-            dbEntity.CreatedBy = businessEntity.AuditInfo.CreatedBy;
-            dbEntity.UpdatedOn = businessEntity.AuditInfo.UpdatedOn;
-            dbEntity.UpdatedBy = businessEntity.AuditInfo.UpdatedBy;
-            dbEntity.UpdatedContentOn = businessEntity.AuditInfo.UpdatedContentOn;
-            dbEntity.UpdatedContentBy = businessEntity.AuditInfo.UpdatedContentBy;
-            dbEntity.DeletedOn = businessEntity.AuditInfo.DeletedOn;
-            dbEntity.DeletedBy = businessEntity.AuditInfo.DeletedBy;
+            dbEntity.AuditInfo.IsDeleted = businessEntity.AuditInfo.IsDeleted;
+            dbEntity.AuditInfo.CreatedOn = businessEntity.AuditInfo.CreatedOn;
+            dbEntity.AuditInfo.CreatedBy = businessEntity.AuditInfo.CreatedBy;
+            dbEntity.AuditInfo.UpdatedOn = businessEntity.AuditInfo.UpdatedOn;
+            dbEntity.AuditInfo.UpdatedBy = businessEntity.AuditInfo.UpdatedBy;
+            dbEntity.AuditInfo.UpdatedContentOn = businessEntity.AuditInfo.UpdatedContentOn;
+            dbEntity.AuditInfo.UpdatedContentBy = businessEntity.AuditInfo.UpdatedContentBy;
+            dbEntity.AuditInfo.DeletedOn = businessEntity.AuditInfo.DeletedOn;
+            dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
         }
-        internal abstract IDbEntity BusinessToDbEntity(IMainEntity businessEntity);
-        internal abstract IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection);
+        internal abstract IEntity BusinessToDbEntity(IMainEntityModel businessEntity);
+        internal abstract IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
     }
 }

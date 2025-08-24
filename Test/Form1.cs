@@ -19,12 +19,12 @@ namespace Test
         private void AddButton_Click(object sender, EventArgs e)
         {
             var mainEntityRepository = new Philadelphus.MongoRepository.Repositories.MongoMainEntitóInfrastructure();
-            var entities = new List<DbTreeRoot>();
+            var entities = new List<TreeRoot>();
             for (int i = 0; i < 5; i++)
             {
-                entities.Add(new DbTreeRoot());
+                entities.Add(new TreeRoot());
             }
-            mainEntityRepository.InsertRoots((List<DbTreeRoot>)entities);
+            mainEntityRepository.InsertRoots((List<TreeRoot>)entities);
         }
 
         private void LoadButton_Click(object sender, EventArgs e)

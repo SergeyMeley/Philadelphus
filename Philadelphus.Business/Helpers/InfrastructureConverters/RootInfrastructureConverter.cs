@@ -13,31 +13,31 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class RootInfrastructureConverter :InfrastructureConverterBase
     {
-        internal override IDbEntity BusinessToDbEntity(IMainEntity businessEntity)
+        internal override IEntity BusinessToDbEntity(IMainEntityModel businessEntity)
         {
-            var result = (DbTreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeRoot());
+            var result = (TreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
             return result;
         }
-        internal override IEnumerable<IDbEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntity> businessEntityCollection)
+        internal override IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
-            var result = new List<DbTreeRoot>();
+            var result = new List<TreeRoot>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (DbTreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBase)businessEntity, new DbTreeRoot());
+                var entity = (TreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
                 result.Add(entity);
             }
             return result;
         }
-        internal override IMainEntity DbToBusinessEntity(IDbEntity dbEntity)
+        internal override IMainEntityModel DbToBusinessEntity(IEntity dbEntity)
         {
             //var result = new TreeRoot(new Guid(dbEntity.ParentGuid));
             //result = (TreeRoot)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
             //return result;
             return null;
         }
-        internal override IEnumerable<IMainEntity> DbToBusinessEntityCollection(IEnumerable<IDbEntity> dbEntityCollection)
+        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
         {
-            var result = new List<TreeRoot>();
+            var result = new List<TreeRootModel>();
             //foreach (var dbEntity in dbEntityCollection)
             //{
             //    var entity = new TreeRoot(new Guid(dbEntity.ParentGuid));

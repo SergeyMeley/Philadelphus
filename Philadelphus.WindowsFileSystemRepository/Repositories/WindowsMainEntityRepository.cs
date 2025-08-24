@@ -12,8 +12,8 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
     public class WindowsMainEntityRepository : IMainEntitiesInfrastructure
     {
-        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
-        public DbMainEntitiesCollection GetMainEntitiesCollection()
+        public InfrastructureTypes InftastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
+        public MainEntitiesCollection GetMainEntitiesCollection()
         {
             return null;
         }
@@ -34,19 +34,19 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             }
             return list;
         }
-        public IEnumerable<DbTreeRepository> SelectRepositories(List<string> pathes)
+        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
         {
-            var list = new List<DbTreeRepository>();
+            var list = new List<TreeRepository>();
             foreach (var item in pathes)
             {
                 if (File.Exists(item))
                 {
-                    var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
+                    var repositoryXmlSerializer = new XmlSerializer(typeof(TreeRepository));
                     using (var repofs = new FileStream(item, FileMode.OpenOrCreate))
                     {
                         try
                         {
-                            var repo = repositoryXmlSerializer.Deserialize(repofs) as DbTreeRepository;
+                            var repo = repositoryXmlSerializer.Deserialize(repofs) as TreeRepository;
                             list.Add(repo);
                         }
                         catch (Exception)
@@ -58,27 +58,27 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             }
             return list;
         }
-        public IEnumerable<DbTreeRoot> SelectRoots()
+        public IEnumerable<TreeRoot> SelectRoots()
         {
             return null;
         }
-        public IEnumerable<DbTreeNode> SelectNodes()
+        public IEnumerable<TreeNode> SelectNodes()
         {
             return null;
         }
-        public IEnumerable<DbTreeLeave> SelectLeaves()
+        public IEnumerable<TreeLeave> SelectLeaves()
         {
             return null;
         }
-        public IEnumerable<DbEntityAttribute> SelectAttributes()
+        public IEnumerable<ElementAttribute> SelectAttributes()
         {
             return null;
         }
-        public IEnumerable<DbAttributeEntry> SelectAttributeEntries()
+        public IEnumerable<AttributeEntry> SelectAttributeEntries()
         {
             return null;
         }
-        public IEnumerable<DbAttributeValue> SelectAttributeValues()
+        public IEnumerable<AttributeValue> SelectAttributeValues()
         {
             return null;
         }
@@ -93,7 +93,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             }
             return 0;
         }
-        public long InsertRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long InsertRepositories(IEnumerable<TreeRepository> repositories)
         {
             foreach (var item in repositories)
             {
@@ -114,7 +114,7 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
                 {
                     try
                     {
-                        var repositoryXmlSerializer = new XmlSerializer(typeof(DbTreeRepository));
+                        var repositoryXmlSerializer = new XmlSerializer(typeof(TreeRepository));
                         using (var repofs = new FileStream(item.ConfigPath, FileMode.OpenOrCreate))
                         {
                             repositoryXmlSerializer.Serialize(repofs, item);
@@ -128,63 +128,63 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             }
             return repositories.Count();
         }
-        public long InsertRoots(IEnumerable<DbTreeRoot> roots)
+        public long InsertRoots(IEnumerable<TreeRoot> roots)
         {
             return roots.Count();
         }
-        public long InsertNodes(IEnumerable<DbTreeNode> nodes)
+        public long InsertNodes(IEnumerable<TreeNode> nodes)
         {
             return nodes.Count();
         }
-        public long InsertLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long InsertLeaves(IEnumerable<TreeLeave> leaves)
         {
             return leaves.Count();
         }
-        public long InsertAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long InsertAttributes(IEnumerable<ElementAttribute> attributes)
         {
             return attributes.Count();
         }
-        public long InsertAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long InsertAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             return attributeEntries.Count();
         }
-        public long InsertAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             return attributeValues.Count();
         }
         #endregion
         #region [ Delete ]
-        public long DeleteRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
         {
             return 0;
         }
-        public long DeleteRoots(IEnumerable<DbTreeRoot> roots)
+        public long DeleteRoots(IEnumerable<TreeRoot> roots)
         {
             return 0;
         }
-        public long DeleteNodes(IEnumerable<DbTreeNode> nodes)
+        public long DeleteNodes(IEnumerable<TreeNode> nodes)
         {
             return 0;
         }
-        public long DeleteLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long DeleteLeaves(IEnumerable<TreeLeave> leaves)
         {
             return 0;
         }
-        public long DeleteAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<ElementAttribute> attributes)
         {
             return 0;
         }
-        public long DeleteAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             return 0;
         }
-        public long DeleteAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             return 0;
         }
         #endregion
         #region [ Update ]
-        public long UpdateRepositories(IEnumerable<DbTreeRepository> repositories)
+        public long UpdateRepositories(IEnumerable<TreeRepository> repositories)
         {
             foreach (var item in repositories)
             {
@@ -214,27 +214,27 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
             }
             return 0;
         }
-        public long UpdateRoots(IEnumerable<DbTreeRoot> roots)
+        public long UpdateRoots(IEnumerable<TreeRoot> roots)
         {
             return 0;
         }
-        public long UpdateNodes(IEnumerable<DbTreeNode> nodes)
+        public long UpdateNodes(IEnumerable<TreeNode> nodes)
         {
             return 0;
         }
-        public long UpdateLeaves(IEnumerable<DbTreeLeave> leaves)
+        public long UpdateLeaves(IEnumerable<TreeLeave> leaves)
         {
             return 0;
         }
-        public long UpdateAttributes(IEnumerable<DbEntityAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<ElementAttribute> attributes)
         {
             return 0;
         }
-        public long UpdateAttributeEntries(IEnumerable<DbAttributeEntry> attributeEntries)
+        public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
             return 0;
         }
-        public long UpdateAttributeValues(IEnumerable<DbAttributeValue> attributeValues)
+        public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             return 0;
         }
