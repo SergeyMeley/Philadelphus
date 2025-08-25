@@ -1,4 +1,5 @@
-﻿using Philadelphus.InfrastructureEntities.Enums;
+﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.PostgreEfRepository;
@@ -100,7 +101,14 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             using (_context)
             {
-                _context.RootDetails.AddRange(roots);
+                foreach (var item in roots)
+                {
+                    item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                    item.AuditInfo.CreatedOn = DateTime.Now.ToString();
+                    item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                    item.AuditInfo.UpdatedOn = DateTime.Now.ToString();
+                    _context.RootDetails.Add(item);
+                }
                 return _context.SaveChanges();
             }
         }
@@ -132,18 +140,22 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
         {
+            var result = new List<TreeRepository>();
             using (_context)
             {
-                return _context.Repositories;
+                result = _context.Repositories.ToList();
             }
+            return result;
         }
 
         public IEnumerable<TreeRoot> SelectRoots()
         {
+            var result = new List<TreeRoot>();
             using (_context)
             {
-                return _context.RootDetails;
+                result = _context.RootDetails.ToList();
             }
+            return result;
         }
 
         public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)

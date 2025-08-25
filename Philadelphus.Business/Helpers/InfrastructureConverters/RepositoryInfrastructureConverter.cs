@@ -39,8 +39,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<TreeRepositoryModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var entity = new TreeRepositoryModel(new Guid(dbEntity.ParentGuid));
-                entity = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, new Guid(dbEntity.ParentGuid)));
+                var entity = new TreeRepositoryModel(Guid.Empty);
+                entity = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (MainEntityBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.Empty));
                 result.Add(entity);
             }
             return result;

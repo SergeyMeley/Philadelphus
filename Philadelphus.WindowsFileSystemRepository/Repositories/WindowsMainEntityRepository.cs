@@ -186,32 +186,32 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         #region [ Update ]
         public long UpdateRepositories(IEnumerable<TreeRepository> repositories)
         {
-            foreach (var item in repositories)
-            {
-                // Проверяем указанный путь.Если его нет, пробуем создать.
-                if (!Directory.Exists(item.DirectoryFullPath))
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(item.DirectoryFullPath);
-                    }
-                    catch (Exception)
-                    {
-                        throw new Exception("Ошибка создания директории, проверьте указанный путь");
-                    }
-                    if (!File.Exists(item.ConfigPath))
-                    {
-                        try
-                        {
-                            File.Create(item.ConfigPath);
-                        }
-                        catch (Exception)
-                        {
-                            throw new Exception("Ошибка создания элемента, проверьте указанный путь");
-                        }
-                    }
-                }
-            }
+            //foreach (var item in repositories)
+            //{
+            //    // Проверяем указанный путь.Если его нет, пробуем создать.
+            //    if (!Directory.Exists(item.DirectoryFullPath))
+            //    {
+            //        try
+            //        {
+            //            Directory.CreateDirectory(item.DirectoryFullPath);
+            //        }
+            //        catch (Exception)
+            //        {
+            //            throw new Exception("Ошибка создания директории, проверьте указанный путь");
+            //        }
+            //        if (!File.Exists(item.ConfigPath))
+            //        {
+            //            try
+            //            {
+            //                File.Create(item.ConfigPath);
+            //            }
+            //            catch (Exception)
+            //            {
+            //                throw new Exception("Ошибка создания элемента, проверьте указанный путь");
+            //            }
+            //        }
+            //    }
+            //}
             return 0;
         }
         public long UpdateRoots(IEnumerable<TreeRoot> roots)

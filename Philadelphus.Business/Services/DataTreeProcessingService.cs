@@ -44,7 +44,12 @@ namespace Philadelphus.Business.Services
             }
             return DataTreeRepositories;
         }
-
+        public List<TreeRepositoryModel> GetRepositoryCollection()
+        {
+            var infrastructure = new PostgreEfMainEntitуInfrastructure();
+            var converter = new RepositoryInfrastructureConverter();
+            return converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories(new List<string>())).ToList();
+        }
 
         //public List<TreeRepository> AddRepository(TreeRepository repository)
         //{
