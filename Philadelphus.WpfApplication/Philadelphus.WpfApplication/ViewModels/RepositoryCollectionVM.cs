@@ -38,22 +38,30 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             get
             {
+                DataTreeProcessingService treeRepositoryService = new DataTreeProcessingService();
+                var treeRepositories = treeRepositoryService.GetRepositoryCollection();
                 if (_treeRepositoriesVMs == null)
                 {
                     _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerViewModel>();
-                    for (int i = 0; i < 5; i++)
+                    foreach (var item in treeRepositories)
                     {
                         var vm = new RepositoryExplorerViewModel();
-                        
-                        //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
-                        //Временно
-                        DataTreeProcessingService treeRepositoryService = new DataTreeProcessingService();
-                        TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
-                        //Временно
-                        treeRepository.Name = $"TEST {i}";
-                        vm.TreeRepository = treeRepository;
+                        vm.TreeRepository = item;
                         _treeRepositoriesVMs.Add(vm);
                     }
+                    //for (int i = 0; i < 5; i++)
+                    //{
+                    //    var vm = new RepositoryExplorerViewModel();
+                        
+                    //    //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
+                    //    //Временно
+                        
+                    //    TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
+                    //    //Временно
+                    //    treeRepository.Name = $"TEST {i}";
+                    //    vm.TreeRepository = treeRepository;
+                    //    _treeRepositoriesVMs.Add(vm);
+                    //}
                 }
                 return _treeRepositoriesVMs;
             }
@@ -127,7 +135,10 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     DataTreeProcessingService service = new DataTreeProcessingService();
-                    service.CreateNewTreeRepository();
+                    var repositoryExplorerViewModel = new RepositoryExplorerViewModel();
+                    repositoryExplorerViewModel.TreeRepository = service.CreateNewTreeRepository();
+                    TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
+                     
                 });
             }
         }
