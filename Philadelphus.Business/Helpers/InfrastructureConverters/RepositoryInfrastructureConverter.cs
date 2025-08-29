@@ -15,11 +15,15 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override TreeRepository BusinessToDbEntity(IMainEntityModel businessEntity)
         {
+            if (businessEntity == null)
+                return null;
             var result = (TreeRepository)BusinessToDbMainProperties((MainEntityBaseModel)businessEntity, new TreeRepository());
             return result;
         }
         internal override List<TreeRepository> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
+            if (businessEntityCollection == null)
+                return null;
             var result = new List<TreeRepository>();
             foreach (var businessEntity in businessEntityCollection)
             {
@@ -30,12 +34,16 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal override TreeRepositoryModel DbToBusinessEntity(IEntity dbEntity)
         {
+            if (dbEntity == null)
+                return null;
             var result = new TreeRepositoryModel(new Guid(dbEntity.ParentGuid));
             result = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, new Guid(dbEntity.ParentGuid)));
             return result;
         }
         internal override List<TreeRepositoryModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
         {
+            if (dbEntityCollection == null)
+                return null;
             var result = new List<TreeRepositoryModel>();
             foreach (var dbEntity in dbEntityCollection)
             {

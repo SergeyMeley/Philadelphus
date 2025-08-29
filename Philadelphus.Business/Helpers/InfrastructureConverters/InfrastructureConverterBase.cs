@@ -13,6 +13,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, MainEntityBaseModel businessEntity)
         {
+            if (dbEntity == null)
+                return null;
             //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
             //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
             //businessEntity.ConfigPath = dbEntity.ConfigPath;
@@ -38,6 +40,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection);
         protected static IEntity BusinessToDbMainProperties(MainEntityBaseModel businessEntity, IEntity dbEntity)
         {
+            if (businessEntity == null)
+                return null;
             //dbEntity.ParentGuid = businessEntity.Parent.ToString();
             //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
             //dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;

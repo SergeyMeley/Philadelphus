@@ -16,11 +16,15 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
     {
         internal override IEntity BusinessToDbEntity(IMainEntityModel businessEntity)
         {
+            if (businessEntity == null)
+                return null;
             var result = (AttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeValue());
             return result;
         }
         internal override IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
+            if (businessEntityCollection == null)
+                return null;
             var result = new List<AttributeValue>();
             foreach (var businessEntity in businessEntityCollection)
             {
@@ -31,6 +35,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal override IMainEntityModel DbToBusinessEntity(IEntity dbEntity)
         {
+            if (dbEntity == null)
+                return null;
             //var result = new EntityAttributeValue(dbEntity.Parent);
             //result = (EntityAttributeValue)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeValue));
             //return result;
@@ -38,6 +44,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
         {
+            if (dbEntityCollection == null)
+                return null;
             var result = new List<ElementAttributeValueModel>();
             //    foreach (var dbEntity in dbEntityCollection)
             //    {
