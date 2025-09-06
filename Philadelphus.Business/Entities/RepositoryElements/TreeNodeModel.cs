@@ -18,10 +18,10 @@ using ZstdSharp;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeNodeModel : TreeRepositoryMemberBaseModel, IParentModel, ITreeRootMemberModel
+    public class TreeNodeModel : TreeRepositoryMemberBaseModel, IParentModel, ITreeRootMemberModel, IHavingOwnDataStorageModel
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Node; }
-        public IMainEntitiesInfrastructure Infrastructure { get; private set; }
+        public IMainEntitiesInfrastructureRepository Infrastructure { get; private set; }
         public EntityElementTypeModel ElementType { get; set; }
         public IEnumerable<IChildrenModel> Childs { get; set; }
         public TreeRootModel ParentRoot { get; private set; }

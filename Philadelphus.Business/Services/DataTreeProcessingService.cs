@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using Philadelphus.Business.Helpers;
 using Philadelphus.PostgreEfRepository.Repositories;
+using Philadelphus.InfrastructureEntities.Interfaces;
 
 namespace Philadelphus.Business.Services
 {
@@ -46,9 +47,9 @@ namespace Philadelphus.Business.Services
         }
         public List<TreeRepositoryModel> GetRepositoryCollection()
         {
-            var infrastructure = new PostgreEfMainEntitуInfrastructure();
+            var infrastructure = new PostgreEfMainEntityInfrastructure();
             var converter = new RepositoryInfrastructureConverter();
-            return converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories(new List<string>())).ToList();
+            return converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories(new List<string>()))?.ToList();
         }
 
         //public List<TreeRepository> AddRepository(TreeRepository repository)
@@ -208,16 +209,20 @@ namespace Philadelphus.Business.Services
             return (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
         }
 
-        public TreeRepositoryModel CreateNewTreeRepository(string name = "")
+        public TreeRepositoryModel CreateNewTreeRepository(string name, IInfrastructureRepository)
         {
             var result = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
-            result.Name = NamingHelper.GetNewName(null, "Новый репозиторий");
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "Новый репозиторий";
+            }
+            result.Name = NamingHelper.GetNewName(null, name);
             //ВРЕМЕННО!!!
-            result.SetInfrastructureRepository(new PostgreEfMainEntitуInfrastructure());
+            result.SetInfrastructureRepository(new PostgreEfMainEntityInfrastructure());
             //ВРЕМЕННО!!!
 
             var converter = new RepositoryInfrastructureConverter();
-            result.Infrastructure.InsertRepositories(new List<TreeRepository>() { converter.BusinessToDbEntity(result) });
+            result.OwnDataStorage.InsertRepositories(new List<TreeRepository>() { converter.BusinessToDbEntity(result) });
             return result;
         }
 
@@ -320,9 +325,9 @@ namespace Philadelphus.Business.Services
 
         private TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel currentRepository)
         {
-            //foreach (var item in CurrentRepository.InfrastructureRepositories)
+            //foreach (var item in CurrentRepository.RootsDefaultDataStorage)
             //{
-            //    IMainEntitiesInfrastructure infrastructureRepository;
+            //    IMainEntitiesInfrastructureRepository infrastructureRepository;
             //    switch (item.InfrastructureRepositoryTypes)
             //    {
             //        case InfrastructureTypes.WindowsDirectory:
@@ -367,7 +372,7 @@ namespace Philadelphus.Business.Services
         }
         //private TreeRoot GetRootContent(TreeRoot treeRoot) 
         //{
-        //    IMainEntitiesInfrastructure infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(treeRoot.InftastructureRepositoryType);
+        //    IMainEntitiesInfrastructureRepository infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(treeRoot.InftastructureRepositoryType);
         //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
         //    for (int i = 0; i < nodeCollection.Count(); i++)
         //    {
@@ -377,7 +382,7 @@ namespace Philadelphus.Business.Services
         //}
         //private TreeNode GetNodeContent(TreeNode treeNode)
         //{
-        //    IMainEntitiesInfrastructure infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
+        //    IMainEntitiesInfrastructureRepository infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
         //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
         //    for (int i = 0; i < nodeCollection.Count(); i++)
         //    {

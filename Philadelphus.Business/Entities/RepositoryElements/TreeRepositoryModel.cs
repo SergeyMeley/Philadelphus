@@ -16,13 +16,10 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeRepositoryModel : MainEntityBaseModel, IHavingOwnStorageModel, IParentModel
+    public class TreeRepositoryModel : MainEntityBaseModel, IHavingOwnDataStorageModel, IParentModel
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Repository; }
-        public InfrastructureTypes DefaultInfrastructureRepositoryType { get; }
-        public IMainEntitiesInfrastructure Infrastructure { get; private set; }
-        public IEnumerable<IMainEntitiesInfrastructure> InfrastructureRepositories { get; set; }
-        //public IEnumerable<IDataStorage> DataStorages { get; set; }
+        public IDataStorageModel OwnDataStorage { get; private set; }
         public IEnumerable<IChildrenModel> Childs { get; private set; }
         public IEnumerable<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         internal TreeRepositoryModel(Guid guid) : base(guid)
@@ -36,9 +33,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             Childs = new ObservableCollection<IChildrenModel>();
         }
 
-        public bool SetInfrastructureRepository(IMainEntitiesInfrastructure infrastructure)
+        public bool SetInfrastructureRepository(IDataStorageModel storage)
         {
-            Infrastructure = infrastructure;
+            OwnDataStorage = storage;
             return true;
         }
 

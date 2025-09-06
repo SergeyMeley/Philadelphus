@@ -1,4 +1,5 @@
-﻿using Philadelphus.InfrastructureEntities.Interfaces;
+﻿using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
     /// <summary>
     /// Реализует возможность наличия независимой инфраструктуры (места и способа хранения данных)
     /// </summary>
-    internal interface IHavingOwnStorageModel
+    internal interface IHavingOwnDataStorageModel
     {
-        public IMainEntitiesInfrastructure Infrastructure { get; }
+        internal IDataStorageModel OwnDataStorage { get; }
+        public bool SetInfrastructureRepository(IDataStorageModel storage);
     }
 }

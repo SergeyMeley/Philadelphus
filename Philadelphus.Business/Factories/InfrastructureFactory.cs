@@ -11,9 +11,9 @@ namespace Philadelphus.Business.Factories
 {
     internal static class InfrastructureFactory
     {
-        internal static IMainEntitiesInfrastructure GetMainEntitiesInfrastructure(InfrastructureTypes repositoryType)
+        internal static IMainEntitiesInfrastructureRepository GetMainEntitiesInfrastructure(InfrastructureTypes repositoryType)
         {
-            IMainEntitiesInfrastructure mainEntitiesRepository;
+            IMainEntitiesInfrastructureRepository mainEntitiesRepository;
             switch (repositoryType)
             {
                 case InfrastructureTypes.WindowsDirectory:

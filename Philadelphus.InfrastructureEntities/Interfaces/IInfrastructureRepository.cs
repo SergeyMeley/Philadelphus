@@ -10,5 +10,6 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
     public interface IInfrastructureRepository
     {
         public InfrastructureTypes InfrastructureRepositoryTypes { get; }
+        public bool CheckAvailability();
     }
 }

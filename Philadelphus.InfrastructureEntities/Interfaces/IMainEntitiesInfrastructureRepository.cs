@@ -2,8 +2,9 @@
 
 namespace Philadelphus.InfrastructureEntities.Interfaces
 {
-    public interface IMainEntitiesInfrastructure : IInfrastructureRepository
+    public interface IMainEntitiesInfrastructureRepository : IInfrastructureRepository
     {
+        public bool CanConnect();
         MainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]
         public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes);

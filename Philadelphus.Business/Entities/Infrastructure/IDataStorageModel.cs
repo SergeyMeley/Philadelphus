@@ -13,7 +13,11 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public Guid Guid { get; }
         public string Name { get; }
         public string Description { get; }
-        InfrastructureTypes InfrastructureType { get; }
+        //InfrastructureTypes InfrastructureType { get; }
         public IInfrastructureRepository InfrastructureRepository { get; }
+        public bool CheckAvailability()
+        {
+            return InfrastructureRepository.CheckAvailability();
+        }
     }
 }

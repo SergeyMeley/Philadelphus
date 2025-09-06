@@ -11,10 +11,20 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.PostgreEfRepository.Repositories
 {
-    public class PostgreEfMainEntitуInfrastructure : IMainEntitiesInfrastructure
+    public class PostgreEfMainEntityInfrastructure : IMainEntitiesInfrastructureRepository
     {
+        public bool CanConnect()
+        {
+            bool result;
+            using (var context = new PhiladelphusContext())
+            {
+                result = context.Database.CanConnect();
+            }
+            return result;
+        }
         public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSql;
         private readonly PhiladelphusContext _context = new PhiladelphusContext();
+        
 
         public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {
@@ -85,6 +95,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             using(_context)
             {
+                if (CanConnect() == false)
+                    return 0;
                 foreach (var item in repositories)
                 {
                     item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
@@ -101,6 +113,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             using (_context)
             {
+                if (CanConnect() == false)
+                    return 0;
                 foreach (var item in roots)
                 {
                     item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
@@ -140,6 +154,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
         {
+            if (CanConnect() == false)
+                return null;
             var result = new List<TreeRepository>();
             using (_context)
             {
@@ -150,6 +166,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public IEnumerable<TreeRoot> SelectRoots()
         {
+            if (CanConnect() == false)
+                return null;
             var result = new List<TreeRoot>();
             using (_context)
             {
