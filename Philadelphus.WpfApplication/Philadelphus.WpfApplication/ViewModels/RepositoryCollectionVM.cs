@@ -19,8 +19,8 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
-        private static RepositoryExplorerViewModel _currentRepositoryExplorerVM = new RepositoryExplorerViewModel();
-        public  RepositoryExplorerViewModel CurrentRepositoryExplorerVM 
+        private static RepositoryExplorerVM _currentRepositoryExplorerVM = new RepositoryExplorerVM();
+        public  RepositoryExplorerVM CurrentRepositoryExplorerVM 
         { 
             get 
             { 
@@ -33,25 +33,25 @@ namespace Philadelphus.WpfApplication.ViewModels
                 OnPropertyChanged(nameof(PropertyList));
             }
         }
-        private ObservableCollection<RepositoryExplorerViewModel> _treeRepositoriesVMs;
-        public ObservableCollection<RepositoryExplorerViewModel> TreeRepositoriesVMs
+        private ObservableCollection<RepositoryExplorerVM> _treeRepositoriesVMs;
+        public ObservableCollection<RepositoryExplorerVM> TreeRepositoriesVMs
         {
             get
             {
                 DataTreeProcessingService treeRepositoryService = new DataTreeProcessingService();
                 var treeRepositories = treeRepositoryService.GetRepositoryCollection();
-                if (_treeRepositoriesVMs == null)
+                if (treeRepositories != null && _treeRepositoriesVMs == null)
                 {
-                    _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerViewModel>();
+                    _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
                     foreach (var item in treeRepositories)
                     {
-                        var vm = new RepositoryExplorerViewModel();
+                        var vm = new RepositoryExplorerVM();
                         vm.TreeRepository = item;
                         _treeRepositoriesVMs.Add(vm);
                     }
                     //for (int i = 0; i < 5; i++)
                     //{
-                    //    var vm = new RepositoryExplorerViewModel();
+                    //    var vm = new RepositoryExplorerVM();
                         
                     //    //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
                     //    //Временно
@@ -135,7 +135,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     DataTreeProcessingService service = new DataTreeProcessingService();
-                    var repositoryExplorerViewModel = new RepositoryExplorerViewModel();
+                    var repositoryExplorerViewModel = new RepositoryExplorerVM();
                     repositoryExplorerViewModel.TreeRepository = service.CreateNewTreeRepository();
                     TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
                      

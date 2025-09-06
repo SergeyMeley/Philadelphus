@@ -1,0 +1,42 @@
+﻿<Window x:Class="Philadelphus.WpfApplication.Views.DataStoragesSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
+        mc:Ignorable="d"
+        Title="Настройка хранилищ" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Выбрать хранилище">
+            <ListBox>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Наименование: "></TextBlock>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                            <TextBlock Text=". Описание: "></TextBlock>
+                            <TextBlock Text="{Binding Guid}"></TextBlock>
+                            <TextBlock Text=". UUID: "></TextBlock>
+                            <TextBlock Text="{Binding Guid}"></TextBlock>
+                            <TextBlock Text=". Адаптер: "></TextBlock>
+                            <TextBlock Text="{Binding InfrastructureRepository}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                    
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+        <GroupBox Grid.Row="0" Header="Выбрать хранилище">
+
+        </GroupBox>
+        <Expander Grid.Row="1" IsExpanded="False" Header="Добавить новое хранилище">
+            
+        </Expander>
+        <Button Grid.Row="2" Content="Подтвердить"></Button>
+    </Grid>
+</Window>

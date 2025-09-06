@@ -154,7 +154,9 @@
 
                 </RibbonTab>
                 <RibbonTab Header="Настройки">
-
+                    <RibbonGroup Header="Хранилища">
+                        <RibbonButton Label="Открыть настройки хранилищ" Command="{Binding OpenDataStorageSettings}"></RibbonButton>
+                    </RibbonGroup>
                 </RibbonTab>
                 <RibbonTab Header="Справка">
                     <RibbonGroup>

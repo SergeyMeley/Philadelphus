@@ -14,6 +14,18 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationViewModel : ViewModelBase
     {
+        private DataStoragesSettingsVM _dataStoragesSettingsVM;
+        public DataStoragesSettingsVM DataStoragesSettingsVM
+        {
+            get
+            {
+                if (_dataStoragesSettingsVM == null)
+                {
+                    _dataStoragesSettingsVM = new DataStoragesSettingsVM();
+                }
+                return _dataStoragesSettingsVM;
+            }
+        }
         private PopupVM _popupVM;
         public PopupVM PopupVM 
         { 
@@ -36,7 +48,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             _startWindow = new StartWindow() { DataContext = this };
             _startWindow.Show();
             // ВРЕМЕННО!!!
-            RepositoryCollectionViewModel.CurrentRepositoryExplorerVM = RepositoryCollectionViewModel.TreeRepositoriesVMs.FirstOrDefault();
+            //RepositoryCollectionViewModel.CurrentRepositoryExplorerVM = RepositoryCollectionViewModel.TreeRepositoriesVMs.FirstOrDefault();
             SetNotificationHandlers();
             // ВРЕМЕННО!!!
             //_mainWindow = new MainWindow() { DataContext = this };
@@ -66,8 +78,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             } 
         }
 
-        private RepositoryExplorerViewModel _repositoryViewModel = new RepositoryExplorerViewModel();
-        public RepositoryExplorerViewModel RepositoryExplorerViewModel 
+        private RepositoryExplorerVM _repositoryViewModel = new RepositoryExplorerVM();
+        public RepositoryExplorerVM RepositoryExplorerViewModel 
         { 
             get 
             { 
@@ -144,6 +156,17 @@ namespace Philadelphus.WpfApplication.ViewModels
 
                     _popupVM.StartReceivingNotifications();
                     OnPropertyChanged(nameof(PopupVM));
+                });
+            }
+        }
+        public RelayCommand OpenDataStorageSettings
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = new DataStoragesSettingsWindow() { DataContext = DataStoragesSettingsVM };
+                    window.Show();
                 });
             }
         }

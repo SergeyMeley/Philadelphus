@@ -23,7 +23,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
     /// </summary>
     public partial class RepositoryExplorer : UserControl
     {
-        public RepositoryExplorerViewModel ViewModel { get { return (RepositoryExplorerViewModel)DataContext; } }
+        public RepositoryExplorerVM ViewModel { get { return (RepositoryExplorerVM)DataContext; } }
         public RepositoryExplorer()
         {
             InitializeComponent();

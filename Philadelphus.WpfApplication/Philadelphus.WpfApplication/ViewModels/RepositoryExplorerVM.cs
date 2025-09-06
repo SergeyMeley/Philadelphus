@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
-    public  class RepositoryExplorerViewModel : ViewModelBase
+    public  class RepositoryExplorerVM : ViewModelBase
     {
         private TreeRepositoryModel _treeRepository;
         public TreeRepositoryModel TreeRepository 
@@ -60,6 +60,14 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             get { return _visabilityList; }
         }
+
+        public bool CheckTreeRepositoryAvailability()
+        {
+            if (_treeRepository == null)
+                return false;
+            return _treeRepository.OwnDataStorage.CheckAvailability();
+        }
+
 
         #region [Commands]
         public RelayCommand CreateRootCommand
