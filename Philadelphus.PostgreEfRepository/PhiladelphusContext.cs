@@ -12,10 +12,6 @@ namespace Philadelphus.PostgreEfRepository
 {
     public partial class PhiladelphusContext : DbContext
     {
-        public PhiladelphusContext()
-        {
-        }
-
         public PhiladelphusContext(DbContextOptions<PhiladelphusContext> options)
             : base(options)
         {

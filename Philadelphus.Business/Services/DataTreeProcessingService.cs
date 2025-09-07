@@ -43,7 +43,7 @@ namespace Philadelphus.Business.Services
             var converter = new RepositoryInfrastructureConverter();
             foreach (var dataStorage in dataStorages)
             {
-                var infrastructure = (ITreeRepositoryHeadersInfrastructureRepository)dataStorage.InfrastructureRepository;
+                var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
                 if (dataStorage.GetType().IsAssignableFrom(typeof(ITreeRepositoryHeadersInfrastructureRepository)))
                 {
                     result.AddRange(converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories(new List<string>()))?.ToList());
@@ -336,7 +336,7 @@ namespace Philadelphus.Business.Services
             //        case InfrastructureTypes.PostgreSql:
             //            infrastructureRepository = new PostgreInfrastructure.Repositories.PostgreMainEntityInfrastructure();
             //            break;
-            //        case InfrastructureTypes.MongoDb:
+            //        case InfrastructureTypes.MongoDbAdo:
             //            infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
             //            break;
             //        default:

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -11,19 +12,25 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.PostgreEfRepository.Repositories
 {
-    public class MainEntitiesInfrastructureRepository : IMainEntitiesInfrastructureRepository
+    public class PostgreEfMainEntitiesInfrastructureRepository : IMainEntitiesInfrastructureRepository
     {
+        private readonly PhiladelphusContext _context;
+        public PostgreEfMainEntitiesInfrastructureRepository(string connectionString)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<PhiladelphusContext>();
+            optionsBuilder.UseNpgsql(connectionString);
+            _context = new PhiladelphusContext(optionsBuilder.Options);
+        }
         public bool CheckAvailability()
         {
-            bool result;
-            using (var context = new PhiladelphusContext())
-            {
-                result = context.Database.CanConnect();
-            }
+            bool result = false;
+            //using (var context = new PhiladelphusContext())
+            //{
+            //    result = context.Database.CanConnect();
+            //}
             return result;
         }
-        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSql;
-        private readonly PhiladelphusContext _context = new PhiladelphusContext();
+        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSqlEf;
         
 
         public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)

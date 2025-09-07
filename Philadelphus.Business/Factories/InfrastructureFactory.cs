@@ -19,10 +19,10 @@ namespace Philadelphus.Business.Factories
                 case InfrastructureTypes.WindowsDirectory:
                     //mainEntitiesRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
                     break;
-                case InfrastructureTypes.PostgreSql:
-                    mainEntitiesRepository = new PostgreEfRepository.Repositories.MainEntitiesInfrastructureRepository();
+                case InfrastructureTypes.PostgreSqlEf:
+                    //mainEntitiesRepository = new PostgreEfRepository.Repositories.PostgreEfMainEntitiesInfrastructureRepository();
                     break;
-                case InfrastructureTypes.MongoDb:
+                case InfrastructureTypes.MongoDbAdo:
                     //mainEntitiesRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
                     break;
                 default:

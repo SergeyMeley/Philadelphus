@@ -9,7 +9,11 @@ namespace Philadelphus.InfrastructureEntities.Enums
     public enum InfrastructureTypes
     {
         WindowsDirectory,
-        PostgreSql,
-        MongoDb
+        PostgreSqlAdo,
+        PostgreSqlEf,
+        MongoDbAdo,
+        MongoDbEf,
+        MsSqlServerEf,
+        SQLite
     }
 }
