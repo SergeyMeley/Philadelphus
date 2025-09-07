@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
         mc:Ignorable="d"
-        Title="StartWindow" Height="200" Width="400">
+        Title="StartWindow" MinHeight="200" MinWidth="400">
     <Window.Visibility>
         <Binding Path="StartWindowVisibility"/>
     </Window.Visibility>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
             <Run Text="Здравствуйте, "></Run>
@@ -23,23 +23,45 @@
             <Run Text="! "></Run>
             <Run Text="Выберите репозиторий для начала работы"></Run>
         </TextBlock>
-        <ComboBox Grid.Row="1" Margin="2" DataContext="{Binding RepositoryCollectionViewModel}" DisplayMemberPath="TreeRepository.Name" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" SelectedValuePath="TreeRepository.Name"></ComboBox>
-        <Grid Grid.Row="2" DataContext="{Binding RepositoryCollectionViewModel}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"></ColumnDefinition>
-                <ColumnDefinition Width="2*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0"></TextBox>
-            <Button Grid.Column="1" Content="Создать репозиторий" Command="{Binding CreateNewRepository}" Margin="2"></Button>
-        </Grid>
-        <Grid Grid.Row="3" DataContext="{Binding RepositoryCollectionViewModel}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"></ColumnDefinition>
-                <ColumnDefinition Width="2*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0"></TextBox>
-            <Button Grid.Column="1" Content="Добавить существующий репозиторий" Command="{Binding AddExistRepository}" Margin="2"></Button>
-        </Grid>
-        <Button Grid.Row="4" Content="Начать!" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
+        <GroupBox Grid.Row="1" Header="Заголовки репозиториев">
+            <ListBox DataContext="{Binding RepositoryCollectionViewModel}" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" Margin="2">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Height="20" VerticalAlignment="Center" Margin="2">
+                            <Run Text="Наименование: "></Run>
+                            <Run Text="{Binding CurrentRepository}"></Run>
+                            <Run Text="Описание: "></Run>
+                            <Run Text="! "></Run>
+                            <Run Text="Выберите репозиторий для начала работы"></Run>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+        <Button Grid.Row="2" Content="Добавить существующий репозиторий" Height="30" Command="{Binding AddExistRepository}" Margin="2"></Button>
+        <Expander Grid.Row="3" Header="Создание нового репозитория" IsExpanded="False">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Наименование: "></TextBlock>
+                <TextBox Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"></TextBox>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Описание: "></TextBlock>
+                <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"></TextBox>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Хранилище: "></TextBlock>
+                <TextBox Grid.Column="1" Grid.Row="2"></TextBox>
+                <Button  Grid.Column="2" Grid.Row="2" Content="Выбрать"></Button>
+                <Button Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" Content="Создать новый репозиторий" Height="30" Command="{Binding CreateNewRepository}" Margin="2"></Button>
+            </Grid>
+        </Expander>
+        <Button Grid.Row="4" Content="Начать!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
     </Grid>
 </Window>

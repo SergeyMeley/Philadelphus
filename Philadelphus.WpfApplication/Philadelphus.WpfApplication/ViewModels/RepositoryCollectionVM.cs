@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
@@ -15,6 +16,22 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class RepositoryCollectionVM : ViewModelBase
     {
+        private DataStoragesSettingsVM _dataStoragesSettingsVM;
+        public DataStoragesSettingsVM DataStoragesSettingsVM
+        {
+            get
+            {
+                if (_dataStoragesSettingsVM == null)
+                {
+                    _dataStoragesSettingsVM = new DataStoragesSettingsVM();
+                }
+                return _dataStoragesSettingsVM;
+            }
+            set
+            {
+                _dataStoragesSettingsVM = value;
+            }
+        }
         public RepositoryCollectionVM()
         {
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
@@ -38,8 +55,8 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             get
             {
-                DataTreeProcessingService treeRepositoryService = new DataTreeProcessingService();
-                var treeRepositories = treeRepositoryService.GetRepositoryCollection();
+                var treeRepositoryService = new DataTreeProcessingService();
+                var treeRepositories = treeRepositoryService.GetExistTreeRepositories();
                 if (treeRepositories != null && _treeRepositoriesVMs == null)
                 {
                     _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
@@ -123,9 +140,21 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    DataTreeProcessingService service = new DataTreeProcessingService();
+                    var service = new DataTreeProcessingService();
                     service.AddExistTreeRepository(new DirectoryInfo(""));
                 });
+            }
+        }
+        private string _newTreeRepositoryName;
+        public string NewTreeRepositoryName
+        {
+            get
+            {
+                return _newTreeRepositoryName;
+            }
+            set
+            {
+                _newTreeRepositoryName = value;
             }
         }
         public RelayCommand CreateNewRepository
@@ -134,9 +163,10 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    DataTreeProcessingService service = new DataTreeProcessingService();
+                    var service = new DataTreeProcessingService();
                     var repositoryExplorerViewModel = new RepositoryExplorerVM();
-                    repositoryExplorerViewModel.TreeRepository = service.CreateNewTreeRepository();
+                    var builder = new DataStorageBuilder();
+                    repositoryExplorerViewModel.TreeRepository = service.CreateNewTreeRepository(_newTreeRepositoryName, builder.Build());
                     TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
                      
                 });

@@ -14,7 +14,7 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationViewModel : ViewModelBase
     {
-        private DataStoragesSettingsVM _dataStoragesSettingsVM;
+        private static DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM
         {
             get
@@ -26,16 +26,16 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return _dataStoragesSettingsVM;
             }
         }
-        private PopupVM _popupVM;
-        public PopupVM PopupVM 
+        private NotificationsVM _notificationsVM;
+        public NotificationsVM NotificationsVM
         { 
             get 
             {
-                if (_popupVM == null)
+                if (_notificationsVM == null)
                 {
-                    _popupVM = new PopupVM();
+                    _notificationsVM = new NotificationsVM();
                 }
-                return _popupVM; 
+                return _notificationsVM; 
             } 
         }
 
@@ -49,7 +49,6 @@ namespace Philadelphus.WpfApplication.ViewModels
             _startWindow.Show();
             // ВРЕМЕННО!!!
             //RepositoryCollectionViewModel.CurrentRepositoryExplorerVM = RepositoryCollectionViewModel.TreeRepositoriesVMs.FirstOrDefault();
-            SetNotificationHandlers();
             // ВРЕМЕННО!!!
             //_mainWindow = new MainWindow() { DataContext = this };
         }
@@ -69,7 +68,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private RepositoryCollectionVM _repositoryCollectionViewModel = new RepositoryCollectionVM();
+        private RepositoryCollectionVM _repositoryCollectionViewModel = new RepositoryCollectionVM() { DataStoragesSettingsVM = _dataStoragesSettingsVM };        
         public RepositoryCollectionVM RepositoryCollectionViewModel
         {
             get 
@@ -101,44 +100,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             } 
         }
 
-        private bool SetNotificationHandlers()
-        {
-            NotificationService.TextMessageHandler = SendText;
-            bool SendText(NotificationModel notification) 
-            {
-                return true;
-            }
-            NotificationService.SendNotification("Обработчик текстовых сообщений назначен.", criticalLevel: NotificationCriticalLevelModel.Info, type: NotificationTypesModel.TextMessage);
-
-            NotificationService.ModalWindowHandler = SendModal;
-            bool SendModal(NotificationModel notification)
-            {
-                MessageBoxImage image;
-                switch (notification.CriticalLevel)
-                {
-                    case NotificationCriticalLevelModel.Info:
-                        image = MessageBoxImage.Information;
-                        break;
-                    case NotificationCriticalLevelModel.Warning:
-                        image = MessageBoxImage.Warning;
-                        break;
-                    case NotificationCriticalLevelModel.Error:
-                        image = MessageBoxImage.Error;
-                        break;
-                    case NotificationCriticalLevelModel.Alarm:
-                        image = MessageBoxImage.Error;
-                        break;
-                    default:
-                        image = MessageBoxImage.Error;
-                        break;
-                }
-                MessageBox.Show(messageBoxText: notification.Text, caption: notification.CriticalLevel.ToString(), MessageBoxButton.OK, icon: image);
-                return true;
-            }
-            NotificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevelModel.Info, type: NotificationTypesModel.TextMessage);
-
-            return true;
-        }
+        
 
         #region  [Commands]
         public RelayCommand OpenMainWindowCommand
@@ -153,8 +115,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     
                     //_startWindow.Visibility = Visibility.Hidden;
                     _startWindow.Close();
-
-                    _popupVM.StartReceivingNotifications();
+                    _notificationsVM = new NotificationsVM();
                     OnPropertyChanged(nameof(PopupVM));
                 });
             }
