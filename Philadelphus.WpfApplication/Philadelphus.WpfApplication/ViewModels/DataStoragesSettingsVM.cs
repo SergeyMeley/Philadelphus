@@ -10,7 +10,7 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class DataStoragesSettingsVM
     {
-        public ObservableCollection<IDataStorageModel>? DataStorages { get; set; }
+        public ObservableCollection<IDataStorageModel>? DataStorages { get; set; } = new ObservableCollection<IDataStorageModel>();
         public IDataStorageModel SelectedDataStorage {  get; set; }
     }
 }

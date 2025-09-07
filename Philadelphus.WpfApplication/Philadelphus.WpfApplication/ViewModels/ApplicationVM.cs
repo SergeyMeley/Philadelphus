@@ -28,10 +28,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                 }
                 var service = new StorageConfigService();
                 service.LoadConfig();
-                
-                foreach (var setting in service.GetAllStorageModels())
+                var models = service.GetAllStorageModels();
+                foreach (var model in models)
                 {
-                    _dataStoragesSettingsVM.DataStorages.Add(setting);
+                    if (model != null && _dataStoragesSettingsVM.DataStorages.FirstOrDefault(x => x.Guid == model.Guid) == null)
+                    {
+                        _dataStoragesSettingsVM.DataStorages.Add(model);
+                    }
                 }
                 return _dataStoragesSettingsVM;
             }
@@ -154,7 +157,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var window = new DataStoragesSettingsWindow() { DataContext = DataStoragesSettingsVM };
+                    var window = new DataStoragesSettingsWindow() { DataContext = this };
                     window.Show();
                 });
             }

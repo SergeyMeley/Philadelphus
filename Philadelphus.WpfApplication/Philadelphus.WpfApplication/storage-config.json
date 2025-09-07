@@ -2,7 +2,7 @@
   "DataStorageModels": [
     {
       "TypeName": "SqlServerStorageModel",
-      "GuidString": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "GuidString": "b7d28b7b-a2fa-40f8-9a35-d3f68a15c32d",
       "Name": "Основное SQL Server хранилище",
       "Description": "Основная база данных на SQL Server для production",
       "ConnectionString": "Server=localhost;Database=ProductionDB;Trusted_Connection=true;TrustServerCertificate=true;",
@@ -12,7 +12,7 @@
     },
     {
       "TypeName": "PostgreSqlStorageModel",
-      "GuidString": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "GuidString": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
       "Name": "Резервное PostgreSQL хранилище",
       "Description": "Резервная база данных на PostgreSQL",
       "ConnectionString": "Host=localhost;Database=BackupDB;Username=admin;Password=secret123",
@@ -21,28 +21,38 @@
       "Priority": 2
     },
     {
+      "TypeName": "PostgreSqlStorageModel",
+      "GuidString": "4c04583e-d57a-40c2-b281-3676af36dc54",
+      "Name": "Резервное PostgreSQL хранилище",
+      "Description": "Резервная база данных на PostgreSQL",
+      "ConnectionString": "Host=localhost;Database=BackupDB;Username=admin;Password=secret123",
+      "ProviderTypeString": "PostgreSqlEf",
+      "IsEnabled": true,
+      "Priority": 3
+    },
+    {
       "TypeName": "SqliteStorageModel",
-      "GuidString": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+      "GuidString": "da98c450-ec75-49ee-8aff-c037e08dbbfb",
       "Name": "Локальное SQLite хранилище",
       "Description": "Локальная база для тестирования и разработки",
       "ConnectionString": "Data Source=localstorage.db",
       "ProviderTypeString": "SQLite",
       "IsEnabled": true,
-      "Priority": 3
+      "Priority": 4
     },
     {
       "TypeName": "MongoDbStorageModel",
-      "GuidString": "d4e5f6a7-b8c9-0123-defg-456789012345",
+      "GuidString": "ca041a1a-c96c-4239-b92c-87f0e9e4da69",
       "Name": "Документное MongoDB хранилище",
       "Description": "Хранилище для документов и неструктурированных данных",
       "ConnectionString": "mongodb://localhost:27017",
       "DatabaseName": "DocumentStorage",
       "ProviderTypeString": "MongoDbEf",
       "IsEnabled": false,
-      "Priority": 4
+      "Priority": 5
     }
   ],
-  "DefaultStorageGuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "DefaultStorageGuid": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
   "CacheTimeoutMinutes": 30,
   "MaxRetryAttempts": 3
 }
