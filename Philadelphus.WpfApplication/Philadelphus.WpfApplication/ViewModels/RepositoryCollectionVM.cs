@@ -66,19 +66,19 @@ namespace Philadelphus.WpfApplication.ViewModels
                         vm.TreeRepository = item;
                         _treeRepositoriesVMs.Add(vm);
                     }
-                    //for (int i = 0; i < 5; i++)
-                    //{
-                    //    var vm = new RepositoryExplorerVM();
-                        
-                    //    //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
-                    //    //Временно
-                        
-                    //    TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
-                    //    //Временно
-                    //    treeRepository.Name = $"TEST {i}";
-                    //    vm.TreeRepository = treeRepository;
-                    //    _treeRepositoriesVMs.Add(vm);
-                    //}
+                    for (int i = 0; i < 5; i++)
+                    {
+                        var vm = new RepositoryExplorerVM();
+
+                        //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
+                        //Временно
+
+                        TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
+                        //Временно
+                        treeRepository.Name = $"TEST {i}";
+                        vm.TreeRepository = treeRepository;
+                        _treeRepositoriesVMs.Add(vm);
+                    }
                 }
                 return _treeRepositoriesVMs;
             }

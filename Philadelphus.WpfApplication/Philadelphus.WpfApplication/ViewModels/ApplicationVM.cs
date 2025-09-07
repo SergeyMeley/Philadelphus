@@ -48,18 +48,33 @@ namespace Philadelphus.WpfApplication.ViewModels
             _startWindow = new StartWindow() { DataContext = this };
             _startWindow.Show();
             // ВРЕМЕННО!!!
-            //RepositoryCollectionViewModel.CurrentRepositoryExplorerVM = RepositoryCollectionViewModel.TreeRepositoriesVMs.FirstOrDefault();
+            //RepositoryCollectionVM.CurrentRepositoryExplorerVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault();
             // ВРЕМЕННО!!!
             //_mainWindow = new MainWindow() { DataContext = this };
         }
 
-        public string UserName = "Sergey";
+        private string _userName;
+        public string UserName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_userName))
+                {
+                    _userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                }
+                return _userName;
+            }
+            private set
+            {
+                _userName = value;
+            }
+        }
         public string Title 
         { 
             get
             {
                 var title = "Чубушник";
-                var repositoryName = _repositoryCollectionViewModel?.CurrentRepositoryExplorerVM?.TreeRepository?.Name;
+                var repositoryName = _repositoryCollectionVM?.CurrentRepositoryExplorerVM?.TreeRepository?.Name;
                 if (String.IsNullOrEmpty(repositoryName) == false)
                 {
                     title = $"{repositoryName} - Чубушник";
@@ -68,22 +83,25 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private RepositoryCollectionVM _repositoryCollectionViewModel = new RepositoryCollectionVM() { DataStoragesSettingsVM = _dataStoragesSettingsVM };        
-        public RepositoryCollectionVM RepositoryCollectionViewModel
+        private RepositoryCollectionVM _repositoryCollectionVM = new RepositoryCollectionVM() { DataStoragesSettingsVM = _dataStoragesSettingsVM };        
+        public RepositoryCollectionVM RepositoryCollectionVM
         {
             get 
             { 
-                return _repositoryCollectionViewModel; 
+                return _repositoryCollectionVM; 
             } 
         }
 
-        private RepositoryExplorerVM _repositoryViewModel = new RepositoryExplorerVM();
-        public RepositoryExplorerVM RepositoryExplorerViewModel 
+        public RepositoryExplorerVM RepositoryExplorerVM 
         { 
             get 
             { 
-                return _repositoryViewModel; 
+                return _repositoryCollectionVM.CurrentRepositoryExplorerVM; 
             } 
+            set
+            {
+                _repositoryCollectionVM.CurrentRepositoryExplorerVM = value;
+            }
         }
 
         private int _currentProgress = 0;
@@ -111,7 +129,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_mainWindow == null)
                         _mainWindow = new MainWindow() { DataContext = this };
-                    _mainWindow.Show();
+                        _mainWindow.Show();
                     
                     //_startWindow.Visibility = Visibility.Hidden;
                     _startWindow.Close();

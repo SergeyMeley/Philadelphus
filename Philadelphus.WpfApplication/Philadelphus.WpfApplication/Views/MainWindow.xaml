@@ -115,8 +115,8 @@
                                 </Style>
                             </RibbonComboBox.Style>
                         </RibbonComboBox>-->
-                        <ComboBox ItemsSource="{Binding RepositoryCollectionViewModel.TreeRepositoriesVMs}" DisplayMemberPath="TreeRepository.Name" SelectedItem="{Binding RepositoryCollectionViewModel.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200"></ComboBox>
-                        <RibbonButton Label="Настроить список репозиториев" DataContext="{Binding RepositoryCollectionViewModel}" Command="{Binding OpenRepositoryCollectionSettingsWindow}" />
+                        <ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="TreeRepository.Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200"></ComboBox>
+                        <RibbonButton Label="Настроить список репозиториев" DataContext="{Binding RepositoryCollectionVM}" Command="{Binding OpenRepositoryCollectionSettingsWindow}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Иерархия репозитория">
                         <RibbonButton Label="Добавить собственный корень" />
@@ -229,7 +229,7 @@
                         <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2" Background="White">
                             <TabControl Margin="2">
                                 <TabItem Header="Репозиторий">
-                                    <ctrls:RepositoryExplorer DataContext="{Binding RepositoryCollectionViewModel.CurrentRepositoryExplorerVM}"></ctrls:RepositoryExplorer>
+                                    <ctrls:RepositoryExplorer DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"></ctrls:RepositoryExplorer>
                                 </TabItem>
                                 <TabItem Header="Атрибуты">
                                     <ctrls:AttributeGuide></ctrls:AttributeGuide>

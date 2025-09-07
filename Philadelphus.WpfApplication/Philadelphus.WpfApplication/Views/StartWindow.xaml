@@ -19,20 +19,27 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
             <Run Text="Здравствуйте, "></Run>
-            <Run Text="{Binding UserName}"></Run>
+            <Run Text="{Binding UserName, Mode=OneWay}"></Run>
             <Run Text="! "></Run>
             <Run Text="Выберите репозиторий для начала работы"></Run>
         </TextBlock>
         <GroupBox Grid.Row="1" Header="Заголовки репозиториев">
-            <ListBox DataContext="{Binding RepositoryCollectionViewModel}" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" Margin="2">
+            <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" Margin="2">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Height="20" VerticalAlignment="Center" Margin="2">
                             <Run Text="Наименование: "></Run>
-                            <Run Text="{Binding CurrentRepository}"></Run>
+                            <Run Text="{Binding TreeRepository.Name, Mode=OneWay}"></Run>
+                            <Run Text=". "></Run>
                             <Run Text="Описание: "></Run>
-                            <Run Text="! "></Run>
-                            <Run Text="Выберите репозиторий для начала работы"></Run>
+                            <Run Text="{Binding TreeRepository.Description, Mode=OneWay}"></Run>
+                            <Run Text=". "></Run>
+                            <Run Text="Guid: "></Run>
+                            <Run Text="{Binding TreeRepository.Guid, Mode=OneWay}"></Run>
+                            <Run Text=". "></Run>
+                            <Run Text="Хранилище: "></Run>
+                            <Run Text="{Binding TreeRepository.DataStorage.Name, Mode=OneWay}"></Run>
+                            <Run Text=". "></Run>
                         </TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
