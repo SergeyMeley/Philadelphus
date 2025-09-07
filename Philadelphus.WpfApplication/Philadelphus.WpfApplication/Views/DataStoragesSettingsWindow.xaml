@@ -32,7 +32,23 @@
             </ListBox>
         </GroupBox>
         <GroupBox Grid.Row="0" Header="Выбрать хранилище">
-
+            <ListBox DataContext="{Binding DataStoragesSettingsVM}" ItemsSource="{Binding DataStorages}" SelectedItem="{Binding SelectedDataStorage}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="Наименование: "></Run>
+                            <Run Text="{Binding Name}"></Run>
+                            <Run Text=". "></Run>
+                            <Run Text="Описание: "></Run>
+                            <Run Text="{Binding Description}"></Run>
+                            <Run Text=". "></Run>
+                            <Run Text="Guid: "></Run>
+                            <Run Text="{Binding Guid}"></Run>
+                            <Run Text=". "></Run>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </GroupBox>
         <Expander Grid.Row="1" IsExpanded="False" Header="Добавить новое хранилище">
             

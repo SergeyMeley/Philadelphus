@@ -1,12 +1,15 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Handlers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Globalization;
 using System.Windows;
 
@@ -22,6 +25,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                 if (_dataStoragesSettingsVM == null)
                 {
                     _dataStoragesSettingsVM = new DataStoragesSettingsVM();
+                }
+                var service = new StorageConfigService();
+                service.LoadConfig();
+                
+                foreach (var setting in service.GetAllStorageModels())
+                {
+                    _dataStoragesSettingsVM.DataStorages.Add(setting);
                 }
                 return _dataStoragesSettingsVM;
             }
