@@ -14,6 +14,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
     internal interface IHavingOwnDataStorageModel
     {
         internal IDataStorageModel OwnDataStorage { get; }
-        public bool SetInfrastructureRepository(IDataStorageModel storage);
+        public bool ChangeDataStorage(IDataStorageModel storage);
     }
 }

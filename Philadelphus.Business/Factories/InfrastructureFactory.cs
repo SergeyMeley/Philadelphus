@@ -13,17 +13,17 @@ namespace Philadelphus.Business.Factories
     {
         internal static IMainEntitiesInfrastructureRepository GetMainEntitiesInfrastructure(InfrastructureTypes repositoryType)
         {
-            IMainEntitiesInfrastructureRepository mainEntitiesRepository;
+            IMainEntitiesInfrastructureRepository mainEntitiesRepository = null;
             switch (repositoryType)
             {
                 case InfrastructureTypes.WindowsDirectory:
-                    mainEntitiesRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
+                    //mainEntitiesRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
                     break;
                 case InfrastructureTypes.PostgreSql:
-                    mainEntitiesRepository = new PostgreInfrastructure.Repositories.PostgreMainEntityInfrastructure();
+                    mainEntitiesRepository = new PostgreEfRepository.Repositories.MainEntitiesInfrastructureRepository();
                     break;
                 case InfrastructureTypes.MongoDb:
-                    mainEntitiesRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
+                    //mainEntitiesRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
                     break;
                 default:
                     throw new Exception($"Неизвестная инфраструктура ({repositoryType.ToString()}), измените настройки и повторите попытку.");

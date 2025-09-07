@@ -4,10 +4,7 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
 {
     public interface IMainEntitiesInfrastructureRepository : IInfrastructureRepository
     {
-        public bool CanConnect();
-        MainEntitiesCollection GetMainEntitiesCollection();        //удалить?
         # region [ Select ]
-        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes);
         public IEnumerable<TreeRoot> SelectRoots();
         public IEnumerable<TreeNode> SelectNodes();
         public IEnumerable<TreeLeave> SelectLeaves();
@@ -16,7 +13,6 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
         public IEnumerable<AttributeValue> SelectAttributeValues();
         #endregion
         #region [ Insert ]
-        public long InsertRepositories(IEnumerable<TreeRepository> repositories);
         public long InsertRoots(IEnumerable<TreeRoot> roots);
         public long InsertNodes(IEnumerable<TreeNode> nodes);
         public long InsertLeaves(IEnumerable<TreeLeave> leaves);
@@ -25,7 +21,6 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
         public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues);
         #endregion
         #region [ Delete ]
-        public long DeleteRepositories(IEnumerable<TreeRepository> repositories);
         public long DeleteRoots(IEnumerable<TreeRoot> roots);
         public long DeleteNodes(IEnumerable<TreeNode> nodes);
         public long DeleteLeaves(IEnumerable<TreeLeave> leaves);
@@ -34,7 +29,6 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
         public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues);
         #endregion
         #region [ Update ]
-        public long UpdateRepositories(IEnumerable<TreeRepository> repositories);
         public long UpdateRoots(IEnumerable<TreeRoot> roots);
         public long UpdateNodes(IEnumerable<TreeNode> nodes);
         public long UpdateLeaves(IEnumerable<TreeLeave> leaves);

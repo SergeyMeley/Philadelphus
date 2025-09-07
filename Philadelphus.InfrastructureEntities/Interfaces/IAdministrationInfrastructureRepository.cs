@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.Interfaces
 {
-    public interface IAdministrationRepository
+    public interface IAdministrationInfrastructureRepository : IInfrastructureRepository
     {
     }
 }

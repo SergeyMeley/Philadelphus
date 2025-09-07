@@ -18,7 +18,7 @@ using ZstdSharp;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeNodeModel : TreeRepositoryMemberBaseModel, IParentModel, ITreeRootMemberModel, IHavingOwnDataStorageModel
+    public class TreeNodeModel : TreeRepositoryMemberBaseModel, IParentModel, ITreeRootMemberModel
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Node; }
         public IMainEntitiesInfrastructureRepository Infrastructure { get; private set; }

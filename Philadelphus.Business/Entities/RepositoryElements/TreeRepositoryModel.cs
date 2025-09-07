@@ -33,7 +33,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             Childs = new ObservableCollection<IChildrenModel>();
         }
 
-        public bool SetInfrastructureRepository(IDataStorageModel storage)
+        public bool ChangeDataStorage(IDataStorageModel storage)
         {
             OwnDataStorage = storage;
             return true;
