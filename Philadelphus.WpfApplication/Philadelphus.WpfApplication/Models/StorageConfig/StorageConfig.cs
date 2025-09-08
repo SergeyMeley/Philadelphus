@@ -9,8 +9,8 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
     public class StorageConfig
     {
         public List<StorageModelConfig> DataStorageModels { get; set; } = new();
-        public Guid DefaultStorageGuid { get; set; }
-        public int CacheTimeoutMinutes { get; set; } = 30;
-        public int MaxRetryAttempts { get; set; } = 3;
+        //public Guid DefaultStorageGuid { get; set; }
+        //public int CacheTimeoutMinutes { get; set; } = 30;
+        //public int MaxRetryAttempts { get; set; } = 3;
     }
 }

@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
         mc:Ignorable="d"
-        Title="StartWindow" MinHeight="200" MinWidth="400">
+        Title="StartWindow"
+        MinHeight="500" MinWidth="1000"
+        WindowState="Maximized">
     <Window.Visibility>
         <Binding Path="StartWindowVisibility"/>
     </Window.Visibility>
@@ -46,7 +48,7 @@
             </ListBox>
         </GroupBox>
         <Button Grid.Row="2" Content="Добавить существующий репозиторий" Height="30" Command="{Binding AddExistRepository}" Margin="2"></Button>
-        <Expander Grid.Row="3" Header="Создание нового репозитория" IsExpanded="False">
+        <Expander Grid.Row="3" Header="Создание нового репозитория" IsExpanded="True">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"></ColumnDefinition>

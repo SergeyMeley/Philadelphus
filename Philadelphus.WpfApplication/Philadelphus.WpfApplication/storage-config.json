@@ -1,58 +1,49 @@
 {
   "DataStorageModels": [
     {
-      "TypeName": "SqlServerStorageModel",
-      "GuidString": "b7d28b7b-a2fa-40f8-9a35-d3f68a15c32d",
+      "TypeName": "DataStorageModel",
+      "Guid": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
+      "Name": "PostgreSQL localhost",
+      "Description": "Сервер PostgreSQL на домашнем ПК",
+      "ConnectionString": "Host=192.168.0.64;Port=5433;Username=postgres;Password=Dniwe2002;Database=philadelphus;",
+      "ProviderTypeString": "PostgreSqlEf"
+    },
+    {
+      "TypeName": "DataStorageModel",
+      "Guid": "4c04583e-d57a-40c2-b281-3676af36dc54",
+      "Name": "PostgreSQL server",
+      "Description": "Сервер PostgreSQL на локальном домашнем сервере",
+      "ConnectionString": "Host=localhost;Port=5434;Username=postgres;Password=Dniwe2002;Database=philadelphus;",
+      "ProviderTypeString": "PostgreSqlEf"
+    }
+  ],
+  "ReservStorageModels": [
+    {
+      "TypeName": "DataStorageModel",
+      "Guid": "b7d28b7b-a2fa-40f8-9a35-d3f68a15c32d",
       "Name": "Основное SQL Server хранилище",
       "Description": "Основная база данных на SQL Server для production",
       "ConnectionString": "Server=localhost;Database=ProductionDB;Trusted_Connection=true;TrustServerCertificate=true;",
-      "ProviderTypeString": "MsSqlServerEf",
-      "IsEnabled": true,
-      "Priority": 1
+      "ProviderTypeString": "MsSqlServerEf"
     },
     {
-      "TypeName": "PostgreSqlStorageModel",
-      "GuidString": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
-      "Name": "Резервное PostgreSQL хранилище",
-      "Description": "Резервная база данных на PostgreSQL",
-      "ConnectionString": "Host=localhost;Database=BackupDB;Username=admin;Password=secret123",
-      "ProviderTypeString": "PostgreSqlEf",
-      "IsEnabled": true,
-      "Priority": 2
-    },
-    {
-      "TypeName": "PostgreSqlStorageModel",
-      "GuidString": "4c04583e-d57a-40c2-b281-3676af36dc54",
-      "Name": "Резервное PostgreSQL хранилище",
-      "Description": "Резервная база данных на PostgreSQL",
-      "ConnectionString": "Host=localhost;Database=BackupDB;Username=admin;Password=secret123",
-      "ProviderTypeString": "PostgreSqlEf",
-      "IsEnabled": true,
-      "Priority": 3
-    },
-    {
-      "TypeName": "SqliteStorageModel",
-      "GuidString": "da98c450-ec75-49ee-8aff-c037e08dbbfb",
+      "TypeName": "DataStorageModel",
+      "Guid": "da98c450-ec75-49ee-8aff-c037e08dbbfb",
       "Name": "Локальное SQLite хранилище",
       "Description": "Локальная база для тестирования и разработки",
       "ConnectionString": "Data Source=localstorage.db",
-      "ProviderTypeString": "SQLite",
-      "IsEnabled": true,
-      "Priority": 4
+      "ProviderTypeString": "SQLite"
     },
     {
-      "TypeName": "MongoDbStorageModel",
-      "GuidString": "ca041a1a-c96c-4239-b92c-87f0e9e4da69",
+      "TypeName": "DataStorageModel",
+      "Guid": "ca041a1a-c96c-4239-b92c-87f0e9e4da69",
       "Name": "Документное MongoDB хранилище",
       "Description": "Хранилище для документов и неструктурированных данных",
       "ConnectionString": "mongodb://localhost:27017",
       "DatabaseName": "DocumentStorage",
-      "ProviderTypeString": "MongoDbEf",
-      "IsEnabled": false,
-      "Priority": 5
+      "ProviderTypeString": "MongoDbEf"
     }
   ],
-  "DefaultStorageGuid": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
   "CacheTimeoutMinutes": 30,
   "MaxRetryAttempts": 3
 }

@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
         mc:Ignorable="d"
-        Title="Настройка хранилищ" Height="450" Width="800">
+        Title="Настройка хранилищ"
+        MinHeight="500" MinWidth="1000"
+        WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="Выбрать хранилище">
             <ListBox DataContext="{Binding DataStoragesSettingsVM}" ItemsSource="{Binding DataStorages}" SelectedItem="{Binding SelectedDataStorage}">
@@ -26,6 +28,9 @@
                             <Run Text="Guid: "></Run>
                             <Run Text="{Binding Guid, Mode=OneWay}"></Run>
                             <Run Text=". "></Run>
+                            <Run Text="Доступность: "></Run>
+                            <Run Text="{Binding IsAvailable, Mode=OneWay}"></Run>
+                            <Run Text=". "></Run>
                         </TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -34,6 +39,6 @@
         <Expander Grid.Row="1" IsExpanded="False" Header="Добавить новое хранилище">
             
         </Expander>
-        <Button Grid.Row="2" Content="Подтвердить"></Button>
+        <Button Grid.Row="2" Height="30" Content="Подтвердить"></Button>
     </Grid>
 </Window>

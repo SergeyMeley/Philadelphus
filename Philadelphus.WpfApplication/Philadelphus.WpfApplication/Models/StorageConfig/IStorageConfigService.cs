@@ -11,7 +11,7 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
     {
         StorageConfig LoadConfig(string filePath = "storage-config.json");
         IDataStorageModel? CreateStorageModel(Guid modelGuid);
-        IDataStorageModel? GetDefaultStorageModel();
-        List<IDataStorageModel> GetEnabledStorageModels();
+        //IDataStorageModel? GetDefaultStorageModel();
+        //List<IDataStorageModel> GetEnabledStorageModels();
     }
 }

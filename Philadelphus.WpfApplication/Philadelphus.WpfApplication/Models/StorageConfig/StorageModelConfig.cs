@@ -10,10 +10,10 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
     public class StorageModelConfig
     {
         public string TypeName { get; set; } = string.Empty;
-        public string GuidString { get; set; } = string.Empty;
-        public Guid Guid { get => Guid.Parse(GuidString); set => GuidString = value.ToString(); }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        //public string GuidString { get => Guid.ToString(); set => Guid = Guid.Parse(GuidString); }
+        public Guid Guid { get; set; }//{ get => Guid.Parse(GuidString); set => GuidString = value.ToString(); }
         public string ConnectionString { get; set; } = string.Empty;
         public string ProviderTypeString { get; set; } = string.Empty;
         public InfrastructureTypes ProviderType 
@@ -25,9 +25,9 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
             }
             set => ProviderTypeString = value.ToString(); 
         }
-        public string? DatabaseName { get; set; }
-        public bool IsEnabled { get; set; } = true;
-        public int Priority { get; set; } = 1;
-        public Dictionary<string, string>? AdditionalParameters { get; set; }
+        //public string? DatabaseName { get; set; }
+        //public bool IsEnabled { get; set; } = true;
+        //public int Priority { get; set; } = 1;
+        //public Dictionary<string, string>? AdditionalParameters { get; set; }
     }
 }

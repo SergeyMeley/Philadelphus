@@ -65,7 +65,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             if (_treeRepository == null)
                 return false;
-            return _treeRepository.OwnDataStorage.CheckAvailability();
+            return _treeRepository.OwnDataStorage.IsAvailable;
         }
 
 

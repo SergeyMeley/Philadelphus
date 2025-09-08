@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.Models.StorageConfig
@@ -28,7 +29,8 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                WriteIndented = true
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
             };
             _config = JsonSerializer.Deserialize<StorageConfig>(json, options);
             return _config ?? throw new InvalidOperationException("Failed to deserialize configuration");
@@ -77,22 +79,22 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
             return builder.Build();
         }
 
-        public IDataStorageModel? GetDefaultStorageModel()
-        {
-            if (_config == null) return null;
-            return CreateStorageModel(_config.DefaultStorageGuid);
-        }
+        //public IDataStorageModel? GetDefaultStorageModel()
+        //{
+        //    if (_config == null) return null;
+        //    return CreateStorageModel(_config.DefaultStorageGuid);
+        //}
 
-        public List<IDataStorageModel> GetEnabledStorageModels()
-        {
-            if (_config == null) return new List<IDataStorageModel>();
+        //public List<IDataStorageModel> GetEnabledStorageModels()
+        //{
+        //    if (_config == null) return new List<IDataStorageModel>();
 
-            return _config.DataStorageModels
-                .Where(m => m.IsEnabled)
-                .OrderBy(m => m.Priority)
-                .Select(m => CreateStorageModel(m.Guid)!)
-                .Where(m => m != null)
-                .ToList();
-        }
+        //    return _config.DataStorageModels
+        //        .Where(m => m.IsEnabled)
+        //        .OrderBy(m => m.Priority)
+        //        .Select(m => CreateStorageModel(m.Guid)!)
+        //        .Where(m => m != null)
+        //        .ToList();
+        //}
     }
 }
