@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Philadelphus.PostgreEfRepository;
+using Philadelphus.PostgreEfRepository.Contexts;
 
 #nullable disable
 
 namespace Philadelphus.PostgreEfRepository.Migrations
 {
-    [DbContext(typeof(PhiladelphusContext))]
+    [DbContext(typeof(MainEntitiesPhiladelphusContext))]
     partial class PhiladelphusContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

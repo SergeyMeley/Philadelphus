@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Extensions.Options;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.PostgreEfRepository;
+using Philadelphus.PostgreEfRepository.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,21 +15,17 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfMainEntitiesInfrastructureRepository : IMainEntitiesInfrastructureRepository
     {
-        private readonly PhiladelphusContext _context;
+        private readonly MainEntitiesPhiladelphusContext _context;
         public PostgreEfMainEntitiesInfrastructureRepository(string connectionString)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<PhiladelphusContext>();
-            optionsBuilder.UseNpgsql(connectionString);
-            _context = new PhiladelphusContext(optionsBuilder.Options);
+            //var optionsBuilder = new DbContextOptionsBuilder<MainEntitiesPhiladelphusContext>();
+            //optionsBuilder.UseNpgsql(connectionString);
+            //_context = new MainEntitiesPhiladelphusContext(optionsBuilder.Options);
+            _context = new MainEntitiesPhiladelphusContext(connectionString);
         }
         public bool CheckAvailability()
         {
-            bool result = false;
-            //using (var context = new PhiladelphusContext())
-            //{
-            //    result = context.Database.CanConnect();
-            //}
-            return result;
+            return _context.Database.CanConnect();
         }
         public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSqlEf;
         

@@ -17,14 +17,17 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public InfrastructureTypes InfrastructureType { get; }
         public ITreeRepositoryHeadersInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; set; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; set; }
-        public bool CheckAvailability()
-        {
-            if (TreeRepositoryHeadersInfrastructureRepository.CheckAvailability() == false)
-                return false;
-            if (MainEntitiesInfrastructureRepository.CheckAvailability() == false)
-                return false;
-            return true;
+        public bool IsAvailable {
+            get
+            {
+                if (TreeRepositoryHeadersInfrastructureRepository.CheckAvailability() == false)
+                    return false;
+                if (MainEntitiesInfrastructureRepository.CheckAvailability() == false)
+                    return false;
+                return true;
+            }
         }
+        
         internal DataStorageModel(Guid guid, string name, string description)
         {
             Guid = guid;

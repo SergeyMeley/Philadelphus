@@ -2,6 +2,7 @@
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.PostgreEfRepository.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,21 +13,17 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoryHeadersInfrastructureRepository
     {
-        private readonly PhiladelphusContext _context;
+        private TreeRepositoryHeadersPhiladelphusContext _context;
         public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<PhiladelphusContext>();
-            optionsBuilder.UseNpgsql(connectionString);
-            _context = new PhiladelphusContext(optionsBuilder.Options);
+            //var optionsBuilder = new DbContextOptionsBuilder<TreeRepositoryHeadersPhiladelphusContext>();
+            //optionsBuilder.UseNpgsql(connectionString);
+            //_context = new TreeRepositoryHeadersPhiladelphusContext(optionsBuilder.Options);
+            _context = new TreeRepositoryHeadersPhiladelphusContext(connectionString);
         }
         public bool CheckAvailability()
         {
-            bool result = false;
-            //using (var context = new PhiladelphusContext())
-            //{
-            //    result = context.Database.CanConnect();
-            //}
-            return result;
+            return _context.Database.CanConnect();
         }
         public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSqlEf;
         public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)

@@ -8,11 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Philadelphus.PostgreEfRepository
+namespace Philadelphus.PostgreEfRepository.Contexts
 {
-    public partial class PhiladelphusContext : DbContext
+    public partial class MainEntitiesPhiladelphusContext : DbContext
     {
-        public PhiladelphusContext(DbContextOptions<PhiladelphusContext> options)
+        private readonly string _connectionString;
+        public MainEntitiesPhiladelphusContext(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+        public MainEntitiesPhiladelphusContext(DbContextOptions<MainEntitiesPhiladelphusContext> options)
             : base(options)
         {
         }
@@ -38,10 +43,14 @@ namespace Philadelphus.PostgreEfRepository
         public virtual DbSet<TreeRoot> RootDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-            => optionsBuilder
-            .UseNpgsql("Host=192.168.0.64;Port=5433;Username=postgres;Password=Dniwe2002;Database=philadelphus")
-            .UseLazyLoadingProxies();
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder
+                    .UseNpgsql(_connectionString)
+                    .UseLazyLoadingProxies();
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
