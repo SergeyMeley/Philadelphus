@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.OtherEntities
 {
-    internal class DataStoragesCollection
+    public class DataStoragesCollection
     {
         public List<DataStorage> DataStorages { get; set; }
     }

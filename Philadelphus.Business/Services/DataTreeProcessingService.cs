@@ -46,7 +46,7 @@ namespace Philadelphus.Business.Services
                 var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
                 if (dataStorage.GetType().IsAssignableFrom(typeof(ITreeRepositoryHeadersInfrastructureRepository)))
                 {
-                    result.AddRange(converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories(new List<string>()))?.ToList());
+                    result.AddRange(converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories())?.ToList());
                 }
             }
             return result;

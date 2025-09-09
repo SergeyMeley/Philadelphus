@@ -63,7 +63,7 @@ namespace Philadelphus.InfrastructureConverters.Converters
                     break;
             }
             var builder = new DataStorageBuilder()
-                .SetGeneralParameters(entity.Name, entity.Description, entity.Guid)
+                .SetGeneralParameters(entity.Name, entity.Description, entity.Guid, entity.InfrastructureType)
                 .SetRepository(dataStorageInfrastructureRepository)
                 .SetRepository(treeRepositoryHeadersInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);

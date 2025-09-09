@@ -25,7 +25,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             return _context.Database.CanConnect();
         }
-        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
+        public IEnumerable<TreeRepository> SelectRepositories()
         {
             if (CheckAvailability() == false)
                 return null;

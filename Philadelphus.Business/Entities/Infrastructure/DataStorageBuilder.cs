@@ -1,4 +1,5 @@
-﻿using Philadelphus.InfrastructureEntities.Interfaces;
+﻿using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,11 @@ namespace Philadelphus.Business.Entities.Infrastructure
         {
 
         }
-        public DataStorageBuilder SetGeneralParameters(string name, string description, Guid guid)
+        public DataStorageBuilder SetGeneralParameters(string name, string description, Guid guid, InfrastructureTypes infrastructureType)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description) || guid == Guid.Empty)
                 throw new ArgumentException("Переданы некорректные параметры");
-            _storageModel = new DataStorageModel(guid, name, description);
+            _storageModel = new DataStorageModel(guid, name, description, infrastructureType);
             return this;
         }
         public DataStorageBuilder SetRepository(IDataStorageInfrastructureRepository repository)

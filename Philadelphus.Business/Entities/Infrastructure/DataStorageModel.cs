@@ -14,27 +14,30 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public Guid Guid { get; }
         public string Name { get; }
         public string Description { get; }
+        public InfrastructureTypes InfrastructureType { get; set; }
         public IDataStorageInfrastructureRepository DataStorageInfrastructureRepositoryRepository { get; set; }
         public ITreeRepositoryHeadersInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; set; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; set; }
         public bool IsAvailable {
             get
             {
-                if (DataStorageInfrastructureRepositoryRepository.CheckAvailability() == false)
+                if (DataStorageInfrastructureRepositoryRepository?.CheckAvailability() == false)
                     return false;
-                if (TreeRepositoryHeadersInfrastructureRepository.CheckAvailability() == false)
+                if (TreeRepositoryHeadersInfrastructureRepository?.CheckAvailability() == false)
                     return false;
-                if (MainEntitiesInfrastructureRepository.CheckAvailability() == false)
+                if (MainEntitiesInfrastructureRepository?.CheckAvailability() == false)
                     return false;
                 return true;
             }
         }
-        
-        internal DataStorageModel(Guid guid, string name, string description)
+
+
+        internal DataStorageModel(Guid guid, string name, string description, InfrastructureTypes infrastructureType)
         {
             Guid = guid;
             Name = name;
             Description = description;
+            InfrastructureType = infrastructureType;
         }
     }
 }

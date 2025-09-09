@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Philadelphus.JsonRepository.Repositories
@@ -19,7 +21,21 @@ namespace Philadelphus.JsonRepository.Repositories
 
         public IEnumerable<DataStorage> SelectDataStorages()
         {
-            throw new NotImplementedException();
+            var filePath = "storages.json";
+            DataStoragesCollection resultCollection = null;
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Конфигурационный файл не найден: {filePath}");
+            }
+            var json = File.ReadAllText(filePath);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+            resultCollection = JsonSerializer.Deserialize<DataStoragesCollection>(json, options);
+            return resultCollection.DataStorages ?? throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
         }
 
         public IEnumerable<TreeRepository> SelectRepositories()
@@ -49,13 +65,23 @@ namespace Philadelphus.JsonRepository.Repositories
 
         public long InsertDataStorages(IEnumerable<DataStorage> storages)
         {
-            throw new NotImplementedException();
+            var filePath = "storages.json";
+            var collection = new DataStoragesCollection() { DataStorages = storages.ToList() };
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Converters = { new JsonStringEnumConverter() }
+            };
+            var json = JsonSerializer.Serialize<DataStoragesCollection>(collection, options);
+            File.WriteAllText(filePath, json);
+
+            return storages.Count();
         }
 
         public long InsertRepositories(IEnumerable<TreeRepository> repositories)
         {
             throw new NotImplementedException();
         }
-
     }
 }
