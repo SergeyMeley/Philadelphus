@@ -27,8 +27,6 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             return _context.Database.CanConnect();
         }
-        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSqlEf;
-        
 
         public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
         {

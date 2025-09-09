@@ -9,6 +9,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class TreeRepository : EntityBase
     {
+        public Guid OwnDataStorageGuid { get; set; }
         public List<Guid> ChildTreeRootGuids { get; set; } = new List<Guid>();
         public TreeRepository()
         {

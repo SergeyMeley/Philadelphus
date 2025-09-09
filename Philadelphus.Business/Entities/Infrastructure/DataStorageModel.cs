@@ -14,12 +14,14 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public Guid Guid { get; }
         public string Name { get; }
         public string Description { get; }
-        public InfrastructureTypes InfrastructureType { get; }
+        public IDataStorageInfrastructureRepository DataStorageInfrastructureRepositoryRepository { get; set; }
         public ITreeRepositoryHeadersInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; set; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; set; }
         public bool IsAvailable {
             get
             {
+                if (DataStorageInfrastructureRepositoryRepository.CheckAvailability() == false)
+                    return false;
                 if (TreeRepositoryHeadersInfrastructureRepository.CheckAvailability() == false)
                     return false;
                 if (MainEntitiesInfrastructureRepository.CheckAvailability() == false)

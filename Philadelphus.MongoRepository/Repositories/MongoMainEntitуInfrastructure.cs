@@ -13,9 +13,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.MongoRepository.Repositories
 {
-    public class MongoMainEntitуInfrastructure : IMainEntitiesInfrastructure
+    public class MongoMainEntitуInfrastructure : IMainEntitiesInfrastructureRepository
     {
-        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.MongoDb;
         MongoClient _client;
         IMongoDatabase _database;
         public MongoMainEntitуInfrastructure()
@@ -264,6 +263,11 @@ namespace Philadelphus.MongoRepository.Repositories
                 collection.InsertOne(item);
             }
             return entitie.Count();
+        }
+
+        public bool CheckAvailability()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public Guid Guid { get; }
         public string Name { get; }
         public string Description { get; }
-        public InfrastructureTypes InfrastructureType { get; }
+        public InfrastructureTypes InfrastructureType { get; set; }
+        public IDataStorageInfrastructureRepository DataStorageInfrastructureRepositoryRepository { get; set; }
         public ITreeRepositoryHeadersInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; set; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; set; }
         public bool IsAvailable { get; }

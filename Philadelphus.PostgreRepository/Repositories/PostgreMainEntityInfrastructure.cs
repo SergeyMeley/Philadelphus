@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.PostgreInfrastructure.Repositories
 {
-    public class PostgreMainEntityInfrastructure : IMainEntitiesInfrastructure
+    public class PostgreMainEntityInfrastructure : IMainEntitiesInfrastructureRepository
     {
-        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSql;
         private readonly Context _context;
         public PostgreMainEntityInfrastructure()
         {
@@ -187,26 +186,6 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.InsertRepositories(IEnumerable<TreeRepository> repositories)
-        {
-            throw new NotImplementedException();
-        }
-
-        long IMainEntitiesInfrastructure.InsertRoots(IEnumerable<TreeRoot> roots)
-        {
-            throw new NotImplementedException();
-        }
-
-        long IMainEntitiesInfrastructure.InsertNodes(IEnumerable<TreeNode> nodes)
-        {
-            throw new NotImplementedException();
-        }
-
-        long IMainEntitiesInfrastructure.InsertLeaves(IEnumerable<TreeLeave> leaves)
-        {
-            throw new NotImplementedException();
-        }
-
         public long InsertAttributes(IEnumerable<ElementAttribute> attributes)
         {
             throw new NotImplementedException();
@@ -257,26 +236,6 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructure.UpdateRepositories(IEnumerable<TreeRepository> repositories)
-        {
-            throw new NotImplementedException();
-        }
-
-        long IMainEntitiesInfrastructure.UpdateRoots(IEnumerable<TreeRoot> roots)
-        {
-            throw new NotImplementedException();
-        }
-
-        long IMainEntitiesInfrastructure.UpdateNodes(IEnumerable<TreeNode> nodes)
-        {
-            throw new NotImplementedException();
-        }
-
-        long IMainEntitiesInfrastructure.UpdateLeaves(IEnumerable<TreeLeave> leaves)
-        {
-            throw new NotImplementedException();
-        }
-
         public long UpdateAttributes(IEnumerable<ElementAttribute> attributes)
         {
             throw new NotImplementedException();
@@ -288,6 +247,41 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
         }
 
         public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        {
+            throw new NotImplementedException();
+        }
+
+        long IMainEntitiesInfrastructureRepository.InsertRoots(IEnumerable<TreeRoot> roots)
+        {
+            return InsertRoots(roots);
+        }
+
+        long IMainEntitiesInfrastructureRepository.InsertNodes(IEnumerable<TreeNode> nodes)
+        {
+            return InsertNodes(nodes);
+        }
+
+        long IMainEntitiesInfrastructureRepository.InsertLeaves(IEnumerable<TreeLeave> leaves)
+        {
+            return InsertLeaves(leaves);
+        }
+
+        long IMainEntitiesInfrastructureRepository.UpdateRoots(IEnumerable<TreeRoot> roots)
+        {
+            return UpdateRoots(roots);
+        }
+
+        long IMainEntitiesInfrastructureRepository.UpdateNodes(IEnumerable<TreeNode> nodes)
+        {
+            return UpdateNodes(nodes);
+        }
+
+        long IMainEntitiesInfrastructureRepository.UpdateLeaves(IEnumerable<TreeLeave> leaves)
+        {
+            return UpdateLeaves(leaves);
+        }
+
+        public bool CheckAvailability()
         {
             throw new NotImplementedException();
         }

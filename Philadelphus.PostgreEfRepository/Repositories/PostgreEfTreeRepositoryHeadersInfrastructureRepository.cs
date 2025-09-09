@@ -25,7 +25,6 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             return _context.Database.CanConnect();
         }
-        public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.PostgreSqlEf;
         public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
         {
             if (CheckAvailability() == false)

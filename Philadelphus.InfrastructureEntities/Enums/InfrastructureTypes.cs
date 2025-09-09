@@ -14,6 +14,8 @@ namespace Philadelphus.InfrastructureEntities.Enums
         MongoDbAdo,
         MongoDbEf,
         MsSqlServerEf,
-        SQLite
+        SQLite,
+        JsonDocument,
+        XmlDocument
     }
 }

@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Tests.Business
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.PostgreEfRepository", "Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj", "{DB6892AB-23F5-4FA8-9877-653C46121A50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.JsonRepository", "Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj", "{EB3D9676-7556-4BE2-8DB8-552CFF858092}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.InfrastructureConverters", "Philadelphus.InfrastructureConverters\Philadelphus.InfrastructureConverters.csproj", "{D83EA472-2898-45BA-A911-E8BEBC7E5A72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{DB6892AB-23F5-4FA8-9877-653C46121A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB6892AB-23F5-4FA8-9877-653C46121A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB6892AB-23F5-4FA8-9877-653C46121A50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB3D9676-7556-4BE2-8DB8-552CFF858092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB3D9676-7556-4BE2-8DB8-552CFF858092}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB3D9676-7556-4BE2-8DB8-552CFF858092}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB3D9676-7556-4BE2-8DB8-552CFF858092}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D83EA472-2898-45BA-A911-E8BEBC7E5A72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D83EA472-2898-45BA-A911-E8BEBC7E5A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D83EA472-2898-45BA-A911-E8BEBC7E5A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D83EA472-2898-45BA-A911-E8BEBC7E5A72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

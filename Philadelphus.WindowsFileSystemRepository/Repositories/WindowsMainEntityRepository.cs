@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace Philadelphus.WindowsFileSystemRepository.Repositories
 {
-    public class WindowsMainEntityRepository : IMainEntitiesInfrastructure
+    public class WindowsMainEntityRepository : IMainEntitiesInfrastructureRepository
     {
         public InfrastructureTypes InfrastructureRepositoryTypes { get; } = InfrastructureTypes.WindowsDirectory;
         public MainEntitiesCollection GetMainEntitiesCollection()
@@ -237,6 +237,11 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             return 0;
+        }
+
+        public bool CheckAvailability()
+        {
+            return true;
         }
         #endregion
     }

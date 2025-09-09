@@ -22,31 +22,44 @@ namespace Philadelphus.Business.Entities.Infrastructure
             _storageModel = new DataStorageModel(guid, name, description);
             return this;
         }
-        public DataStorageBuilder SetRepository(IMainEntitiesInfrastructureRepository repository)
+        public DataStorageBuilder SetRepository(IDataStorageInfrastructureRepository repository)
         {
             if (repository == null)
-                throw new ArgumentNullException();
+                return null;
             if (_storageModel == null)
                 throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
-            _storageModel.MainEntitiesInfrastructureRepository = repository;
+            _storageModel.DataStorageInfrastructureRepositoryRepository = repository;
             return this;
         }
         public DataStorageBuilder SetRepository(ITreeRepositoryHeadersInfrastructureRepository repository)
         {
             if (repository == null)
-                throw new ArgumentNullException();
+                return null;
             if (_storageModel == null)
                 throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
             _storageModel.TreeRepositoryHeadersInfrastructureRepository = repository;
+            return this;
+        }
+        public DataStorageBuilder SetRepository(IMainEntitiesInfrastructureRepository repository)
+        {
+            if (repository == null)
+                return null;
+            if (_storageModel == null)
+                throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
+            _storageModel.MainEntitiesInfrastructureRepository = repository;
             return this;
         }
         public IDataStorageModel Build()
         {
             if (_storageModel == null)
                 return null;
-            if (string.IsNullOrEmpty(_storageModel.Name) || string.IsNullOrEmpty(_storageModel.Description) || _storageModel.Guid == Guid.Empty)
+            if (string.IsNullOrEmpty(_storageModel.Name) 
+                || string.IsNullOrEmpty(_storageModel.Description) 
+                || _storageModel.Guid == Guid.Empty)
                 return null;
-            if (_storageModel.MainEntitiesInfrastructureRepository == null && _storageModel.TreeRepositoryHeadersInfrastructureRepository == null)
+            if (_storageModel.DataStorageInfrastructureRepositoryRepository == null
+                && _storageModel.TreeRepositoryHeadersInfrastructureRepository == null
+                && _storageModel.MainEntitiesInfrastructureRepository == null)
                 return null;
             return _storageModel;
         }
