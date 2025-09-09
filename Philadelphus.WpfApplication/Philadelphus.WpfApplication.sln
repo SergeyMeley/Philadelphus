@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.PostgreEfRepos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.InfrastructureEntities", "..\..\Philadelphus.Libraries\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj", "{B1B66515-E1F7-8737-AE94-1B9DE76433DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.JsonRepository", "..\..\Philadelphus.Libraries\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj", "{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.InfrastructureConverters", "..\..\Philadelphus.Libraries\Philadelphus.InfrastructureConverters\Philadelphus.InfrastructureConverters.csproj", "{93FDF671-8008-9364-060E-061AA6A59DA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93FDF671-8008-9364-060E-061AA6A59DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93FDF671-8008-9364-060E-061AA6A59DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93FDF671-8008-9364-060E-061AA6A59DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93FDF671-8008-9364-060E-061AA6A59DA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

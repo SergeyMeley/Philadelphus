@@ -73,7 +73,7 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
             }
             DataStorageBuilder builder = new DataStorageBuilder();
             builder
-                .SetGeneralParameters(modelConfig.Name, modelConfig.Description, modelConfig.Guid)
+                .SetGeneralParameters(modelConfig.Name, modelConfig.Description, modelConfig.Guid, modelConfig.ProviderType)
                 .SetRepository(treeRepositoryHeadersInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();

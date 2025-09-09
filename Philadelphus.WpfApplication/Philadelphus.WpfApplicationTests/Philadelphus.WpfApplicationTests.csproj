@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.InfrastructureConverters\Philadelphus.InfrastructureConverters.csproj" />
+    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
+    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.WpfApplication\Philadelphus.WpfApplication.csproj" />
   </ItemGroup>
 
