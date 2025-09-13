@@ -151,7 +151,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
-        public RelayCommand OpenDataStorageSettings
+        public RelayCommand OpenDataStorageSettingsCommand
         {
             get
             {

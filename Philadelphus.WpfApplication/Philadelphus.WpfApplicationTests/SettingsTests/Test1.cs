@@ -18,11 +18,11 @@ public class Test1
         {
             new DataStorageBuilder()
                 .SetGeneralParameters("qwe", "dfbdfzbz", Guid.NewGuid(), InfrastructureTypes.JsonDocument)
-                .SetRepository((IDataStorageInfrastructureRepository)repository)
+                .SetRepository((IDataStoragesInfrastructureRepository)repository)
                 .Build().BusinessToDbEntity(),
             new DataStorageBuilder()
                 .SetGeneralParameters("qwe2", "qwewgfd", Guid.NewGuid(), InfrastructureTypes.JsonDocument)
-                .SetRepository((IDataStorageInfrastructureRepository)repository)
+                .SetRepository((IDataStoragesInfrastructureRepository)repository)
                 .Build().BusinessToDbEntity()
         };
         repository.InsertDataStorages(storages);

@@ -50,7 +50,7 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
             var modelConfig = _config?.DataStorageModels.FirstOrDefault(m => m.Guid == modelGuid);
             if (modelConfig == null) 
                 return null;
-            ITreeRepositoryHeadersInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
+            ITreeRepositoriesInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
             switch (modelConfig.ProviderType)
             {
