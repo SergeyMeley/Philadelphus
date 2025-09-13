@@ -12,7 +12,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public IEnumerable<TreeNode> DbTreeNodes { get; set; }
         public IEnumerable<TreeLeave> DbTreeLeaves { get; set; }
         public IEnumerable<ElementAttribute> DbAttributes { get; set; }
-        public IEnumerable<AttributeEntry> DbAttributeEntries { get; set; }
-        public IEnumerable<AttributeValue> DbAttributeValues { get; set; }
+        public IEnumerable<TreeElementAttribute> DbAttributeEntries { get; set; }
+        public IEnumerable<TreeElementAttributeValue> DbAttributeValues { get; set; }
     }
 }

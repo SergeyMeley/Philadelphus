@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class TreeLeave : EntityBase
+    public class TreeLeave : TreeRepositoryMemberBase
     {
         public long ParentTreeNodeGuid { get; set; }
         public string Type { get; set; }

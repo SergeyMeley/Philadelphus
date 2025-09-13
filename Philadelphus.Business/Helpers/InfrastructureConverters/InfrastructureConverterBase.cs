@@ -11,7 +11,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public abstract class InfrastructureConverterBase
     {
-        protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, MainEntityBaseModel businessEntity)
+        protected static IMainEntityModel DbToBusinessMainProperties(IMainEntity dbEntity, MainEntityBaseModel businessEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -36,9 +36,9 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
             return businessEntity;
         }
-        internal abstract IMainEntityModel DbToBusinessEntity(IEntity dbEntity);
-        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection);
-        protected static IEntity BusinessToDbMainProperties(MainEntityBaseModel businessEntity, IEntity dbEntity)
+        internal abstract IMainEntityModel DbToBusinessEntity(IMainEntity dbEntity);
+        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection);
+        protected static IMainEntity BusinessToDbMainProperties(MainEntityBaseModel businessEntity, IMainEntity dbEntity)
         {
             if (businessEntity == null)
                 return null;
@@ -64,7 +64,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
         }
-        internal abstract IEntity BusinessToDbEntity(IMainEntityModel businessEntity);
-        internal abstract IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
+        internal abstract IMainEntity BusinessToDbEntity(IMainEntityModel businessEntity);
+        internal abstract IEnumerable<IMainEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
     }
 }

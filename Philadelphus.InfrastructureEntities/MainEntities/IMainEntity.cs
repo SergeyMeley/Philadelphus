@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public interface IEntity
+    public interface IMainEntity
     {
         public Guid Guid { get; set; }
         public string? ParentGuid { get; set; }

@@ -75,14 +75,14 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             var result = new List<ElementAttribute>();
             return result;
         }
-        public IEnumerable<AttributeEntry> SelectAttributeEntries()
+        public IEnumerable<TreeElementAttribute> SelectAttributeEntries()
         {
-            var result = new List<AttributeEntry>();
+            var result = new List<TreeElementAttribute>();
             return result;
         }
-        public IEnumerable<AttributeValue> SelectAttributeValues()
+        public IEnumerable<TreeElementAttributeValue> SelectAttributeValues()
         {
-            var result = new List<AttributeValue>();
+            var result = new List<TreeElementAttributeValue>();
             return result;
         }
         #endregion
@@ -176,12 +176,12 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AttributeEntry> SelectAttributeEntries(TreeRepository dbTreeRepository)
+        public IEnumerable<TreeElementAttribute> SelectAttributeEntries(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AttributeValue> SelectAttributeValues(TreeRepository dbTreeRepository)
+        public IEnumerable<TreeElementAttributeValue> SelectAttributeValues(TreeRepository dbTreeRepository)
         {
             throw new NotImplementedException();
         }
@@ -191,12 +191,12 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public long InsertAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        public long InsertAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        public long InsertAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }
@@ -226,12 +226,12 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        public long DeleteAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        public long DeleteAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }
@@ -241,12 +241,12 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        public long UpdateAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        public long UpdateAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }

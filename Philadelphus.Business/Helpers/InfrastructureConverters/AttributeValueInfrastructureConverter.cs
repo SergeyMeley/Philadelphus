@@ -14,26 +14,26 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class AttributeValueInfrastructureConverter : InfrastructureConverterBase
     {
-        internal override IEntity BusinessToDbEntity(IMainEntityModel businessEntity)
+        internal override IMainEntity BusinessToDbEntity(IMainEntityModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
-            var result = (AttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeValue());
+            var result = (TreeElementAttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeElementAttributeValue());
             return result;
         }
-        internal override IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
+        internal override IEnumerable<IMainEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
                 return null;
-            var result = new List<AttributeValue>();
+            var result = new List<TreeElementAttributeValue>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (AttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeValue());
+                var entity = (TreeElementAttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeElementAttributeValue());
                 result.Add(entity);
             }
             return result;
         }
-        internal override IMainEntityModel DbToBusinessEntity(IEntity dbEntity)
+        internal override IMainEntityModel DbToBusinessEntity(IMainEntity dbEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -42,7 +42,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //return result;
             return null;
         }
-        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
+        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;

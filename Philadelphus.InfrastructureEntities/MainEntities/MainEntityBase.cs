@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public abstract class EntityBase : IEntity
+    public abstract class MainEntityBase : IMainEntity
     {
         public int Id { get; set; }
         public Guid Guid { get; set; }
@@ -21,7 +21,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public bool IsOriginal { get; set; }
         public bool IsLegacy { get; set; }
         public AuditInfo AuditInfo { get; set; } = new AuditInfo();
-        public EntityBase()
+        public MainEntityBase()
         {
 
         }

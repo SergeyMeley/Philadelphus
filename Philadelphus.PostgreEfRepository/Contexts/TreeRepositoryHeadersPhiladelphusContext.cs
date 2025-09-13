@@ -36,24 +36,34 @@ namespace Philadelphus.PostgreEfRepository.Contexts
         {
             modelBuilder.Entity<AuditInfo>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("audit_info_pkey");
+                entity.HasKey(e => e.Id).HasName("audit_infos_pkey");
 
-                entity.ToTable("audit_info");
+                entity.ToTable("audit_infos");
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.RepositoryElementId).HasColumnName("repository_element_id");
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+                entity.Property(e => e.CreatedOn).HasColumnName("created_on");
+                entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+                entity.Property(e => e.DeletedOn).HasColumnName("deleted_on");
+                entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
+                entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+                entity.Property(e => e.UpdatedContentBy).HasColumnName("updated_content_by");
+                entity.Property(e => e.UpdatedContentOn).HasColumnName("updated_content_on");
+                entity.Property(e => e.UpdatedOn).HasColumnName("updated_on");
+
             });
 
             modelBuilder.Entity<TreeRepository>(entity =>
             {
                 entity.ToTable("repositories");
-                entity.HasBaseType<EntityBase>();
+                entity.HasBaseType<MainEntityBase>();
 
                 //entity.Property(e => e.ChildTreeRootGuids).HasColumnName("root_uuids");
                 entity.Property(e => e.Guid).HasColumnName("uuid");
             });
 
-            modelBuilder.Entity<EntityBase>(entity =>
+            modelBuilder.Entity<MainEntityBase>(entity =>
             {
                 entity.ToTable("repository_elements");
 

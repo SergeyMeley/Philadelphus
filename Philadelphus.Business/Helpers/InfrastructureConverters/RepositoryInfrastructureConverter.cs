@@ -32,7 +32,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             }
             return result;
         }
-        internal override TreeRepositoryModel DbToBusinessEntity(IEntity dbEntity)
+        internal override TreeRepositoryModel DbToBusinessEntity(IMainEntity dbEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -40,7 +40,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             result = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, new Guid(dbEntity.ParentGuid)));
             return result;
         }
-        internal override List<TreeRepositoryModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
+        internal override List<TreeRepositoryModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;

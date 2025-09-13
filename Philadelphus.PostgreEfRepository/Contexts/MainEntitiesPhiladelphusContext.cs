@@ -24,7 +24,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
 
         public virtual DbSet<ElementAttribute> Attributes { get; set; }
 
-        public virtual DbSet<AttributeValue> AttributeValues { get; set; }
+        public virtual DbSet<TreeElementAttributeValue> AttributeValues { get; set; }
 
         //public virtual DbSet<AttributeValueGroup> AttributeValueGroups { get; set; }
 
@@ -38,7 +38,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
 
         public virtual DbSet<TreeRepository> Repositories { get; set; }
 
-        public virtual DbSet<EntityBase> RepositoryElements { get; set; }
+        public virtual DbSet<MainEntityBase> RepositoryElements { get; set; }
 
         public virtual DbSet<TreeRoot> RootDetails { get; set; }
 
@@ -101,7 +101,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
             modelBuilder.Entity<TreeLeave>(entity =>
             {
                 entity.ToTable("leave_details");
-                entity.HasBaseType<EntityBase>();
+                entity.HasBaseType<MainEntityBase>();
 
                 entity.Property(e => e.Id).HasColumnName("repository_element_id");
             });
@@ -121,7 +121,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
             modelBuilder.Entity<TreeNode>(entity =>
             {
                 entity.ToTable("node_details");
-                entity.HasBaseType<EntityBase>();
+                entity.HasBaseType<MainEntityBase>();
 
                 entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.Id).HasColumnName("repository_element_id");
@@ -130,13 +130,13 @@ namespace Philadelphus.PostgreEfRepository.Contexts
             modelBuilder.Entity<TreeRepository>(entity =>
             {
                 entity.ToTable("repositories");
-                entity.HasBaseType<EntityBase>();
+                entity.HasBaseType<MainEntityBase>();
 
                 //entity.Property(e => e.ChildTreeRootGuids).HasColumnName("root_uuids");
                 entity.Property(e => e.Guid).HasColumnName("uuid");
             });
 
-            modelBuilder.Entity<EntityBase>(entity =>
+            modelBuilder.Entity<MainEntityBase>(entity =>
             {
                 entity.ToTable("repository_elements");
 
@@ -147,7 +147,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
             modelBuilder.Entity<TreeRoot>(entity =>
             {
                 entity.ToTable("root_details");
-                entity.HasBaseType<EntityBase>();
+                entity.HasBaseType<MainEntityBase>();
 
                 entity.Property(e => e.Id).HasColumnName("repository_element_id");
             });

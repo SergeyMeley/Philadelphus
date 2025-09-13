@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
 
-    public class TreeRoot : EntityBase
+    public class TreeRoot : TreeRepositoryMemberBase
     {
         public long ParentTreeRepositoryGuid { get; set; }
         public List<long> AttributeGuids { get; set; } = new List<long>();

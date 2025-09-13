@@ -74,11 +74,11 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return null;
         }
-        public IEnumerable<AttributeEntry> SelectAttributeEntries()
+        public IEnumerable<TreeElementAttribute> SelectAttributeEntries()
         {
             return null;
         }
-        public IEnumerable<AttributeValue> SelectAttributeValues()
+        public IEnumerable<TreeElementAttributeValue> SelectAttributeValues()
         {
             return null;
         }
@@ -144,11 +144,11 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return attributes.Count();
         }
-        public long InsertAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        public long InsertAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
         {
             return attributeEntries.Count();
         }
-        public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        public long InsertAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             return attributeValues.Count();
         }
@@ -174,11 +174,11 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        public long DeleteAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
         {
             return 0;
         }
-        public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        public long DeleteAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             return 0;
         }
@@ -230,11 +230,11 @@ namespace Philadelphus.WindowsFileSystemRepository.Repositories
         {
             return 0;
         }
-        public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
+        public long UpdateAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
         {
             return 0;
         }
-        public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
+        public long UpdateAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             return 0;
         }

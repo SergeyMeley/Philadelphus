@@ -13,14 +13,14 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     internal class RootInfrastructureConverter :InfrastructureConverterBase
     {
-        internal override IEntity BusinessToDbEntity(IMainEntityModel businessEntity)
+        internal override IMainEntity BusinessToDbEntity(IMainEntityModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
             var result = (TreeRoot)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
             return result;
         }
-        internal override IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
+        internal override IEnumerable<IMainEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
                 return null;
@@ -32,7 +32,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             }
             return result;
         }
-        internal override IMainEntityModel DbToBusinessEntity(IEntity dbEntity)
+        internal override IMainEntityModel DbToBusinessEntity(IMainEntity dbEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -41,7 +41,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //return result;
             return null;
         }
-        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
+        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;

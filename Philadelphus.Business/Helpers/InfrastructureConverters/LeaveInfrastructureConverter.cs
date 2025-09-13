@@ -32,7 +32,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             }
             return result;
         }
-        internal override TreeLeaveModel DbToBusinessEntity(IEntity dbEntity)
+        internal override TreeLeaveModel DbToBusinessEntity(IMainEntity dbEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -41,7 +41,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //return result;
             return null;
         }
-        internal override List<TreeLeaveModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
+        internal override List<TreeLeaveModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;
