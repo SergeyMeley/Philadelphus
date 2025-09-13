@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -16,14 +17,22 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         private TreeRepositoriesPhiladelphusContext _context;
         public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<TreeRepositoriesPhiladelphusContext>();
-            optionsBuilder
-                .UseNpgsql(connectionString)
-                .UseLazyLoadingProxies();
-            _context = new TreeRepositoriesPhiladelphusContext(optionsBuilder.Options);
-            _context.Database.Migrate();
-            //_context = new TreeRepositoryHeadersPhiladelphusContext(connectionString);
+            //var optionsBuilder = new DbContextOptionsBuilder<TreeRepositoriesPhiladelphusContext>();
+            //optionsBuilder
+            //    .UseNpgsql(connectionString)
+            //    .UseLazyLoadingProxies();
+            //_context = new TreeRepositoriesPhiladelphusContext(optionsBuilder.Options);
+            _context = new TreeRepositoriesPhiladelphusContext(connectionString);
+            if (_context.Database.GetPendingMigrations().ToList().Any())
+            {
+                try
+                {
+                    _context.Database.Migrate();
+                }
+                catch (PostgresException ex) when (ex.SqlState == "42P07") { }
+            }
         }
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository; }
         public bool CheckAvailability()
         {
             return _context.Database.CanConnect();

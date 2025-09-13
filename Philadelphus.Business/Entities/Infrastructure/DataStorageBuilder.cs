@@ -23,31 +23,20 @@ namespace Philadelphus.Business.Entities.Infrastructure
             _storageModel = new DataStorageModel(guid, name, description, infrastructureType);
             return this;
         }
-        public DataStorageBuilder SetRepository(IDataStoragesInfrastructureRepository repository)
+        public DataStorageBuilder SetRepository(IInfrastructureRepository repository)
         {
             if (repository == null)
                 return null;
             if (_storageModel == null)
                 throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
-            _storageModel.DataStorageInfrastructureRepositoryRepository = repository;
-            return this;
-        }
-        public DataStorageBuilder SetRepository(ITreeRepositoriesInfrastructureRepository repository)
-        {
-            if (repository == null)
-                return null;
-            if (_storageModel == null)
-                throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
-            _storageModel.TreeRepositoryHeadersInfrastructureRepository = repository;
-            return this;
-        }
-        public DataStorageBuilder SetRepository(IMainEntitiesInfrastructureRepository repository)
-        {
-            if (repository == null)
-                return null;
-            if (_storageModel == null)
-                throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
-            _storageModel.MainEntitiesInfrastructureRepository = repository;
+            if (_storageModel.InfrastructureRepositories.ContainsKey(repository.EntityGroup))
+            {
+                _storageModel.InfrastructureRepositories[repository.EntityGroup] = repository;
+            }
+            else
+            {
+                _storageModel.InfrastructureRepositories.Add(repository.EntityGroup, repository);
+            }
             return this;
         }
         public IDataStorageModel Build()
@@ -58,9 +47,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
                 || string.IsNullOrEmpty(_storageModel.Description) 
                 || _storageModel.Guid == Guid.Empty)
                 return null;
-            if (_storageModel.DataStorageInfrastructureRepositoryRepository == null
-                && _storageModel.TreeRepositoryHeadersInfrastructureRepository == null
-                && _storageModel.MainEntitiesInfrastructureRepository == null)
+            if (_storageModel.InfrastructureRepositories == null || _storageModel.InfrastructureRepositories.Count == 0)
                 return null;
             return _storageModel;
         }

@@ -14,6 +14,7 @@ namespace Philadelphus.JsonRepository.Repositories
 {
     public class JsonDataStorageAndTreeRepositoryInfrastructureRepository : IDataStoragesInfrastructureRepository, ITreeRepositoriesInfrastructureRepository
     {
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.DataStoragesInfrastructureRepository; }
         public bool CheckAvailability()
         {
             return true;

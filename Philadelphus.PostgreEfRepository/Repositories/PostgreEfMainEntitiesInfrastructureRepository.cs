@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Options;
+using Npgsql;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -22,7 +23,16 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             //optionsBuilder.UseNpgsql(connectionString);
             //_context = new MainEntitiesPhiladelphusContext(optionsBuilder.Options);
             _context = new MainEntitiesPhiladelphusContext(connectionString);
+            if (_context.Database.GetPendingMigrations().ToList().Any())
+            {
+                try
+                {
+                    _context.Database.Migrate();
+                }
+                catch (PostgresException ex) when (ex.SqlState == "42P07") { }
+            }
         }
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntitiesInfrastructureRepository; }
         public bool CheckAvailability()
         {
             return _context.Database.CanConnect();
