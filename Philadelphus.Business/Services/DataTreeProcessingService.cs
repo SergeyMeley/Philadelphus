@@ -44,7 +44,7 @@ namespace Philadelphus.Business.Services
             foreach (var dataStorage in dataStorages)
             {
                 var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
-                if (dataStorage.GetType().IsAssignableFrom(typeof(ITreeRepositoryHeadersInfrastructureRepository)))
+                if (dataStorage.GetType().IsAssignableFrom(typeof(ITreeRepositoriesInfrastructureRepository)))
                 {
                     result.AddRange(converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories())?.ToList());
                 }
@@ -222,7 +222,7 @@ namespace Philadelphus.Business.Services
             //ВРЕМЕННО!!!
 
             var converter = new RepositoryInfrastructureConverter();
-            ((ITreeRepositoryHeadersInfrastructureRepository)result.OwnDataStorage).InsertRepositories(new List<TreeRepository>() { converter.BusinessToDbEntity(result) });
+            ((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepositories(new List<TreeRepository>() { converter.BusinessToDbEntity(result) });
             return result;
         }
 
@@ -291,7 +291,7 @@ namespace Philadelphus.Business.Services
                         break;
                     case EntityTypesModel.Repository:
                         converter = new RepositoryInfrastructureConverter();
-                        ((ITreeRepositoryHeadersInfrastructureRepository)infrastructureRepository).UpdateRepositories((List<TreeRepository>)converter.BusinessToDbEntityCollection(entities));
+                        ((ITreeRepositoriesInfrastructureRepository)infrastructureRepository).UpdateRepositories((List<TreeRepository>)converter.BusinessToDbEntityCollection(entities));
                         break;
                     case EntityTypesModel.Root:
                         converter = new RootInfrastructureConverter();

@@ -5,10 +5,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Philadelphus.PostgreEfRepository.Migrations
+namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,10 +49,10 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     UpdatedOn = table.Column<string>(type: "text", nullable: false),
                     UpdatedBy = table.Column<string>(type: "text", nullable: false),
-                    UpdatedContentOn = table.Column<string>(type: "text", nullable: false),
-                    UpdatedContentBy = table.Column<string>(type: "text", nullable: false),
-                    DeletedOn = table.Column<string>(type: "text", nullable: false),
-                    DeletedBy = table.Column<string>(type: "text", nullable: false)
+                    UpdatedContentOn = table.Column<string>(type: "text", nullable: true),
+                    UpdatedContentBy = table.Column<string>(type: "text", nullable: true),
+                    DeletedOn = table.Column<string>(type: "text", nullable: true),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -66,15 +66,12 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     repository_element_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     uuid = table.Column<Guid>(type: "uuid", nullable: false),
-                    ParentGuid = table.Column<string>(type: "text", nullable: false),
-                    DirectoryPath = table.Column<string>(type: "text", nullable: false),
-                    DirectoryFullPath = table.Column<string>(type: "text", nullable: false),
-                    ConfigPath = table.Column<string>(type: "text", nullable: false),
-                    Sequence = table.Column<long>(type: "bigint", nullable: false),
+                    ParentGuid = table.Column<string>(type: "text", nullable: true),
+                    Sequence = table.Column<long>(type: "bigint", nullable: true),
                     name = table.Column<string>(type: "text", nullable: false),
-                    Alias = table.Column<string>(type: "text", nullable: false),
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    Alias = table.Column<string>(type: "text", nullable: true),
+                    CustomCode = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     HasContent = table.Column<bool>(type: "boolean", nullable: false),
                     IsOriginal = table.Column<bool>(type: "boolean", nullable: false),
                     IsLegacy = table.Column<bool>(type: "boolean", nullable: false),
@@ -138,6 +135,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                 columns: table => new
                 {
                     repository_element_id = table.Column<int>(type: "integer", nullable: false),
+                    OwnDataStorageGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     ChildTreeRootGuids = table.Column<List<Guid>>(type: "uuid[]", nullable: false)
                 },
                 constraints: table =>

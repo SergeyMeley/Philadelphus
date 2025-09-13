@@ -9,7 +9,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public class AuditInfo
     {
         public int Id { get; set; }
-        public int RepositoryElementId { get; set; }
+        public int RepositoryElementUuid { get; set; }
         public bool IsDeleted { get; set; }
         public string CreatedOn { get; set; }
         public string CreatedBy { get; set; }

@@ -11,15 +11,18 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.PostgreEfRepository.Repositories
 {
-    public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoryHeadersInfrastructureRepository
+    public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
-        private TreeRepositoryHeadersPhiladelphusContext _context;
+        private TreeRepositoriesPhiladelphusContext _context;
         public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString)
         {
-            //var optionsBuilder = new DbContextOptionsBuilder<TreeRepositoryHeadersPhiladelphusContext>();
-            //optionsBuilder.UseNpgsql(connectionString);
-            //_context = new TreeRepositoryHeadersPhiladelphusContext(optionsBuilder.Options);
-            _context = new TreeRepositoryHeadersPhiladelphusContext(connectionString);
+            var optionsBuilder = new DbContextOptionsBuilder<TreeRepositoriesPhiladelphusContext>();
+            optionsBuilder
+                .UseNpgsql(connectionString)
+                .UseLazyLoadingProxies();
+            _context = new TreeRepositoriesPhiladelphusContext(optionsBuilder.Options);
+            _context.Database.Migrate();
+            //_context = new TreeRepositoryHeadersPhiladelphusContext(connectionString);
         }
         public bool CheckAvailability()
         {

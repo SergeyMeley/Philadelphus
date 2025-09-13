@@ -13,6 +13,9 @@ namespace Philadelphus.PostgreEfRepository.Contexts
     public partial class MainEntitiesPhiladelphusContext : DbContext
     {
         private readonly string _connectionString;
+        public MainEntitiesPhiladelphusContext()
+        {
+        }
         public MainEntitiesPhiladelphusContext(string connectionString)
         {
             _connectionString = connectionString;
@@ -95,7 +98,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
                 entity.ToTable("audit_info");
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.RepositoryElementId).HasColumnName("repository_element_id");
+                entity.Property(e => e.RepositoryElementUuid).HasColumnName("repository_element_id");
             });
 
             modelBuilder.Entity<TreeLeave>(entity =>

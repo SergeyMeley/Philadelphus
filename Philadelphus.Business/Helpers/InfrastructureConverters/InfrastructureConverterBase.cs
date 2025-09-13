@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //businessEntity.ConfigPath = dbEntity.ConfigPath;
             businessEntity.Name = dbEntity.Name;
             businessEntity.Alias = dbEntity.Alias;
-            businessEntity.CustomCode = dbEntity.Code;
+            businessEntity.CustomCode = dbEntity.CustomCode;
             businessEntity.Description = dbEntity.Description;
             businessEntity.HasContent = dbEntity.HasContent;
             businessEntity.IsOriginal = dbEntity.IsOriginal;
@@ -48,7 +48,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //dbEntity.ConfigPath = businessEntity.ConfigPath;
             dbEntity.Name = businessEntity.Name;
             dbEntity.Alias = businessEntity.Alias;
-            dbEntity.Code = businessEntity.CustomCode;
+            dbEntity.CustomCode = businessEntity.CustomCode;
             dbEntity.Description = businessEntity.Description;
             dbEntity.HasContent = businessEntity.HasContent;
             dbEntity.IsOriginal = businessEntity.IsOriginal;

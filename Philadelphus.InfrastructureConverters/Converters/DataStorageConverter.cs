@@ -31,9 +31,9 @@ namespace Philadelphus.InfrastructureConverters.Converters
         }
         public static IDataStorageModel DbToBusinessEntity(this DataStorage entity)
         {
-            ITreeRepositoryHeadersInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
+            ITreeRepositoriesInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
-            IDataStorageInfrastructureRepository dataStorageInfrastructureRepository = null;
+            IDataStoragesInfrastructureRepository dataStorageInfrastructureRepository = null;
             string connectionString = ConfigurationManager.ConnectionStrings[entity.Guid.ToString()].ConnectionString;
             switch (entity.InfrastructureType)
             {

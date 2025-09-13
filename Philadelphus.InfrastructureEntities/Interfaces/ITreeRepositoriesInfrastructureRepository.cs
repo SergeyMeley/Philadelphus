@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.Interfaces
 {
-    public interface ITreeRepositoryHeadersInfrastructureRepository : IInfrastructureRepository
+    public interface ITreeRepositoriesInfrastructureRepository : IInfrastructureRepository
     {
         public IEnumerable<TreeRepository> SelectRepositories();
         public long InsertRepositories(IEnumerable<TreeRepository> repositories);

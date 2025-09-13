@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.JsonRepository.Repositories
 {
-    public class JsonDataStorageAndTreeRepositoryInfrastructureRepository : IDataStorageInfrastructureRepository, ITreeRepositoryHeadersInfrastructureRepository
+    public class JsonDataStorageAndTreeRepositoryInfrastructureRepository : IDataStoragesInfrastructureRepository, ITreeRepositoriesInfrastructureRepository
     {
         public bool CheckAvailability()
         {

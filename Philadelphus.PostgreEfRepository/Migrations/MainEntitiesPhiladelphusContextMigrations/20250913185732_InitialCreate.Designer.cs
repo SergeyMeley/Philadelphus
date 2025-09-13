@@ -10,11 +10,11 @@ using Philadelphus.PostgreEfRepository.Contexts;
 
 #nullable disable
 
-namespace Philadelphus.PostgreEfRepository.Migrations
+namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     [DbContext(typeof(MainEntitiesPhiladelphusContext))]
-    [Migration("20250824222206_NullableFields2")]
-    partial class NullableFields2
+    [Migration("20250913185732_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("RepositoryElementId")
+                    b.Property<int>("RepositoryElementUuid")
                         .HasColumnType("integer")
                         .HasColumnName("repository_element_id");
 
@@ -79,7 +79,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     b.ToTable("audit_info", (string)null);
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.EntityBase", b =>
+            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,7 +94,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     b.Property<int>("AuditInfoId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Code")
+                    b.Property<string>("CustomCode")
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
@@ -133,16 +133,9 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.AttributeValue", b =>
-                {
-                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.EntityBase");
-
-                    b.ToTable("AttributeValues");
-                });
-
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.ElementAttribute", b =>
                 {
-                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.EntityBase");
+                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase");
 
                     b.PrimitiveCollection<List<long>>("ValueIds")
                         .IsRequired()
@@ -155,9 +148,16 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     b.ToTable("Attributes");
                 });
 
+            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeElementAttributeValue", b =>
+                {
+                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase");
+
+                    b.ToTable("AttributeValues");
+                });
+
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeLeave", b =>
                 {
-                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.EntityBase");
+                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase");
 
                     b.PrimitiveCollection<List<long>>("AttributeGuids")
                         .IsRequired()
@@ -175,7 +175,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", b =>
                 {
-                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.EntityBase");
+                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase");
 
                     b.PrimitiveCollection<List<long>>("AttributeGuids")
                         .IsRequired()
@@ -200,18 +200,21 @@ namespace Philadelphus.PostgreEfRepository.Migrations
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRepository", b =>
                 {
-                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.EntityBase");
+                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase");
 
                     b.PrimitiveCollection<List<Guid>>("ChildTreeRootGuids")
                         .IsRequired()
                         .HasColumnType("uuid[]");
+
+                    b.Property<Guid>("OwnDataStorageGuid")
+                        .HasColumnType("uuid");
 
                     b.ToTable("repositories", (string)null);
                 });
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", b =>
                 {
-                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.EntityBase");
+                    b.HasBaseType("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase");
 
                     b.PrimitiveCollection<List<long>>("AttributeGuids")
                         .IsRequired()
@@ -227,7 +230,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
                     b.ToTable("root_details", (string)null);
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.EntityBase", b =>
+            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase", b =>
                 {
                     b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.AuditInfo", "AuditInfo")
                         .WithMany()
@@ -240,7 +243,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeLeave", b =>
                 {
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.EntityBase", null)
+                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase", null)
                         .WithOne()
                         .HasForeignKey("Philadelphus.InfrastructureEntities.MainEntities.TreeLeave", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -249,7 +252,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", b =>
                 {
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.EntityBase", null)
+                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase", null)
                         .WithOne()
                         .HasForeignKey("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -258,7 +261,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRepository", b =>
                 {
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.EntityBase", null)
+                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase", null)
                         .WithOne()
                         .HasForeignKey("Philadelphus.InfrastructureEntities.MainEntities.TreeRepository", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -267,7 +270,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations
 
             modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", b =>
                 {
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.EntityBase", null)
+                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.MainEntityBase", null)
                         .WithOne()
                         .HasForeignKey("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", "Id")
                         .OnDelete(DeleteBehavior.Cascade)

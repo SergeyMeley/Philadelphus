@@ -23,7 +23,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
             _storageModel = new DataStorageModel(guid, name, description, infrastructureType);
             return this;
         }
-        public DataStorageBuilder SetRepository(IDataStorageInfrastructureRepository repository)
+        public DataStorageBuilder SetRepository(IDataStoragesInfrastructureRepository repository)
         {
             if (repository == null)
                 return null;
@@ -32,7 +32,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
             _storageModel.DataStorageInfrastructureRepositoryRepository = repository;
             return this;
         }
-        public DataStorageBuilder SetRepository(ITreeRepositoryHeadersInfrastructureRepository repository)
+        public DataStorageBuilder SetRepository(ITreeRepositoriesInfrastructureRepository repository)
         {
             if (repository == null)
                 return null;

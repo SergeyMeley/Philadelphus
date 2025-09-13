@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.Interfaces
 {
-    public interface IDataStorageInfrastructureRepository : IInfrastructureRepository
+    public interface IDataStoragesInfrastructureRepository : IInfrastructureRepository
     {
         public IEnumerable<DataStorage> SelectDataStorages();
         public long InsertDataStorages(IEnumerable<DataStorage> storages);

@@ -15,8 +15,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public string Name { get; }
         public string Description { get; }
         public InfrastructureTypes InfrastructureType { get; set; }
-        public IDataStorageInfrastructureRepository DataStorageInfrastructureRepositoryRepository { get; set; }
-        public ITreeRepositoryHeadersInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; set; }
+        public IDataStoragesInfrastructureRepository DataStorageInfrastructureRepositoryRepository { get; set; }
+        public ITreeRepositoriesInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; set; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; set; }
         public bool IsAvailable {
             get
