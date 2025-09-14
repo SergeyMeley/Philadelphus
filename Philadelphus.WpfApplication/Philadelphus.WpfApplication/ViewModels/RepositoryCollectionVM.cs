@@ -16,6 +16,8 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class RepositoryCollectionVM : ViewModelBase
     {
+        private DataTreeProcessingService _dataTreeProcessingService = new DataTreeProcessingService();
+
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
         public RepositoryCollectionVM(DataStoragesSettingsVM dataStoragesSettings)
@@ -39,33 +41,10 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private ObservableCollection<RepositoryExplorerVM> _treeRepositoriesVMs;
+        private ObservableCollection<RepositoryExplorerVM> _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
         public ObservableCollection<RepositoryExplorerVM> TreeRepositoriesVMs
         {
-            get
-            {
-                var treeRepositoryService = new DataTreeProcessingService();
-                var treeRepositories = treeRepositoryService.GetExistTreeRepositories(_dataStoragesSettingsVM.DataStorages);
-                if (treeRepositories != null && _treeRepositoriesVMs == null)
-                {
-                    _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
-                    foreach (var item in treeRepositories)
-                    {
-                        var vm = new RepositoryExplorerVM(item);
-                        _treeRepositoriesVMs.Add(vm);
-                    }
-                    for (int i = 0; i < 5; i++)
-                    {
-                        //Временно
-                        var dataStorage = DataStoragesSettingsVM.DataStorages[i % _dataStoragesSettingsVM.DataStorages.Count];
-                        var treeRepository = treeRepositoryService.CreateSampleRepository(dataStorage);
-                        var vm = new RepositoryExplorerVM(treeRepository);
-                        _treeRepositoriesVMs.Add(vm);
-                        //Временно
-                    }
-                }
-                return _treeRepositoriesVMs;
-            }
+            get => _treeRepositoriesVMs;
             //private set
             //{
             //    _treeRepositoriesVMs = value.ToList();
@@ -159,12 +138,24 @@ namespace Philadelphus.WpfApplication.ViewModels
         }
         private bool InitRepositoryCollection()
         {
-            var service = new DataTreeProcessingService();
-            var repositories = service.GetExistTreeRepositories(_dataStoragesSettingsVM.DataStorages);
+            var repositories = _dataTreeProcessingService.GetRepositories(_dataStoragesSettingsVM.DataStorages);
             foreach (var item in repositories)
             {
                 _treeRepositoriesVMs.Add(new RepositoryExplorerVM(item));
             }
+            //Временно
+            if (_treeRepositoriesVMs.Count == 0)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    var dataStorage = DataStoragesSettingsVM.DataStorages[i % _dataStoragesSettingsVM.DataStorages.Count];
+                    var treeRepository = _dataTreeProcessingService.CreateSampleRepository(dataStorage);
+                    var vm = new RepositoryExplorerVM(treeRepository);
+                    _treeRepositoriesVMs.Add(vm);
+                }
+                _dataTreeProcessingService.SaveChanges();
+            }
+            //Временно
             return true;
         }
 
