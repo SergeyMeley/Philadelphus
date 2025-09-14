@@ -22,20 +22,6 @@ namespace Philadelphus.WpfApplication.ViewModels
         {
             get
             {
-                if (_dataStoragesSettingsVM == null)
-                {
-                    _dataStoragesSettingsVM = new DataStoragesSettingsVM();
-                }
-                var service = new StorageConfigService();
-                service.LoadConfig();
-                var models = service.GetAllStorageModels();
-                foreach (var model in models)
-                {
-                    if (model != null && _dataStoragesSettingsVM.DataStorages.FirstOrDefault(x => x.Guid == model.Guid) == null)
-                    {
-                        _dataStoragesSettingsVM.DataStorages.Add(model);
-                    }
-                }
                 return _dataStoragesSettingsVM;
             }
         }
@@ -58,6 +44,8 @@ namespace Philadelphus.WpfApplication.ViewModels
         public ApplicationViewModel()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
+            InitDataStorages();
+            InitRepositoryCollection();
             _startWindow = new StartWindow() { DataContext = this };
             _startWindow.Show();
             // ВРЕМЕННО!!!
@@ -96,11 +84,15 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private RepositoryCollectionVM _repositoryCollectionVM = new RepositoryCollectionVM() { DataStoragesSettingsVM = _dataStoragesSettingsVM };        
+        private RepositoryCollectionVM _repositoryCollectionVM;        
         public RepositoryCollectionVM RepositoryCollectionVM
         {
             get 
-            { 
+            {
+                if (_repositoryCollectionVM == null)
+                {
+                    _repositoryCollectionVM = new RepositoryCollectionVM() { DataStoragesSettingsVM = _dataStoragesSettingsVM };
+                }
                 return _repositoryCollectionVM; 
             } 
         }
@@ -200,5 +192,42 @@ namespace Philadelphus.WpfApplication.ViewModels
         //    }
         //}
         #endregion
+
+        private bool InitDataStorages()
+        {
+            if (_dataStoragesSettingsVM == null)
+            {
+                _dataStoragesSettingsVM = new DataStoragesSettingsVM();
+            }
+            var service = new StorageConfigService();
+            service.LoadConfig();
+            var models = service.GetAllStorageModels();
+            foreach (var model in models)
+            {
+                if (model != null && _dataStoragesSettingsVM.DataStorages.FirstOrDefault(x => x.Guid == model.Guid) == null)
+                {
+                    _dataStoragesSettingsVM.DataStorages.Add(model);
+                }
+            }
+           return true;
+        }
+        private bool InitRepositoryCollection()
+        {
+            if (_repositoryCollectionVM == null)
+            {
+                _repositoryCollectionVM = new RepositoryCollectionVM();
+            }
+            //var service = new DataTreeProcessingService();
+            //service.LoadConfig();
+            //var models = service.GetAllStorageModels();
+            //foreach (var model in models)
+            //{
+            //    if (model != null && _dataStoragesSettingsVM.DataStorages.FirstOrDefault(x => x.Guid == model.Guid) == null)
+            //    {
+            //        _dataStoragesSettingsVM.DataStorages.Add(model);
+            //    }
+            //}
+            return true;
+        }
     }
 }

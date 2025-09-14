@@ -56,7 +56,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             get
             {
                 var treeRepositoryService = new DataTreeProcessingService();
-                var treeRepositories = treeRepositoryService.GetExistTreeRepositories();
+                var treeRepositories = treeRepositoryService.GetExistTreeRepositories(_dataStoragesSettingsVM.DataStorages);
                 if (treeRepositories != null && _treeRepositoriesVMs == null)
                 {
                     _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
@@ -73,7 +73,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                         //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
                         //Временно
 
-                        TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository();
+                        TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository(DataStoragesSettingsVM.DataStorages[i % _dataStoragesSettingsVM.DataStorages.Count]);
                         //Временно
                         treeRepository.Name = $"TEST {i}";
                         vm.TreeRepository = treeRepository;

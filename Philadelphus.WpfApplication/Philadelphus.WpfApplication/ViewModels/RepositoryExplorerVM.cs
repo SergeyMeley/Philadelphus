@@ -78,7 +78,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     
                     var service = new DataTreeProcessingService();
-                    service.InitTreeRoot(_treeRepository);
+                    service.InitTreeRoot(_treeRepository, null);
                 });
             }
         }
