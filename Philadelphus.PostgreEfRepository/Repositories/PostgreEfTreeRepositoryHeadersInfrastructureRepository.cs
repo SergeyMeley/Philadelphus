@@ -23,14 +23,17 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             //    .UseLazyLoadingProxies();
             //_context = new TreeRepositoriesPhiladelphusContext(optionsBuilder.Options);
             _context = new TreeRepositoriesPhiladelphusContext(connectionString);
-            if (_context.Database.GetPendingMigrations().ToList().Any())
+            if(CheckAvailability())
             {
-                try
+                if (_context.Database.GetPendingMigrations().ToList().Any())
                 {
-                    _context.Database.Migrate();
+                    try
+                    {
+                        _context.Database.Migrate();
+                    }
+                    catch (PostgresException ex) when (ex.SqlState == "42P07") { }
+                    catch (Exception ex) { throw; }
                 }
-                catch (PostgresException ex) when (ex.SqlState == "42P07") { }
-                catch (Exception ex) { throw; }
             }
         }
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository; }
