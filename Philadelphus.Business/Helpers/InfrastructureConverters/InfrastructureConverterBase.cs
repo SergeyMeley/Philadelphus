@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
-    public abstract class InfrastructureConverterBase
+    internal static class InfrastructureConverterBase
     {
-        protected static IMainEntityModel DbToBusinessMainProperties(IMainEntity dbEntity, MainEntityBaseModel businessEntity)
+        public static MainEntityBaseModel DbToBusinessMainProperties(this IMainEntity dbEntity, MainEntityBaseModel businessEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -36,9 +36,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
             return businessEntity;
         }
-        internal abstract IMainEntityModel DbToBusinessEntity(IMainEntity dbEntity);
-        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection);
-        protected static IMainEntity BusinessToDbMainProperties(MainEntityBaseModel businessEntity, IMainEntity dbEntity)
+        public static IMainEntity BusinessToDbMainProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
         {
             if (businessEntity == null)
                 return null;
@@ -64,7 +62,5 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
         }
-        internal abstract IMainEntity BusinessToDbEntity(IMainEntityModel businessEntity);
-        internal abstract IEnumerable<IMainEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
     }
 }

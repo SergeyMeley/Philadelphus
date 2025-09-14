@@ -11,44 +11,43 @@
 
 //namespace Philadelphus.InfrastructureConverters.Converters
 //{
-//    internal class RepositoryInfrastructureConverter : InfrastructureConverterBase
+//    public static class RepositoryInfrastructureConverter
 //    {
-//        internal override TreeRepository BusinessToDbEntity(IMainEntityModel businessEntity)
+//        public static TreeRepository BusinessToDbEntity(IMainEntityModel businessEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
 //            var result = (TreeRepository)BusinessToDbMainProperties((MainEntityBaseModel)businessEntity, new TreeRepository());
 //            return result;
 //        }
-//        internal override List<TreeRepository> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
+//        public static List<TreeRepository> BusinessToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)
 //        {
 //            if (businessEntityCollection == null)
 //                return null;
 //            var result = new List<TreeRepository>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (TreeRepository)BusinessToDbMainProperties((MainEntityBaseModel)businessEntity, new TreeRepository());
+//                var entity = businessEntity.BusinessToDbMainProperties(new TreeRepository());
 //                result.Add(entity);
 //            }
 //            return result;
 //        }
-//        internal override TreeRepositoryModel DbToBusinessEntity(IEntity dbEntity)
+//        public static TreeRepositoryModel DbToBusinessEntity(this TreeRepository dbEntity, out TreeRepositoryModel businessEntity = null)
 //        {
 //            if (dbEntity == null)
-//                return null;
-//            var result = new TreeRepositoryModel(new Guid(dbEntity.ParentGuid));
-//            result = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, new Guid(dbEntity.ParentGuid)));
+//                return businessEntity;
+//            result = dbEntity.DbToBusinessMainProperties((MainEntityBaseModel)businessEntity);
 //            return result;
 //        }
-//        internal override List<TreeRepositoryModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection)
+//        public static List<TreeRepositoryModel> DbToBusinessEntityCollection(this IEnumerable<TreeRepository> dbEntityCollection)
 //        {
 //            if (dbEntityCollection == null)
 //                return null;
 //            var result = new List<TreeRepositoryModel>();
 //            foreach (var dbEntity in dbEntityCollection)
 //            {
-//                var entity = new TreeRepositoryModel(Guid.Empty);
-//                entity = (TreeRepositoryModel)DbToBusinessMainProperties(dbEntity, (MainEntityBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.Empty));
+//                var entity = new TreeRepositoryModel();
+//                entity = dbEntityCollection.DbToBusinessMainProperties((MainEntityBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.Empty));
 //                result.Add(entity);
 //            }
 //            return result;

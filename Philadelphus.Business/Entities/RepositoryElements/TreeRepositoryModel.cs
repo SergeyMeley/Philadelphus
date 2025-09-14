@@ -22,9 +22,10 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IDataStorageModel OwnDataStorage { get; private set; }
         public IEnumerable<IChildrenModel> Childs { get; private set; }
         public IEnumerable<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
-        internal TreeRepositoryModel(Guid guid) : base(guid)
+        internal TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage) : base(guid)
         {
             Guid = guid;
+            OwnDataStorage = dataStorage;
             Initialize();
         }
         private void Initialize()

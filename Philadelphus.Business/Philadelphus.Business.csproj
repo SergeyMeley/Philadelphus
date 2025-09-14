@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
+    <ProjectReference Include="..\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />

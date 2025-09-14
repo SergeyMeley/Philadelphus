@@ -9,9 +9,9 @@
 
 //namespace Philadelphus.InfrastructureConverters.Converters
 //{
-//    public abstract class InfrastructureConverterBase
+//    internal static class InfrastructureConverterBase
 //    {
-//        protected static IMainEntityModel DbToBusinessMainProperties(IEntity dbEntity, MainEntityBaseModel businessEntity)
+//        public static MainEntityBaseModel DbToBusinessMainProperties(this IMainEntity dbEntity, MainEntityBaseModel businessEntity)
 //        {
 //            if (dbEntity == null)
 //                return null;
@@ -36,9 +36,7 @@
 //            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
 //            return businessEntity;
 //        }
-//        internal abstract IMainEntityModel DbToBusinessEntity(IEntity dbEntity);
-//        internal abstract IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IEntity> dbEntityCollection);
-//        protected static IEntity BusinessToDbMainProperties(MainEntityBaseModel businessEntity, IEntity dbEntity)
+//        public static IMainEntity BusinessToDbMainProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
@@ -64,7 +62,5 @@
 //            dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
 //            return dbEntity;
 //        }
-//        internal abstract IEntity BusinessToDbEntity(IMainEntityModel businessEntity);
-//        internal abstract IEnumerable<IEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection);
 //    }
 //}

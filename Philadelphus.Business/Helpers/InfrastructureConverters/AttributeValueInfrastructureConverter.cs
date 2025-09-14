@@ -9,31 +9,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Philadelphus.Business.Helpers.InfrastructureConverters;
 
 namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
-    internal class AttributeValueInfrastructureConverter : InfrastructureConverterBase
+    public static class AttributeValueInfrastructureConverter
     {
-        internal override IMainEntity BusinessToDbEntity(IMainEntityModel businessEntity)
+        public static TreeElementAttributeValue BusinessToDbEntity(ElementAttributeValueModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeElementAttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeElementAttributeValue());
+            var result = (TreeElementAttributeValue)businessEntity.BusinessToDbMainProperties(new TreeElementAttributeValue());
             return result;
         }
-        internal override IEnumerable<IMainEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
+        public static IEnumerable<TreeElementAttributeValue> BusinessToDbEntityCollection(IEnumerable<ElementAttributeValueModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
                 return null;
             var result = new List<TreeElementAttributeValue>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (TreeElementAttributeValue)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeElementAttributeValue());
+                var entity = (TreeElementAttributeValue)businessEntity.BusinessToDbMainProperties(new TreeElementAttributeValue());
                 result.Add(entity);
             }
             return result;
         }
-        internal override IMainEntityModel DbToBusinessEntity(IMainEntity dbEntity)
+        public static ElementAttributeValueModel DbToBusinessEntity(TreeElementAttributeValue dbEntity)
         {
             if (dbEntity == null)
                 return null;
@@ -42,7 +43,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //return result;
             return null;
         }
-        internal override IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
+    public static IEnumerable<ElementAttributeValueModel> DbToBusinessEntityCollection(IEnumerable<TreeElementAttributeValue> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;

@@ -9,7 +9,9 @@ using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Philadelphus.Business.Helpers.InfrastructureConverters;
 
 namespace Philadelphus.Business.Services
 {
@@ -40,13 +42,12 @@ namespace Philadelphus.Business.Services
         public List<TreeRepositoryModel> GetRepositoryHeadersCollection(IEnumerable<IDataStorageModel> dataStorages)
         {
             var result = new List<TreeRepositoryModel>();
-            var converter = new RepositoryInfrastructureConverter();
             foreach (var dataStorage in dataStorages)
             {
                 var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
                 if (dataStorage.GetType().IsAssignableFrom(typeof(ITreeRepositoriesInfrastructureRepository)))
                 {
-                    result.AddRange(converter.DbToBusinessEntityCollection(infrastructure.SelectRepositories())?.ToList());
+                    result.AddRange(infrastructure.SelectRepositories().DbToBusinessEntityCollection(dataStorages));
                 }
             }
             return result;
@@ -75,9 +76,9 @@ namespace Philadelphus.Business.Services
         //    }
         //    return GetRepositoryHeadersCollection();
         //}
-        public TreeRootModel InitTreeRoot(TreeRepositoryModel parentElement)
+        public TreeRootModel InitTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
         {
-            var result = new TreeRootModel(Guid.NewGuid(), parentElement);
+            var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage);
             ((List<TreeRepositoryMemberBaseModel>)parentElement.ElementsCollection).Add(result);
             ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
             return result;
@@ -175,13 +176,12 @@ namespace Philadelphus.Business.Services
         /// Создание нового пустого репозитория.
         /// </summary>
         /// <returns></returns>
-        public TreeRepositoryModel CreateSampleRepository()
+        public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
         {
-            //Временно
-            var repo = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
+            var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
             for (int i = 0; i < 5; i++)
             {
-                var root = new TreeRootModel(Guid.NewGuid(), repo);
+                var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage);
                 GetAttributesSample(root);
                 ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(root);
                 for (int j = 0; j < 5; j++)
@@ -205,13 +205,11 @@ namespace Philadelphus.Business.Services
                 ((ObservableCollection<IChildrenModel>)repo.Childs).Add(root);
             }
             return repo;
-            //Временно
-            return (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
         }
 
         public TreeRepositoryModel CreateNewTreeRepository(string name, IDataStorageModel dataStorage)
         {
-            var result = (TreeRepositoryModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.NewGuid());
+            var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
             if (string.IsNullOrEmpty(name))
             {
                 name = "Новый репозиторий";
@@ -221,14 +219,17 @@ namespace Philadelphus.Business.Services
             result.ChangeDataStorage(dataStorage);
             //ВРЕМЕННО!!!
 
-            var converter = new RepositoryInfrastructureConverter();
-            ((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepositories(new List<TreeRepository>() { converter.BusinessToDbEntity(result) });
+            ((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepositories(new List<TreeRepository>() { result.BusinessToDbEntity() });
             return result;
         }
 
-        public IEnumerable<TreeRepositoryModel> GetExistTreeRepositories()
+        public IEnumerable<TreeRepositoryModel> GetExistTreeRepositories(IEnumerable<IDataStorageModel> dataStorages)
         {
             var result = new List<TreeRepositoryModel>();
+            foreach (var dataStorage in dataStorages)
+            {
+                result.AddRange(dataStorage.TreeRepositoryHeadersInfrastructureRepository.SelectRepositories().DbToBusinessEntityCollection(dataStorages).ToList());
+            }
             return result;
         }
 
@@ -279,41 +280,41 @@ namespace Philadelphus.Business.Services
         //    UpdateEntities(DataTreeRepositories);
             
         //}
-        private void UpdateEntities(IEnumerable<IMainEntityModel> entities, InfrastructureTypes infrastructure)
-        {
-            foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
-            {
-                var infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(infrastructure);
-                InfrastructureConverterBase converter;
-                switch (entityType)
-                {
-                    case EntityTypesModel.None:
-                        break;
-                    case EntityTypesModel.Repository:
-                        converter = new RepositoryInfrastructureConverter();
-                        ((ITreeRepositoriesInfrastructureRepository)infrastructureRepository).UpdateRepositories((List<TreeRepository>)converter.BusinessToDbEntityCollection(entities));
-                        break;
-                    case EntityTypesModel.Root:
-                        converter = new RootInfrastructureConverter();
-                        infrastructureRepository.UpdateRoots((List<TreeRoot>)converter.BusinessToDbEntityCollection(entities));
-                        break;
-                    case EntityTypesModel.Node:
-                        converter = new NodeInfrastructureConverter();
-                        infrastructureRepository.UpdateNodes((List<TreeNode>)converter.BusinessToDbEntityCollection(entities));
-                        break;
-                    case EntityTypesModel.Leave:
-                        converter = new LeaveInfrastructureConverter();
-                        infrastructureRepository.UpdateLeaves((List<TreeLeave>)converter.BusinessToDbEntityCollection(entities));
-                        break;
-                    case EntityTypesModel.Attribute:
-                        converter = new AttributeInfrastructureConverter();
-                        infrastructureRepository.UpdateAttributes((List<ElementAttribute>)converter.BusinessToDbEntityCollection(entities));
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        //private void UpdateEntities(IEnumerable<IMainEntityModel> entities, InfrastructureTypes infrastructure)
+        //{
+        //    foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
+        //    {
+        //        var infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(infrastructure);
+        //        InfrastructureConverterBase converter;
+        //        switch (entityType)
+        //        {
+        //            case EntityTypesModel.None:
+        //                break;
+        //            case EntityTypesModel.Repository:
+        //                converter = new RepositoryInfrastructureConverter();
+        //                ((ITreeRepositoriesInfrastructureRepository)infrastructureRepository).UpdateRepositories((List<TreeRepository>)converter.BusinessToDbEntityCollection(entities));
+        //                break;
+        //            case EntityTypesModel.Root:
+        //                converter = new RootInfrastructureConverter();
+        //                infrastructureRepository.UpdateRoots((List<TreeRoot>)converter.BusinessToDbEntityCollection(entities));
+        //                break;
+        //            case EntityTypesModel.Node:
+        //                converter = new NodeInfrastructureConverter();
+        //                infrastructureRepository.UpdateNodes((List<TreeNode>)converter.BusinessToDbEntityCollection(entities));
+        //                break;
+        //            case EntityTypesModel.Leave:
+        //                converter = new LeaveInfrastructureConverter();
+        //                infrastructureRepository.UpdateLeaves((List<TreeLeave>)converter.BusinessToDbEntityCollection(entities));
+        //                break;
+        //            case EntityTypesModel.Attribute:
+        //                converter = new AttributeInfrastructureConverter();
+        //                infrastructureRepository.UpdateAttributes((List<ElementAttribute>)converter.BusinessToDbEntityCollection(entities));
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //    }
+        //}
 
 
 
