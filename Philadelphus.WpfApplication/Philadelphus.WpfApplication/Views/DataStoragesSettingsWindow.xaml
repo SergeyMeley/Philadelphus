@@ -18,20 +18,22 @@
             <ListBox DataContext="{Binding DataStoragesSettingsVM}" ItemsSource="{Binding DataStorages}" SelectedItem="{Binding SelectedDataStorage}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock>
-                            <Run Text="Наименование: "></Run>
-                            <Run Text="{Binding Name, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                            <Run Text="Описание: "></Run>
-                            <Run Text="{Binding Description, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                            <Run Text="Guid: "></Run>
-                            <Run Text="{Binding Guid, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                            <Run Text="Доступность: "></Run>
-                            <Run Text="{Binding IsAvailable, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                        </TextBlock>
+                        <StackPanel>
+                            <TextBlock>
+                                <Run Text="Наименование: "></Run>
+                                <Run Text="{Binding Name, Mode=OneWay}"></Run>
+                                <Run Text=". "></Run>
+                                <Run Text="Описание: "></Run>
+                                <Run Text="{Binding Description, Mode=OneWay}"></Run>
+                                <Run Text=". "></Run>
+                                <Run Text="Guid: "></Run>
+                                <Run Text="{Binding Guid, Mode=OneWay}"></Run>
+                                <Run Text=". "></Run>
+                                <Run Text="Доступность: "></Run>
+                                <Run Text="{Binding IsAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run>
+                                <Run Text=". "></Run>
+                            </TextBlock>
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
