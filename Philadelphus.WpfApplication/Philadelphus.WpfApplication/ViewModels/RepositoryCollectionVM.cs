@@ -17,26 +17,14 @@ namespace Philadelphus.WpfApplication.ViewModels
     public class RepositoryCollectionVM : ViewModelBase
     {
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
-        public DataStoragesSettingsVM DataStoragesSettingsVM
+        public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
+        public RepositoryCollectionVM(DataStoragesSettingsVM dataStoragesSettings)
         {
-            get
-            {
-                if (_dataStoragesSettingsVM == null)
-                {
-                    _dataStoragesSettingsVM = new DataStoragesSettingsVM();
-                }
-                return _dataStoragesSettingsVM;
-            }
-            set
-            {
-                _dataStoragesSettingsVM = value;
-            }
-        }
-        public RepositoryCollectionVM()
-        {
+            _dataStoragesSettingsVM = dataStoragesSettings;
+            InitRepositoryCollection();
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
-        private static RepositoryExplorerVM _currentRepositoryExplorerVM = new RepositoryExplorerVM();
+        private static RepositoryExplorerVM _currentRepositoryExplorerVM;
         public  RepositoryExplorerVM CurrentRepositoryExplorerVM 
         { 
             get 
@@ -50,6 +38,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 OnPropertyChanged(nameof(PropertyList));
             }
         }
+
         private ObservableCollection<RepositoryExplorerVM> _treeRepositoriesVMs;
         public ObservableCollection<RepositoryExplorerVM> TreeRepositoriesVMs
         {
@@ -62,22 +51,17 @@ namespace Philadelphus.WpfApplication.ViewModels
                     _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
                     foreach (var item in treeRepositories)
                     {
-                        var vm = new RepositoryExplorerVM();
-                        vm.TreeRepository = item;
+                        var vm = new RepositoryExplorerVM(item);
                         _treeRepositoriesVMs.Add(vm);
                     }
                     for (int i = 0; i < 5; i++)
                     {
-                        var vm = new RepositoryExplorerVM();
-
-                        //TreeRepository treeRepository = new TreeRepository(Guid.NewGuid());
                         //Временно
-
-                        TreeRepositoryModel treeRepository = treeRepositoryService.CreateSampleRepository(DataStoragesSettingsVM.DataStorages[i % _dataStoragesSettingsVM.DataStorages.Count]);
-                        //Временно
-                        treeRepository.Name = $"TEST {i}";
-                        vm.TreeRepository = treeRepository;
+                        var dataStorage = DataStoragesSettingsVM.DataStorages[i % _dataStoragesSettingsVM.DataStorages.Count];
+                        var treeRepository = treeRepositoryService.CreateSampleRepository(dataStorage);
+                        var vm = new RepositoryExplorerVM(treeRepository);
                         _treeRepositoriesVMs.Add(vm);
+                        //Временно
                     }
                 }
                 return _treeRepositoriesVMs;
@@ -100,6 +84,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return list;
             }
         }
+
         private PropertyGridRepresentations _propertyGridRepresentation;
         public PropertyGridRepresentations PropertyGridRepresentation
         {
@@ -145,6 +130,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
+
         private string _newTreeRepositoryName;
         public string NewTreeRepositoryName
         {
@@ -164,13 +150,23 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeProcessingService();
-                    var repositoryExplorerViewModel = new RepositoryExplorerVM();
                     var builder = new DataStorageBuilder();
-                    repositoryExplorerViewModel.TreeRepository = service.CreateNewTreeRepository(_newTreeRepositoryName, builder.Build());
+                    var repositoryExplorerViewModel = new RepositoryExplorerVM(service.CreateNewTreeRepository(_newTreeRepositoryName, builder.Build()));
                     TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
                      
                 });
             }
         }
+        private bool InitRepositoryCollection()
+        {
+            var service = new DataTreeProcessingService();
+            var repositories = service.GetExistTreeRepositories(_dataStoragesSettingsVM.DataStorages);
+            foreach (var item in repositories)
+            {
+                _treeRepositoriesVMs.Add(new RepositoryExplorerVM(item));
+            }
+            return true;
+        }
+
     }
 }

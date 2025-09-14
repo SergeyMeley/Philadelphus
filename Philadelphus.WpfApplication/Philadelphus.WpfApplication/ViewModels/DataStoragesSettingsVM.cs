@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.WpfApplication.Models.StorageConfig;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,29 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class DataStoragesSettingsVM
     {
-        public ObservableCollection<IDataStorageModel>? DataStorages { get; set; } = new ObservableCollection<IDataStorageModel>();
+        private ObservableCollection<IDataStorageModel>? _dataStorages = new ObservableCollection<IDataStorageModel>();
+        public ObservableCollection<IDataStorageModel>? DataStorages { get => _dataStorages; set => _dataStorages = value; } 
         public IDataStorageModel SelectedDataStorage {  get; set; }
+        public DataStoragesSettingsVM()
+        {
+            InitDataStorages();
+        }
+        private bool InitDataStorages()
+        {
+            var service = new StorageConfigService();
+            service.LoadConfig();
+            var models = service.GetAllStorageModels();
+            foreach (var model in models)
+            {
+                if (model != null)
+                {
+                    if (_dataStorages.FirstOrDefault(x => x.Guid == model.Guid) == null)
+                    {
+                        _dataStorages.Add(model);
+                    }
+                }
+            }
+            return true;
+        }
     }
 }

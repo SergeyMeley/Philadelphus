@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
         mc:Ignorable="d"
-        Title="StartWindow"
+        Title="Выбор репозитория"
         MinHeight="500" MinWidth="1000"
         WindowState="Maximized">
     <Window.Visibility>
@@ -30,18 +30,10 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Height="20" VerticalAlignment="Center" Margin="2">
-                            <Run Text="Наименование: "></Run>
-                            <Run Text="{Binding TreeRepository.Name, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                            <Run Text="Описание: "></Run>
-                            <Run Text="{Binding TreeRepository.Description, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                            <Run Text="Guid: "></Run>
-                            <Run Text="{Binding TreeRepository.Guid, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
-                            <Run Text="Хранилище: "></Run>
-                            <Run Text="{Binding TreeRepository.DataStorage.Name, Mode=OneWay}"></Run>
-                            <Run Text=". "></Run>
+                            <Run Text="Наименование: '"></Run><Run Text="{Binding TreeRepository.Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                            <Run Text="Описание: '"></Run><Run Text="{Binding TreeRepository.Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                            <Run Text="Guid: '"></Run><Run Text="{Binding TreeRepository.Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                            <Run Text="Хранилище: '"></Run><Run Text="{Binding TreeRepository.OwnDataStorage.Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
                         </TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -17,17 +17,8 @@ namespace Philadelphus.WpfApplication.ViewModels
     public  class RepositoryExplorerVM : ViewModelBase
     {
         private TreeRepositoryModel _treeRepository;
-        public TreeRepositoryModel TreeRepository 
-        { 
-            get 
-            { 
-                return _treeRepository; 
-            } 
-            set
-            {
-                _treeRepository = value;
-            }
-        }
+        public TreeRepositoryModel TreeRepository { get => _treeRepository; }
+
         private TreeRepositoryMemberBaseModel? _selectedRepositoryMember;
         public TreeRepositoryMemberBaseModel? SelectedRepositoryMember
         {
@@ -55,12 +46,16 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return PropertyGridHelper.GetProperties(_selectedRepositoryMember);
             }
         }
+
         private List<string> _visabilityList = new List<string> { "Скрытый (private)", "Всем (public)", "Только наследникам (protected)", "Только элементам корня (internal)" };
         public List<string> VisabilityList
         {
             get { return _visabilityList; }
         }
-
+        public RepositoryExplorerVM(TreeRepositoryModel treeRepository)
+        {
+            _treeRepository = treeRepository;
+        }
         public bool CheckTreeRepositoryAvailability()
         {
             if (_treeRepository == null)
@@ -139,7 +134,6 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
-
         public RelayCommand DeleteElementCommand
         {
             get 
