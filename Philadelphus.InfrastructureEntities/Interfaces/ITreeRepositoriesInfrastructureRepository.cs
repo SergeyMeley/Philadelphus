@@ -11,9 +11,8 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
     public interface ITreeRepositoriesInfrastructureRepository : IInfrastructureRepository
     {
         public IEnumerable<TreeRepository> SelectRepositories();
-        public long InsertRepositories(IEnumerable<TreeRepository> repositories);
-        public long DeleteRepositories(IEnumerable<TreeRepository> repositories);
-        public long UpdateRepositories(IEnumerable<TreeRepository> repositories);
-
+        public long InsertRepository(TreeRepository repository);
+        public long DeleteRepository(TreeRepository repository);
+        public long UpdateRepository(TreeRepository repository);
     }
 }

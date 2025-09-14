@@ -49,7 +49,7 @@ namespace Philadelphus.JsonRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public long UpdateRepositories(IEnumerable<TreeRepository> repositories)
+        public long UpdateRepository(TreeRepository repository)
         {
             throw new NotImplementedException();
         }
@@ -59,7 +59,7 @@ namespace Philadelphus.JsonRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
+        public long DeleteRepository(TreeRepository repository)
         {
             throw new NotImplementedException();
         }
@@ -80,7 +80,7 @@ namespace Philadelphus.JsonRepository.Repositories
             return storages.Count();
         }
 
-        public long InsertRepositories(IEnumerable<TreeRepository> repositories)
+        public long InsertRepository(TreeRepository repository)
         {
             throw new NotImplementedException();
         }

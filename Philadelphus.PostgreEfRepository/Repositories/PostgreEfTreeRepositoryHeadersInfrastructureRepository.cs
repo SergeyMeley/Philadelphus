@@ -47,28 +47,25 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return null;
             return _context.Repositories.ToList();
         }
-        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
+        public long DeleteRepository(TreeRepository repository)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateRepositories(IEnumerable<TreeRepository> repositories)
+        public long UpdateRepository(TreeRepository repository)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertRepositories(IEnumerable<TreeRepository> repositories)
+        public long InsertRepository(TreeRepository repository)
         {
             if (CheckAvailability() == false)
                 return 0;
-            foreach (var item in repositories)
-            {
-                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.CreatedOn = DateTime.Now.ToString();
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.UpdatedOn = DateTime.Now.ToString();
-                _context.Repositories.Add(item);
-            }
+            repository.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            repository.AuditInfo.CreatedOn = DateTime.Now.ToString();
+            repository.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            repository.AuditInfo.UpdatedOn = DateTime.Now.ToString();
+            _context.Repositories.Add(repository);
             return _context.SaveChanges();
         }
     }
