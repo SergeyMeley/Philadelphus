@@ -30,6 +30,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                     _context.Database.Migrate();
                 }
                 catch (PostgresException ex) when (ex.SqlState == "42P07") { }
+                catch (Exception ex) { throw; }
             }
         }
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository; }
