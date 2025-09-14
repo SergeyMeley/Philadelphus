@@ -30,7 +30,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder
-                    .UseNpgsql("Host=localhost;Port=5434;Username=postgres;Password=Dniwe2002;Database=philadelphus_pilot;")
+                    .UseNpgsql(_connectionString)
                     .UseLazyLoadingProxies();
             }
         }

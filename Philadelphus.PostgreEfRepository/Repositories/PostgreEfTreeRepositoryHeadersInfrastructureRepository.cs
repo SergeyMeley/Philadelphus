@@ -45,12 +45,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             if (CheckAvailability() == false)
                 return null;
-            var result = new List<TreeRepository>();
-            using (_context)
-            {
-                result = _context.Repositories.ToList();
-            }
-            return result;
+            return _context.Repositories.ToList();
         }
         public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
         {
@@ -64,20 +59,17 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public long InsertRepositories(IEnumerable<TreeRepository> repositories)
         {
-            using (_context)
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in repositories)
             {
-                if (CheckAvailability() == false)
-                    return 0;
-                foreach (var item in repositories)
-                {
-                    item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                    item.AuditInfo.CreatedOn = DateTime.Now.ToString();
-                    item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                    item.AuditInfo.UpdatedOn = DateTime.Now.ToString();
-                    _context.Repositories.Add(item);
-                }
-                return _context.SaveChanges();
+                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.CreatedOn = DateTime.Now.ToString();
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedOn = DateTime.Now.ToString();
+                _context.Repositories.Add(item);
             }
+            return _context.SaveChanges();
         }
     }
 }
