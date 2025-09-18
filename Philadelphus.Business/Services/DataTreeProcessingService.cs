@@ -48,7 +48,8 @@ namespace Philadelphus.Business.Services
             foreach (var dataStorage in dataStorages)
             {
                 var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
-                if (dataStorage.TreeRepositoryHeadersInfrastructureRepository.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository)))
+                if (dataStorage.TreeRepositoryHeadersInfrastructureRepository.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
+                    && dataStorage.IsAvailable)
                 {
                     result.AddRange(infrastructure.SelectRepositories().DbToBusinessEntityCollection(dataStorages));
                 }
