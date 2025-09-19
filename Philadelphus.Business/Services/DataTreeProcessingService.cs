@@ -6,7 +6,6 @@ using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
 using Philadelphus.Business.Factories;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
-using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -28,18 +27,64 @@ namespace Philadelphus.Business.Services
             set => _currentRepository = value;
         }
 
-        private List<TreeRepositoryModel> _dataTreeRepositories = new List<TreeRepositoryModel>();
-        public List<TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
+        private MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
 
-        private MainEntitiesCollection _dbMainEntitiesCollection = new MainEntitiesCollection();
+        public MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
+
+        private
 
         public int SaveChanges()
         {
-            foreach (var item in _dataTreeRepositories)
+            foreach (var item in _mainEntityCollection)
             {
-                item.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(item.BusinessToDbEntity());
+                IDataStorageModel dataStorage = null;
+                if (item.GetType().IsAssignableTo(typeof(IHavingOwnDataStorageModel)))
+                {
+                    dataStorage = ((IHavingOwnDataStorageModel)item).OwnDataStorage;
+                }
+                else if(item.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
+                {
+                    dataStorage = ((ITreeRepositoryMemberModel)item).ParentRepository.OwnDataStorage;
+                }
+                else if (item.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
+                {
+                    dataStorage = ((ITreeRootMemberModel)item).ParentRoot.OwnDataStorage;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+                switch (item.State)
+                {
+                    case State.Initialized:
+
+                        if (item.GetType() == typeof(TreeRepositoryModel))
+                        {
+                            dataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository((TreeRepositoryModel)item);
+                        }
+                        else if (item.GetType() == typeof(TreeRootModel))
+                        {
+                            dataStorage.MainEntitiesInfrastructureRepository.InsertRoots(new List<TreeRootModel>() { (TreeRoot)item. });
+                        }
+                        break;
+                    case State.Changed:
+                        break;
+                    case State.Saved:
+                        break;
+                    case State.Deleted:
+                        break;
+                    default:
+                        break;
+                }
+                
+                
+                
             }
-            return _dataTreeRepositories.Count;
+            return _mainEntityCollection.Where(
+                x => x.State == State.Changed || 
+                x.State == State.Deleted ||
+                x.State == State.Initialized)
+                .Count();
         }
 
         public IEnumerable<TreeRepositoryModel> GetRepositories(IEnumerable<IDataStorageModel> dataStorages)

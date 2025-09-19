@@ -18,5 +18,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
         public string Alias { get; set; }
         public string CustomCode { get; set; }
         public AuditInfoModel AuditInfo { get; }
+        internal State State { get; set; }
     }
 }
