@@ -19,11 +19,11 @@ public class Test1
         //    new DataStorageBuilder()
         //        .SetGeneralParameters("qwe", "dfbdfzbz", Guid.NewGuid(), InfrastructureTypes.JsonDocument)
         //        .SetRepository((IDataStoragesInfrastructureRepository)repository)
-        //        .Build().BusinessToDbEntity(),
+        //        .Build().ToDbEntity(),
         //    new DataStorageBuilder()
         //        .SetGeneralParameters("qwe2", "qwewgfd", Guid.NewGuid(), InfrastructureTypes.JsonDocument)
         //        .SetRepository((IDataStoragesInfrastructureRepository)repository)
-        //        .Build().BusinessToDbEntity()
+        //        .Build().ToDbEntity()
         //};
         //repository.InsertDataStorages(storages);
     }
