@@ -31,60 +31,53 @@ namespace Philadelphus.Business.Services
 
         public MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
-        private
-
-        public int SaveChanges()
+        public long SaveChanges(TreeRepositoryModel treeRepository)
         {
-            foreach (var item in _mainEntityCollection)
+            long result = 0;
+            switch (treeRepository.State)
             {
-                IDataStorageModel dataStorage = null;
-                if (item.GetType().IsAssignableTo(typeof(IHavingOwnDataStorageModel)))
-                {
-                    dataStorage = ((IHavingOwnDataStorageModel)item).OwnDataStorage;
-                }
-                else if(item.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
-                {
-                    dataStorage = ((ITreeRepositoryMemberModel)item).ParentRepository.OwnDataStorage;
-                }
-                else if (item.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
-                {
-                    dataStorage = ((ITreeRootMemberModel)item).ParentRoot.OwnDataStorage;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-                switch (item.State)
-                {
-                    case State.Initialized:
-
-                        if (item.GetType() == typeof(TreeRepositoryModel))
-                        {
-                            dataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository((TreeRepositoryModel)item);
-                        }
-                        else if (item.GetType() == typeof(TreeRootModel))
-                        {
-                            dataStorage.MainEntitiesInfrastructureRepository.InsertRoots(new List<TreeRootModel>() { (TreeRoot)item. });
-                        }
-                        break;
-                    case State.Changed:
-                        break;
-                    case State.Saved:
-                        break;
-                    case State.Deleted:
-                        break;
-                    default:
-                        break;
-                }
-                
-                
-                
+                case State.Initialized:
+                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.BusinessToDbEntity());
+                    break;
+                case State.Changed:
+                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.BusinessToDbEntity());
+                    break;
+                case State.Deleted:
+                    result = treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.BusinessToDbEntity());
+                    break;
+                default:
+                    break;
             }
-            return _mainEntityCollection.Where(
-                x => x.State == State.Changed || 
-                x.State == State.Deleted ||
-                x.State == State.Initialized)
-                .Count();
+            SaveChanges((TreeRootModel)treeRepository.Childs);
+            return result;
+        }
+        public long SaveChanges(TreeRootModel treeRoot)
+        {
+            long result = 0;
+
+            SaveChanges((TreeNodeModel)treeRoot.Childs);
+            return result;
+        }
+        public long SaveChanges(TreeNodeModel treeNode)
+        {
+            long result = 0;
+
+            SaveChanges((TreeLeaveModel)treeNode.Childs);
+            return result;
+        }
+        public long SaveChanges(TreeLeaveModel treeLeave)
+        {
+            long result = 0;
+
+
+            return result;
+        }
+
+        public long SaveChanges()
+        {
+            long result = 0;
+            result = SaveChanges(_currentRepository);
+            return result;
         }
 
         public IEnumerable<TreeRepositoryModel> GetRepositories(IEnumerable<IDataStorageModel> dataStorages)
@@ -228,7 +221,7 @@ namespace Philadelphus.Business.Services
         public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
         {
             var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
-            _dataTreeRepositories.Add(repo);
+            _mainEntityCollection.DataTreeRepositories.Add(repo);
             for (int i = 0; i < 5; i++)
             {
                 var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage);
@@ -388,7 +381,7 @@ namespace Philadelphus.Business.Services
             //    var leaveInfrastructureConverter = new LeaveInfrastructureConverter();
             //    _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves();
             //}
-            _currentRepository = DataTreeRepositories.Where(x => x.Guid == currentRepository.Guid).Last();
+            _currentRepository = _mainEntityCollection.DataTreeRepositories.Where(x => x.Guid == currentRepository.Guid).Last();
             //using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
             //{
             //    //var dbRepository = new DbTreeRepository();

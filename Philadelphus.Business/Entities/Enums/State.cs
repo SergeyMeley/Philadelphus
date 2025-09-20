@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.Enums
 {
-    internal enum State
+    public enum State
     {
         Initialized,
         Changed,

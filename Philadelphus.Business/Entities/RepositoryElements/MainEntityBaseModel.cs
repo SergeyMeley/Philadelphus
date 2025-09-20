@@ -38,6 +38,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             sb.Append(Guid);
             return sb.ToString();
         }
-        internal State State { get; set; } = State.Initialized;
+        public State State { get; set; } = State.Initialized;
     }
 }
