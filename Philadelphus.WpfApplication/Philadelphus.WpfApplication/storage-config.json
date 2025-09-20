@@ -15,6 +15,14 @@
       "Description": "Сервер PostgreSQL на локальном домашнем сервере",
       "ConnectionString": "Host=localhost;Port=5434;Username=postgres;Password=Dniwe2002;Database=philadelphus;",
       "ProviderTypeString": "PostgreSqlEf"
+    },
+    {
+      "TypeName": "DataStorageModel",
+      "Guid": "a1b53074-54a8-47fc-9e90-ab64bc9d445e",
+      "Name": "PostgreSQL VBA",
+      "Description": "Сервер PostgreSQL на виртуалке Влада (через Интернет)",
+      "ConnectionString": "Host=212.22.94.51;Port=5432;Username=msv;Password=Dniwe2002;Database=mydb;",
+      "ProviderTypeString": "PostgreSqlEf"
     }
   ],
   "ReservStorageModels": [
