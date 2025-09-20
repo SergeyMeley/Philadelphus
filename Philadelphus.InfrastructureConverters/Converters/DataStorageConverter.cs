@@ -15,7 +15,7 @@
 //{
 //    public static class DataStorageConverter
 //    {
-//        public static DataStorage BusinessToDbEntity(this IDataStorageModel model)
+//        public static DataStorage ToDbEntity(this IDataStorageModel model)
 //        {
 //            var result = new DataStorage()
 //            {
@@ -29,7 +29,7 @@
 //            };
 //            return result;
 //        }
-//        public static IDataStorageModel DbToBusinessEntity(this DataStorage entity)
+//        public static IDataStorageModel ToModel(this DataStorage entity)
 //        {
 //            ITreeRepositoriesInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
 //            IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;

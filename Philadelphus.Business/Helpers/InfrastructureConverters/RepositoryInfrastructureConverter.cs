@@ -14,43 +14,41 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public static class RepositoryInfrastructureConverter
     {
-        public static TreeRepository BusinessToDbEntity(this TreeRepositoryModel businessEntity)
+        public static TreeRepository ToDbEntity(this TreeRepositoryModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeRepository)businessEntity.BusinessToDbMainProperties(new TreeRepository());
+            var result = (TreeRepository)businessEntity.ToDbEntityGenetalProperties(new TreeRepository());
             return result;
         }
-        public static List<TreeRepository> BusinessToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)
+        public static List<TreeRepository> ToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
                 return null;
             var result = new List<TreeRepository>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (TreeRepository)businessEntity.BusinessToDbMainProperties(new TreeRepository());
-                result.Add(entity);
+                result.Add(businessEntity.ToDbEntity());
             }
             return result;
         }
-        public static TreeRepositoryModel DbToBusinessEntity(this TreeRepository dbEntity, IEnumerable<IDataStorageModel> dataStorages)
+        public static TreeRepositoryModel ToModel(this TreeRepository dbEntity, IEnumerable<IDataStorageModel> dataStorages)
         {
             if (dbEntity == null)
                 return null;
             var dataStorage = dataStorages.FirstOrDefault(x => x.Guid == dbEntity.OwnDataStorageGuid);
-            var result = (TreeRepositoryModel)dbEntity.DbToBusinessMainProperties(new TreeRepositoryModel(dbEntity.Guid, dataStorage));
+            var result = new TreeRepositoryModel(dbEntity.Guid, dataStorage);
+            result = (TreeRepositoryModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
-        public static List<TreeRepositoryModel> DbToBusinessEntityCollection(this IEnumerable<TreeRepository> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
+        public static List<TreeRepositoryModel> ToModelCollection(this IEnumerable<TreeRepository> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
         {
             if (dbEntityCollection == null)
                 return null;
             var result = new List<TreeRepositoryModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var dataStorage = dataStorages.FirstOrDefault(x => x.Guid == dbEntity.OwnDataStorageGuid);
-                var entity = (TreeRepositoryModel)dbEntity.DbToBusinessMainProperties(new TreeRepositoryModel(dbEntity.Guid, dataStorage));
-                result.Add(entity);
+                result.Add(dbEntity.ToModel(dataStorages));
             }
             return result;
         }

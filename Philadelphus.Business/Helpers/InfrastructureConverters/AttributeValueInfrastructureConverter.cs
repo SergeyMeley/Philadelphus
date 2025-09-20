@@ -19,7 +19,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeElementAttributeValue)businessEntity.BusinessToDbMainProperties(new TreeElementAttributeValue());
+            var result = (TreeElementAttributeValue)businessEntity.ToDbEntityGenetalProperties(new TreeElementAttributeValue());
             return result;
         }
         public static IEnumerable<TreeElementAttributeValue> BusinessToDbEntityCollection(IEnumerable<ElementAttributeValueModel> businessEntityCollection)
@@ -29,7 +29,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<TreeElementAttributeValue>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (TreeElementAttributeValue)businessEntity.BusinessToDbMainProperties(new TreeElementAttributeValue());
+                var entity = (TreeElementAttributeValue)businessEntity.ToDbEntityGenetalProperties(new TreeElementAttributeValue());
                 result.Add(entity);
             }
             return result;
@@ -39,7 +39,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             if (dbEntity == null)
                 return null;
             //var result = new EntityAttributeValue(dbEntity.Parent);
-            //result = (EntityAttributeValue)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeValue));
+            //result = (EntityAttributeValue)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeValue));
             //return result;
             return null;
         }
@@ -51,7 +51,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //    foreach (var dbEntity in dbEntityCollection)
             //    {
             //        var entity = new EntityAttributeValue(dbEntity.Parent);
-            //        entity = (EntityAttributeValue)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeValue));
+            //        entity = (EntityAttributeValue)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeValue));
             //        result.Add(entity);
             //    }
             return result;

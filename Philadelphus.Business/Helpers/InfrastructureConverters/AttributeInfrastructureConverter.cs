@@ -15,35 +15,35 @@
 //{
 //    public static class AttributeInfrastructureConverter
 //    {
-//        public static ElementAttributeModel BusinessToDbEntity(ElementAttribute businessEntity)
+//        public static ElementAttributeModel ToDbEntity(ElementAttribute businessEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = businessEntity.BusinessToDbMainProperties();
+//            var result = businessEntity.ToDbEntityGenetalProperties();
 //            return result;
 //        }
-//        public static IEnumerable<IMainEntity> BusinessToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
+//        public static IEnumerable<IMainEntity> ToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
 //        {
 //            if (businessEntityCollection == null)
 //                return null;
 //            var result = new List<ElementAttribute>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (ElementAttribute)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new ElementAttribute());
+//                var entity = (ElementAttribute)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new ElementAttribute());
 //                result.Add(entity);
 //            }
 //            return result;
 //        }
-//        public static IMainEntityModel DbToBusinessEntity(IMainEntity dbEntity)
+//        public static IMainEntityModel ToModel(IMainEntity dbEntity)
 //        {
 //            if (dbEntity == null)
 //                return null;
 //            //var result = new ElementAttribute(new Guid(dbEntity.ParentGuid));
-//            //result = (ElementAttribute)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+//            //result = (ElementAttribute)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
 //            //return result;
 //            return null;
 //        }
-//        public static IEnumerable<IMainEntityModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
+//        public static IEnumerable<IMainEntityModel> ToModelCollection(IEnumerable<IMainEntity> dbEntityCollection)
 //        {
 //            if (dbEntityCollection == null)
 //                return null;
@@ -51,7 +51,7 @@
 //            //foreach (var dbEntity in dbEntityCollection)
 //            //{
 //            //    var entity = new ElementAttribute(new Guid(dbEntity.ParentGuid));
-//            //    entity = (ElementAttribute)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
+//            //    entity = (ElementAttribute)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Attribute));
 //            //    result.Add(entity);
 //            //}
 //            return result;

@@ -13,33 +13,33 @@
 //{
 //    public static class RepositoryInfrastructureConverter
 //    {
-//        public static TreeRepository BusinessToDbEntity(IMainEntityModel businessEntity)
+//        public static TreeRepository ToDbEntity(IMainEntityModel businessEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = (TreeRepository)BusinessToDbMainProperties((MainEntityBaseModel)businessEntity, new TreeRepository());
+//            var result = (TreeRepository)ToDbEntityGenetalProperties((MainEntityBaseModel)businessEntity, new TreeRepository());
 //            return result;
 //        }
-//        public static List<TreeRepository> BusinessToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)
+//        public static List<TreeRepository> ToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)
 //        {
 //            if (businessEntityCollection == null)
 //                return null;
 //            var result = new List<TreeRepository>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = businessEntity.BusinessToDbMainProperties(new TreeRepository());
+//                var entity = businessEntity.ToDbEntityGenetalProperties(new TreeRepository());
 //                result.Add(entity);
 //            }
 //            return result;
 //        }
-//        public static TreeRepositoryModel DbToBusinessEntity(this TreeRepository dbEntity, out TreeRepositoryModel businessEntity = null)
+//        public static TreeRepositoryModel ToModel(this TreeRepository dbEntity, out TreeRepositoryModel businessEntity = null)
 //        {
 //            if (dbEntity == null)
 //                return businessEntity;
-//            result = dbEntity.DbToBusinessMainProperties((MainEntityBaseModel)businessEntity);
+//            result = dbEntity.ToModelGeneralProperties((MainEntityBaseModel)businessEntity);
 //            return result;
 //        }
-//        public static List<TreeRepositoryModel> DbToBusinessEntityCollection(this IEnumerable<TreeRepository> dbEntityCollection)
+//        public static List<TreeRepositoryModel> ToModelCollection(this IEnumerable<TreeRepository> dbEntityCollection)
 //        {
 //            if (dbEntityCollection == null)
 //                return null;
@@ -47,7 +47,7 @@
 //            foreach (var dbEntity in dbEntityCollection)
 //            {
 //                var entity = new TreeRepositoryModel();
-//                entity = dbEntityCollection.DbToBusinessMainProperties((MainEntityBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.Empty));
+//                entity = dbEntityCollection.ToModelGeneralProperties((MainEntityBaseModel)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypesModel.Repository, Guid.Empty));
 //                result.Add(entity);
 //            }
 //            return result;

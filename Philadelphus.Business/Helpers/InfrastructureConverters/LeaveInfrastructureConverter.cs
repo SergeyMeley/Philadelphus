@@ -13,35 +13,35 @@
 //{
 //    public static class LeaveInfrastructureConverter
 //    {
-//        public static TreeLeave BusinessToDbEntity(TreeLeaveModel businessEntity)
+//        public static TreeLeave ToDbEntity(TreeLeaveModel businessEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = (TreeLeave)businessEntity.BusinessToDbMainProperties(new TreeLeave());
+//            var result = (TreeLeave)businessEntity.ToDbEntityGenetalProperties(new TreeLeave());
 //            return result;
 //        }
-//        public static List<TreeLeave> BusinessToDbEntityCollection(IEnumerable<TreeLeaveModel> businessEntityCollection)
+//        public static List<TreeLeave> ToDbEntityCollection(IEnumerable<TreeLeaveModel> businessEntityCollection)
 //        {
 //            if (businessEntityCollection == null)
 //                return null;
 //            var result = new List<TreeLeave>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (TreeLeave)BusinessToDbMainProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
+//                var entity = (TreeLeave)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
 //                result.Add(entity);
 //            }
 //            return result;
 //        }
-//        public static TreeLeaveModel DbToBusinessEntity(IMainEntity dbEntity)
+//        public static TreeLeaveModel ToModel(IMainEntity dbEntity)
 //        {
 //            if (dbEntity == null)
 //                return null;
 //            //var result = new TreeLeave(new Guid(dbEntity.ParentGuid));
-//            //result = (TreeLeave)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+//            //result = (TreeLeave)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
 //            //return result;
 //            return null;
 //        }
-//        public static List<TreeLeaveModel> DbToBusinessEntityCollection(IEnumerable<IMainEntity> dbEntityCollection)
+//        public static List<TreeLeaveModel> ToModelCollection(IEnumerable<IMainEntity> dbEntityCollection)
 //        {
 //            if (dbEntityCollection == null)
 //                return null;
@@ -49,7 +49,7 @@
 //            //foreach (var dbEntity in dbEntityCollection)
 //            //{
 //            //    var entity = new TreeLeave(new Guid(dbEntity.ParentGuid));
-//            //    entity = (TreeLeave)DbToBusinessMainProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
+//            //    entity = (TreeLeave)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Leave));
 //            //    result.Add(entity);
 //            //}
 //            return result;

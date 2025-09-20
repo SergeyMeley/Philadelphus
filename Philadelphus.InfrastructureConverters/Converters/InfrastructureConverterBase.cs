@@ -11,7 +11,7 @@
 //{
 //    internal static class InfrastructureConverterBase
 //    {
-//        public static MainEntityBaseModel DbToBusinessMainProperties(this IMainEntity dbEntity, MainEntityBaseModel businessEntity)
+//        public static MainEntityBaseModel ToModelGeneralProperties(this IMainEntity dbEntity, MainEntityBaseModel businessEntity)
 //        {
 //            if (dbEntity == null)
 //                return null;
@@ -36,7 +36,7 @@
 //            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
 //            return businessEntity;
 //        }
-//        public static IMainEntity BusinessToDbMainProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
+//        public static IMainEntity ToDbEntityGenetalProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
