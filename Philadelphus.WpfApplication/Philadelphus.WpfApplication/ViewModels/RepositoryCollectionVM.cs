@@ -39,7 +39,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private ObservableCollection<RepositoryExplorerVM> _treeRepositoriesVMs;
+        private ObservableCollection<RepositoryExplorerVM> _treeRepositoriesVMs = new ObservableCollection<RepositoryExplorerVM>();
         public ObservableCollection<RepositoryExplorerVM> TreeRepositoriesVMs
         {
             get
