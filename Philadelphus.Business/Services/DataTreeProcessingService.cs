@@ -185,16 +185,10 @@ namespace Philadelphus.Business.Services
 
 
         #region Create
-        public TreeRepositoryModel CreateNewTreeRepository(string name, IDataStorageModel dataStorage)
+        public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage)
         {
             var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
-            if (string.IsNullOrEmpty(name))
-            {
-                name = "Новый репозиторий";
-            }
-            result.Name = NamingHelper.GetNewName(null, name);
-
-            ((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
+            //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
             return result;
         }
         public TreeRootModel CreateTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)

@@ -22,6 +22,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public class TreeRootModel : TreeRepositoryMemberBaseModel, IHavingOwnDataStorageModel, IChildrenModel, IParentModel
     {
+        protected override string DefaultFixedPartOfName { get => "Новый корень"; }
         public override EntityTypesModel EntityType { get => EntityTypesModel.Root; }
         public IDataStorageModel OwnDataStorage { get; private set; }
         public EntityElementTypeModel ElementType { get; set; }
@@ -57,7 +58,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //{
             //    existNames.Add(((IMainEntity)child).Name);
             //}
-            Name = NamingHelper.GetNewName(existNames, "Новый корень");
+            Name = NamingHelper.GetNewName(existNames, DefaultFixedPartOfName);
             Childs = new ObservableCollection<IChildrenModel>();
             ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
         }

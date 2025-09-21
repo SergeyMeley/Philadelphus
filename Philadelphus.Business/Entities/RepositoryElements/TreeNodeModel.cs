@@ -20,6 +20,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public class TreeNodeModel : TreeRepositoryMemberBaseModel, IParentModel, ITreeRootMemberModel
     {
+        protected override string DefaultFixedPartOfName { get => "Новый узел"; }
         public override EntityTypesModel EntityType { get => EntityTypesModel.Node; }
         public IMainEntitiesInfrastructureRepository Infrastructure { get; private set; }
         public EntityElementTypeModel ElementType { get; set; }
@@ -64,7 +65,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             {
                 existNames.Add(item.Name);
             }
-            Name = NamingHelper.GetNewName(existNames, "Новый узел");
+            Name = NamingHelper.GetNewName(existNames, DefaultFixedPartOfName);
             Childs = new ObservableCollection<IChildrenModel>();
             ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
         }

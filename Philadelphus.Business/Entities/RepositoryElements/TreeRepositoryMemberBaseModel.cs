@@ -9,6 +9,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IContentOwnerModel, IChildrenModel, ITypedModel, ISequencableModel
     {
+        protected override string DefaultFixedPartOfName { get => "Новый член репозитория"; }
         public IParentModel Parent { get; protected set; }
         public TreeRepositoryModel ParentRepository { get; protected set; }
         public long Sequence { get; set; }

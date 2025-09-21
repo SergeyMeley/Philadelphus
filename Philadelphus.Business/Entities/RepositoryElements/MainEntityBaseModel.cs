@@ -13,6 +13,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public abstract class MainEntityBaseModel : IMainEntityModel, ILinkableByGuidModel
     {
+        protected virtual string DefaultFixedPartOfName { get => "Новая основная сущность"; }
         public abstract EntityTypesModel EntityType { get; }
         public Guid Guid { get; protected set; }
         //public Guid ParentGuid { get; protected set; }

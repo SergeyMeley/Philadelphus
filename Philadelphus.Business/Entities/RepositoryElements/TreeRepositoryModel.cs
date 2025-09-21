@@ -18,6 +18,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public class TreeRepositoryModel : MainEntityBaseModel, IHavingOwnDataStorageModel, IParentModel
     {
+        protected override string DefaultFixedPartOfName { get => "Новый репозиторий"; }
         public override EntityTypesModel EntityType { get => EntityTypesModel.Repository; }
         public IDataStorageModel OwnDataStorage { get; private set; }
         public IEnumerable<IChildrenModel> Childs { get; private set; }
@@ -30,14 +31,13 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         }
         private void Initialize()
         {
-            Name = NamingHelper.GetNewName(new string[0], "Новый репозиторий");
+            Name = NamingHelper.GetNewName(new string[0], DefaultFixedPartOfName);
             Childs = new ObservableCollection<IChildrenModel>();
         }
 
         public bool ChangeDataStorage(IDataStorageModel storage)
         {
-            OwnDataStorage = storage;
-            return true;
+            throw new NotImplementedException();
         }
 
     }
