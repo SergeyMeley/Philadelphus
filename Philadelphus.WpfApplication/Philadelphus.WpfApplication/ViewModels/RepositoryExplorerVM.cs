@@ -47,10 +47,10 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private List<string> _visabilityList = new List<string> { "Скрытый (private)", "Всем (public)", "Только наследникам (protected)", "Только элементам корня (internal)" };
-        public List<string> VisabilityList
+        private List<string> _visibilityList = new List<string> { "Скрытый (private)", "Всем (public)", "Только наследникам (protected)", "Только элементам корня (internal)" };
+        public List<string> VisibilityList
         {
-            get { return _visabilityList; }
+            get { return _visibilityList; }
         }
         public RepositoryExplorerVM(TreeRepositoryModel treeRepository)
         {

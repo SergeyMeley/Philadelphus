@@ -10,10 +10,10 @@ namespace Philadelphus.WpfApplication
     /// </summary>
     public partial class App : Application
     {
-        ApplicationViewModel _viewModel;
+        ApplicationVM _viewModel;
         public App()
         {
-            _viewModel = new ApplicationViewModel();
+            _viewModel = new ApplicationVM();
         }
     }
 

@@ -8,7 +8,7 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
         xmlns:ntf="clr-namespace:Philadelphus.Business.Services;assembly=Philadelphus.Business"
-        d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationViewModel}"
+        d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationVM}"
         mc:Ignorable="d"
         Title="{Binding Title}"
         MinHeight="500" MinWidth="1000"

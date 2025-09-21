@@ -21,7 +21,7 @@ namespace Philadelphus.WpfApplication.Converters
             if (value is bool)
             {
                 if ((bool)value)
-                    result = Brushes.LightGreen;
+                    result = Brushes.Green;
                 else
                     result = Brushes.Red;
             }

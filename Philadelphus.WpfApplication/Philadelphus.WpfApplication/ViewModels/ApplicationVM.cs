@@ -8,6 +8,7 @@ using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
+using Philadelphus.WpfApplication.Views.Controls;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
@@ -15,61 +16,40 @@ using System.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
-    public class ApplicationViewModel : ViewModelBase
+    public class ApplicationVM : ViewModelBase
     {
-        private static DataStoragesSettingsVM _dataStoragesSettingsVM;
-        public DataStoragesSettingsVM DataStoragesSettingsVM
-        {
-            get
-            {
-                return _dataStoragesSettingsVM;
-            }
-        }
+        private ApplicationWindowsVM _applicationWindowsVM;
+        public ApplicationWindowsVM ApplicationWindowsVM { get => _applicationWindowsVM; }
+
+        private ApplicationCommandsVM _applicationCommandsVM;
+        public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
+
+        private LaunchVM _launchVM;
+        public LaunchVM LaunchVM { get { return _launchVM; } }
+
+        private RepositoryCreationVM _repositoryCreationVM;
+        public RepositoryCreationVM RepositoryCreationVM { get => _repositoryCreationVM; }
+
+        private DataStoragesSettingsVM _dataStoragesSettingsVM;
+        public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
+
+        private RepositoryCollectionVM _repositoryCollectionVM;
+        public RepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
+
         private NotificationsVM _notificationsVM;
-        public NotificationsVM NotificationsVM
-        { 
-            get 
-            {
-                if (_notificationsVM == null)
-                {
-                    _notificationsVM = new NotificationsVM();
-                }
-                return _notificationsVM; 
-            } 
-        }
-
-        private StartWindow _startWindow;
-        private MainWindow _mainWindow;
-
-        public ApplicationViewModel()
+        public NotificationsVM NotificationsVM { get => _notificationsVM; }
+        public ApplicationVM()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
+            _applicationWindowsVM = new ApplicationWindowsVM();
+            _applicationCommandsVM = new ApplicationCommandsVM(this, _applicationWindowsVM);
             _dataStoragesSettingsVM = new DataStoragesSettingsVM();
             _repositoryCollectionVM = new RepositoryCollectionVM(_dataStoragesSettingsVM);
-            _startWindow = new StartWindow() { DataContext = this };
-            _startWindow.Show();
-            // ВРЕМЕННО!!!
-            //RepositoryCollectionVM.CurrentRepositoryExplorerVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault();
-            // ВРЕМЕННО!!!
-            //_mainWindow = new MainWindow() { DataContext = this };
+            _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _applicationCommandsVM.OpenDataStoragesSettingsWindowCommand, _applicationCommandsVM.OpenMainWindowCommand);
+            _applicationWindowsVM.LaunchWindow = new LaunchWindow() { DataContext = _launchVM };
+            _applicationWindowsVM.LaunchWindow.Show();
         }
 
-        private string _userName;
-        public string UserName
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_userName))
-                {
-                    _userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                }
-                return _userName;
-            }
-            private set
-            {
-                _userName = value;
-            }
-        }
         public string Title 
         { 
             get
@@ -84,19 +64,6 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private RepositoryCollectionVM _repositoryCollectionVM;        
-        public RepositoryCollectionVM RepositoryCollectionVM
-        {
-            get 
-            {
-                if (_repositoryCollectionVM == null)
-                {
-                    _repositoryCollectionVM = new RepositoryCollectionVM(_dataStoragesSettingsVM);
-                }
-                return _repositoryCollectionVM; 
-            } 
-        }
-
         public RepositoryExplorerVM RepositoryExplorerVM 
         { 
             get 
@@ -108,89 +75,5 @@ namespace Philadelphus.WpfApplication.ViewModels
                 _repositoryCollectionVM.CurrentRepositoryExplorerVM = value;
             }
         }
-
-        private int _currentProgress = 0;
-        public int CurrentProgress 
-        {  
-            get 
-            {
-                return _currentProgress; 
-            } 
-            set 
-            {
-                _currentProgress = value;
-                OnPropertyChanged(nameof(CurrentProgress));
-            } 
-        }
-
-        
-
-        #region  [Commands]
-        public RelayCommand OpenMainWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    if (_mainWindow == null)
-                        _mainWindow = new MainWindow() { DataContext = this };
-                        _mainWindow.Show();
-                    
-                    //_startWindow.Visibility = Visibility.Hidden;
-                    _startWindow.Close();
-                    _notificationsVM = new NotificationsVM();
-                    OnPropertyChanged(nameof(PopupVM));
-                });
-            }
-        }
-        public RelayCommand OpenDataStorageSettingsCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var window = new DataStoragesSettingsWindow() { DataContext = this };
-                    window.Show();
-                });
-            }
-        }
-        //public RelayCommand AddNewTreeRepositoryCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(obj =>
-        //        {
-        //            var repository = new TreeRepository(Guid.Empty);
-        //            _treeRepositoriesVMs.Add(repository);
-        //            OnPropertyChanged(nameof(TreeRepositoriesVMs));
-        //            _currentTreeRepository = TreeRepositoriesVMs.Last();
-        //            OnPropertyChanged(nameof(CurrentTreeRepository));
-        //        });
-        //    }
-        //}
-        //public RelayCommand SaveRepositoryCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(obj =>
-        //        {
-        //            var service = new DataTreeProsessingService();
-        //            service.ModifyRepository(_currentTreeRepository);
-        //        });
-        //    }
-        //}
-        //public RelayCommand RefreshRepositoryListCommand
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(obj =>
-        //        {
-        //            var service = new DataTreeProsessingService();
-        //            _treeRepositoriesVMs = service.GetRepositories() ?? new List<TreeRepository>();
-        //            OnPropertyChanged(nameof(TreeRepositoriesVMs));
-        //        });
-        //    }
-        //}
-        #endregion
     }
 }

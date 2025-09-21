@@ -1,5 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,16 +10,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Views
+namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
-    /// Логика взаимодействия для LaunchWindow.xaml
+    /// Логика взаимодействия для RepositoryCreationVM.xaml
     /// </summary>
-    public partial class LaunchWindow : Window
+    public partial class RepositoryCreation : UserControl
     {
-        public LaunchWindow()
+        public RepositoryCreation()
         {
             InitializeComponent();
         }

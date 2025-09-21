@@ -86,7 +86,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return PropertyGridHelper.GetProperties(_currentRepositoryExplorerVM.TreeRepository);
             }
         }
-        //TODO: Перенести в ApplicationViewModel
+        //TODO: Перенести в ApplicationVM
         public RelayCommand OpenRepositoryCollectionSettingsWindow
         {
             get
@@ -110,18 +110,6 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private string _newTreeRepositoryName;
-        public string NewTreeRepositoryName
-        {
-            get
-            {
-                return _newTreeRepositoryName;
-            }
-            set
-            {
-                _newTreeRepositoryName = value;
-            }
-        }
         public RelayCommand CreateNewRepository
         {
             get
@@ -130,7 +118,8 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     var service = new DataTreeProcessingService();
                     var builder = new DataStorageBuilder();
-                    var repositoryExplorerViewModel = new RepositoryExplorerVM(service.CreateNewTreeRepository(_newTreeRepositoryName, builder.Build()));
+                    var repository = service.CreateNewTreeRepository(builder.Build());
+                    var repositoryExplorerViewModel = new RepositoryExplorerVM(repository);
                     TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
                      
                 });
