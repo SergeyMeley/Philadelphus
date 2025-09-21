@@ -15,14 +15,14 @@ namespace Philadelphus.WpfApplication.ViewModels
         private RepositoryCollectionVM _repositoryCollectionVM;
         public RepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
         public string UserName { get => System.Security.Principal.WindowsIdentity.GetCurrent().Name; }
-        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, RepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand, RelayCommand openMainWindowCommand)
+        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, RepositoryCollectionVM repositoryCollectionVM, RelayCommand openRepositoryCreationWindowCommand, RelayCommand openMainWindowCommand)
         {
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = repositoryCollectionVM;
-            OpenDataStoragesSettingsWindowCommand = openDataStoragesSettingsWindowCommand;
+            OpenRepositoryCreationWindowCommand = openRepositoryCreationWindowCommand;
             OpenMainWindowCommand = openMainWindowCommand;
         }
-        public RelayCommand OpenDataStoragesSettingsWindowCommand { get; }
+        public RelayCommand OpenRepositoryCreationWindowCommand { get; }
         public RelayCommand OpenMainWindowCommand { get; }
     }
 }

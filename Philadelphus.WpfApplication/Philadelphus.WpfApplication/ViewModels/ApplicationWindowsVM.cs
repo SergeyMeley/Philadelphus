@@ -21,6 +21,6 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private RepositoryCreationWindow _repositoryCreationWindow;
         public RepositoryCreationWindow RepositoryCreationWindow { get => _repositoryCreationWindow; set => _repositoryCreationWindow = value; }
-        
+
     }
 }

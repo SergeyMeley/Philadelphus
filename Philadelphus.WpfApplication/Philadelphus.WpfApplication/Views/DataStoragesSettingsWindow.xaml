@@ -15,7 +15,7 @@
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="Выбрать хранилище">
-            <ListBox DataContext="{Binding DataStoragesSettingsVM}" ItemsSource="{Binding DataStorages}" SelectedItem="{Binding SelectedDataStorage}">
+            <ListBox ItemsSource="{Binding DataStorages}" SelectedItem="{Binding SelectedDataStorage}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>

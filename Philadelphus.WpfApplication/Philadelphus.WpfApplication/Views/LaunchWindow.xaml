@@ -69,7 +69,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </GroupBox>
-        <Button Grid.Row="2" Content="Создать новый репозиторий" Height="30" Command="{Binding OpenDataStoragesSettingsWindowCommand}" Margin="2"></Button>
+        <Button Grid.Row="2" Content="Создать новый репозиторий" Height="30" Command="{Binding OpenRepositoryCreationWindowCommand}" Margin="2"></Button>
         <Button Grid.Row="4" Content="Начать!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
     </Grid>
 </Window>

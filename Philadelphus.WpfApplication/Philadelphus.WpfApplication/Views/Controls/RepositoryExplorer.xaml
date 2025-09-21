@@ -31,12 +31,13 @@
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="2">
-                        <Button Content="{StaticResource imageModify}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                        <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageModify}" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}"  Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageDelete}" Command="{Binding DeleteElementCommand}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                        <Button Content="{StaticResource imageProtect}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                        <Button Content="{StaticResource imageDelete}" Command="{Binding DeleteElementCommand}" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageProtect}" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="2">
                         <TextBlock VerticalAlignment="Center" Text="Представление "></TextBlock>

@@ -20,9 +20,10 @@ namespace Philadelphus.WpfApplication.Views
     /// </summary>
     public partial class LaunchWindow : Window
     {
-        public LaunchWindow()
+        public LaunchWindow(LaunchVM vm)
         {
             InitializeComponent();
+            DataContext = vm;
         }
     }
 }

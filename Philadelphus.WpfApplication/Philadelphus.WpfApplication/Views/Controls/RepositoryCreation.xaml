@@ -21,13 +21,13 @@
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
-        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentRepositoryExplorerVM.TreeRepository.Name}" Margin="2"></TextBox>
+        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Name}" Margin="2"></TextBox>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentRepositoryExplorerVM.TreeRepository.Description}" Margin="2"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description}" Margin="2"></TextBox>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="UUID" Margin="2"></TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentRepositoryExplorerVM.TreeRepository.Guid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Guid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Хранилище данных" Margin="2"></TextBlock>
-        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding RepositoryCollectionVM.DataStoragesSettingsVM.DataStorages}" SelectedValue="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM.TreeRepository.OwnDataStorage}" Margin="2">
+        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding DataStoragesSettingsVM.DataStorages}" SelectedValue="{Binding DataStoragesSettingsVM.SelectedDataStorage}" Margin="2">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -38,7 +38,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Grid.Row="3" Grid.Column="2" Command="{Binding CreateAndSaveRepositoryCommand}" Content="Открыть настройки хранилищ" Margin="2"></Button>
+        <Button Grid.Row="3" Grid.Column="2" Command="{Binding OpenDataStoragesSettingsWindowCommand}" Content="Открыть настройки хранилищ" Margin="2"></Button>
         <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding CreateAndSaveRepositoryCommand}" Content="Добавить и сохранить" Margin="2"></Button>
     </Grid>
 </UserControl>

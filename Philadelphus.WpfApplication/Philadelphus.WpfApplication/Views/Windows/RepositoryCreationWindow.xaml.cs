@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Philadelphus.WpfApplication.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,10 @@ namespace Philadelphus.WpfApplication.Views.Windows
     /// </summary>
     public partial class RepositoryCreationWindow : Window
     {
-        public RepositoryCreationWindow()
+        public RepositoryCreationWindow(RepositoryCreationVM vm)
         {
             InitializeComponent();
+            DataContext = vm;
         }
     }
 }

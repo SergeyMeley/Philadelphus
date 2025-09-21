@@ -29,7 +29,9 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_applicationWindowsVM.MainWindow == null)
                         _applicationWindowsVM.MainWindow = new MainWindow() { DataContext = _applicationVM };
-                    _applicationWindowsVM.MainWindow.Show();
+                    _applicationWindowsVM.MainWindow.ShowDialog();
+                    _applicationWindowsVM.LaunchWindow.Close();
+                    _applicationWindowsVM.LaunchWindow = null;
                 });
             }
         }
@@ -39,9 +41,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_applicationWindowsVM.DataStoragesSettingsWindow == null)
-                        _applicationWindowsVM.DataStoragesSettingsWindow = new DataStoragesSettingsWindow() { DataContext = _applicationVM.DataStoragesSettingsVM };
-                    _applicationWindowsVM.DataStoragesSettingsWindow.Show();
+                    _applicationWindowsVM.DataStoragesSettingsWindow = new DataStoragesSettingsWindow(_applicationVM.DataStoragesSettingsVM);
+                    _applicationWindowsVM.DataStoragesSettingsWindow.ShowDialog();
                 });
             }
         }
@@ -52,11 +53,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var window = new RepositoryCreationWindow() { DataContext = this };
-                    window.Show();
-                    if (_applicationWindowsVM.RepositoryCreationWindow == null)
-                        _applicationWindowsVM.RepositoryCreationWindow = new RepositoryCreationWindow() { DataContext = _applicationVM.RepositoryCreationVM };
-                    _applicationWindowsVM.DataStoragesSettingsWindow.Show();
+                    _applicationVM.RepositoryCreationVM.OpenWindow();
                 });
             }
         }

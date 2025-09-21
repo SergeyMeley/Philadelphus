@@ -65,15 +65,25 @@ namespace Philadelphus.WpfApplication.ViewModels
 
 
         #region [Commands]
+        public RelayCommand SaveCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var service = new DataTreeProcessingService();
+                    service.SaveChanges(TreeRepository);
+                });
+            }
+        }
         public RelayCommand CreateRootCommand
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
-                    
                     var service = new DataTreeProcessingService();
-                    service.CreateTreeRoot(_treeRepository, null);
+                    service.CreateTreeRoot(_treeRepository, _treeRepository.OwnDataStorage);
                 });
             }
         }

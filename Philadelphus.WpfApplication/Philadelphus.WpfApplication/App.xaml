@@ -10,7 +10,7 @@
         <converters:RepresentationToDataGridVisibilityConverter x:Key="representationToDataGridVisibilityConverter" />
         <converters:RepresentationToStandardGridVisibilityConverter x:Key="representationToStandardGridVisibilityConverter" />
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
-
+        
         <Image x:Key="imageAdd" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageBack" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageCopy" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
@@ -26,6 +26,7 @@
         <Image x:Key="imageProtect" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageRemove" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageReturn" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageSave" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageUp" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
         <Image x:Key="imageRepository" Source="C:\Users\MeleychukSV\Downloads\icons8_icon_repository.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>

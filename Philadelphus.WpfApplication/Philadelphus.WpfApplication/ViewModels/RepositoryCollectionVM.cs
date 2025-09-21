@@ -141,8 +141,9 @@ namespace Philadelphus.WpfApplication.ViewModels
                     var treeRepository = _dataTreeProcessingService.CreateSampleRepository(dataStorage);
                     var vm = new RepositoryExplorerVM(treeRepository);
                     _treeRepositoriesVMs.Add(vm);
+                    _dataTreeProcessingService.SaveChanges(vm.TreeRepository);
                 }
-                _dataTreeProcessingService.SaveChanges();
+                
             }
             //Временно
             return true;

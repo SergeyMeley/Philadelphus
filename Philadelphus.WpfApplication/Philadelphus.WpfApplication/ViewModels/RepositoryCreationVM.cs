@@ -20,12 +20,25 @@ namespace Philadelphus.WpfApplication.ViewModels
         private string _description;
         public string Description { get => _description; set => _description = value; }
 
-        private DataStoragesSettingsVM _dataStoragesSettingsVM;
+        private DataStoragesSettingsVM _dataStoragesSettingsVM = new DataStoragesSettingsVM();
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
-        public RepositoryCreationVM(RepositoryCreationWindow window, RelayCommand openDataStoragesSettingsWindowCommand)
+
+        private RepositoryCollectionVM _repositoryCollectionVM;
+        public RepositoryCreationVM(RepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand)
         {
-            _window = window;
+            _repositoryCollectionVM = repositoryCollectionVM;
             OpenDataStoragesSettingsWindowCommand = openDataStoragesSettingsWindowCommand;
+        }
+        public void OpenWindow()
+        {
+            if (_window == null)
+                _window = new RepositoryCreationWindow(this);
+            _window.ShowDialog();
+        }
+        public void CloseWindow()
+        {
+            _window.Close();
+            _window = null;
         }
         public RelayCommand CreateAndSaveRepositoryCommand
         {
@@ -34,14 +47,17 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeProcessingService();
+                    if (_dataStoragesSettingsVM.SelectedDataStorage == null)
+                        return;
                     var result = service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorage);
                     result.Name = _name;
                     result.Description = _description;
                     service.SaveChanges(result);
-                    _window.Close();
+                    _repositoryCollectionVM.TreeRepositoriesVMs.Add(new RepositoryExplorerVM(result));
+                    CloseWindow();
                 });
             }
         }
-        public RelayCommand OpenDataStoragesSettingsWindowCommand;
+        public RelayCommand OpenDataStoragesSettingsWindowCommand { get; }
     }
 }
