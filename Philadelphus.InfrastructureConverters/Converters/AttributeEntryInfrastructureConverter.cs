@@ -12,7 +12,7 @@
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = (AttributeEntry)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeEntry());
+//            var result = (AttributeEntry)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeEntry());
 //            result.Guid = businessEntity.Guid;
 //            return result;
 //        }
@@ -23,7 +23,7 @@
 //            var result = new List<AttributeEntry>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (AttributeEntry)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeEntry());
+//                var entity = (AttributeEntry)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new AttributeEntry());
 //                entity.Guid = businessEntity.Guid;
 //                result.Add(entity);
 //            }

@@ -18,7 +18,7 @@
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = businessEntity.ToDbEntityGenetalProperties();
+//            var result = businessEntity.ToDbEntityGeneralProperties();
 //            result.Guid = businessEntity.Guid;
 //            return result;
 //        }
@@ -29,7 +29,7 @@
 //            var result = new List<TreeElementAttribute>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = businessEntity.ToDbEntityGenetalProperties();
+//                var entity = businessEntity.ToDbEntityGeneralProperties();
 //                entity.Guid = businessEntity.Guid;
 //                result.Add(entity);
 //            }

@@ -17,7 +17,7 @@
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = (TreeLeave)businessEntity.ToDbEntityGenetalProperties(new TreeLeave());
+//            var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(new TreeLeave());
 //            return result;
 //        }
 //        public static List<TreeLeave> ToDbEntityCollection(IEnumerable<TreeLeaveModel> businessEntityCollection)
@@ -27,7 +27,7 @@
 //            var result = new List<TreeLeave>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (TreeLeave)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
+//                var entity = (TreeLeave)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
 //                result.Add(entity);
 //            }
 //            return result;

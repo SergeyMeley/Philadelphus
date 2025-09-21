@@ -19,7 +19,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeElementAttributeValue)businessEntity.ToDbEntityGenetalProperties(new TreeElementAttributeValue());
+            var result = (TreeElementAttributeValue)businessEntity.ToDbEntityGeneralProperties(new TreeElementAttributeValue());
             return result;
         }
         public static IEnumerable<TreeElementAttributeValue> BusinessToDbEntityCollection(IEnumerable<ElementAttributeValueModel> businessEntityCollection)
@@ -29,7 +29,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<TreeElementAttributeValue>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                var entity = (TreeElementAttributeValue)businessEntity.ToDbEntityGenetalProperties(new TreeElementAttributeValue());
+                var entity = (TreeElementAttributeValue)businessEntity.ToDbEntityGeneralProperties(new TreeElementAttributeValue());
                 result.Add(entity);
             }
             return result;

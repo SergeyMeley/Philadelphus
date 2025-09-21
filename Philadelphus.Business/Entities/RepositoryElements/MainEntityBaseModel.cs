@@ -1,6 +1,8 @@
 ﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Helpers.InfrastructureConverters;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,5 +41,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             return sb.ToString();
         }
         public State State { get; set; } = State.Initialized;
+
+        public IMainEntity DbEntity { get => this.ToDbEntity(); }
     }
 }

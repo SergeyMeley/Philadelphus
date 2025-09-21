@@ -28,70 +28,9 @@ namespace Philadelphus.Business.Services
         }
 
         private MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
-
         public MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
-        public long SaveChanges(TreeRepositoryModel treeRepository)
-        {
-            long result = 0;
-            switch (treeRepository.State)
-            {
-                case State.Initialized:
-                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
-                    break;
-                case State.Changed:
-                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
-                    break;
-                case State.Deleted:
-                    result = treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
-                    break;
-                default:
-                    break;
-            }
-            SaveChanges((TreeRootModel)treeRepository.Childs);
-            return result;
-        }
-        public long SaveChanges(TreeRootModel treeRoot)
-        {
-            long result = 0;
-            switch (treeRoot.State)
-            {
-                case State.Initialized:
-                    treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.InsertRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
-                    break;
-                case State.Changed:
-                    treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.UpdateRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
-                    break;
-                case State.Deleted:
-                    result = treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.DeleteRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
-                    break;
-                default:
-                    break;
-            }
-            SaveChanges((TreeNodeModel)treeRoot.Childs);
-            return result;
-        }
-        public long SaveChanges(TreeNodeModel treeNode)
-        {
-            long result = 0;
-
-            SaveChanges((TreeLeaveModel)treeNode.Childs);
-            return result;
-        }
-        public long SaveChanges(TreeLeaveModel treeLeave)
-        {
-            long result = 0;
-
-
-            return result;
-        }
-
-        public long SaveChanges()
-        {
-            long result = 0;
-            result = SaveChanges(_currentRepository);
-            return result;
-        }
+        
 
         public IEnumerable<TreeRepositoryModel> GetRepositories(IEnumerable<IDataStorageModel> dataStorages)
         {
@@ -131,51 +70,7 @@ namespace Philadelphus.Business.Services
         //    }
         //    return GetRepositoryHeadersCollection();
         //}
-        public TreeRootModel InitTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
-        {
-            var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage);
-            ((List<TreeRepositoryMemberBaseModel>)parentElement.ElementsCollection).Add(result);
-            ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
-            return result;
-        }
-        public TreeNodeModel InitTreeNode(IParentModel parentElement)
-        {
-            var result = new TreeNodeModel(Guid.NewGuid(), parentElement);
-            ((List<TreeRepositoryMemberBaseModel>)result.ParentRepository.ElementsCollection).Add(result);
-            ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
-            return result;
-        }
-        public TreeLeaveModel InitTreeLeave(IParentModel parentElement)
-        {
-            try
-            {
-                if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) == false || parentElement.GetType() != typeof(TreeNodeModel))
-                {
-                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
-                    return null;
-                }
-                else
-                {
-                    var result = new TreeLeaveModel(Guid.NewGuid(), parentElement);
-                    ((List<TreeRepositoryMemberBaseModel>)result.ParentRepository.ElementsCollection).Add(result);
-                    ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
-                throw;
-            }
-        }
-
-        public ElementAttributeModel InitElementAttribute(IContentOwnerModel owner)
-        {
-            var result = new ElementAttributeModel(Guid.NewGuid(), owner);
-            //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
-            ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(result);
-            return result;
-        }
+        
 
         public bool RemoveElement(IChildrenModel element)
         {
@@ -263,18 +158,7 @@ namespace Philadelphus.Business.Services
             return repo;
         }
 
-        public TreeRepositoryModel CreateNewTreeRepository(string name, IDataStorageModel dataStorage)
-        {
-            var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
-            if (string.IsNullOrEmpty(name))
-            {
-                name = "Новый репозиторий";
-            }
-            result.Name = NamingHelper.GetNewName(null, name);
-
-            ((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
-            return result;
-        }
+        
 
         
 
@@ -297,75 +181,68 @@ namespace Philadelphus.Business.Services
 
             return result;
         }
-        /// <summary>
-        /// Сохранение измененного репозитория.
-        /// </summary>
-        /// <param name="entity"></param>
-        //public void SaveRepository(TreeRepository repository)
-        //{
-        //    DataTreeRepositories = GetRepositoryHeadersCollection();
-        //    bool availableInList = false;
-        //    for (int i = 0; i < DataTreeRepositories.Count; i++)
-        //    {
-        //        if (DataTreeRepositories[i].Guid == repository.Guid)
-        //        {
-        //            DataTreeRepositories[i] = repository;
-        //            availableInList = true;
-        //        }
-        //    }
-        //    if (!availableInList)
-        //    {
-        //        DataTreeRepositories.Add(repository);
-        //    }
-        //    foreach (var item in DataTreeRepositories)
-        //    {
-        //        item.DirectoryFullPath = Path.Join(new string[] { item.DirectoryPath, Path.DirectorySeparatorChar.ToString(), item.Name });
-        //        item.ConfigPath = Path.Join(new string[] { item.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
-        //    }
-        //    UpdateEntities(DataTreeRepositories);
-            
-        //}
-        //private void UpdateEntities(IEnumerable<IMainEntityModel> entities, InfrastructureTypes infrastructure)
-        //{
-        //    foreach (var entityType in entities.Select(x => x.EntityType).Distinct())
-        //    {
-        //        var infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(infrastructure);
-        //        InfrastructureConverterBase converter;
-        //        switch (entityType)
-        //        {
-        //            case EntityTypesModel.None:
-        //                break;
-        //            case EntityTypesModel.Repository:
-        //                converter = new RepositoryInfrastructureConverter();
-        //                ((ITreeRepositoriesInfrastructureRepository)infrastructureRepository).UpdateRepository((List<TreeRepository>)converter.ToDbEntityCollection(entities));
-        //                break;
-        //            case EntityTypesModel.Root:
-        //                converter = new RootInfrastructureConverter();
-        //                infrastructureRepository.UpdateRoots((List<TreeRoot>)converter.ToDbEntityCollection(entities));
-        //                break;
-        //            case EntityTypesModel.Node:
-        //                converter = new NodeInfrastructureConverter();
-        //                infrastructureRepository.UpdateNodes((List<TreeNode>)converter.ToDbEntityCollection(entities));
-        //                break;
-        //            case EntityTypesModel.Leave:
-        //                converter = new LeaveInfrastructureConverter();
-        //                infrastructureRepository.UpdateLeaves((List<TreeLeave>)converter.ToDbEntityCollection(entities));
-        //                break;
-        //            case EntityTypesModel.Attribute:
-        //                converter = new AttributeInfrastructureConverter();
-        //                infrastructureRepository.UpdateAttributes((List<ElementAttribute>)converter.ToDbEntityCollection(entities));
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //    }
-        //}
 
 
 
+        #region Create
+        public TreeRepositoryModel CreateNewTreeRepository(string name, IDataStorageModel dataStorage)
+        {
+            var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "Новый репозиторий";
+            }
+            result.Name = NamingHelper.GetNewName(null, name);
 
+            ((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
+            return result;
+        }
+        public TreeRootModel CreateTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
+        {
+            var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage);
+            ((List<TreeRepositoryMemberBaseModel>)parentElement.ElementsCollection).Add(result);
+            ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
+            return result;
+        }
+        public TreeNodeModel CreateTreeNode(IParentModel parentElement)
+        {
+            var result = new TreeNodeModel(Guid.NewGuid(), parentElement);
+            ((List<TreeRepositoryMemberBaseModel>)result.ParentRepository.ElementsCollection).Add(result);
+            ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
+            return result;
+        }
+        public TreeLeaveModel CreateTreeLeave(IParentModel parentElement)
+        {
+            try
+            {
+                if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) == false || parentElement.GetType() != typeof(TreeNodeModel))
+                {
+                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                    return null;
+                }
+                else
+                {
+                    var result = new TreeLeaveModel(Guid.NewGuid(), parentElement);
+                    ((List<TreeRepositoryMemberBaseModel>)result.ParentRepository.ElementsCollection).Add(result);
+                    ((ObservableCollection<IChildrenModel>)parentElement.Childs).Add(result);
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                throw;
+            }
+        }
 
-
+        public ElementAttributeModel CreateElementAttribute(IContentOwnerModel owner)
+        {
+            var result = new ElementAttributeModel(Guid.NewGuid(), owner);
+            //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
+            ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(result);
+            return result;
+        }
+        #endregion
 
 
 
@@ -436,5 +313,71 @@ namespace Philadelphus.Business.Services
         //    }
         //    return treeNode;
         //}
+
+
+
+        #region Save
+        public long SaveChanges(TreeRepositoryModel treeRepository)
+        {
+            long result = 0;
+            switch (treeRepository.State)
+            {
+                case State.Initialized:
+                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
+                    break;
+                case State.Changed:
+                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
+                    break;
+                case State.Deleted:
+                    result = treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
+                    break;
+                default:
+                    break;
+            }
+            SaveChanges((TreeRootModel)treeRepository.Childs);
+            return result;
+        }
+        public long SaveChanges(TreeRootModel treeRoot)
+        {
+            long result = 0;
+            switch (treeRoot.State)
+            {
+                case State.Initialized:
+                    treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.InsertRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
+                    break;
+                case State.Changed:
+                    treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.UpdateRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
+                    break;
+                case State.Deleted:
+                    result = treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.DeleteRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
+                    break;
+                default:
+                    break;
+            }
+            SaveChanges((TreeNodeModel)treeRoot.Childs);
+            return result;
+        }
+        public long SaveChanges(TreeNodeModel treeNode)
+        {
+            long result = 0;
+
+            SaveChanges((TreeLeaveModel)treeNode.Childs);
+            return result;
+        }
+        public long SaveChanges(TreeLeaveModel treeLeave)
+        {
+            long result = 0;
+
+
+            return result;
+        }
+
+        public long SaveChanges()
+        {
+            long result = 0;
+            result = SaveChanges(_currentRepository);
+            return result;
+        }
+        #endregion
     }
 }

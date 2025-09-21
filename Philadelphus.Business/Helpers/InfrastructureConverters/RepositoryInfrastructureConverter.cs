@@ -18,7 +18,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeRepository)businessEntity.ToDbEntityGenetalProperties(new TreeRepository());
+            var result = (TreeRepository)businessEntity.ToDbEntityGeneralProperties(new TreeRepository());
             return result;
         }
         public static List<TreeRepository> ToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)

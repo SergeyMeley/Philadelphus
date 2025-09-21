@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Philadelphus.PostgreEfRepository.Contexts;
@@ -12,9 +13,11 @@ using Philadelphus.PostgreEfRepository.Contexts;
 namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     [DbContext(typeof(MainEntitiesPhiladelphusContext))]
-    partial class MainEntitiesPhiladelphusContextModelSnapshot : ModelSnapshot
+    [Migration("20250921093641_SomeChanges210925")]
+    partial class SomeChanges210925
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

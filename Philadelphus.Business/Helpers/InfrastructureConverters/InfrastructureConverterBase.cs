@@ -1,6 +1,8 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +38,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
             return businessEntity;
         }
-        public static IMainEntity ToDbEntityGenetalProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
+        public static IMainEntity ToDbEntityGeneralProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
         {
             if (businessEntity == null)
                 return null;
@@ -62,6 +64,79 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.AuditInfo.DeletedOn = businessEntity.AuditInfo.DeletedOn;
             dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
+        }
+
+        public static IMainEntity ToDbEntity(this IMainEntityModel businessEntity)
+        {
+            if (businessEntity != null)
+                return null;
+            IMainEntity result = null;
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeRepositoryModel)))
+            {
+                TreeRepositoryModel model = (TreeRepositoryModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeRootModel)))
+            {
+                TreeRootModel model = (TreeRootModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeNodeModel)))
+            {
+                TreeNodeModel model = (TreeNodeModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeLeaveModel)))
+            {
+                TreeLeaveModel model = (TreeLeaveModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            throw new Exception();
+        }
+        public static List<IMainEntity> ToDbEntityCollection(this IEnumerable<IMainEntityModel> businessEntityCollection)
+        {
+            List<IMainEntity> result = null;
+            foreach (var item in businessEntityCollection)
+            {
+                result.Add(item.ToDbEntity());
+            }
+            return result;
+        }
+        public static IMainEntityModel ToModel(this IMainEntity dbEntity, IEnumerable<IDataStorageModel> dataStorages)
+        {
+            if (dbEntity != null)
+                return null;
+            IMainEntity result = null;
+            if (dbEntity.GetType().IsAssignableTo(typeof(TreeRepository)))
+            {
+                TreeRepository entity = (TreeRepository)dbEntity;
+                return entity.ToModel(dataStorages);
+            }
+            if (dbEntity.GetType().IsAssignableTo(typeof(TreeRoot)))
+            {
+                TreeRoot entity = (TreeRoot)dbEntity;
+                return entity.ToModel(dataStorages);
+            }
+            if (dbEntity.GetType().IsAssignableTo(typeof(TreeNode)))
+            {
+                TreeNode entity = (TreeNode)dbEntity;
+                return entity.ToModel(dataStorages);
+            }
+            if (dbEntity.GetType().IsAssignableTo(typeof(TreeLeave)))
+            {
+                TreeLeave entity = (TreeLeave)dbEntity;
+                return entity.ToModel(dataStorages);
+            }
+            throw new Exception();
+        }
+        public static List<IMainEntityModel> ToModelCollection(this IEnumerable<IMainEntity> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
+        {
+            List<IMainEntityModel> result = null;
+            foreach (var item in dbEntityCollection)
+            {
+                result.Add(item.ToModel(dataStorages));
+            }
+            return result;
         }
     }
 }

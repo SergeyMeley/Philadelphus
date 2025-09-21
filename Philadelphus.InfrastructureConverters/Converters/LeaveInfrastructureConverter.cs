@@ -17,7 +17,7 @@
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = (TreeLeave)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
+//            var result = (TreeLeave)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
 //            return result;
 //        }
 //        internal override List<TreeLeave> ToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
@@ -27,7 +27,7 @@
 //            var result = new List<TreeLeave>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (TreeLeave)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
+//                var entity = (TreeLeave)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeLeave());
 //                result.Add(entity);
 //            }
 //            return result;

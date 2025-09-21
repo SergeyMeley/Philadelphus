@@ -2,6 +2,7 @@
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
         public string CustomCode { get; set; }
         public AuditInfoModel AuditInfo { get; }
         public State State { get; set; }
+        public IMainEntity DbEntity { get; }
     }
 }

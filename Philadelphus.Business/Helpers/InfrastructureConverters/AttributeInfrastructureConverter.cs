@@ -19,7 +19,7 @@
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = businessEntity.ToDbEntityGenetalProperties();
+//            var result = businessEntity.ToDbEntityGeneralProperties();
 //            return result;
 //        }
 //        public static IEnumerable<IMainEntity> ToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
@@ -29,7 +29,7 @@
 //            var result = new List<ElementAttribute>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (ElementAttribute)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new ElementAttribute());
+//                var entity = (ElementAttribute)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new ElementAttribute());
 //                result.Add(entity);
 //            }
 //            return result;

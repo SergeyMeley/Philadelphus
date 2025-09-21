@@ -17,7 +17,7 @@
 //        {
 //            if (businessEntity == null)
 //                return null;
-//            var result = (TreeRoot)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
+//            var result = (TreeRoot)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
 //            return result;
 //        }
 //        internal override IEnumerable<IEntity> ToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
@@ -27,7 +27,7 @@
 //            var result = new List<TreeRoot>();
 //            foreach (var businessEntity in businessEntityCollection)
 //            {
-//                var entity = (TreeRoot)ToDbEntityGenetalProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
+//                var entity = (TreeRoot)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeRoot());
 //                result.Add(entity);
 //            }
 //            return result;

@@ -36,7 +36,7 @@
 //            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
 //            return businessEntity;
 //        }
-//        public static IMainEntity ToDbEntityGenetalProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
+//        public static IMainEntity ToDbEntityGeneralProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
 //        {
 //            if (businessEntity == null)
 //                return null;
