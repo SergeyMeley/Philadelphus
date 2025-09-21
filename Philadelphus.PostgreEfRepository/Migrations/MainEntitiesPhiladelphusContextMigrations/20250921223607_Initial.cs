@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -154,7 +154,8 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                 columns: table => new
                 {
                     repository_element_id = table.Column<int>(type: "integer", nullable: false),
-                    ParentTreeRepositoryGuid = table.Column<long>(type: "bigint", nullable: false),
+                    OwnDataStorageGuid = table.Column<Guid>(type: "uuid", nullable: false),
+                    ParentTreeRepositoryGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     AttributeGuids = table.Column<List<long>>(type: "bigint[]", nullable: false),
                     ChildTreeNodeGuids = table.Column<List<long>>(type: "bigint[]", nullable: false)
                 },

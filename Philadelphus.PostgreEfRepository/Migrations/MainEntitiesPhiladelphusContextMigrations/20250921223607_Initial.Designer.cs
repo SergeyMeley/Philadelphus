@@ -13,8 +13,8 @@ using Philadelphus.PostgreEfRepository.Contexts;
 namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     [DbContext(typeof(MainEntitiesPhiladelphusContext))]
-    [Migration("20250913185732_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250921223607_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -224,8 +224,11 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                         .IsRequired()
                         .HasColumnType("bigint[]");
 
-                    b.Property<long>("ParentTreeRepositoryGuid")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("OwnDataStorageGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ParentTreeRepositoryGuid")
+                        .HasColumnType("uuid");
 
                     b.ToTable("root_details", (string)null);
                 });

@@ -26,7 +26,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
         }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository
         {
-            get => (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository];
+            get => (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntitiesInfrastructureRepository];
         }
         public bool IsAvailable {
             get

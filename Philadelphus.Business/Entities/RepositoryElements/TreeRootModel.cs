@@ -40,6 +40,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 Guid = guid;
                 Parent = parent;
                 ParentRepository = (TreeRepositoryModel)parent;
+                OwnDataStorage = dataStorage;
                 Initialize();
             }
             else

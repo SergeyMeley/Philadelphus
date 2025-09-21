@@ -328,7 +328,10 @@ namespace Philadelphus.Business.Services
                 default:
                     break;
             }
-            SaveChanges((TreeRootModel)treeRepository.Childs);
+            for (int i = 0; i < treeRepository.Childs.Count(); i++)
+            {
+                SaveChanges(((TreeRootModel)treeRepository.Childs.ToList()[i]));
+            }
             return result;
         }
         public long SaveChanges(TreeRootModel treeRoot)
@@ -348,20 +351,25 @@ namespace Philadelphus.Business.Services
                 default:
                     break;
             }
-            SaveChanges((TreeNodeModel)treeRoot.Childs);
+            for (int i = 0; i < treeRoot.Childs.Count(); i++)
+            {
+                SaveChanges(((TreeNodeModel)treeRoot.Childs.ToList()[i]));
+            }
             return result;
         }
         public long SaveChanges(TreeNodeModel treeNode)
         {
             long result = 0;
-
-            SaveChanges((TreeLeaveModel)treeNode.Childs);
+            
+            //for (int i = 0; i < treeNode.Childs.Count(); i++)
+            //{
+            //    SaveChanges(((TreeLeaveModel)treeNode.Childs.ToList()[i]));
+            //}
             return result;
         }
         public long SaveChanges(TreeLeaveModel treeLeave)
         {
             long result = 0;
-
 
             return result;
         }
