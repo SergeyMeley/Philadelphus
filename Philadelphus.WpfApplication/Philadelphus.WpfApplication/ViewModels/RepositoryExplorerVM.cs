@@ -73,7 +73,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     
                     var service = new DataTreeProcessingService();
-                    service.InitTreeRoot(_treeRepository, null);
+                    service.CreateTreeRoot(_treeRepository, null);
                 });
             }
         }
@@ -91,7 +91,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     if (_selectedRepositoryMember?.GetType().IsAssignableTo(typeof(IParentModel)) == false)
                         return;
                     var service = new DataTreeProcessingService();
-                    service.InitTreeNode((IParentModel)_selectedRepositoryMember);
+                    service.CreateTreeNode((IParentModel)_selectedRepositoryMember);
                 });
             }
         }
@@ -112,7 +112,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                         return;
                     }
                     var service = new DataTreeProcessingService();
-                    service.InitTreeLeave((IParentModel)_selectedRepositoryMember);
+                    service.CreateTreeLeave((IParentModel)_selectedRepositoryMember);
                 });
             }
         }
@@ -130,7 +130,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwnerModel)) == false)
                         return;
                     var service = new DataTreeProcessingService();
-                    service.InitElementAttribute((IContentOwnerModel)_selectedRepositoryMember);
+                    service.CreateElementAttribute((IContentOwnerModel)_selectedRepositoryMember);
                 });
             }
         }
