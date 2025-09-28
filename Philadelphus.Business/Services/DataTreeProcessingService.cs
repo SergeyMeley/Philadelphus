@@ -41,7 +41,12 @@ namespace Philadelphus.Business.Services
                 if (dataStorage.TreeRepositoryHeadersInfrastructureRepository.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
                     && dataStorage.IsAvailable)
                 {
-                    result.AddRange(infrastructure.SelectRepositories().ToModelCollection(dataStorages));
+                    var dbRepositories = infrastructure.SelectRepositories();
+                    var repositories = dbRepositories?.ToModelCollection(dataStorages);
+                    if (repositories != null)
+                    {
+                        result.AddRange(repositories);
+                    }
                 }
             }
             return result;
@@ -328,6 +333,7 @@ namespace Philadelphus.Business.Services
                 default:
                     break;
             }
+            treeRepository.State = State.Saved;
             for (int i = 0; i < treeRepository.Childs.Count(); i++)
             {
                 SaveChanges(((TreeRootModel)treeRepository.Childs.ToList()[i]));
@@ -351,6 +357,7 @@ namespace Philadelphus.Business.Services
                 default:
                     break;
             }
+            treeRoot.State = State.Saved;
             for (int i = 0; i < treeRoot.Childs.Count(); i++)
             {
                 SaveChanges(((TreeNodeModel)treeRoot.Childs.ToList()[i]));
@@ -360,17 +367,19 @@ namespace Philadelphus.Business.Services
         public long SaveChanges(TreeNodeModel treeNode)
         {
             long result = 0;
-            
+
             //for (int i = 0; i < treeNode.Childs.Count(); i++)
             //{
             //    SaveChanges(((TreeLeaveModel)treeNode.Childs.ToList()[i]));
             //}
+            treeNode.State = State.Saved;
             return result;
         }
         public long SaveChanges(TreeLeaveModel treeLeave)
         {
             long result = 0;
 
+            treeLeave.State = State.Saved;
             return result;
         }
 

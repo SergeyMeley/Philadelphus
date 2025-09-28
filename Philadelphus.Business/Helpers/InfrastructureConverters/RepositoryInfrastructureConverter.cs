@@ -19,6 +19,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = (TreeRepository)businessEntity.ToDbEntityGeneralProperties(new TreeRepository());
+            result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
             return result;
         }
         public static List<TreeRepository> ToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)

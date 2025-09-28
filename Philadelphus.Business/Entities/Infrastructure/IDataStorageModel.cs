@@ -19,5 +19,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public ITreeRepositoriesInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; }
         public bool IsAvailable { get; }
+        public DateTime LastCheckTime { get; }
+        public bool CheckAvailable();
+        public bool StartAvailableAutoChecking();
     }
 }

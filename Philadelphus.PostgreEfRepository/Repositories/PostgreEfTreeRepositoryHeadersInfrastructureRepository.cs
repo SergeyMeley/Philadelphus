@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
@@ -39,7 +41,21 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository; }
         public bool CheckAvailability()
         {
-            return _context.Database.CanConnect();
+            if (_context.Database.CanConnect() == false)
+                return false;
+            try
+            {
+                if (_context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
+                    return false;
+                _context.Database.ExecuteSqlRaw($"SELECT {0}", 1);
+                _context.Database.OpenConnection();
+                _context.Database.CloseConnection();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
         public IEnumerable<TreeRepository> SelectRepositories()
         {
