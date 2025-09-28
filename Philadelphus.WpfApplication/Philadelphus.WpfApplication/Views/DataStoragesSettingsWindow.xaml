@@ -15,15 +15,16 @@
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="Выбрать хранилище">
-            <ListBox ItemsSource="{Binding DataStorages}" SelectedItem="{Binding SelectedDataStorage}">
+            <ListBox ItemsSource="{Binding DataStorageVMs}" SelectedItem="{Binding SelectedDataStorageVM}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
                             <TextBlock>
-                                <Run Text="Наименование: "></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text=". "></Run>
-                                <Run Text="Описание: "></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text=". "></Run>
-                                <Run Text="Guid: "></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text=". "></Run>
+                                <Run Text="Наименование: "></Run><Run Text="{Binding DataStorage.Name, Mode=OneWay}"></Run><Run Text=". "></Run>
+                                <Run Text="Описание: "></Run><Run Text="{Binding DataStorage.Description, Mode=OneWay}"></Run><Run Text=". "></Run>
+                                <Run Text="Guid: "></Run><Run Text="{Binding DataStorage.Guid, Mode=OneWay}"></Run><Run Text=". "></Run>
                                 <Run Text="Доступность: "></Run><Run Text="{Binding IsAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run><Run Text=". "></Run>
+                                <Run Text="("></Run><Run Text="{Binding LastCheckTime, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></Run><Run Text=")"></Run>
                             </TextBlock>
                         </StackPanel>
                     </DataTemplate>

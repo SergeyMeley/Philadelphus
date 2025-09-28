@@ -127,25 +127,12 @@ namespace Philadelphus.WpfApplication.ViewModels
         }
         private bool InitRepositoryCollection()
         {
-            var repositories = _dataTreeProcessingService.GetRepositories(_dataStoragesSettingsVM.DataStorages);
+            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
+            var repositories = _dataTreeProcessingService.GetRepositories(storages);
             foreach (var item in repositories)
             {
                 _treeRepositoriesVMs.Add(new RepositoryExplorerVM(item));
             }
-            //Временно
-            if (_treeRepositoriesVMs.Count == 0)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    var dataStorage = DataStoragesSettingsVM.DataStorages[i % _dataStoragesSettingsVM.DataStorages.Count];
-                    var treeRepository = _dataTreeProcessingService.CreateSampleRepository(dataStorage);
-                    var vm = new RepositoryExplorerVM(treeRepository);
-                    _treeRepositoriesVMs.Add(vm);
-                    _dataTreeProcessingService.SaveChanges(vm.TreeRepository);
-                }
-                
-            }
-            //Временно
             return true;
         }
 

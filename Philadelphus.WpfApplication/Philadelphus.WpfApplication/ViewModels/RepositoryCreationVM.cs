@@ -31,8 +31,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         }
         public void OpenWindow()
         {
-            if (_window == null)
-                _window = new RepositoryCreationWindow(this);
+            _window = new RepositoryCreationWindow(this);
             _window.ShowDialog();
         }
         public void CloseWindow()
@@ -47,9 +46,9 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeProcessingService();
-                    if (_dataStoragesSettingsVM.SelectedDataStorage == null)
+                    if (_dataStoragesSettingsVM.SelectedDataStorageVM == null)
                         return;
-                    var result = service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorage);
+                    var result = service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
                     result.Name = _name;
                     result.Description = _description;
                     service.SaveChanges(result);

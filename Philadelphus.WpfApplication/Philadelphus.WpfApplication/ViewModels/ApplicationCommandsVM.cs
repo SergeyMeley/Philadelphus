@@ -29,7 +29,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_applicationWindowsVM.MainWindow == null)
                         _applicationWindowsVM.MainWindow = new MainWindow() { DataContext = _applicationVM };
-                    _applicationWindowsVM.MainWindow.ShowDialog();
+                    _applicationWindowsVM.MainWindow.Show();
                     _applicationWindowsVM.LaunchWindow.Close();
                     _applicationWindowsVM.LaunchWindow = null;
                 });

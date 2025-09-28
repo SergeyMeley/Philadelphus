@@ -27,13 +27,13 @@
         <TextBlock Grid.Row="2" Grid.Column="0" Text="UUID" Margin="2"></TextBlock>
         <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Guid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Хранилище данных" Margin="2"></TextBlock>
-        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding DataStoragesSettingsVM.DataStorages}" SelectedValue="{Binding DataStoragesSettingsVM.SelectedDataStorage}" Margin="2">
+        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding DataStoragesSettingsVM.DataStorageVMs}" SelectedValue="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}" Margin="2">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}"></TextBlock>
+                        <TextBlock Text="{Binding DataStorage.Name}"></TextBlock>
                         <TextBlock Text=". Доступность: "></TextBlock>
-                        <TextBlock Text="{Binding IsAvailable}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></TextBlock>
+                        <TextBlock Text="{Binding DataStorage.IsAvailable}" FontWeight="Bold" Foreground="{Binding DataStorage.IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>

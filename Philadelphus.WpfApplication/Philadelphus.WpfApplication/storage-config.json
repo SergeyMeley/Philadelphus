@@ -1,49 +1,55 @@
 {
   "DataStorageModels": [
     {
-      "TypeName": "DataStorageModel",
+      "Name": "PostgreSQL_PC_MSV_LOCAL",
+      "Description": "Сервер PostgreSQL в контейнере на домашнем ПК",
       "Guid": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
-      "Name": "PostgreSQL localhost",
-      "Description": "Сервер PostgreSQL на домашнем ПК",
-      "ProviderTypeString": "PostgreSqlEf"
+      "ProviderTypeString": "PostgreSqlEf",
+      "IsHidden": false
     },
     {
-      "TypeName": "DataStorageModel",
+      "Name": "PostgreSQL_SERVER_MSV_LOCAL",
+      "Description": "Сервер PostgreSQL на домашнем сервере по локальной сети",
       "Guid": "4c04583e-d57a-40c2-b281-3676af36dc54",
-      "Name": "PostgreSQL server",
-      "Description": "Сервер PostgreSQL на локальном домашнем сервере",
-      "ProviderTypeString": "PostgreSqlEf"
+      "ProviderTypeString": "PostgreSqlEf",
+      "IsHidden": false
     },
     {
-      "TypeName": "DataStorageModel",
+      "Name": "PostgreSQL_SERVER_MSV_INTERNET",
+      "Description": "Сервер PostgreSQL на домашнем сервере по глобальной сети",
+      "Guid": "8bffede3-9df6-4f1c-8238-fb25ac18e7f2",
+      "ProviderTypeString": "PostgreSqlEf",
+      "IsHidden": false
+    },
+    {
+      "Name": "PostgreSQL_VM_BVA_INTERNET",
+      "Description": "Сервер PostgreSQL на виртуалке Влада по глобальной сети",
       "Guid": "a1b53074-54a8-47fc-9e90-ab64bc9d445e",
-      "Name": "PostgreSQL VBA",
-      "Description": "Сервер PostgreSQL на виртуалке Влада (через Интернет)",
-      "ProviderTypeString": "PostgreSqlEf"
+      "ProviderTypeString": "PostgreSqlEf",
+      "IsHidden": true
     }
   ],
   "ReservStorageModels": [
     {
-      "TypeName": "DataStorageModel",
-      "Guid": "b7d28b7b-a2fa-40f8-9a35-d3f68a15c32d",
       "Name": "Основное SQL Server хранилище",
       "Description": "Основная база данных на SQL Server для production",
-      "ProviderTypeString": "MsSqlServerEf"
+      "Guid": "b7d28b7b-a2fa-40f8-9a35-d3f68a15c32d",
+      "ProviderTypeString": "MsSqlServerEf",
+      "IsHidden": true
     },
     {
-      "TypeName": "DataStorageModel",
-      "Guid": "da98c450-ec75-49ee-8aff-c037e08dbbfb",
       "Name": "Локальное SQLite хранилище",
       "Description": "Локальная база для тестирования и разработки",
-      "ProviderTypeString": "SQLite"
+      "Guid": "da98c450-ec75-49ee-8aff-c037e08dbbfb",
+      "ProviderTypeString": "SQLite",
+      "IsHidden": true
     },
     {
-      "TypeName": "DataStorageModel",
-      "Guid": "ca041a1a-c96c-4239-b92c-87f0e9e4da69",
       "Name": "Документное MongoDB хранилище",
       "Description": "Хранилище для документов и неструктурированных данных",
-      "DatabaseName": "DocumentStorage",
-      "ProviderTypeString": "MongoDbEf"
+      "Guid": "ca041a1a-c96c-4239-b92c-87f0e9e4da69",
+      "ProviderTypeString": "MongoDbEf",
+      "IsHidden": true
     }
   ],
   "CacheTimeoutMinutes": 30,

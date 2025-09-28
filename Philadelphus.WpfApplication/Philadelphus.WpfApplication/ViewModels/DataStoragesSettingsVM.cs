@@ -6,16 +6,18 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
-    public class DataStoragesSettingsVM
+    public class DataStoragesSettingsVM : ViewModelBase
     {
-        private ObservableCollection<IDataStorageModel>? _dataStorages = new ObservableCollection<IDataStorageModel>();
-        public ObservableCollection<IDataStorageModel>? DataStorages { get => _dataStorages; set => _dataStorages = value; }
+        private ObservableCollection<DataStorageVM>? _dataStorageVMs = new ObservableCollection<DataStorageVM>();
+        public ObservableCollection<DataStorageVM>? DataStorageVMs { get => _dataStorageVMs; set => _dataStorageVMs = value; }
 
-        private IDataStorageModel _selectedDataStorage;
-        public IDataStorageModel SelectedDataStorage { get => _selectedDataStorage; set => _selectedDataStorage = value; }
+        private DataStorageVM _selectedDataStorageVM;
+        public DataStorageVM SelectedDataStorageVM { get => _selectedDataStorageVM; set => _selectedDataStorageVM = value; }
+
         public DataStoragesSettingsVM()
         {
             InitDataStorages();
@@ -29,9 +31,9 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 if (model != null)
                 {
-                    if (_dataStorages.FirstOrDefault(x => x.Guid == model.Guid) == null)
+                    if (_dataStorageVMs.FirstOrDefault(x => x.DataStorage.Guid == model.Guid) == null)
                     {
-                        _dataStorages.Add(model);
+                        _dataStorageVMs.Add(new DataStorageVM(model));
                     }
                 }
             }
