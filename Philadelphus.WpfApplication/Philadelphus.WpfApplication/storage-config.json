@@ -27,6 +27,13 @@
       "Guid": "a1b53074-54a8-47fc-9e90-ab64bc9d445e",
       "ProviderTypeString": "PostgreSqlEf",
       "IsHidden": true
+    },
+    {
+      "Name": "PostgreSQL_LAPTOP_MSV_LOCAL",
+      "Description": "Сервер PostgreSQL на ноутбуке",
+      "Guid": "9aca3962-de53-4ff8-805c-54698f67d8b9",
+      "ProviderTypeString": "PostgreSqlEf",
+      "IsHidden": true
     }
   ],
   "ReservStorageModels": [
