@@ -17,16 +17,15 @@ namespace Philadelphus.PostgreEfRepository.Repositories
     public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
         private TreeRepositoriesPhiladelphusContext _context;
-        public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString)
+        public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
         {
-            //var optionsBuilder = new DbContextOptionsBuilder<TreeRepositoriesPhiladelphusContext>();
-            //optionsBuilder
-            //    .UseNpgsql(connectionString)
-            //    .UseLazyLoadingProxies();
-            //_context = new TreeRepositoriesPhiladelphusContext(optionsBuilder.Options);
             _context = new TreeRepositoriesPhiladelphusContext(connectionString);
-            if(CheckAvailability())
+
+            if (CheckAvailability())
             {
+                //_context.Database.EnsureDeleted();
+                _context.Database.EnsureCreated();
+
                 if (_context.Database.GetPendingMigrations().ToList().Any())
                 {
                     try
@@ -77,10 +76,10 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             if (CheckAvailability() == false)
                 return 0;
-            repository.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            repository.AuditInfo.CreatedOn = DateTime.Now.ToString();
-            repository.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            repository.AuditInfo.UpdatedOn = DateTime.Now.ToString();
+            //repository.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //repository.AuditInfo.CreatedOn = DateTime.Now;
+            //repository.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //repository.AuditInfo.UpdatedOn = DateTime.Now;
             _context.Repositories.Add(repository);
             return _context.SaveChanges();
         }

@@ -8,16 +8,16 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class AuditInfo
     {
-        public int Id { get; set; }
-        public int RepositoryElementUuid { get; set; }
+        //public Guid RepositoryElementUuid { get; set; }
+        //public virtual IMainEntity RepositoryElement { get; set; }
         public bool IsDeleted { get; set; }
-        public string CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
-        public string UpdatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
         public string UpdatedBy { get; set; }
-        public string? UpdatedContentOn { get; set; }
+        public DateTime? UpdatedContentOn { get; set; }
         public string? UpdatedContentBy { get; set; }
-        public string? DeletedOn { get; set; }
+        public DateTime? DeletedOn { get; set; }
         public string? DeletedBy { get; set; }
     }
 }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class TreeRepositoryMemberBase : MainEntityBase
+    public abstract class TreeRootMemberBase : MainEntityBase
     {
+        public Guid? ParentGuid { get; set; }
+        public abstract IMainEntity Parent { get; set; }
     }
 }

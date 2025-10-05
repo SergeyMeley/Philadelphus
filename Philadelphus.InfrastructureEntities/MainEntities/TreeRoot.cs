@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
 
-    public class TreeRoot : TreeRepositoryMemberBase
+    public class TreeRoot : MainEntityBase
     {
         public Guid OwnDataStorageGuid { get; set; }
-        public Guid ParentTreeRepositoryGuid { get; set; }
-        public List<long> AttributeGuids { get; set; } = new List<long>();
-        public List<long> ChildTreeNodeGuids { get; set; } = new List<long>();
+        public Guid[] DataStoragesGuids { get; set; }
+        public virtual TreeNode[] ChildTreeNodes { get; set; }
         public TreeRoot()
         {
             

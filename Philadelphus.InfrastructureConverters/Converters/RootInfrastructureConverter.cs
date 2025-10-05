@@ -37,7 +37,7 @@
 //            if (dbEntity == null)
 //                return null;
 //            //var result = new TreeRoot(new Guid(dbEntity.ParentGuid));
-//            //result = (TreeRoot)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
+//            //result = (TreeRoot)ToModelGeneralProperties(dbEntity, (TreeRootMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
 //            //return result;
 //            return null;
 //        }
@@ -49,7 +49,7 @@
 //            //foreach (var dbEntity in dbEntityCollection)
 //            //{
 //            //    var entity = new TreeRoot(new Guid(dbEntity.ParentGuid));
-//            //    entity = (TreeRoot)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
+//            //    entity = (TreeRoot)ToModelGeneralProperties(dbEntity, (TreeRootMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Root));
 //            //    result.Add(entity);
 //            //}
 //            return result;

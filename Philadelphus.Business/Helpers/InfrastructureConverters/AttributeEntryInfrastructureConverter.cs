@@ -40,7 +40,7 @@
 //            if (dbEntity == null)
 //                return null;
 //            ////var result = new EntityAttributeEntry();
-//            //result = (EntityAttributeEntry)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
+//            //result = (EntityAttributeEntry)ToModelGeneralProperties(dbEntity, (TreeRootMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
 //            //return result;
 //            return null;
 //        }
@@ -52,7 +52,7 @@
 //            //foreach (var dbEntity in dbEntityCollection)
 //            //{
 //            //    //var entity = new EntityAttributeEntry());
-//            //    //entity = (EntityAttributeEntry)ToModelGeneralProperties(dbEntity, (TreeRepositoryMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
+//            //    //entity = (EntityAttributeEntry)ToModelGeneralProperties(dbEntity, (TreeRootMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.AttributeEntry));
 //            //    //result.Add(entity);
 //            //}
 //            //return result;

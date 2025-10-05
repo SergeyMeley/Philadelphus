@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class TreeRepository : MainEntityBase
+    public class TreeRepository
     {
+        public Guid Guid { get; set; }
+        public string Name { get; set; }
+        public string? Description { get; set; }
+        public virtual AuditInfo AuditInfo { get; set; }
         public Guid OwnDataStorageGuid { get; set; }
-        public List<Guid> ChildTreeRootGuids { get; set; } = new List<Guid>();
+        public Guid[] DataStoragesGuids { get; set; }
+        public Guid[] ChildTreeRootsGuids { get; set; }
         public TreeRepository()
         {
             

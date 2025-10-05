@@ -24,8 +24,6 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.Alias = dbEntity.Alias;
             businessEntity.CustomCode = dbEntity.CustomCode;
             businessEntity.Description = dbEntity.Description;
-            businessEntity.HasContent = dbEntity.HasContent;
-            businessEntity.IsOriginal = dbEntity.IsOriginal;
             businessEntity.IsLegacy = dbEntity.IsLegacy;
             businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
             businessEntity.AuditInfo.CreatedOn = dbEntity.AuditInfo.CreatedOn;
@@ -51,8 +49,6 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.Alias = businessEntity.Alias;
             dbEntity.CustomCode = businessEntity.CustomCode;
             dbEntity.Description = businessEntity.Description;
-            dbEntity.HasContent = businessEntity.HasContent;
-            dbEntity.IsOriginal = businessEntity.IsOriginal;
             dbEntity.IsLegacy = businessEntity.IsLegacy;
             dbEntity.AuditInfo.IsDeleted = businessEntity.AuditInfo.IsDeleted;
             dbEntity.AuditInfo.CreatedOn = businessEntity.AuditInfo.CreatedOn;
@@ -71,11 +67,6 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             if (businessEntity != null)
                 return null;
             IMainEntity result = null;
-            if (businessEntity.GetType().IsAssignableTo(typeof(TreeRepositoryModel)))
-            {
-                TreeRepositoryModel model = (TreeRepositoryModel)businessEntity;
-                return model.ToDbEntity();
-            }
             if (businessEntity.GetType().IsAssignableTo(typeof(TreeRootModel)))
             {
                 TreeRootModel model = (TreeRootModel)businessEntity;
@@ -107,11 +98,6 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             if (dbEntity != null)
                 return null;
             IMainEntity result = null;
-            if (dbEntity.GetType().IsAssignableTo(typeof(TreeRepository)))
-            {
-                TreeRepository entity = (TreeRepository)dbEntity;
-                return entity.ToModel(dataStorages);
-            }
             if (dbEntity.GetType().IsAssignableTo(typeof(TreeRoot)))
             {
                 TreeRoot entity = (TreeRoot)dbEntity;

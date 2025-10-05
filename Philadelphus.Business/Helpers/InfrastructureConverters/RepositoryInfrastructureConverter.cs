@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.InfrastructureEntities.OtherEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,12 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeRepository)businessEntity.ToDbEntityGeneralProperties(new TreeRepository());
+            //var result = (TreeRepository)businessEntity.ToDbEntityGeneralProperties(new TreeRepository());
+            var result = new TreeRepository();
+            result.Name = businessEntity.Name;
+            result.Description = businessEntity.Description;
+            //result.AuditInfo = dbEntity.AuditInfo.ToModel();
+            result.ChildTreeRootsGuids = businessEntity.Childs.Select(x => x.Guid).ToArray();
             result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
             return result;
         }
@@ -39,7 +45,11 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
                 return null;
             var dataStorage = dataStorages.FirstOrDefault(x => x.Guid == dbEntity.OwnDataStorageGuid);
             var result = new TreeRepositoryModel(dbEntity.Guid, dataStorage);
-            result = (TreeRepositoryModel)dbEntity.ToModelGeneralProperties(result);
+            result.Name = dbEntity.Name;
+            result.Description = dbEntity.Description;
+            //result.AuditInfo = dbEntity.AuditInfo.ToModel();
+            //result.Childs = dbEntity.ChildTreeRoots.ToModelCollection(dataStorages);
+            //result = (TreeRepositoryModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
         public static List<TreeRepositoryModel> ToModelCollection(this IEnumerable<TreeRepository> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)

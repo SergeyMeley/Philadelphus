@@ -22,12 +22,13 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         private readonly MainEntitiesPhiladelphusContext _context;
         public PostgreEfMainEntitiesInfrastructureRepository(string connectionString)
         {
-            //var optionsBuilder = new DbContextOptionsBuilder<MainEntitiesPhiladelphusContext>();
-            //optionsBuilder.UseNpgsql(connectionString);
-            //_context = new MainEntitiesPhiladelphusContext(optionsBuilder.Options);
             _context = new MainEntitiesPhiladelphusContext(connectionString);
+
             if (CheckAvailability())
             {
+                //_context.Database.EnsureDeleted();
+                _context.Database.EnsureCreated();
+
                 if (_context.Database.GetPendingMigrations().ToList().Any())
                 {
                     try
@@ -58,78 +59,99 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             }
             return true;
         }
-
-        public long DeleteAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteAttributes(IEnumerable<ElementAttribute> attributes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteLeaves(IEnumerable<TreeLeave> leaves)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteNodes(IEnumerable<TreeNode> nodes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteRoots(IEnumerable<TreeRoot> roots)
-        {
-            throw new NotImplementedException();
-        }
-
         public MainEntitiesCollection GetMainEntitiesCollection()
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
+        public long DeleteAttributeEntries(IEnumerable<TreeElementAttribute> items)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributes(IEnumerable<ElementAttribute> attributes)
+        public long DeleteAttributes(IEnumerable<ElementAttribute> items)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
+        public long DeleteAttributeValues(IEnumerable<TreeElementAttributeValue> items)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertLeaves(IEnumerable<TreeLeave> leaves)
+        public long DeleteLeaves(IEnumerable<TreeLeave> items)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertNodes(IEnumerable<TreeNode> nodes)
+        public long DeleteNodes(IEnumerable<TreeNode> items)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertRoots(IEnumerable<TreeRoot> roots)
+        public long DeleteRoots(IEnumerable<TreeRoot> items)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public long InsertAttributeEntries(IEnumerable<TreeElementAttribute> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long InsertAttributes(IEnumerable<ElementAttribute> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long InsertAttributeValues(IEnumerable<TreeElementAttributeValue> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long InsertLeaves(IEnumerable<TreeLeave> items)
         {
             if (CheckAvailability() == false)
                 return 0;
-            foreach (var item in roots)
+            foreach (var item in items)
             {
                 item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.CreatedOn = DateTime.Now.ToString();
+                item.AuditInfo.CreatedOn = DateTime.Now;
                 item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.UpdatedOn = DateTime.Now.ToString();
-                _context.RootDetails.Add(item);
+                item.AuditInfo.UpdatedOn = DateTime.Now;
+                _context.TreeLeaves.Add(item);
+            }
+            return _context.SaveChanges();
+
+        }
+
+        public long InsertNodes(IEnumerable<TreeNode> items)
+        {
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.CreatedOn = DateTime.Now;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedOn = DateTime.Now;
+                _context.TreeNodes.Add(item);
+            }
+            return _context.SaveChanges();
+        }
+
+        public long InsertRoots(IEnumerable<TreeRoot> items)
+        {
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.CreatedOn = DateTime.Now;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedOn = DateTime.Now;
+                _context.TreeRoots.Add(item);
             }
             return _context.SaveChanges();
         }
@@ -151,47 +173,61 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public IEnumerable<TreeLeave> SelectLeaves()
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return null;
+            return _context.TreeLeaves.ToList();
         }
 
         public IEnumerable<TreeNode> SelectNodes()
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return null;
+            return _context.TreeNodes.ToList();
         }
 
         public IEnumerable<TreeRoot> SelectRoots()
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.RootDetails.ToList();
+            return _context.TreeRoots.ToList();
         }
 
-        public long UpdateAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
+        public long UpdateAttributeEntries(IEnumerable<TreeElementAttribute> items)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributes(IEnumerable<ElementAttribute> attributes)
+        public long UpdateAttributes(IEnumerable<ElementAttribute> items)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
+        public long UpdateAttributeValues(IEnumerable<TreeElementAttributeValue> items)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateLeaves(IEnumerable<TreeLeave> leaves)
+        public long UpdateLeaves(IEnumerable<TreeLeave> items)
+        {
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.CreatedOn = DateTime.Now;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedOn = DateTime.Now;
+                _context.TreeRoots.Add(item);
+            }
+            return _context.SaveChanges();
+        }
+
+        public long UpdateNodes(IEnumerable<TreeNode> items)
         {
             throw new NotImplementedException();
         }
 
-        public long UpdateNodes(IEnumerable<TreeNode> nodes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long UpdateRoots(IEnumerable<TreeRoot> roots)
+        public long UpdateRoots(IEnumerable<TreeRoot> items)
         {
             throw new NotImplementedException();
         }

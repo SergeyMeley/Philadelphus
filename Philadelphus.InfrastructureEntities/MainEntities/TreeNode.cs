@@ -6,13 +6,36 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class TreeNode : TreeRepositoryMemberBase
+    public class TreeNode : TreeRootMemberBase
     {
-        public long ParentTreeRootGuid { get; set; }
-        public long ParentTreeNodeGuid { get; set; }
-        public List<long> AttributeGuids { get; set; } = new List<long>();
-        public List<long> ChildTreeNodeGuids { get; set; } = new List<long>();
-        public List<long> ChildTreeLeaveGuids { get; set; } = new List<long>();
+        public Guid? ParentGuid { get; set; }
+        public virtual TreeRoot ParentTreeRoot { get; set; }
+        public virtual TreeNode ParentTreeNode { get; set; }
+        public override IMainEntity Parent
+        {
+            get
+            {
+                if (ParentTreeRoot != null)
+                {
+                    return ParentTreeRoot;
+                }
+                else
+                {
+                    return ParentTreeNode;
+                }
+            }
+            set
+            {
+                if (value.GetType() == typeof(TreeRoot))
+                {
+                    ParentTreeRoot = (TreeRoot)value;
+                }
+                else if (value.GetType() == typeof(TreeNode))
+                {
+                    ParentTreeNode = (TreeNode)value;
+                }
+            }
+        }
         public TreeNode()
         {
 
