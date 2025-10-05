@@ -16,8 +16,15 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public  class RepositoryExplorerVM : ViewModelBase
     {
+        private DataTreeProcessingService _service = new DataTreeProcessingService();
+
         private TreeRepositoryModel _treeRepository;
-        public TreeRepositoryModel TreeRepository { get => _treeRepository; }
+        public TreeRepositoryModel TreeRepository 
+        { get
+            {
+                return _service.GetRepositoryContent(_treeRepository);
+            }
+        }
 
         private TreeRepositoryMemberBaseModel? _selectedRepositoryMember;
         public TreeRepositoryMemberBaseModel? SelectedRepositoryMember
