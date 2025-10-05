@@ -38,7 +38,7 @@ namespace Philadelphus.Business.Services
             foreach (var dataStorage in dataStorages)
             {
                 var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
-                if (dataStorage.TreeRepositoryHeadersInfrastructureRepository.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
+                if (infrastructure.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
                     && dataStorage.IsAvailable)
                 {
                     var dbRepositories = infrastructure.SelectRepositories();
@@ -245,8 +245,24 @@ namespace Philadelphus.Business.Services
 
 
 
-        private TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel currentRepository)
+        public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel currentRepository)
         {
+            var result = currentRepository;
+            foreach (var dataStorage in currentRepository.DataStorages)
+            {
+                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
+                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
+                    && dataStorage.IsAvailable)
+                {
+                    var dbRoots = infrastructure.SelectRoots();
+                    var roots = dbRoots?.ToModelCollection(currentRepository.DataStorages);
+                    if (roots != null)
+                    {
+                        result.Childs = roots;
+                    }
+                }
+            }
+            return result;
             //foreach (var item in CurrentRepository.RootsDefaultDataStorage)
             //{
             //    IMainEntitiesInfrastructureRepository infrastructureRepository;

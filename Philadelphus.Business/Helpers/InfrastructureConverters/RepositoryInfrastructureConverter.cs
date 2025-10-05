@@ -48,6 +48,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new TreeRepositoryModel(dbEntity.Guid, dataStorage);
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
+            result.DataStorages = new List<IDataStorageModel>() { dataStorage };
             //result.AuditInfo = dbEntity.AuditInfo.ToModel();
             //result.Childs = dbEntity.ChildTreeRoots.ToModelCollection(dataStorages);
             //result = (TreeRepositoryModel)dbEntity.ToModelGeneralProperties(result);

@@ -74,11 +74,11 @@ namespace Philadelphus.Business.Services
 
             Notifications.Add(error);
 
-            for (int i = 0; i < Enum.GetValues(typeof(NotificationTypesModel)).Length; i++)
-            {
-                if (error.TryInvokeHandler((NotificationTypesModel)i))
-                    return true;
-            }
+            //for (int i = 0; i < Enum.GetValues(typeof(NotificationTypesModel)).Length; i++)
+            //{
+            //    if (error.TryInvokeHandler((NotificationTypesModel)i))
+            //        return true;
+            //}
                 
             return false;
         }

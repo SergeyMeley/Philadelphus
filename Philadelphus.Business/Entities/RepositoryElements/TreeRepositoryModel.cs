@@ -21,6 +21,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         protected override string DefaultFixedPartOfName { get => "Новый репозиторий"; }
         public override EntityTypesModel EntityType { get => EntityTypesModel.Repository; }
         public IDataStorageModel OwnDataStorage { get; private set; }
+        public List<IDataStorageModel> DataStorages { get; internal set; }
         public IEnumerable<IChildrenModel> Childs { get; internal set; }
         public IEnumerable<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         internal TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage) : base(guid)
