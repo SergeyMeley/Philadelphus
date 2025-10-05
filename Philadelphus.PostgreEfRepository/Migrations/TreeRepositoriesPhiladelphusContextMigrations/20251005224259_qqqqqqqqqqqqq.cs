@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelphusContextMigrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class qqqqqqqqqqqqq : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,18 +19,18 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
                 schema: "repositories",
                 columns: table => new
                 {
-                    uuid = table.Column<Guid>(type: "uuid", maxLength: 255, nullable: false),
-                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    uuid = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                    created_by = table.Column<string>(type: "text", nullable: false, defaultValue: "session_user"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<string>(type: "text", nullable: true),
+                    content_updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    content_updated_by = table.Column<string>(type: "text", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    created_at = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    created_by = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    updated_at = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    updated_by = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    content_updated_at = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    content_updated_by = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    deleted_at = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    deleted_by = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_by = table.Column<string>(type: "text", nullable: true),
                     data_storage_uuid = table.Column<Guid>(type: "uuid", nullable: false),
                     data_storages_uuids = table.Column<Guid[]>(type: "uuid[]", nullable: false),
                     child_tree_roots_uuids = table.Column<Guid[]>(type: "uuid[]", nullable: false)

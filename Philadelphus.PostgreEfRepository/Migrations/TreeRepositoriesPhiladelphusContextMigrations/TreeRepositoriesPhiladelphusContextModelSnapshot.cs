@@ -29,9 +29,9 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(255)
                         .HasColumnType("uuid")
-                        .HasColumnName("uuid");
+                        .HasColumnName("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.PrimitiveCollection<Guid[]>("ChildTreeRootsGuids")
                         .IsRequired()
@@ -44,14 +44,12 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
                         .HasColumnName("data_storages_uuids");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<Guid>("OwnDataStorageGuid")
@@ -69,29 +67,37 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
                     b.OwnsOne("Philadelphus.InfrastructureEntities.MainEntities.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeRepositoryGuid")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
+
+                            b1.Property<DateTime?>("ContentUpdatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("content_updated_at");
+
+                            b1.Property<string>("ContentUpdatedBy")
+                                .HasColumnType("text")
+                                .HasColumnName("content_updated_by");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("created_at")
+                                .HasDefaultValueSql("NOW()");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("text")
+                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
-                            b1.Property<string>("CreatedOn")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
-                                .HasColumnName("created_at");
+                            b1.Property<DateTime?>("DeletedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("deleted_by");
-
-                            b1.Property<string>("DeletedOn")
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
-                                .HasColumnName("deleted_at");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
@@ -99,27 +105,13 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
-                            b1.Property<string>("UpdatedBy")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("updated_by");
-
-                            b1.Property<string>("UpdatedContentBy")
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("content_updated_by");
-
-                            b1.Property<string>("UpdatedContentOn")
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
-                                .HasColumnName("content_updated_at");
-
-                            b1.Property<string>("UpdatedOn")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
+                            b1.Property<DateTime?>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("updated_at");
+
+                            b1.Property<string>("UpdatedBy")
+                                .HasColumnType("text")
+                                .HasColumnName("updated_by");
 
                             b1.HasKey("TreeRepositoryGuid");
 

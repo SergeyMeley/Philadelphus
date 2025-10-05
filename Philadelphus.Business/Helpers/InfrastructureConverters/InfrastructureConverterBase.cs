@@ -26,13 +26,13 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             businessEntity.Description = dbEntity.Description;
             businessEntity.IsLegacy = dbEntity.IsLegacy;
             businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
-            businessEntity.AuditInfo.CreatedOn = dbEntity.AuditInfo.CreatedOn;
+            businessEntity.AuditInfo.CreatedAt = dbEntity.AuditInfo.CreatedAt;
             businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;
-            businessEntity.AuditInfo.UpdatedOn = dbEntity.AuditInfo.UpdatedOn;
+            businessEntity.AuditInfo.UpdatedAt = dbEntity.AuditInfo.UpdatedAt;
             businessEntity.AuditInfo.UpdatedBy = dbEntity.AuditInfo.UpdatedBy;
-            businessEntity.AuditInfo.UpdatedContentOn = dbEntity.AuditInfo.UpdatedContentOn;
-            businessEntity.AuditInfo.UpdatedContentBy = dbEntity.AuditInfo.UpdatedContentBy;
-            businessEntity.AuditInfo.DeletedOn = dbEntity.AuditInfo.DeletedOn;
+            businessEntity.AuditInfo.ContentUpdatedAt = dbEntity.AuditInfo.ContentUpdatedAt;
+            businessEntity.AuditInfo.ContentUpdatedBy = dbEntity.AuditInfo.ContentUpdatedBy;
+            businessEntity.AuditInfo.DeletedAt = dbEntity.AuditInfo.DeletedAt;
             businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
             return businessEntity;
         }
@@ -51,13 +51,13 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             dbEntity.Description = businessEntity.Description;
             dbEntity.IsLegacy = businessEntity.IsLegacy;
             dbEntity.AuditInfo.IsDeleted = businessEntity.AuditInfo.IsDeleted;
-            dbEntity.AuditInfo.CreatedOn = businessEntity.AuditInfo.CreatedOn;
+            dbEntity.AuditInfo.CreatedAt = businessEntity.AuditInfo.CreatedAt;
             dbEntity.AuditInfo.CreatedBy = businessEntity.AuditInfo.CreatedBy;
-            dbEntity.AuditInfo.UpdatedOn = businessEntity.AuditInfo.UpdatedOn;
+            dbEntity.AuditInfo.UpdatedAt = businessEntity.AuditInfo.UpdatedAt;
             dbEntity.AuditInfo.UpdatedBy = businessEntity.AuditInfo.UpdatedBy;
-            dbEntity.AuditInfo.UpdatedContentOn = businessEntity.AuditInfo.UpdatedContentOn;
-            dbEntity.AuditInfo.UpdatedContentBy = businessEntity.AuditInfo.UpdatedContentBy;
-            dbEntity.AuditInfo.DeletedOn = businessEntity.AuditInfo.DeletedOn;
+            dbEntity.AuditInfo.ContentUpdatedAt = businessEntity.AuditInfo.ContentUpdatedAt;
+            dbEntity.AuditInfo.ContentUpdatedBy = businessEntity.AuditInfo.ContentUpdatedBy;
+            dbEntity.AuditInfo.DeletedAt = businessEntity.AuditInfo.DeletedAt;
             dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
         }

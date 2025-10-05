@@ -110,20 +110,19 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             throw new NotImplementedException();
         }
 
-        public long InsertLeaves(IEnumerable<TreeLeave> items)
+        public long InsertRoots(IEnumerable<TreeRoot> items)
         {
             if (CheckAvailability() == false)
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.CreatedOn = DateTime.Now;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.UpdatedOn = DateTime.Now;
-                _context.TreeLeaves.Add(item);
+                //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.CreatedAt = DateTime.Now;
+                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.UpdatedAt = DateTime.Now;
+                _context.TreeRoots.Add(item);
             }
             return _context.SaveChanges();
-
         }
 
         public long InsertNodes(IEnumerable<TreeNode> items)
@@ -132,29 +131,29 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.CreatedOn = DateTime.Now;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.UpdatedOn = DateTime.Now;
+                //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.CreatedAt = DateTime.Now;
+                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.UpdatedAt = DateTime.Now;
                 _context.TreeNodes.Add(item);
             }
             return _context.SaveChanges();
         }
-
-        public long InsertRoots(IEnumerable<TreeRoot> items)
+        public long InsertLeaves(IEnumerable<TreeLeave> items)
         {
             if (CheckAvailability() == false)
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.CreatedOn = DateTime.Now;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.UpdatedOn = DateTime.Now;
-                _context.TreeRoots.Add(item);
+                //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.CreatedAt = DateTime.Now;
+                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.UpdatedAt = DateTime.Now;
+                _context.TreeLeaves.Add(item);
             }
             return _context.SaveChanges();
         }
+
 
         public IEnumerable<TreeElementAttribute> SelectAttributeEntries()
         {
@@ -213,11 +212,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.CreatedOn = DateTime.Now;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                item.AuditInfo.UpdatedOn = DateTime.Now;
-                _context.TreeRoots.Add(item);
+                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.UpdatedAt = DateTime.Now;
+                _context.TreeLeaves.Add(item);
             }
             return _context.SaveChanges();
         }

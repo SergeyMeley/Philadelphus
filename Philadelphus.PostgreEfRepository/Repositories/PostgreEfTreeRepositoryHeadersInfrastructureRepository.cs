@@ -62,25 +62,32 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return null;
             return _context.Repositories.ToList();
         }
-        public long DeleteRepository(TreeRepository repository)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long UpdateRepository(TreeRepository repository)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long InsertRepository(TreeRepository repository)
+        public long DeleteRepository(TreeRepository item)
         {
             if (CheckAvailability() == false)
-                return 0;
-            //repository.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            //repository.AuditInfo.CreatedOn = DateTime.Now;
+                return -1;
+            var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
+            repository.AuditInfo.IsDeleted = true;
+            repository.AuditInfo.DeletedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            repository.AuditInfo.DeletedAt = DateTime.Now;
+            return _context.SaveChanges();
+        }
+
+        public long UpdateRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+            //var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
             //repository.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            //repository.AuditInfo.UpdatedOn = DateTime.Now;
-            _context.Repositories.Add(repository);
+            //repository.AuditInfo.UpdatedAt = DateTime.Now;
+            return _context.SaveChanges();
+        }
+
+        public long InsertRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+            _context.Repositories.Add(item);
             return _context.SaveChanges();
         }
     }

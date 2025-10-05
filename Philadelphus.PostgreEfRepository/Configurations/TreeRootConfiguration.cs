@@ -21,16 +21,15 @@ namespace Philadelphus.PostgreEfRepository.Configurations
             builder.Property(x => x.Guid)
                 .HasColumnName("uuid")
                 .IsRequired()
-                .HasMaxLength(255);
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("gen_random_uuid()");
 
             builder.Property(x => x.Name)
                 .HasColumnName("name")
-                .IsRequired()
-                .HasMaxLength(255);
+                .IsRequired();
 
             builder.Property(x => x.Description)
-                .HasColumnName("description")
-                .HasMaxLength(1000);
+                .HasColumnName("description");
 
             builder.Property(x => x.Sequence)
                 .HasColumnName("sequence");
@@ -55,41 +54,33 @@ namespace Philadelphus.PostgreEfRepository.Configurations
                     .IsRequired()
                     .HasDefaultValue(false);
 
-                audit.Property(a => a.CreatedOn)
+                audit.Property(a => a.CreatedAt)
                     .HasColumnName("created_at")
                     .IsRequired()
-                    .HasMaxLength(50);
+                    .HasDefaultValueSql("NOW()");
 
                 audit.Property(a => a.CreatedBy)
                     .HasColumnName("created_by")
                     .IsRequired()
-                    .HasMaxLength(100);
+                    .HasDefaultValue("session_user");
 
-                audit.Property(a => a.UpdatedOn)
-                    .HasColumnName("updated_at")
-                    .IsRequired()
-                    .HasMaxLength(50);
+                audit.Property(a => a.UpdatedAt)
+                    .HasColumnName("updated_at");
 
                 audit.Property(a => a.UpdatedBy)
-                    .HasColumnName("updated_by")
-                    .IsRequired()
-                    .HasMaxLength(100);
+                    .HasColumnName("updated_by");
 
-                audit.Property(a => a.UpdatedContentOn)
-                    .HasColumnName("content_updated_at")
-                    .HasMaxLength(50);
+                audit.Property(a => a.ContentUpdatedAt)
+                    .HasColumnName("content_updated_at");
 
-                audit.Property(a => a.UpdatedContentBy)
-                    .HasColumnName("content_updated_by")
-                    .HasMaxLength(100);
+                audit.Property(a => a.ContentUpdatedBy)
+                    .HasColumnName("content_updated_by");
 
-                audit.Property(a => a.DeletedOn)
-                    .HasColumnName("deleted_at")
-                    .HasMaxLength(50);
+                audit.Property(a => a.DeletedAt)
+                    .HasColumnName("deleted_at");
 
                 audit.Property(a => a.DeletedBy)
-                    .HasColumnName("deleted_by")
-                    .HasMaxLength(100);
+                    .HasColumnName("deleted_by");
             });
         }
     }

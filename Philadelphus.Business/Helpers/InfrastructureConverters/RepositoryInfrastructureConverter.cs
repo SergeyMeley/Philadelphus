@@ -26,6 +26,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             //result.AuditInfo = dbEntity.AuditInfo.ToModel();
             result.ChildTreeRootsGuids = businessEntity.Childs.Select(x => x.Guid).ToArray();
             result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
+            result.DataStoragesGuids = new[] { businessEntity.OwnDataStorage.Guid };
             return result;
         }
         public static List<TreeRepository> ToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)
