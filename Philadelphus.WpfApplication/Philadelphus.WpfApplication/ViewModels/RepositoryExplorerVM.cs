@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,7 +23,11 @@ namespace Philadelphus.WpfApplication.ViewModels
         public TreeRepositoryModel TreeRepository 
         { get
             {
-                return _service.GetRepositoryContent(_treeRepository);
+                if (_treeRepository == null)
+                {
+                    _treeRepository = _service.LoadRepositoryContent(_treeRepository);
+                }
+                return _treeRepository;
             }
         }
 
@@ -90,7 +95,8 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeProcessingService();
-                    service.CreateTreeRoot(_treeRepository, _treeRepository.OwnDataStorage);
+                    var result = service.CreateTreeRoot(_treeRepository, _treeRepository.OwnDataStorage);
+                    OnPropertyChanged(nameof(TreeRepository.Childs));
                 });
             }
         }
@@ -158,7 +164,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     var service = new DataTreeProcessingService();
-                    service.RemoveElement(_selectedRepositoryMember);
+                    service.RemoveMember(_selectedRepositoryMember);
                 });
             }
         }

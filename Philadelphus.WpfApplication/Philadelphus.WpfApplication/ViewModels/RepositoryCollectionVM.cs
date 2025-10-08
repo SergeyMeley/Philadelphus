@@ -128,7 +128,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         private bool InitRepositoryCollection()
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
-            var repositories = _dataTreeProcessingService.GetRepositories(storages);
+            var repositories = _dataTreeProcessingService.LoadRepositories(storages);
             foreach (var item in repositories)
             {
                 _treeRepositoriesVMs.Add(new RepositoryExplorerVM(item));
