@@ -15,6 +15,8 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Business.Services
 {
+    #region [ Props ]
+
     public class DataTreeProcessingService
     {
         private TreeRepositoryModel _currentRepository;
@@ -22,7 +24,7 @@ namespace Philadelphus.Business.Services
         { 
             get
             {
-                return GetRepositoryContent(_currentRepository);
+                return LoadRepositoryContent(_currentRepository);
             }
             set => _currentRepository = value;
         }
@@ -30,9 +32,26 @@ namespace Philadelphus.Business.Services
         private MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
         public MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
-        
+        #endregion
 
-        public IEnumerable<TreeRepositoryModel> GetRepositories(IEnumerable<IDataStorageModel> dataStorages)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        #region [ Load ]
+
+        public IEnumerable<TreeRepositoryModel> LoadRepositories(IEnumerable<IDataStorageModel> dataStorages)
         {
             var result = new List<TreeRepositoryModel>();
             foreach (var dataStorage in dataStorages)
@@ -51,149 +70,40 @@ namespace Philadelphus.Business.Services
             }
             return result;
         }
-
-        //public List<TreeRepository> AddRepository(TreeRepository repository)
-        //{
-        //    if (repository != null)
-        //    {
-        //        var infrastructure = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
-        //        // Добавление пути к папке и файлу репозитория
-        //        //repository.DirectoryFullPath = Path.Join(new string[] { repository.DirectoryPath, Path.DirectorySeparatorChar.ToString(), repository.Name });
-        //        //repository.ConfigPath = Path.Join(new string[] { repository.DirectoryFullPath, Path.DirectorySeparatorChar.ToString(), ".repository" });
-        //        //// Получение текущего списка репозиториев и добавление туда нового
-        //        //DataTreeRepositories = GetRepositoryHeadersCollection();
-        //        //DataTreeRepositories.Add(repository);
-        //        // Создания нового репозитория
-        //        var list = new List<TreeRepository>();
-        //        list.Add(repository);
-        //        var converter = new RepositoryInfrastructureConverter();
-        //        infrastructure.InsertRepository(converter.ToDbEntityCollection(list));
-        //        // Дополнение списка репозиториев в настроечном файле
-        //        //GeneralSettings.RepositoryPathList = DataTreeRepositories.Select(x => x.ConfigPath).Distinct().ToList();
-        //        //infrastructure.InsertRepositoryPathes(GeneralSettings.RepositoryListPath, GeneralSettings.RepositoryPathList);
-        //        // Получение актуального списка репозиториев
-        //    }
-        //    return GetRepositoryHeadersCollection();
-        //}
-        
-
-        public bool RemoveElement(IChildrenModel element)
+        public TreeRepositoryModel LoadRepositoryContent(TreeRepositoryModel repository)
         {
-            try
+            var result = repository;
+            foreach (var dataStorage in repository?.DataStorages)
             {
-                if (element == null)
+                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
+                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
+                    && dataStorage.IsAvailable)
                 {
-                    return false;
-                }
-                ((ObservableCollection<IChildrenModel>)element.Parent.Childs).Remove(element);
-                if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBaseModel)))
-                {
-                    ((List<TreeRepositoryMemberBaseModel>)((ITreeRepositoryMemberModel)element).ParentRepository.ElementsCollection).Remove((TreeRepositoryMemberBaseModel)element);
-                }
-                //
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-        //public List<TreeRepository> ModifyRepository(TreeRepository repository)
-        //{
-        //    return AddRepository(repository);
-        //    //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
-        //    //{
-        //    //    xmlSerializer.Serialize(fs, RepositoryPathList);
-        //    //}
-        //    //using (var fs = new FileStream(new GeneralSettings().RepositoryListPath, FileMode.OpenOrCreate))
-        //    //{
-        //    //    //var dbRepositories = new List<DbTreeRepository>();
-        //    //    try
-        //    //    {
-        //    //        RepositoryPathList = xmlSerializer.Deserialize(fs) as List<string>;
-        //    //    }
-        //    //    catch (Exception ex)
-        //    //    {
-        //    //    }
-        //    //    if (RepositoryPathList != null)
-        //    //    {
-        //    //        var repositoryXmlSerializer = new XmlSerializer(typeof(List<string>));
-        //    //        foreach (var item in RepositoryPathList)
-        //    //        {
-        //    //        }
-        //    //        //var repositoryInfrastructureConverter = new RepositoryInfrastructureConverter();
-        //    //        //DataTreeRepositories = (List<TreeRepository>)repositoryInfrastructureConverter.ToModelCollection(dbRepositories);
-        //    //    }
-        //    //    return GetRepositoryHeadersCollection();
-        //    //}
-        //}
-        /// <summary>
-        /// Создание примера репозитория.
-        /// </summary>
-        /// <returns></returns>
-        public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
-        {
-            var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
-            _mainEntityCollection.DataTreeRepositories.Add(repo);
-            for (int i = 0; i < 5; i++)
-            {
-                var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage);
-                GetAttributesSample(root);
-                ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(root);
-                for (int j = 0; j < 5; j++)
-                {
-                    var node = new TreeNodeModel(Guid.NewGuid(), root);
-                    GetAttributesSample(node);
-                    ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node);
-                    for (int k = 0; k < 5; k++)
+                    var dbRoots = infrastructure.SelectRoots(repository.ChildsGuids.ToArray());
+                    var roots = dbRoots?.ToModelCollection(repository.DataStorages);
+                    if (roots != null)
                     {
-                        var node2 = new TreeNodeModel(Guid.NewGuid(), root);
-                        GetAttributesSample(node2);
-                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node2);
-                        ((ObservableCollection<IChildrenModel>)node.Childs).Add(node2);
-                        var leave = new TreeLeaveModel(Guid.NewGuid(), node);
-                        GetAttributesSample(leave);
-                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(leave);
-                        ((ObservableCollection<IChildrenModel>)node.Childs).Add(leave);
+                        result.Childs = roots;
                     }
-                    ((ObservableCollection<IChildrenModel>)root.Childs).Add(node);
                 }
-                ((ObservableCollection<IChildrenModel>)repo.Childs).Add(root);
             }
-            return repo;
-        }
-
-        
-
-        
-
-        public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path)
-        {
-            var result = new List<TreeRepositoryModel>();
-            return result;
-        }
-
-        private List<ElementAttributeModel> GetAttributesSample(IContentOwnerModel owner)
-        {
-            var result = new List<ElementAttributeModel>();
-
-            for (int i = 0; i < 20; i++)
-            {
-                var entry = new ElementAttributeModel(Guid.NewGuid(), owner);
-                ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(entry);
-                result.Add(entry);
-            }
-
             return result;
         }
 
 
+        #endregion
 
-        #region Create
+        #region [ Init + Add ]
+
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage)
         {
             var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
             //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
+            return result;
+        }
+        public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path)
+        {
+            var result = new List<TreeRepositoryModel>();
             return result;
         }
         public TreeRootModel CreateTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
@@ -233,7 +143,6 @@ namespace Philadelphus.Business.Services
                 throw;
             }
         }
-
         public ElementAttributeModel CreateElementAttribute(IContentOwnerModel owner)
         {
             var result = new ElementAttributeModel(Guid.NewGuid(), owner);
@@ -241,97 +150,43 @@ namespace Philadelphus.Business.Services
             ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(result);
             return result;
         }
+
         #endregion
 
+        #region [ Delete + Remove ]
 
-
-        public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel currentRepository)
+        public bool RemoveMember(IChildrenModel element)
         {
-            var result = currentRepository;
-            foreach (var dataStorage in currentRepository.DataStorages)
+            try
             {
-                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
-                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
-                    && dataStorage.IsAvailable)
+                if (element == null)
                 {
-                    var dbRoots = infrastructure.SelectRoots();
-                    var roots = dbRoots?.ToModelCollection(currentRepository.DataStorages);
-                    if (roots != null)
-                    {
-                        result.Childs = roots;
-                    }
+                    return false;
                 }
+                ((ObservableCollection<IChildrenModel>)element.Parent.Childs).Remove(element);
+                if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBaseModel)))
+                {
+                    ((List<TreeRepositoryMemberBaseModel>)((ITreeRepositoryMemberModel)element).ParentRepository.ElementsCollection).Remove((TreeRepositoryMemberBaseModel)element);
+                }
+                //
+                return true;
             }
-            return result;
-            //foreach (var item in CurrentRepository.RootsDefaultDataStorage)
-            //{
-            //    IMainEntitiesInfrastructureRepository infrastructureRepository;
-            //    switch (item.InfrastructureRepositoryTypes)
-            //    {
-            //        case InfrastructureTypes.WindowsDirectory:
-            //            infrastructureRepository = new WindowsFileSystemRepository.Repositories.WindowsMainEntityRepository();
-            //            break;
-            //        case InfrastructureTypes.PostgreSql:
-            //            infrastructureRepository = new PostgreInfrastructure.Repositories.PostgreMainEntityInfrastructure();
-            //            break;
-            //        case InfrastructureTypes.MongoDbAdo:
-            //            infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
-            //            break;
-            //        default:
-            //            infrastructureRepository = null;
-            //            break;
-            //    }
-            //    var nodeInfrastructureConverter = new NodeInfrastructureConverter();
-            //    _dbMainEntitiesCollection.DbTreeNodes = infrastructureRepository.SelectNodes();
-            //    var leaveInfrastructureConverter = new LeaveInfrastructureConverter();
-            //    _dbMainEntitiesCollection.DbTreeLeaves = infrastructureRepository.SelectLeaves();
-            //}
-            _currentRepository = _mainEntityCollection.DataTreeRepositories.Where(x => x.Guid == currentRepository.Guid).Last();
-            //using (var fs = new FileStream(CurrentRepository.ConfigPath, FileMode.OpenOrCreate))
-            //{
-            //    //var dbRepository = new DbTreeRepository();
-            //    //try
-            //    //{
-            //    //    dbRepository.ChildTreeRootIds = xmlSerializer.Deserialize(fs) as List<TreeRoot>;
-            //    //}
-            //    //catch (Exception ex)
-            //    //{
-            //    //}
-            //    //if (dbRepository != null)
-            //    //{
-
-            //    //}
-            //}
-            for (int i = 0; i < currentRepository.Childs.Count(); i++)
+            catch (Exception)
             {
-                //currentRepository.ChildTreeRoots.ToList()[i] = GetRootContent(currentRepository.ChildTreeRoots.ToList()[i]);
+                return false;
             }
-            return _currentRepository;
         }
-        //private TreeRoot GetRootContent(TreeRoot treeRoot) 
-        //{
-        //    IMainEntitiesInfrastructureRepository infrastructureRepository = InfrastructureFactory.GetMainEntitiesInfrastructure(treeRoot.InftastructureRepositoryType);
-        //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeRoot.Guid);
-        //    for (int i = 0; i < nodeCollection.Count(); i++)
-        //    {
-        //        //treeRoot.ChildTreeNodes.ToList()[i] = InfrastructureConverter.DbToBusinessNode(nodeCollection.ToList()[i]);
-        //    }
-        //    return treeRoot;
-        //}
-        //private TreeNode GetNodeContent(TreeNode treeNode)
-        //{
-        //    IMainEntitiesInfrastructureRepository infrastructureRepository = new MongoRepository.Repositories.MongoMainEntitуInfrastructure();
-        //    var nodeCollection = infrastructureRepository.SelectNodes(InfrastructureConverterBase.BusinessToDbRepository(CurrentRepository)).Where(x => x.Guid == treeNode.Guid);
-        //    for (int i = 0; i < nodeCollection.Count(); i++)
-        //    {
-        //        treeNode.ChildTreeNodes.ToList()[i] = InfrastructureConverterBase.DbToBusinessNode(nodeCollection.ToList()[i]);
-        //    }
-        //    return treeNode;
-        //}
 
+        #endregion
 
+        #region [ Save ]
 
-        #region Save
+        public long SaveChanges()
+        {
+            long result = 0;
+            result = SaveChanges(_currentRepository);
+            return result;
+        }
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
             long result = 0;
@@ -399,10 +254,56 @@ namespace Philadelphus.Business.Services
             return result;
         }
 
-        public long SaveChanges()
+        #endregion
+
+        #region [ Temp ]
+
+        /// <summary>
+        /// Создание примера репозитория.
+        /// </summary>
+        /// <returns></returns>
+        public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
         {
-            long result = 0;
-            result = SaveChanges(_currentRepository);
+            var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
+            _mainEntityCollection.DataTreeRepositories.Add(repo);
+            for (int i = 0; i < 5; i++)
+            {
+                var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage);
+                GetAttributesSample(root);
+                ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(root);
+                for (int j = 0; j < 5; j++)
+                {
+                    var node = new TreeNodeModel(Guid.NewGuid(), root);
+                    GetAttributesSample(node);
+                    ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node);
+                    for (int k = 0; k < 5; k++)
+                    {
+                        var node2 = new TreeNodeModel(Guid.NewGuid(), root);
+                        GetAttributesSample(node2);
+                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node2);
+                        ((ObservableCollection<IChildrenModel>)node.Childs).Add(node2);
+                        var leave = new TreeLeaveModel(Guid.NewGuid(), node);
+                        GetAttributesSample(leave);
+                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(leave);
+                        ((ObservableCollection<IChildrenModel>)node.Childs).Add(leave);
+                    }
+                    ((ObservableCollection<IChildrenModel>)root.Childs).Add(node);
+                }
+                ((ObservableCollection<IChildrenModel>)repo.Childs).Add(root);
+            }
+            return repo;
+        }
+        private List<ElementAttributeModel> GetAttributesSample(IContentOwnerModel owner)
+        {
+            var result = new List<ElementAttributeModel>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                var entry = new ElementAttributeModel(Guid.NewGuid(), owner);
+                ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(entry);
+                result.Add(entry);
+            }
+
             return result;
         }
         #endregion

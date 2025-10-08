@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.InfrastructureEntities.MainEntities
 {
-    public class TreeLeave : TreeRootMemberBase
+    public class TreeLeave : TreeNodeMemberBase
     {
-        public virtual TreeNode ParentTreeNode { get; set; }
-        public override IMainEntity Parent { get => ParentTreeNode; set => ParentTreeNode = (TreeNode)value; }
         public TreeLeave()
         {
 
         }
-
     }
 }

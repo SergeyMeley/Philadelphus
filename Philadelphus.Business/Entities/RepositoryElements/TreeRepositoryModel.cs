@@ -20,8 +20,22 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     {
         protected override string DefaultFixedPartOfName { get => "Новый репозиторий"; }
         public override EntityTypesModel EntityType { get => EntityTypesModel.Repository; }
-        public IDataStorageModel OwnDataStorage { get; private set; }
-        public List<IDataStorageModel> DataStorages { get; internal set; }
+
+        private IDataStorageModel _ownDataStorage;
+        public IDataStorageModel OwnDataStorage 
+        { 
+            get
+            {
+                return _ownDataStorage;
+            }
+            private set
+            {
+                _ownDataStorage = value;
+                DataStorages.Add(value);
+            }
+        }
+        public List<IDataStorageModel> DataStorages { get; internal set; } = new List<IDataStorageModel>();
+        public IEnumerable<Guid> ChildsGuids { get; set; }
         public IEnumerable<IChildrenModel> Childs { get; internal set; }
         public IEnumerable<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         internal TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage) : base(guid)

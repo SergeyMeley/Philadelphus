@@ -43,6 +43,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         }
         public State State { get; set; } = State.Initialized;
 
-        public IMainEntity DbEntity { get => this.ToDbEntity(); }
+        public IMainEntity DbEntity { get; set; }
     }
 }

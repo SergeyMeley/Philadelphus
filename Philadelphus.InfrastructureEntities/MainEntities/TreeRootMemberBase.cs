@@ -8,7 +8,19 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public abstract class TreeRootMemberBase : MainEntityBase
     {
+        public Guid? ParentTreeRootGuid { get; set; }
+        public virtual TreeRoot ParentTreeRoot { get; set; }
         public Guid? ParentGuid { get; set; }
-        public abstract IMainEntity Parent { get; set; }
+        public virtual IMainEntity Parent
+        {
+            get
+            {
+                return ParentTreeRoot;
+            }
+            set
+            {
+                ParentTreeRoot = (TreeRoot)value;
+            }
+        }
     }
 }
