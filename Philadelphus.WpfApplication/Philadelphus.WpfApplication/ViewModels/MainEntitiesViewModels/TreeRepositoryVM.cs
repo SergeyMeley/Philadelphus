@@ -10,6 +10,7 @@ using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -108,30 +109,31 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 return new RelayCommand(obj =>
                 {
                     _service.SaveChanges(_model);
+                    OnPropertyChanged(nameof(State));
 
                     //TODO: Переработать, временный костыль для проверки
-                    OnPropertyChanged(nameof(State));
-                    OnPropertyChanged(nameof(Childs));
-                    foreach (var item in Childs)
-                    {
-                        item.OnPropertyChanged();
-                        item.OnPropertyChanged(nameof(State));
-                        foreach (var item2 in item.ChildNodes)
-                        {
-                            item2.OnPropertyChanged();
-                            item2.OnPropertyChanged(nameof(State));
-                            foreach (var item3 in item2.ChildNodes)
-                            {
-                                item3.OnPropertyChanged();
-                                item3.OnPropertyChanged(nameof(State));
-                            }
-                            foreach (var item3 in item2.ChildLeaves)
-                            {
-                                item3.OnPropertyChanged();
-                                item3.OnPropertyChanged(nameof(State));
-                            }
-                        }
-                    }
+                    //OnPropertyChanged(nameof(Childs));
+                    //foreach (var item in Childs)
+                    //{
+                    //    item.OnPropertyChanged();
+                    //    item.OnPropertyChanged(nameof(State));
+                    //    foreach (var item2 in item.ChildNodes)
+                    //    {
+                    //        item2.OnPropertyChanged();
+                    //        item2.OnPropertyChanged(nameof(State));
+                    //        foreach (var item3 in item2.ChildNodes)
+                    //        {
+                    //            item3.OnPropertyChanged();
+                    //            item3.OnPropertyChanged(nameof(State));
+                    //        }
+                    //        foreach (var item3 in item2.ChildLeaves)
+                    //        {
+                    //            item3.OnPropertyChanged();
+                    //            item3.OnPropertyChanged(nameof(State));
+                    //        }
+                    //    }
+                    //}
+                     NotifyChildsPropertyChangedRecursive();
                 });
             }
         }
@@ -234,6 +236,15 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             if (_model == null)
                 return false;
             return _model.OwnDataStorage.IsAvailable;
+        }
+
+        internal void NotifyChildsPropertyChangedRecursive()
+        {
+            OnPropertyChanged(nameof(State));
+            foreach (var item in Childs)
+            {
+                item.NotifyChildsPropertyChangedRecursive();
+            }
         }
 
         #endregion

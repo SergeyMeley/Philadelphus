@@ -67,6 +67,19 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             return result;
         }
 
+        internal void NotifyChildsPropertyChangedRecursive()
+        {
+            OnPropertyChanged(nameof(State));
+            //for (int i = 0; i < ChildNodes.Count; i++)
+            //{
+            //    ChildNodes[i].NotifyChildsPropertyChangedRecursive();
+            //}
+            foreach (var item in ChildNodes)
+            {
+                item.NotifyChildsPropertyChangedRecursive();
+            }
+        }
+
         #endregion
     }
 }

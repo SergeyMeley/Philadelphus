@@ -33,6 +33,10 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 
         #region [ Methods ]
 
+        internal void NotifyChildsPropertyChangedRecursive()
+        {
+            OnPropertyChanged(nameof(State));
+        }
 
         #endregion
     }
