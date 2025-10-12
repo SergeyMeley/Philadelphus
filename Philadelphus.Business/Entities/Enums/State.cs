@@ -10,7 +10,7 @@ namespace Philadelphus.Business.Entities.Enums
     {
         Initialized,
         Changed,
-        Saved,
+        SavedOrLoaded,
         Deleted,
     }
 }

@@ -57,7 +57,10 @@ namespace Philadelphus.Business.Services
                     var roots = dbRoots?.ToModelCollection(repository.DataStorages);
                     if (roots != null)
                     {
-                        roots.Cast<IChildrenModel>();
+                        for (int i = 0; i < roots.Count; i++)
+                        {
+                            roots[i].State = State.SavedOrLoaded;
+                        }
                         result.Childs = roots.Cast<IChildrenModel>().ToList();
                     }
                 }
@@ -92,7 +95,7 @@ namespace Philadelphus.Business.Services
                 default:
                     break;
             }
-            treeRepository.State = State.Saved;
+            treeRepository.State = State.SavedOrLoaded;
             for (int i = 0; i < treeRepository.Childs.Count(); i++)
             {
                 SaveChanges(((TreeRootModel)treeRepository.Childs.ToList()[i]));
@@ -116,7 +119,7 @@ namespace Philadelphus.Business.Services
                 default:
                     break;
             }
-            treeRoot.State = State.Saved;
+            treeRoot.State = State.SavedOrLoaded;
             for (int i = 0; i < treeRoot.Childs.Count(); i++)
             {
                 SaveChanges(((TreeNodeModel)treeRoot.Childs.ToList()[i]));
@@ -131,14 +134,14 @@ namespace Philadelphus.Business.Services
             //{
             //    SaveChanges(((TreeLeaveModel)treeNode.Childs.ToList()[i]));
             //}
-            treeNode.State = State.Saved;
+            treeNode.State = State.SavedOrLoaded;
             return result;
         }
         public long SaveChanges(TreeLeaveModel treeLeave)
         {
             long result = 0;
 
-            treeLeave.State = State.Saved;
+            treeLeave.State = State.SavedOrLoaded;
             return result;
         }
 

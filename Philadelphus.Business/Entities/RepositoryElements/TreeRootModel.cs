@@ -30,31 +30,19 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<IChildrenModel> Childs { get; set; }
         internal TreeRootModel(Guid guid, IParentModel parent, IDataStorageModel dataStorage) : base(guid, parent)
         {
-            if (parent == null)
-            {
-                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
-                return;
-            }
-            if (parent.GetType() == typeof(TreeRepositoryModel))
-            {
-                Guid = guid;
-                Parent = parent;
-                ParentRepository = (TreeRepositoryModel)parent;
-                OwnDataStorage = dataStorage;
-                Initialize();
-            }
-            else
-            {
-                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
-            }
+            Guid = guid;
+            Parent = parent;
+            ParentRepository = (TreeRepositoryModel)parent;
+            OwnDataStorage = dataStorage;
+            Initialize();
         }
         private void Initialize()
         {
             List<string> existNames = new List<string>();
-            foreach (var item in ParentRepository.ElementsCollection)
-            {
-                existNames.Add(item.Name);
-            }
+            //foreach (var item in ParentRepository.ElementsCollection)
+            //{
+            //    existNames.Add(item.Name);
+            //}
             //foreach (var child in Parent.Childs)
             //{
             //    existNames.Add(((IMainEntity)child).Name);

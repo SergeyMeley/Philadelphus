@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
@@ -42,6 +43,10 @@ namespace Philadelphus.Business.Services
                     var repositories = dbRepositories?.ToModelCollection(dataStorages);
                     if (repositories != null)
                     {
+                        for (int i = 0; i < repositories.Count; i++)
+                        {
+                            repositories[i].State = State.SavedOrLoaded;
+                        }
                         result.AddRange(repositories);
                     }
                 }
