@@ -24,7 +24,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public override EntityTypesModel EntityType { get => EntityTypesModel.Node; }
         public IMainEntitiesInfrastructureRepository Infrastructure { get; private set; }
         public EntityElementTypeModel ElementType { get; set; }
-        public IEnumerable<IChildrenModel> Childs { get; set; }
+        public List<IChildrenModel> Childs { get; set; }
         public TreeRootModel ParentRoot { get; private set; }
         internal TreeNodeModel(Guid guid, IParentModel parent) : base(guid, parent)
         {
@@ -66,7 +66,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 existNames.Add(item.Name);
             }
             Name = NamingHelper.GetNewName(existNames, DefaultFixedPartOfName);
-            Childs = new ObservableCollection<IChildrenModel>();
+            Childs = new List<IChildrenModel>();
             ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
         }
     }

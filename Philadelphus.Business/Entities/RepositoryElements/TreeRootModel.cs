@@ -27,7 +27,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IDataStorageModel OwnDataStorage { get; private set; }
         public EntityElementTypeModel ElementType { get; set; }
         public IParentModel Parent {  get; private set; }
-        public IEnumerable<IChildrenModel> Childs { get; set; }
+        public List<IChildrenModel> Childs { get; set; }
         internal TreeRootModel(Guid guid, IParentModel parent, IDataStorageModel dataStorage) : base(guid, parent)
         {
             if (parent == null)
@@ -60,7 +60,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //    existNames.Add(((IMainEntity)child).Name);
             //}
             Name = NamingHelper.GetNewName(existNames, DefaultFixedPartOfName);
-            Childs = new ObservableCollection<IChildrenModel>();
+            Childs = new List<IChildrenModel>();
             ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
         }
         public bool ChangeDataStorage(IDataStorageModel storage)

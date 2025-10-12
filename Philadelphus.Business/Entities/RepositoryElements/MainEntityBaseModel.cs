@@ -16,10 +16,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         protected virtual string DefaultFixedPartOfName { get => "Новая основная сущность"; }
         public abstract EntityTypesModel EntityType { get; }
         public Guid Guid { get; protected set; }
-        //public Guid ParentGuid { get; protected set; }
-        /// <summary>
-        /// Идентификатор экземпляра в текущей базе данных
-        /// </summary>
         public string Name { get; set; }
         public string Alias { get; set; }
         public string CustomCode { get; set; }
@@ -29,6 +25,8 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public bool IsLegacy { get; set; }
         public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
         public EntityElementTypeModel ElementType { get; set; }
+        public State State { get; set; } = State.Initialized;
+        public IMainEntity DbEntity { get; set; }
         public MainEntityBaseModel(Guid guid)
         {
             Guid = guid;
@@ -41,8 +39,5 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             sb.Append(Guid);
             return sb.ToString();
         }
-        public State State { get; set; } = State.Initialized;
-
-        public IMainEntity DbEntity { get; set; }
     }
 }

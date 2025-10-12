@@ -10,8 +10,8 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
     public interface IContentOwnerModel : ILinkableByGuidModel
     {
         public bool HasContent { get; set; }
-        public IEnumerable<ElementAttributeModel> PersonalAttributes { get; }
-        public IEnumerable<ElementAttributeModel> ParentElementAttributes { get; }
-        public IEnumerable<ElementAttributeValueModel> AttributeValues { get; set; }
+        public List<ElementAttributeModel> PersonalAttributes { get; }
+        public List<ElementAttributeModel> ParentElementAttributes { get; }
+        public List<ElementAttributeValueModel> AttributeValues { get; set; }
     }
 }

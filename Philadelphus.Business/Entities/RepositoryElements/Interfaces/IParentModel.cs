@@ -8,6 +8,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
 {
     public interface IParentModel : ILinkableByGuidModel
     {
-        IEnumerable<IChildrenModel> Childs { get; }
+        List<IChildrenModel> Childs { get; }
     }
 }

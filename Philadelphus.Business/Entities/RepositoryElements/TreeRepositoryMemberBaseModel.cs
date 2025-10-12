@@ -13,9 +13,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IParentModel Parent { get; protected set; }
         public TreeRepositoryModel ParentRepository { get; protected set; }
         public long Sequence { get; set; }
-        public IEnumerable<ElementAttributeModel> PersonalAttributes { get; set; } = new List<ElementAttributeModel>();
-        public IEnumerable<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
-        public IEnumerable<ElementAttributeValueModel> AttributeValues { get; set; } = new List<ElementAttributeValueModel>();
+        public List<ElementAttributeModel> PersonalAttributes { get; set; } = new List<ElementAttributeModel>();
+        public List<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
+        public List<ElementAttributeValueModel> AttributeValues { get; set; } = new List<ElementAttributeValueModel>();
 
         internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent) : base(guid)
         {

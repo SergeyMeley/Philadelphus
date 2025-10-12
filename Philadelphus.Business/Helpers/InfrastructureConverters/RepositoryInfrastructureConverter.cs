@@ -49,7 +49,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
             result.DataStorages = new List<IDataStorageModel>() { dataStorage };
-            result.ChildsGuids = dbEntity.ChildTreeRootsGuids;
+            result.ChildsGuids = dbEntity.ChildTreeRootsGuids.ToList();
             //result.AuditInfo = dbEntity.AuditInfo.ToModel();
             //result.Childs = dbEntity.ChildTreeRoots.ToModelCollection(dataStorages);
             //result = (TreeRepositoryModel)dbEntity.ToModelGeneralProperties(result);

@@ -32,10 +32,10 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 
         public IEnumerator<IMainEntityModel> GetEnumerator()
         {
-            for (int i = 0; i < _dataTreeRepositories.Count; i++)
-            {
-                yield return _dataTreeRepositories[i];
-            }
+            //for (int i = 0; i < _dataTreeRepositories.Count; i++)
+            //{
+            //    yield return _dataTreeRepositories[i];
+            //}
             for (int i = 0; i < _dataTreeRoots.Count; i++)
             {
                 yield return _dataTreeRoots[i];

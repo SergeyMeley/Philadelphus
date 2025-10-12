@@ -12,8 +12,8 @@ using Philadelphus.PostgreEfRepository.Contexts;
 namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelphusContextMigrations
 {
     [DbContext(typeof(TreeRepositoriesPhiladelphusContext))]
-    [Migration("20251005224259_qqqqqqqqqqqqq")]
-    partial class qqqqqqqqqqqqq
+    [Migration("20251012073336_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

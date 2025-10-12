@@ -10,7 +10,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
     public class TreeRoot : MainEntityBase
     {
         public Guid OwnDataStorageGuid { get; set; }
-        public Guid[] DataStoragesGuids { get; set; }
+        public Guid[] DataStoragesGuids { get; set; }   //TODO: Удалить
         public virtual TreeNode[] ChildTreeNodes { get; set; }
         public TreeRoot()
         {
