@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Services;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -45,14 +46,15 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var service = new DataTreeProcessingService();
+                    var collectionService = new TreeRepositoryCollectionService();
                     if (_dataStoragesSettingsVM.SelectedDataStorageVM == null)
                         return;
-                    var result = service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
+                    var result = collectionService.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
+                    var service = new TreeRepositoryService(result);
                     result.Name = _name;
                     result.Description = _description;
                     service.SaveChanges(result);
-                    _repositoryCollectionVM.TreeRepositoriesVMs.Add(new RepositoryExplorerVM(result));
+                    _repositoryCollectionVM.TreeRepositoriesVMs.Add(new TreeRepositoryVM(result));
                     CloseWindow();
                 });
             }

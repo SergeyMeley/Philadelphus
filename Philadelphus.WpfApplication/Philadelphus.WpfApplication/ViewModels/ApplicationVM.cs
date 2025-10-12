@@ -6,6 +6,7 @@ using Philadelphus.Business.Handlers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.WpfApplication.Models.StorageConfig;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
 using Philadelphus.WpfApplication.Views.Controls;
@@ -56,7 +57,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             get
             {
                 var title = "Чубушник";
-                var repositoryName = _repositoryCollectionVM?.CurrentRepositoryExplorerVM?.TreeRepository?.Name;
+                var repositoryName = _repositoryCollectionVM?.CurrentRepositoryExplorerVM?.Name;
                 if (String.IsNullOrEmpty(repositoryName) == false)
                 {
                     title = $"{repositoryName} - Чубушник";
@@ -65,7 +66,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        public RepositoryExplorerVM RepositoryExplorerVM 
+        public TreeRepositoryVM RepositoryExplorerVM 
         { 
             get 
             { 

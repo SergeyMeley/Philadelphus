@@ -53,7 +53,7 @@
                
                 <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2" Grid.ColumnSpan="2">
 
-                    <TreeView Name="MainTreeView" ItemsSource="{Binding TreeRepository.Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+                    <TreeView Name="MainTreeView" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
                         <TreeView.ItemTemplate>
                             <!--<HierarchicalDataTemplate Template="{StaticResource ResourceKey=}" DataType="{x:Type mainentities:TreeRoot}" ItemsSource="{Binding Childs}">

@@ -1,4 +1,5 @@
-﻿using Philadelphus.WpfApplication.Views;
+﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
+using Philadelphus.WpfApplication.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;

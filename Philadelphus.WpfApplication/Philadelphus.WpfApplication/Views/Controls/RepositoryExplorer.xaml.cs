@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
-using Philadelphus.WpfApplication.ViewModels;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
     /// </summary>
     public partial class RepositoryExplorer : UserControl
     {
-        public RepositoryExplorerVM ViewModel { get { return (RepositoryExplorerVM)DataContext; } }
+        public TreeRepositoryVM ViewModel { get { return (TreeRepositoryVM)DataContext; } }
         public RepositoryExplorer()
         {
             InitializeComponent();
@@ -31,7 +31,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
 
         private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            ViewModel.SelectedRepositoryMember = (TreeRepositoryMemberBaseModel)MainTreeView.SelectedItem;
+            ViewModel.SelectedRepositoryMember = (MainEntityBaseVM)MainTreeView.SelectedItem;
         }
     }
 }

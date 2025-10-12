@@ -1,4 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels;
+﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
