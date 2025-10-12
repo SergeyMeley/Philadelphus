@@ -23,7 +23,6 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 
         private readonly ObservableCollection<TreeNodeVM> _childNodes = new ObservableCollection<TreeNodeVM>();
         public ObservableCollection<TreeNodeVM> ChildNodes { get => _childNodes; }
-
         public CompositeCollection Childs { get; }
 
         #endregion
@@ -33,11 +32,14 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public TreeRootVM(TreeRootModel treeRoot, TreeRepositoryService service) : base(treeRoot, service)
         {
             _model = treeRoot;
-            foreach (var item in treeRoot.Childs)
+            if (treeRoot.Childs != null)
             {
-                if (item.GetType() == typeof(TreeNodeModel))
+                foreach (var item in treeRoot.Childs)
                 {
-                    _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, service));
+                    if (item.GetType() == typeof(TreeNodeModel))
+                    {
+                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, service));
+                    }
                 }
             }
             Childs = new CompositeCollection()

@@ -108,6 +108,30 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 return new RelayCommand(obj =>
                 {
                     _service.SaveChanges(_model);
+
+                    //TODO: Переработать, временный костыль для проверки
+                    OnPropertyChanged(nameof(State));
+                    OnPropertyChanged(nameof(Childs));
+                    foreach (var item in Childs)
+                    {
+                        item.OnPropertyChanged();
+                        item.OnPropertyChanged(nameof(State));
+                        foreach (var item2 in item.ChildNodes)
+                        {
+                            item2.OnPropertyChanged();
+                            item2.OnPropertyChanged(nameof(State));
+                            foreach (var item3 in item2.ChildNodes)
+                            {
+                                item3.OnPropertyChanged();
+                                item3.OnPropertyChanged(nameof(State));
+                            }
+                            foreach (var item3 in item2.ChildLeaves)
+                            {
+                                item3.OnPropertyChanged();
+                                item3.OnPropertyChanged(nameof(State));
+                            }
+                        }
+                    }
                 });
             }
         }
@@ -199,7 +223,11 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         internal bool LoadTreeRepository()
         {
             _service.LoadRepositoryContent(_model);
-            return _model != null;
+            foreach (var item in _model.Childs)
+            {
+                Childs.Add(new TreeRootVM((TreeRootModel)item, _service));
+            }
+            return Childs != null;
         }
         public bool CheckTreeRepositoryAvailability()
         {
