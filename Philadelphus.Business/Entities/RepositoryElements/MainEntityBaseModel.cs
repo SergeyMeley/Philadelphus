@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
@@ -27,6 +28,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public EntityElementTypeModel ElementType { get; set; }
         public State State { get; set; } = State.Initialized;
         public IMainEntity DbEntity { get; set; }
+        public abstract IDataStorageModel DataStorage { get; }
         public MainEntityBaseModel(Guid guid)
         {
             Guid = guid;

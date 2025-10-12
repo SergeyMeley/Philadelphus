@@ -129,18 +129,48 @@ namespace Philadelphus.Business.Services
         public long SaveChanges(TreeNodeModel treeNode)
         {
             long result = 0;
-
-            //for (int i = 0; i < treeNode.Childs.Count(); i++)
-            //{
-            //    SaveChanges(((TreeLeaveModel)treeNode.Childs.ToList()[i]));
-            //}
+            switch (treeNode.State)
+            {
+                case State.Initialized:
+                    treeNode.DataStorage.MainEntitiesInfrastructureRepository.InsertNodes(new List<TreeNode>() { treeNode.ToDbEntity() });
+                    break;
+                case State.Changed:
+                    treeNode.DataStorage.MainEntitiesInfrastructureRepository.UpdateNodes(new List<TreeNode>() { treeNode.ToDbEntity() });
+                    break;
+                case State.Deleted:
+                    result = treeNode.DataStorage.MainEntitiesInfrastructureRepository.DeleteNodes(new List<TreeNode>() { treeNode.ToDbEntity() });
+                    break;
+                default:
+                    break;
+            }
+            for (int i = 0; i < treeNode.ChildTreeNodes?.Count; i++)
+            {
+                SaveChanges(treeNode.ChildTreeNodes?[i]);
+            }
+            for (int i = 0; i < treeNode.ChildTreeLeaves?.Count; i++)
+            {
+                SaveChanges(treeNode.ChildTreeLeaves?[i]);
+            }
             treeNode.State = State.SavedOrLoaded;
             return result;
         }
         public long SaveChanges(TreeLeaveModel treeLeave)
         {
             long result = 0;
-
+            switch (treeLeave.State)
+            {
+                case State.Initialized:
+                    treeLeave.DataStorage.MainEntitiesInfrastructureRepository.InsertLeaves(new List<TreeLeave>() { treeLeave.ToDbEntity() });
+                    break;
+                case State.Changed:
+                    treeLeave.DataStorage.MainEntitiesInfrastructureRepository.UpdateLeaves(new List<TreeLeave>() { treeLeave.ToDbEntity() });
+                    break;
+                case State.Deleted:
+                    result = treeLeave.DataStorage.MainEntitiesInfrastructureRepository.DeleteLeaves(new List<TreeLeave>() { treeLeave.ToDbEntity() });
+                    break;
+                default:
+                    break;
+            }
             treeLeave.State = State.SavedOrLoaded;
             return result;
         }

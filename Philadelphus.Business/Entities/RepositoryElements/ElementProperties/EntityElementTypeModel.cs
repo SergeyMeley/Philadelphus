@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
@@ -13,6 +14,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements.ElementProperties
     public class EntityElementTypeModel : MainEntityBaseModel
     {
         public override EntityTypesModel EntityType => EntityTypesModel.RepositoryElementType;
+
+        public override IDataStorageModel DataStorage => throw new NotImplementedException();
+
         public EntityElementTypeModel(Guid guid, ITypedModel parent) : base(guid)
         {
             Name = "TEST TYPE";

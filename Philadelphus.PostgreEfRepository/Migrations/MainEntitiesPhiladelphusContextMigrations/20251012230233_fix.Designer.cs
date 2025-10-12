@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Philadelphus.PostgreEfRepository.Contexts;
@@ -11,9 +12,11 @@ using Philadelphus.PostgreEfRepository.Contexts;
 namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     [DbContext(typeof(MainEntitiesPhiladelphusContext))]
-    partial class MainEntitiesPhiladelphusContextModelSnapshot : ModelSnapshot
+    [Migration("20251012230233_fix")]
+    partial class fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,9 +58,6 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                         .HasColumnName("name");
 
                     b.Property<Guid?>("ParentGuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ParentTreeNodeGuid")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ParentTreeRootGuid")
@@ -109,13 +109,11 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                     b.Property<Guid?>("ParentGuid")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ParentTreeNodeGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_tree_node_uuid");
+                    b.Property<Guid>("ParentTreeNodeGuid")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("ParentTreeRootGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_tree_root_uuid");
+                        .HasColumnType("uuid");
 
                     b.Property<long?>("Sequence")
                         .HasColumnType("bigint")
@@ -266,7 +264,9 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
 
                     b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", "ParentTreeNode")
                         .WithMany()
-                        .HasForeignKey("ParentTreeNodeGuid");
+                        .HasForeignKey("ParentTreeNodeGuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", null)
                         .WithMany("ChildTreeNodes")

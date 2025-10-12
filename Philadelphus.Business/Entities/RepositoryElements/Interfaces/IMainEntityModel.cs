@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
@@ -21,5 +22,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
         public AuditInfoModel AuditInfo { get; }
         public State State { get; set; }
         public IMainEntity DbEntity { get; }
+        public IDataStorageModel DataStorage { get; }
     }
 }

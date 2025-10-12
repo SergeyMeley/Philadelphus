@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
@@ -19,6 +20,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementCon
         public override EntityTypesModel EntityType { get => EntityTypesModel.None; }
         public ValueTypesModel ValueType { get; set; }
         public IEnumerable<ElementAttributeValueModel> Values { get; set; } = new List<ElementAttributeValueModel>();
+
+        public override IDataStorageModel DataStorage => throw new NotImplementedException();
+
         public OLD_ElementAttributeModel(Guid guid, TreeRepositoryMemberBaseModel owner) : base(guid)
         {
 

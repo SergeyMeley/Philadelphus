@@ -79,15 +79,22 @@ namespace Philadelphus.PostgreEfRepository.Configurations
                     .HasColumnName("deleted_by");
             });
 
-            builder.HasOne(x => x.ParentTreeRoot)
-                  .WithMany()
-                  .HasForeignKey(x => x.ParentGuid);
+            builder.Property(x => x.ParentTreeRootGuid)
+                .HasColumnName("parent_tree_root_uuid");
 
-            builder.HasOne(x => x.ParentTreeNode)
-                  .WithMany()
-                  .HasForeignKey(x => x.ParentGuid);
+            builder.Property(x => x.ParentTreeNodeGuid)
+                .HasColumnName("parent_tree_node_uuid");
 
             builder.Ignore(x => x.Parent);
+
+            builder.HasOne(x => x.ParentTreeRoot)
+              .WithMany()
+              .HasForeignKey(x => x.ParentGuid);
+
+            //builder.HasOne(x => x.ParentTreeNode)
+            //      .WithMany()
+            //      .HasForeignKey(x => x.ParentGuid);
+
         }
     }
 }

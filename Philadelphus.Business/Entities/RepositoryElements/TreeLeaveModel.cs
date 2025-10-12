@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
@@ -18,6 +19,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Leave; }
         public TreeRootModel ParentRoot { get; private set; }
+        public override IDataStorageModel DataStorage { get => ParentRoot.OwnDataStorage; }
         internal TreeLeaveModel(Guid guid, IParentModel parent) : base(guid, parent)
         {
             try
@@ -29,17 +31,22 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                     throw new Exception(message);
                 }
                 Parent = parent;
-                if (Parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
+                if (parent.GetType() == typeof(TreeRepositoryModel))
                 {
-                    ParentRepository = ((ITreeRepositoryMemberModel)Parent).ParentRepository;
+                    ParentRepository = (TreeRepositoryModel)parent;
                 }
-                else if (Parent.GetType() == typeof(TreeRepositoryModel))
+                else if(parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
                 {
-                    ParentRepository = (TreeRepositoryModel)Parent;
+                    ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
+                    if (parent.GetType() == typeof(TreeRootModel))
+                    {
+                        ParentRoot = ((ITreeRootMemberModel)parent).ParentRoot;
+                    }
                 }
-                if (Parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
+                if (parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
                 {
-                    ParentRoot = ((ITreeRootMemberModel)Parent).ParentRoot;
+                    ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
+                    ParentRoot = ((ITreeRootMemberModel)parent).ParentRoot;
                 }
                 else if (Parent.GetType() == typeof(TreeRootModel))
                 {

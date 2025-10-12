@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
@@ -16,7 +17,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<ElementAttributeModel> PersonalAttributes { get; set; } = new List<ElementAttributeModel>();
         public List<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
         public List<ElementAttributeValueModel> AttributeValues { get; set; } = new List<ElementAttributeValueModel>();
-
+        public override IDataStorageModel DataStorage { get; }
         internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent) : base(guid)
         {
             if (parent == null)

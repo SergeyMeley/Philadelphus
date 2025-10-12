@@ -1,58 +1,61 @@
-﻿//using Philadelphus.Business.Entities.Enums;
-//using Philadelphus.Business.Entities.RepositoryElements;
-//using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
-//using Philadelphus.Business.Factories;
-//using Philadelphus.InfrastructureEntities.MainEntities;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Factories;
+using Philadelphus.InfrastructureEntities.MainEntities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace Philadelphus.Business.Helpers.InfrastructureConverters
-//{
-//    internal class NodeInfrastructureConverter : InfrastructureConverterBase
-//    {
-//        internal override IMainEntity ToDbEntity(IMainEntityModel businessEntity)
-//        {
-//            if (businessEntity == null)
-//                return null;
-//            var result = (TreeNode)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeNode());
-//            return result;
-//        }
-//        internal override IEnumerable<IMainEntity> ToDbEntityCollection(IEnumerable<IMainEntityModel> businessEntityCollection)
-//        {
-//            if (businessEntityCollection == null)
-//                return null;
-//            var result = new List<TreeNode>();
-//            foreach (var businessEntity in businessEntityCollection)
-//            {
-//                var entity = (TreeNode)ToDbEntityGeneralProperties((TreeRepositoryMemberBaseModel)businessEntity, new TreeNode());
-//                result.Add(entity);
-//            }
-//            return result;
-//        }
-//        internal override IMainEntityModel ToModel(IMainEntity dbEntity)
-//        {
-//            if (dbEntity == null)
-//                return null;
-//            //var result = new TreeNode(new Guid(dbEntity.ParentGuid));
-//            //result = (TreeNode)ToModelGeneralProperties(dbEntity, (TreeRootMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Node));
-//            //return result;
-//            return null;
-//        }
-//        internal override IEnumerable<IMainEntityModel> ToModelCollection(IEnumerable<IMainEntity> dbEntityCollection)
-//        {
-//            if (dbEntityCollection == null)
-//                return null;
-//            var result = new List<TreeNodeModel>();
-//            //foreach (var dbEntity in dbEntityCollection)
-//            //{
-//            //    var entity = new TreeNode(new Guid(dbEntity.ParentGuid));
-//            //    entity = (TreeNode)ToModelGeneralProperties(dbEntity, (TreeRootMemberBase)MainEntityFactory.CreateMainEntitiesRepositoriesFactory(EntityTypes.Node));
-//            //    result.Add(entity);
-//            //}
-//            return result;
-//        }
-//    }
-//}
+namespace Philadelphus.Business.Helpers.InfrastructureConverters
+{
+    internal static class NodeInfrastructureConverter
+    {
+        public static TreeNode ToDbEntity(this TreeNodeModel businessEntity)
+        {
+            if (businessEntity == null)
+                return null;
+            var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(new TreeNode());
+            result.ParentGuid = businessEntity.Parent.Guid;
+            result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;
+            return result;
+        }
+        public static List<TreeNode> ToDbEntityCollection(this IEnumerable<TreeNodeModel> businessEntityCollection)
+        {
+            if (businessEntityCollection == null)
+                return null;
+            var result = new List<TreeNode>();
+            foreach (var businessEntity in businessEntityCollection)
+            {
+                result.Add(businessEntity.ToDbEntity());
+            }
+            return result;
+        }
+        public static TreeNodeModel ToModel(this TreeNode dbEntity, IParentModel parent)
+        {
+            if (dbEntity == null)
+                return null;
+            var result = new TreeNodeModel(dbEntity.Guid, parent);
+            result = (TreeNodeModel)dbEntity.ToModelGeneralProperties(result);
+            return result;
+        }
+        public static List<TreeNodeModel> ToModelCollection(this IEnumerable<TreeNode> dbEntityCollection, IEnumerable<IParentModel> parents)
+        {
+            if (dbEntityCollection == null)
+                return null;
+            var result = new List<TreeNodeModel>();
+            foreach (var dbEntity in dbEntityCollection)
+            {
+                var parent = parents.FirstOrDefault(x => x.Guid == dbEntity.ParentGuid);
+                if (parent != null)
+                {
+                    result.Add(dbEntity.ToModel(parent));
+                }
+            }
+            return result;
+        }
+    }
+}

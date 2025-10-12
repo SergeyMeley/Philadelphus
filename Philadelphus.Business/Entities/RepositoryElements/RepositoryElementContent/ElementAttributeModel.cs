@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
@@ -24,6 +25,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementCon
         public IContentOwnerModel Owner { get; set; }
         public TreeRootModel ParentRoot { get; set; }
         public TreeRepositoryModel ParentRepository { get; set; }
+
+        public override IDataStorageModel DataStorage => throw new NotImplementedException();
+
         public ElementAttributeModel(Guid guid, IContentOwnerModel owner) : base(guid)
         {
             Guid = guid;

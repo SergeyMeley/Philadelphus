@@ -45,7 +45,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<Guid> ChildsGuids { get; set; }
         public List<IChildrenModel> Childs { get; internal set; }
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
-
         public TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage)
         {
             Guid = guid;
