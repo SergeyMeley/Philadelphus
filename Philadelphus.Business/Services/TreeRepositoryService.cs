@@ -28,7 +28,7 @@ namespace Philadelphus.Business.Services
             }
         }
 
-        private MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
+        private static MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
         public MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
         #endregion
@@ -42,7 +42,16 @@ namespace Philadelphus.Business.Services
 
         #endregion
 
-        #region [ Load ]
+        #region [ Get + Load ]
+
+        public static IMainEntity GetEntityFromCollection(Guid guid)
+        {
+            return GetModelFromCollection(guid).ToDbEntity();
+        }
+        public static IMainEntityModel GetModelFromCollection(Guid guid)
+        {
+            return _mainEntityCollection.FirstOrDefault(x => x.Guid == guid);
+        }
 
         public TreeRepositoryModel LoadRepositoryContent(TreeRepositoryModel repository)
         {
@@ -80,98 +89,112 @@ namespace Philadelphus.Business.Services
         }
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
+            if (treeRepository == null)
+                return 0;
             long result = 0;
             switch (treeRepository.State)
             {
                 case State.Initialized:
-                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
+                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
                     break;
                 case State.Changed:
-                    treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
+                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
                     break;
                 case State.Deleted:
-                    result = treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
+                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
                     break;
                 default:
                     break;
             }
             treeRepository.State = State.SavedOrLoaded;
-            for (int i = 0; i < treeRepository.Childs.Count(); i++)
+            result += SaveChanges(treeRepository.ChildTreeRoots);
+            return result;
+        }
+        public long SaveChanges(IEnumerable<TreeRootModel> treeRoots)
+        {
+            if (treeRoots == null || treeRoots.Count() == 0)
+                return 0;
+            foreach (var treeRoot in treeRoots)
             {
-                SaveChanges(((TreeRootModel)treeRepository.Childs.ToList()[i]));
+                if (treeRoot.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Guid == treeRoot.Guid) == false)
+                {
+                    _mainEntityCollection.DataTreeRoots.Add(treeRoot);
+                }
+            }
+            long result = 0;
+            foreach (var storage in treeRoots.Select(x => x.DataStorage).Distinct())
+            {
+                List<TreeRoot> dbCollection;
+                dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.InsertRoots(dbCollection);
+                dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.UpdateRoots(dbCollection);
+                dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.DeleteRoots(dbCollection);
+            }
+            result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes));
+            foreach (var treeRoot in treeRoots)
+            {
+                treeRoot.State = State.SavedOrLoaded;
             }
             return result;
         }
-        public long SaveChanges(TreeRootModel treeRoot)
+        public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes)
         {
+            if (treeNodes == null || treeNodes.Count() == 0)
+                return 0;
+            foreach (var treeNode in treeNodes)
+            {
+                if (treeNode.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Guid == treeNode.Guid) == false)
+                {
+                    _mainEntityCollection.DataTreeNodes.Add(treeNode);
+                }
+            }
             long result = 0;
-            switch (treeRoot.State)
+            foreach (var storage in treeNodes.Select(x => x.DataStorage).Distinct())
             {
-                case State.Initialized:
-                    treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.InsertRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
-                    break;
-                case State.Changed:
-                    treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.UpdateRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
-                    break;
-                case State.Deleted:
-                    result = treeRoot.OwnDataStorage.MainEntitiesInfrastructureRepository.DeleteRoots(new List<TreeRoot>() { treeRoot.ToDbEntity() });
-                    break;
-                default:
-                    break;
+                List<TreeNode> dbCollection;
+                dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.InsertNodes(dbCollection);
+                dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.UpdateNodes(dbCollection);
+                dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.DeleteNodes(dbCollection);
             }
-            treeRoot.State = State.SavedOrLoaded;
-            for (int i = 0; i < treeRoot.Childs.Count(); i++)
+            result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes));
+            result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves));
+            foreach (var treeNode in treeNodes)
             {
-                SaveChanges(((TreeNodeModel)treeRoot.Childs.ToList()[i]));
+                treeNode.State = State.SavedOrLoaded;
             }
-            return result;
+            return treeNodes.Where(x => x.State != State.SavedOrLoaded).Count();
         }
-        public long SaveChanges(TreeNodeModel treeNode)
+        public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves)
         {
+            if (treeLeaves == null || treeLeaves.Count() == 0)
+                return 0;
+            foreach (var treeLeave in treeLeaves)
+            {
+                if (treeLeave.State == State.Initialized && _mainEntityCollection.DataTreeLeaves.Any(x => x.Guid == treeLeave.Guid) == false)
+                {
+                    _mainEntityCollection.DataTreeLeaves.Add(treeLeave);
+                }
+            }
             long result = 0;
-            switch (treeNode.State)
+            foreach (var storage in treeLeaves.Select(x => x.DataStorage).Distinct())
             {
-                case State.Initialized:
-                    treeNode.DataStorage.MainEntitiesInfrastructureRepository.InsertNodes(new List<TreeNode>() { treeNode.ToDbEntity() });
-                    break;
-                case State.Changed:
-                    treeNode.DataStorage.MainEntitiesInfrastructureRepository.UpdateNodes(new List<TreeNode>() { treeNode.ToDbEntity() });
-                    break;
-                case State.Deleted:
-                    result = treeNode.DataStorage.MainEntitiesInfrastructureRepository.DeleteNodes(new List<TreeNode>() { treeNode.ToDbEntity() });
-                    break;
-                default:
-                    break;
+                List<TreeLeave> dbCollection;
+                dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.InsertLeaves(dbCollection);
+                dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.UpdateLeaves(dbCollection);
+                dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.DeleteLeaves(dbCollection);
             }
-            for (int i = 0; i < treeNode.ChildTreeNodes?.Count; i++)
+            foreach (var treeLeave in treeLeaves)
             {
-                SaveChanges(treeNode.ChildTreeNodes?[i]);
+                treeLeave.State = State.SavedOrLoaded;
             }
-            for (int i = 0; i < treeNode.ChildTreeLeaves?.Count; i++)
-            {
-                SaveChanges(treeNode.ChildTreeLeaves?[i]);
-            }
-            treeNode.State = State.SavedOrLoaded;
-            return result;
-        }
-        public long SaveChanges(TreeLeaveModel treeLeave)
-        {
-            long result = 0;
-            switch (treeLeave.State)
-            {
-                case State.Initialized:
-                    treeLeave.DataStorage.MainEntitiesInfrastructureRepository.InsertLeaves(new List<TreeLeave>() { treeLeave.ToDbEntity() });
-                    break;
-                case State.Changed:
-                    treeLeave.DataStorage.MainEntitiesInfrastructureRepository.UpdateLeaves(new List<TreeLeave>() { treeLeave.ToDbEntity() });
-                    break;
-                case State.Deleted:
-                    result = treeLeave.DataStorage.MainEntitiesInfrastructureRepository.DeleteLeaves(new List<TreeLeave>() { treeLeave.ToDbEntity() });
-                    break;
-                default:
-                    break;
-            }
-            treeLeave.State = State.SavedOrLoaded;
             return result;
         }
 
@@ -272,5 +295,6 @@ namespace Philadelphus.Business.Services
             return result;
         }
         #endregion
+
     }
 }

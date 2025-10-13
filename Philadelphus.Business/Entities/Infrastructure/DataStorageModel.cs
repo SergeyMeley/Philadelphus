@@ -45,7 +45,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
         }
         public bool StartAvailableAutoChecking()
         {
-            System.Timers.Timer timer = new System.Timers.Timer(1000);
+            System.Timers.Timer timer = new System.Timers.Timer(10000);
             timer.Elapsed += CheckAvailable;
             timer.AutoReset = true;
             timer.Enabled = true;

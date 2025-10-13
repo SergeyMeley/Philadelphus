@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.InfrastructureEntities.Interfaces;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,12 @@ namespace Philadelphus.Business.Services
     {
         #region [ Props ]
 
+        private static Dictionary<Guid, IDataStorageModel> _dataStorageModels = new Dictionary<Guid, IDataStorageModel>();
+        public Dictionary<Guid, IDataStorageModel> DataStorageModels { get => _dataStorageModels; private set => _dataStorageModels = value; }
+
+        private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
+        public Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
+
         #endregion
 
         #region [ Construct ]
@@ -28,8 +35,48 @@ namespace Philadelphus.Business.Services
 
         #endregion
 
-        #region [ Load ]
+        #region [ Get + Load ]
 
+        public static TreeRepository GetTreeRepositoryFromCollection(Guid guid)
+        {
+            return GetTreeRepositoryModelFromCollection(guid).ToDbEntity();
+        }
+        public static List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> guids)
+        {
+            return GetTreeRepositoryModelFromCollection(guids).ToDbEntityCollection();
+        }
+        public static TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid guid)
+        {
+            return _dataTreeRepositories[guid];
+        }
+        public static List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> guids)
+        {
+            var result = new List<TreeRepositoryModel>();
+            foreach (var guid in guids)
+            {
+                if (_dataTreeRepositories.TryGetValue(guid, out var model))
+                {
+                    result.Add(model);
+                }
+            }
+            return result;
+        }
+        public static IDataStorageModel GetStorageModelFromCollection(Guid guid)
+        {
+            return _dataStorageModels[guid];
+        }
+        public static List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> guids)
+        {
+            var result = new List<IDataStorageModel>();
+            foreach (var guid in guids)
+            {
+                if (_dataStorageModels.TryGetValue(guid, out var model))
+                {
+                    result.Add(model);
+                }
+            }
+            return result;
+        }
         public IEnumerable<TreeRepositoryModel> LoadRepositories(IEnumerable<IDataStorageModel> dataStorages)
         {
             var result = new List<TreeRepositoryModel>();

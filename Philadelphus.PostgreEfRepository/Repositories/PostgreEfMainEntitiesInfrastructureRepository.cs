@@ -135,8 +135,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             {
                 //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeNodes.Add(item);
             }
             return _context.SaveChanges();
@@ -149,8 +149,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             {
                 //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeLeaves.Add(item);
             }
             return _context.SaveChanges();
@@ -170,11 +170,27 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public long UpdateRoots(IEnumerable<TreeRoot> items)
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.TreeRoots.Update(item);
+            }
+            return _context.SaveChanges();
         }
         public long UpdateNodes(IEnumerable<TreeNode> items)
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.TreeNodes.Update(item);
+            }
+            return _context.SaveChanges();
         }
         public long UpdateLeaves(IEnumerable<TreeLeave> items)
         {
@@ -182,9 +198,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeLeaves.Add(item);
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.TreeLeaves.Update(item);
             }
             return _context.SaveChanges();
         }
@@ -203,15 +219,42 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
         public long DeleteRoots(IEnumerable<TreeRoot> items)
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.IsDeleted = true;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.TreeRoots.Update(item);
+            }
+            return _context.SaveChanges();
         }
         public long DeleteNodes(IEnumerable<TreeNode> items)
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.IsDeleted = true;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.TreeNodes.Update(item);
+            }
+            return _context.SaveChanges();
         }
         public long DeleteLeaves(IEnumerable<TreeLeave> items)
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.IsDeleted = true;
+                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.TreeLeaves.Update(item);
+            }
+            return _context.SaveChanges();
         }
         public long DeleteAttributes(IEnumerable<ElementAttribute> items)
         {

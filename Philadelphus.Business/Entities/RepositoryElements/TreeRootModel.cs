@@ -27,6 +27,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IDataStorageModel OwnDataStorage { get; private set; }
         public EntityElementTypeModel ElementType { get; set; }
         public IParentModel Parent {  get; private set; }
+        public List<TreeNodeModel> ChildTreeNodes { get => Childs.Where(x => x.GetType() == typeof(TreeNodeModel)).Cast<TreeNodeModel>().ToList(); }
         public List<IChildrenModel> Childs { get; set; }
         public override IDataStorageModel DataStorage { get => OwnDataStorage; }
         internal TreeRootModel(Guid guid, IParentModel parent, IDataStorageModel dataStorage) : base(guid, parent)

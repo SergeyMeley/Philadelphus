@@ -64,7 +64,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 
         public static IMainEntity ToDbEntity(this IMainEntityModel businessEntity)
         {
-            if (businessEntity != null)
+            if (businessEntity == null)
                 return null;
             IMainEntity result = null;
             if (businessEntity.GetType().IsAssignableTo(typeof(TreeRootModel)))
@@ -95,7 +95,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         }
         public static IMainEntityModel ToModel(this IMainEntity dbEntity, IEnumerable<IDataStorageModel> dataStorages)
         {
-            if (dbEntity != null)
+            if (dbEntity == null)
                 return null;
             IMainEntity result = null;
             if (dbEntity.GetType().IsAssignableTo(typeof(TreeRoot)))
