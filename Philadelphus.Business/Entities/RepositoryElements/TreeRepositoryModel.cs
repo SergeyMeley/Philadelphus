@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using Philadelphus.Business.Helpers;
+using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -42,8 +43,21 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             }
         }
         public List<IDataStorageModel> DataStorages { get; internal set; } = new List<IDataStorageModel>();
+        //TODO
         public List<TreeRootModel> ChildTreeRoots { get => Childs.Where(x => x.GetType() == typeof(TreeRootModel)).Cast<TreeRootModel>().ToList(); }
-        public List<Guid> ChildsGuids { get; set; }
+        //TODO
+        public List<Guid> ChildsGuids 
+        { 
+            get => Childs.Select(x => x.Guid).ToList();
+            set
+            {
+                if (value.Count() != null)
+                {
+                    Childs = OwnDataStorage.MainEntitiesInfrastructureRepository.SelectRoots(value.ToArray()).ToModelCollection(DataStorages).Cast<IChildrenModel>().ToList();
+
+                }
+            } 
+        }
         public List<IChildrenModel> Childs { get; internal set; }
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         public TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage)

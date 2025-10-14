@@ -22,7 +22,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(new TreeNode());
             result.ParentGuid = businessEntity.Parent.Guid;
             result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;
-            result.ParentTreeRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
+            result.ParentTreeRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
+            //result.ParentTreeRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
             return result;
         }
         public static List<TreeNode> ToDbEntityCollection(this IEnumerable<TreeNodeModel> businessEntityCollection)

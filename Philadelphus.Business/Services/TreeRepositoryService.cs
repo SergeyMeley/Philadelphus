@@ -29,7 +29,7 @@ namespace Philadelphus.Business.Services
         }
 
         private static MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
-        public MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
+        public static MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
         #endregion
 

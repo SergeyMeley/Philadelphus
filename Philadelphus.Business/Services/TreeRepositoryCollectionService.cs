@@ -19,10 +19,10 @@ namespace Philadelphus.Business.Services
         #region [ Props ]
 
         private static Dictionary<Guid, IDataStorageModel> _dataStorageModels = new Dictionary<Guid, IDataStorageModel>();
-        public Dictionary<Guid, IDataStorageModel> DataStorageModels { get => _dataStorageModels; private set => _dataStorageModels = value; }
+        public static Dictionary<Guid, IDataStorageModel> DataStorageModels { get => _dataStorageModels; private set => _dataStorageModels = value; }
 
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
-        public Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
+        public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
 
         #endregion
 
@@ -141,7 +141,7 @@ namespace Philadelphus.Business.Services
         {
             var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
             var service = new TreeRepositoryService(repo);
-            service.MainEntityCollection.DataTreeRepositories.Add(repo);
+            TreeRepositoryCollectionService.DataTreeRepositories.Add(repo.Guid, repo);
             for (int i = 0; i < 5; i++)
             {
                 var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage);

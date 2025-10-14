@@ -10,9 +10,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public class MainEntitiesCollectionModel : IEnumerable<IMainEntityModel>, ICollection<IMainEntityModel>
     {
-        private List<TreeRepositoryModel> _dataTreeRepositories = new List<TreeRepositoryModel>();
-        public List<TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
-
         private List<TreeRootModel> _dataTreeRoots = new List<TreeRootModel>();
         public List<TreeRootModel> DataTreeRoots { get => _dataTreeRoots; private set => _dataTreeRoots = value; }
 
@@ -23,7 +20,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<TreeLeaveModel> DataTreeLeaves { get => _dataTreeLeaves; private set => _dataTreeLeaves = value; }
 
         public int Count => 
-            _dataTreeRepositories.Count 
             + _dataTreeRoots.Count
             + _dataTreeNodes.Count
             + _dataTreeLeaves.Count;
@@ -32,10 +28,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 
         public IEnumerator<IMainEntityModel> GetEnumerator()
         {
-            //for (int i = 0; i < _dataTreeRepositories.Count; i++)
-            //{
-            //    yield return _dataTreeRepositories[i];
-            //}
             for (int i = 0; i < _dataTreeRoots.Count; i++)
             {
                 yield return _dataTreeRoots[i];
@@ -57,17 +49,32 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 
         public void Add(IMainEntityModel item)
         {
-            throw new NotImplementedException();
+            if (item.GetType() == typeof(TreeRootModel))
+            {
+                _dataTreeRoots.Add((TreeRootModel)item);
+            }
+            else if (item.GetType() == typeof(TreeNodeModel))
+            {
+                _dataTreeNodes.Add((TreeNodeModel)item);
+            }
+            else if (item.GetType() == typeof(TreeNodeModel))
+            {
+                _dataTreeNodes.Add((TreeNodeModel)item);
+            }
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            _dataTreeRoots.Clear();
+            _dataTreeNodes.Clear();
+            _dataTreeLeaves.Clear();
         }
 
         public bool Contains(IMainEntityModel item)
         {
-            throw new NotImplementedException();
+            return _dataTreeRoots.Contains(item)
+                || _dataTreeNodes.Contains(item)
+                || _dataTreeLeaves.Contains(item);
         }
 
         public void CopyTo(IMainEntityModel[] array, int arrayIndex)
@@ -77,7 +84,22 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 
         public bool Remove(IMainEntityModel item)
         {
-            throw new NotImplementedException();
+            if (item.GetType() == typeof(TreeRootModel))
+            {
+                _dataTreeRoots.Remove((TreeRootModel)item);
+                return true;
+            }
+            else if (item.GetType() == typeof(TreeNodeModel))
+            {
+                _dataTreeNodes.Remove((TreeNodeModel)item);
+                return true;
+            }
+            else if (item.GetType() == typeof(TreeNodeModel))
+            {
+                _dataTreeNodes.Remove((TreeNodeModel)item);
+                return true;
+            }
+            return false;
         }
     }
 }

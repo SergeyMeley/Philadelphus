@@ -133,6 +133,10 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
+                if (_context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid) != null)
+                {
+                    item.ParentTreeRoot = _context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid);
+                }
                 //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
                 item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
@@ -147,6 +151,10 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
+                if (_context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid) != null)
+                {
+                    item.ParentTreeRoot = _context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid);
+                }
                 //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
                 item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;

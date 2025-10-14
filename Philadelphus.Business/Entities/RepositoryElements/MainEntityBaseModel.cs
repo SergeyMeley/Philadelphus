@@ -3,6 +3,7 @@ using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
+using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,23 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
         public EntityElementTypeModel ElementType { get; set; }
         public State State { get; set; } = State.Initialized;
-        public IMainEntity DbEntity { get; set; }
+
+        private IMainEntity _dbEntity;
+        public IMainEntity DbEntity 
+        { 
+            get
+            {
+                if (_dbEntity == null)
+                {
+                    _dbEntity = this.ToDbEntity();
+                }
+                return _dbEntity;
+            }
+        }
         public abstract IDataStorageModel DataStorage { get; }
-        public MainEntityBaseModel(Guid guid)
+        public MainEntityBaseModel(Guid guid, IMainEntity dbEntity = null)
         {
+            _dbEntity = dbEntity;
             Guid = guid;
         }
         public override string ToString()
