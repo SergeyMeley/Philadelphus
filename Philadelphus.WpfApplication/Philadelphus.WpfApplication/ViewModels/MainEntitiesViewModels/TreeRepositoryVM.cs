@@ -82,6 +82,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         //    get { return _visibilityList; }
         //}
 
+        public string ChildsCount { get => $"Детей: {_model.Childs.Count()}, Корней: {_model.ChildTreeRoots?.Count()}, Uuids: {_model.ChildsGuids.Count}"; }
+
         #endregion
 
         #region [ Construct ]
@@ -225,10 +227,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         internal bool LoadTreeRepository()
         {
             _service.LoadRepositoryContent(_model);
+            Childs.Clear();
             foreach (var item in _model.Childs)
             {
                 Childs.Add(new TreeRootVM((TreeRootModel)item, _service));
             }
+            OnPropertyChanged(nameof(Childs));
+            OnPropertyChanged(nameof(ChildsCount));
             return Childs != null;
         }
         public bool CheckTreeRepositoryAvailability()

@@ -62,6 +62,9 @@
                                 <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
                                     <Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorage.Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
                                 </TextBlock>
+                                <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+                                    <Run Text="Количество корней: '" FontWeight="Light"></Run><Run Text="{Binding ChildsCount, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                </TextBlock>
                             </Grid>
                             <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
                         </Grid>

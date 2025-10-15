@@ -40,6 +40,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 _currentRepositoryExplorerVM.LoadTreeRepository();
                 OnPropertyChanged(nameof(CurrentRepositoryExplorerVM));
                 OnPropertyChanged(nameof(PropertyList));
+                OnPropertyChanged(nameof(TreeRepositoriesVMs));
             }
         }
 
