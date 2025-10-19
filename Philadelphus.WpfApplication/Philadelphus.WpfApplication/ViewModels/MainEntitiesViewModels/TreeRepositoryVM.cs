@@ -82,7 +82,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         //    get { return _visibilityList; }
         //}
 
-        public string ChildsCount { get => $"Детей: {_model.Childs.Count()}, Корней: {_model.ChildTreeRoots?.Count()}, Uuids: {_model.ChildsGuids.Count}"; }
+        public string ChildsCount { get => $"Детей: {_model.Childs.Count()}, Корней: {_model?.ChildTreeRoots?.Count()}, Uuids: {_model?.ChildsGuids?.Count}"; }
 
         #endregion
 
