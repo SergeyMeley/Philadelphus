@@ -8,7 +8,7 @@ using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
-using Philadelphus.WpfApplication.Views;
+using Philadelphus.WpfApplication.Views.Windows;
 using Philadelphus.WpfApplication.Views.Controls;
 using System.Collections.ObjectModel;
 using System.Configuration;

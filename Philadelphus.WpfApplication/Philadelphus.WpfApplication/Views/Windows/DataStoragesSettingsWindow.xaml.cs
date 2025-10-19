@@ -13,14 +13,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Views
+namespace Philadelphus.WpfApplication.Views.Windows
 {
     /// <summary>
-    /// Логика взаимодействия для LaunchWindow.xaml
+    /// Логика взаимодействия для DataStoragesSettingsWindow.xaml
     /// </summary>
-    public partial class LaunchWindow : Window
+    public partial class DataStoragesSettingsWindow : Window
     {
-        public LaunchWindow(LaunchVM vm)
+        public DataStoragesSettingsWindow(DataStoragesSettingsVM vm)
         {
             InitializeComponent();
             DataContext = vm;

@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication
+namespace Philadelphus.WpfApplication.Views.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

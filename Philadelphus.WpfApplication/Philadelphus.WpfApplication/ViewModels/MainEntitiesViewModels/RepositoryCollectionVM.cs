@@ -3,7 +3,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
-using Philadelphus.WpfApplication.Views;
+using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

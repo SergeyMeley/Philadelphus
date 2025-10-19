@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Windows"
-        xmlns:ctrl="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+        xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
         mc:Ignorable="d"
         Title="RepositoryCreationWindow" Height="450" Width="800">
     <Grid>
-        <ctrl:RepositoryCreation></ctrl:RepositoryCreation>
+        <ctrls:RepositoryCreation></ctrls:RepositoryCreation>
     </Grid>
 </Window>
