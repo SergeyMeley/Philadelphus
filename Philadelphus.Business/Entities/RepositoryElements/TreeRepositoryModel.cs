@@ -44,7 +44,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         }
         public List<IDataStorageModel> DataStorages { get; internal set; } = new List<IDataStorageModel>();
         //TODO
-        public List<TreeRootModel> ChildTreeRoots { get/* => Childs.Where(x => x.GetType() == typeof(TreeRootModel)).Cast<TreeRootModel>().ToList()*/;  internal set; }
+        public List<TreeRootModel> ChildTreeRoots { get => Childs.Where(x => x.GetType() == typeof(TreeRootModel)).Cast<TreeRootModel>().ToList(); }
         //TODO
         public List<Guid> ChildsGuids {  get; internal set; }
         //{ 
