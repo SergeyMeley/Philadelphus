@@ -21,13 +21,14 @@ namespace Philadelphus.WpfApplication.ViewModels
         private string _description;
         public string Description { get => _description; set => _description = value; }
 
-        private DataStoragesSettingsVM _dataStoragesSettingsVM = new DataStoragesSettingsVM();
+        private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
         private RepositoryCollectionVM _repositoryCollectionVM;
-        public RepositoryCreationVM(RepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand)
+        public RepositoryCreationVM(RepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand, DataStoragesSettingsVM dataStoragesSettingsVM)
         {
             _repositoryCollectionVM = repositoryCollectionVM;
+            _dataStoragesSettingsVM = dataStoragesSettingsVM;
             OpenDataStoragesSettingsWindowCommand = openDataStoragesSettingsWindowCommand;
         }
         public void OpenWindow()

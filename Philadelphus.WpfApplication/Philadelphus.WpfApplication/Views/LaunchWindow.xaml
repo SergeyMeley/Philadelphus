@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+        xmlns:converters="clr-namespace:Philadelphus.WpfApplication.Converters"
         mc:Ignorable="d"
         Title="Выбор репозитория"
         MinHeight="500" MinWidth="1000"
@@ -12,67 +13,191 @@
     <Window.Visibility>
         <Binding Path="StartWindowVisibility"/>
     </Window.Visibility>
+    <Window.Resources>
+        <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
+        <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Padding" Value="4,4,4,4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TabControlNormalBorderBrush}"/>
+            <Setter Property="Background" Value="#F9F9F9"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" 
+                                        Orientation="Vertical" 
+                                        IsItemsHost="True"/>
+                            <Border Grid.Column="1" 
+                                    x:Name="ContentPanel" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    Background="{TemplateBinding Background}" 
+                                    KeyboardNavigation.DirectionalNavigation="Contained" 
+                                    KeyboardNavigation.TabIndex="2" 
+                                    KeyboardNavigation.TabNavigation="Local">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" 
+                                                  ContentSource="SelectedContent" 
+                                                  Margin="{TemplateBinding Padding}" 
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LeftVerticalTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Border Name="Border" BorderThickness="1,1,0,1" BorderBrush="LightSlateGray" Margin="1">
+                                <StackPanel Orientation="Vertical" 
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Height="50"
+                                            Width="70"
+                                            Margin="5,5">
+                                    <Image Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                           Width="24" Height="24" 
+                                           Margin="0,5,0,0"/>
+                                    <TextBlock Text="{TemplateBinding Header}" 
+                                               HorizontalAlignment="Center"
+                                               Margin="0,5,0,5"
+                                               FontSize="10"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="3*"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
-            <Run Text="Здравствуйте, "></Run>
-            <Run Text="{Binding UserName, Mode=OneWay}"></Run>
-            <Run Text="! "></Run>
-            <Run Text="Выберите репозиторий для начала работы"></Run>
-        </TextBlock>
-        <GroupBox Grid.Row="1" Header="Заголовки репозиториев">
-            <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
+        <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
+            <TabItem Header="Главная" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" MaxHeight="300"></RowDefinition>
+                        <RowDefinition Height="4*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" Header="Создать">
+                        <ctrls:RepositoryCreation></ctrls:RepositoryCreation>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1" Header="Открыть">
                         <Grid>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                    <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                    <Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                </TextBlock>
-                                <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                    <Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                </TextBlock>
-                                <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                    <Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                </TextBlock>
-                                <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-                                    <Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorage.Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                </TextBlock>
-                                <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-                                    <Run Text="Количество корней: '" FontWeight="Light"></Run><Run Text="{Binding ChildsCount, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                </TextBlock>
-                            </Grid>
-                            <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
+                            <GroupBox Grid.Row="0" Header="Избранные">
+                                <ListBox>
+                                    
+                                </ListBox>
+                            </GroupBox>
+                            <GroupBox Grid.Row="1" Header="Последние">
+                                <ListBox>
+
+                                </ListBox>
+                            </GroupBox>
+                            <Button Grid.Row="3" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
                         </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </GroupBox>
-        <Button Grid.Row="2" Content="Создать новый репозиторий" Height="30" Command="{Binding OpenRepositoryCreationWindowCommand}" Margin="2"></Button>
-        <Button Grid.Row="4" Content="Начать!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Создать" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <!-- Содержимое вкладки "Создать" -->
+            </TabItem>
+
+            <TabItem Header="Открыть" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <ctrls:RepositoryOpen></ctrls:RepositoryOpen>
+            </TabItem>
+
+            <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>
+            </TabItem>
+
+            <TabItem Header="OLD" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="3*"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
+                        <Run Text="Здравствуйте, "></Run>
+                        <Run Text="{Binding UserName, Mode=OneWay}"></Run>
+                        <Run Text="! "></Run>
+                        <Run Text="Выберите репозиторий для начала работы"></Run>
+                    </TextBlock>
+                    <GroupBox Grid.Row="1" Header="Заголовки репозиториев">
+                        <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
+                                                <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+                                                <Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+                                                <Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+                                                <Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+                                                <Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorage.Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+                                                <Run Text="Количество корней: '" FontWeight="Light"></Run><Run Text="{Binding ChildsCount, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                            </TextBlock>
+                                        </Grid>
+                                        <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </GroupBox>
+                    <Button Grid.Row="2" Content="Создать новый репозиторий" Height="30" Command="{Binding OpenRepositoryCreationWindowCommand}" Margin="2"></Button>
+                    <Button Grid.Row="4" Content="Начать!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

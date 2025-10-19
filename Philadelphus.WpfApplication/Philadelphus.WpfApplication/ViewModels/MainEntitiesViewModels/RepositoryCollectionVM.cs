@@ -97,7 +97,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var window = new RepositorySettingsWindow() { DataContext = this }; 
+                    var window = new RepositorySettingsWindow(this); 
                     window.Show();
                 });
             }

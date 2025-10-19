@@ -28,7 +28,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 return new RelayCommand(obj =>
                 {
                     if (_applicationWindowsVM.MainWindow == null)
-                        _applicationWindowsVM.MainWindow = new MainWindow() { DataContext = _applicationVM };
+                        _applicationWindowsVM.MainWindow = new MainWindow(_applicationVM);
                     _applicationWindowsVM.MainWindow.Show();
                     _applicationWindowsVM.LaunchWindow.Close();
                     _applicationWindowsVM.LaunchWindow = null;

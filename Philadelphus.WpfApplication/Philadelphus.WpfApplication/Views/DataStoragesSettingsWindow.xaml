@@ -4,36 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views"
+        xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
         mc:Ignorable="d"
         Title="Настройка хранилищ"
         MinHeight="500" MinWidth="1000"
         WindowState="Maximized">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="Выбрать хранилище">
-            <ListBox ItemsSource="{Binding DataStorageVMs}" SelectedItem="{Binding SelectedDataStorageVM}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <TextBlock>
-                                <Run Text="Наименование: "></Run><Run Text="{Binding DataStorage.Name, Mode=OneWay}"></Run><Run Text=". "></Run>
-                                <Run Text="Описание: "></Run><Run Text="{Binding DataStorage.Description, Mode=OneWay}"></Run><Run Text=". "></Run>
-                                <Run Text="Guid: "></Run><Run Text="{Binding DataStorage.Guid, Mode=OneWay}"></Run><Run Text=". "></Run>
-                                <Run Text="Доступность: "></Run><Run Text="{Binding IsAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run><Run Text=". "></Run>
-                                <Run Text="("></Run><Run Text="{Binding LastCheckTime, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></Run><Run Text=")"></Run>
-                            </TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </GroupBox>
-        <Expander Grid.Row="1" IsExpanded="False" Header="Добавить новое хранилище">
-            
-        </Expander>
-        <Button Grid.Row="2" Height="30" Content="Подтвердить"></Button>
+        <!--<ctrls:DataStoragesOpen></ctrls:DataStoragesOpen>-->
     </Grid>
 </Window>

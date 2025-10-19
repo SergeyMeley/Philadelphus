@@ -1,4 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
+﻿using Philadelphus.WpfApplication.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +11,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Views
+namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
-    /// Логика взаимодействия для RepositorySettingsWindow.xaml
+    /// Логика взаимодействия для DataStoragesOpen.xaml
     /// </summary>
-    public partial class RepositorySettingsWindow : Window
+    public partial class DataStoragesOpen : UserControl
     {
-        public RepositorySettingsWindow(RepositoryCollectionVM vm)
+        public DataStoragesOpen()
         {
             InitializeComponent();
-            DataContext = vm;
         }
     }
 }
