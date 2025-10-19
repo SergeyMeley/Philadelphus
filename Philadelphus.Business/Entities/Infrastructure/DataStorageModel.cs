@@ -30,7 +30,7 @@ namespace Philadelphus.Business.Entities.Infrastructure
         {
             get => (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntitiesInfrastructureRepository];
         }
-        private bool _isAvailable;
+        private bool _isAvailable = false;
         public bool IsAvailable { get => _isAvailable; }
 
         private DateTime _lastCheckTime;

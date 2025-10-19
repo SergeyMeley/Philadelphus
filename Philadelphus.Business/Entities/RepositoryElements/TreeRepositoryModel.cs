@@ -19,7 +19,7 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeRepositoryModel : IHavingOwnDataStorageModel, IParentModel
+    public class TreeRepositoryModel : ITreeRepositoryHeaderModel, IHavingOwnDataStorageModel, IParentModel
     {
         protected virtual string DefaultFixedPartOfName { get => "Новый репозиторий"; }
         public Guid Guid { get; protected set; }
@@ -59,6 +59,8 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         //}
         public List<IChildrenModel> Childs { get; internal set; }
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
+        public DateTime? LastOpening { get; set; }
+        public bool IsFavorite { get; set; }
         public TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage)
         {
             Guid = guid;

@@ -19,8 +19,8 @@ namespace Philadelphus.Business.Services
 
     public class TreeRepositoryService
     {
-        private TreeRepositoryModel _repository;
-        public TreeRepositoryModel Repository 
+        private ITreeRepositoryHeaderModel _repository;
+        public ITreeRepositoryHeaderModel Repository 
         { 
             get
             {
@@ -35,7 +35,7 @@ namespace Philadelphus.Business.Services
 
         #region [ Construct ]
 
-        public TreeRepositoryService(TreeRepositoryModel repository)
+        public TreeRepositoryService(ITreeRepositoryHeaderModel repository)
         {
             _repository = repository;
         }
@@ -84,7 +84,7 @@ namespace Philadelphus.Business.Services
         public long SaveChanges()
         {
             long result = 0;
-            result = SaveChanges(_repository);
+            result = SaveChanges(_repository as TreeRepositoryModel);
             return result;
         }
         public long SaveChanges(TreeRepositoryModel treeRepository)
