@@ -61,7 +61,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
-        public TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage)
+        internal TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage)
         {
             Guid = guid;
             OwnDataStorage = dataStorage;

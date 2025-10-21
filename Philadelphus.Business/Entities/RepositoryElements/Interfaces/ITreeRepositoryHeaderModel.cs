@@ -17,7 +17,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
         public AuditInfoModel AuditInfo { get; }
         public IDataStorageModel OwnDataStorage { get; }
         public State State { get; }
-        public DateTime? LastOpening { get; }
-        public bool IsFavorite { get; }
+        public DateTime? LastOpening { get; set; }
+        public bool IsFavorite { get; set; }
     }
 }

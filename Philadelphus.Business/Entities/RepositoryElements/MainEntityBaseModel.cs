@@ -42,7 +42,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             }
         }
         public abstract IDataStorageModel DataStorage { get; }
-        public MainEntityBaseModel(Guid guid, IMainEntity dbEntity = null)
+        internal MainEntityBaseModel(Guid guid, IMainEntity dbEntity = null)
         {
             _dbEntity = dbEntity;
             Guid = guid;
