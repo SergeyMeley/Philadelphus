@@ -3,12 +3,15 @@ using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
+using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.JsonRepository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,13 +27,19 @@ namespace Philadelphus.Business.Services
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
         public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
 
+        private static IDataStorageModel _mainDataStorageModel;
+
         #endregion
 
         #region [ Construct ]
 
         public TreeRepositoryCollectionService()
         {
-            
+            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder();
+            dataStorageBuilder
+                .SetGeneralParameters(name: "Основное хранилище", description: "Хранилище настроечных файлов в формате Json", Guid.Empty, InfrastructureTypes.JsonDocument, isDisabled: false)
+                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository());
+            _mainDataStorageModel = dataStorageBuilder.Build();
         }
 
         #endregion
@@ -76,6 +85,15 @@ namespace Philadelphus.Business.Services
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Получение из настроечного файла коллекции заголовков репозиториев, являющихся избранными или последними запускаемыми.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TreeRepositoryHeaderModel> GetTreeRepositoryHeadersCollection()
+        {
+            return _mainDataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.SelectRepositoryCollection().ToModelCollection();
         }
         public IEnumerable<TreeRepositoryModel> LoadRepositories(IEnumerable<IDataStorageModel> dataStorages)
         {

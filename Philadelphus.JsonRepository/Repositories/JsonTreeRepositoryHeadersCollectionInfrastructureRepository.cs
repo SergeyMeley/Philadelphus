@@ -25,14 +25,10 @@ namespace Philadelphus.JsonRepository.Repositories
 
         public IEnumerable<TreeRepositoryHeader> SelectRepositoryCollection()
         {
-            var filePath = "storage-config.json";
-
-            if (CheckAvailability())
-            {
-
-            }
+            if (CheckAvailability() == false)
+                return new List<TreeRepositoryHeader>();
             TreeRepositoryHeadersCollection resultCollection = null;
-            var json = File.ReadAllText(filePath);
+            var json = File.ReadAllText(_file.FullName);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,

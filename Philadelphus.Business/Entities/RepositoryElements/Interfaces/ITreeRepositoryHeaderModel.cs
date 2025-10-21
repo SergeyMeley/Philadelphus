@@ -14,7 +14,8 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
         public Guid Guid { get; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public IDataStorageModel OwnDataStorage { get; }
+        public string OwnDataStorageName { get; set; }
+        public Guid OwnDataStorageUuid { get; set; }
         public State State { get; }
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }

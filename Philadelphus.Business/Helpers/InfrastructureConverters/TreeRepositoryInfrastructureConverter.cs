@@ -20,7 +20,8 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             result.Guid = businessEntity.Guid;
             result.Name = businessEntity.Name;
             result.Description = businessEntity.Description;
-            result.OwnDataStorage = businessEntity.OwnDataStorage.ToDbEntity();
+            result.OwnDataStorageName = businessEntity.OwnDataStorageName;
+            result.OwnDataStorageUuid = businessEntity.OwnDataStorageUuid;
             result.LastOpening = businessEntity.LastOpening;
             result.IsFavorite = businessEntity.IsFavorite;
             return result;
@@ -36,28 +37,28 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             }
             return result;
         }
-        public static TreeRepositoryHeaderModel ToModel(this TreeRepositoryHeader dbEntity, IEnumerable<IDataStorageModel> dataStorages)
+        public static TreeRepositoryHeaderModel ToModel(this TreeRepositoryHeader dbEntity)
         {
             if (dbEntity == null)
                 return null;
-            var dataStorage = dataStorages.FirstOrDefault(x => x.Guid == dbEntity.OwnDataStorage.Guid);
             var result = new TreeRepositoryHeaderModel();
             result.Guid = dbEntity.Guid;
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
-            result.OwnDataStorage = dataStorage;
+            result.OwnDataStorageName = dbEntity.OwnDataStorageName;
+            result.OwnDataStorageUuid = dbEntity.OwnDataStorageUuid;
             result.LastOpening = dbEntity.LastOpening;
             result.IsFavorite = dbEntity.IsFavorite;
             return result;
         }
-        public static List<TreeRepositoryHeaderModel> ToModelCollection(this IEnumerable<TreeRepositoryHeader> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
+        public static List<TreeRepositoryHeaderModel> ToModelCollection(this IEnumerable<TreeRepositoryHeader> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;
             var result = new List<TreeRepositoryHeaderModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                result.Add(dbEntity.ToModel(dataStorages));
+                result.Add(dbEntity.ToModel());
             }
             return result;
         }
