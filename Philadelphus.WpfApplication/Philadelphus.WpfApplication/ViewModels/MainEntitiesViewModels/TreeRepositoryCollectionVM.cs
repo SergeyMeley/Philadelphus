@@ -1,5 +1,7 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
+﻿using MongoDB.Driver.Linq;
+using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
@@ -55,9 +57,31 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             //}
         }
 
-        public ObservableCollection<TreeRepositoryVM> FavoriteTreeRepositoriesVMs
+        private ObservableCollection<ITreeRepositoryHeaderModel> _treeRepositoryHeaders;
+        public ObservableCollection<ITreeRepositoryHeaderModel> TreeRepositoryHeaders
         {
-            get => new ObservableCollection<TreeRepositoryVM>(_treeRepositoriesVMs.Where(x => x.IsFavorite == true));
+            get
+            {
+                if (_treeRepositoryHeaders == null)
+                {
+                    var headers = _service.GetTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
+                    _treeRepositoryHeaders = new ObservableCollection<ITreeRepositoryHeaderModel>(headers);
+                }
+                return _treeRepositoryHeaders;
+            }
+        }
+
+        private ObservableCollection<ITreeRepositoryHeaderModel> _favoriteTreeRepositories;
+        public ObservableCollection<ITreeRepositoryHeaderModel> FavoriteTreeRepositories
+        {
+            get
+            {
+                if (_favoriteTreeRepositories == null)
+                {
+                    _favoriteTreeRepositories = new ObservableCollection<ITreeRepositoryHeaderModel>(TreeRepositoryHeaders.Where(x => x.IsFavorite));
+                }
+                return _favoriteTreeRepositories;
+            }
         }
 
         public List<string> PropertyGridRepresentationsCollection

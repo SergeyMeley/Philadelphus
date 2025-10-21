@@ -106,13 +106,109 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <GroupBox Grid.Row="0" Header="Избранные">
-                                <ListBox>
-                                    
+                                <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding FavoriteTreeRepositories}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition></RowDefinition>
+                                                        <RowDefinition></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
+<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                                                        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Избранное: " FontWeight="Light"></Run>
+                                                        </TextBlock>
+                                                        <CheckBox IsChecked="{Binding IsFavorite}"></CheckBox>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="2" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Последний запуск: '" FontWeight="Light"></Run><Run Text="{Binding LastOpening, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                </Grid>
+                                                <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
                                 </ListBox>
                             </GroupBox>
                             <GroupBox Grid.Row="1" Header="Последние">
-                                <ListBox>
-
+                                <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding TreeRepositoryHeaders}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition></RowDefinition>
+                                                        <RowDefinition></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
+<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                                                        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Избранное: " FontWeight="Light"></Run>
+                                                        </TextBlock>
+                                                        <CheckBox IsChecked="{Binding IsFavorite}"></CheckBox>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="2" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
+<Run Text="Последний запуск: '" FontWeight="Light"></Run><Run Text="{Binding LastOpening, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    </TextBlock>
+                                                </Grid>
+                                                <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
                                 </ListBox>
                             </GroupBox>
                             <Button Grid.Row="3" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
