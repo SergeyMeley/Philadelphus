@@ -54,6 +54,12 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             //    OnPropertyChanged(nameof(TreeRepositoriesVMs));
             //}
         }
+
+        public ObservableCollection<TreeRepositoryVM> FavoriteTreeRepositoriesVMs
+        {
+            get => new ObservableCollection<TreeRepositoryVM>(_treeRepositoriesVMs.Where(x => x.IsFavorite == true));
+        }
+
         public List<string> PropertyGridRepresentationsCollection
         {
             get
