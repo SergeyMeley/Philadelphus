@@ -82,7 +82,7 @@ namespace Philadelphus.Business.Services
             var result = new List<TreeRepositoryModel>();
             foreach (var dataStorage in dataStorages)
             {
-                var infrastructure = dataStorage.TreeRepositoryHeadersInfrastructureRepository;
+                var infrastructure = dataStorage.TreeRepositoriesInfrastructureRepository;
                 if (infrastructure.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
                     && dataStorage.IsAvailable)
                 {

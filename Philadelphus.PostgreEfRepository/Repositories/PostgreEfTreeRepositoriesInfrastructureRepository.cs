@@ -14,10 +14,10 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.PostgreEfRepository.Repositories
 {
-    public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
+    public class PostgreEfTreeRepositoriesInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
         private TreeRepositoriesPhiladelphusContext _context;
-        public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
+        public PostgreEfTreeRepositoriesInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
         {
             _context = new TreeRepositoriesPhiladelphusContext(connectionString);
 
@@ -37,7 +37,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 }
             }
         }
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository; }
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositories; }
         public bool CheckAvailability()
         {
             if (_context.Database.CanConnect() == false)

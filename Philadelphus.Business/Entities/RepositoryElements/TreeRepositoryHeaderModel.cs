@@ -12,14 +12,14 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public class TreeRepositoryHeaderModel : ITreeRepositoryHeaderModel
     {
-        public Guid Guid { get; protected set; }
+        public Guid Guid { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
         public IDataStorageModel OwnDataStorage { get; set; }
-        public State State { get; set; } = State.Initialized;
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
+        public bool IsDisabled { get; set; }
+        public State State { get; set; } = State.Initialized;
         internal TreeRepositoryHeaderModel() 
         { 
         }

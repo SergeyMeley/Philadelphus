@@ -17,34 +17,84 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public string Name { get; }
         public string Description { get; }
         public InfrastructureTypes InfrastructureType { get; set; }
-        public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories { get; internal set; } = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
-        public IDataStoragesInfrastructureRepository DataStorageInfrastructureRepositoryRepository
-        {
-            get => (IDataStoragesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.DataStoragesInfrastructureRepository];
+
+        private Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> _infrastructureRepositories;
+        public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories 
+        { 
+            get
+            {
+                if (_isDisabled)
+                    return null;
+                return _infrastructureRepositories;
+            }
+            internal set
+            {
+                if (_isDisabled)
+                    return;
+                _infrastructureRepositories = value;
+            }
         }
-        public ITreeRepositoriesInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository
+        public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository
         {
-            get => (ITreeRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoriesInfrastructureRepository];
+            get
+            {
+                if (_isDisabled)
+                    return null;
+                return (IDataStoragesCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.DataStoragesCollection];
+            }
+        }
+        public ITreeRepositoryHeadersCollectionInfrastructureRepository TreeRepositoryHeadersCollectionInfrastructureRepository
+        {
+            get
+            {
+                if (_isDisabled)
+                    return null;
+                return (ITreeRepositoryHeadersCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoryHeadersCollection];
+            }
+        }
+        public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository
+        {
+            get
+            {
+                if (_isDisabled)
+                    return null;
+                return (ITreeRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositories];
+            }
         }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository
         {
-            get => (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntitiesInfrastructureRepository];
+            get
+            {
+                if (_isDisabled)
+                    return null;
+                return (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
+            }
         }
         private bool _isAvailable = false;
         public bool IsAvailable { get => _isAvailable; }
 
+        private bool _isDisabled;
+        public bool IsDisabled { get => _isDisabled; set => _isDisabled = value; }
+
         private DateTime _lastCheckTime;
         public DateTime LastCheckTime { get => _lastCheckTime; }
-        internal DataStorageModel(Guid guid, string name, string description, InfrastructureTypes infrastructureType)
+        internal DataStorageModel(Guid guid, string name, string description, InfrastructureTypes infrastructureType, bool isDisabled)
         {
             Guid = guid;
             Name = name;
             Description = description;
             InfrastructureType = infrastructureType;
+            IsDisabled = isDisabled;
+            if (IsDisabled == false)
+            {
+                InfrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
+            }
             CheckAvailable();
         }
         public bool StartAvailableAutoChecking()
         {
+            if (_isDisabled)
+                return false;
             System.Timers.Timer timer = new System.Timers.Timer(10000);
             timer.Elapsed += CheckAvailable;
             timer.AutoReset = true;
@@ -53,6 +103,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
         }
         public bool CheckAvailable()
         {
+            if (_isDisabled)
+                return false;
             var result = true;
             foreach (var item in InfrastructureRepositories)
             {

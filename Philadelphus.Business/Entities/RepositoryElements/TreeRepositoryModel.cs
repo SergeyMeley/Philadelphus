@@ -53,7 +53,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         //    {
         //        if (value.Count() != null)
         //        {
-        //            Childs = OwnDataStorage.MainEntitiesInfrastructureRepository.SelectRoots(value.ToArray()).ToModelCollection(DataStorages).Cast<IChildrenModel>().ToList();
+        //            Childs = OwnDataStorage.MainEntities.SelectRoots(value.ToArray()).ToModelCollection(DataStorages).Cast<IChildrenModel>().ToList();
         //        }
         //    } 
         //}
@@ -67,6 +67,13 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             OwnDataStorage = dataStorage;
             Initialize();
         }
+
+        internal TreeRepositoryModel(TreeRepositoryHeaderModel headerModel)
+        {
+            Guid = headerModel.Guid;
+            Initialize();
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

@@ -95,13 +95,13 @@ namespace Philadelphus.Business.Services
             switch (treeRepository.State)
             {
                 case State.Initialized:
-                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
+                    result += treeRepository.OwnDataStorage.TreeRepositoriesInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
                     break;
                 case State.Changed:
-                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
+                    result += treeRepository.OwnDataStorage.TreeRepositoriesInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
                     break;
                 case State.Deleted:
-                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
+                    result += treeRepository.OwnDataStorage.TreeRepositoriesInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
                     break;
                 default:
                     break;

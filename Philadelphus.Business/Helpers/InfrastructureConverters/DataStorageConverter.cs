@@ -15,25 +15,26 @@ namespace Philadelphus.InfrastructureConverters.Converters
 {
     public static class DataStorageConverter
     {
-        public static DataStorage BusinessToDbEntity(this IDataStorageModel model)
+        public static DataStorage ToDbEntity(this IDataStorageModel model)
         {
             var result = new DataStorage()
             {
                 Name = model.Name,
                 Description = model.Description,
                 Guid = model.Guid,
-                HasDataStorageInfrastructureRepositoryRepository = model.DataStorageInfrastructureRepositoryRepository != null,
-                HasTreeRepositoryHeadersInfrastructureRepository = model.TreeRepositoryHeadersInfrastructureRepository != null,
+                HasDataStorageInfrastructureRepositoryRepository = model.DataStoragesCollectionInfrastructureRepository != null,
+                HasTreeRepositoryHeadersInfrastructureRepository = model.TreeRepositoriesInfrastructureRepository != null,
                 HasMainEntitiesInfrastructureRepository = model.MainEntitiesInfrastructureRepository != null,
                 InfrastructureType = model.InfrastructureType,
             };
             return result;
         }
-        public static IDataStorageModel DbToBusinessEntity(this DataStorage entity, string connectionString)
+        public static IDataStorageModel ToModel(this DataStorage entity, string connectionString)
         {
-            ITreeRepositoriesInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
+            IDataStoragesCollectionInfrastructureRepository dataStoragesCollectionInfrastructureRepository = new JsonDataStoragesCollectionInfrastructureRepository(); ;
+            ITreeRepositoryHeadersCollectionInfrastructureRepository treeRepositoryHeadersCollectionInfrastructureRepository = new JsonTreeRepositoryHeadersCollectionInfrastructureRepository();
+            ITreeRepositoriesInfrastructureRepository treeRepositoriesInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
-            IDataStoragesInfrastructureRepository dataStorageInfrastructureRepository = null;
             switch (entity.InfrastructureType)
             {
                 case InfrastructureTypes.WindowsDirectory:
@@ -41,7 +42,7 @@ namespace Philadelphus.InfrastructureConverters.Converters
                 case InfrastructureTypes.PostgreSqlAdo:
                     break;
                 case InfrastructureTypes.PostgreSqlEf:
-                    treeRepositoryHeadersInfrastructureRepository = new PostgreEfTreeRepositoryHeadersInfrastructureRepository(connectionString);
+                    treeRepositoriesInfrastructureRepository = new PostgreEfTreeRepositoriesInfrastructureRepository(connectionString);
                     mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(connectionString);
                     break;
                 case InfrastructureTypes.MongoDbAdo:
@@ -53,8 +54,6 @@ namespace Philadelphus.InfrastructureConverters.Converters
                 case InfrastructureTypes.SQLite:
                     break;
                 case InfrastructureTypes.JsonDocument:
-                    dataStorageInfrastructureRepository = new JsonDataStorageAndTreeRepositoryInfrastructureRepository();
-                    treeRepositoryHeadersInfrastructureRepository = new JsonDataStorageAndTreeRepositoryInfrastructureRepository();
                     break;
                 case InfrastructureTypes.XmlDocument:
                     break;
@@ -62,9 +61,10 @@ namespace Philadelphus.InfrastructureConverters.Converters
                     break;
             }
             var builder = new DataStorageBuilder()
-                .SetGeneralParameters(entity.Name, entity.Description, entity.Guid, entity.InfrastructureType)
-                .SetRepository(dataStorageInfrastructureRepository)
-                .SetRepository(treeRepositoryHeadersInfrastructureRepository)
+                .SetGeneralParameters(entity.Name, entity.Description, entity.Guid, entity.InfrastructureType, entity.IsDisabled)
+                .SetRepository(dataStoragesCollectionInfrastructureRepository)
+                .SetRepository(treeRepositoryHeadersCollectionInfrastructureRepository)
+                .SetRepository(treeRepositoriesInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();
         }

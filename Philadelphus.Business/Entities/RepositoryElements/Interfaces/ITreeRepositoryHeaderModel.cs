@@ -14,7 +14,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
         public Guid Guid { get; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public AuditInfoModel AuditInfo { get; }
         public IDataStorageModel OwnDataStorage { get; }
         public State State { get; }
         public DateTime? LastOpening { get; set; }

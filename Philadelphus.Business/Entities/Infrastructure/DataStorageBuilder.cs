@@ -16,17 +16,19 @@ namespace Philadelphus.Business.Entities.Infrastructure
         {
 
         }
-        public DataStorageBuilder SetGeneralParameters(string name, string description, Guid guid, InfrastructureTypes infrastructureType)
+        public DataStorageBuilder SetGeneralParameters(string name, string description, Guid guid, InfrastructureTypes infrastructureType, bool isDisabled)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description) || guid == Guid.Empty)
                 throw new ArgumentException("Переданы некорректные параметры");
-            _storageModel = new DataStorageModel(guid, name, description, infrastructureType);
+            _storageModel = new DataStorageModel(guid, name, description, infrastructureType, isDisabled);
             return this;
         }
         public DataStorageBuilder SetRepository(IInfrastructureRepository repository)
         {
             if (repository == null)
-                return null;
+                return this;
+            if (_storageModel.IsDisabled)
+                return this;
             if (_storageModel == null)
                 throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
             if (_storageModel.InfrastructureRepositories.ContainsKey(repository.EntityGroup))
