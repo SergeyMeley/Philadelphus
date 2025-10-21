@@ -19,7 +19,7 @@
       "Description": "Сервер PostgreSQL на домашнем сервере по глобальной сети",
       "Guid": "8bffede3-9df6-4f1c-8238-fb25ac18e7f2",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": false
+      "IsHidden": true
     },
     {
       "Name": "PostgreSQL_VM_BVA_INTERNET",

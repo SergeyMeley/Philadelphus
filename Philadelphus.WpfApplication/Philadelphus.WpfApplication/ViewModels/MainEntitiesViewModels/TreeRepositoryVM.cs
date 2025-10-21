@@ -84,6 +84,30 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 
         public string ChildsCount { get => $"Детей: {_model.Childs.Count()}, Корней: {_model?.ChildTreeRoots?.Count()}, Uuids: {_model?.ChildsGuids?.Count}"; }
 
+        public bool IsFavorite 
+        { 
+            get
+            {
+                return _model.IsFavorite;
+            }
+            set
+            {
+                _model.IsFavorite = value;
+            }
+        }
+
+        public DateTime? LastOpening
+        { 
+            get
+            {
+                return _model.LastOpening;
+            }
+            set
+            {
+                _model.LastOpening = value;
+            }
+        }
+
         #endregion
 
         #region [ Construct ]
