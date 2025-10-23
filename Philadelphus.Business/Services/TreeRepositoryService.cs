@@ -207,12 +207,14 @@ namespace Philadelphus.Business.Services
             var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage);
             parentElement.ElementsCollection.Add(result);
             parentElement.Childs.Add(result);
+            parentElement.State = State.Changed;
             return result;
         }
         public TreeNodeModel CreateTreeNode(IParentModel parentElement)
         {
             var result = new TreeNodeModel(Guid.NewGuid(), parentElement);
             result.ParentRepository.ElementsCollection.Add(result);
+            //parentElement.State = State.Changed;
             parentElement.Childs.Add(result);
             return result;
         }
@@ -230,6 +232,7 @@ namespace Philadelphus.Business.Services
                     var result = new TreeLeaveModel(Guid.NewGuid(), parentElement);
                     result.ParentRepository.ElementsCollection.Add(result);
                     parentElement.Childs.Add(result);
+                    //parentElement.State = State.Changed;
                     return result;
                 }
             }
@@ -244,6 +247,7 @@ namespace Philadelphus.Business.Services
             var result = new ElementAttributeModel(Guid.NewGuid(), owner);
             //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
             owner.PersonalAttributes.Add(result);
+            //owner.State = State.Changed;
             return result;
         }
 

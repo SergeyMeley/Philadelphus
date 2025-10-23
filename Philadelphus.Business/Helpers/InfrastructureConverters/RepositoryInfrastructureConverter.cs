@@ -21,12 +21,15 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
                 return null;
             //var result = (TreeRepository)businessEntity.ToDbEntityGeneralProperties(new TreeRepository());
             var result = new TreeRepository();
+            result.Guid = businessEntity.Guid;
             result.Name = businessEntity.Name;
             result.Description = businessEntity.Description;
             //result.AuditInfo = dbEntity.AuditInfo.ToModel();
             result.ChildTreeRootsGuids = businessEntity.Childs.Select(x => x.Guid).ToArray();
             result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
             result.DataStoragesGuids = new[] { businessEntity.OwnDataStorage.Guid };
+            //result.LastOpening = businessEntity.LastOpening;
+            //result.IsFavorite = businessEntity.IsFavorite;
             return result;
         }
         public static List<TreeRepository> ToDbEntityCollection(this IEnumerable<TreeRepositoryModel> businessEntityCollection)

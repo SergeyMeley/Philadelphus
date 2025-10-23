@@ -16,9 +16,14 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
+        private string _connectionString;   //TODO
+
         private TreeRepositoriesPhiladelphusContext _context;
         public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
         {
+            _connectionString = connectionString;   //TODO
+
+
             _context = new TreeRepositoriesPhiladelphusContext(connectionString);
 
             if (CheckAvailability())
@@ -69,7 +74,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
             repository.AuditInfo.IsDeleted = true;
             repository.AuditInfo.DeletedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            repository.AuditInfo.DeletedAt = DateTime.Now;
+            repository.AuditInfo.DeletedAt = DateTime.UtcNow;
             return _context.SaveChanges();
         }
 
@@ -78,9 +83,15 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             if (CheckAvailability() == false)
                 return -1;
             //var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
-            //repository.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            //repository.AuditInfo.UpdatedAt = DateTime.Now;
-            return _context.SaveChanges();
+            //_context.Update(item);
+            //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+            //return _context.SaveChanges();
+            var context = new TreeRepositoriesPhiladelphusContext(_connectionString);
+            //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+            context.Update(item);
+            return context.SaveChanges();
         }
 
         public long InsertRepository(TreeRepository item)
