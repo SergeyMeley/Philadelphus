@@ -148,6 +148,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                     var result = _service.CreateTreeRoot(_model, _model.OwnDataStorage);
                     Childs.Add(new TreeRootVM(result, _service));
                     OnPropertyChanged(nameof(Childs));
+                    OnPropertyChanged(nameof(State));
                 });
             }
         }
@@ -171,6 +172,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeNode();
                     }
                     OnPropertyChanged(nameof(Childs));
+                    OnPropertyChanged(nameof(State));
                 });
             }
         }
@@ -190,6 +192,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeLeave();
                     }
                     OnPropertyChanged(nameof(Childs));
+                    OnPropertyChanged(nameof(State));
                 });
             }
         }
@@ -207,6 +210,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                     if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwnerModel)) == false)
                         return;
                     //_service.CreateElementAttribute(_selectedRepositoryMember);
+                    OnPropertyChanged(nameof(State));
                 });
             }
         }
@@ -217,6 +221,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 return new RelayCommand(obj =>
                 {
                     //_service.RemoveMember(_selectedRepositoryMember);
+                    OnPropertyChanged(nameof(State));
                 });
             }
         }
