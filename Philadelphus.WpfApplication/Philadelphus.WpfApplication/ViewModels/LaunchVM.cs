@@ -15,7 +15,7 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private RepositoryCollectionVM _repositoryCollectionVM;
         public RepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
-        public string UserName { get => System.Security.Principal.WindowsIdentity.GetCurrent().Name; }
+        public string UserName { get => Environment.UserName; }
         public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, RepositoryCollectionVM repositoryCollectionVM, RelayCommand openRepositoryCreationWindowCommand, RelayCommand openMainWindowCommand)
         {
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
