@@ -119,9 +119,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.CreatedBy = Environment.UserName;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeRoots.Add(item);
             }
@@ -137,9 +137,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 {
                     item.ParentTreeRoot = _context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid);
                 }
-                //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.CreatedBy = Environment.UserName;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeNodes.Add(item);
             }
@@ -155,9 +155,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 {
                     item.ParentTreeRoot = _context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid);
                 }
-                //item.AuditInfo.CreatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                //item.AuditInfo.CreatedBy = Environment.UserName;
                 //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeLeaves.Add(item);
             }
@@ -182,7 +182,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeRoots.Update(item);
             }
@@ -194,7 +194,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeNodes.Update(item);
             }
@@ -206,7 +206,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return 0;
             foreach (var item in items)
             {
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeLeaves.Update(item);
             }
@@ -232,7 +232,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             foreach (var item in items)
             {
                 item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeRoots.Update(item);
             }
@@ -245,7 +245,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             foreach (var item in items)
             {
                 item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeNodes.Update(item);
             }
@@ -258,7 +258,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             foreach (var item in items)
             {
                 item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
                 item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 _context.TreeLeaves.Update(item);
             }

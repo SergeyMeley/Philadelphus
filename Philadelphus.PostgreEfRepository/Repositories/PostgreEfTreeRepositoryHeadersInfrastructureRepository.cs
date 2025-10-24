@@ -73,25 +73,31 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return -1;
             var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
             repository.AuditInfo.IsDeleted = true;
-            repository.AuditInfo.DeletedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            repository.AuditInfo.DeletedBy = Environment.UserName;
             repository.AuditInfo.DeletedAt = DateTime.UtcNow;
             return _context.SaveChanges();
         }
 
         public long UpdateRepository(TreeRepository item)
         {
+            long result = 0;
+
             if (CheckAvailability() == false)
                 return -1;
             //var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
             //_context.Update(item);
-            //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //item.AuditInfo.UpdatedBy = Environment.UserName;
             //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
             //return _context.SaveChanges();
-            var context = new TreeRepositoriesPhiladelphusContext(_connectionString);
-            //item.AuditInfo.UpdatedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-            context.Update(item);
-            return context.SaveChanges();
+            using (var context = new TreeRepositoriesPhiladelphusContext(_connectionString))
+            {
+                //item.AuditInfo.UpdatedBy = Environment.UserName;
+                //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                context.Update(item);
+                result = context.SaveChanges();
+            }
+
+            return result;
         }
 
         public long InsertRepository(TreeRepository item)
