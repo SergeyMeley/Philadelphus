@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using AutoMapper;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
@@ -15,10 +16,10 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Business.Services
 {
-    #region [ Props ]
-
     public class TreeRepositoryService
     {
+        #region [ Props ]
+
         private ITreeRepositoryHeaderModel _repository;
         public ITreeRepositoryHeaderModel Repository 
         { 
@@ -27,6 +28,8 @@ namespace Philadelphus.Business.Services
                 return _repository;
             }
         }
+
+        private readonly IMapper _mapper;
 
         private static MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
         public static MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
@@ -52,7 +55,6 @@ namespace Philadelphus.Business.Services
         {
             return _mainEntityCollection.FirstOrDefault(x => x.Guid == guid);
         }
-
         public TreeRepositoryModel LoadRepositoryContent(TreeRepositoryModel repository)
         {
             var result = repository;
@@ -98,6 +100,8 @@ namespace Philadelphus.Business.Services
                     result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.InsertRepository(treeRepository.ToDbEntity());
                     break;
                 case State.Changed:
+                    //var entity = _mapper.Map<TreeRepositoryModel, TreeRepository>(treeRepository);
+                    //result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(entity);
                     result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
                     break;
                 case State.Deleted:

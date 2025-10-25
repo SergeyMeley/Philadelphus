@@ -1,8 +1,11 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
+using Philadelphus.Business.Mapping;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -18,6 +21,8 @@ namespace Philadelphus.Business.Services
     {
         #region [ Props ]
 
+        private readonly IMapper _mapper;
+
         private static Dictionary<Guid, IDataStorageModel> _dataStorageModels = new Dictionary<Guid, IDataStorageModel>();
         public static Dictionary<Guid, IDataStorageModel> DataStorageModels { get => _dataStorageModels; private set => _dataStorageModels = value; }
 
@@ -30,7 +35,23 @@ namespace Philadelphus.Business.Services
 
         public TreeRepositoryCollectionService()
         {
-            
+            //TODO: ВРЕСЕННО, ПЕРЕДЕЛАТЬ ПОЛНОСТЬЮ КОНСТРУКТОР, МАППЕР ПОЛУЧИТЬ ИЗ DI-КОНЕТЕЙНЕРА
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter("Microsoft", LogLevel.Warning)
+                    .AddFilter("System", LogLevel.Warning)
+                    .AddFilter("Philadelphus", LogLevel.Debug)
+                    ;
+            });
+
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>();
+                // Добавьте другие профили здесь
+            }, loggerFactory);
+
+            _mapper = configuration.CreateMapper();
         }
 
         #endregion
@@ -87,6 +108,7 @@ namespace Philadelphus.Business.Services
                     && dataStorage.IsAvailable)
                 {
                     var dbRepositories = infrastructure.SelectRepositories();
+                    //var repositories = _mapper.Map<List<TreeRepositoryModel>>(dbRepositories);
                     var repositories = dbRepositories?.ToModelCollection(dataStorages);
                     if (repositories != null)
                     {

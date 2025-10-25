@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
     <ProjectReference Include="..\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj" />
