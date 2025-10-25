@@ -24,7 +24,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             result.Guid = businessEntity.Guid;
             result.Name = businessEntity.Name;
             result.Description = businessEntity.Description;
-            //result.AuditInfo = dbEntity.AuditInfo.ToModel();
+            result.AuditInfo = businessEntity.AuditInfo.ToDbEntity();
             result.ChildTreeRootsGuids = businessEntity.Childs.Select(x => x.Guid).ToArray();
             result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
             result.DataStoragesGuids = new[] { businessEntity.OwnDataStorage.Guid };
@@ -51,6 +51,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new TreeRepositoryModel(dbEntity.Guid, dataStorage);
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
+            result.AuditInfo = dbEntity.AuditInfo.ToModel();
             result.DataStorages = new List<IDataStorageModel>() { dataStorage };
             result.ChildsGuids = dbEntity.ChildTreeRootsGuids.ToList();
             //result.AuditInfo = dbEntity.AuditInfo.ToModel();

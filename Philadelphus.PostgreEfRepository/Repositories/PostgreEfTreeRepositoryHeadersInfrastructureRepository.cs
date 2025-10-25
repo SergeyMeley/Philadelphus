@@ -16,14 +16,12 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
-        private string _connectionString;   //TODO
+        private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
 
         private TreeRepositoriesPhiladelphusContext _context;
         public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
         {
-            _connectionString = connectionString;   //TODO
-
-
+            _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой   
             _context = new TreeRepositoriesPhiladelphusContext(connectionString);
 
             if (CheckAvailability())
@@ -91,8 +89,8 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             //return _context.SaveChanges();
             using (var context = new TreeRepositoriesPhiladelphusContext(_connectionString))
             {
-                //item.AuditInfo.UpdatedBy = Environment.UserName;
-                //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 context.Update(item);
                 result = context.SaveChanges();
             }

@@ -101,8 +101,8 @@ namespace Philadelphus.Business.Services
                     break;
                 case State.Changed:
                     //var entity = _mapper.Map<TreeRepositoryModel, TreeRepository>(treeRepository);
-                    //result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(entity);
-                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(treeRepository.ToDbEntity());
+                    var entity = treeRepository.ToDbEntity();
+                    result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.UpdateRepository(entity);
                     break;
                 case State.Deleted:
                     result += treeRepository.OwnDataStorage.TreeRepositoryHeadersInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());

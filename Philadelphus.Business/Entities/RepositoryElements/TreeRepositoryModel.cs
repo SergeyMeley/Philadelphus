@@ -25,7 +25,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public Guid Guid { get; protected set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
+        public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
         public State State { get; set; } = State.Initialized;
         public IMainEntity DbEntity { get; set; }
 

@@ -12,7 +12,7 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
         public Guid Guid { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public virtual AuditInfo AuditInfo { get; set; }
+        public virtual AuditInfo AuditInfo { get; set; } = new AuditInfo();
         public Guid OwnDataStorageGuid { get; set; }
         public Guid[] DataStoragesGuids { get; set; }
         public Guid[] ChildTreeRootsGuids { get; set; }
