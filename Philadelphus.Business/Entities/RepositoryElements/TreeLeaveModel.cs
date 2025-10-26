@@ -31,29 +31,26 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                     NotificationService.SendNotification(message, NotificationCriticalLevelModel.Warning, NotificationTypesModel.TextMessage);
                     throw new Exception(message);
                 }
-                Parent = parent;
+                //Parent = parent;
                 if (parent.GetType() == typeof(TreeRepositoryModel))
                 {
                     ParentRepository = (TreeRepositoryModel)parent;
                 }
-                else if(parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
+                else if (parent.GetType() == typeof(TreeRootModel))
                 {
-                    ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
-                    if (parent.GetType() == typeof(TreeRootModel))
-                    {
-                        ParentRoot = ((ITreeRootMemberModel)parent).ParentRoot;
-                    }
+                    ParentRepository = ((TreeRootModel)parent).ParentRepository;
+                    ParentRoot = (TreeRootModel)parent;
                 }
-                if (parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
+                else if (parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
                 {
                     ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
                     ParentRoot = ((ITreeRootMemberModel)parent).ParentRoot;
                 }
-                else if (Parent.GetType() == typeof(TreeRootModel))
+                else if (parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
                 {
-                    ParentRoot = (TreeRootModel)Parent;
+                    ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
                 }
-                Guid = guid;
+                //Guid = guid;
                 Initialize();
             }
             catch (Exception ex)

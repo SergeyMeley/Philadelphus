@@ -90,7 +90,7 @@ namespace Philadelphus.Business.Services
                 if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
                     && dataStorage.IsAvailable)
                 {
-                    var dbNodes = infrastructure.SelectNodes(root.Guid).Where(x => x.ParentGuid == root.Guid);
+                    var dbNodes = infrastructure.SelectNodes(root.Guid)?.Where(x => x.ParentGuid == root.Guid);
                     var nodes = dbNodes?.ToModelCollection(new List<TreeRootModel>() { root });
                     if (nodes != null)
                     {
@@ -117,7 +117,7 @@ namespace Philadelphus.Business.Services
                 if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
                     && dataStorage.IsAvailable)
                 {
-                    var dbNodes = infrastructure.SelectNodes(node.ParentRoot.Guid).Where(x => x.ParentGuid == node.Guid);
+                    var dbNodes = infrastructure.SelectNodes(node.ParentRoot.Guid)?.Where(x => x.ParentGuid == node.Guid);
                     var nodes = dbNodes?.ToModelCollection(new List<TreeRootModel>() { node.ParentRoot });
                     if (nodes != null)
                     {
@@ -133,7 +133,7 @@ namespace Philadelphus.Business.Services
                         }
                     }
 
-                    var dbLeaves = infrastructure.SelectLeaves(node.ParentRoot.Guid).Where(x => x.ParentGuid == node.Guid);
+                    var dbLeaves = infrastructure.SelectLeaves(node.ParentRoot.Guid)?.Where(x => x.ParentGuid == node.Guid);
                     var leaves = dbLeaves?.ToModelCollection(new List<TreeRootModel>() { node.ParentRoot });
                     if (leaves != null)
                     {
