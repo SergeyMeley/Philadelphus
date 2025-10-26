@@ -18,9 +18,9 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeRoot)businessEntity.ToDbEntityGeneralProperties(new TreeRoot());
+            var result = (TreeRoot)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
-            result.DataStoragesGuids = new[] { businessEntity.OwnDataStorage.Guid };
+            result.DataStoragesGuids = businessEntity.DataStorages.Select(x => x.Guid).ToArray();
             return result;
         }
         public static List<TreeRoot> ToDbEntityCollection(this IEnumerable<TreeRootModel> businessEntityCollection)
@@ -34,23 +34,24 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             }
             return result;
         }
-        public static TreeRootModel ToModel(this TreeRoot dbEntity, IEnumerable<IDataStorageModel> dataStorages)
+        public static TreeRootModel ToModel(this TreeRoot dbEntity, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<TreeRepositoryModel> treeRepositories)
         {
             if (dbEntity == null)
                 return null;
             var dataStorage = dataStorages.FirstOrDefault(x => x.Guid == dbEntity.OwnDataStorageGuid);
-            var result = new TreeRootModel(dbEntity.Guid, null, dataStorage);
+            var treeRepository = treeRepositories.FirstOrDefault(x => x.ChildsGuids.Any(g => g == dbEntity.Guid));
+            var result = new TreeRootModel(dbEntity.Guid, treeRepository, dataStorage, dbEntity);
             result = (TreeRootModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
-        public static List<TreeRootModel> ToModelCollection(this IEnumerable<TreeRoot> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
+        public static List<TreeRootModel> ToModelCollection(this IEnumerable<TreeRoot> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<TreeRepositoryModel> treeRepositories)
         {
             if (dbEntityCollection == null)
                 return null;
             var result = new List<TreeRootModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                result.Add(dbEntity.ToModel(dataStorages));
+                result.Add(dbEntity.ToModel(dataStorages, treeRepositories));
             }
             return result;
         }

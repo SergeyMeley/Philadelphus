@@ -133,7 +133,7 @@ namespace Philadelphus.Business.Services
 
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage)
         {
-            var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
+            var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage, new TreeRepository());
             //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
             return result;
         }
@@ -161,26 +161,26 @@ namespace Philadelphus.Business.Services
         /// <returns></returns>
         public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
         {
-            var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage);
+            var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage, new TreeRepository());
             var service = new TreeRepositoryService(repo);
             TreeRepositoryCollectionService.DataTreeRepositories.Add(repo.Guid, repo);
             for (int i = 0; i < 5; i++)
             {
-                var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage);
+                var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage, new TreeRoot());
                 service.GetAttributesSample(root);
                 ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(root);
                 for (int j = 0; j < 5; j++)
                 {
-                    var node = new TreeNodeModel(Guid.NewGuid(), root);
+                    var node = new TreeNodeModel(Guid.NewGuid(), root, new TreeNode());
                     service.GetAttributesSample(node);
                     ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node);
                     for (int k = 0; k < 5; k++)
                     {
-                        var node2 = new TreeNodeModel(Guid.NewGuid(), root);
+                        var node2 = new TreeNodeModel(Guid.NewGuid(), root, new TreeNode());
                         service.GetAttributesSample(node2);
                         repo.ElementsCollection.Add(node2);
                         node.Childs.Add(node2);
-                        var leave = new TreeLeaveModel(Guid.NewGuid(), node);
+                        var leave = new TreeLeaveModel(Guid.NewGuid(), node, new TreeLeave());
                         service.GetAttributesSample(leave);
                         ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(leave);
                         node.Childs.Add(leave);

@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
 using Philadelphus.Business.Services;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System.Collections.Generic;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
@@ -18,7 +19,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
         public List<ElementAttributeValueModel> AttributeValues { get; set; } = new List<ElementAttributeValueModel>();
         public override IDataStorageModel DataStorage { get; }
-        internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent) : base(guid)
+        internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, dbEntity)
         {
             if (parent == null)
             {

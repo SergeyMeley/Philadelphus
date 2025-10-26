@@ -18,7 +18,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(new TreeLeave());
+            var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             result.ParentGuid = businessEntity.Parent.Guid;
             result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;
             result.ParentTreeRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
@@ -39,7 +39,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeLeaveModel(dbEntity.Guid, parent);
+            var result = new TreeLeaveModel(dbEntity.Guid, parent, dbEntity);
             result = (TreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }

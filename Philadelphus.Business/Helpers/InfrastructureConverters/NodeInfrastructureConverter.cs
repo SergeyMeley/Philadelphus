@@ -19,10 +19,10 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(new TreeNode());
+            var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             result.ParentGuid = businessEntity.Parent.Guid;
-            result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;
-            result.ParentTreeRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
+            result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;     //TODO: ВРЕМЕННО
+            //result.ParentTreeRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
             //result.ParentTreeRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
             return result;
         }
@@ -41,7 +41,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeNodeModel(dbEntity.Guid, parent);
+            var result = new TreeNodeModel(dbEntity.Guid, parent, dbEntity);
             result = (TreeNodeModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }

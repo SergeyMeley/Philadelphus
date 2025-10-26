@@ -3,6 +3,7 @@ using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.ElementProperties
 
         public override IDataStorageModel DataStorage => throw new NotImplementedException();
 
-        public EntityElementTypeModel(Guid guid, ITypedModel parent) : base(guid)
+        public EntityElementTypeModel(Guid guid, ITypedModel parent, IMainEntity dbEntity) : base(guid, dbEntity)
         {
             Name = "TEST TYPE";
         }

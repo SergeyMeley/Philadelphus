@@ -28,23 +28,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
         public EntityElementTypeModel ElementType { get; set; }
         public State State { get; set; } = State.Initialized;
-
-        private IMainEntity _dbEntity;
-        public IMainEntity DbEntity 
-        { 
-            get
-            {
-                if (_dbEntity == null)
-                {
-                    _dbEntity = this.ToDbEntity();
-                }
-                return _dbEntity;
-            }
-        }
+        public IMainEntity DbEntity { get; set; }
         public abstract IDataStorageModel DataStorage { get; }
-        public MainEntityBaseModel(Guid guid, IMainEntity dbEntity = null)
+        public MainEntityBaseModel(Guid guid, IMainEntity dbEntity)
         {
-            _dbEntity = dbEntity;
+            DbEntity = dbEntity;
             Guid = guid;
         }
         public override string ToString()

@@ -7,6 +7,7 @@ using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,7 +29,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementCon
 
         public override IDataStorageModel DataStorage => throw new NotImplementedException();
 
-        public ElementAttributeModel(Guid guid, IContentOwnerModel owner) : base(guid)
+        public ElementAttributeModel(Guid guid, IContentOwnerModel owner, IMainEntity dbEntity) : base(guid, dbEntity)
         {
             Guid = guid;
             Owner = owner;

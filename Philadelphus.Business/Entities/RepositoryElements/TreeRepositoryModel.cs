@@ -27,7 +27,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public string Description { get; set; }
         public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
         public State State { get; set; } = State.Initialized;
-        public IMainEntity DbEntity { get; set; }
+        public TreeRepository DbEntity { get; set; }
 
         private IDataStorageModel _ownDataStorage;
         public IDataStorageModel OwnDataStorage
@@ -61,10 +61,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
-        public TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage)
+        public TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage, TreeRepository dbEntity)
         {
             Guid = guid;
             OwnDataStorage = dataStorage;
+            DbEntity = dbEntity;
             Initialize();
         }
         public override string ToString()

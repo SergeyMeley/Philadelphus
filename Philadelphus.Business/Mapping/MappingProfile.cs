@@ -42,7 +42,8 @@ namespace Philadelphus.Business.Mapping
                 // Специальная логика создания
                 return new TreeRepositoryModel(
                     guid: src.Guid,
-                    dataStorage: GetDataStorage(src.OwnDataStorageGuid) //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
+                    dataStorage: GetDataStorage(src.OwnDataStorageGuid), //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
+                    dbEntity: src
                 );
             });
         }

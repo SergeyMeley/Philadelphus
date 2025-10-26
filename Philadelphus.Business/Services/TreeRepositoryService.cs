@@ -57,7 +57,6 @@ namespace Philadelphus.Business.Services
         }
         public TreeRepositoryModel LoadRepositoryContent(TreeRepositoryModel repository)
         {
-            var result = repository;
             foreach (var dataStorage in repository?.DataStorages)
             {
                 var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
@@ -65,18 +64,88 @@ namespace Philadelphus.Business.Services
                     && dataStorage.IsAvailable)
                 {
                     var dbRoots = infrastructure.SelectRoots(repository.ChildsGuids?.ToArray());
-                    var roots = dbRoots?.ToModelCollection(repository.DataStorages);
+                    var roots = dbRoots?.ToModelCollection(repository.DataStorages, new List<TreeRepositoryModel>() { repository });
                     if (roots != null)
                     {
                         for (int i = 0; i < roots.Count; i++)
                         {
                             roots[i].State = State.SavedOrLoaded;
                         }
-                        result.Childs = roots.Cast<IChildrenModel>().ToList();
+                        repository.Childs = roots.Cast<IChildrenModel>().ToList();
+
+                        for (int i = 0; i < roots.Count; i++)
+                        {
+                            LoadRootContent(roots[i]);
+                        }
                     }
                 }
             }
-            return result;
+            return repository;
+        }
+        public TreeRootModel LoadRootContent(TreeRootModel root)
+        {
+            foreach (var dataStorage in root?.DataStorages)
+            {
+                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
+                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
+                    && dataStorage.IsAvailable)
+                {
+                    var dbNodes = infrastructure.SelectNodes(root.Guid).Where(x => x.ParentGuid == root.Guid);
+                    var nodes = dbNodes?.ToModelCollection(new List<TreeRootModel>() { root });
+                    if (nodes != null)
+                    {
+                        for (int i = 0; i < nodes.Count; i++)
+                        {
+                            nodes[i].State = State.SavedOrLoaded;
+                        }
+                        root.Childs = nodes.Cast<IChildrenModel>().ToList();
+
+                        for (int i = 0; i < nodes.Count; i++)
+                        {
+                            LoadNodeContent(nodes[i]);
+                        }
+                    }
+                }
+            }
+            return root;
+        }
+        public TreeNodeModel LoadNodeContent(TreeNodeModel node)
+        {
+            foreach (var dataStorage in node?.ParentRoot?.DataStorages)
+            {
+                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
+                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
+                    && dataStorage.IsAvailable)
+                {
+                    var dbNodes = infrastructure.SelectNodes(node.ParentRoot.Guid).Where(x => x.ParentGuid == node.Guid);
+                    var nodes = dbNodes?.ToModelCollection(new List<TreeRootModel>() { node.ParentRoot });
+                    if (nodes != null)
+                    {
+                        for (int i = 0; i < nodes.Count; i++)
+                        {
+                            nodes[i].State = State.SavedOrLoaded;
+                        }
+                        node.Childs = nodes.Cast<IChildrenModel>().ToList();
+
+                        for (int i = 0; i < nodes.Count; i++)
+                        {
+                            LoadNodeContent(nodes[i]);
+                        }
+                    }
+
+                    var dbLeaves = infrastructure.SelectLeaves(node.ParentRoot.Guid).Where(x => x.ParentGuid == node.Guid);
+                    var leaves = dbLeaves?.ToModelCollection(new List<TreeRootModel>() { node.ParentRoot });
+                    if (leaves != null)
+                    {
+                        for (int i = 0; i < leaves.Count; i++)
+                        {
+                            leaves[i].State = State.SavedOrLoaded;
+                        }
+                        node.Childs = leaves.Cast<IChildrenModel>().ToList();
+                    }
+                }
+            }
+            return node;
         }
 
         #endregion
@@ -171,7 +240,7 @@ namespace Philadelphus.Business.Services
             {
                 treeNode.State = State.SavedOrLoaded;
             }
-            return treeNodes.Where(x => x.State != State.SavedOrLoaded).Count();
+            return result;
         }
         public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves)
         {
@@ -208,7 +277,7 @@ namespace Philadelphus.Business.Services
 
         public TreeRootModel CreateTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
         {
-            var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage);
+            var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage, new TreeRoot());
             parentElement.ElementsCollection.Add(result);
             parentElement.Childs.Add(result);
             parentElement.State = State.Changed;
@@ -216,7 +285,7 @@ namespace Philadelphus.Business.Services
         }
         public TreeNodeModel CreateTreeNode(IParentModel parentElement)
         {
-            var result = new TreeNodeModel(Guid.NewGuid(), parentElement);
+            var result = new TreeNodeModel(Guid.NewGuid(), parentElement, new TreeNode());
             result.ParentRepository.ElementsCollection.Add(result);
             //parentElement.State = State.Changed;
             parentElement.Childs.Add(result);
@@ -233,7 +302,7 @@ namespace Philadelphus.Business.Services
                 }
                 else
                 {
-                    var result = new TreeLeaveModel(Guid.NewGuid(), parentElement);
+                    var result = new TreeLeaveModel(Guid.NewGuid(), parentElement, new TreeLeave());
                     result.ParentRepository.ElementsCollection.Add(result);
                     parentElement.Childs.Add(result);
                     //parentElement.State = State.Changed;
@@ -248,7 +317,7 @@ namespace Philadelphus.Business.Services
         }
         public ElementAttributeModel CreateElementAttribute(IContentOwnerModel owner)
         {
-            var result = new ElementAttributeModel(Guid.NewGuid(), owner);
+            var result = new ElementAttributeModel(Guid.NewGuid(), owner, null);
             //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
             owner.PersonalAttributes.Add(result);
             //owner.State = State.Changed;
@@ -295,7 +364,7 @@ namespace Philadelphus.Business.Services
 
             for (int i = 0; i < 20; i++)
             {
-                var entry = new ElementAttributeModel(Guid.NewGuid(), owner);
+                var entry = new ElementAttributeModel(Guid.NewGuid(), owner, null);
                 ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(entry);
                 result.Add(entry);
             }

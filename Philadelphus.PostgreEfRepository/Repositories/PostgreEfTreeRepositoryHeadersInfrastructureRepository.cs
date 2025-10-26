@@ -17,6 +17,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
     public class PostgreEfTreeRepositoryHeadersInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
         private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
+        private TreeRepositoriesPhiladelphusContext GetNewContext() => new TreeRepositoriesPhiladelphusContext(_connectionString);
 
         private TreeRepositoriesPhiladelphusContext _context;
         public PostgreEfTreeRepositoryHeadersInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
@@ -63,34 +64,62 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.Repositories.ToList();
+
+            List<TreeRepository> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.Repositories.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
+        }
+        public long InsertRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                item.AuditInfo.CreatedBy = Environment.UserName;
+                context.Repositories.Add(item);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
+        public long UpdateRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
+                context.Update(item);
+                result = context.SaveChanges();
+            }
+
+            return result;
         }
         public long DeleteRepository(TreeRepository item)
         {
             if (CheckAvailability() == false)
                 return -1;
-            var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
-            repository.AuditInfo.IsDeleted = true;
-            repository.AuditInfo.DeletedBy = Environment.UserName;
-            repository.AuditInfo.DeletedAt = DateTime.UtcNow;
-            return _context.SaveChanges();
-        }
 
-        public long UpdateRepository(TreeRepository item)
-        {
             long result = 0;
 
-            if (CheckAvailability() == false)
-                return -1;
-            //var repository = _context.Repositories.FirstOrDefault(x => x.Guid == item.Guid);
-            //_context.Update(item);
-            //item.AuditInfo.UpdatedBy = Environment.UserName;
-            //item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-            //return _context.SaveChanges();
-            using (var context = new TreeRepositoriesPhiladelphusContext(_connectionString))
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                item.AuditInfo.IsDeleted = true;
+                item.AuditInfo.DeletedAt = DateTime.UtcNow;
+                item.AuditInfo.DeletedBy = Environment.UserName;
                 context.Update(item);
                 result = context.SaveChanges();
             }
@@ -98,12 +127,6 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             return result;
         }
 
-        public long InsertRepository(TreeRepository item)
-        {
-            if (CheckAvailability() == false)
-                return -1;
-            _context.Repositories.Add(item);
-            return _context.SaveChanges();
-        }
+
     }
 }

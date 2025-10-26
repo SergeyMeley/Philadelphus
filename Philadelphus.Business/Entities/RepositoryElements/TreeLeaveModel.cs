@@ -6,6 +6,7 @@ using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public override EntityTypesModel EntityType { get => EntityTypesModel.Leave; }
         public TreeRootModel ParentRoot { get; private set; }
         public override IDataStorageModel DataStorage { get => ParentRoot.OwnDataStorage; }
-        internal TreeLeaveModel(Guid guid, IParentModel parent) : base(guid, parent)
+        internal TreeLeaveModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
         {
             try
             {
@@ -74,7 +75,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             //}
             Name = NamingHelper.GetNewName(existNames, "Новый лист");
             //Childs = new ObservableCollection<IChildren>();
-            ElementType = new EntityElementTypeModel(Guid.NewGuid(), this);
+            ElementType = new EntityElementTypeModel(Guid.NewGuid(), this, null);
         }
     }
 }

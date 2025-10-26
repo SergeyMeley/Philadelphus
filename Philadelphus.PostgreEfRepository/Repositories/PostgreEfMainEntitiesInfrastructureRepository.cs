@@ -19,9 +19,13 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfMainEntitiesInfrastructureRepository : IMainEntitiesInfrastructureRepository
     {
+        private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
+        private MainEntitiesPhiladelphusContext GetNewContext() => new MainEntitiesPhiladelphusContext(_connectionString);
+
         private readonly MainEntitiesPhiladelphusContext _context;
         public PostgreEfMainEntitiesInfrastructureRepository(string connectionString)
         {
+            _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой  
             _context = new MainEntitiesPhiladelphusContext(connectionString);
 
             if (CheckAvailability())
@@ -116,34 +120,44 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         public long InsertRoots(IEnumerable<TreeRoot> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                //item.AuditInfo.CreatedBy = Environment.UserName;
-                //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeRoots.Add(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                    item.AuditInfo.CreatedBy = Environment.UserName;
+                }
+                
+                context.TreeRoots.AddRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long InsertNodes(IEnumerable<TreeNode> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                if (_context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid) != null)
+                foreach (var item in items)
                 {
-                    item.ParentTreeRoot = _context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid);
+                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                    item.AuditInfo.CreatedBy = Environment.UserName;
                 }
-                //item.AuditInfo.CreatedBy = Environment.UserName;
-                //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeNodes.Add(item);
+
+                context.TreeNodes.AddRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long InsertLeaves(IEnumerable<TreeLeave> items)
         {
