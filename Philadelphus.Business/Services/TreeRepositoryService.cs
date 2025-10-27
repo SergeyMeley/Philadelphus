@@ -71,8 +71,12 @@ namespace Philadelphus.Business.Services
 
                     var dbNodes = infrastructure.SelectNodes(repository.ChildsGuids?.ToArray());
                     var nodes = dbNodes?.ToModelCollection(MainEntityCollection.DataTreeRoots);
-                    MainEntityCollection.DataTreeNodes.AddRange(nodes);
-
+                    while (nodes.Count > 0)
+                    {
+                        MainEntityCollection.DataTreeNodes.AddRange(nodes);
+                        nodes = dbNodes?.ToModelCollection(nodes);
+                    }
+                    
                     var dbLeaves = infrastructure.SelectLeaves(repository.ChildsGuids?.ToArray());
                     var leaves = dbLeaves?.ToModelCollection(MainEntityCollection.DataTreeNodes);
                     MainEntityCollection.DataTreeLeaves.AddRange(leaves);
@@ -125,6 +129,8 @@ namespace Philadelphus.Business.Services
         public TreeNodeModel GetNodeContent(TreeNodeModel node)
         {
             var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
+            var qwe1 = MainEntityCollection.DataTreeNodes;
+            var qwe2 = qwe1.Where(x => x.Parent.Guid == node.Guid);
 
             if (childNodes != null)
             {

@@ -70,33 +70,78 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeRoots.ToList();
+
+            List<TreeRoot> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.TreeRoots.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
         }
         public IEnumerable<TreeRoot> SelectRoots(Guid[] guids)
         {
             if (CheckAvailability() == false)
                 return null;
-            if (guids == null || guids.Any() == false)
-                return new List<TreeRoot>();
-            return _context.TreeRoots.Where(x => guids.Contains(x.Guid)).ToList();
+
+            List<TreeRoot> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.TreeRoots.Where(x => 
+                x.AuditInfo.IsDeleted == false
+                && guids.Contains(x.Guid)
+                ).ToList();
+            }
+
+            return result;
         }
         public IEnumerable<TreeNode> SelectNodes()
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeNodes.ToList();
+
+            List<TreeNode> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.TreeNodes.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
         }
         public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeNodes.Where(x => parentRootGuids.Any(g => g == x.ParentTreeRoot.Guid)).ToList();
+
+            List<TreeNode> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.TreeNodes.Where(x =>
+                x.AuditInfo.IsDeleted == false
+                && (parentRootGuids.Contains(x.ParentTreeRootGuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
+                || parentRootGuids.Contains(x.ParentTreeRoot.Guid))
+                ).ToList();
+            }
+
+            return result;
         }
         public IEnumerable<TreeLeave> SelectLeaves()
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeLeaves.ToList();
+
+            List<TreeLeave> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.TreeLeaves.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
         }
         public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
         {
