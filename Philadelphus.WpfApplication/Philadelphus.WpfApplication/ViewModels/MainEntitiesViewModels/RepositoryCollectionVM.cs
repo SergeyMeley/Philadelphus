@@ -130,7 +130,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         private bool InitRepositoryCollection()
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
-            var repositories = _service.LoadRepositories(storages);
+            var repositories = _service.LoadTreeRepositoriesCollection(storages);
             foreach (var item in repositories)
             {
                 _treeRepositoriesVMs.Add(new TreeRepositoryVM(item));

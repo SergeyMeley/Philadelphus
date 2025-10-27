@@ -231,7 +231,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 
         internal bool LoadTreeRepository()
         {
-            _service.LoadRepositoryContent(_model);
+            _service.GetRepositoryContent(_model);
             Childs.Clear();
             foreach (var item in _model.Childs)
             {
