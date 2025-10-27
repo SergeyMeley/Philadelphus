@@ -17,5 +17,6 @@ namespace Philadelphus.InfrastructureEntities.OtherEntities
         public bool HasDataStorageInfrastructureRepositoryRepository { get; set; }
         public bool HasTreeRepositoryHeadersInfrastructureRepository { get; set; }
         public bool HasMainEntitiesInfrastructureRepository { get; set; }
+        public bool IsDisabled { get; set; }
     }
 }

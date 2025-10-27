@@ -15,10 +15,12 @@ namespace Philadelphus.Business.Entities.Infrastructure
         public string Description { get; }
         public InfrastructureTypes InfrastructureType { get; }
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories { get; }
-        public IDataStoragesInfrastructureRepository DataStorageInfrastructureRepositoryRepository { get; }
-        public ITreeRepositoriesInfrastructureRepository TreeRepositoryHeadersInfrastructureRepository { get; }
+        public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository { get; }
+        public ITreeRepositoryHeadersCollectionInfrastructureRepository TreeRepositoryHeadersCollectionInfrastructureRepository { get; }
+        public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository { get; }
         public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository { get; }
         public bool IsAvailable { get; }
+        public bool IsDisabled { get; set; }
         public DateTime LastCheckTime { get; }
         public bool CheckAvailable();
         public bool StartAvailableAutoChecking();

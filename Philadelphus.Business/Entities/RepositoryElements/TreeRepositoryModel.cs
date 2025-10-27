@@ -42,6 +42,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements
                 DataStorages.Add(value);
             }
         }
+
+        public string OwnDataStorageName { get => _ownDataStorage.Name; set => OwnDataStorageName = value; }    //TODO: Исправить костыль
+        public Guid OwnDataStorageUuid { get => _ownDataStorage.Guid; set => OwnDataStorageUuid = value; }      //TODO: Исправить костыль
         public List<IDataStorageModel> DataStorages { get; internal set; } = new List<IDataStorageModel>();
         //TODO
         public List<TreeRootModel> ChildTreeRoots { get => Childs.Where(x => x.GetType() == typeof(TreeRootModel)).Cast<TreeRootModel>().ToList(); }
@@ -58,6 +61,13 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             DbEntity = dbEntity;
             Initialize();
         }
+
+        internal TreeRepositoryModel(TreeRepositoryHeaderModel headerModel)
+        {
+            Guid = headerModel.Guid;
+            Initialize();
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

@@ -44,7 +44,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 }
             }
         }
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntitiesInfrastructureRepository; }
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntities; }
         public bool CheckAvailability()
         {
             if (_context.Database.CanConnect() == false)

@@ -8,8 +8,9 @@ namespace Philadelphus.InfrastructureEntities.Enums
 {
     public enum InfrastructureEntityGroups
     {
-        DataStoragesInfrastructureRepository,
-        TreeRepositoriesInfrastructureRepository,
-        MainEntitiesInfrastructureRepository,
+        DataStoragesCollection,
+        TreeRepositoryHeadersCollection,
+        TreeRepositories,
+        MainEntities,
     }
 }

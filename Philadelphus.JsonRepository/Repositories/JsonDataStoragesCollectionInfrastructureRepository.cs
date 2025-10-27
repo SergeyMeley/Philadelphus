@@ -12,17 +12,20 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.JsonRepository.Repositories
 {
-    public class JsonDataStorageAndTreeRepositoryInfrastructureRepository : IDataStoragesInfrastructureRepository, ITreeRepositoriesInfrastructureRepository
+    public class JsonDataStoragesCollectionInfrastructureRepository : IDataStoragesCollectionInfrastructureRepository
     {
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.DataStoragesInfrastructureRepository; }
+        FileInfo _file = new FileInfo("storage-config.json");
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.DataStoragesCollection; }
         public bool CheckAvailability()
         {
+            if (_file.Exists == false)
+                throw new FileNotFoundException($"Не найден настроечный файл хранилищ данных: {_file.FullName}");
             return true;
         }
 
         public IEnumerable<DataStorage> SelectDataStorages()
         {
-            var filePath = "storages.json";
+            var filePath = "storage-config.json";
             DataStoragesCollection resultCollection = null;
             if (!File.Exists(filePath))
             {
@@ -39,32 +42,7 @@ namespace Philadelphus.JsonRepository.Repositories
             return resultCollection.DataStorages ?? throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
         }
 
-        public IEnumerable<TreeRepository> SelectRepositories()
-        {
-            throw new NotImplementedException();
-        }
-
         public long UpdateDataStorages(IEnumerable<DataStorage> storages)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long UpdateRepository(TreeRepository repository)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteDataStorages(IEnumerable<DataStorage> storages)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteRepository(TreeRepository repository)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long InsertDataStorages(IEnumerable<DataStorage> storages)
         {
             var filePath = "storages.json";
             var collection = new DataStoragesCollection() { DataStorages = storages.ToList() };
@@ -78,11 +56,6 @@ namespace Philadelphus.JsonRepository.Repositories
             File.WriteAllText(filePath, json);
 
             return storages.Count();
-        }
-
-        public long InsertRepository(TreeRepository repository)
-        {
-            throw new NotImplementedException();
         }
     }
 }
