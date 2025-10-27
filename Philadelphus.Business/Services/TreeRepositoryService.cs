@@ -13,6 +13,8 @@ using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Philadelphus.Business.Services
 {
@@ -55,7 +57,7 @@ namespace Philadelphus.Business.Services
         {
             return _mainEntityCollection.FirstOrDefault(x => x.Guid == guid);
         }
-        public TreeRepositoryModel LoadRepositoryContent(TreeRepositoryModel repository)
+        public TreeRepositoryModel LoadMainEntityCollection(TreeRepositoryModel repository)
         {
             foreach (var dataStorage in repository?.DataStorages)
             {
@@ -65,86 +67,95 @@ namespace Philadelphus.Business.Services
                 {
                     var dbRoots = infrastructure.SelectRoots(repository.ChildsGuids?.ToArray());
                     var roots = dbRoots?.ToModelCollection(repository.DataStorages, new List<TreeRepositoryModel>() { repository });
-                    if (roots != null)
-                    {
-                        for (int i = 0; i < roots.Count; i++)
-                        {
-                            roots[i].State = State.SavedOrLoaded;
-                        }
-                        repository.Childs = roots.Cast<IChildrenModel>().ToList();
+                    MainEntityCollection.DataTreeRoots.AddRange(roots);
 
-                        for (int i = 0; i < roots.Count; i++)
-                        {
-                            LoadRootContent(roots[i]);
-                        }
-                    }
+                    var dbNodes = infrastructure.SelectNodes(repository.ChildsGuids?.ToArray());
+                    var nodes = dbNodes?.ToModelCollection(MainEntityCollection.DataTreeRoots);
+                    MainEntityCollection.DataTreeNodes.AddRange(nodes);
+
+                    var dbLeaves = infrastructure.SelectLeaves(repository.ChildsGuids?.ToArray());
+                    var leaves = dbLeaves?.ToModelCollection(MainEntityCollection.DataTreeNodes);
+                    MainEntityCollection.DataTreeLeaves.AddRange(leaves);
                 }
             }
             return repository;
         }
-        public TreeRootModel LoadRootContent(TreeRootModel root)
-        {
-            foreach (var dataStorage in root?.DataStorages)
-            {
-                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
-                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
-                    && dataStorage.IsAvailable)
-                {
-                    var dbNodes = infrastructure.SelectNodes(root.Guid)?.Where(x => x.ParentGuid == root.Guid);
-                    var nodes = dbNodes?.ToModelCollection(new List<TreeRootModel>() { root });
-                    if (nodes != null)
-                    {
-                        for (int i = 0; i < nodes.Count; i++)
-                        {
-                            nodes[i].State = State.SavedOrLoaded;
-                        }
-                        root.Childs = nodes.Cast<IChildrenModel>().ToList();
 
-                        for (int i = 0; i < nodes.Count; i++)
-                        {
-                            LoadNodeContent(nodes[i]);
-                        }
-                    }
+        public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel repository)
+        {
+            LoadMainEntityCollection(repository);
+
+            var childRoots = MainEntityCollection.DataTreeRoots.Where(x => x.ParentRepository.Guid == repository.Guid);
+            if (childRoots != null)
+            {
+                foreach (var child in childRoots)
+                {
+                    child.State = State.SavedOrLoaded;
+                }
+                repository.Childs = childRoots.Cast<IChildrenModel>().ToList();
+
+                foreach (var child in childRoots)
+                {
+                    GetRootContent(child);
                 }
             }
+            return repository;
+        }
+
+        public TreeRootModel GetRootContent(TreeRootModel root)
+        {
+            var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == root.Guid);
+
+            if (childNodes != null)
+            {
+                foreach (var child in childNodes)
+                {
+                    child.State = State.SavedOrLoaded;
+                }
+                root.Childs = childNodes.Cast<IChildrenModel>().ToList();
+
+                foreach (var child in childNodes)
+                {
+                    GetNodeContent(child);
+                }
+            }
+
             return root;
         }
-        public TreeNodeModel LoadNodeContent(TreeNodeModel node)
+        public TreeNodeModel GetNodeContent(TreeNodeModel node)
         {
-            foreach (var dataStorage in node?.ParentRoot?.DataStorages)
+            var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
+
+            if (childNodes != null)
             {
-                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
-                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
-                    && dataStorage.IsAvailable)
+                foreach (var child in childNodes)
                 {
-                    var dbNodes = infrastructure.SelectNodes(node.ParentRoot.Guid)?.Where(x => x.ParentGuid == node.Guid);
-                    var nodes = dbNodes?.ToModelCollection(new List<TreeRootModel>() { node.ParentRoot });
-                    if (nodes != null)
-                    {
-                        for (int i = 0; i < nodes.Count; i++)
-                        {
-                            nodes[i].State = State.SavedOrLoaded;
-                        }
-                        node.Childs = nodes.Cast<IChildrenModel>().ToList();
+                    child.State = State.SavedOrLoaded;
+                }
+                node.Childs = childNodes.Cast<IChildrenModel>().ToList();
 
-                        for (int i = 0; i < nodes.Count; i++)
-                        {
-                            LoadNodeContent(nodes[i]);
-                        }
-                    }
-
-                    var dbLeaves = infrastructure.SelectLeaves(node.ParentRoot.Guid)?.Where(x => x.ParentGuid == node.Guid);
-                    var leaves = dbLeaves?.ToModelCollection(new List<TreeNodeModel>() { node });
-                    if (leaves != null)
-                    {
-                        for (int i = 0; i < leaves.Count; i++)
-                        {
-                            leaves[i].State = State.SavedOrLoaded;
-                        }
-                        node.Childs = leaves.Cast<IChildrenModel>().ToList();
-                    }
+                foreach (var child in childNodes)
+                {
+                    GetNodeContent(child);
                 }
             }
+
+            var childLeaves = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
+
+            if (childLeaves != null)
+            {
+                foreach (var child in childLeaves)
+                {
+                    child.State = State.SavedOrLoaded;
+                }
+                node.Childs = childLeaves.Cast<IChildrenModel>().ToList();
+
+                foreach (var child in childLeaves)
+                {
+                    GetNodeContent(child);
+                }
+            }
+
             return node;
         }
 

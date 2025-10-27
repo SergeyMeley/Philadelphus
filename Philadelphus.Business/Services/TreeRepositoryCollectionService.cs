@@ -98,7 +98,7 @@ namespace Philadelphus.Business.Services
             }
             return result;
         }
-        public IEnumerable<TreeRepositoryModel> LoadRepositories(IEnumerable<IDataStorageModel> dataStorages)
+        public IEnumerable<TreeRepositoryModel> LoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages)
         {
             var result = new List<TreeRepositoryModel>();
             foreach (var dataStorage in dataStorages)

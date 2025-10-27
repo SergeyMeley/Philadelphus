@@ -8,9 +8,9 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
         public IEnumerable<TreeRoot> SelectRoots();
         public IEnumerable<TreeRoot> SelectRoots(Guid[] guids);
         public IEnumerable<TreeNode> SelectNodes();
-        public IEnumerable<TreeNode> SelectNodes(Guid parentRootGuid);
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids);
         public IEnumerable<TreeLeave> SelectLeaves();
-        public IEnumerable<TreeLeave> SelectLeaves(Guid parentRootGuid);
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids);
         public IEnumerable<ElementAttribute> SelectAttributes();
         public IEnumerable<TreeElementAttributeValue> SelectAttributeValues();
         #endregion

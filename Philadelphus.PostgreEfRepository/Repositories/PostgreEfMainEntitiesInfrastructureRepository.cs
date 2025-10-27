@@ -86,11 +86,11 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return null;
             return _context.TreeNodes.ToList();
         }
-        public IEnumerable<TreeNode> SelectNodes(Guid parentRootGuid)
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeNodes.Where(x => x.ParentTreeRoot.Guid == parentRootGuid).ToList();
+            return _context.TreeNodes.Where(x => parentRootGuids.Any(g => g == x.ParentTreeRoot.Guid)).ToList();
         }
         public IEnumerable<TreeLeave> SelectLeaves()
         {
@@ -98,11 +98,11 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 return null;
             return _context.TreeLeaves.ToList();
         }
-        public IEnumerable<TreeLeave> SelectLeaves(Guid parentRootGuid)
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeLeaves.Where(x => x.ParentTreeRoot.Guid == parentRootGuid).ToList();
+            return _context.TreeLeaves.Where(x => parentRootGuids.Any(g => g == x.ParentTreeRoot.Guid)).ToList();
         }
         public IEnumerable<ElementAttribute> SelectAttributes()
         {
