@@ -89,7 +89,7 @@ namespace Philadelphus.PostgreEfRepository.Configurations
 
             builder.HasOne(x => x.ParentTreeRoot)
               .WithMany()
-              .HasForeignKey(x => x.ParentGuid);
+              .HasForeignKey(x => x.ParentTreeRootGuid);
 
             //builder.HasOne(x => x.ParentTreeNode)
             //      .WithMany()
