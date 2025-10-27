@@ -5,21 +5,21 @@
       "Description": "Сервер PostgreSQL в контейнере на домашнем ПК",
       "Guid": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": false
+      "IsHidden": true
     },
     {
       "Name": "PostgreSQL_SERVER_MSV_LOCAL",
       "Description": "Сервер PostgreSQL на домашнем сервере по локальной сети",
       "Guid": "4c04583e-d57a-40c2-b281-3676af36dc54",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": false
+      "IsHidden": true
     },
     {
       "Name": "PostgreSQL_SERVER_MSV_INTERNET",
       "Description": "Сервер PostgreSQL на домашнем сервере по глобальной сети",
       "Guid": "8bffede3-9df6-4f1c-8238-fb25ac18e7f2",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": false
+      "IsHidden": true
     },
     {
       "Name": "PostgreSQL_VM_BVA_INTERNET",
@@ -33,7 +33,7 @@
       "Description": "Сервер PostgreSQL на ноутбуке",
       "Guid": "9aca3962-de53-4ff8-805c-54698f67d8b9",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": true
+      "IsHidden": false
     }
   ],
   "ReservStorageModels": [
