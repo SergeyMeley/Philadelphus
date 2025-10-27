@@ -50,7 +50,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<TreeLeaveModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = parents.FirstOrDefault(x => x.Guid == dbEntity.ParentTreeRoot.Guid);
+                var parent = parents.FirstOrDefault(x => x.Guid == dbEntity.ParentGuid);
                 if (parent != null)
                 {
                     result.Add(dbEntity.ToModel(parent));

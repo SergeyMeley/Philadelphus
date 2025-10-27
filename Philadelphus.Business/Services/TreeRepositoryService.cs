@@ -89,14 +89,17 @@ namespace Philadelphus.Business.Services
         {
             LoadMainEntityCollection(repository);
 
+            repository.Childs.Clear();
+
             var childRoots = MainEntityCollection.DataTreeRoots.Where(x => x.ParentRepository.Guid == repository.Guid);
+
             if (childRoots != null)
             {
                 foreach (var child in childRoots)
                 {
                     child.State = State.SavedOrLoaded;
                 }
-                repository.Childs = childRoots.Cast<IChildrenModel>().ToList();
+                repository.Childs.AddRange(childRoots.Cast<IChildrenModel>().ToList());
 
                 foreach (var child in childRoots)
                 {
@@ -108,6 +111,8 @@ namespace Philadelphus.Business.Services
 
         public TreeRootModel GetRootContent(TreeRootModel root)
         {
+            root.Childs.Clear();
+
             var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == root.Guid);
 
             if (childNodes != null)
@@ -116,7 +121,7 @@ namespace Philadelphus.Business.Services
                 {
                     child.State = State.SavedOrLoaded;
                 }
-                root.Childs = childNodes.Cast<IChildrenModel>().ToList();
+                root.Childs.AddRange(childNodes.Cast<IChildrenModel>().ToList());
 
                 foreach (var child in childNodes)
                 {
@@ -128,9 +133,9 @@ namespace Philadelphus.Business.Services
         }
         public TreeNodeModel GetNodeContent(TreeNodeModel node)
         {
+            node.Childs.Clear();
+
             var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
-            var qwe1 = MainEntityCollection.DataTreeNodes;
-            var qwe2 = qwe1.Where(x => x.Parent.Guid == node.Guid);
 
             if (childNodes != null)
             {
@@ -138,7 +143,7 @@ namespace Philadelphus.Business.Services
                 {
                     child.State = State.SavedOrLoaded;
                 }
-                node.Childs = childNodes.Cast<IChildrenModel>().ToList();
+                node.Childs.AddRange(childNodes.Cast<IChildrenModel>().ToList());
 
                 foreach (var child in childNodes)
                 {
@@ -146,7 +151,7 @@ namespace Philadelphus.Business.Services
                 }
             }
 
-            var childLeaves = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
+            var childLeaves = MainEntityCollection.DataTreeLeaves.Where(x => x.Parent.Guid == node.Guid);
 
             if (childLeaves != null)
             {
@@ -154,12 +159,7 @@ namespace Philadelphus.Business.Services
                 {
                     child.State = State.SavedOrLoaded;
                 }
-                node.Childs = childLeaves.Cast<IChildrenModel>().ToList();
-
-                foreach (var child in childLeaves)
-                {
-                    GetNodeContent(child);
-                }
+                node.Childs.AddRange(childLeaves.Cast<IChildrenModel>().ToList());
             }
 
             return node;

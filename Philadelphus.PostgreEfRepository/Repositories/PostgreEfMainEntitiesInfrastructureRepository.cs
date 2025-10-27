@@ -147,7 +147,19 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         {
             if (CheckAvailability() == false)
                 return null;
-            return _context.TreeLeaves.Where(x => parentRootGuids.Any(g => g == x.ParentTreeRoot.Guid)).ToList();
+
+            List<TreeLeave> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.TreeLeaves.Where(x =>
+                x.AuditInfo.IsDeleted == false
+                && (parentRootGuids.Contains(x.ParentTreeRootGuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
+                || parentRootGuids.Contains(x.ParentTreeRoot.Guid))
+                ).ToList();
+            }
+
+            return result;
         }
         public IEnumerable<ElementAttribute> SelectAttributes()
         {
