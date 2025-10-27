@@ -21,7 +21,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     public class TreeLeaveModel : TreeRootMemberBaseModel, IChildrenModel, ITreeRootMemberModel
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Leave; }
-        public TreeRootModel ParentRoot { get; private set; }
         public override IDataStorageModel DataStorage { get => ParentRoot.OwnDataStorage; }
         internal TreeLeaveModel(Guid guid, TreeNodeModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
         {
