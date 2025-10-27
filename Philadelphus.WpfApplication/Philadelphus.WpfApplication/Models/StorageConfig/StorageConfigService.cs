@@ -59,7 +59,7 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
                 case InfrastructureTypes.PostgreSqlAdo:
                     break;
                 case InfrastructureTypes.PostgreSqlEf:
-                    treeRepositoryHeadersInfrastructureRepository = new PostgreEfTreeRepositoryHeadersInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Guid.ToString()].ConnectionString);
+                    treeRepositoryHeadersInfrastructureRepository = new PostgreEfTreeRepositoriesInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Guid.ToString()].ConnectionString);
                     mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Guid.ToString()].ConnectionString);
                     break;
                 case InfrastructureTypes.MongoDbAdo:
@@ -73,7 +73,7 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
             }
             DataStorageBuilder builder = new DataStorageBuilder();
             builder
-                .SetGeneralParameters(modelConfig.Name, modelConfig.Description, modelConfig.Guid, modelConfig.ProviderType)
+                .SetGeneralParameters(modelConfig.Name, modelConfig.Description, modelConfig.Guid, modelConfig.ProviderType, modelConfig.IsHidden)
                 .SetRepository(treeRepositoryHeadersInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();

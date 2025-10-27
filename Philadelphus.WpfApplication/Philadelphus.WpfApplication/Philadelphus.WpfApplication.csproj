@@ -22,6 +22,9 @@
     <None Update="App.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="repository-headers-config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="storage-config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
