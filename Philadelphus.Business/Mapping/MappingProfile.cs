@@ -51,7 +51,7 @@ namespace Philadelphus.Business.Mapping
         private IDataStorageModel GetDataStorage(Guid guid)
         {
             var builder = new DataStorageBuilder()
-                    .SetGeneralParameters("test", "test", guid, InfrastructureEntities.Enums.InfrastructureTypes.PostgreSqlEf);
+                    .SetGeneralParameters("test", "test", guid, InfrastructureEntities.Enums.InfrastructureTypes.PostgreSqlEf, isDisabled: false);
             return builder.Build();
         }
     }
