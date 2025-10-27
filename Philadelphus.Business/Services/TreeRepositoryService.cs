@@ -134,7 +134,7 @@ namespace Philadelphus.Business.Services
                     }
 
                     var dbLeaves = infrastructure.SelectLeaves(node.ParentRoot.Guid)?.Where(x => x.ParentGuid == node.Guid);
-                    var leaves = dbLeaves?.ToModelCollection(new List<TreeRootModel>() { node.ParentRoot });
+                    var leaves = dbLeaves?.ToModelCollection(new List<TreeNodeModel>() { node });
                     if (leaves != null)
                     {
                         for (int i = 0; i < leaves.Count; i++)
@@ -291,7 +291,7 @@ namespace Philadelphus.Business.Services
             parentElement.Childs.Add(result);
             return result;
         }
-        public TreeLeaveModel CreateTreeLeave(IParentModel parentElement)
+        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement)
         {
             try
             {

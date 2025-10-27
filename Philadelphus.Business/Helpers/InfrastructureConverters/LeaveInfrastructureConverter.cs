@@ -35,7 +35,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             }
             return result;
         }
-        public static TreeLeaveModel ToModel(this TreeLeave dbEntity, IParentModel parent)
+        public static TreeLeaveModel ToModel(this TreeLeave dbEntity, TreeNodeModel parent)
         {
             if (dbEntity == null)
                 return null;
@@ -43,7 +43,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             result = (TreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
-        public static List<TreeLeaveModel> ToModelCollection(this IEnumerable<TreeLeave> dbEntityCollection, IEnumerable<IParentModel> parents)
+        public static List<TreeLeaveModel> ToModelCollection(this IEnumerable<TreeLeave> dbEntityCollection, IEnumerable<TreeNodeModel> parents)
         {
             if (dbEntityCollection == null)
                 return null;

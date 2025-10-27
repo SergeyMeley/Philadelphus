@@ -45,13 +45,25 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public IParentModel Parent {  get; private set; }
         public List<TreeNodeModel> ChildTreeNodes { get => Childs.Where(x => x.GetType() == typeof(TreeNodeModel)).Cast<TreeNodeModel>().ToList(); }
         public List<IChildrenModel> Childs { get; set; }
-        internal TreeRootModel(Guid guid, IParentModel parent, IDataStorageModel dataStorage, IMainEntity dbEntity) : base(guid, parent, dbEntity)
+        internal TreeRootModel(Guid guid, TreeRepositoryModel parent, IDataStorageModel dataStorage, IMainEntity dbEntity) : base(guid, parent, dbEntity)
         {
-            Guid = guid;
-            Parent = parent;
-            ParentRepository = (TreeRepositoryModel)parent;
-            OwnDataStorage = dataStorage;
-            Initialize();
+            if (SetParents(parent))
+            {
+                OwnDataStorage = dataStorage;
+                try
+                {
+                    Initialize();
+                }
+                catch (Exception ex)
+                {
+                    NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                    throw;
+                }
+            }
+            else
+            {
+                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
+            }
         }
         private void Initialize()
         {

@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
@@ -7,6 +8,7 @@ using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.InfrastructureEntities.OtherEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,48 +18,30 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeLeaveModel : TreeRepositoryMemberBaseModel, IChildrenModel, ITreeRootMemberModel
+    public class TreeLeaveModel : TreeRootMemberBaseModel, IChildrenModel, ITreeRootMemberModel
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.Leave; }
         public TreeRootModel ParentRoot { get; private set; }
         public override IDataStorageModel DataStorage { get => ParentRoot.OwnDataStorage; }
-        internal TreeLeaveModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
+        internal TreeLeaveModel(Guid guid, TreeNodeModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
         {
-            try
+            if (SetParents(parent))
             {
-                if (parent == null)
+                try
                 {
-                    string message = "Не выделен родительский элемент!";
-                    NotificationService.SendNotification(message, NotificationCriticalLevelModel.Warning, NotificationTypesModel.TextMessage);
-                    throw new Exception(message);
+                    Initialize();
                 }
-                //Parent = parent;
-                if (parent.GetType() == typeof(TreeRepositoryModel))
+                catch (Exception ex)
                 {
-                    ParentRepository = (TreeRepositoryModel)parent;
+                    NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                    throw;
                 }
-                else if (parent.GetType() == typeof(TreeRootModel))
-                {
-                    ParentRepository = ((TreeRootModel)parent).ParentRepository;
-                    ParentRoot = (TreeRootModel)parent;
-                }
-                else if (parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
-                {
-                    ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
-                    ParentRoot = ((ITreeRootMemberModel)parent).ParentRoot;
-                }
-                else if (parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
-                {
-                    ParentRepository = ((ITreeRepositoryMemberModel)parent).ParentRepository;
-                }
-                //Guid = guid;
-                Initialize();
             }
-            catch (Exception ex)
+            else
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
-                throw;
+                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
             }
+            
         }
         private void Initialize()
         {

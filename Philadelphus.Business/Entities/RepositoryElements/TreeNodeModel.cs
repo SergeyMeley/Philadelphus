@@ -20,7 +20,7 @@ using ZstdSharp;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public class TreeNodeModel : TreeRepositoryMemberBaseModel, IParentModel, ITreeRootMemberModel
+    public class TreeNodeModel : TreeRootMemberBaseModel, IParentModel, ITreeRootMemberModel
     {
         protected override string DefaultFixedPartOfName { get => "Новый узел"; }
         public override EntityTypesModel EntityType { get => EntityTypesModel.Node; }
@@ -28,66 +28,24 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<TreeNodeModel> ChildTreeNodes { get => Childs.Where(x => x.GetType() == typeof(TreeNodeModel)).Cast<TreeNodeModel>().ToList(); }
         public List<TreeLeaveModel> ChildTreeLeaves { get => Childs.Where(x => x.GetType() == typeof(TreeLeaveModel)).Cast<TreeLeaveModel>().ToList(); }
         public List<IChildrenModel> Childs { get; set; } = new List<IChildrenModel>();
-        //{ 
-        //    get
-        //    {
-        //        var result = new List<IChildrenModel>();
-        //        if (ChildTreeNodes != null)
-        //            result.AddRange(ChildTreeNodes);
-        //        if (ChildTreeLeaves != null)
-        //            result.AddRange(ChildTreeLeaves);
-        //        return result;
-        //    }
-        //    set
-        //    {
-        //        if (value != null)
-        //        {
-        //            foreach (var item in value)
-        //            {
-        //                if (item.GetType() == typeof(TreeNodeModel))
-        //                {
-        //                    ChildTreeNodes.Add((TreeNodeModel)item);
-        //                }
-        //                else if (item.GetType() == typeof(TreeLeaveModel))
-        //                {
-        //                    ChildTreeLeaves.Add((TreeLeaveModel)item);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-        public TreeRootModel ParentRoot { get; private set; }
         public override IDataStorageModel DataStorage { get => ParentRoot.OwnDataStorage; }
         internal TreeNodeModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
         {
-            if (parent == null)
+            if (SetParents(parent))
             {
-                NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
-                return;
-            }
-            //Guid = guid;
-            //Parent = parent;
-            if (parent.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)))
-            {
-                if (parent.GetType() == typeof(TreeRootModel))
+                try
                 {
-                    ParentRoot = (TreeRootModel)parent;
-                    ParentRepository = ((TreeRootModel)parent).ParentRepository;
+                    Initialize();
                 }
-                else if (parent.GetType().IsAssignableTo(typeof(ITreeRootMemberModel)))
+                catch (Exception ex)
                 {
-                    ParentRoot = ((ITreeRootMemberModel)parent).ParentRoot;
-                    ParentRepository = ((ITreeRootMemberModel)parent).ParentRepository;
+                    NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                    throw;
                 }
-                else
-                {
-                    NotificationService.Notifications.Add(new NotificationModel("Узел может быть добавлен только в другой узел или корень!", NotificationCriticalLevelModel.Error));
-                }
-                Initialize();
             }
             else
             {
-                NotificationService.Notifications.Add(new NotificationModel("Узел может быть добавлен только в участника репозитория!", NotificationCriticalLevelModel.Error));
+                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
             }
         }
         private void Initialize()

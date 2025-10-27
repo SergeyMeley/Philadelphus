@@ -21,20 +21,32 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public override IDataStorageModel DataStorage { get; }
         internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, dbEntity)
         {
+            SetParents(parent);
+        }
+
+        protected bool SetParents(IParentModel parent)
+        {
             if (parent == null)
             {
                 NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLevelModel.Error);
-                return;
+                return false;
             }
+
             Parent = parent;
-            if (parent.GetType() == typeof(TreeRepositoryModel))
+
+            if (parent is TreeRepositoryModel)
             {
                 ParentRepository = (TreeRepositoryModel)parent;
+                return true;
             }
-            else
+            else if (parent is TreeRepositoryMemberBaseModel)
             {
                 ParentRepository = ((TreeRepositoryMemberBaseModel)parent).ParentRepository;
+                return true;
             }
+
+            NotificationService.SendNotification($"Ошибка присвоения родительского репозитория", NotificationCriticalLevelModel.Error);
+            return false;
         }
     }
 }

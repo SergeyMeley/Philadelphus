@@ -47,16 +47,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public List<TreeRootModel> ChildTreeRoots { get => Childs.Where(x => x.GetType() == typeof(TreeRootModel)).Cast<TreeRootModel>().ToList(); }
         //TODO
         public List<Guid> ChildsGuids {  get; internal set; }
-        //{ 
-        //    get => Childs.Select(x => x.Guid).ToList();
-        //    set
-        //    {
-        //        if (value.Count() != null)
-        //        {
-        //            Childs = OwnDataStorage.MainEntitiesInfrastructureRepository.SelectRoots(value.ToArray()).ToModelCollection(DataStorages).Cast<IChildrenModel>().ToList();
-        //        }
-        //    } 
-        //}
         public List<IChildrenModel> Childs { get; internal set; }
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         public DateTime? LastOpening { get; set; }
