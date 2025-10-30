@@ -6,7 +6,25 @@
       "description": "Главное хранилище данных проекта",
       "ownDataStorageName": "TEST",
       "ownDataStorageUuid": "682df887-d9f5-434c-a9dc-941b9b577403",
-      "lastOpening": "2024-01-15T10:30:00",
+      "lastOpening": "2025-10-23T10:30:00",
+      "isFavorite": true
+    },
+    {
+      "guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567891",
+      "name": "Основной репозиторий 2",
+      "description": "Главное хранилище данных проекта",
+      "ownDataStorageName": "TEST",
+      "ownDataStorageUuid": "682df887-d9f5-434c-a9dc-941b9b577403",
+      "lastOpening": "2025-10-25T10:30:00",
+      "isFavorite": true
+    },
+    {
+      "guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567892",
+      "name": "Основной репозиторий 3",
+      "description": "Главное хранилище данных проекта",
+      "ownDataStorageName": "TEST",
+      "ownDataStorageUuid": "682df887-d9f5-434c-a9dc-941b9b577403",
+      "lastOpening": "2025-10-20T10:30:00",
       "isFavorite": true
     },
     {

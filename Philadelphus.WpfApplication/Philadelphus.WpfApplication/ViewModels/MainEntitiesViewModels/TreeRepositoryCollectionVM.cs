@@ -84,6 +84,19 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             }
         }
 
+        private ObservableCollection<ITreeRepositoryHeaderModel> _lastTreeRepositoryHeaders;
+        public ObservableCollection<ITreeRepositoryHeaderModel> LastTreeRepositoryHeaders
+        {
+            get
+            {
+                if (_lastTreeRepositoryHeaders == null)
+                {
+                    _lastTreeRepositoryHeaders = new ObservableCollection<ITreeRepositoryHeaderModel>(TreeRepositoryHeaders.OrderByDescending(x => x.LastOpening).Where(x => DateTime.UtcNow - x.LastOpening <= TimeSpan.FromDays(30)));
+                }
+                return _lastTreeRepositoryHeaders;
+            }
+        }
+
         public List<string> PropertyGridRepresentationsCollection
         {
             get

@@ -158,8 +158,8 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </GroupBox>
-                            <GroupBox Grid.Row="1" Header="Последние">
-                                <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding TreeRepositoryHeaders}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                            <GroupBox Grid.Row="1" Header="Недавние">
+                                <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding LastTreeRepositoryHeaders}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
