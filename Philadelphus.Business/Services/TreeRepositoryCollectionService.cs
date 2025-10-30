@@ -156,6 +156,21 @@ namespace Philadelphus.Business.Services
             //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
             return result;
         }
+        public bool TryCreateTreeRepositoryFromHeader(ITreeRepositoryHeaderModel header, out TreeRepositoryModel outRepositiry)
+        {
+            var dataStorage = DataStorageModels.FirstOrDefault(x => x.Value.Guid == header.OwnDataStorageUuid).Value;
+            var dbTreeRepository = DataTreeRepositories.FirstOrDefault(x => x.Value.Guid == header.Guid).Value.DbEntity;
+            if (dataStorage != null && dbTreeRepository != null)
+            {
+                var result = new TreeRepositoryModel(header.Guid, dataStorage, dbTreeRepository);
+                outRepositiry = result;
+                return true;
+
+            }
+            //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
+            outRepositiry = null;
+            return false;
+        }
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path)
         {
             var result = new List<TreeRepositoryModel>();
