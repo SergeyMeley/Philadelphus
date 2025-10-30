@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
+using Philadelphus.InfrastructureEntities.OtherEntities;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
@@ -29,11 +30,11 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
         private static TreeRepositoryVM _currentRepositoryExplorerVM;
-        public  TreeRepositoryVM CurrentRepositoryExplorerVM 
-        { 
-            get 
-            { 
-                return _currentRepositoryExplorerVM; 
+        public TreeRepositoryVM CurrentRepositoryExplorerVM
+        {
+            get
+            {
+                return _currentRepositoryExplorerVM;
             }
             set
             {
@@ -97,6 +98,9 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             }
         }
 
+        private ITreeRepositoryHeaderModel _selectedTreeRepositoryHeader;
+        public ITreeRepositoryHeaderModel SelectedTreeRepositoryHeader { get => _selectedTreeRepositoryHeader; set => _selectedTreeRepositoryHeader = value; }
+
         public List<string> PropertyGridRepresentationsCollection
         {
             get
@@ -140,8 +144,27 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var window = new RepositorySettingsWindow(this); 
+                    var window = new RepositorySettingsWindow(this);
                     window.Show();
+                });
+            }
+        }
+
+        public RelayCommand OpenMainWindowWithHeader
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = new MainWindow(_vm);
+                    window.Show();
+                },
+                ce =>
+                {
+                    if (SelectedTreeRepositoryHeader is TreeRepositoryHeaderModel)
+                        return CheckExistTreeRepositoryByHeader((TreeRepositoryHeaderModel)SelectedTreeRepositoryHeader);
+                    else
+                        return false;
                 });
             }
         }
@@ -179,6 +202,11 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 _treeRepositoriesVMs.Add(new TreeRepositoryVM(item));
             }
             return true;
+        }
+
+        private bool CheckExistTreeRepositoryByHeader(TreeRepositoryHeaderModel header)
+        {
+            _service.
         }
 
     }
