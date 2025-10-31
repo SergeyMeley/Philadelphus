@@ -15,6 +15,8 @@ namespace Philadelphus.WpfApplication.ViewModels
     {
         private RepositoryCreationWindow _window;
 
+        private TreeRepositoryCollectionService _service;
+
         private string _name;
         public string Name { get => _name; set => _name = value; }
 
@@ -24,9 +26,10 @@ namespace Philadelphus.WpfApplication.ViewModels
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
-        private RepositoryCollectionVM _repositoryCollectionVM;
-        public RepositoryCreationVM(RepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand, DataStoragesSettingsVM dataStoragesSettingsVM)
+        private TreeRepositoryCollectionVM _repositoryCollectionVM;
+        public RepositoryCreationVM(TreeRepositoryCollectionService service, TreeRepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand, DataStoragesSettingsVM dataStoragesSettingsVM)
         {
+            _service = service;
             _repositoryCollectionVM = repositoryCollectionVM;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             OpenDataStoragesSettingsWindowCommand = openDataStoragesSettingsWindowCommand;
@@ -47,10 +50,9 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var collectionService = new TreeRepositoryCollectionService();
                     if (_dataStoragesSettingsVM.SelectedDataStorageVM == null)
                         return;
-                    var result = collectionService.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
+                    var result = _service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
                     var service = new TreeRepositoryService(result);
                     result.Name = _name;
                     result.Description = _description;

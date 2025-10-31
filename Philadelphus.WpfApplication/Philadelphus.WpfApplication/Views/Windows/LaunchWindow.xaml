@@ -106,7 +106,7 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <GroupBox Grid.Row="0" Header="Избранные">
-                                <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding FavoriteTreeRepositories}" SelectedItem="{Binding SelectedTreeRepositoryHeader}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                                <ListBox DataContext="{Binding RepositoryHeadersCollectionVM}" ItemsSource="{Binding FavoriteTreeRepositoryHeadersVMs}" SelectedItem="{Binding SelectedTreeRepositoryHeaderVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
@@ -159,7 +159,7 @@
                                 </ListBox>
                             </GroupBox>
                             <GroupBox Grid.Row="1" Header="Недавние">
-                                <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding LastTreeRepositoryHeaders}" SelectedItem="{Binding SelectedTreeRepositoryHeader}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
+                                <ListBox DataContext="{Binding RepositoryHeadersCollectionVM}" ItemsSource="{Binding LastTreeRepositoryHeadersVMs}" SelectedItem="{Binding SelectedTreeRepositoryHeaderVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
@@ -211,7 +211,7 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </GroupBox>
-                            <Button Grid.Row="3" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
+                            <Button Grid.Row="3" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
                         </Grid>
                     </GroupBox>
                 </Grid>

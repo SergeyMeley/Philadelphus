@@ -20,6 +20,7 @@ namespace Philadelphus.WpfApplication.Models.StorageConfig
 
         public StorageConfig LoadConfig(string filePath = "storage-config.json")
         {
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Philadelphus\\storage-config.json");
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Configuration file not found: {filePath}");

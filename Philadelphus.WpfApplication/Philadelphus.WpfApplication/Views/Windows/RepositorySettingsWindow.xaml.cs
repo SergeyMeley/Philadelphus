@@ -20,7 +20,7 @@ namespace Philadelphus.WpfApplication.Views.Windows
     /// </summary>
     public partial class RepositorySettingsWindow : Window
     {
-        public RepositorySettingsWindow(RepositoryCollectionVM vm)
+        public RepositorySettingsWindow(TreeRepositoryCollectionVM vm)
         {
             InitializeComponent();
             DataContext = vm;

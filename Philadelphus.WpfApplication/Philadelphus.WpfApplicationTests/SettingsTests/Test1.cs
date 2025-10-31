@@ -13,7 +13,7 @@ public class Test1
     [TestMethod]
     public void InsertDataStorages()
     {
-        var repository = new JsonDataStoragesCollectionInfrastructureRepository();
+        //var repository = new JsonDataStoragesCollectionInfrastructureRepository();
         //var storages = new List<DataStorage>()
         //{
         //    new DataStorageBuilder()

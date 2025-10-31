@@ -22,10 +22,10 @@
     <None Update="App.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="repository-headers-config.json">
+    <None Update="ConfigSamples\repository-headers-config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="storage-config.json">
+    <None Update="ConfigSamples\storage-config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

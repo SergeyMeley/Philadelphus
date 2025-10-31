@@ -5,7 +5,7 @@
       "Description": "Сервер PostgreSQL в контейнере на домашнем ПК",
       "Guid": "2b22989a-f845-43bc-b639-ad9ed41ec4cf",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": true
+      "IsHidden": false
     },
     {
       "Name": "PostgreSQL_SERVER_MSV_LOCAL",
@@ -33,7 +33,7 @@
       "Description": "Сервер PostgreSQL на ноутбуке",
       "Guid": "9aca3962-de53-4ff8-805c-54698f67d8b9",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": false
+      "IsHidden": true
     }
   ],
   "ReservStorageModels": [

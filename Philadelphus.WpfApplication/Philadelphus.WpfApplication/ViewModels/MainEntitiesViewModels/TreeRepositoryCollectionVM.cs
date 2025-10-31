@@ -17,14 +17,15 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 {
-    public class RepositoryCollectionVM : ViewModelBase
+    public class TreeRepositoryCollectionVM : ViewModelBase
     {
-        private TreeRepositoryCollectionService _service = new TreeRepositoryCollectionService();
+        private TreeRepositoryCollectionService _service;
 
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
-        public RepositoryCollectionVM(DataStoragesSettingsVM dataStoragesSettings)
+        public TreeRepositoryCollectionVM(TreeRepositoryCollectionService service, DataStoragesSettingsVM dataStoragesSettings)
         {
+            _service = service;
             _dataStoragesSettingsVM = dataStoragesSettings;
             InitRepositoryCollection();
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
@@ -58,48 +59,6 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             //}
         }
 
-        private ObservableCollection<ITreeRepositoryHeaderModel> _treeRepositoryHeaders;
-        public ObservableCollection<ITreeRepositoryHeaderModel> TreeRepositoryHeaders
-        {
-            get
-            {
-                if (_treeRepositoryHeaders == null)
-                {
-                    var headers = _service.GetTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
-                    _treeRepositoryHeaders = new ObservableCollection<ITreeRepositoryHeaderModel>(headers);
-                }
-                return _treeRepositoryHeaders;
-            }
-        }
-
-        private ObservableCollection<ITreeRepositoryHeaderModel> _favoriteTreeRepositories;
-        public ObservableCollection<ITreeRepositoryHeaderModel> FavoriteTreeRepositories
-        {
-            get
-            {
-                if (_favoriteTreeRepositories == null)
-                {
-                    _favoriteTreeRepositories = new ObservableCollection<ITreeRepositoryHeaderModel>(TreeRepositoryHeaders.Where(x => x.IsFavorite));
-                }
-                return _favoriteTreeRepositories;
-            }
-        }
-
-        private ObservableCollection<ITreeRepositoryHeaderModel> _lastTreeRepositoryHeaders;
-        public ObservableCollection<ITreeRepositoryHeaderModel> LastTreeRepositoryHeaders
-        {
-            get
-            {
-                if (_lastTreeRepositoryHeaders == null)
-                {
-                    _lastTreeRepositoryHeaders = new ObservableCollection<ITreeRepositoryHeaderModel>(TreeRepositoryHeaders.OrderByDescending(x => x.LastOpening).Where(x => DateTime.UtcNow - x.LastOpening <= TimeSpan.FromDays(30)));
-                }
-                return _lastTreeRepositoryHeaders;
-            }
-        }
-
-        private ITreeRepositoryHeaderModel _selectedTreeRepositoryHeader;
-        public ITreeRepositoryHeaderModel SelectedTreeRepositoryHeader { get => _selectedTreeRepositoryHeader; set => _selectedTreeRepositoryHeader = value; }
 
         public List<string> PropertyGridRepresentationsCollection
         {
@@ -150,24 +109,6 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             }
         }
 
-        public RelayCommand OpenMainWindowWithHeader
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var window = new MainWindow(_vm);
-                    window.Show();
-                },
-                ce =>
-                {
-                    if (SelectedTreeRepositoryHeader is TreeRepositoryHeaderModel)
-                        return CheckExistTreeRepositoryByHeader((TreeRepositoryHeaderModel)SelectedTreeRepositoryHeader);
-                    else
-                        return false;
-                });
-            }
-        }
         public RelayCommand AddExistRepository
         {
             get
@@ -203,11 +144,5 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             }
             return true;
         }
-
-        private bool CheckExistTreeRepositoryByHeader(TreeRepositoryHeaderModel header)
-        {
-            _service.
-        }
-
     }
 }
