@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
         public bool IsDisabled { get; set; }
-        public State State { get; set; } = State.Initialized;
+        public State State { get; internal set; } = State.Initialized;
         internal TreeRepositoryHeaderModel() 
         { 
         }

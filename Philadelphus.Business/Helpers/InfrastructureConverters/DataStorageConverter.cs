@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,10 +30,10 @@ namespace Philadelphus.InfrastructureConverters.Converters
             };
             return result;
         }
-        public static IDataStorageModel ToModel(this DataStorage entity, string connectionString)
+        public static IDataStorageModel ToModel(this DataStorage entity, string connectionString, DirectoryInfo directory)
         {
-            IDataStoragesCollectionInfrastructureRepository dataStoragesCollectionInfrastructureRepository = new JsonDataStoragesCollectionInfrastructureRepository(); ;
-            ITreeRepositoryHeadersCollectionInfrastructureRepository treeRepositoryHeadersCollectionInfrastructureRepository = new JsonTreeRepositoryHeadersCollectionInfrastructureRepository();
+            IDataStoragesCollectionInfrastructureRepository dataStoragesCollectionInfrastructureRepository = new JsonDataStoragesCollectionInfrastructureRepository(directory);
+            ITreeRepositoryHeadersCollectionInfrastructureRepository treeRepositoryHeadersCollectionInfrastructureRepository = new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(directory);
             ITreeRepositoriesInfrastructureRepository treeRepositoriesInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
             switch (entity.InfrastructureType)

@@ -19,8 +19,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfMainEntitiesInfrastructureRepository : IMainEntitiesInfrastructureRepository
     {
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntities; }
+
         private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
-        private MainEntitiesPhiladelphusContext GetNewContext() => new MainEntitiesPhiladelphusContext(_connectionString);
 
         private readonly MainEntitiesPhiladelphusContext _context;
         public PostgreEfMainEntitiesInfrastructureRepository(string connectionString)
@@ -44,7 +45,6 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 }
             }
         }
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntities; }
         public bool CheckAvailability()
         {
             if (_context.Database.CanConnect() == false)
@@ -63,6 +63,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             }
             return true;
         }
+        private MainEntitiesPhiladelphusContext GetNewContext() => new MainEntitiesPhiladelphusContext(_connectionString);
 
         #region [ Select ]
 

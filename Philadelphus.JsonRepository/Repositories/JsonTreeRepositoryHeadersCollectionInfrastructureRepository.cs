@@ -14,8 +14,13 @@ namespace Philadelphus.JsonRepository.Repositories
 {
     public class JsonTreeRepositoryHeadersCollectionInfrastructureRepository : ITreeRepositoryHeadersCollectionInfrastructureRepository
     {
-        FileInfo _file = new FileInfo("repository-headers-config.json");
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoryHeadersCollection; }
+
+        private FileInfo _file;
+        public JsonTreeRepositoryHeadersCollectionInfrastructureRepository(DirectoryInfo directory)
+        {
+            _file = new FileInfo(Path.Combine(directory.FullName, "repository-headers-config.json"));
+        }
         public bool CheckAvailability()
         {
             if (_file.Exists == false)
@@ -26,21 +31,60 @@ namespace Philadelphus.JsonRepository.Repositories
         public IEnumerable<TreeRepositoryHeader> SelectRepositoryCollection()
         {
             if (CheckAvailability() == false)
-                return new List<TreeRepositoryHeader>();
-            TreeRepositoryHeadersCollection resultCollection = null;
+                return null;
+
+            List<TreeRepositoryHeader> result = null;
+
             var json = File.ReadAllText(_file.FullName);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true,
             };
-            resultCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options);
-            return resultCollection.TreeRepositoryHeaders ?? throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
+
+            result = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options).TreeRepositoryHeaders;
+
+            if (result == null)
+                throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
+
+            return result;
         }
 
-        public long UpdateRepositoryCollection(IEnumerable<TreeRepositoryHeader> collection)
+        public long UpdateRepository(TreeRepositoryHeader treeRepositoryHeader)
         {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            var json = File.ReadAllText(_file.FullName);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = true,
+            };
+
+            var treeRepositoryHeadersCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options);
+
+            if (treeRepositoryHeadersCollection == null)
+                throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
+
+
+            var index = treeRepositoryHeadersCollection.TreeRepositoryHeaders.FindIndex(x => x.Guid == treeRepositoryHeader.Guid);
+            if (index == null)
+            {
+                treeRepositoryHeadersCollection.TreeRepositoryHeaders.Add(treeRepositoryHeader);
+            }
+            else
+            {
+                treeRepositoryHeadersCollection.TreeRepositoryHeaders[index] = treeRepositoryHeader;
+            }
+
+            json = JsonSerializer.Serialize<TreeRepositoryHeadersCollection>(treeRepositoryHeadersCollection);
+
+            File.WriteAllText(_file.FullName, json);
+
+            return 1;
         }
     }
 }

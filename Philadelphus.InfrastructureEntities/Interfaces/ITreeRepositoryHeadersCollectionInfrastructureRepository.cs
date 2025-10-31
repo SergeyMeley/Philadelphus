@@ -11,6 +11,6 @@ namespace Philadelphus.InfrastructureEntities.Interfaces
     public interface ITreeRepositoryHeadersCollectionInfrastructureRepository : IInfrastructureRepository
     {
         public IEnumerable<TreeRepositoryHeader> SelectRepositoryCollection();
-        public long UpdateRepositoryCollection(IEnumerable<TreeRepositoryHeader> collection);
+        public long UpdateRepository(TreeRepositoryHeader treeRepositoryHeader);
     }
 }

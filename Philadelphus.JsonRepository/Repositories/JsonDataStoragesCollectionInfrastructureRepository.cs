@@ -14,8 +14,13 @@ namespace Philadelphus.JsonRepository.Repositories
 {
     public class JsonDataStoragesCollectionInfrastructureRepository : IDataStoragesCollectionInfrastructureRepository
     {
-        FileInfo _file = new FileInfo("storage-config.json");
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.DataStoragesCollection; }
+
+        private FileInfo _file;
+        public JsonDataStoragesCollectionInfrastructureRepository(DirectoryInfo directory)
+        {
+            _file = new FileInfo(Path.Combine(directory.FullName, "storage-config.json"));
+        }
         public bool CheckAvailability()
         {
             if (_file.Exists == false)

@@ -9,6 +9,7 @@ using Philadelphus.Business.Mapping;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.InfrastructureEntities.OtherEntities;
 using Philadelphus.JsonRepository.Repositories;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace Philadelphus.Business.Services
 
         #region [ Construct ]
 
-        public TreeRepositoryCollectionService()
+        public TreeRepositoryCollectionService(DirectoryInfo configsDirectory)
         {
             //TODO: ВРЕСЕННО, ПЕРЕДЕЛАТЬ ПОЛНОСТЬЮ КОНСТРУКТОР, МАППЕР ПОЛУЧИТЬ ИЗ DI-КОНЕТЕЙНЕРА
             var loggerFactory = LoggerFactory.Create(builder =>
@@ -60,7 +61,7 @@ namespace Philadelphus.Business.Services
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder();
             dataStorageBuilder
                 .SetGeneralParameters(name: "Основное хранилище", description: "Хранилище настроечных файлов в формате Json", Guid.Empty, InfrastructureTypes.JsonDocument, isDisabled: false)
-                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository());
+                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory));
             _mainDataStorageModel = dataStorageBuilder.Build();
         }
 
@@ -146,6 +147,21 @@ namespace Philadelphus.Business.Services
 
         #region [ Save ]
 
+        public long SaveChanges(TreeRepositoryModel treeRepository)
+        {
+            var service = new TreeRepositoryService(treeRepository);
+            long result = 0;
+            result = service.SaveChanges(treeRepository);
+            return result;
+        }
+        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader)
+        {
+            long result = 0;
+            var dbEntity = treeRepositoryHeader.ToDbEntity();
+            result += _mainDataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.UpdateRepository(dbEntity);
+            return result;
+        }
+
         #endregion
 
         #region [ Create + Add ]
@@ -156,21 +172,21 @@ namespace Philadelphus.Business.Services
             //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
             return result;
         }
-        public bool TryCreateTreeRepositoryFromHeader(ITreeRepositoryHeaderModel header, out TreeRepositoryModel outRepositiry)
-        {
-            var dataStorage = DataStorageModels.FirstOrDefault(x => x.Value.Guid == header.OwnDataStorageUuid).Value;
-            var dbTreeRepository = DataTreeRepositories.FirstOrDefault(x => x.Value.Guid == header.Guid).Value.DbEntity;
-            if (dataStorage != null && dbTreeRepository != null)
-            {
-                var result = new TreeRepositoryModel(header.Guid, dataStorage, dbTreeRepository);
-                outRepositiry = result;
-                return true;
+        //public bool TryCreateTreeRepositoryFromHeader(ITreeRepositoryHeaderModel header, out TreeRepositoryModel outTreeRepository)
+        //{
+        //    var dataStorage = DataStorageModels.FirstOrDefault(x => x.Value.Guid == header.OwnDataStorageUuid).Value;
+        //    var dbTreeRepository = DataTreeRepositories.FirstOrDefault(x => x.Value.Guid == header.Guid).Value.DbEntity;
+        //    if (dataStorage != null && dbTreeRepository != null)
+        //    {
+        //        var result = new TreeRepositoryModel(header.Guid, dataStorage, dbTreeRepository);
+        //        outTreeRepository = result;
+        //        return true;
 
-            }
-            //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
-            outRepositiry = null;
-            return false;
-        }
+        //    }
+        //    //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
+        //    outTreeRepository = null;
+        //    return false;
+        //}
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path)
         {
             var result = new List<TreeRepositoryModel>();

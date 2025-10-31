@@ -16,8 +16,9 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 {
     public class PostgreEfTreeRepositoriesInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
     {
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositories; }
+
         private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
-        private TreeRepositoriesPhiladelphusContext GetNewContext() => new TreeRepositoriesPhiladelphusContext(_connectionString);
 
         private TreeRepositoriesPhiladelphusContext _context;
         public PostgreEfTreeRepositoriesInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
@@ -41,7 +42,6 @@ namespace Philadelphus.PostgreEfRepository.Repositories
                 }
             }
         }
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositories; }
         public bool CheckAvailability()
         {
             if (_context.Database.CanConnect() == false)
@@ -60,6 +60,7 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             }
             return true;
         }
+        private TreeRepositoriesPhiladelphusContext GetNewContext() => new TreeRepositoriesPhiladelphusContext(_connectionString);
         public IEnumerable<TreeRepository> SelectRepositories()
         {
             if (CheckAvailability() == false)
