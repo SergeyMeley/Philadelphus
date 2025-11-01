@@ -14,6 +14,8 @@
         <Binding Path="StartWindowVisibility"/>
     </Window.Visibility>
     <Window.Resources>
+        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
+        
         <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
         <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
@@ -179,6 +181,7 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                         <ColumnDefinition Width="auto"></ColumnDefinition>
                                                         <ColumnDefinition Width="auto"></ColumnDefinition>
+                                                        <ColumnDefinition Width="auto"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition></RowDefinition>
@@ -198,11 +201,15 @@
                                                         <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray"></Run>
                                                         <Run Text="{Binding OwnDataStorageUuid, Mode=OneWay}" FontStyle="Italic"></Run>
                                                     </TextBlock>
-                                                    <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="2">
+                                                    <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
+                                                        <Run Text="Доступность:" FontWeight="Light" Foreground="LightSlateGray"></Run>
+                                                        <Run Text="{Binding IsTreeRepositoryAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsTreeRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="3" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
                                                         <Run Text="Последний запуск: " FontWeight="Light" Foreground="LightSlateGray"></Run>
                                                         <Run Text="{Binding LastOpening, Mode=OneWay}"></Run>
                                                     </TextBlock>
-                                                    <ToggleButton Grid.Column="3" Grid.Row="0" Grid.RowSpan="100" IsChecked="{Binding IsFavorite}" ToolTip="Избранное" Margin="2" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <ToggleButton Grid.Column="4" Grid.Row="0" Grid.RowSpan="100" IsChecked="{Binding IsFavorite}" ToolTip="Избранное" Margin="5,2,5,2" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                         <ContentControl>
                                                             <TextBlock Text="☆" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="25"></TextBlock>
                                                         </ContentControl>
