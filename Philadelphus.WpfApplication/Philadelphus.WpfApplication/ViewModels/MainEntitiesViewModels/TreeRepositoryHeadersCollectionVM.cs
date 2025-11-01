@@ -28,7 +28,9 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 };
                 foreach (var header in headers)
                 {
-                    _treeRepositoryHeadersVMs.Add(new TreeRepositoryHeaderVM(_service, header, updateTreeRepositoryHeaders));
+                    var vm = new TreeRepositoryHeaderVM(_service, header, updateTreeRepositoryHeaders);
+                    CheckTreeRepositoryAvailable(vm);
+                    _treeRepositoryHeadersVMs.Add(vm);
                 }
                 return _treeRepositoryHeadersVMs;
             }
@@ -58,7 +60,18 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             set
             {
                 _selectedTreeRepositoryHeaderVM = value;
+                CheckTreeRepositoryAvailable(_selectedTreeRepositoryHeaderVM);
+                OnPropertyChanged(nameof(SelectedTreeRepositoryHeaderVM));
             }
+        }
+
+        public Predicate<TreeRepositoryHeaderVM> CheckTreeRepositoryAvailableAction;
+        public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
+        {
+            if (CheckTreeRepositoryAvailableAction == null)
+                return false;
+            CheckTreeRepositoryAvailableAction.Invoke(header);
+            return header.IsTreeRepositoryAvailable;
         }
 
         public TreeRepositoryHeadersCollectionVM(TreeRepositoryCollectionService service)
