@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -40,6 +41,7 @@ namespace Philadelphus.JsonRepository.Repositories
             {
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
             result = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options).TreeRepositoryHeaders;
@@ -62,6 +64,7 @@ namespace Philadelphus.JsonRepository.Repositories
             {
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
             var treeRepositoryHeadersCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options);
@@ -80,7 +83,7 @@ namespace Philadelphus.JsonRepository.Repositories
                 treeRepositoryHeadersCollection.TreeRepositoryHeaders[index] = treeRepositoryHeader;
             }
 
-            json = JsonSerializer.Serialize<TreeRepositoryHeadersCollection>(treeRepositoryHeadersCollection);
+            json = JsonSerializer.Serialize<TreeRepositoryHeadersCollection>(treeRepositoryHeadersCollection, options);
 
             File.WriteAllText(_file.FullName, json);
 
