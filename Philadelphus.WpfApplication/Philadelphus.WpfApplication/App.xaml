@@ -11,28 +11,30 @@
         <converters:RepresentationToStandardGridVisibilityConverter x:Key="representationToStandardGridVisibilityConverter" />
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
         
-        <Image x:Key="imageAdd" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageBack" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageCopy" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageCut" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_cut.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDelete" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_delete.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDelete2" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_delete2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDuplicate" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_duplicate.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageEmpty" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_empty.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageForward" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLink" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageModify" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imagePaste" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageProtect" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageRemove" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageReturn" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageSave" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageUp" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageAdd" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageBack" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageCopy" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageCut" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_cut.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDelete" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_delete.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDelete2" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_delete2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDuplicate" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_duplicate.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageEmpty" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_empty.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageForward" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLink" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageModify" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageOpen" Source="/Philadelphus.WpfApplication;component/Icons/open.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imagePaste" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageProtect" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRemove" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageReturn" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageSave" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageUp" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
-        <Image x:Key="imageRepository" Source="C:\Users\MeleychukSV\Downloads\icons8_icon_repository.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageRoot" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_root.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNode" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_node.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLeave" Source="C:\Users\MeleychukSV\Downloads\Flaticon_icon_leave.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageStorage" Source="/Philadelphus.WpfApplication;component/Icons/storage.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRepository" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/icons8_icon_repository.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRoot" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_root.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNode" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_node.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLeave" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_leave.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
         <Button x:Key="buttonBack" Content="{StaticResource imageBack}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
         <Button x:Key="buttonCopy" Content="{StaticResource imageCopy}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
@@ -87,7 +89,7 @@
                     <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
                     <Image Height="24" Margin="10,0,10,0">
                         <Image.Source>
-                            <BitmapImage UriSource="C:\Users\MeleychukSV\Downloads\icons8-квадратный-корень-2-64.png" />
+                            <BitmapImage UriSource="/Philadelphus.WpfApplication;component/Icons/without_a_license/icons8-квадратный-корень-2-64.png" />
                         </Image.Source>
                     </Image>
                     <StackPanel Margin="0,2,10,2">

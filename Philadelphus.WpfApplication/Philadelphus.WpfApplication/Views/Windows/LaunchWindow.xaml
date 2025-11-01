@@ -61,16 +61,16 @@
                                 <StackPanel Orientation="Vertical" 
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Height="50"
-                                            Width="70"
+                                            Height="75"
+                                            Width="90"
                                             Margin="5,5">
-                                    <Image Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Width="24" Height="24" 
+                                    <ContentControl Content="{TemplateBinding Tag}"
+                                           Width="45" Height="45" 
                                            Margin="0,5,0,0"/>
                                     <TextBlock Text="{TemplateBinding Header}" 
                                                HorizontalAlignment="Center"
                                                Margin="0,5,0,5"
-                                               FontSize="10"
+                                               FontSize="14"
                                                TextWrapping="Wrap"
                                                TextAlignment="Center"/>
                                 </StackPanel>
@@ -88,7 +88,7 @@
     </Window.Resources>
     <Grid>
         <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
-            <TabItem Header="Главная" Style="{StaticResource LeftVerticalTabItemStyle}">
+            <TabItem Header="Главная" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageRepository}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" MaxHeight="300"></RowDefinition>
@@ -100,6 +100,7 @@
                     <GroupBox Grid.Row="1" Header="Открыть">
                         <Grid>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition></RowDefinition>
@@ -175,35 +176,37 @@
                                                 <Grid Grid.Row="0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
+                                                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                                                        <ColumnDefinition Width="auto"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition></RowDefinition>
                                                         <RowDefinition></RowDefinition>
                                                     </Grid.RowDefinitions>
                                                     <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                        <Run Text="Репозиторий: " FontWeight="Light" Foreground="LightSlateGray"></Run>
+                                                        <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic"></Run>
+                                                        <Run Text="   "></Run>
+                                                        <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray"></Run>
+                                                        <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic"></Run>
                                                     </TextBlock>
                                                     <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
-<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                        <Run Text="Хранилище: " FontWeight="Light" Foreground="LightSlateGray"></Run>
+                                                        <Run Text="{Binding OwnDataStorageName, Mode=OneWay}" FontStyle="Italic"></Run>
+                                                        <Run Text="   "></Run>
+                                                        <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray"></Run>
+                                                        <Run Text="{Binding OwnDataStorageUuid, Mode=OneWay}" FontStyle="Italic"></Run>
                                                     </TextBlock>
-                                                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
-                                                        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Избранное: " FontWeight="Light"></Run>
-                                                        </TextBlock>
-                                                        <CheckBox IsChecked="{Binding IsFavorite}"></CheckBox>
-                                                    </StackPanel>
-                                                    <TextBlock Grid.Column="2" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Последний запуск: '" FontWeight="Light"></Run><Run Text="{Binding LastOpening, Mode=OneWay}"></Run><Run Text="'. "></Run>
+                                                    <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="2">
+                                                        <Run Text="Последний запуск: " FontWeight="Light" Foreground="LightSlateGray"></Run>
+                                                        <Run Text="{Binding LastOpening, Mode=OneWay}"></Run>
                                                     </TextBlock>
+                                                    <ToggleButton Grid.Column="3" Grid.Row="0" Grid.RowSpan="100" IsChecked="{Binding IsFavorite}" ToolTip="Избранное" Margin="2" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <ContentControl>
+                                                            <TextBlock Text="☆" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="25"></TextBlock>
+                                                        </ContentControl>
+                                                    </ToggleButton>
                                                 </Grid>
                                                 <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
                                             </Grid>
@@ -211,13 +214,33 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </GroupBox>
-                            <Button Grid.Row="3" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
+                            <Expander Grid.Row="2" Header="Детальная информация" IsExpanded="True">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
+                                        <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
+                                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                </Grid>
+                            </Expander>
+
+                            <Button Grid.Row="4" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
                         </Grid>
                     </GroupBox>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Создать" Style="{StaticResource LeftVerticalTabItemStyle}">
+            <TabItem Header="Создать" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageAdd}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"></RowDefinition>
@@ -233,11 +256,11 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Открыть" Style="{StaticResource LeftVerticalTabItemStyle}">
+            <TabItem Header="Открыть" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageOpen}">
                 <ctrls:RepositoryOpen></ctrls:RepositoryOpen>
             </TabItem>
 
-            <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}">
+            <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
                 <ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>
             </TabItem>
 

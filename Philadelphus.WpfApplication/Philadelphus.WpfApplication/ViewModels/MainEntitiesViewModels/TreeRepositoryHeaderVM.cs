@@ -137,6 +137,18 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             }
         }
 
+        public TreeRepositoryVM TreeRepositoryVM { get; internal set; }
+
+        public bool IsTreeRepositoryAvailable
+        {
+            get
+            {
+                if (TreeRepositoryVM != null)
+                    return true;
+                return false;
+            }
+        }
+
         #endregion
 
         #region [ Construct ]

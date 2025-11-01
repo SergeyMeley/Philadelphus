@@ -1,4 +1,7 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Services;
+using Philadelphus.InfrastructureEntities.OtherEntities;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.Views;
 using Philadelphus.WpfApplication.Views.Windows;
@@ -6,7 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Timers;
+using System.Windows;
+using Timers = System.Timers;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -28,6 +33,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             OpenRepositoryCreationWindowCommand = openRepositoryCreationWindowCommand;
             OpenMainWindowCommand = openMainWindowCommand;
+            StartCheckingTreeRepositoriesAvailable();
         }
         public RelayCommand OpenRepositoryCreationWindowCommand { get; }
         public RelayCommand OpenMainWindowCommand { get; }
@@ -37,9 +43,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var result = GetTreeRepositoryByHeader(_repositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, out TreeRepositoryVM model);
-                    RepositoryCollectionVM.TreeRepositoriesVMs.Add(model);
-                    RepositoryCollectionVM.CurrentRepositoryExplorerVM = model;
+                    RepositoryCollectionVM.TreeRepositoriesVMs.Add(RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM.TreeRepositoryVM);
+                    RepositoryCollectionVM.CurrentRepositoryExplorerVM = RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM.TreeRepositoryVM;
                     var command = OpenMainWindowCommand;
                 },
                 ce =>
@@ -50,29 +55,46 @@ namespace Philadelphus.WpfApplication.ViewModels
                         return false;
                     if (RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM is TreeRepositoryHeaderModel == false)
                         return false;
-                    return GetTreeRepositoryByHeader(_repositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, out TreeRepositoryVM model);
+                    return RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM.IsTreeRepositoryAvailable;
                 });
             }
         }
 
-        private bool GetTreeRepositoryByHeader(TreeRepositoryHeaderVM treeRepositoryHeaderVM, out TreeRepositoryVM outTreeRepositoryVM)
+        private void StartCheckingTreeRepositoriesAvailable()
         {
-            if (DataStoragesSettingsVM == null)
-                throw new NullReferenceException("Не инициализирована модель представления настроек хранилищ данных.");
-            if (DataStoragesSettingsVM.DataStorageVMs == null)
-                throw new NullReferenceException("Не инициализированы модели представлений хранилищ данных.");
-
-            var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage).FirstOrDefault(x => x.Guid == treeRepositoryHeaderVM.OwnDataStorageUuid);
-            if (dataStorage == null)
-                throw new NullReferenceException("Отсутствует подходящее хранилище данных.");
-
-            outTreeRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == treeRepositoryHeaderVM.Guid);
-
-            if (outTreeRepositoryVM != null)
-                return true;
-
-            return false;
+            Timers.Timer timer = new Timers.Timer(5000);
+            timer.Elapsed += CheckTreeRepositoriesAvailable;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+            timer.Start();
         }
 
+        private void CheckTreeRepositoriesAvailable(object? sender, ElapsedEventArgs e)
+        {
+            foreach (var header in RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs)
+            {
+                if (DataStoragesSettingsVM == null)
+                    throw new NullReferenceException("Не инициализирована модель представления настроек хранилищ данных.");
+                if (DataStoragesSettingsVM.DataStorageVMs == null)
+                    throw new NullReferenceException("Не инициализированы модели представлений хранилищ данных.");
+
+                var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage).FirstOrDefault(x => x.Guid == header.OwnDataStorageUuid);
+                if (dataStorage == null)
+                {
+                    //var text = $"Не найдено хранилище данных {header.OwnDataStorageName} [{header.OwnDataStorageUuid}] для заголовка репозитория {header.Name} [{header.Guid}]";
+                    //NotificationService.SendNotification(text, NotificationCriticalLevelModel.Warning, NotificationTypesModel.TextMessage);
+                    return;
+                }
+
+                var treeRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == header.Guid);
+
+                RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM.TreeRepositoryVM = treeRepositoryVM;
+
+                if (treeRepositoryVM != null)
+                {
+                    RepositoryCollectionVM.CurrentRepositoryExplorerVM = treeRepositoryVM;
+                }
+            }
+        }
     }
 }
