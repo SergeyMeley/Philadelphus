@@ -17,20 +17,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 if (_treeRepositoryHeadersVMs == null)
                 {
                     _treeRepositoryHeadersVMs = new List<TreeRepositoryHeaderVM>();
-                }
-                _treeRepositoryHeadersVMs.Clear();
-                var headers = _service.GetTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
-                Action updateTreeRepositoryHeaders = () =>
-                {
-                    OnPropertyChanged(nameof(TreeRepositoryHeadersVMs));
-                    OnPropertyChanged(nameof(FavoriteTreeRepositoryHeadersVMs));
-                    OnPropertyChanged(nameof(LastTreeRepositoryHeadersVMs));
-                };
-                foreach (var header in headers)
-                {
-                    var vm = new TreeRepositoryHeaderVM(_service, header, updateTreeRepositoryHeaders);
-                    CheckTreeRepositoryAvailable(vm);
-                    _treeRepositoryHeadersVMs.Add(vm);
+                    LoadTreeRepositoryHeadersVMs();
                 }
                 return _treeRepositoryHeadersVMs;
             }
@@ -80,6 +67,24 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public TreeRepositoryHeadersCollectionVM(TreeRepositoryCollectionService service)
         {
             _service = service;
+        }
+        private List<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs()
+        {
+            _treeRepositoryHeadersVMs.Clear();
+            var headers = _service.GetTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
+            Action updateTreeRepositoryHeaders = () =>
+            {
+                OnPropertyChanged(nameof(TreeRepositoryHeadersVMs));
+                OnPropertyChanged(nameof(FavoriteTreeRepositoryHeadersVMs));
+                OnPropertyChanged(nameof(LastTreeRepositoryHeadersVMs));
+            };
+            foreach (var header in headers)
+            {
+                var vm = new TreeRepositoryHeaderVM(_service, header, updateTreeRepositoryHeaders);
+                CheckTreeRepositoryAvailable(vm);
+                _treeRepositoryHeadersVMs.Add(vm);
+            }
+            return TreeRepositoryHeadersVMs;
         }
 
     }
