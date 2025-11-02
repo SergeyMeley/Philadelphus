@@ -19,7 +19,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public Guid OwnDataStorageUuid { get; set; }
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
-        public bool IsDisabled { get; set; }
+        public bool IsHidden { get; set; }
         public State State { get; internal set; } = State.Initialized;
         internal TreeRepositoryHeaderModel() 
         { 
