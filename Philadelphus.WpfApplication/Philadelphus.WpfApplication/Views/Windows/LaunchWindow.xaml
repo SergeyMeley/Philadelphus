@@ -4,7 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Windows"
+        xmlns:lbs="clr-namespace:Philadelphus.WpfApplication.Views.Controls.CollectionControls.ListBoxes"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+        xmlns:detail="clr-namespace:Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids"
         xmlns:converters="clr-namespace:Philadelphus.WpfApplication.Converters"
         mc:Ignorable="d"
         Title="Выбор репозитория"
@@ -15,7 +17,7 @@
     </Window.Visibility>
     <Window.Resources>
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
-        
+
         <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
         <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
@@ -109,167 +111,13 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <GroupBox Grid.Row="0" Header="Избранные">
-                                <ListBox DataContext="{Binding RepositoryHeadersCollectionVM}" ItemsSource="{Binding FavoriteTreeRepositoryHeadersVMs}" SelectedItem="{Binding SelectedTreeRepositoryHeaderVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
-                                    <ListBox.ItemContainerStyle>
-                                        <Style TargetType="ListBoxItem">
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                                        </Style>
-                                    </ListBox.ItemContainerStyle>
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition></RowDefinition>
-                                                    <RowDefinition></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition></RowDefinition>
-                                                        <RowDefinition></RowDefinition>
-                                                    </Grid.RowDefinitions>
-                                                    <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
-<Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorageName, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
-                                                        <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Избранное: " FontWeight="Light"></Run>
-                                                        </TextBlock>
-                                                        <CheckBox IsChecked="{Binding IsFavorite}"></CheckBox>
-                                                    </StackPanel>
-                                                    <TextBlock Grid.Column="2" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-<Run Text="Последний запуск: '" FontWeight="Light"></Run><Run Text="{Binding LastOpening, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                                    </TextBlock>
-                                                </Grid>
-                                                <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
+                                <lbs:RepositoryHeadersListBox ItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs}" SelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
                             </GroupBox>
                             <GroupBox Grid.Row="1" Header="Недавние">
-                                <ListBox DataContext="{Binding RepositoryHeadersCollectionVM}" ItemsSource="{Binding LastTreeRepositoryHeadersVMs}" SelectedItem="{Binding SelectedTreeRepositoryHeaderVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
-                                    <ListBox.ItemContainerStyle>
-                                        <Style TargetType="ListBoxItem">
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                                        </Style>
-                                    </ListBox.ItemContainerStyle>
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition></RowDefinition>
-                                                    <RowDefinition></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                                        <ColumnDefinition Width="auto"></ColumnDefinition>
-                                                        <ColumnDefinition Width="auto"></ColumnDefinition>
-                                                        <ColumnDefinition Width="auto"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition></RowDefinition>
-                                                        <RowDefinition></RowDefinition>
-                                                    </Grid.RowDefinitions>
-                                                    <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                                        <Run Text="Репозиторий: " FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic"></Run>
-                                                        <Run Text="   "></Run>
-                                                        <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic"></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-                                                        <Run Text="Хранилище: " FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding OwnDataStorageName, Mode=OneWay}" FontStyle="Italic"></Run>
-                                                        <Run Text="   "></Run>
-                                                        <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding OwnDataStorageUuid, Mode=OneWay}" FontStyle="Italic"></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
-                                                        <Run Text="Доступность:" FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding IsTreeRepositoryAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsTreeRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run>
-                                                    </TextBlock>
-                                                    <TextBlock Grid.Column="3" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
-                                                        <Run Text="Последний запуск: " FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding LastOpening, Mode=OneWay}"></Run>
-                                                    </TextBlock>
-                                                    <ToggleButton Grid.Column="4" Grid.Row="0" Grid.RowSpan="100" IsChecked="{Binding IsFavorite}" ToolTip="Избранное" Margin="5,2,5,2" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                        <ContentControl>
-                                                            <TextBlock Text="☆" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="25"></TextBlock>
-                                                        </ContentControl>
-                                                    </ToggleButton>
-                                                </Grid>
-                                                <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
+                                <lbs:RepositoryHeadersListBox ItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs}" SelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
                             </GroupBox>
                             <Expander Grid.Row="2" Header="Детальная информация" IsExpanded="True">
-                                <Grid DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
-                                        <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
-                                        <ColumnDefinition Width="auto"></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Text="Заголовок репозитория:" FontWeight="Bold" Margin="2"></TextBlock>
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" IsReadOnly="True" Margin="2"></TextBox>
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" IsReadOnly="True" Margin="2"></TextBox>
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Guid" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Guid}" IsReadOnly="True" Margin="2"></TextBox>
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsTreeRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsTreeRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}" IsReadOnly="True" Margin="2"></TextBox>
-                                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="100" Text="Хранилище:" FontWeight="Bold" Margin="2"></TextBlock>
-                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding OwnDataStorageName}" IsReadOnly="True" Margin="2"></TextBox>
-                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Guid" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding OwnDataStorageUuid}" IsReadOnly="True" Margin="2"></TextBox>
-
-                                    <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="100" Text="Локальная информация:" FontWeight="Bold" Margin="2"></TextBlock>
-                                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Последнее открытие" Margin="2"></TextBlock>
-                                    <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding LastOpening}" IsReadOnly="True" Margin="2"></TextBox>
-                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Избранное" Margin="2"></TextBlock>
-                                    <CheckBox Grid.Row="10" Grid.Column="1" IsChecked="{Binding IsFavorite}" Margin="2"></CheckBox>
-                                    <TextBlock Grid.Row="11" Grid.Column="0" Text="Скрытый" Margin="2"></TextBlock>
-                                    <CheckBox Grid.Row="11" Grid.Column="1" IsChecked="{Binding IsHidden}" Margin="2"></CheckBox>
-
-                                </Grid>
+                                <detail:RepositoryHeaderDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}"></detail:RepositoryHeaderDetails>
                             </Expander>
 
                             <Button Grid.Row="4" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
