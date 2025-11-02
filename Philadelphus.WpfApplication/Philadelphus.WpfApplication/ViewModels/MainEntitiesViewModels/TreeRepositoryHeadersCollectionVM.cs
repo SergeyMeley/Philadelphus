@@ -33,7 +33,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         {
             get
             {
-                return TreeRepositoryHeadersVMs.OrderByDescending(x => x.LastOpening).Where(x => DateTime.UtcNow - x.LastOpening <= TimeSpan.FromDays(30)).ToList();
+                return TreeRepositoryHeadersVMs.OrderByDescending(x => x.LastOpening).Where(x => DateTime.UtcNow - x.LastOpening <= TimeSpan.FromDays(90)).ToList();
             }
         }
 
