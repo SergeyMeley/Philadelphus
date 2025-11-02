@@ -60,7 +60,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             set
             {
                 _selectedTreeRepositoryHeaderVM = value;
-                CheckTreeRepositoryAvailable(_selectedTreeRepositoryHeaderVM);
+                if (_selectedTreeRepositoryHeaderVM != null)
+                    CheckTreeRepositoryAvailable(_selectedTreeRepositoryHeaderVM);
                 OnPropertyChanged(nameof(SelectedTreeRepositoryHeaderVM));
             }
         }
@@ -68,6 +69,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public Predicate<TreeRepositoryHeaderVM> CheckTreeRepositoryAvailableAction;
         public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
         {
+            if (header == null)
+                return false;
             if (CheckTreeRepositoryAvailableAction == null)
                 return false;
             CheckTreeRepositoryAvailableAction.Invoke(header);

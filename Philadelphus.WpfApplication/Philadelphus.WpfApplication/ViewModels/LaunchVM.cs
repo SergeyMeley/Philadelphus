@@ -68,6 +68,8 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
         {
+            if (header == null)
+                return false;
             if (DataStoragesSettingsVM == null)
                 throw new NullReferenceException("Не инициализирована модель представления настроек хранилищ данных.");
             if (DataStoragesSettingsVM.DataStorageVMs == null)

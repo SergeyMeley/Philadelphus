@@ -116,17 +116,17 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 OnPropertyChanged(nameof(IsFavorite));
             }
         }
-        public bool IsDisabled
+        public bool IsHidden
         {
             get
             {
-                return _model.IsDisabled;
+                return _model.IsHidden;
             }
             set
             {
-                _model.IsDisabled = value;
+                _model.IsHidden = value;
                 SaveRepositoryHeader();
-                OnPropertyChanged(nameof(IsDisabled));
+                OnPropertyChanged(nameof(IsHidden));
             }
         }
         public State State
