@@ -1,4 +1,5 @@
-﻿using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
+﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
+using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
@@ -27,6 +28,18 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
+                    var currentRepositoryVM = ApplicationVM.LaunchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM;
+                    if (currentRepositoryVM != null)
+                    {
+                        var headerVM = ApplicationVM.LaunchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Guid == currentRepositoryVM.Guid);
+                        if (headerVM == null)
+                        {
+                            headerVM = ApplicationVM.LaunchVM.RepositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(currentRepositoryVM);
+                            
+                        }
+                        headerVM.LastOpening = DateTime.UtcNow;
+                    }
+                    
                     if (_applicationWindowsVM.MainWindow == null)
                         _applicationWindowsVM.MainWindow = new MainWindow(_applicationVM);
                     _applicationWindowsVM.MainWindow.Show();

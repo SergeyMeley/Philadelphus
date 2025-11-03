@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Windows;
+using System.Xml.Linq;
 using Timers = System.Timers;
 
 namespace Philadelphus.WpfApplication.ViewModels
@@ -39,6 +40,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         public RelayCommand OpenRepositoryCreationWindowCommand { get; }
 
         private RelayCommand _openMainWindowCommand;
+        public RelayCommand OpenMainWindowCommand { get => _openMainWindowCommand; }
         public RelayCommand OpenMainWindowWithHeaderCommand
         {
             get
@@ -89,10 +91,14 @@ namespace Philadelphus.WpfApplication.ViewModels
             if (treeRepositoryVM != null)
             {
                 header.IsTreeRepositoryAvailable = true;
-                header.Name = treeRepositoryVM.Name;
-                header.Description = treeRepositoryVM.Description;
-                header.OwnDataStorageName = treeRepositoryVM.OwnDataStorage.Name;
-                header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Guid;
+                if (header.Name != treeRepositoryVM.Name)
+                    header.Name = treeRepositoryVM.Name;
+                if (header.Description != treeRepositoryVM.Description)
+                    header.Description = treeRepositoryVM.Description;
+                if (header.OwnDataStorageName != treeRepositoryVM.OwnDataStorage.Name)
+                    header.OwnDataStorageName = treeRepositoryVM.OwnDataStorage.Name;
+                if (header.OwnDataStorageUuid != treeRepositoryVM.OwnDataStorage.Guid)
+                    header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Guid;
                 return true;
             }
             else

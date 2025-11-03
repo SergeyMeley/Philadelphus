@@ -25,13 +25,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         private readonly TreeRepositoryService _service;
 
         private readonly TreeRepositoryModel _model;
-        //public TreeRepositoryModel TreeRepository 
-        //{ 
-        //    get
-        //    {
-        //        return _model;
-        //    }
-        //}
+        public TreeRepositoryModel TreeRepositoryModel
+        {
+            get
+            {
+                return _model;
+            }
+        }
 
         public Guid Guid { get => _model.Guid; }
         public string Name { get => _model.Name; set => _model.Name = value; }
