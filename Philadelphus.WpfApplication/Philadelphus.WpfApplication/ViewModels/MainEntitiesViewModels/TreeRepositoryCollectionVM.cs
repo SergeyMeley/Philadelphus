@@ -27,7 +27,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         {
             _service = service;
             _dataStoragesSettingsVM = dataStoragesSettings;
-            InitRepositoryCollection();
+            InitRepositoriesVMsCollection();
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
         private static TreeRepositoryVM _currentRepositoryExplorerVM;
@@ -134,15 +134,40 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 });
             }
         }
-        private bool InitRepositoryCollection()
+        private bool InitRepositoriesVMsCollection()
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
-            var repositories = _service.LoadTreeRepositoriesCollection(storages);
+            var repositories = _service.GetTreeRepositoriesCollection(storages);
+            if (repositories == null)
+                return false;
             foreach (var item in repositories)
             {
                 _treeRepositoriesVMs.Add(new TreeRepositoryVM(item));
             }
             return true;
+        }
+        internal bool CheckTreeRepositoryVMAvailable(Guid guid, out TreeRepositoryVM outTreeRepositoryVM)
+        {
+            outTreeRepositoryVM = TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == guid);
+            if (outTreeRepositoryVM != null && outTreeRepositoryVM.OwnDataStorage.IsAvailable == true)
+                return true;
+            outTreeRepositoryVM = InitTreeRepositoryVM(guid);
+            if (outTreeRepositoryVM != null && outTreeRepositoryVM.OwnDataStorage.IsAvailable == true)
+                return true;
+            return false;
+        }
+        private TreeRepositoryVM InitTreeRepositoryVM(Guid guid)
+        {
+            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
+            var repositories = _service.GetTreeRepositoriesCollection(storages, new[] { guid });
+            if (repositories == null)
+                return null;
+            var repository = repositories.FirstOrDefault(x => x.Guid == guid);
+            if (repository == null)
+                return null;
+            var result = new TreeRepositoryVM(repository);
+            _treeRepositoriesVMs.Add(result);
+            return result;
         }
     }
 }

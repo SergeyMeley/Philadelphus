@@ -83,7 +83,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         private List<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs()
         {
             _treeRepositoryHeadersVMs.Clear();
-            var headers = _service.GetTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
+            var headers = _service.ForceLoadTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
             
             foreach (var header in headers)
             {

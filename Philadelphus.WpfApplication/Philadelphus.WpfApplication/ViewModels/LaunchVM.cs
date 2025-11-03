@@ -86,20 +86,22 @@ namespace Philadelphus.WpfApplication.ViewModels
             //    return false;
             //}
 
-            var treeRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == header.Guid);
-
-            if (treeRepositoryVM != null)
+            if (RepositoryCollectionVM.CheckTreeRepositoryVMAvailable(header.Guid, out var treeRepositoryVM))
             {
-                header.IsTreeRepositoryAvailable = true;
-                if (header.Name != treeRepositoryVM.Name)
-                    header.Name = treeRepositoryVM.Name;
-                if (header.Description != treeRepositoryVM.Description)
-                    header.Description = treeRepositoryVM.Description;
-                if (header.OwnDataStorageName != treeRepositoryVM.OwnDataStorage.Name)
-                    header.OwnDataStorageName = treeRepositoryVM.OwnDataStorage.Name;
-                if (header.OwnDataStorageUuid != treeRepositoryVM.OwnDataStorage.Guid)
-                    header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Guid;
-                return true;
+                if (treeRepositoryVM != null)
+                {
+                    header.IsTreeRepositoryAvailable = true;
+                    if (header.Name != treeRepositoryVM.Name)
+                        header.Name = treeRepositoryVM.Name;
+                    if (header.Description != treeRepositoryVM.Description)
+                        header.Description = treeRepositoryVM.Description;
+                    if (header.OwnDataStorageName != treeRepositoryVM.OwnDataStorage.Name)
+                        header.OwnDataStorageName = treeRepositoryVM.OwnDataStorage.Name;
+                    if (header.OwnDataStorageUuid != treeRepositoryVM.OwnDataStorage.Guid)
+                        header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Guid;
+                    return true;
+                }
+                return false;
             }
             else
             {
