@@ -114,11 +114,20 @@ namespace Philadelphus.Business.Services
         /// Получение из настроечного файла коллекции заголовков репозиториев, являющихся избранными или последними запускаемыми.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TreeRepositoryHeaderModel> GetTreeRepositoryHeadersCollection()
+        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection()
         {
             return _mainDataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.SelectRepositoryCollection().ToModelCollection();
         }
-        public IEnumerable<TreeRepositoryModel> LoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages)
+        public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null)
+        {
+            IEnumerable<TreeRepositoryModel> result = DataTreeRepositories.Values;
+            if (result == null || result?.Count() == 0)
+            {
+                result = ForceLoadTreeRepositoriesCollection(dataStorages, guids);
+            }
+            return result;
+        }
+        public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null)
         {
             var result = new List<TreeRepositoryModel>();
             foreach (var dataStorage in dataStorages)
@@ -127,7 +136,11 @@ namespace Philadelphus.Business.Services
                 if (infrastructure.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
                     && dataStorage.IsAvailable)
                 {
-                    var dbRepositories = infrastructure.SelectRepositories();
+                    IEnumerable<TreeRepository> dbRepositories = null;
+                    if (guids == null)
+                        dbRepositories = infrastructure.SelectRepositories();
+                    else
+                        dbRepositories = infrastructure.SelectRepositories(guids);
                     //var repositories = _mapper.Map<List<TreeRepositoryModel>>(dbRepositories);
                     var repositories = dbRepositories?.ToModelCollection(dataStorages);
                     if (repositories != null)

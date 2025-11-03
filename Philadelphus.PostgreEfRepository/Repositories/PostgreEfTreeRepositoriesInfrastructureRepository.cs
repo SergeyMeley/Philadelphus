@@ -75,6 +75,24 @@ namespace Philadelphus.PostgreEfRepository.Repositories
 
             return result;
         }
+        public IEnumerable<TreeRepository> SelectRepositories(Guid[] guids)
+        {
+            if (CheckAvailability() == false)
+                return null;
+
+            List<TreeRepository> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.Repositories.Where(x =>
+                x.AuditInfo.IsDeleted == false
+                && guids.Contains(x.Guid)
+                ).ToList();
+            }
+
+            return result;
+        }
+
         public long InsertRepository(TreeRepository item)
         {
             if (CheckAvailability() == false)
