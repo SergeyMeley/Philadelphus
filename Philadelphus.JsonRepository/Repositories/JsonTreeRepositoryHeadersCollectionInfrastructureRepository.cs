@@ -74,7 +74,7 @@ namespace Philadelphus.JsonRepository.Repositories
 
 
             var index = treeRepositoryHeadersCollection.TreeRepositoryHeaders.FindIndex(x => x.Guid == treeRepositoryHeader.Guid);
-            if (index == null)
+            if (index == null || index == -1)
             {
                 treeRepositoryHeadersCollection.TreeRepositoryHeaders.Add(treeRepositoryHeader);
             }

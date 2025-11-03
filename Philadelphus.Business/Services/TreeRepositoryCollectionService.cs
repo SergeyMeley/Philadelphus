@@ -187,6 +187,18 @@ namespace Philadelphus.Business.Services
         //    outTreeRepository = null;
         //    return false;
         //}
+        public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel)
+        {
+            var result = new TreeRepositoryHeaderModel();
+            result.Guid = treeRepositoryModel.Guid;
+            result.Name = treeRepositoryModel.Name;
+            result.Description = treeRepositoryModel.Description;
+            result.OwnDataStorageName = treeRepositoryModel.OwnDataStorageName;
+            result.OwnDataStorageUuid = treeRepositoryModel.OwnDataStorageUuid;
+            result.IsFavorite = treeRepositoryModel.IsFavorite;
+            result.State = treeRepositoryModel.State;
+            return result;
+        }
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path)
         {
             var result = new List<TreeRepositoryModel>();
