@@ -39,6 +39,20 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public AuditInfoModel AuditInfo { get => _model.AuditInfo; }
         public State State { get => _model.State; }
         public IDataStorageModel OwnDataStorage { get => _model.OwnDataStorage; }
+        public string OwnDataStorageName
+        {
+            get
+            {
+                return _model.OwnDataStorageName;
+            }
+        }
+        public Guid OwnDataStorageUuid
+        {
+            get
+            {
+                return _model.OwnDataStorageUuid;
+            }
+        }
 
         private ObservableCollection<IDataStorageModel> _dataStorages { get; }
         public ObservableCollection<IDataStorageModel> DataStorages { get => _dataStorages; }

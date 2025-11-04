@@ -35,22 +35,22 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Text="Заголовок репозитория:" FontWeight="Bold" Margin="2"></TextBlock>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Guid" Margin="2"></TextBlock>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Guid}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Guid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" Margin="2"></TextBlock>
         <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsTreeRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsTreeRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="100" Text="Хранилище:" FontWeight="Bold" Margin="2"></TextBlock>
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
-        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding OwnDataStorageName}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding OwnDataStorageName, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="7" Grid.Column="0" Text="Guid" Margin="2"></TextBlock>
-        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding OwnDataStorageUuid}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding OwnDataStorageUuid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
 
         <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="100" Text="Локальная информация:" FontWeight="Bold" Margin="2"></TextBlock>
         <TextBlock Grid.Row="9" Grid.Column="0" Text="Последнее открытие" Margin="2"></TextBlock>
-        <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding LastOpening}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding LastOpening, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="10" Grid.Column="0" Text="Избранное" Margin="2"></TextBlock>
         <CheckBox Grid.Row="10" Grid.Column="1" IsChecked="{Binding IsFavorite}" Margin="2"></CheckBox>
         <TextBlock Grid.Row="11" Grid.Column="0" Text="Скрытый" Margin="2"></TextBlock>

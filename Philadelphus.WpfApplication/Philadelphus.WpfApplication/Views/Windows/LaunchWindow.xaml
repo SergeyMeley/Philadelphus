@@ -95,41 +95,19 @@
             <TabItem Header="Главная" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageRepository}">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="auto" MaxHeight="300"></RowDefinition>
                         <RowDefinition Height="4*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Header="Создать">
+                    <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" Margin="10">
+                        <Run Text="Здравствуйте, "></Run><Run Text="{Binding UserName, Mode=OneWay}" FontWeight="Bold"></Run><Run Text="!"></Run>
+                        <Run Text="Выберите репозиторий для начала работы или создайте новый"></Run>
+                    </TextBlock>
+                    <GroupBox Grid.Row="1" Header="Создать">
                         <ctrls:RepositoryCreation></ctrls:RepositoryCreation>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Header="Открыть">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="2*"></RowDefinition>
-                                <RowDefinition Height="auto"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition Width="auto"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <GroupBox Grid.Row="0" Header="Избранные">
-                                <lbs:RepositoryHeadersListBox ItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs}" SelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
-                            </GroupBox>
-                            <GroupBox Grid.Row="1" Header="Недавние">
-                                <lbs:RepositoryHeadersListBox ItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs}" SelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
-                            </GroupBox>
-                            <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" IsExpanded="False" ExpandDirection="Right">
-                                <Expander.Header>
-                                    <TextBlock Text="Детальная информация">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="-90"/>
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
-                                </Expander.Header>
-                                <detail:RepositoryHeaderDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:RepositoryHeaderDetails>
-                            </Expander>
-                            <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
-                        </Grid>
+                    <GroupBox Grid.Row="2" Header="Открыть">
+                        <ctrls:FavoriteAndLastRepositoryHeaders></ctrls:FavoriteAndLastRepositoryHeaders>
                     </GroupBox>
                 </Grid>
             </TabItem>
@@ -156,72 +134,6 @@
 
             <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
                 <ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>
-            </TabItem>
-
-            <TabItem Header="OLD" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="3*"></RowDefinition>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
-                        <Run Text="Здравствуйте, "></Run>
-                        <Run Text="{Binding UserName, Mode=OneWay}"></Run>
-                        <Run Text="! "></Run>
-                        <Run Text="Выберите репозиторий для начала работы"></Run>
-                    </TextBlock>
-                    <GroupBox Grid.Row="1" Header="Заголовки репозиториев">
-                        <ListBox DataContext="{Binding RepositoryCollectionVM}" ItemsSource="{Binding TreeRepositoriesVMs}" SelectedItem="{Binding CurrentRepositoryExplorerVM}" Margin="2" BorderBrush="LightGray" BorderThickness="1">
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <Grid Grid.Row="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                                <ColumnDefinition Width="*" MinWidth="300"></ColumnDefinition>
-                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                                <Run Text="Наименование: '" FontWeight="Light"></Run><Run Text="{Binding Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                            </TextBlock>
-                                            <TextBlock Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                                <Run Text="Описание: '" FontWeight="Light"></Run><Run Text="{Binding Description, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                            </TextBlock>
-                                            <TextBlock Grid.Column="2" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
-                                                <Run Text="UUID: '" FontWeight="Light"></Run><Run Text="{Binding Guid, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                            </TextBlock>
-                                            <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-                                                <Run Text="Хранилище: '" FontWeight="Light"></Run><Run Text="{Binding OwnDataStorage.Name, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                            </TextBlock>
-                                            <TextBlock Grid.Column="1" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
-                                                <Run Text="Количество корней: '" FontWeight="Light"></Run><Run Text="{Binding ChildsCount, Mode=OneWay}"></Run><Run Text="'. "></Run>
-                                            </TextBlock>
-                                        </Grid>
-                                        <Rectangle Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Fill="Gray" Height="1"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </GroupBox>
-                    <Button Grid.Row="2" Content="Создать новый репозиторий" Height="30" Command="{Binding OpenRepositoryCreationWindowCommand}" Margin="2"></Button>
-                    <Button Grid.Row="4" Content="Начать!" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>
-                </Grid>
             </TabItem>
         </TabControl>
     </Grid>
