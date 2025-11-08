@@ -2,8 +2,9 @@
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
+using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -245,7 +246,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                         NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
                     }
-                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IContentOwnerModel)) == false)
+                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IAttributeOwnerModel)) == false)
                         return;
                     //_service.CreateElementAttribute(_selectedRepositoryMember);
                     OnPropertyChanged(nameof(State));

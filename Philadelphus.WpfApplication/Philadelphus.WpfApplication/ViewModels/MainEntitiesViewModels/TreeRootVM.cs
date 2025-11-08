@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;

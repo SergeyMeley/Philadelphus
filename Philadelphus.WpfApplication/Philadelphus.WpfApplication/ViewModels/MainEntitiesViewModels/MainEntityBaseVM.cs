@@ -21,7 +21,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public string Alias { get => _mainEntityBaseModel.Alias; set => _mainEntityBaseModel.Alias = value; }
         public string CustomCode { get => _mainEntityBaseModel.CustomCode; set => _mainEntityBaseModel.CustomCode = value; }
         public string Description { get => _mainEntityBaseModel.Description; set => _mainEntityBaseModel.Description = value; }
-        public bool HasContent { get => _mainEntityBaseModel.HasContent; }
+        public bool HasContent { get => _mainEntityBaseModel.HasAttributes; }
         public bool IsOriginal { get => _mainEntityBaseModel.IsOriginal; set => _mainEntityBaseModel.IsOriginal = value; }
         public bool IsLegacy { get => _mainEntityBaseModel.IsLegacy; set => _mainEntityBaseModel.IsLegacy = value; }
         public AuditInfoModel AuditInfo { get => _mainEntityBaseModel.AuditInfo; }
