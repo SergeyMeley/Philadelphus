@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements.Interfaces
+namespace Philadelphus.Business.Interfaces
 {
     public interface ITreeRepositoryHeaderModel
     {

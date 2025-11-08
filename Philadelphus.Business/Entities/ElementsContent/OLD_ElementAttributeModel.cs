@@ -2,6 +2,7 @@
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -11,7 +12,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
+namespace Philadelphus.Business.Entities.ElementsContent
 {
     /// <summary>
     /// OLD

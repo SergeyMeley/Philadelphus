@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+﻿using Philadelphus.Business.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements
+namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
 {
-    public class MainEntitiesCollectionModel : IEnumerable<IMainEntityModel>, ICollection<IMainEntityModel>
+    public class RepositoryMembersCollectionModel : IEnumerable<IMainEntityModel>, ICollection<IMainEntityModel>
     {
         private List<TreeRootModel> _dataTreeRoots = new List<TreeRootModel>();
         public List<TreeRootModel> DataTreeRoots { get => _dataTreeRoots; private set => _dataTreeRoots = value; }

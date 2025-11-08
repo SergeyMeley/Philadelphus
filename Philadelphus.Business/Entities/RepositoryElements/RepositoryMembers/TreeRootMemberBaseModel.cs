@@ -1,5 +1,5 @@
 ﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements
+namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
 {
     public abstract class TreeRootMemberBaseModel : TreeRepositoryMemberBaseModel, ITreeRootMemberModel
     {

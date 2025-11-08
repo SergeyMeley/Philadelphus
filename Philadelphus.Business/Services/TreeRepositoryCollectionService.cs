@@ -4,6 +4,7 @@ using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.Business.Mapping;
 using Philadelphus.InfrastructureEntities.Enums;

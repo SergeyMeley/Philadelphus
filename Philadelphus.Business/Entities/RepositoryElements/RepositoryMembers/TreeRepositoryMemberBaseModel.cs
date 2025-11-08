@@ -1,15 +1,15 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Philadelphus.Business.Entities.ElementsContent;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
+using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System.Collections.Generic;
 
-namespace Philadelphus.Business.Entities.RepositoryElements
+namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
 {
-    public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IContentOwnerModel, IChildrenModel, ITypedModel, ISequencableModel
+    public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IAttributeOwnerModel, IChildrenModel, ITypedModel, ISequencableModel
     {
         protected override string DefaultFixedPartOfName { get => "Новый член репозитория"; }
         public IParentModel Parent { get; protected set; }

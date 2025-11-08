@@ -3,8 +3,9 @@ using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
+using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -15,21 +16,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent
+namespace Philadelphus.Business.Entities.ElementsContent
 {
-    public class ElementAttributeModel : MainEntityBaseModel, ITreeElementContentModek, ITreeRootMemberModel, ITreeRepositoryMemberModel
+    public class ElementAttributeModel : MainEntityBaseModel, ITreeElementContentModel, ITreeRootMemberModel, ITreeRepositoryMemberModel
     {
         public override EntityTypesModel EntityType { get => EntityTypesModel.None; }
         public ValueTypesModel ValueType { get; set; }
         public IEnumerable<ElementAttributeValueModel>? ValueList { get; set; }
         public ElementAttributeValueModel? AttributeValue { get; set; }
-        public IContentOwnerModel Owner { get; set; }
+        public IAttributeOwnerModel Owner { get; set; }
         public TreeRootModel ParentRoot { get; set; }
         public TreeRepositoryModel ParentRepository { get; set; }
 
         public override IDataStorageModel DataStorage => throw new NotImplementedException();
 
-        public ElementAttributeModel(Guid guid, IContentOwnerModel owner, IMainEntity dbEntity) : base(guid, dbEntity)
+        public ElementAttributeModel(Guid guid, IAttributeOwnerModel owner, IMainEntity dbEntity) : base(guid, dbEntity)
         {
             Guid = guid;
             Owner = owner;

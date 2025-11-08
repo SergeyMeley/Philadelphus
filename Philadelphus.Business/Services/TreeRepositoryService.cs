@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
+using Philadelphus.Business.Entities.ElementsContent;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Factories;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
+using Philadelphus.Business.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -33,8 +34,8 @@ namespace Philadelphus.Business.Services
 
         private readonly IMapper _mapper;
 
-        private static MainEntitiesCollectionModel _mainEntityCollection = new MainEntitiesCollectionModel();
-        public static MainEntitiesCollectionModel MainEntityCollection { get => _mainEntityCollection; }
+        private static RepositoryMembersCollectionModel _mainEntityCollection = new RepositoryMembersCollectionModel();
+        public static RepositoryMembersCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
         #endregion
 
@@ -332,7 +333,7 @@ namespace Philadelphus.Business.Services
                 throw;
             }
         }
-        public ElementAttributeModel CreateElementAttribute(IContentOwnerModel owner)
+        public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner)
         {
             var result = new ElementAttributeModel(Guid.NewGuid(), owner, null);
             //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
@@ -375,7 +376,7 @@ namespace Philadelphus.Business.Services
 
         #region [ Temp ]
 
-        internal List<ElementAttributeModel> GetAttributesSample(IContentOwnerModel owner)
+        internal List<ElementAttributeModel> GetAttributesSample(IAttributeOwnerModel owner)
         {
             var result = new List<ElementAttributeModel>();
 

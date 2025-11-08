@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Philadelphus.WindowsFileSystemRepository\Philadelphus.WindowsFileSystemRepository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Entities\RepositoryElements\ElementsContent\" />
+  </ItemGroup>
+
 </Project>
