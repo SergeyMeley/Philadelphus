@@ -2,7 +2,6 @@
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.OtherEntities;
 using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Interfaces;

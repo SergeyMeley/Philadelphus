@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using Philadelphus.Business.Entities.ElementsProperties;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using System;

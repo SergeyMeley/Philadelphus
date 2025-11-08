@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
+﻿using Philadelphus.Business.Entities.ElementsProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
