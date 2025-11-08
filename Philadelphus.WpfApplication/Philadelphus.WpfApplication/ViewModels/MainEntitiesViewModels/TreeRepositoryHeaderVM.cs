@@ -1,8 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using System;

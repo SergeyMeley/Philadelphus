@@ -1,6 +1,6 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Philadelphus.Business.Entities.ElementsProperties;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Services;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,7 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Philadelphus.Business.Entities.ElementsProperties;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.ElementProperties;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Interfaces;

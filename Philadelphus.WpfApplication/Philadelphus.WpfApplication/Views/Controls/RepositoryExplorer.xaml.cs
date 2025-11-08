@@ -1,5 +1,4 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using System;
 using System.Collections.Generic;
