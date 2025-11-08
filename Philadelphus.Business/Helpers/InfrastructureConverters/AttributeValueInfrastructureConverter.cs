@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
-using Philadelphus.Business.Entities.ElementsContent;
+using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 
 namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {

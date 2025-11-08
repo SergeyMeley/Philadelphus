@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Philadelphus.Business.Entities.ElementsContent;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Factories;
 using Philadelphus.Business.Helpers;
@@ -305,6 +305,8 @@ namespace Philadelphus.Business.Services
         public TreeNodeModel CreateTreeNode(IParentModel parentElement)
         {
             var result = new TreeNodeModel(Guid.NewGuid(), parentElement, new TreeNode());
+            if (parentElement is IAttributeOwnerModel)
+                result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
             result.ParentRepository.ElementsCollection.Add(result);
             //parentElement.State = State.Changed;
             parentElement.Childs.Add(result);
@@ -322,6 +324,7 @@ namespace Philadelphus.Business.Services
                 else
                 {
                     var result = new TreeLeaveModel(Guid.NewGuid(), parentElement, new TreeLeave());
+                    result.ParentElementAttributes = parentElement.Attributes;
                     result.ParentRepository.ElementsCollection.Add(result);
                     parentElement.Childs.Add(result);
                     //parentElement.State = State.Changed;
@@ -336,11 +339,24 @@ namespace Philadelphus.Business.Services
         }
         public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner)
         {
-            var result = new ElementAttributeModel(Guid.NewGuid(), owner, null);
-            //((List<ITreeRepositoryMember>)result.ParentRepository.ElementsCollection).Add(result);
-            owner.PersonalAttributes.Add(result);
-            //owner.State = State.Changed;
-            return result;
+            try
+            {
+                var result = new ElementAttributeModel(Guid.NewGuid(), owner, new TreeElementAttribute());
+                owner.PersonalAttributes.Add(result);
+
+                if (owner is IMainEntityModel)
+                {
+                    var mainEntity = (IMainEntityModel)owner;
+                    mainEntity.State = State.Changed;
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                throw;
+            }
         }
 
         #endregion

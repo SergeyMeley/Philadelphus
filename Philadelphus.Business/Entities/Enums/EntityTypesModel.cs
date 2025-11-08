@@ -21,10 +21,6 @@ namespace Philadelphus.Business.Entities.Enums
         Leave,
         //[EnumDescription("Атрибут")]
         Attribute,
-        //[EnumDescription("Вхождение атрибута")]
-        AttributeEntry,
-        //[EnumDescription("Значение атрибута")]
-        AttributeValue,
         //[EnumDescription("Тип элемента")]
         RepositoryElementType,
     }

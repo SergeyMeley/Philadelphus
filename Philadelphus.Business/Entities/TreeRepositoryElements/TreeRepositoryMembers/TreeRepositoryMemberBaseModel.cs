@@ -1,6 +1,6 @@
-﻿using Philadelphus.Business.Entities.ElementsContent;
-using Philadelphus.Business.Entities.Enums;
+﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -14,9 +14,14 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
         public IParentModel Parent { get; protected set; }
         public TreeRepositoryModel ParentRepository { get; protected set; }
         public long Sequence { get; set; }
+        public List<ElementAttributeModel> Attributes 
+        { get
+            {
+                return PersonalAttributes.Concat(ParentElementAttributes).ToList();
+            }
+        }
         public List<ElementAttributeModel> PersonalAttributes { get; set; } = new List<ElementAttributeModel>();
         public List<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
-        public List<ElementAttributeValueModel> AttributeValues { get; set; } = new List<ElementAttributeValueModel>();
         public override IDataStorageModel DataStorage { get; }
         internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, dbEntity)
         {

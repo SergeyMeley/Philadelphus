@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.ElementsContent
+namespace Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent
 {
     public class ElementAttributeValueModel : MainEntityBaseModel, ITreeElementContentModel
     {
