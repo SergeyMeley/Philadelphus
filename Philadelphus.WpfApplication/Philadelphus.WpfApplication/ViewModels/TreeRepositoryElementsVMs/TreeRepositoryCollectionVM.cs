@@ -5,6 +5,7 @@ using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;

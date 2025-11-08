@@ -8,6 +8,8 @@ using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs;
+using Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs.RootMembersVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -246,13 +248,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                         NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
                     }
-                    if (_selectedRepositoryMember.GetType().IsAssignableTo(typeof(IAttributeOwnerModel)) == false)
-                        return;
-                    //_service.CreateElementAttribute(_selectedRepositoryMember);
+                    _selectedRepositoryMember.AddAttribute();
+                    
                     OnPropertyChanged(nameof(State));
                 });
             }
         }
+
         public RelayCommand DeleteElementCommand
         {
             get 

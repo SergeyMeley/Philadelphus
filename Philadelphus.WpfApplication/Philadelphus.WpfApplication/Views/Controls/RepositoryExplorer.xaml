@@ -189,14 +189,14 @@
                     <Expander  Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="{StaticResource imageAdd}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                                <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="2" Height="25" Width="25" Background="Transparent" />
                                 <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
                             </StackPanel>
-                            <DataGrid  Height="auto" ItemsSource="{Binding SelectedRepositoryMember.PersonalAttributes}" AutoGenerateColumns="true">
+                            <DataGrid Height="auto" ItemsSource="{Binding SelectedRepositoryMember.PersonalAttributesVMs}" AutoGenerateColumns="false">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
-                                    <DataGridComboBoxColumn Header="Тип данных" ItemsSource="{Binding ValueType}"></DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
+                                    <DataGridComboBoxColumn Header="Тип данных" ItemsSource="{Binding ValueTypesList}" DisplayMemberPath="Name" SelectedItemBinding="{Binding ValueType}" SelectedValuePath="Name"></DataGridComboBoxColumn>
+                                    <DataGridComboBoxColumn Header="Список значений (пресет)" ItemsSource="{Binding ValuesList}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Value}" SelectedValuePath="Name"></DataGridComboBoxColumn>
                                     <DataGridCheckBoxColumn Header="Обязательный"></DataGridCheckBoxColumn>
                                     <DataGridComboBoxColumn Header="Область видимости" ItemsSource="{Binding VisabilityList}"></DataGridComboBoxColumn>
                                     <DataGridCheckBoxColumn Header="Только чтение"></DataGridCheckBoxColumn>

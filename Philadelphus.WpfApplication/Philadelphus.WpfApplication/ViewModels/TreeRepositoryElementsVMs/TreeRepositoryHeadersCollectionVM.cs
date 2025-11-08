@@ -87,7 +87,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             
             foreach (var header in headers)
             {
-                var vm = new TreeRepositoryHeaderVM(_service, header, _updateTreeRepositoryHeaders);
+                var vm = new TreeRepositoryHeaderVM(header, _service, _updateTreeRepositoryHeaders);
                 CheckTreeRepositoryAvailable(vm);
                 _treeRepositoryHeadersVMs.Add(vm);
             }
@@ -96,7 +96,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         internal TreeRepositoryHeaderVM AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
         {
             var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.TreeRepositoryModel);
-            var result = new TreeRepositoryHeaderVM(_service, header, _updateTreeRepositoryHeaders);
+            var result = new TreeRepositoryHeaderVM(header, _service, _updateTreeRepositoryHeaders);
             TreeRepositoryHeadersVMs.Add(result);
             return result;
         }

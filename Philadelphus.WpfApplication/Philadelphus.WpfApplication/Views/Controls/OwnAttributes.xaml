@@ -8,17 +8,13 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Content="{StaticResource imageAdd}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
-            </StackPanel>
-            <DataGrid  Height="auto">
+            <DataGrid Height="auto" ItemsSource="{Binding SelectedRepositoryMember.ParentElementAttributesVMs}" AutoGenerateColumns="false">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Наименование"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
                     <DataGridComboBoxColumn Header="Тип данных"></DataGridComboBoxColumn>
                     <DataGridCheckBoxColumn Header="Может быть пустым"></DataGridCheckBoxColumn>
                     <DataGridComboBoxColumn Header="Область видимости" ItemsSource="{Binding VisabilityList}"></DataGridComboBoxColumn>
-                    <DataGridTextColumn Header="Источник"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Источник" Binding="{Binding Owner.Name}"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>

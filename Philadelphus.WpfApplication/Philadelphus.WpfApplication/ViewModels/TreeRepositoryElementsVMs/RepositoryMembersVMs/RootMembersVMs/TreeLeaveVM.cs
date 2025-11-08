@@ -1,13 +1,14 @@
 ﻿using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
+namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs.RootMembersVMs
 {
     public class TreeLeaveVM : MainEntityBaseVM
     {

@@ -1,5 +1,4 @@
 ﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
 using Philadelphus.WpfApplication.Views;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;

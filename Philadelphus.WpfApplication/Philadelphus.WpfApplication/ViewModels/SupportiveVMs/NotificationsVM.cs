@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
+namespace Philadelphus.WpfApplication.ViewModels.SupportiveVMs
 {
     public class NotificationsVM
     {

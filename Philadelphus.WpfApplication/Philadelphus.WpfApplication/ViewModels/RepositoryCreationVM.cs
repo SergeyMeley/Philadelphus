@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Services;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;

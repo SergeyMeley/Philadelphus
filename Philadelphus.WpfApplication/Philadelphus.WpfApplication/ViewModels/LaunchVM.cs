@@ -3,6 +3,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.OtherEntities;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.Views;
 using Philadelphus.WpfApplication.Views.Windows;

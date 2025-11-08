@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace Philadelphus.WpfApplication.ViewModels.SupportiveViewModels
+namespace Philadelphus.WpfApplication.ViewModels.SupportiveVMs
 {
     public class PopupVM : ViewModelBase
     {

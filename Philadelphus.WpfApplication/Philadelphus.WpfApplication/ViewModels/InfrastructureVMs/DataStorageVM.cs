@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Philadelphus.WpfApplication.ViewModels
+namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
 {
     public class DataStorageVM : ViewModelBase
     {
@@ -35,7 +35,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             OnPropertyChanged(nameof(DataStorage.IsAvailable));
             OnPropertyChanged(nameof(DataStorage.LastCheckTime));
         }
-        private void CheckStorage(Object source, ElapsedEventArgs e)
+        private void CheckStorage(object source, ElapsedEventArgs e)
         {
             CheckStorage();
         }

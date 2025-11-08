@@ -152,7 +152,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 
         #region [ Construct ]
 
-        public TreeRepositoryHeaderVM(TreeRepositoryCollectionService service, TreeRepositoryHeaderModel treeRepositoryHeader, Action updateTreeRepositoryHeaders)
+        public TreeRepositoryHeaderVM(TreeRepositoryHeaderModel treeRepositoryHeader, TreeRepositoryCollectionService service, Action updateTreeRepositoryHeaders)
         {
             _model = treeRepositoryHeader;
             _service = service;
