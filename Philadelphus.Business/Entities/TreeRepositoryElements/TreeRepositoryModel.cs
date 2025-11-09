@@ -26,7 +26,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public string Name { get; set; }
         public string Description { get; set; }
         public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
-        public State State { get; set; } = State.Initialized;
+        public State State { get; internal set; } = State.Initialized;
         public TreeRepository DbEntity { get; set; }
 
         private IDataStorageModel _ownDataStorage;

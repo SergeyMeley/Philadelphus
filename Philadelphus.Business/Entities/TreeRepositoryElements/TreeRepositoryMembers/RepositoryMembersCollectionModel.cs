@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
+using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Interfaces;
 using System;
 using System.Collections;
@@ -20,10 +21,14 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
         private List<TreeLeaveModel> _dataTreeLeaves = new List<TreeLeaveModel>();
         public List<TreeLeaveModel> DataTreeLeaves { get => _dataTreeLeaves; private set => _dataTreeLeaves = value; }
 
+        private List<ElementAttributeModel> _elementAttributes = new List<ElementAttributeModel>();
+        public List<ElementAttributeModel> ElementAttributes { get => _elementAttributes; private set => _elementAttributes = value; }
+
         public int Count => 
             + _dataTreeRoots.Count
             + _dataTreeNodes.Count
-            + _dataTreeLeaves.Count;
+            + _dataTreeLeaves.Count
+            + _elementAttributes.Count;
 
         public bool IsReadOnly => throw new NotImplementedException();
 
@@ -40,6 +45,10 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
             for (int i = 0; i < _dataTreeLeaves.Count; i++)
             {
                 yield return _dataTreeLeaves[i];
+            }
+            for (int i = 0; i < _elementAttributes.Count; i++)
+            {
+                yield return _elementAttributes[i];
             }
         }
 
@@ -62,6 +71,10 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
             {
                 _dataTreeNodes.Add((TreeNodeModel)item);
             }
+            else if (item.GetType() == typeof(ElementAttributeModel))
+            {
+                _elementAttributes.Add((ElementAttributeModel)item);
+            }
         }
 
         public void Clear()
@@ -69,13 +82,15 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
             _dataTreeRoots.Clear();
             _dataTreeNodes.Clear();
             _dataTreeLeaves.Clear();
+            _elementAttributes.Clear();
         }
 
         public bool Contains(IMainEntityModel item)
         {
             return _dataTreeRoots.Contains(item)
                 || _dataTreeNodes.Contains(item)
-                || _dataTreeLeaves.Contains(item);
+                || _dataTreeLeaves.Contains(item)
+                || _elementAttributes.Contains(item);
         }
 
         public void CopyTo(IMainEntityModel[] array, int arrayIndex)
@@ -98,6 +113,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
             else if (item.GetType() == typeof(TreeNodeModel))
             {
                 _dataTreeNodes.Remove((TreeNodeModel)item);
+                return true;
+            }
+            else if (item.GetType() == typeof(ElementAttributeModel))
+            {
+                _elementAttributes.Remove((ElementAttributeModel)item);
                 return true;
             }
             return false;

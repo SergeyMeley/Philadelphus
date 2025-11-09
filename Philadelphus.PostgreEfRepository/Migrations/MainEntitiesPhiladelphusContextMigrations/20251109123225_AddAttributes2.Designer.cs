@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Philadelphus.PostgreEfRepository.Contexts;
@@ -11,9 +12,11 @@ using Philadelphus.PostgreEfRepository.Contexts;
 namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     [DbContext(typeof(MainEntitiesPhiladelphusContext))]
-    partial class MainEntitiesPhiladelphusContextModelSnapshot : ModelSnapshot
+    [Migration("20251109123225_AddAttributes2")]
+    partial class AddAttributes2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,11 +65,11 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
-                    b.Property<Guid?>("ValueTypeUuid")
+                    b.Property<Guid>("ValueTypeUuid")
                         .HasColumnType("uuid")
                         .HasColumnName("value_type_uuid");
 
-                    b.Property<Guid?>("ValueUuid")
+                    b.Property<Guid>("ValueUuid")
                         .HasColumnType("uuid")
                         .HasColumnName("value_uuid");
 

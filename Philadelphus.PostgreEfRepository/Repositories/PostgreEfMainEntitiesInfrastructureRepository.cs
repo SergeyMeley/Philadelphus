@@ -164,11 +164,17 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         }
         public IEnumerable<ElementAttribute> SelectAttributes()
         {
-            throw new NotImplementedException();
-        }
-        public IEnumerable<TreeElementAttributeValue> SelectAttributeValues()
-        {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return null;
+
+            List<ElementAttribute> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.ElementAttributes.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
         }
 
         #endregion
@@ -237,11 +243,18 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         }
         public long InsertAttributes(IEnumerable<ElementAttribute> items)
         {
-            throw new NotImplementedException();
-        }
-        public long InsertAttributeValues(IEnumerable<TreeElementAttributeValue> items)
-        {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.CreatedBy = Environment.UserName;
+                item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.ElementAttributes.Add(item);
+            }
+            return _context.SaveChanges();
+
         }
 
         #endregion
@@ -286,11 +299,15 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         }
         public long UpdateAttributes(IEnumerable<ElementAttribute> items)
         {
-            throw new NotImplementedException();
-        }
-        public long UpdateAttributeValues(IEnumerable<TreeElementAttributeValue> items)
-        {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.UpdatedBy = Environment.UserName;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.ElementAttributes.Update(item);
+            }
+            return _context.SaveChanges();
         }
 
         #endregion
@@ -338,11 +355,16 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         }
         public long DeleteAttributes(IEnumerable<ElementAttribute> items)
         {
-            throw new NotImplementedException();
-        }
-        public long DeleteAttributeValues(IEnumerable<TreeElementAttributeValue> items)
-        {
-            throw new NotImplementedException();
+            if (CheckAvailability() == false)
+                return 0;
+            foreach (var item in items)
+            {
+                item.AuditInfo.IsDeleted = true;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                _context.ElementAttributes.Update(item);
+            }
+            return _context.SaveChanges();
         }
 
         #endregion

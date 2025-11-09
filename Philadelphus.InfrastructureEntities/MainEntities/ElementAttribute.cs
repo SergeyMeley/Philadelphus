@@ -8,8 +8,9 @@ namespace Philadelphus.InfrastructureEntities.MainEntities
 {
     public class ElementAttribute : MainEntityBase
     {
-        public string ValueType { get; set; }
-        public List<long> ValueIds { get; set; } = new List<long>();
+        public Guid OwnerUuid { get; set; }
+        public Guid? ValueTypeUuid { get; set; }
+        public Guid? ValueUuid { get; set; }
         public ElementAttribute()
         {
             

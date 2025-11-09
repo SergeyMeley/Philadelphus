@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Interfaces
         public string Alias { get; set; }
         public string CustomCode { get; set; }
         public AuditInfoModel AuditInfo { get; }
-        public State State { get; set; }
+        public State State { get; }
         public IMainEntity DbEntity { get; }
         public IDataStorageModel DataStorage { get; }
     }

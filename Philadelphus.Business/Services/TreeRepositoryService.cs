@@ -13,6 +13,7 @@ using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.OtherEntities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml.Linq;
@@ -82,6 +83,13 @@ namespace Philadelphus.Business.Services
                     var dbLeaves = infrastructure.SelectLeaves(repository.ChildsGuids?.ToArray());
                     var leaves = dbLeaves?.ToModelCollection(MainEntityCollection.DataTreeNodes);
                     MainEntityCollection.DataTreeLeaves.AddRange(leaves);
+
+                    var dbAttributes = infrastructure.SelectAttributes();
+                    var owners = roots.Cast<IAttributeOwnerModel>()
+                        .Concat(nodes.Cast<IAttributeOwnerModel>())
+                        .Concat(leaves.Cast<IAttributeOwnerModel>());
+                    var attributes = dbAttributes?.ToModelCollection(owners);
+                    MainEntityCollection.ElementAttributes.AddRange(attributes);
                 }
             }
             return repository;
@@ -99,7 +107,7 @@ namespace Philadelphus.Business.Services
             {
                 foreach (var child in childRoots)
                 {
-                    child.State = State.SavedOrLoaded;
+                    SetModelState(child, State.SavedOrLoaded);
                 }
                 repository.Childs.AddRange(childRoots.Cast<IChildrenModel>().ToList());
 
@@ -113,6 +121,8 @@ namespace Philadelphus.Business.Services
 
         public TreeRootModel GetRootContent(TreeRootModel root)
         {
+            GetPersonalAttributes(root);
+
             root.Childs.Clear();
 
             var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == root.Guid);
@@ -121,7 +131,7 @@ namespace Philadelphus.Business.Services
             {
                 foreach (var child in childNodes)
                 {
-                    child.State = State.SavedOrLoaded;
+                    SetModelState(child, State.SavedOrLoaded);
                 }
                 root.Childs.AddRange(childNodes.Cast<IChildrenModel>().ToList());
 
@@ -135,6 +145,8 @@ namespace Philadelphus.Business.Services
         }
         public TreeNodeModel GetNodeContent(TreeNodeModel node)
         {
+            GetPersonalAttributes(node);
+
             node.Childs.Clear();
 
             var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
@@ -143,7 +155,7 @@ namespace Philadelphus.Business.Services
             {
                 foreach (var child in childNodes)
                 {
-                    child.State = State.SavedOrLoaded;
+                    SetModelState(child, State.SavedOrLoaded);
                 }
                 node.Childs.AddRange(childNodes.Cast<IChildrenModel>().ToList());
 
@@ -159,12 +171,40 @@ namespace Philadelphus.Business.Services
             {
                 foreach (var child in childLeaves)
                 {
-                    child.State = State.SavedOrLoaded;
+                    SetModelState(child, State.SavedOrLoaded);
                 }
                 node.Childs.AddRange(childLeaves.Cast<IChildrenModel>().ToList());
+
+                foreach (var child in childLeaves)
+                {
+                    GetLeaveContent(child);
+                }
             }
 
             return node;
+        }
+
+        public TreeLeaveModel GetLeaveContent(TreeLeaveModel leave)
+        {
+            GetPersonalAttributes(leave);
+            return leave;
+        }
+
+        public IEnumerable<ElementAttributeModel> GetPersonalAttributes(IAttributeOwnerModel attributeOwner)
+        {
+
+            attributeOwner.PersonalAttributes.Clear();
+            var attributes = MainEntityCollection.ElementAttributes.Where(x => x.Owner.Guid == attributeOwner.Guid);
+            if (attributes != null)
+            {
+                foreach (var attribute in attributes)
+                {
+                    SetModelState(attribute, State.SavedOrLoaded);
+                }
+                attributeOwner.PersonalAttributes.AddRange(attributes);
+                return attributes;
+            }
+            return null;
         }
 
         #endregion
@@ -225,9 +265,10 @@ namespace Philadelphus.Business.Services
                 result += storage.MainEntitiesInfrastructureRepository.DeleteRoots(dbCollection);
             }
             result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes));
+            result += SaveChanges(treeRoots.SelectMany(x => x.Attributes));
             foreach (var treeRoot in treeRoots)
             {
-                treeRoot.State = State.SavedOrLoaded;
+                SetModelState(treeRoot, State.SavedOrLoaded);
             }
             return result;
         }
@@ -257,7 +298,7 @@ namespace Philadelphus.Business.Services
             result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves));
             foreach (var treeNode in treeNodes)
             {
-                treeNode.State = State.SavedOrLoaded;
+                SetModelState(treeNode, State.SavedOrLoaded);
             }
             return result;
         }
@@ -285,7 +326,36 @@ namespace Philadelphus.Business.Services
             }
             foreach (var treeLeave in treeLeaves)
             {
-                treeLeave.State = State.SavedOrLoaded;
+                SetModelState(treeLeave, State.SavedOrLoaded);
+            }
+            return result;
+        }
+
+        public long SaveChanges(IEnumerable<ElementAttributeModel> elementAttributes)
+        {
+            if (elementAttributes == null || elementAttributes.Count() == 0)
+                return 0;
+            foreach (var elementAttribute in elementAttributes)
+            {
+                if (elementAttribute.State == State.Initialized && _mainEntityCollection.ElementAttributes.Any(x => x.Guid == elementAttribute.Guid) == false)
+                {
+                    _mainEntityCollection.ElementAttributes.Add(elementAttribute);
+                }
+            }
+            long result = 0;
+            foreach (var storage in elementAttributes.Select(x => x.DataStorage).Distinct())
+            {
+                List<ElementAttribute> dbCollection;
+                dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.InsertAttributes(dbCollection);
+                dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.UpdateAttributes(dbCollection);
+                dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                result += storage.MainEntitiesInfrastructureRepository.DeleteAttributes(dbCollection);
+            }
+            foreach (var elementAttribute in elementAttributes)
+            {
+                SetModelState(elementAttribute, State.SavedOrLoaded);
             }
             return result;
         }
@@ -309,6 +379,10 @@ namespace Philadelphus.Business.Services
                 result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
             result.ParentRepository.ElementsCollection.Add(result);
             //parentElement.State = State.Changed;
+            //if (parentElement is IMainEntityWritableModel)
+            //{
+            //    SetModelState((IMainEntityWritableModel)parentElement, State.SavedOrLoaded);
+            //}
             parentElement.Childs.Add(result);
             return result;
         }
@@ -341,13 +415,12 @@ namespace Philadelphus.Business.Services
         {
             try
             {
-                var result = new ElementAttributeModel(Guid.NewGuid(), owner, new TreeElementAttribute());
+                var result = new ElementAttributeModel(Guid.NewGuid(), owner, new ElementAttribute());
                 owner.PersonalAttributes.Add(result);
 
-                if (owner is IMainEntityModel)
+                if (owner is IMainEntityWritableModel)
                 {
-                    var mainEntity = (IMainEntityModel)owner;
-                    mainEntity.State = State.Changed;
+                    SetModelState((IMainEntityWritableModel)owner, State.SavedOrLoaded);
                 }
                 
                 return result;
@@ -406,6 +479,15 @@ namespace Philadelphus.Business.Services
 
             return result;
         }
+        #endregion
+
+        #region [ Private methods ]
+
+        private void SetModelState(IMainEntityWritableModel model, State newState)
+        {
+            model.SetState(newState);
+        }
+
         #endregion
 
     }

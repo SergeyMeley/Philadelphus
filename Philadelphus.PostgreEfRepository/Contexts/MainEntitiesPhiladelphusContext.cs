@@ -29,6 +29,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
         public virtual DbSet<TreeRoot> TreeRoots { get; set; }
         public virtual DbSet<TreeNode> TreeNodes { get; set; }
         public virtual DbSet<TreeLeave> TreeLeaves { get; set; }
+        public virtual DbSet<ElementAttribute> ElementAttributes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -46,6 +47,7 @@ namespace Philadelphus.PostgreEfRepository.Contexts
             modelBuilder.ApplyConfiguration(new TreeRootConfiguration());
             modelBuilder.ApplyConfiguration(new TreeNodeConfiguration());
             modelBuilder.ApplyConfiguration(new TreeLeaveConfiguration());
+            modelBuilder.ApplyConfiguration(new ElementAttributeConfiguration());
             OnModelCreatingPartial(modelBuilder);
         }
 

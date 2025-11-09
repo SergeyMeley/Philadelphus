@@ -13,12 +13,25 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Entities.RepositoryElements
 {
-    public abstract class MainEntityBaseModel : IMainEntityModel, ILinkableByGuidModel
+    public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByGuidModel
     {
         protected virtual string DefaultFixedPartOfName { get => "Новая основная сущность"; }
         public abstract EntityTypesModel EntityType { get; }
         public Guid Guid { get; protected set; }
-        public string Name { get; set; }
+
+        private string _name;
+        public string Name 
+        { 
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = value;
+                _state = State.Changed;
+            }
+        }
         public string Alias { get; set; }
         public string CustomCode { get; set; }
         public string Description { get; set; }
@@ -26,7 +39,9 @@ namespace Philadelphus.Business.Entities.RepositoryElements
         public bool IsLegacy { get; set; }
         public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
         public EntityElementTypeModel ElementType { get; set; }
-        public State State { get; set; } = State.Initialized;
+        
+        private State _state = State.Initialized;
+        public State State { get => _state; }
         public IMainEntity DbEntity { get; set; }
         public abstract IDataStorageModel DataStorage { get; }
         public MainEntityBaseModel(Guid guid, IMainEntity dbEntity)
@@ -41,6 +56,11 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             sb.AppendLine();
             sb.Append(Guid);
             return sb.ToString();
+        }
+        bool IMainEntityWritableModel.SetState(State newState)
+        {
+            _state = newState;
+            return true;
         }
     }
 }
