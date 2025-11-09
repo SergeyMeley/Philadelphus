@@ -74,6 +74,11 @@ namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.Eleme
 
         #region [ Methods ]
 
+        internal void NotifyChildsPropertyChangedRecursive()
+        {
+            OnPropertyChanged(nameof(State));
+        }
+
         #endregion
     }
 }

@@ -194,6 +194,7 @@
                             </StackPanel>
                             <DataGrid Height="auto" ItemsSource="{Binding SelectedRepositoryMember.PersonalAttributesVMs}" AutoGenerateColumns="false">
                                 <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Состояние" Binding="{Binding State, Mode=OneWay}"></DataGridTextColumn>
                                     <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
                                     <DataGridComboBoxColumn Header="Тип данных" ItemsSource="{Binding ValueTypesList}" DisplayMemberPath="Name" SelectedItemBinding="{Binding ValueType}" SelectedValuePath="Name"></DataGridComboBoxColumn>
                                     <DataGridComboBoxColumn Header="Список значений (пресет)" ItemsSource="{Binding ValuesList}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Value}" SelectedValuePath="Name"></DataGridComboBoxColumn>

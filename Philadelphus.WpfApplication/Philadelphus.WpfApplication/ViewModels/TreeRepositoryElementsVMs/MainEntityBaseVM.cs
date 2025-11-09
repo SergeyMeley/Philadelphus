@@ -24,17 +24,101 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 return _model; 
             } 
         }
-        public EntityTypesModel EntityType { get => _model.EntityType; }
-        public Guid Guid { get => _model.Guid; }
-        public string Name { get => _model.Name; set => _model.Name = value; }
-        public string Alias { get => _model.Alias; set => _model.Alias = value; }
-        public string CustomCode { get => _model.CustomCode; set => _model.CustomCode = value; }
-        public string Description { get => _model.Description; set => _model.Description = value; }
-        public AuditInfoModel AuditInfo { get => _model.AuditInfo; }
-        public EntityElementTypeModel ElementType { get => _model.ElementType; set => _model.ElementType = value; }
-        public State State { get => _model.State; }
-        public ObservableCollection<ElementAttributeVM> PersonalAttributesVMs { get; set; } = new ObservableCollection<ElementAttributeVM>();
-        public ObservableCollection<ElementAttributeVM> ParentElementAttributesVMs { get; set; } = new ObservableCollection<ElementAttributeVM>();
+        public EntityTypesModel EntityType
+        {
+            get
+            {
+                return _model.EntityType;
+            }
+        }
+        public Guid Guid 
+        { 
+            get
+            {
+                return _model.Guid;
+            }
+        }
+        public string Name
+        {
+            get
+            {
+                return _model.Name;
+            }
+            set
+            {
+                _model.Name = value;
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+        public string Alias
+        {
+            get
+            {
+                return _model.Alias;
+            }
+            set
+            {
+                _model.Alias = value;
+                OnPropertyChanged(nameof(Alias));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+        public string CustomCode
+        {
+            get
+            {
+                return _model.CustomCode;
+            }
+            set
+            {
+                _model.CustomCode = value;
+                OnPropertyChanged(nameof(CustomCode));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+        public string Description
+        {
+            get
+            {
+                return _model.Description;
+            }
+            set
+            {
+                _model.Description = value;
+                OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+        public AuditInfoModel AuditInfo 
+        {
+            get
+            {
+                return _model.AuditInfo;
+            }
+        }
+        public EntityElementTypeModel ElementType
+        {
+            get
+            {
+                return _model.ElementType;
+            }
+            set
+            {
+                _model.ElementType = value;
+                OnPropertyChanged(nameof(ElementType));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+        public State State
+        {
+            get
+            {
+                return _model.State;
+            }
+        }
+        public ObservableCollection<ElementAttributeVM> PersonalAttributesVMs { get; } = new ObservableCollection<ElementAttributeVM>();
+        public ObservableCollection<ElementAttributeVM> ParentElementAttributesVMs { get; } = new ObservableCollection<ElementAttributeVM>();
 
         public MainEntityBaseVM(MainEntityBaseModel mainEntityBaseModel, TreeRepositoryService service)
         {
