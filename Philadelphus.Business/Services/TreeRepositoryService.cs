@@ -232,7 +232,7 @@ namespace Philadelphus.Business.Services
                     var entity = treeRepository.ToDbEntity();
                     result += treeRepository.OwnDataStorage.TreeRepositoriesInfrastructureRepository.UpdateRepository(entity);
                     break;
-                case State.Deleted:
+                case State.ForSoftDelete:
                     result += treeRepository.OwnDataStorage.TreeRepositoriesInfrastructureRepository.DeleteRepository(treeRepository.ToDbEntity());
                     break;
                 default:
@@ -261,7 +261,7 @@ namespace Philadelphus.Business.Services
                 result += storage.MainEntitiesInfrastructureRepository.InsertRoots(dbCollection);
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.UpdateRoots(dbCollection);
-                dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.DeleteRoots(dbCollection);
             }
             result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes));
@@ -291,7 +291,7 @@ namespace Philadelphus.Business.Services
                 result += storage.MainEntitiesInfrastructureRepository.InsertNodes(dbCollection);
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.UpdateNodes(dbCollection);
-                dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.DeleteNodes(dbCollection);
             }
             result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes));
@@ -321,7 +321,7 @@ namespace Philadelphus.Business.Services
                 result += storage.MainEntitiesInfrastructureRepository.InsertLeaves(dbCollection);
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.UpdateLeaves(dbCollection);
-                dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.DeleteLeaves(dbCollection);
             }
             foreach (var treeLeave in treeLeaves)
@@ -335,6 +335,7 @@ namespace Philadelphus.Business.Services
         {
             if (elementAttributes == null || elementAttributes.Count() == 0)
                 return 0;
+            //TODO: Вынести в отдельный метод AddInitialized
             foreach (var elementAttribute in elementAttributes)
             {
                 if (elementAttribute.State == State.Initialized && _mainEntityCollection.ElementAttributes.Any(x => x.Guid == elementAttribute.Guid) == false)
@@ -342,6 +343,7 @@ namespace Philadelphus.Business.Services
                     _mainEntityCollection.ElementAttributes.Add(elementAttribute);
                 }
             }
+            //TODO: Вынести в отдельный метод AddInitialized
             long result = 0;
             foreach (var storage in elementAttributes.Select(x => x.DataStorage).Distinct())
             {
@@ -350,9 +352,20 @@ namespace Philadelphus.Business.Services
                 result += storage.MainEntitiesInfrastructureRepository.InsertAttributes(dbCollection);
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.UpdateAttributes(dbCollection);
-                dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Deleted).ToDbEntityCollection();
+                dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.DeleteAttributes(dbCollection);
             }
+            //TODO: Вынести в отдельный метод RemoveDeleted
+            //TODO: ПОЧИНИТЬ!!!
+            foreach (var elementAttribute in elementAttributes)
+            {
+                if ((elementAttribute.State == State.ForHardDelete || elementAttribute.State == State.ForSoftDelete || elementAttribute.State == State.SoftDeleted) 
+                    && _mainEntityCollection.Any(x => x.Guid == elementAttribute.Guid) == false)
+                {
+                    _mainEntityCollection.Remove(elementAttribute);
+                }
+            }
+            //TODO: Вынести в отдельный метод RemoveDeleted
             foreach (var elementAttribute in elementAttributes)
             {
                 SetModelState(elementAttribute, State.SavedOrLoaded);
@@ -384,6 +397,7 @@ namespace Philadelphus.Business.Services
             //    SetModelState((IMainEntityWritableModel)parentElement, State.SavedOrLoaded);
             //}
             parentElement.Childs.Add(result);
+            SetModelState(result, State.Initialized);
             return result;
         }
         public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement)
@@ -402,6 +416,7 @@ namespace Philadelphus.Business.Services
                     result.ParentRepository.ElementsCollection.Add(result);
                     parentElement.Childs.Add(result);
                     //parentElement.State = State.Changed;
+                    SetModelState(result, State.Initialized);
                     return result;
                 }
             }
@@ -440,20 +455,30 @@ namespace Philadelphus.Business.Services
 
         #region [ Delete + Remove ]
 
-        public bool RemoveMember(IChildrenModel element)
+        public bool SoftDeleteRepositoryMember(IChildrenModel element)
         {
             try
             {
+                //if (element == null)
+                //    return false;
+                
+                //if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBaseModel)))
+                //{
+                //    ((List<TreeRepositoryMemberBaseModel>)((ITreeRepositoryMemberModel)element).ParentRepository.ElementsCollection).Remove((TreeRepositoryMemberBaseModel)element);
+                //}
+                ////
+                //return true;
+
+
+
+
                 if (element == null)
-                {
                     return false;
-                }
-                element.Parent.Childs.Remove(element);
-                if (element.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) && element.GetType().IsAssignableTo(typeof(TreeRepositoryMemberBaseModel)))
+                long result = 0;
+                if (element is IMainEntityWritableModel)
                 {
-                    ((List<TreeRepositoryMemberBaseModel>)((ITreeRepositoryMemberModel)element).ParentRepository.ElementsCollection).Remove((TreeRepositoryMemberBaseModel)element);
+                    SetModelState((IMainEntityWritableModel)element, State.ForSoftDelete);
                 }
-                //
                 return true;
             }
             catch (Exception)

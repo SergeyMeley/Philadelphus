@@ -15,6 +15,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements
 {
     public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByGuidModel
     {
+        //TODO: Во всех IMainEntityModel при изменении значения свойств обновлять статус
         protected virtual string DefaultFixedPartOfName { get => "Новая основная сущность"; }
         public abstract EntityTypesModel EntityType { get; }
         public Guid Guid { get; protected set; }
@@ -29,7 +30,8 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             set
             {
                 _name = value;
-                _state = State.Changed;
+               if(_state != State.Initialized)
+                    _state = State.Changed;
             }
         }
         public string Alias { get; set; }

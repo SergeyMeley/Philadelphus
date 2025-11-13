@@ -11,6 +11,8 @@ namespace Philadelphus.Business.Entities.Enums
         Initialized,
         Changed,
         SavedOrLoaded,
-        Deleted,
+        ForSoftDelete,
+        ForHardDelete,
+        SoftDeleted,
     }
 }
