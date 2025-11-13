@@ -151,35 +151,74 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
             {
                 return new RelayCommand(obj =>
                 {
+                    UpdateChildsCollection(this);
                     _service.SaveChanges(_model);
                     OnPropertyChanged(nameof(State));
-
-                    //TODO: Переработать, временный костыль для проверки
-                    //OnPropertyChanged(nameof(Childs));
-                    //foreach (var item in Childs)
-                    //{
-                    //    item.OnPropertyChanged();
-                    //    item.OnPropertyChanged(nameof(State));
-                    //    foreach (var item2 in item.ChildNodes)
-                    //    {
-                    //        item2.OnPropertyChanged();
-                    //        item2.OnPropertyChanged(nameof(State));
-                    //        foreach (var item3 in item2.ChildNodes)
-                    //        {
-                    //            item3.OnPropertyChanged();
-                    //            item3.OnPropertyChanged(nameof(State));
-                    //        }
-                    //        foreach (var item3 in item2.ChildLeaves)
-                    //        {
-                    //            item3.OnPropertyChanged();
-                    //            item3.OnPropertyChanged(nameof(State));
-                    //        }
-                    //    }
-                    //}
-                     NotifyChildsPropertyChangedRecursive();
+                    NotifyChildsPropertyChangedRecursive();
                 });
             }
         }
+        private bool UpdateChildsCollection(ViewModelBase parent)    //TODO: Переделать временный костыль
+        {
+            if (parent is TreeRepositoryVM)
+            {
+                var repository = (TreeRepositoryVM)parent;
+                for (int i = repository.Childs.Count - 1; i >= 0; i--)
+                {
+                    if (repository.Childs[i].State == State.ForHardDelete
+                    || repository.Childs[i].State == State.ForSoftDelete
+                    || repository.Childs[i].State == State.SoftDeleted)
+                    {
+                        repository.Childs.Remove(repository.Childs[i]);
+                    }
+                    else
+                        UpdateChildsCollection(repository.Childs[i]);
+                }
+            }
+            if (parent is TreeRootVM)
+            {
+                var root = (TreeRootVM)parent;
+                for (int i = root.ChildNodes.Count - 1; i >= 0; i--)
+                {
+                    if (root.ChildNodes[i].State == State.ForHardDelete
+                    || root.ChildNodes[i].State == State.ForSoftDelete
+                    || root.ChildNodes[i].State == State.SoftDeleted)
+                    {
+                        root.ChildNodes.Remove(root.ChildNodes[i]);
+                    }
+                    else
+                        UpdateChildsCollection(root.ChildNodes[i]);
+                }
+            }
+            if (parent is TreeNodeVM)
+            {
+                var node = (TreeNodeVM)parent;
+                for (int i = node.ChildNodes.Count - 1; i >= 0; i--)
+                {
+                    if (node.ChildNodes[i].State == State.ForHardDelete
+                    || node.ChildNodes[i].State == State.ForSoftDelete
+                    || node.ChildNodes[i].State == State.SoftDeleted)
+                    {
+                        node.ChildNodes.Remove(node.ChildNodes[i]);
+                    }
+                    else
+                        UpdateChildsCollection(node.ChildNodes[i]);
+                }
+                for (int i = node.ChildLeaves.Count - 1; i >= 0; i--)
+                {
+                    if (node.ChildLeaves[i].State == State.ForHardDelete
+                    || node.ChildLeaves[i].State == State.ForSoftDelete
+                    || node.ChildLeaves[i].State == State.SoftDeleted)
+                    {
+                        node.ChildLeaves.Remove(node.ChildLeaves[i]);
+                    }
+                    else
+                        UpdateChildsCollection(node.ChildLeaves[i]);
+                }
+            }
+            return true;
+        }
+
         public RelayCommand CreateRootCommand
         {
             get
@@ -254,18 +293,40 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
                 });
             }
         }
-
-        public RelayCommand DeleteElementCommand
+        public RelayCommand SoftDeleteRepositoryMemberCommand
         {
             get 
             {
                 return new RelayCommand(obj =>
                 {
-                    //_service.RemoveMember(_selectedRepositoryMember);
+                    if (_selectedRepositoryMember.Model is IChildrenModel)
+                    {
+                        var member = (IChildrenModel)_selectedRepositoryMember.Model;
+                        _service.SoftDeleteRepositoryMember(member);
+                    }
                     OnPropertyChanged(nameof(State));
+                    NotifyChildsPropertyChangedRecursive();
+                },
+                ce =>
+                {
+                    return _selectedRepositoryMember?.Model is IChildrenModel;
                 });
             }
         }
+        public RelayCommand ProtectCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                },
+                ce =>
+                {
+                    return false;
+                });
+            }
+        }
+
         #endregion
 
         #region [ Methods ]
