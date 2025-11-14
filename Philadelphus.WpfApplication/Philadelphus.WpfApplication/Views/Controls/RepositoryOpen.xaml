@@ -85,7 +85,7 @@
                                         </TextBlock.LayoutTransform>
                                     </TextBlock>
                                 </Expander.Header>
-                                <detail:RepositoryHeaderDetails DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:RepositoryHeaderDetails>
+                                <detail:TreeRepositoryDetails DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:TreeRepositoryDetails>
                             </Expander>
 
                             <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Content="Открыть" Height="30" Command="{Binding OpenMainWindowCommand}" Margin="2"></Button>

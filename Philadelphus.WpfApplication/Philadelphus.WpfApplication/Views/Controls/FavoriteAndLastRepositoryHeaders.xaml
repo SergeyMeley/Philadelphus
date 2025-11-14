@@ -32,7 +32,7 @@
                     </TextBlock.LayoutTransform>
                 </TextBlock>
             </Expander.Header>
-            <detail:RepositoryHeaderDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:RepositoryHeaderDetails>
+            <detail:TreeRepositoryHeaderDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:TreeRepositoryHeaderDetails>
         </Expander>
         <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
     </Grid>

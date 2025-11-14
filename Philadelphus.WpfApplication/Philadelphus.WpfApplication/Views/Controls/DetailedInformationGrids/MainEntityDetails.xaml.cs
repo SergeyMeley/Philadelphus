@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids
 {
     /// <summary>
-    /// Логика взаимодействия для RepositoryHeaderDetails.xaml
+    /// Логика взаимодействия для MainEntityDetails.xaml
     /// </summary>
-    public partial class RepositoryHeaderDetails : UserControl
+    public partial class MainEntityDetails : UserControl
     {
-        public RepositoryHeaderDetails()
+        public MainEntityDetails()
         {
             InitializeComponent();
         }
