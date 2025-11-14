@@ -100,6 +100,10 @@ namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.Repos
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }
+            foreach (var item in PersonalAttributesVMs)
+            {
+                item.NotifyChildsPropertyChangedRecursive();
+            }
         }
 
         #endregion

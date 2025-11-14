@@ -84,10 +84,6 @@ namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.Repos
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }
-            foreach (var item in ParentElementAttributesVMs)
-            {
-                item.NotifyChildsPropertyChangedRecursive();
-            }
         }
 
         #endregion

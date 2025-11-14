@@ -37,6 +37,10 @@ namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.Repos
         internal void NotifyChildsPropertyChangedRecursive()
         {
             OnPropertyChanged(nameof(State));
+            foreach (var item in PersonalAttributesVMs)
+            {
+                item.NotifyChildsPropertyChangedRecursive();
+            }
         }
 
         #endregion
