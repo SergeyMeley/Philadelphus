@@ -265,7 +265,7 @@ namespace Philadelphus.Business.Services
                 result += storage.MainEntitiesInfrastructureRepository.DeleteRoots(dbCollection);
             }
             result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes));
-            result += SaveChanges(treeRoots.SelectMany(x => x.Attributes));
+            result += SaveChanges(treeRoots.SelectMany(x => x.PersonalAttributes));
             foreach (var treeRoot in treeRoots)
             {
                 SetModelState(treeRoot, State.SavedOrLoaded);
@@ -296,6 +296,7 @@ namespace Philadelphus.Business.Services
             }
             result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes));
             result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves));
+            result += SaveChanges(treeNodes.SelectMany(x => x.PersonalAttributes));
             foreach (var treeNode in treeNodes)
             {
                 SetModelState(treeNode, State.SavedOrLoaded);
@@ -324,6 +325,7 @@ namespace Philadelphus.Business.Services
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.MainEntitiesInfrastructureRepository.DeleteLeaves(dbCollection);
             }
+            result += SaveChanges(treeLeaves.SelectMany(x => x.PersonalAttributes));
             foreach (var treeLeave in treeLeaves)
             {
                 SetModelState(treeLeave, State.SavedOrLoaded);
