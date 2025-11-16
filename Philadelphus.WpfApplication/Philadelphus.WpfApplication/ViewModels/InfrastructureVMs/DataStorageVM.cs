@@ -1,4 +1,6 @@
 ﻿using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.InfrastructureEntities.Enums;
+using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using System;
 using System.Collections.Generic;
@@ -12,18 +14,117 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
 {
     public class DataStorageVM : ViewModelBase
     {
-        private IDataStorageModel? _dataStorage;
-        public IDataStorageModel? DataStorage { get => _dataStorage; set => _dataStorage = value; }
-        public bool? IsAvailable { get => DataStorage.IsAvailable; }
-        public DateTime? LastCheckTime { get => DataStorage.LastCheckTime; }
+        private IDataStorageModel? _model;
+        public IDataStorageModel? Model
+        { 
+            get
+            {
+                return _model;
+            }
+        }
+        public Guid Guid 
+        { 
+            get
+            {
+                return _model.Guid;
+            }
+        }
+        public string Name 
+        {
+            get
+            {
+                return _model.Name;
+            }
+            set
+            {
+                _model.Name = value;
+            }
+        }
+        public string Description
+        {
+            get
+            {
+                return _model.Description;
+            }
+            set
+            {
+                _model.Description = value;
+            }
+        }
+        public InfrastructureTypes InfrastructureType
+        {
+            get
+            {
+                return _model.InfrastructureType;
+            }
+        }
+        public bool HasInfrastructureRepositories
+        {
+            get
+            {
+                if (_model.InfrastructureRepositories == null || _model.InfrastructureRepositories.Count() == 0)
+                    return false;
+                return true;
+            }
+        }
+        public bool HasDataStoragesCollectionInfrastructureRepository
+        {
+            get
+            {
+                if (_model.DataStoragesCollectionInfrastructureRepository == null)
+                    return false;
+                return true;
+            }
+        }
+        public bool HasTreeRepositoryHeadersCollectionInfrastructureRepository
+        {
+            get
+            {
+                if (_model.TreeRepositoryHeadersCollectionInfrastructureRepository == null)
+                    return false;
+                return true;
+            }
+        }
+        public bool HasTreeRepositoriesInfrastructureRepository
+        {
+            get
+            {
+                if (_model.TreeRepositoriesInfrastructureRepository == null)
+                    return false;
+                return true;
+            }
+        }
+        public bool HasMainEntitiesInfrastructureRepository
+        {
+            get
+            {
+                if (_model.MainEntitiesInfrastructureRepository == null)
+                    return false;
+                return true;
+            }
+        }
+        public bool? IsAvailable 
+        {
+            get
+            {
+                return _model.IsAvailable;
+            }
+        }
+        public DateTime? LastCheckTime 
+        {
+            get
+            {
+                return _model.LastCheckTime;
+            }
+        }
         public DataStorageVM(IDataStorageModel dataStorage)
         {
-            _dataStorage = dataStorage;
+            _model = dataStorage;
             StartCheckingStorage();
         }
         private void StartCheckingStorage()
         {
-            _dataStorage.StartAvailableAutoChecking();
+            _model.StartAvailableAutoChecking();
             System.Timers.Timer timer = new System.Timers.Timer(100);
             timer.Elapsed += CheckStorage;
             timer.AutoReset = true;
@@ -31,9 +132,9 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
         }
         private void CheckStorage()
         {
-            OnPropertyChanged(nameof(DataStorage));
-            OnPropertyChanged(nameof(DataStorage.IsAvailable));
-            OnPropertyChanged(nameof(DataStorage.LastCheckTime));
+            OnPropertyChanged(nameof(Model));
+            OnPropertyChanged(nameof(Model.IsAvailable));
+            OnPropertyChanged(nameof(Model.LastCheckTime));
         }
         private void CheckStorage(object source, ElapsedEventArgs e)
         {

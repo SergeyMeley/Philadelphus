@@ -1,20 +1,5 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.OtherEntities;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.Views;
-using Philadelphus.WpfApplication.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Timers;
-using System.Windows;
-using System.Xml.Linq;
-using Timers = System.Timers;
+﻿using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -78,7 +63,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             if (DataStoragesSettingsVM.DataStorageVMs == null)
                 throw new NullReferenceException("Не инициализированы модели представлений хранилищ данных.");
 
-            //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage).FirstOrDefault(x => x.Guid == header.OwnDataStorageUuid);
+            //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model).FirstOrDefault(x => x.Guid == header.OwnDataStorageUuid);
             //if (dataStorage == null)
             //{
             //    //var text = $"Не найдено хранилище данных {header.OwnDataStorageName} [{header.OwnDataStorageUuid}] для заголовка репозитория {header.Name} [{header.Guid}]";

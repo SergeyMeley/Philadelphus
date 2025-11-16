@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids
+namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
-    /// Логика взаимодействия для TreeLeaveDetails.xaml
+    /// Логика взаимодействия для AvailableRepositoryHeaders.xaml
     /// </summary>
-    public partial class TreeLeaveDetails : UserControl
+    public partial class AvailableRepositoryHeaders : UserControl
     {
-        public TreeLeaveDetails()
+        public AvailableRepositoryHeaders()
         {
             InitializeComponent();
         }

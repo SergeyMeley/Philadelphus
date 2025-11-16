@@ -1,23 +1,11 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Handlers;
-using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.WpfApplication.Models.StorageConfig;
+﻿using Philadelphus.Business.Services;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
-using Philadelphus.WpfApplication.Views.Controls;
 using Philadelphus.WpfApplication.Views.Windows;
-using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
 using System.IO;
-using System.Security.Principal;
-using System.Windows;
-using static System.Environment;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {

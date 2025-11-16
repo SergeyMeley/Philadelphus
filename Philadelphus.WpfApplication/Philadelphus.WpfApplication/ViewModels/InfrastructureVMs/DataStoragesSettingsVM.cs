@@ -31,7 +31,7 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
             {
                 if (model != null)
                 {
-                    if (_dataStorageVMs.FirstOrDefault(x => x.DataStorage.Guid == model.Guid) == null)
+                    if (_dataStorageVMs.FirstOrDefault(x => x.Model.Guid == model.Guid) == null)
                     {
                         _dataStorageVMs.Add(new DataStorageVM(model));
                     }

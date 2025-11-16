@@ -20,6 +20,15 @@ namespace Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids
     /// </summary>
     public partial class DataStorageDetails : UserControl
     {
+        public static readonly DependencyProperty IsReadOnlyProperty =
+            DependencyProperty.Register("IsReadOnly", typeof(bool),
+            typeof(MainEntityDetails), new PropertyMetadata(null));
+        public bool IsReadOnly
+        {
+            get { return (bool)GetValue(IsReadOnlyProperty); }
+            set { SetValue(IsReadOnlyProperty, value); }
+        }
+
         public DataStorageDetails()
         {
             InitializeComponent();

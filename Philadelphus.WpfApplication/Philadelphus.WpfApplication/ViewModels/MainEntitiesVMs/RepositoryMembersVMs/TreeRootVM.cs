@@ -1,21 +1,11 @@
-﻿using Microsoft.VisualBasic;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs.RootMembersVMs;
-using System;
-using System.Collections.Generic;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs
 {
     public class TreeRootVM : MainEntityBaseVM
     {

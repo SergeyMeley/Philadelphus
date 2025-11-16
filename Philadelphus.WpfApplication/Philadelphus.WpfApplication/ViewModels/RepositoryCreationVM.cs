@@ -1,14 +1,7 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Services;
+﻿using Philadelphus.Business.Services;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -53,7 +46,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_dataStoragesSettingsVM.SelectedDataStorageVM == null)
                         return;
-                    var result = _service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
+                    var result = _service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.Model);
                     var service = new TreeRepositoryService(result);
                     result.Name = _name;
                     result.Description = _description;

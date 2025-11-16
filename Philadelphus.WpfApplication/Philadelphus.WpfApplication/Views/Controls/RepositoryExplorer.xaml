@@ -7,6 +7,7 @@
              xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
              xmlns:mainentities="clr-namespace:Philadelphus.Business.Entities.RepositoryElements;assembly=Philadelphus.Business"
              xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+             xmlns:detail="clr-namespace:Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="White">
@@ -172,42 +173,64 @@
         <Grid Grid.Row="0" Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="Атрибуты элемента" Margin="2">
-                
-                <StackPanel>
-                    <Expander Grid.Row="0" Grid.Column="0" Header="Стандартные атрибуты (свойства) элемента" Margin="2">
-                        <ctrls:PropertyGrid></ctrls:PropertyGrid>
-                    </Expander>
-                    <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                    <Expander  Grid.Row="2" Grid.Column="0" Header="Внешние атрибуты" Margin="2">
-                        <ctrls:OwnAttributes></ctrls:OwnAttributes>
-                    </Expander>
-                    <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                    <Expander  Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                                <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                            </StackPanel>
-                            <DataGrid Height="auto" ItemsSource="{Binding SelectedRepositoryMember.PersonalAttributesVMs}" AutoGenerateColumns="false">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Состояние" Binding="{Binding State, Mode=OneWay}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
-                                    <DataGridComboBoxColumn Header="Тип данных" ItemsSource="{Binding ValueTypesList}" DisplayMemberPath="Name" SelectedItemBinding="{Binding ValueType}" SelectedValuePath="Name"></DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="Список значений (пресет)" ItemsSource="{Binding ValuesList}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Value}" SelectedValuePath="Name"></DataGridComboBoxColumn>
-                                    <DataGridCheckBoxColumn Header="Обязательный"></DataGridCheckBoxColumn>
-                                    <DataGridComboBoxColumn Header="Область видимости" ItemsSource="{Binding VisabilityList}"></DataGridComboBoxColumn>
-                                    <DataGridCheckBoxColumn Header="Только чтение"></DataGridCheckBoxColumn>
-                                    <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
-                                    <DataGridTextColumn Header="Значение" IsReadOnly="True"></DataGridTextColumn> 
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </Expander>
-                </StackPanel>
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="Текущий элемент">
+                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" MinHeight="25"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto" MinHeight="25"></RowDefinition>
+                            <RowDefinition Height="auto" MinHeight="25"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Expander Grid.Row="0" Grid.Column="0" Header="Свойства элемента">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <GroupBox>
+                                        <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
+                                    </GroupBox>
+                                </ScrollViewer>
+                            </Expander>
+                        </Grid>
+                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                        <Expander  Grid.Row="2" Grid.Column="0" Header="Внешние атрибуты" Margin="2">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <GroupBox>
+                                    <ctrls:OwnAttributes></ctrls:OwnAttributes>
+                                </GroupBox>
+                            </ScrollViewer>
+                        </Expander>
+                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                        <Expander  Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <GroupBox>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                                            <Button Content="{StaticResource imageRemove}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                                        </StackPanel>
+                                        <DataGrid Height="auto" ItemsSource="{Binding SelectedRepositoryMember.PersonalAttributesVMs}" AutoGenerateColumns="false">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Состояние" Binding="{Binding State, Mode=OneWay}"></DataGridTextColumn>
+                                                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
+                                                <DataGridComboBoxColumn Header="Тип данных" ItemsSource="{Binding ValueTypesList}" DisplayMemberPath="Name" SelectedItemBinding="{Binding ValueType}" SelectedValuePath="Name"></DataGridComboBoxColumn>
+                                                <DataGridComboBoxColumn Header="Список значений (пресет)" ItemsSource="{Binding ValuesList}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Value}" SelectedValuePath="Name"></DataGridComboBoxColumn>
+                                                <DataGridCheckBoxColumn Header="Обязательный"></DataGridCheckBoxColumn>
+                                                <DataGridComboBoxColumn Header="Область видимости" ItemsSource="{Binding VisabilityList}"></DataGridComboBoxColumn>
+                                                <DataGridCheckBoxColumn Header="Только чтение"></DataGridCheckBoxColumn>
+                                                <DataGridComboBoxColumn Header="Список значений (пресет)"></DataGridComboBoxColumn>
+                                                <DataGridTextColumn Header="Значение" IsReadOnly="True"></DataGridTextColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </GroupBox>
+                            </ScrollViewer>
+                        </Expander>
+                    </Grid>
+                </ScrollViewer>
             </GroupBox>
             <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
             <GroupBox Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2">

@@ -3,15 +3,11 @@ using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
-using Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.ElementsContentVMs;
-using System;
-using System.Collections.Generic;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContentVMs;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public abstract class MainEntityBaseVM : ViewModelBase
     {
@@ -120,10 +116,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public ObservableCollection<ElementAttributeVM> PersonalAttributesVMs { get; } = new ObservableCollection<ElementAttributeVM>();
         public ObservableCollection<ElementAttributeVM> ParentElementAttributesVMs { get; } = new ObservableCollection<ElementAttributeVM>();
 
+        private DataStorageVM _storageVM;
+        public DataStorageVM StorageVM { get => _storageVM; }
         public MainEntityBaseVM(MainEntityBaseModel mainEntityBaseModel, TreeRepositoryService service)
         {
             _service = service;
             _model = mainEntityBaseModel;
+            _storageVM = new DataStorageVM(mainEntityBaseModel.DataStorage);
             if (_model is IAttributeOwnerModel)
             {
                 var attributeOwnerModel = (IAttributeOwnerModel)_model;

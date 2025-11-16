@@ -6,7 +6,6 @@ using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.ElementsContentVMs
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContentVMs
 {
     public class ElementAttributeVM : MainEntityBaseVM
     {

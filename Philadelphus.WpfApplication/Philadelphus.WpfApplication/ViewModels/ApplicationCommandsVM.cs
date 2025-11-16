@@ -1,11 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.Views;
-using Philadelphus.WpfApplication.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.WpfApplication.Views.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {

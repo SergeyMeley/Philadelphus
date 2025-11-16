@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public class TreeRepositoryCollectionVM : ViewModelBase
     {
@@ -136,7 +136,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         }
         private bool InitRepositoriesVMsCollection()
         {
-            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
+            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
             var repositories = _service.GetTreeRepositoriesCollection(storages);
             if (repositories == null)
                 return false;
@@ -158,7 +158,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         }
         private TreeRepositoryVM InitTreeRepositoryVM(Guid guid)
         {
-            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage);
+            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
             var repositories = _service.GetTreeRepositoriesCollection(storages, new[] { guid });
             if (repositories == null)
                 return null;

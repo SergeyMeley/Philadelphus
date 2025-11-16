@@ -14,7 +14,7 @@ public class Test1
     public void InsertDataStorages()
     {
         //var repository = new JsonDataStoragesCollectionInfrastructureRepository();
-        //var storages = new List<DataStorage>()
+        //var storages = new List<Model>()
         //{
         //    new DataStorageBuilder()
         //        .SetGeneralParameters("qwe", "dfbdfzbz", Guid.NewGuid(), InfrastructureTypes.JsonDocument)

@@ -1,16 +1,9 @@
 ﻿using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs.RootMembersVMs
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
     public class TreeNodeVM : MainEntityBaseVM
     {

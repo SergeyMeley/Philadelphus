@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public class TreeRepositoryHeadersCollectionVM : ViewModelBase
     {

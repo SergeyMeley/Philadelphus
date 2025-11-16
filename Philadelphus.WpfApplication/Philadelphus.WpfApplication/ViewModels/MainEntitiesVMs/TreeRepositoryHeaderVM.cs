@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public class TreeRepositoryHeaderVM : ViewModelBase
     {

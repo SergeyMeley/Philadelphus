@@ -6,20 +6,12 @@ using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs;
-using Philadelphus.WpfApplication.ViewModels.TreeRepositoryElementsVMs.RepositoryMembersVMs.RootMembersVMs;
-using System;
-using System.Collections.Generic;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
+namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public  class TreeRepositoryVM : ViewModelBase
     {
@@ -42,6 +34,9 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
         public AuditInfoModel AuditInfo { get => _model.AuditInfo; }
         public State State { get => _model.State; }
         public IDataStorageModel OwnDataStorage { get => _model.OwnDataStorage; }
+
+        private DataStorageVM _storageVM;
+        public DataStorageVM StorageVM { get => _storageVM; }
         public string OwnDataStorageName
         {
             get
@@ -129,11 +124,12 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels
 
         #region [ Construct ]
 
-        public TreeRepositoryVM(TreeRepositoryModel treeRepository)
+        public TreeRepositoryVM(TreeRepositoryModel treeRepositoryModel)
         {
-            _service = new TreeRepositoryService(treeRepository);
-            _model = treeRepository;
-            foreach (var item in treeRepository.Childs)
+            _service = new TreeRepositoryService(treeRepositoryModel);
+            _model = treeRepositoryModel;
+            _storageVM = new DataStorageVM(treeRepositoryModel.OwnDataStorage);
+            foreach (var item in treeRepositoryModel.Childs)
             {
                 if (item.GetType() == typeof(TreeRootModel))
                 {
