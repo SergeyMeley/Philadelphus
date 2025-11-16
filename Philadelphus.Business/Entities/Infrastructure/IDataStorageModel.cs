@@ -11,8 +11,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
     public interface IDataStorageModel
     {
         public Guid Guid { get; }
-        public string Name { get; }
-        public string Description { get; }
+        public string Name { get; set; }
+        public string Description { get; set; }
         public InfrastructureTypes InfrastructureType { get; }
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories { get; }
         public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository { get; }
