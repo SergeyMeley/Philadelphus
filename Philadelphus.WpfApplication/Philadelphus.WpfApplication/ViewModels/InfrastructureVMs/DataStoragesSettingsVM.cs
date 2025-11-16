@@ -13,10 +13,32 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
     public class DataStoragesSettingsVM : ViewModelBase
     {
         private ObservableCollection<DataStorageVM>? _dataStorageVMs = new ObservableCollection<DataStorageVM>();
-        public ObservableCollection<DataStorageVM>? DataStorageVMs { get => _dataStorageVMs; set => _dataStorageVMs = value; }
+        public ObservableCollection<DataStorageVM>? DataStorageVMs 
+        { 
+            get
+            {
+                return _dataStorageVMs;
+            }
+            set
+            {
+                _dataStorageVMs = value;
+                OnPropertyChanged(nameof(DataStorageVMs));
+            }
+        }
 
         private DataStorageVM _selectedDataStorageVM;
-        public DataStorageVM SelectedDataStorageVM { get => _selectedDataStorageVM; set => _selectedDataStorageVM = value; }
+        public DataStorageVM SelectedDataStorageVM 
+        {
+            get
+            {
+                return _selectedDataStorageVM;
+            }
+            set
+            {
+                _selectedDataStorageVM = value;
+                OnPropertyChanged(nameof(SelectedDataStorageVM));
+            }
+        }
 
         public DataStoragesSettingsVM()
         {

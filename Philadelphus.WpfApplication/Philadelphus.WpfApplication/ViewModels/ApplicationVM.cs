@@ -54,6 +54,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenRepositoryCreationWindowCommand, _applicationCommandsVM.OpenMainWindowCommand);
             _applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
             _applicationWindowsVM.LaunchWindow.Show();
+            _applicationWindowsVM.LaunchWindow.Focus();
+            _applicationWindowsVM.LaunchWindow.Activate();
         }
 
         public string Title 

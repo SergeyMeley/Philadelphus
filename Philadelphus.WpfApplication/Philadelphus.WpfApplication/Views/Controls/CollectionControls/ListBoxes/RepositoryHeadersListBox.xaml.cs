@@ -21,24 +21,24 @@ namespace Philadelphus.WpfApplication.Views.Controls.CollectionControls.ListBoxe
     /// </summary>
     public partial class RepositoryHeadersListBox : UserControl
     {
-        public static readonly DependencyProperty ItemsSourceProperty =
-        DependencyProperty.Register("ItemsSource", typeof(IEnumerable),
+        public static readonly DependencyProperty RepositoryHeadersItemsSourceProperty =
+        DependencyProperty.Register("RepositoryHeadersItemsSource", typeof(IEnumerable),
         typeof(RepositoryHeadersListBox), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(object),
+        public static readonly DependencyProperty RepositoryHeadersSelectedItemProperty =
+            DependencyProperty.Register("RepositoryHeadersSelectedItem", typeof(object),
             typeof(RepositoryHeadersListBox), new PropertyMetadata(null));
 
-        public IEnumerable ItemsSource
+        public IEnumerable RepositoryHeadersItemsSource
         {
-            get { return (IEnumerable)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            get { return (IEnumerable)GetValue(RepositoryHeadersItemsSourceProperty); }
+            set { SetValue(RepositoryHeadersItemsSourceProperty, value); }
         }
 
-        public object SelectedItem
+        public object RepositoryHeadersSelectedItem
         {
-            get { return GetValue(SelectedItemProperty); }
-            set { SetValue(SelectedItemProperty, value); }
+            get { return GetValue(RepositoryHeadersSelectedItemProperty); }
+            set { SetValue(RepositoryHeadersSelectedItemProperty, value); }
         }
         public RepositoryHeadersListBox()
         {
