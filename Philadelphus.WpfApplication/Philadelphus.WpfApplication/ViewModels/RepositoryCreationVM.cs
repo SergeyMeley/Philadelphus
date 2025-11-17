@@ -7,8 +7,6 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class RepositoryCreationVM : ViewModelBase
     {
-        private RepositoryCreationWindow _window;
-
         private TreeRepositoryCollectionService _service;
 
         private string _name;
@@ -21,22 +19,11 @@ namespace Philadelphus.WpfApplication.ViewModels
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
-        public RepositoryCreationVM(TreeRepositoryCollectionService service, TreeRepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand, DataStoragesSettingsVM dataStoragesSettingsVM)
+        public RepositoryCreationVM(TreeRepositoryCollectionService service, TreeRepositoryCollectionVM repositoryCollectionVM, DataStoragesSettingsVM dataStoragesSettingsVM)
         {
             _service = service;
             _repositoryCollectionVM = repositoryCollectionVM;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
-            OpenDataStoragesSettingsWindowCommand = openDataStoragesSettingsWindowCommand;
-        }
-        public void OpenWindow()
-        {
-            _window = new RepositoryCreationWindow(this);
-            _window.ShowDialog();
-        }
-        public void CloseWindow()
-        {
-            _window.Close();
-            _window = null;
         }
         public RelayCommand CreateAndSaveRepositoryCommand
         {
@@ -52,10 +39,8 @@ namespace Philadelphus.WpfApplication.ViewModels
                     result.Description = _description;
                     service.SaveChanges(result);
                     _repositoryCollectionVM.TreeRepositoriesVMs.Add(new TreeRepositoryVM(result));
-                    CloseWindow();
                 });
             }
         }
-        public RelayCommand OpenDataStoragesSettingsWindowCommand { get; }
     }
 }

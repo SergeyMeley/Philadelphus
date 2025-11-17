@@ -96,18 +96,6 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 return null;
             }
         }
-        //TODO: Перенести в ApplicationVM
-        public RelayCommand OpenRepositoryCollectionSettingsWindow
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var window = new RepositorySettingsWindow(this);
-                    window.Show();
-                });
-            }
-        }
 
         public RelayCommand AddExistRepository
         {

@@ -15,12 +15,5 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private MainWindow _mainWindow;
         public MainWindow MainWindow { get => _mainWindow; set => _mainWindow = value; }
-
-        private DataStoragesSettingsWindow _dataStoragesSettingsWindow;
-        public DataStoragesSettingsWindow DataStoragesSettingsWindow { get => _dataStoragesSettingsWindow; set => _dataStoragesSettingsWindow = value; }
-
-        private RepositoryCreationWindow _repositoryCreationWindow;
-        public RepositoryCreationWindow RepositoryCreationWindow { get => _repositoryCreationWindow; set => _repositoryCreationWindow = value; }
-
     }
 }

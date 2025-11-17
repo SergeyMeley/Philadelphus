@@ -50,8 +50,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             _dataStoragesSettingsVM = new DataStoragesSettingsVM();
             _repositoryCollectionVM = new TreeRepositoryCollectionVM(treeRepositoryCollectionService, _dataStoragesSettingsVM);
             _repositoryHeadersCollectionVM = new TreeRepositoryHeadersCollectionVM(treeRepositoryCollectionService);
-            _repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _applicationCommandsVM.OpenDataStoragesSettingsWindowCommand, _dataStoragesSettingsVM);
-            _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenRepositoryCreationWindowCommand, _applicationCommandsVM.OpenMainWindowCommand);
+            _repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
+            _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenMainWindowCommand);
             _applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
             _applicationWindowsVM.LaunchWindow.Show();
             _applicationWindowsVM.LaunchWindow.Focus();

@@ -40,27 +40,5 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
-        public RelayCommand OpenDataStoragesSettingsWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    _applicationWindowsVM.DataStoragesSettingsWindow = new DataStoragesSettingsWindow(_applicationVM.DataStoragesSettingsVM);
-                    _applicationWindowsVM.DataStoragesSettingsWindow.ShowDialog();
-                });
-            }
-        }
-
-        public RelayCommand OpenRepositoryCreationWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    _applicationVM.RepositoryCreationVM.OpenWindow();
-                });
-            }
-        }
     }
 }

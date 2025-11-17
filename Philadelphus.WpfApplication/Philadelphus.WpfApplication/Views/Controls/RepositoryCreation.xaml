@@ -31,9 +31,9 @@
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding DataStorage.Name}"></TextBlock>
+                        <TextBlock Text="{Binding Name}"></TextBlock>
                         <TextBlock Text=". Доступность: "></TextBlock>
-                        <TextBlock Text="{Binding DataStorage.IsAvailable}" FontWeight="Bold" Foreground="{Binding DataStorage.IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></TextBlock>
+                        <TextBlock Text="{Binding IsAvailable}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>

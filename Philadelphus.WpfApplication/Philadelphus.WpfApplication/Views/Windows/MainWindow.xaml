@@ -238,12 +238,6 @@
                                 <TabItem Header="Репозиторий">
                                     <ctrls:RepositoryExplorer DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"></ctrls:RepositoryExplorer>
                                 </TabItem>
-                                <TabItem Header="Атрибуты">
-                                    <ctrls:AttributeGuide></ctrls:AttributeGuide>
-                                </TabItem>
-                                <TabItem Header="Пресеты (стандартные наборы)">
-                                    <ctrls:PresetGuide></ctrls:PresetGuide>
-                                </TabItem>
                                 <TabItem Header="Отчеты">
                                     <ctrls:ReportProcessor></ctrls:ReportProcessor>
                                 </TabItem>
@@ -252,9 +246,6 @@
                                 </TabItem>
                                 <TabItem Header="Импорт / экспорт">
                                     <ctrls:DataExchange></ctrls:DataExchange>
-                                </TabItem>
-                                <TabItem Header="Настройки репозитория">
-                                    <!--<ctrls:RepositorySettings></ctrls:RepositorySettings>-->
                                 </TabItem>
                             </TabControl>
                         </GroupBox>
