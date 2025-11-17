@@ -44,21 +44,24 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         }
         public bool CheckAvailability()
         {
-            if (_context.Database.CanConnect() == false)
-                return false;
-            try
+            using (var context = GetNewContext())
             {
-                if (_context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
+                if (context.Database.CanConnect() == false)
+                     return false;
+                try
+                {
+                    if (context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
+                        return false;
+                    context.Database.ExecuteSqlRaw($"SELECT {0}", 1);
+                    context.Database.OpenConnection();
+                    context.Database.CloseConnection();
+                }
+                catch (Exception ex)
+                {
                     return false;
-                _context.Database.ExecuteSqlRaw($"SELECT {0}", 1);
-                _context.Database.OpenConnection();
-                _context.Database.CloseConnection();
+                }
+                return true;
             }
-            catch (Exception)
-            {
-                return false;
-            }
-            return true;
         }
         private TreeRepositoriesPhiladelphusContext GetNewContext() => new TreeRepositoriesPhiladelphusContext(_connectionString);
         public IEnumerable<TreeRepository> SelectRepositories()

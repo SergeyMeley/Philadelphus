@@ -113,7 +113,6 @@ namespace Philadelphus.Business.Entities.Infrastructure
                     result = false;
                     break;
                 }
-                    
             }
             _lastCheckTime = DateTime.Now;
             _isAvailable = result;
