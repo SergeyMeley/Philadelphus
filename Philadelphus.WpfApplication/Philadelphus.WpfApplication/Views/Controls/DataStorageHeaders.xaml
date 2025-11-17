@@ -35,7 +35,7 @@
                             </TextBlock.LayoutTransform>
                         </TextBlock>
                     </Expander.Header>
-                    <detail:DataStorageDetails DataContext="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:DataStorageDetails>
+                    <detail:UniversalDetails DataContext="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:UniversalDetails>
                 </Expander>
             </Grid>
         </GroupBox>
