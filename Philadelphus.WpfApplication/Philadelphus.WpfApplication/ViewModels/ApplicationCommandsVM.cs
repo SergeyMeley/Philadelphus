@@ -40,5 +40,18 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
+
+        public RelayCommand OpenRepositoryMemberDetailsWindow
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var currentRepositoryMemberVM = ApplicationVM.LaunchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember;
+                    var window = new DetailsWindow(currentRepositoryMemberVM);
+                    window.Show();
+                });
+            }
+        }
     }
 }

@@ -34,6 +34,7 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
+        public ViewModelBase SelectedElementVM { get => RepositoryCollectionVM.CurrentRepositoryExplorerVM; } //TODO: Временно только элементы репозитория
         public ApplicationVM()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");

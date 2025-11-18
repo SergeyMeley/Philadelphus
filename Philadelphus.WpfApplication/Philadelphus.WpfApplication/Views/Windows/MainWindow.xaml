@@ -115,7 +115,7 @@
                                 </Style>
                             </RibbonComboBox.Style>
                         </RibbonComboBox>-->
-                        <ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200"></ComboBox>
+                        <ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>
                         
                         <RibbonButton Label="Настроить список репозиториев" DataContext="{Binding RepositoryCollectionVM}" Command="{Binding OpenRepositoryCollectionSettingsWindow}" />
                     </RibbonGroup>
@@ -124,6 +124,11 @@
                             <TextBlock Text="Состояние: "></TextBlock>
                             <TextBlock Text="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM.State}"></TextBlock>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Текущий участник репозитория: "></TextBlock>
+                            <TextBlock Text="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember.Name}"></TextBlock>
+                        </StackPanel>
+                        <RibbonButton Label="Подробнее" Command="{Binding ApplicationCommandsVM.OpenRepositoryMemberDetailsWindow}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Иерархия репозитория">
                         <RibbonButton Label="Добавить собственный корень" />
