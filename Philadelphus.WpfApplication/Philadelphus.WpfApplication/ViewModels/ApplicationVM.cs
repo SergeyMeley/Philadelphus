@@ -37,26 +37,26 @@ namespace Philadelphus.WpfApplication.ViewModels
         public ViewModelBase SelectedElementVM { get => RepositoryCollectionVM.CurrentRepositoryExplorerVM; } //TODO: Временно только элементы репозитория
         public ApplicationVM()
         {
-            CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
+            //CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
-            var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
-            if (configPath == null)
-                throw new Exception("Не найден путь к настроечным файлам. Проверьте параметр \'ConfigsDirectory\' в \'App.config\'.");
-            var configDirectory = new DirectoryInfo(configPath);
+            //var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
+            //if (configPath == null)
+            //    throw new Exception("Не найден путь к настроечным файлам. Проверьте параметр \'ConfigsDirectory\' в \'App.config\'.");
+            //var configDirectory = new DirectoryInfo(configPath);
 
-            var treeRepositoryCollectionService = new TreeRepositoryCollectionService(configDirectory);
+            //var treeRepositoryCollectionService = new TreeRepositoryCollectionService(configDirectory);
 
-            _applicationWindowsVM = new ApplicationWindowsVM();
-            _applicationCommandsVM = new ApplicationCommandsVM(this, _applicationWindowsVM);
-            _dataStoragesSettingsVM = new DataStoragesSettingsVM();
-            _repositoryCollectionVM = new TreeRepositoryCollectionVM(treeRepositoryCollectionService, _dataStoragesSettingsVM);
-            _repositoryHeadersCollectionVM = new TreeRepositoryHeadersCollectionVM(treeRepositoryCollectionService);
-            _repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
-            _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenMainWindowCommand);
-            _applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
-            _applicationWindowsVM.LaunchWindow.Show();
-            _applicationWindowsVM.LaunchWindow.Focus();
-            _applicationWindowsVM.LaunchWindow.Activate();
+            //_applicationWindowsVM = new ApplicationWindowsVM();
+            //_applicationCommandsVM = new ApplicationCommandsVM(this, _applicationWindowsVM);
+            //_dataStoragesSettingsVM = new DataStoragesSettingsVM();
+            //_repositoryCollectionVM = new TreeRepositoryCollectionVM(treeRepositoryCollectionService, _dataStoragesSettingsVM);
+            //_repositoryHeadersCollectionVM = new TreeRepositoryHeadersCollectionVM(treeRepositoryCollectionService);
+            //_repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
+            //_launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenMainWindowCommand);
+            //_applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
+            //_applicationWindowsVM.LaunchWindow.Show();
+            //_applicationWindowsVM.LaunchWindow.Focus();
+            //_applicationWindowsVM.LaunchWindow.Activate();
         }
 
         public string Title 
