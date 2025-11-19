@@ -1,12 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
-using Philadelphus.WpfApplication.Views;
-using Philadelphus.WpfApplication.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.WpfApplication.Views.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -48,25 +40,16 @@ namespace Philadelphus.WpfApplication.ViewModels
                 });
             }
         }
-        public RelayCommand OpenDataStoragesSettingsWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    _applicationWindowsVM.DataStoragesSettingsWindow = new DataStoragesSettingsWindow(_applicationVM.DataStoragesSettingsVM);
-                    _applicationWindowsVM.DataStoragesSettingsWindow.ShowDialog();
-                });
-            }
-        }
 
-        public RelayCommand OpenRepositoryCreationWindowCommand
+        public RelayCommand OpenRepositoryMemberDetailsWindow
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
-                    _applicationVM.RepositoryCreationVM.OpenWindow();
+                    var currentRepositoryMemberVM = ApplicationVM.LaunchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember;
+                    var window = new DetailsWindow(currentRepositoryMemberVM);
+                    window.Show();
                 });
             }
         }

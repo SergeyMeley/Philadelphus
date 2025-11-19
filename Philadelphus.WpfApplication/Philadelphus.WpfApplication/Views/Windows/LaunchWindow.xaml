@@ -133,7 +133,8 @@
             </TabItem>
 
             <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
-                <ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>
+                <!--<ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>-->
+                <ctrls:DataStorageHeaders></ctrls:DataStorageHeaders>
             </TabItem>
         </TabControl>
     </Grid>

@@ -13,8 +13,8 @@
     </UserControl.Resources>
     <Grid>
         <ListBox Margin="2" BorderBrush="LightGray" BorderThickness="1"
-                 ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                 SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
+                 ItemsSource="{Binding RepositoryHeadersItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                 SelectedItem="{Binding RepositoryHeadersSelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>

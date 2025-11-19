@@ -1,20 +1,12 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Services;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
+﻿using Philadelphus.Business.Services;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
     public class RepositoryCreationVM : ViewModelBase
     {
-        private RepositoryCreationWindow _window;
-
         private TreeRepositoryCollectionService _service;
 
         private string _name;
@@ -27,22 +19,11 @@ namespace Philadelphus.WpfApplication.ViewModels
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
-        public RepositoryCreationVM(TreeRepositoryCollectionService service, TreeRepositoryCollectionVM repositoryCollectionVM, RelayCommand openDataStoragesSettingsWindowCommand, DataStoragesSettingsVM dataStoragesSettingsVM)
+        public RepositoryCreationVM(TreeRepositoryCollectionService service, TreeRepositoryCollectionVM repositoryCollectionVM, DataStoragesSettingsVM dataStoragesSettingsVM)
         {
             _service = service;
             _repositoryCollectionVM = repositoryCollectionVM;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
-            OpenDataStoragesSettingsWindowCommand = openDataStoragesSettingsWindowCommand;
-        }
-        public void OpenWindow()
-        {
-            _window = new RepositoryCreationWindow(this);
-            _window.ShowDialog();
-        }
-        public void CloseWindow()
-        {
-            _window.Close();
-            _window = null;
         }
         public RelayCommand CreateAndSaveRepositoryCommand
         {
@@ -52,16 +33,14 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_dataStoragesSettingsVM.SelectedDataStorageVM == null)
                         return;
-                    var result = _service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.DataStorage);
+                    var result = _service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.Model);
                     var service = new TreeRepositoryService(result);
                     result.Name = _name;
                     result.Description = _description;
                     service.SaveChanges(result);
                     _repositoryCollectionVM.TreeRepositoriesVMs.Add(new TreeRepositoryVM(result));
-                    CloseWindow();
                 });
             }
         }
-        public RelayCommand OpenDataStoragesSettingsWindowCommand { get; }
     }
 }

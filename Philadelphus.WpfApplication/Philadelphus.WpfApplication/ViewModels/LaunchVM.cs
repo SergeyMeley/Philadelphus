@@ -1,19 +1,5 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.OtherEntities;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.Views;
-using Philadelphus.WpfApplication.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Timers;
-using System.Windows;
-using System.Xml.Linq;
-using Timers = System.Timers;
+﻿using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -28,16 +14,14 @@ namespace Philadelphus.WpfApplication.ViewModels
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
         public string UserName { get => Environment.UserName; }
-        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, TreeRepositoryCollectionVM repositoryCollectionVM, TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM, RelayCommand openRepositoryCreationWindowCommand, RelayCommand openMainWindowCommand)
+        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, TreeRepositoryCollectionVM repositoryCollectionVM, TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM, RelayCommand openMainWindowCommand)
         {
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
-            OpenRepositoryCreationWindowCommand = openRepositoryCreationWindowCommand;
             _openMainWindowCommand = openMainWindowCommand;
         }
-        public RelayCommand OpenRepositoryCreationWindowCommand { get; }
 
         private RelayCommand _openMainWindowCommand;
         public RelayCommand OpenMainWindowCommand { get => _openMainWindowCommand; }
@@ -77,7 +61,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             if (DataStoragesSettingsVM.DataStorageVMs == null)
                 throw new NullReferenceException("Не инициализированы модели представлений хранилищ данных.");
 
-            //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.DataStorage).FirstOrDefault(x => x.Guid == header.OwnDataStorageUuid);
+            //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model).FirstOrDefault(x => x.Guid == header.OwnDataStorageUuid);
             //if (dataStorage == null)
             //{
             //    //var text = $"Не найдено хранилище данных {header.OwnDataStorageName} [{header.OwnDataStorageUuid}] для заголовка репозитория {header.Name} [{header.Guid}]";

@@ -1,22 +1,11 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Handlers;
-using Philadelphus.Business.Services;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.WpfApplication.Models.StorageConfig;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesViewModels;
-using Philadelphus.WpfApplication.ViewModels.SupportiveViewModels;
-using Philadelphus.WpfApplication.Views.Controls;
+﻿using Philadelphus.Business.Services;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
 using Philadelphus.WpfApplication.Views.Windows;
-using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
 using System.IO;
-using System.Security.Principal;
-using System.Windows;
-using static System.Environment;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -45,6 +34,7 @@ namespace Philadelphus.WpfApplication.ViewModels
 
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
+        public ViewModelBase SelectedElementVM { get => RepositoryCollectionVM.CurrentRepositoryExplorerVM; } //TODO: Временно только элементы репозитория
         public ApplicationVM()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
@@ -61,10 +51,12 @@ namespace Philadelphus.WpfApplication.ViewModels
             _dataStoragesSettingsVM = new DataStoragesSettingsVM();
             _repositoryCollectionVM = new TreeRepositoryCollectionVM(treeRepositoryCollectionService, _dataStoragesSettingsVM);
             _repositoryHeadersCollectionVM = new TreeRepositoryHeadersCollectionVM(treeRepositoryCollectionService);
-            _repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _applicationCommandsVM.OpenDataStoragesSettingsWindowCommand, _dataStoragesSettingsVM);
-            _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenRepositoryCreationWindowCommand, _applicationCommandsVM.OpenMainWindowCommand);
+            _repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
+            _launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenMainWindowCommand);
             _applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
             _applicationWindowsVM.LaunchWindow.Show();
+            _applicationWindowsVM.LaunchWindow.Focus();
+            _applicationWindowsVM.LaunchWindow.Activate();
         }
 
         public string Title 

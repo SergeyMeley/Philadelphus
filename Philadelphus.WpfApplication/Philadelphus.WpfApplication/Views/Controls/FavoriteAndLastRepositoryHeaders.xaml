@@ -19,12 +19,12 @@
             <ColumnDefinition Width="auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0" Header="Избранные">
-            <lbs:RepositoryHeadersListBox ItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs}" SelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
+            <lbs:RepositoryHeadersListBox RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs}" RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Недавние">
-            <lbs:RepositoryHeadersListBox ItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs}" SelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
+            <lbs:RepositoryHeadersListBox RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs}" RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
         </GroupBox>
-        <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" IsExpanded="False" ExpandDirection="Right">
+        <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" IsExpanded="False" ExpandDirection="Right">
             <Expander.Header>
                 <TextBlock Text="Детальная информация">
                     <TextBlock.LayoutTransform>
@@ -32,7 +32,7 @@
                     </TextBlock.LayoutTransform>
                 </TextBlock>
             </Expander.Header>
-            <detail:RepositoryHeaderDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:RepositoryHeaderDetails>
+            <detail:UniversalDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}"></detail:UniversalDetails>
         </Expander>
         <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
     </Grid>
