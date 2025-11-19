@@ -40,6 +40,11 @@ namespace Philadelphus.Business.Services
 
         #region [ Construct ]
 
+        public TreeRepositoryCollectionService()
+        {
+                
+        }
+
         public TreeRepositoryCollectionService(DirectoryInfo configsDirectory)
         {
             //TODO: ВРЕСЕННО, ПЕРЕДЕЛАТЬ ПОЛНОСТЬЮ КОНСТРУКТОР, МАППЕР ПОЛУЧИТЬ ИЗ DI-КОНЕТЕЙНЕРА
