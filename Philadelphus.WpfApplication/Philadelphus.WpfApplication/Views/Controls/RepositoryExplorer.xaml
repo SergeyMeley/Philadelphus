@@ -37,7 +37,7 @@
                         <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элеменнт репозитория" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элемент репозитория" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageProtect}" Command="{Binding ProtectCommand}" ToolTip="Защитить" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="2">
