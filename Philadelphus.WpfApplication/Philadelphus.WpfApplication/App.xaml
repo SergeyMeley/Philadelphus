@@ -12,22 +12,27 @@
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
         
         <Image x:Key="imageAdd" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageApproval64" Source="/Philadelphus.WpfApplication;component/Icons/approval_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageBack" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageCheck64" Source="/Philadelphus.WpfApplication;component/Icons/check_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageCopy" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageCut" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_cut.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDelete" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_delete.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDelete2" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_delete2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDuplicate" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_duplicate.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageEdit64" Source="/Philadelphus.WpfApplication;component/Icons/edit_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageEditOld" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageEmpty" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_empty.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageForward" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageLink" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageModify" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNewTab64" Source="/Philadelphus.WpfApplication;component/Iconsnew-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageOpen" Source="/Philadelphus.WpfApplication;component/Icons/open.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imagePaste" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageProtect" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageRemove" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageReturn" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageSave" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageShowTopLevel64" Source="/Philadelphus.WpfApplication;component/Icons/top_level_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageUp" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
         <Image x:Key="imageStorage" Source="/Philadelphus.WpfApplication;component/Icons/storage.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
