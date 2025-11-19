@@ -33,7 +33,7 @@
                 <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="2">
                         <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageModify}" ToolTip="Режим редактирования" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
