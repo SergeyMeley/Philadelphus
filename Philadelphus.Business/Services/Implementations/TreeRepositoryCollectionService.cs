@@ -7,6 +7,7 @@ using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.Business.Mapping;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -20,13 +21,16 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Services
+namespace Philadelphus.Business.Services.Implementations
 {
     public class TreeRepositoryCollectionService
     {
         #region [ Props ]
 
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
+        private readonly INotificationService _notificationService;
+        private readonly ITreeRepositoryService _treeRepositoryService;
 
         private static Dictionary<Guid, IDataStorageModel> _dataStorageModels = new Dictionary<Guid, IDataStorageModel>();
         public static Dictionary<Guid, IDataStorageModel> DataStorageModels { get => _dataStorageModels; private set => _dataStorageModels = value; }
@@ -40,9 +44,30 @@ namespace Philadelphus.Business.Services
 
         #region [ Construct ]
 
-        public TreeRepositoryCollectionService()
+        public TreeRepositoryCollectionService(
+            IMapper mapper,
+            ILogger logger,
+            INotificationService notificationService,
+            ITreeRepositoryService treeRepositoryService,
+            DirectoryInfo configsDirectory)
         {
-                
+            _mapper = mapper;
+            _logger = logger;
+            _notificationService = notificationService;
+            _treeRepositoryService = treeRepositoryService;
+
+            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
+                .SetGeneralParameters(
+                    name: "Основное хранилище",
+                    description: "Хранилище настроечных файлов в формате Json",
+                    Guid.Empty,
+                    InfrastructureTypes.JsonDocument,
+                    isDisabled: false)
+                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory))
+            ;
+            _mainDataStorageModel = dataStorageBuilder.Build();
+
+            _logger.LogInformation("TreeRepositoryCollectionService инициализирован.");
         }
 
         public TreeRepositoryCollectionService(DirectoryInfo configsDirectory)
@@ -168,9 +193,8 @@ namespace Philadelphus.Business.Services
 
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
-            var service = new TreeRepositoryService(treeRepository);
             long result = 0;
-            result = service.SaveChanges(treeRepository);
+            result = _treeRepositoryService.SaveChanges(treeRepository);
             return result;
         }
         public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader)
@@ -240,38 +264,37 @@ namespace Philadelphus.Business.Services
         /// Создание примера репозитория.
         /// </summary>
         /// <returns></returns>
-        public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
-        {
-            var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage, new TreeRepository());
-            var service = new TreeRepositoryService(repo);
-            TreeRepositoryCollectionService.DataTreeRepositories.Add(repo.Guid, repo);
-            for (int i = 0; i < 5; i++)
-            {
-                var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage, new TreeRoot());
-                service.GetAttributesSample(root);
-                ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(root);
-                for (int j = 0; j < 5; j++)
-                {
-                    var node = new TreeNodeModel(Guid.NewGuid(), root, new TreeNode());
-                    service.GetAttributesSample(node);
-                    ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(node);
-                    for (int k = 0; k < 5; k++)
-                    {
-                        var node2 = new TreeNodeModel(Guid.NewGuid(), root, new TreeNode());
-                        service.GetAttributesSample(node2);
-                        repo.ElementsCollection.Add(node2);
-                        node.Childs.Add(node2);
-                        var leave = new TreeLeaveModel(Guid.NewGuid(), node, new TreeLeave());
-                        service.GetAttributesSample(leave);
-                        ((List<TreeRepositoryMemberBaseModel>)repo.ElementsCollection).Add(leave);
-                        node.Childs.Add(leave);
-                    }
-                    root.Childs.Add(node);
-                }
-                repo.Childs.Add(root);
-            }
-            return repo;
-        }
+        //public TreeRepositoryModel CreateSampleRepository(IDataStorageModel dataStorage)
+        //{
+        //    var repo = new TreeRepositoryModel(Guid.NewGuid(), dataStorage, new TreeRepository());
+        //    DataTreeRepositories.Add(repo.Guid, repo);
+        //    for (int i = 0; i < 5; i++)
+        //    {
+        //        var root = new TreeRootModel(Guid.NewGuid(), repo, dataStorage, new TreeRoot());
+        //        _treeRepositoryService.GetAttributesSample(root);
+        //        repo.ElementsCollection.Add(root);
+        //        for (int j = 0; j < 5; j++)
+        //        {
+        //            var node = new TreeNodeModel(Guid.NewGuid(), root, new TreeNode());
+        //            _treeRepositoryService.GetAttributesSample(node);
+        //            repo.ElementsCollection.Add(node);
+        //            for (int k = 0; k < 5; k++)
+        //            {
+        //                var node2 = new TreeNodeModel(Guid.NewGuid(), root, new TreeNode());
+        //                _treeRepositoryService.GetAttributesSample(node2);
+        //                repo.ElementsCollection.Add(node2);
+        //                node.Childs.Add(node2);
+        //                var leave = new TreeLeaveModel(Guid.NewGuid(), node, new TreeLeave());
+        //                _treeRepositoryService.GetAttributesSample(leave);
+        //                repo.ElementsCollection.Add(leave);
+        //                node.Childs.Add(leave);
+        //            }
+        //            root.Childs.Add(node);
+        //        }
+        //        repo.Childs.Add(root);
+        //    }
+        //    return repo;
+        //}
 
         #endregion
     }

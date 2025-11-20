@@ -1,7 +1,7 @@
 ﻿using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;

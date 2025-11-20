@@ -9,11 +9,10 @@ namespace Philadelphus.Business.Entities.Enums
     public enum NotificationTypesModel
     {
         TextMessage,
-        ModalWindow,
         PopUpWindow,
+        ModalWindow,
         Email,
         Sms,
         Call,
-        
     }
 }

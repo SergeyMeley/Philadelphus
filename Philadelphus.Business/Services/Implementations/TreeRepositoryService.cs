@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Castle.Core.Logging;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
@@ -9,6 +10,7 @@ using Philadelphus.Business.Factories;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.Business.Interfaces;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -19,22 +21,15 @@ using System.Collections.ObjectModel;
 using System.Xml.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace Philadelphus.Business.Services
+namespace Philadelphus.Business.Services.Implementations
 {
     public class TreeRepositoryService
     {
         #region [ Props ]
 
-        private ITreeRepositoryHeaderModel _repository;
-        public ITreeRepositoryHeaderModel Repository 
-        { 
-            get
-            {
-                return _repository;
-            }
-        }
-
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
+        private readonly INotificationService _notificationService;
 
         private static RepositoryMembersCollectionModel _mainEntityCollection = new RepositoryMembersCollectionModel();
         public static RepositoryMembersCollectionModel MainEntityCollection { get => _mainEntityCollection; }
@@ -43,9 +38,14 @@ namespace Philadelphus.Business.Services
 
         #region [ Construct ]
 
-        public TreeRepositoryService(ITreeRepositoryHeaderModel repository)
+        public TreeRepositoryService(
+            IMapper mapper,
+            ILogger logger,
+            INotificationService notificationService)
         {
-            _repository = repository;
+            _mapper = mapper;
+            _logger = logger;
+            _notificationService = notificationService;
         }
 
         #endregion
@@ -211,12 +211,6 @@ namespace Philadelphus.Business.Services
 
         #region [ Save ]
 
-        public long SaveChanges()
-        {
-            long result = 0;
-            result = SaveChanges(_repository as TreeRepositoryModel);
-            return result;
-        }
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
             if (treeRepository == null)
@@ -381,26 +375,44 @@ namespace Philadelphus.Business.Services
 
         public TreeRootModel CreateTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
         {
-            var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage, new TreeRoot());
-            parentElement.ElementsCollection.Add(result);
-            parentElement.Childs.Add(result);
-            parentElement.State = State.Changed;
-            return result;
+            try
+            {
+                var result = new TreeRootModel(Guid.NewGuid(), parentElement, dataStorage, new TreeRoot());
+                parentElement.ElementsCollection.Add(result);
+                parentElement.Childs.Add(result);
+                parentElement.State = State.Changed;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Ошибка создания корня.", ex);
+                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                throw;
+            }
         }
         public TreeNodeModel CreateTreeNode(IParentModel parentElement)
         {
-            var result = new TreeNodeModel(Guid.NewGuid(), parentElement, new TreeNode());
-            if (parentElement is IAttributeOwnerModel)
-                result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
-            result.ParentRepository.ElementsCollection.Add(result);
-            //parentElement.State = State.Changed;
-            //if (parentElement is IMainEntityWritableModel)
-            //{
-            //    SetModelState((IMainEntityWritableModel)parentElement, State.SavedOrLoaded);
-            //}
-            parentElement.Childs.Add(result);
-            SetModelState(result, State.Initialized);
-            return result;
+            try
+            {
+                var result = new TreeNodeModel(Guid.NewGuid(), parentElement, new TreeNode());
+                if (parentElement is IAttributeOwnerModel)
+                    result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
+                result.ParentRepository.ElementsCollection.Add(result);
+                //parentElement.State = State.Changed;
+                //if (parentElement is IMainEntityWritableModel)
+                //{
+                //    SetModelState((IMainEntityWritableModel)parentElement, State.SavedOrLoaded);
+                //}
+                parentElement.Childs.Add(result);
+                SetModelState(result, State.Initialized);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Ошибка создания узла.", ex);
+                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                throw;
+            }
         }
         public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement)
         {
@@ -408,7 +420,7 @@ namespace Philadelphus.Business.Services
             {
                 if (parentElement.GetType().IsAssignableTo(typeof(ITreeRepositoryMemberModel)) == false || parentElement.GetType() != typeof(TreeNodeModel))
                 {
-                    NotificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                    _notificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                     return null;
                 }
                 else
@@ -424,7 +436,8 @@ namespace Philadelphus.Business.Services
             }
             catch (Exception ex)
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                _logger.Error("Ошибка создания листа.", ex);
+                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
         }
@@ -444,7 +457,8 @@ namespace Philadelphus.Business.Services
             }
             catch (Exception ex)
             {
-                NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                _logger.Error("Ошибка создания атрибута.", ex);
+                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
         }
@@ -500,7 +514,7 @@ namespace Philadelphus.Business.Services
             for (int i = 0; i < 20; i++)
             {
                 var entry = new ElementAttributeModel(Guid.NewGuid(), owner, null);
-                ((List<ElementAttributeModel>)owner.PersonalAttributes).Add(entry);
+                owner.PersonalAttributes.Add(entry);
                 result.Add(entry);
             }
 
