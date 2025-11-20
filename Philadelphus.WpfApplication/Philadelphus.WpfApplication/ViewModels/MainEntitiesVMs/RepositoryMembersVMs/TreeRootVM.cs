@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
 using System.Windows.Data;

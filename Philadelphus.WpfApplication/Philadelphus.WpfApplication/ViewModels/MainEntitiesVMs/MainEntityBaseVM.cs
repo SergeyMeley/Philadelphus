@@ -2,7 +2,7 @@
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContentVMs;
 using System.Collections.ObjectModel;

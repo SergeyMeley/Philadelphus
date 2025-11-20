@@ -2,7 +2,7 @@
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

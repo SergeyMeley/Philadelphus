@@ -5,7 +5,7 @@ using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;

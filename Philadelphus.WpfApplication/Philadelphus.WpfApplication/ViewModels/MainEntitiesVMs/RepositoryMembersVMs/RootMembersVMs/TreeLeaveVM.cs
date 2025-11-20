@@ -1,5 +1,5 @@
 ﻿using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
 
 namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
