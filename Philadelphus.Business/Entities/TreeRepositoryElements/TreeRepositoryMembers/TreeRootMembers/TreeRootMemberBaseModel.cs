@@ -22,17 +22,10 @@ namespace Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMe
 
         protected bool SetParents(IParentModel parent)
         {
-            if (base.SetParents(parent) == false)
-            {
-                return false;
-            }
-
             if (parent == null)
-            {
-                NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLevelModel.Error);
                 return false;
-            }
-
+            if (base.SetParents(parent) == false)
+                return false;
             if (parent is TreeRootModel)
             {
                 ParentRoot = (TreeRootModel)parent;
@@ -43,8 +36,6 @@ namespace Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMe
                 ParentRoot = ((TreeRootMemberBaseModel)parent).ParentRoot;
                 return true;
             }
-
-            NotificationService.SendNotification($"Ошибка присвоения родительского корня", NotificationCriticalLevelModel.Error);
             return false;
         }
     }

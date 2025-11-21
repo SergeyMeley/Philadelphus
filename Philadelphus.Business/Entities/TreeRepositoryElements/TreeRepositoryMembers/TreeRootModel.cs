@@ -50,19 +50,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
             if (SetParents(parent))
             {
                 OwnDataStorage = dataStorage;
-                try
-                {
-                    Initialize();
-                }
-                catch (Exception ex)
-                {
-                    NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
-                    throw;
-                }
-            }
-            else
-            {
-                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
+                Initialize();
             }
         }
         private void Initialize()

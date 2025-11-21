@@ -20,12 +20,16 @@ namespace Philadelphus.JsonRepository.Repositories
         private FileInfo _file;
         public JsonTreeRepositoryHeadersCollectionInfrastructureRepository(DirectoryInfo directory)
         {
+            if (directory == null)
+                return;
             _file = new FileInfo(Path.Combine(directory.FullName, "repository-headers-config.json"));
         }
         public bool CheckAvailability()
         {
+            if (_file == null)
+                return false;
             if (_file.Exists == false)
-                throw new FileNotFoundException($"Не найден перечень заголовков репозиториев: {_file.FullName}");
+                return false;
             return true;
         }
 

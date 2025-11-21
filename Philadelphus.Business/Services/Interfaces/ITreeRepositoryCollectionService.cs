@@ -48,6 +48,7 @@ namespace Philadelphus.Business.Services.Interfaces
 
         #region [ Create + Add ]
 
+        public bool CreateMainDataStorageModel(DirectoryInfo configsDirectory);
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage);
         public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel);
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path);

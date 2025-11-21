@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
@@ -23,12 +24,12 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Philadelphus.Business.Services.Implementations
 {
-    public class TreeRepositoryService
+    public class TreeRepositoryService : ITreeRepositoryService
     {
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
+        private readonly ILogger<TreeRepositoryService> _logger;
         private readonly INotificationService _notificationService;
 
         private static RepositoryMembersCollectionModel _mainEntityCollection = new RepositoryMembersCollectionModel();
@@ -40,7 +41,7 @@ namespace Philadelphus.Business.Services.Implementations
 
         public TreeRepositoryService(
             IMapper mapper,
-            ILogger logger,
+            ILogger<TreeRepositoryService> logger,
             INotificationService notificationService)
         {
             _mapper = mapper;
@@ -52,11 +53,11 @@ namespace Philadelphus.Business.Services.Implementations
 
         #region [ Get + Load ]
 
-        public static IMainEntity GetEntityFromCollection(Guid guid)
+        public IMainEntity GetEntityFromCollection(Guid guid)
         {
             return GetModelFromCollection(guid).ToDbEntity();
         }
-        public static IMainEntityModel GetModelFromCollection(Guid guid)
+        public IMainEntityModel GetModelFromCollection(Guid guid)
         {
             return _mainEntityCollection.FirstOrDefault(x => x.Guid == guid);
         }
@@ -385,7 +386,7 @@ namespace Philadelphus.Business.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error("Ошибка создания корня.", ex);
+                _logger.LogError("Ошибка создания корня.", ex);
                 _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
@@ -409,7 +410,7 @@ namespace Philadelphus.Business.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error("Ошибка создания узла.", ex);
+                _logger.LogError("Ошибка создания узла.", ex);
                 _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
@@ -436,7 +437,7 @@ namespace Philadelphus.Business.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error("Ошибка создания листа.", ex);
+                _logger.LogError("Ошибка создания листа.", ex);
                 _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }
@@ -457,7 +458,7 @@ namespace Philadelphus.Business.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.Error("Ошибка создания атрибута.", ex);
+                _logger.LogError("Ошибка создания атрибута.", ex);
                 _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                 throw;
             }

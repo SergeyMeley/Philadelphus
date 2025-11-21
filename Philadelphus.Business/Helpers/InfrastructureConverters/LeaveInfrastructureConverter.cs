@@ -13,14 +13,14 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
 {
     public static class LeaveInfrastructureConverter
     {
-        public static TreeLeave ToDbEntity(this TreeLeaveModel businessEntity)
+        public static TreeLeave ToDbEntity(this TreeLeaveModel businessEntity, TreeRepositoryService service)
         {
             if (businessEntity == null)
                 return null;
             var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             result.ParentGuid = businessEntity.Parent.Guid;
             result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;
-            result.ParentTreeRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
+            result.ParentTreeRoot = (TreeRoot)service.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
             return result;
         }
         public static List<TreeLeave> ToDbEntityCollection(this IEnumerable<TreeLeaveModel> businessEntityCollection)
@@ -30,7 +30,7 @@ namespace Philadelphus.Business.Helpers.InfrastructureConverters
             var result = new List<TreeLeave>();
             foreach (var businessEntity in businessEntityCollection)
             {
-                result.Add(businessEntity.ToDbEntity());
+                result.Add((TreeLeave)businessEntity.ToDbEntity());
             }
             return result;
         }

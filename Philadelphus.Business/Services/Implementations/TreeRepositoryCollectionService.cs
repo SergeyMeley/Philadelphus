@@ -23,12 +23,12 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Services.Implementations
 {
-    public class TreeRepositoryCollectionService
+    public class TreeRepositoryCollectionService : ITreeRepositoryCollectionService
     {
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
+        private readonly ILogger<TreeRepositoryCollectionService> _logger;
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryService _treeRepositoryService;
 
@@ -46,73 +46,35 @@ namespace Philadelphus.Business.Services.Implementations
 
         public TreeRepositoryCollectionService(
             IMapper mapper,
-            ILogger logger,
+            ILogger<TreeRepositoryCollectionService> logger,
             INotificationService notificationService,
-            ITreeRepositoryService treeRepositoryService,
-            DirectoryInfo configsDirectory)
+            ITreeRepositoryService treeRepositoryService)
         {
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
             _treeRepositoryService = treeRepositoryService;
 
-            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
-                .SetGeneralParameters(
-                    name: "Основное хранилище",
-                    description: "Хранилище настроечных файлов в формате Json",
-                    Guid.Empty,
-                    InfrastructureTypes.JsonDocument,
-                    isDisabled: false)
-                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory))
-            ;
-            _mainDataStorageModel = dataStorageBuilder.Build();
-
             _logger.LogInformation("TreeRepositoryCollectionService инициализирован.");
-        }
-
-        public TreeRepositoryCollectionService(DirectoryInfo configsDirectory)
-        {
-            //TODO: ВРЕСЕННО, ПЕРЕДЕЛАТЬ ПОЛНОСТЬЮ КОНСТРУКТОР, МАППЕР ПОЛУЧИТЬ ИЗ DI-КОНЕТЕЙНЕРА
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddFilter("Microsoft", LogLevel.Warning)
-                    .AddFilter("System", LogLevel.Warning)
-                    .AddFilter("Philadelphus", LogLevel.Debug)
-                    ;
-            });
-
-            var configuration = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<MappingProfile>();
-                // Добавьте другие профили здесь
-            }, loggerFactory);
-
-            _mapper = configuration.CreateMapper();
-            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder();
-            dataStorageBuilder
-                .SetGeneralParameters(name: "Основное хранилище", description: "Хранилище настроечных файлов в формате Json", Guid.Empty, InfrastructureTypes.JsonDocument, isDisabled: false)
-                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory));
-            _mainDataStorageModel = dataStorageBuilder.Build();
         }
 
         #endregion
 
         #region [ Get + Load ]
 
-        public static TreeRepository GetTreeRepositoryFromCollection(Guid guid)
+        public TreeRepository GetTreeRepositoryFromCollection(Guid guid)
         {
             return GetTreeRepositoryModelFromCollection(guid).ToDbEntity();
         }
-        public static List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> guids)
+        public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> guids)
         {
             return GetTreeRepositoryModelFromCollection(guids).ToDbEntityCollection();
         }
-        public static TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid guid)
+        public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid guid)
         {
             return _dataTreeRepositories[guid];
         }
-        public static List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> guids)
+        public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> guids)
         {
             var result = new List<TreeRepositoryModel>();
             foreach (var guid in guids)
@@ -124,11 +86,11 @@ namespace Philadelphus.Business.Services.Implementations
             }
             return result;
         }
-        public static IDataStorageModel GetStorageModelFromCollection(Guid guid)
+        public IDataStorageModel GetStorageModelFromCollection(Guid guid)
         {
             return _dataStorageModels[guid];
         }
-        public static List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> guids)
+        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> guids)
         {
             var result = new List<IDataStorageModel>();
             foreach (var guid in guids)
@@ -208,6 +170,26 @@ namespace Philadelphus.Business.Services.Implementations
         #endregion
 
         #region [ Create + Add ]
+
+        public bool CreateMainDataStorageModel(DirectoryInfo configsDirectory)
+        {
+            if (configsDirectory == null)
+                return false;
+
+            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
+                .SetGeneralParameters(
+                    name: "Основное хранилище",
+                    description: "Хранилище настроечных файлов в формате Json",
+                    Guid.Empty,
+                    InfrastructureTypes.JsonDocument,
+                    isDisabled: false)
+                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory))
+            ;
+            _mainDataStorageModel = dataStorageBuilder.Build();
+
+            _logger.LogInformation("Хранилище конфигурационных файлов инициализировано.");
+            return true;
+        }
 
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage)
         {

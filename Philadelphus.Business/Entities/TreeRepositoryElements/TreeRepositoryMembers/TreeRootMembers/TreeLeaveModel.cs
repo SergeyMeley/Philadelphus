@@ -25,21 +25,8 @@ namespace Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMe
         {
             if (SetParents(parent))
             {
-                try
-                {
-                    Initialize();
-                }
-                catch (Exception ex)
-                {
-                    NotificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
-                    throw;
-                }
+                Initialize();
             }
-            else
-            {
-                NotificationService.Notifications.Add(new NotificationModel("Корень может быть добавлен только в репозиторий!", NotificationCriticalLevelModel.Error));
-            }
-            
         }
         private void Initialize()
         {

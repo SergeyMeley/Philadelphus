@@ -31,10 +31,7 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
         protected bool SetParents(IParentModel parent)
         {
             if (parent == null)
-            {
-                NotificationService.SendNotification($"Невозможно добавить элемент {EntityType}, выделите родительский элемент и повторите попытку!", NotificationCriticalLevelModel.Error);
                 return false;
-            }
 
             Parent = parent;
 
@@ -49,7 +46,6 @@ namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
                 return true;
             }
 
-            NotificationService.SendNotification($"Ошибка присвоения родительского репозитория", NotificationCriticalLevelModel.Error);
             return false;
         }
     }
