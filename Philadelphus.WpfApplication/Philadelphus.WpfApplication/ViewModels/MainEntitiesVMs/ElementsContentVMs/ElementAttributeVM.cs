@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
@@ -6,6 +7,7 @@ using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContent
     {
         #region [ Props ]
 
-        private readonly TreeRepositoryService _service;
+        private readonly ITreeRepositoryService _service;
 
         private readonly ElementAttributeModel _model;
 
@@ -57,10 +59,14 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContent
 
         #region [ Construct ]
 
-        public ElementAttributeVM(ElementAttributeModel elementAttribute, TreeRepositoryService service) : base(elementAttribute, service)
+        public ElementAttributeVM(
+            ElementAttributeModel elementAttribute,
+            ITreeRepositoryService service) 
+            : base(elementAttribute, service)
         {
-            _model = elementAttribute;
             _service = service;
+
+            _model = elementAttribute;
         }
 
         #endregion

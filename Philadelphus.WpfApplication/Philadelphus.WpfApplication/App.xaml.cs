@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Mapping;
 using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
@@ -24,27 +27,39 @@ namespace Philadelphus.WpfApplication
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
             _host = Host.CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    logging.SetMinimumLevel(LogLevel.Information);
+                })
             .ConfigureServices((context, services) =>
             {
+                // Регистрация AutoMapper
+                services.AddAutoMapper(typeof(MappingProfile));
+
                 // Регистрация сервисов
-                //services.AddScoped<IDataService, TreeRepositoryCollectionService>();
-                services.AddScoped<TreeRepositoryCollectionService>();
-                services.AddScoped<TreeRepositoryService>();
+                services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();
+                services.AddSingleton<INotificationService, NotificationService>();
+                services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
 
                 // Регистрация ViewModel
                 services.AddScoped<ApplicationVM>();
+                services.AddScoped<ApplicationCommandsVM>();
+                services.AddScoped<ApplicationWindowsVM>();
                 services.AddScoped<LaunchVM>();
                 services.AddScoped<DataStoragesSettingsVM>();
                 services.AddScoped<TreeRepositoryCollectionVM>();
                 services.AddScoped<TreeRepositoryHeadersCollectionVM>();
+                services.AddScoped<RepositoryCreationVM>();
 
                 // Регистрация View
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<LaunchWindow>();
             })
             .Build();
-
-            
         }
 
         protected override async void OnStartup(StartupEventArgs e)

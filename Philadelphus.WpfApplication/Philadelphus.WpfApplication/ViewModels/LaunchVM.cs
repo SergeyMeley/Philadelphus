@@ -14,13 +14,13 @@ namespace Philadelphus.WpfApplication.ViewModels
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
         public string UserName { get => Environment.UserName; }
-        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, TreeRepositoryCollectionVM repositoryCollectionVM, TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM, RelayCommand openMainWindowCommand)
+        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, TreeRepositoryCollectionVM repositoryCollectionVM, TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM, ApplicationCommandsVM applicationCommandsVM)
         {
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
-            _openMainWindowCommand = openMainWindowCommand;
+            _openMainWindowCommand = applicationCommandsVM.OpenMainWindowCommand;
         }
 
         private RelayCommand _openMainWindowCommand;

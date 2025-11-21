@@ -1,4 +1,6 @@
-﻿using Philadelphus.Business.Services.Implementations;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
@@ -7,7 +9,9 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public class TreeRepositoryHeadersCollectionVM : ViewModelBase
     {
-        private TreeRepositoryCollectionService _service;
+        private readonly ILogger<TreeRepositoryHeadersCollectionVM> _logger;
+        private readonly INotificationService _notificationService;
+        private readonly ITreeRepositoryCollectionService _service;
 
         private List<TreeRepositoryHeaderVM> _treeRepositoryHeadersVMs;
         public List<TreeRepositoryHeaderVM> TreeRepositoryHeadersVMs
@@ -67,8 +71,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 });
             }
         }
-        public TreeRepositoryHeadersCollectionVM(TreeRepositoryCollectionService service)
+        public TreeRepositoryHeadersCollectionVM(
+            ILogger<TreeRepositoryHeadersCollectionVM> logger,
+            INotificationService notificationService,
+            ITreeRepositoryCollectionService service)
         {
+            _logger = logger;
+            _notificationService = notificationService;
             _service = service;
         }
         public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
@@ -83,8 +92,11 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         private List<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs()
         {
             _treeRepositoryHeadersVMs.Clear();
-            var headers = _service.ForceLoadTreeRepositoryHeadersCollection().OrderByDescending(x => x.LastOpening);
-            
+            var headers = _service.ForceLoadTreeRepositoryHeadersCollection();
+            if (headers == null)
+                return null;
+            headers.OrderByDescending(x => x.LastOpening);
+
             foreach (var header in headers)
             {
                 var vm = new TreeRepositoryHeaderVM(header, _service, _updateTreeRepositoryHeaders);

@@ -1,5 +1,8 @@
-﻿using Philadelphus.Business.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Services;
 using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
@@ -8,7 +11,11 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class RepositoryCreationVM : ViewModelBase
     {
-        private TreeRepositoryCollectionService _service;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<RepositoryCreationVM> _logger;
+        private readonly INotificationService _notificationService;
+        private readonly ITreeRepositoryCollectionService _collectionService;
+        private readonly ITreeRepositoryService _service;
 
         private string _name;
         public string Name { get => _name; set => _name = value; }
@@ -20,9 +27,21 @@ namespace Philadelphus.WpfApplication.ViewModels
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
-        public RepositoryCreationVM(TreeRepositoryCollectionService service, TreeRepositoryCollectionVM repositoryCollectionVM, DataStoragesSettingsVM dataStoragesSettingsVM)
+        public RepositoryCreationVM(
+            IServiceProvider serviceProvider,
+            ILogger<RepositoryCreationVM> logger,
+            INotificationService notificationService,
+            ITreeRepositoryCollectionService collectionService,
+            ITreeRepositoryService service,
+            TreeRepositoryCollectionVM repositoryCollectionVM, 
+            DataStoragesSettingsVM dataStoragesSettingsVM)
         {
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+            _notificationService = notificationService;
+            _collectionService = collectionService;
             _service = service;
+
             _repositoryCollectionVM = repositoryCollectionVM;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
         }
@@ -34,12 +53,12 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     if (_dataStoragesSettingsVM.SelectedDataStorageVM == null)
                         return;
-                    var result = _service.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.Model);
-                    var service = new TreeRepositoryService(result);
+                    var result = _collectionService.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.Model);
                     result.Name = _name;
                     result.Description = _description;
-                    service.SaveChanges(result);
-                    _repositoryCollectionVM.TreeRepositoriesVMs.Add(new TreeRepositoryVM(result));
+                    _service.SaveChanges(result);
+                    var vm = _serviceProvider.GetRequiredService<TreeRepositoryVM>();
+                    _repositoryCollectionVM.TreeRepositoriesVMs.Add(vm);
                 });
             }
         }

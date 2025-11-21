@@ -1,8 +1,10 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +18,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
     {
         #region [ Props ]
 
-        private readonly TreeRepositoryCollectionService _service;
+        private readonly ITreeRepositoryCollectionService _service;
 
         private readonly TreeRepositoryHeaderModel _model;
 
@@ -152,7 +154,10 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 
         #region [ Construct ]
 
-        public TreeRepositoryHeaderVM(TreeRepositoryHeaderModel treeRepositoryHeader, TreeRepositoryCollectionService service, Action updateTreeRepositoryHeaders)
+        public TreeRepositoryHeaderVM(
+            TreeRepositoryHeaderModel treeRepositoryHeader,
+            ITreeRepositoryCollectionService service, 
+            Action updateTreeRepositoryHeaders)
         {
             _model = treeRepositoryHeader;
             _service = service;

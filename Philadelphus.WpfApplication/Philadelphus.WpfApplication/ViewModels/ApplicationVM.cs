@@ -1,4 +1,8 @@
-﻿using Philadelphus.Business.Services;
+﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
@@ -11,6 +15,11 @@ namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationVM : ViewModelBase
     {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IMapper _mapper;
+        private readonly ILogger<ApplicationVM> _logger;
+        private readonly INotificationService _notificationService;
+
         private ApplicationWindowsVM _applicationWindowsVM;
         public ApplicationWindowsVM ApplicationWindowsVM { get => _applicationWindowsVM; }
 
@@ -35,14 +44,32 @@ namespace Philadelphus.WpfApplication.ViewModels
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
         public ViewModelBase SelectedElementVM { get => RepositoryCollectionVM.CurrentRepositoryExplorerVM; } //TODO: Временно только элементы репозитория
-        public ApplicationVM()
+        public ApplicationVM(
+            IServiceProvider serviceProvider,
+            IMapper mapper,
+            ILogger<ApplicationVM> logger,
+            INotificationService notificationService,
+            IApplicationSettingsService applicationSettingsService)
         {
+            _serviceProvider = serviceProvider;
+            _mapper = mapper;
+            _logger = logger;
+            _notificationService = notificationService;
+
             //CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
-            //var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
-            //if (configPath == null)
-            //    throw new Exception("Не найден путь к настроечным файлам. Проверьте параметр \'ConfigsDirectory\' в \'App.config\'.");
-            //var configDirectory = new DirectoryInfo(configPath);
+            var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
+            if (configPath == null)
+                throw new Exception("Не найден путь к настроечным файлам. Проверьте параметр \'ConfigsDirectory\' в \'App.config\'.");
+            var configDirectory = new DirectoryInfo(configPath);
+            applicationSettingsService.MainConfigDirectory = configDirectory;
+
+            _applicationWindowsVM = _serviceProvider.GetRequiredService<ApplicationWindowsVM>();
+            //_applicationCommandsVM = _serviceProvider.GetRequiredService<ApplicationCommandsVM>();
+            _dataStoragesSettingsVM = _serviceProvider.GetRequiredService<DataStoragesSettingsVM>();
+            _repositoryCollectionVM = _serviceProvider.GetRequiredService<TreeRepositoryCollectionVM>();
+            _repositoryHeadersCollectionVM = _serviceProvider.GetRequiredService<TreeRepositoryHeadersCollectionVM>();
+            _repositoryCreationVM = _serviceProvider.GetRequiredService<RepositoryCreationVM>();
 
             //var treeRepositoryCollectionService = new TreeRepositoryCollectionService(configDirectory);
 
