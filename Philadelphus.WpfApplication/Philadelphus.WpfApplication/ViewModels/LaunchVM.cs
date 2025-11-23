@@ -14,8 +14,14 @@ namespace Philadelphus.WpfApplication.ViewModels
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
         public string UserName { get => Environment.UserName; }
-        public LaunchVM(DataStoragesSettingsVM dataStoragesSettingsVM, TreeRepositoryCollectionVM repositoryCollectionVM, TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM, ApplicationCommandsVM applicationCommandsVM)
+        public LaunchVM(
+            IServiceProvider serviceProvider,
+            DataStoragesSettingsVM dataStoragesSettingsVM,
+            TreeRepositoryCollectionVM repositoryCollectionVM,
+            TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
+            ApplicationCommandsVM applicationCommandsVM)
         {
+            ;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;

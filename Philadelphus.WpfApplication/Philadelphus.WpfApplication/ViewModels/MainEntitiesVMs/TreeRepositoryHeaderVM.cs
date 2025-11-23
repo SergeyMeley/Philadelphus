@@ -5,6 +5,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +20,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         #region [ Props ]
 
         private readonly ITreeRepositoryCollectionService _service;
+        private readonly DataStorageVM _dataStoragesVM;
 
         private readonly TreeRepositoryHeaderModel _model;
 
@@ -156,11 +158,14 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 
         public TreeRepositoryHeaderVM(
             TreeRepositoryHeaderModel treeRepositoryHeader,
-            ITreeRepositoryCollectionService service, 
+            ITreeRepositoryCollectionService service,
+            DataStorageVM dataStoragesVM, 
             Action updateTreeRepositoryHeaders)
         {
             _model = treeRepositoryHeader;
             _service = service;
+            _dataStoragesVM = dataStoragesVM;
+
             _updateTreeRepositoryHeaders = updateTreeRepositoryHeaders;
         }
 
@@ -176,7 +181,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 
         private bool SaveRepositoryHeader()
         {
-            _service.SaveChanges(_model);
+            _service.SaveChanges(_model, _dataStoragesVM.Model);
             return true;
         }
 

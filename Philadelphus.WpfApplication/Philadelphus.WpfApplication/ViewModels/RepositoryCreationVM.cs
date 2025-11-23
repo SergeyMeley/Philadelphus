@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Philadelphus.Business.Config;
 using Philadelphus.Business.Services;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
@@ -34,7 +36,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             ITreeRepositoryCollectionService collectionService,
             ITreeRepositoryService service,
             TreeRepositoryCollectionVM repositoryCollectionVM, 
-            DataStoragesSettingsVM dataStoragesSettingsVM)
+            DataStoragesSettingsVM dataStoragesSettingsVM,
+            IOptions<ApplicationSettings> options)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

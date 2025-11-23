@@ -1,18 +1,15 @@
-﻿using Philadelphus.WpfApplication.Views.Windows;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.WpfApplication.Views.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
     public class ApplicationCommandsVM
     {
-        private ApplicationVM _applicationVM;
-        public ApplicationVM ApplicationVM { get { return _applicationVM; } }
-
-        private ApplicationWindowsVM _applicationWindowsVM;
-        public ApplicationWindowsVM ApplicationWindowsVM { get => _applicationWindowsVM; }
-        public ApplicationCommandsVM(ApplicationVM applicationVM, ApplicationWindowsVM applicationWindowsVM)
+        private readonly IServiceProvider _serviceProvider;
+        public ApplicationCommandsVM(
+            IServiceProvider serviceProvider)
         {
-            _applicationVM = applicationVM;
-            _applicationWindowsVM = applicationWindowsVM;
+            _serviceProvider = serviceProvider;
         }
         public RelayCommand OpenMainWindowCommand
         {
@@ -20,34 +17,32 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var currentRepositoryVM = ApplicationVM.LaunchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM;
+                    var launchVM = _serviceProvider.GetRequiredService<LaunchVM>();
+                    var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM;
                     if (currentRepositoryVM != null)
                     {
-                        var headerVM = ApplicationVM.LaunchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Guid == currentRepositoryVM.Guid);
+                        var headerVM = launchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Guid == currentRepositoryVM.Guid);
                         if (headerVM == null)
                         {
-                            headerVM = ApplicationVM.LaunchVM.RepositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(currentRepositoryVM);
-                            
+                            headerVM = launchVM.RepositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(currentRepositoryVM);
+
                         }
                         headerVM.LastOpening = DateTime.UtcNow;
                     }
-                    
-                    if (_applicationWindowsVM.MainWindow == null)
-                        _applicationWindowsVM.MainWindow = new MainWindow(_applicationVM);
-                    _applicationWindowsVM.MainWindow.Show();
-                    _applicationWindowsVM.LaunchWindow.Close();
-                    _applicationWindowsVM.LaunchWindow = null;
+
+                    var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+                    mainWindow.Show();
                 });
             }
         }
-
         public RelayCommand OpenRepositoryMemberDetailsWindow
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
-                    var currentRepositoryMemberVM = ApplicationVM.LaunchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember;
+                    var launchVM = _serviceProvider.GetRequiredService<LaunchVM>();
+                    var currentRepositoryMemberVM = launchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember;
                     var window = new DetailsWindow(currentRepositoryMemberVM);
                     window.Show();
                 });

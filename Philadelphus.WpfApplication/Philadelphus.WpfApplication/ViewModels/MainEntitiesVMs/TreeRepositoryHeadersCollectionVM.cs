@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
@@ -12,6 +13,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         private readonly ILogger<TreeRepositoryHeadersCollectionVM> _logger;
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryCollectionService _service;
+        private readonly DataStoragesSettingsVM _dataStoragesSettingsVM;
 
         private List<TreeRepositoryHeaderVM> _treeRepositoryHeadersVMs;
         public List<TreeRepositoryHeaderVM> TreeRepositoryHeadersVMs
@@ -74,11 +76,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         public TreeRepositoryHeadersCollectionVM(
             ILogger<TreeRepositoryHeadersCollectionVM> logger,
             INotificationService notificationService,
-            ITreeRepositoryCollectionService service)
+            ITreeRepositoryCollectionService service,
+            DataStoragesSettingsVM dataStoragesSettingsVM)
         {
             _logger = logger;
             _notificationService = notificationService;
             _service = service;
+            _dataStoragesSettingsVM = dataStoragesSettingsVM;
         }
         public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
         {
@@ -92,14 +96,14 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         private List<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs()
         {
             _treeRepositoryHeadersVMs.Clear();
-            var headers = _service.ForceLoadTreeRepositoryHeadersCollection();
+            var headers = _service.ForceLoadTreeRepositoryHeadersCollection(_dataStoragesSettingsVM.MainDataStorageVM.Model);
             if (headers == null)
                 return null;
             headers.OrderByDescending(x => x.LastOpening);
 
             foreach (var header in headers)
             {
-                var vm = new TreeRepositoryHeaderVM(header, _service, _updateTreeRepositoryHeaders);
+                var vm = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
                 CheckTreeRepositoryAvailable(vm);
                 _treeRepositoryHeadersVMs.Add(vm);
             }
@@ -108,7 +112,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         internal TreeRepositoryHeaderVM AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
         {
             var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.TreeRepositoryModel);
-            var result = new TreeRepositoryHeaderVM(header, _service, _updateTreeRepositoryHeaders);
+            var result = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
             TreeRepositoryHeadersVMs.Add(result);
             return result;
         }

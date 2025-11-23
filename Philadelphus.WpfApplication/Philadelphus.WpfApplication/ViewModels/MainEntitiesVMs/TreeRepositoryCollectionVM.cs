@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
+using Philadelphus.Business.Config;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
@@ -36,7 +38,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
             INotificationService notificationService,
             ITreeRepositoryCollectionService collectionService, 
             ITreeRepositoryService service,
-            DataStoragesSettingsVM dataStoragesSettings)
+            DataStoragesSettingsVM dataStoragesSettings,
+            IOptions<ApplicationSettings> options)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

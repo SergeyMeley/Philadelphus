@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Config;
 using Philadelphus.Business.Mapping;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
@@ -11,6 +14,7 @@ using Philadelphus.WpfApplication.Views.Windows;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 
 namespace Philadelphus.WpfApplication
@@ -34,39 +38,51 @@ namespace Philadelphus.WpfApplication
                     logging.AddDebug();
                     logging.SetMinimumLevel(LogLevel.Information);
                 })
-            .ConfigureServices((context, services) =>
-            {
-                // Регистрация AutoMapper
-                services.AddAutoMapper(typeof(MappingProfile));
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    // Регистрация конфигурации
+                    //var builder = new ConfigurationBuilder()
+                    //    .SetBasePath(Directory.GetCurrentDirectory())
+                    //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    //IConfiguration configuration = builder.Build();
+                    services.Configure<ApplicationSettings>(context.Configuration.GetSection(nameof(ApplicationSettings)));
 
-                // Регистрация сервисов
-                services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();
-                services.AddSingleton<INotificationService, NotificationService>();
-                services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
-                services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
+                    // Регистрация AutoMapper
+                    services.AddAutoMapper(typeof(MappingProfile));
 
-                // Регистрация ViewModel
-                services.AddScoped<ApplicationVM>();
-                services.AddScoped<ApplicationCommandsVM>();
-                services.AddScoped<ApplicationWindowsVM>();
-                services.AddScoped<LaunchVM>();
-                services.AddScoped<DataStoragesSettingsVM>();
-                services.AddScoped<TreeRepositoryCollectionVM>();
-                services.AddScoped<TreeRepositoryHeadersCollectionVM>();
-                services.AddScoped<RepositoryCreationVM>();
+                    // Регистрация сервисов
+                    //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<ApplicationSettings>
+                    services.AddSingleton<INotificationService, NotificationService>();
+                    services.AddSingleton<StorageConfigService>();      //TODO: Заменить на новый сервис
+                    services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                    services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
 
-                // Регистрация View
-                services.AddSingleton<MainWindow>();
-                services.AddSingleton<LaunchWindow>();
-            })
-            .Build();
+                    // Регистрация ViewModel
+                    services.AddScoped<ApplicationVM>();
+                    services.AddScoped<ApplicationCommandsVM>();
+                    services.AddScoped<ApplicationWindowsVM>();
+                    services.AddScoped<LaunchVM>();
+                    services.AddScoped<DataStoragesSettingsVM>();
+                    services.AddScoped<TreeRepositoryCollectionVM>();
+                    services.AddScoped<TreeRepositoryHeadersCollectionVM>();
+                    services.AddScoped<RepositoryCreationVM>();
+
+                    // Регистрация View
+                    services.AddSingleton<MainWindow>();
+                    services.AddSingleton<LaunchWindow>();
+                })
+                .Build();
         }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
             await _host.StartAsync();
 
-            //_viewModel = _host.Services.GetRequiredService<ApplicationVM>();
+            var viewModel = _host.Services.GetRequiredService<ApplicationVM>();
             var window = _host.Services.GetRequiredService<LaunchWindow>();
             window.Show();
             base.OnStartup(e);
