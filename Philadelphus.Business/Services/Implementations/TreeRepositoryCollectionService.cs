@@ -187,6 +187,7 @@ namespace Philadelphus.Business.Services.Implementations
                     Guid.Empty,
                     InfrastructureTypes.JsonDocument,
                     isDisabled: false)
+                .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(configsDirectory))
                 .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory))
             ;
             var mainDataStorageModel = dataStorageBuilder.Build();

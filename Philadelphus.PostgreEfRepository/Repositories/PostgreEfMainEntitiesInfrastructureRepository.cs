@@ -216,8 +216,10 @@ namespace Philadelphus.PostgreEfRepository.Repositories
             {
                 foreach (var item in items)
                 {
-                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
                     item.AuditInfo.CreatedBy = Environment.UserName;
+                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 }
 
                 context.TreeNodes.AddRange(items);
@@ -229,35 +231,48 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         public long InsertLeaves(IEnumerable<TreeLeave> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                if (_context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid) != null)
+                foreach (var item in items)
                 {
-                    item.ParentTreeRoot = _context.TreeRoots.FirstOrDefault(x => x.Guid == item.ParentTreeRootGuid);
+                    item.AuditInfo.CreatedBy = Environment.UserName;
+                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 }
-                //item.AuditInfo.CreatedBy = Environment.UserName;
-                //item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeLeaves.Add(item);
+
+                context.TreeLeaves.AddRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long InsertAttributes(IEnumerable<ElementAttribute> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
-            {
-                item.AuditInfo.CreatedBy = Environment.UserName;
-                item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.ElementAttributes.Add(item);
-            }
-            return _context.SaveChanges();
+                return -1;
 
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                foreach (var item in items)
+                {
+                    item.AuditInfo.CreatedBy = Environment.UserName;
+                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.ElementAttributes.AddRange(items);
+                result = context.SaveChanges();
+            }
+
+            return result;
         }
 
         #endregion
@@ -267,50 +282,86 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         public long UpdateRoots(IEnumerable<TreeRoot> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeRoots.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.TreeRoots.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long UpdateNodes(IEnumerable<TreeNode> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeNodes.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.TreeNodes.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long UpdateLeaves(IEnumerable<TreeLeave> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeLeaves.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.TreeLeaves.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long UpdateAttributes(IEnumerable<ElementAttribute> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.ElementAttributes.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.ElementAttributes.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
 
         #endregion
@@ -320,54 +371,90 @@ namespace Philadelphus.PostgreEfRepository.Repositories
         public long DeleteRoots(IEnumerable<TreeRoot> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeRoots.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.IsDeleted = true;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.TreeRoots.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long DeleteNodes(IEnumerable<TreeNode> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeNodes.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.IsDeleted = true;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.TreeNodes.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long DeleteLeaves(IEnumerable<TreeLeave> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.TreeLeaves.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.IsDeleted = true;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.TreeLeaves.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
         public long DeleteAttributes(IEnumerable<ElementAttribute> items)
         {
             if (CheckAvailability() == false)
-                return 0;
-            foreach (var item in items)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
             {
-                item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                _context.ElementAttributes.Update(item);
+                foreach (var item in items)
+                {
+                    item.AuditInfo.IsDeleted = true;
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.ElementAttributes.UpdateRange(items);
+                result = context.SaveChanges();
             }
-            return _context.SaveChanges();
+
+            return result;
         }
 
         #endregion
