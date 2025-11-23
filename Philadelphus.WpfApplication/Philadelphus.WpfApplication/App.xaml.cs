@@ -62,17 +62,18 @@ namespace Philadelphus.WpfApplication
                     services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
 
                     // Регистрация ViewModel
-                    services.AddScoped<ApplicationVM>();
-                    services.AddScoped<ApplicationCommandsVM>();
-                    services.AddScoped<ApplicationWindowsVM>();
-                    services.AddScoped<LaunchVM>();
-                    services.AddScoped<DataStoragesSettingsVM>();
+                    services.AddSingleton<ApplicationVM>();
+                    services.AddSingleton<ApplicationCommandsVM>();
+                    services.AddTransient<ApplicationWindowsVM>();
+                    services.AddSingleton<LaunchVM>();
+                    services.AddTransient<MainWindowVM>();
+                    services.AddSingleton<DataStoragesSettingsVM>();
                     services.AddScoped<TreeRepositoryCollectionVM>();
                     services.AddScoped<TreeRepositoryHeadersCollectionVM>();
                     services.AddScoped<RepositoryCreationVM>();
 
                     // Регистрация View
-                    services.AddSingleton<MainWindow>();
+                    services.AddTransient<MainWindow>();
                     services.AddSingleton<LaunchWindow>();
                 })
                 .Build();

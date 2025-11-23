@@ -40,9 +40,6 @@ namespace Philadelphus.WpfApplication.ViewModels
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
 
-        private NotificationsVM _notificationsVM;
-        public NotificationsVM NotificationsVM { get => _notificationsVM; }
-        public ViewModelBase SelectedElementVM { get => RepositoryCollectionVM.CurrentRepositoryExplorerVM; } //TODO: Временно только элементы репозитория
         public ApplicationVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -91,30 +88,5 @@ namespace Philadelphus.WpfApplication.ViewModels
             //_applicationWindowsVM.LaunchWindow.Activate();
         }
 
-        public string Title 
-        { 
-            get
-            {
-                var title = "Чубушник";
-                var repositoryName = _repositoryCollectionVM?.CurrentRepositoryExplorerVM?.Name;
-                if (String.IsNullOrEmpty(repositoryName) == false)
-                {
-                    title = $"{repositoryName} - Чубушник";
-                }
-                return title;
-            }
-        }
-
-        public TreeRepositoryVM RepositoryExplorerVM 
-        { 
-            get 
-            { 
-                return _repositoryCollectionVM.CurrentRepositoryExplorerVM; 
-            } 
-            set
-            {
-                _repositoryCollectionVM.CurrentRepositoryExplorerVM = value;
-            }
-        }
     }
 }

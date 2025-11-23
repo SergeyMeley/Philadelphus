@@ -115,20 +115,22 @@
                                 </Style>
                             </RibbonComboBox.Style>
                         </RibbonComboBox>-->
-                        <ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>
-                        
-                        <RibbonButton Label="Настроить список репозиториев" DataContext="{Binding RepositoryCollectionVM}" Command="{Binding OpenRepositoryCollectionSettingsWindow}" />
+                        <!--<ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>-->
+                        <TextBlock Text="{Binding RepositoryExplorerVM.Name}"></TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Состояние: "></TextBlock>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.State}"></TextBlock>
+                        </StackPanel>
+                        <RibbonButton Label="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" />
+
+                        <!--<RibbonButton Label="Настроить список репозиториев" DataContext="{Binding RepositoryCollectionVM}" Command="{Binding OpenRepositoryCollectionSettingsWindow}" />-->
                     </RibbonGroup>
                     <RibbonGroup Header="Информация">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Состояние: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM.State}"></TextBlock>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Текущий участник репозитория: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember.Name}"></TextBlock>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}"></TextBlock>
                         </StackPanel>
-                        <RibbonButton Label="Подробнее" Command="{Binding ApplicationCommandsVM.OpenRepositoryMemberDetailsWindow}" />
+                        <RibbonButton Label="Подробнее" DataContext="{Binding ApplicationCommandsVM}" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Иерархия репозитория">
                         <RibbonButton Label="Добавить собственный корень" />
@@ -241,7 +243,7 @@
                         <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2" Background="White">
                             <TabControl Margin="2">
                                 <TabItem Header="Репозиторий">
-                                    <ctrls:RepositoryExplorer DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"></ctrls:RepositoryExplorer>
+                                    <ctrls:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></ctrls:RepositoryExplorer>
                                 </TabItem>
                                 <TabItem Header="Отчеты">
                                     <ctrls:ReportProcessor></ctrls:ReportProcessor>

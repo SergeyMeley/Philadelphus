@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.Views.Controls;
 using Philadelphus.WpfApplication.Views.Windows;
 
 namespace Philadelphus.WpfApplication.ViewModels
@@ -31,11 +33,28 @@ namespace Philadelphus.WpfApplication.ViewModels
                     }
 
                     var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+                    var context = _serviceProvider.GetRequiredService<MainWindowVM>();
+                    var appVM = _serviceProvider.GetRequiredService<ApplicationVM>();
+                    context.RepositoryExplorerVM = appVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM;
+                    mainWindow.DataContext = context;
                     mainWindow.Show();
+                    var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
+                    launchWindow.Hide();
                 });
             }
         }
-        public RelayCommand OpenRepositoryMemberDetailsWindow
+        public RelayCommand OpenLaunchWindowCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
+                    launchWindow.Show();
+                });
+            }
+        }
+        public RelayCommand OpenRepositoryMemberDetailsWindowCommand
         {
             get
             {

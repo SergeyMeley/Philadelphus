@@ -46,6 +46,13 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
                 OnPropertyChanged(nameof(DataStorageVMs));
             }
         }
+        public IEnumerable<DataStorageVM>? TreeRepositoriesDataStorageVMs
+        {
+            get
+            {
+                return _dataStorageVMs.Where(x => x.HasTreeRepositoriesInfrastructureRepository);
+            }
+        }
 
         private DataStorageVM _selectedDataStorageVM;
         public DataStorageVM SelectedDataStorageVM 

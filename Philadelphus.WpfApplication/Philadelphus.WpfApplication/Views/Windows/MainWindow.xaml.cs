@@ -19,7 +19,7 @@ namespace Philadelphus.WpfApplication.Views.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(ApplicationVM vm)
+        public MainWindow(MainWindowVM vm)
         {
             InitializeComponent();
             DataContext = vm;
