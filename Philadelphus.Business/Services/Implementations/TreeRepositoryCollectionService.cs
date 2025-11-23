@@ -38,8 +38,6 @@ namespace Philadelphus.Business.Services.Implementations
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
         public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get => _dataTreeRepositories; private set => _dataTreeRepositories = value; }
 
-        private static IDataStorageModel _mainDataStorageModel;
-
         #endregion
 
         #region [ Construct ]
@@ -107,9 +105,11 @@ namespace Philadelphus.Business.Services.Implementations
         /// Получение из настроечного файла коллекции заголовков репозиториев, являющихся избранными или последними запускаемыми.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection()
+        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel)
         {
-            return _mainDataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.SelectRepositoryCollection().ToModelCollection();
+            if (dataStorageModel == null)
+                return null;
+            return dataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.SelectRepositoryCollection().ToModelCollection();
         }
         public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null)
         {
@@ -122,8 +122,10 @@ namespace Philadelphus.Business.Services.Implementations
         }
         public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null)
         {
+            if (dataStorages == null)
+                return null;
             var result = new List<TreeRepositoryModel>();
-            foreach (var dataStorage in dataStorages)
+            foreach (var dataStorage in dataStorages.Where(x => x.TreeRepositoriesInfrastructureRepository != null))
             {
                 var infrastructure = dataStorage.TreeRepositoriesInfrastructureRepository;
                 if (infrastructure.GetType().IsAssignableTo(typeof(ITreeRepositoriesInfrastructureRepository))
@@ -159,11 +161,13 @@ namespace Philadelphus.Business.Services.Implementations
             result = _treeRepositoryService.SaveChanges(treeRepository);
             return result;
         }
-        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader)
+        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel)
         {
+            if (dataStorageModel == null)
+                return -1;
             long result = 0;
             var dbEntity = treeRepositoryHeader.ToDbEntity();
-            result += _mainDataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.UpdateRepository(dbEntity);
+            result += dataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.UpdateRepository(dbEntity);
             return result;
         }
 
@@ -171,24 +175,24 @@ namespace Philadelphus.Business.Services.Implementations
 
         #region [ Create + Add ]
 
-        public bool CreateMainDataStorageModel(DirectoryInfo configsDirectory)
+        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo configsDirectory)
         {
             if (configsDirectory == null)
-                return false;
+                return null;
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
-                    name: "Основное хранилище",
-                    description: "Хранилище настроечных файлов в формате Json",
+                    name: "Основное хранилище настроечных файлов",
+                    description: "Хранилище настроечных файлов и конфигураций в формате json-документов",
                     Guid.Empty,
                     InfrastructureTypes.JsonDocument,
                     isDisabled: false)
                 .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory))
             ;
-            _mainDataStorageModel = dataStorageBuilder.Build();
+            var mainDataStorageModel = dataStorageBuilder.Build();
 
             _logger.LogInformation("Хранилище конфигурационных файлов инициализировано.");
-            return true;
+            return mainDataStorageModel;
         }
 
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage)

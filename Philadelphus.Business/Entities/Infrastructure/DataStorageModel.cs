@@ -40,6 +40,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
             {
                 if (_isDisabled)
                     return null;
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.DataStoragesCollection) == false)
+                    return null;
                 return (IDataStoragesCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.DataStoragesCollection];
             }
         }
@@ -48,6 +50,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
             get
             {
                 if (_isDisabled)
+                    return null;
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.TreeRepositoryHeadersCollection) == false)
                     return null;
                 return (ITreeRepositoryHeadersCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoryHeadersCollection];
             }
@@ -58,6 +62,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
             {
                 if (_isDisabled)
                     return null;
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.TreeRepositories) == false)
+                    return null;
                 return (ITreeRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositories];
             }
         }
@@ -66,6 +72,8 @@ namespace Philadelphus.Business.Entities.Infrastructure
             get
             {
                 if (_isDisabled)
+                    return null;
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.MainEntities) == false)
                     return null;
                 return (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
             }

@@ -33,7 +33,7 @@ namespace Philadelphus.Business.Services.Interfaces
         public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> guids);
         public IDataStorageModel GetStorageModelFromCollection(Guid guid);
         public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> guids);
-        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection();
+        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel);
         public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null);
         public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null);
 
@@ -42,13 +42,13 @@ namespace Philadelphus.Business.Services.Interfaces
         #region [ Save ]
 
         public long SaveChanges(TreeRepositoryModel treeRepository);
-        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader);
+        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel);
 
         #endregion
 
         #region [ Create + Add ]
 
-        public bool CreateMainDataStorageModel(DirectoryInfo configsDirectory);
+        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo configsDirectory);
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage);
         public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel);
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path);

@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Handlers;
+﻿using Philadelphus.Business.Config;
+using Philadelphus.Business.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,6 @@ namespace Philadelphus.Business.Services.Interfaces
 {
     public interface IApplicationSettingsService
     {
-        public DirectoryInfo MainConfigDirectory { get; set; }
-
+        ApplicationSettings GetSettings();
     }
 }
