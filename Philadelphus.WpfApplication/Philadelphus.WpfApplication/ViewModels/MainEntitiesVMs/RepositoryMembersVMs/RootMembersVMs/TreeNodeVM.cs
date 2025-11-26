@@ -1,5 +1,7 @@
-﻿using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Services;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 
@@ -9,6 +11,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembe
     {
         #region [ Props ]
 
+        private readonly ITreeRepositoryService _service;
         private readonly TreeNodeModel _model;
 
         private readonly ObservableCollection<TreeNodeVM> _childNodes = new ObservableCollection<TreeNodeVM>();
@@ -22,18 +25,23 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembe
 
         #region [ Construct ]
 
-        public TreeNodeVM(TreeNodeModel treeNode, TreeRepositoryService service) : base(treeNode, service)
+        public TreeNodeVM(
+            TreeNodeModel treeNode,
+            ITreeRepositoryService service) 
+            : base(treeNode,  service)
         {
+            _service = service;
+
             _model = treeNode;
             foreach (var item in treeNode.Childs)
             {
                 if (item.GetType() == typeof(TreeNodeModel))
                 {
-                    _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, service));
+                    _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
                 }
                 else if (item.GetType() == typeof(TreeLeaveModel))
                 {
-                    _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, service));
+                    _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, _service));
                 }
             }
             Childs = new CompositeCollection()

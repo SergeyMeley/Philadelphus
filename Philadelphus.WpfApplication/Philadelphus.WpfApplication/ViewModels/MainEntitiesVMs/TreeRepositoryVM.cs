@@ -1,11 +1,14 @@
-﻿using Philadelphus.Business.Entities.ElementsProperties;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.ElementsProperties;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
@@ -17,7 +20,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
     {
         #region [ Props ]
 
-        private readonly TreeRepositoryService _service;
+        private readonly ITreeRepositoryService _service;
 
         private readonly TreeRepositoryModel _model;
         public TreeRepositoryModel TreeRepositoryModel
@@ -124,9 +127,12 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 
         #region [ Construct ]
 
-        public TreeRepositoryVM(TreeRepositoryModel treeRepositoryModel)
+        public TreeRepositoryVM(
+            TreeRepositoryModel treeRepositoryModel,
+            ITreeRepositoryService service)
         {
-            _service = new TreeRepositoryService(treeRepositoryModel);
+            _service = service;
+
             _model = treeRepositoryModel;
             _storageVM = new DataStorageVM(treeRepositoryModel.OwnDataStorage);
             foreach (var item in treeRepositoryModel.Childs)
@@ -235,10 +241,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 return new RelayCommand(obj =>
                 {
                     if (_selectedRepositoryMember == null)
-                    {
-                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
-                    }
                     if (_selectedRepositoryMember?.GetType() == typeof(TreeRootVM))
                     {
                         ((TreeRootVM)_selectedRepositoryMember).CreateTreeNode();
@@ -259,10 +262,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 return new RelayCommand(obj =>
                 {
                     if (_selectedRepositoryMember == null)
-                    {
-                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
-                    }
                     if (_selectedRepositoryMember?.GetType() == typeof(TreeNodeVM))
                     {
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeLeave();
@@ -279,10 +279,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 return new RelayCommand(obj =>
                 {
                     if (_selectedRepositoryMember == null)
-                    {
-                        NotificationService.SendNotification("Не выделен родительский элемент!", NotificationCriticalLevelModel.Error);
                         return;
-                    }
                     _selectedRepositoryMember.AddAttribute();
                     
                     OnPropertyChanged(nameof(State));

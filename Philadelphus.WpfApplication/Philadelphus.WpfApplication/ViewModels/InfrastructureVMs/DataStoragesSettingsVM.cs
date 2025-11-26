@@ -1,8 +1,15 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Philadelphus.Business.Config;
+using Philadelphus.Business.Entities.Infrastructure;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.Models.StorageConfig;
+using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +19,20 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
 {
     public class DataStoragesSettingsVM : ViewModelBase
     {
+        private readonly ILogger<DataStoragesSettingsVM> _logger;
+        private readonly INotificationService _notificationService;
+        private readonly ITreeRepositoryCollectionService _treeRepositoryCollectionService;
+        private readonly StorageConfigService _storageConfigService;
+
+        private DataStorageVM _mainDataStorageVM;
+        public DataStorageVM MainDataStorageVM
+        {
+            get
+            {
+                return _mainDataStorageVM;
+            }
+        }
+
         private ObservableCollection<DataStorageVM>? _dataStorageVMs = new ObservableCollection<DataStorageVM>();
         public ObservableCollection<DataStorageVM>? DataStorageVMs 
         { 
@@ -23,6 +44,13 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
             {
                 _dataStorageVMs = value;
                 OnPropertyChanged(nameof(DataStorageVMs));
+            }
+        }
+        public IEnumerable<DataStorageVM>? TreeRepositoriesDataStorageVMs
+        {
+            get
+            {
+                return _dataStorageVMs.Where(x => x.HasTreeRepositoriesInfrastructureRepository);
             }
         }
 
@@ -40,9 +68,27 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
             }
         }
 
-        public DataStoragesSettingsVM()
+        public DataStoragesSettingsVM(
+            ILogger<DataStoragesSettingsVM> logger,
+            INotificationService notificationService,
+            ITreeRepositoryCollectionService treeRepositoryCollectionService,
+            StorageConfigService storageConfigService,   //TODO: Заменить на новый сервис
+            IOptions<ApplicationSettings> options)
         {
+            _logger = logger;
+            _notificationService = notificationService;
+            _treeRepositoryCollectionService = treeRepositoryCollectionService;
+            _storageConfigService = storageConfigService;
+
+            InitMainDataStorageVM(options.Value.ConfigsDirectory);
             InitDataStorages();
+        }
+        private bool InitMainDataStorageVM(DirectoryInfo configsDirectory)
+        {
+            var mainDataStorageModel = _treeRepositoryCollectionService.CreateMainDataStorageModel(configsDirectory);
+            _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
+            _dataStorageVMs.Add(_mainDataStorageVM);
+            return true;
         }
         private bool InitDataStorages()
         {

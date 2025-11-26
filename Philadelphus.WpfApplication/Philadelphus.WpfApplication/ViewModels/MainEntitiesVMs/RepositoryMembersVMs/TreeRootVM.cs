@@ -1,6 +1,8 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
@@ -10,6 +12,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembe
     public class TreeRootVM : MainEntityBaseVM
     {
         #region [ Props ]
+
+        private readonly ITreeRepositoryService _service;
 
         private readonly TreeRootModel _model;
 
@@ -21,8 +25,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembe
 
         #region [ Construct ]
 
-        public TreeRootVM(TreeRootModel treeRoot, TreeRepositoryService service) : base(treeRoot, service)
+        public TreeRootVM(
+            TreeRootModel treeRoot,
+            ITreeRepositoryService service) 
+            : base(treeRoot, service)
         {
+                _service = service;
+
             _model = treeRoot;
             if (treeRoot.Childs != null)
             {
@@ -30,7 +39,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembe
                 {
                     if (item.GetType() == typeof(TreeNodeModel))
                     {
-                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, service));
+                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
                     }
                 }
             }

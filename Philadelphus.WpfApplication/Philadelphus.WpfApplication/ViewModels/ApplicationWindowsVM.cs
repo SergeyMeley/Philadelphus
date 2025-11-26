@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
-    public class ApplicationWindowsVM
+    public class ApplicationWindowsVM   //TODO: Удалить и брать окна из DI
     {
         private LaunchWindow _launchWindow;
         public LaunchWindow LaunchWindow { get => _launchWindow; set => _launchWindow = value; }

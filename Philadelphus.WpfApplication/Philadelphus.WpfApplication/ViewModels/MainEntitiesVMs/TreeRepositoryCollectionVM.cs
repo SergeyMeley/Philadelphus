@@ -1,8 +1,13 @@
-﻿using MongoDB.Driver.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver.Linq;
+using Philadelphus.Business.Config;
 using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
@@ -19,14 +24,31 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public class TreeRepositoryCollectionVM : ViewModelBase
     {
-        private TreeRepositoryCollectionService _service;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<TreeRepositoryCollectionVM> _logger;
+        private readonly INotificationService _notificationService;
+        private readonly ITreeRepositoryCollectionService _collectionService;
+        private readonly ITreeRepositoryService _service;
 
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
-        public TreeRepositoryCollectionVM(TreeRepositoryCollectionService service, DataStoragesSettingsVM dataStoragesSettings)
+        public TreeRepositoryCollectionVM(
+            IServiceProvider serviceProvider,
+            ILogger<TreeRepositoryCollectionVM> logger,
+            INotificationService notificationService,
+            ITreeRepositoryCollectionService collectionService, 
+            ITreeRepositoryService service,
+            DataStoragesSettingsVM dataStoragesSettings,
+            IOptions<ApplicationSettings> options)
         {
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+            _notificationService = notificationService;
+            _collectionService = collectionService;
             _service = service;
+
             _dataStoragesSettingsVM = dataStoragesSettings;
+
             InitRepositoriesVMsCollection();
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
@@ -103,7 +125,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    _service.AddExistTreeRepository(new DirectoryInfo(""));
+                    _collectionService.AddExistTreeRepository(new DirectoryInfo(""));
                 });
             }
         }
@@ -115,8 +137,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 return new RelayCommand(obj =>
                 {
                     var builder = new DataStorageBuilder();
-                    var repository = _service.CreateNewTreeRepository(builder.Build());
-                    var repositoryExplorerViewModel = new TreeRepositoryVM(repository);
+                    var repository = _collectionService.CreateNewTreeRepository(builder.Build());
+                    var repositoryExplorerViewModel = new TreeRepositoryVM(repository, _service);
                     TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
                      
                 });
@@ -125,12 +147,12 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         private bool InitRepositoriesVMsCollection()
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
-            var repositories = _service.GetTreeRepositoriesCollection(storages);
+            var repositories = _collectionService.GetTreeRepositoriesCollection(storages);
             if (repositories == null)
                 return false;
             foreach (var item in repositories)
             {
-                _treeRepositoriesVMs.Add(new TreeRepositoryVM(item));
+                _treeRepositoriesVMs.Add(new TreeRepositoryVM(item, _service));
             }
             return true;
         }
@@ -147,13 +169,13 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         private TreeRepositoryVM InitTreeRepositoryVM(Guid guid)
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
-            var repositories = _service.GetTreeRepositoriesCollection(storages, new[] { guid });
+            var repositories = _collectionService.GetTreeRepositoriesCollection(storages, new[] { guid });
             if (repositories == null)
                 return null;
             var repository = repositories.FirstOrDefault(x => x.Guid == guid);
             if (repository == null)
                 return null;
-            var result = new TreeRepositoryVM(repository);
+            var result = new TreeRepositoryVM(repository, _service);
             _treeRepositoriesVMs.Add(result);
             return result;
         }

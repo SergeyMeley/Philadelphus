@@ -117,9 +117,11 @@ namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
                 return _model.LastCheckTime;
             }
         }
-        public DataStorageVM(IDataStorageModel dataStorage)
+        public DataStorageVM(IDataStorageModel model)
         {
-            _model = dataStorage;
+            if (model == null)
+                throw new ArgumentNullException();
+            _model = model;
             StartCheckingStorage();
         }
         private void StartCheckingStorage()

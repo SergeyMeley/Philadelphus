@@ -1,5 +1,7 @@
-﻿using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Services;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 
 namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
@@ -7,14 +9,20 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembe
     {
         #region [ Props ]
 
+        private readonly ITreeRepositoryService _service;
+
         private readonly TreeLeaveModel _model;
 
         #endregion
 
         #region [ Construct ]
 
-        public TreeLeaveVM(TreeLeaveModel treeLeave, TreeRepositoryService service) : base(treeLeave, service)
+        public TreeLeaveVM(
+            TreeLeaveModel treeLeave,
+            ITreeRepositoryService service) 
+            : base(treeLeave, service)
         {
+            _service = service;
             _model = treeLeave;
         }
 

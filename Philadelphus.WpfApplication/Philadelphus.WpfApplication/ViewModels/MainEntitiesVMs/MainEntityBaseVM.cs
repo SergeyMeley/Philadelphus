@@ -1,8 +1,10 @@
-﻿using Philadelphus.Business.Entities.ElementsProperties;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.ElementsProperties;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContentVMs;
 using System.Collections.ObjectModel;
@@ -11,7 +13,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 {
     public abstract class MainEntityBaseVM : ViewModelBase
     {
-        protected readonly TreeRepositoryService _service;
+        protected readonly ITreeRepositoryService _service;
 
         protected readonly MainEntityBaseModel _model;
         public MainEntityBaseModel Model 
@@ -118,9 +120,12 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 
         private DataStorageVM _storageVM;
         public DataStorageVM StorageVM { get => _storageVM; }
-        public MainEntityBaseVM(MainEntityBaseModel mainEntityBaseModel, TreeRepositoryService service)
+        public MainEntityBaseVM(
+            MainEntityBaseModel mainEntityBaseModel, 
+            ITreeRepositoryService service)
         {
             _service = service;
+
             _model = mainEntityBaseModel;
             _storageVM = new DataStorageVM(mainEntityBaseModel.DataStorage);
             if (_model is IAttributeOwnerModel)
