@@ -13,10 +13,22 @@
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
     <ProjectReference Include="..\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj" />
-    <ProjectReference Include="..\Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj" />
     <ProjectReference Include="..\Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj" />
-    <ProjectReference Include="..\Philadelphus.PostgreRepository\Philadelphus.PostgreRepository.csproj" />
-    <ProjectReference Include="..\Philadelphus.WindowsFileSystemRepository\Philadelphus.WindowsFileSystemRepository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
