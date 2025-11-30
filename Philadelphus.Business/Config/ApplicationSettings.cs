@@ -18,5 +18,22 @@ namespace Philadelphus.Business.Config
                 return new DirectoryInfo(expandedPath);
             }
         }
+        public string[] PluginsDirectoriesString { get; set; }
+        public DirectoryInfo[] PluginsDirectories
+        {
+            get
+            {
+                var result = new DirectoryInfo[PluginsDirectoriesString.Length];
+
+                for (int i = 0; i < PluginsDirectoriesString.Length; i++)
+                {
+                    var expandedPath = Environment.ExpandEnvironmentVariables(PluginsDirectoriesString[i] ?? string.Empty);
+                    result[i] = new DirectoryInfo(expandedPath); 
+                    
+                }
+
+                return result;
+            }
+        }
     }
 }
