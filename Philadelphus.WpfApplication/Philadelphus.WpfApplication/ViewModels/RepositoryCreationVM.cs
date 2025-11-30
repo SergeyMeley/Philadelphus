@@ -5,6 +5,7 @@ using Philadelphus.Business.Config;
 using Philadelphus.Business.Services;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;

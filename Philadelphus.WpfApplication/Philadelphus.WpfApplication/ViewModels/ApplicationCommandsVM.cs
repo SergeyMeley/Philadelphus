@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Controls;
 using Philadelphus.WpfApplication.Views.Windows;

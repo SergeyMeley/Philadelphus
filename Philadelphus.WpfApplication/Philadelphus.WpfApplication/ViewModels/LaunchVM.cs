@@ -1,4 +1,5 @@
-﻿using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+﻿using Philadelphus.WpfApplication.Infrastructure;
+using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 
 namespace Philadelphus.WpfApplication.ViewModels
