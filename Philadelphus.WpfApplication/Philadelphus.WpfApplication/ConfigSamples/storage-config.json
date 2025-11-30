@@ -12,14 +12,14 @@
       "Description": "Сервер PostgreSQL на домашнем сервере по локальной сети",
       "Guid": "4c04583e-d57a-40c2-b281-3676af36dc54",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": true
+      "IsHidden": false
     },
     {
       "Name": "PostgreSQL_SERVER_MSV_INTERNET",
       "Description": "Сервер PostgreSQL на домашнем сервере по глобальной сети",
       "Guid": "8bffede3-9df6-4f1c-8238-fb25ac18e7f2",
       "ProviderTypeString": "PostgreSqlEf",
-      "IsHidden": true
+      "IsHidden": false
     },
     {
       "Name": "PostgreSQL_VM_BVA_INTERNET",

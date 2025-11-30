@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Windows"
         xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:i="Microsoft.Xaml.Behaviors;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
         xmlns:ntf="clr-namespace:Philadelphus.Business.Services;assembly=Philadelphus.Business"
         d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationVM}"
