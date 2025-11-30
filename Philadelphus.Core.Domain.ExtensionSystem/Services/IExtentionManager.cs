@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
+using Philadelphus.Core.Domain.ExtensionSystem.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Services.Interfaces
+namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 {
     /// <summary>
     /// Интерфейс менеджера расширений
@@ -19,7 +22,7 @@ namespace Philadelphus.Business.Services.Interfaces
         /// <summary>
         /// Загрузить все расширения
         /// </summary>
-        Task LoadExtensionsAsync();
+        Task LoadExtensionsAsync(string pluginsFolderPath);
 
         /// <summary>
         /// Запустить расширение
@@ -34,7 +37,7 @@ namespace Philadelphus.Business.Services.Interfaces
         /// <summary>
         /// Выполнить основной метод расширения
         /// </summary>
-        Task<IRepositoryElementModel> ExecuteExtensionAsync(ExtensionInstance extension, IRepositoryElementModel element);
+        Task<TreeRepositoryMemberBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, TreeRepositoryMemberBaseModel element);
 
         /// <summary>
         /// Запустить все расширения с AutoStart = true
@@ -44,7 +47,7 @@ namespace Philadelphus.Business.Services.Interfaces
         /// <summary>
         /// Получить расширения, совместимые с элементом
         /// </summary>
-        Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(IRepositoryElementModel element);
+        Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(TreeRepositoryMemberBaseModel element);
 
         event EventHandler<ExtensionLoadedEventArgs> ExtensionLoaded;
         event EventHandler<ExtensionErrorEventArgs> ExtensionError;

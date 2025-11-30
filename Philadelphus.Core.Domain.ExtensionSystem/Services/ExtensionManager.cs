@@ -1,11 +1,16 @@
-﻿using System;
+﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
+using Philadelphus.Core.Domain.ExtensionSystem.Models;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Philadelphus.Business.Services.Implementations
+namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 {
     /// <summary>
     /// Реализация менеджера расширений
@@ -24,10 +29,41 @@ namespace Philadelphus.Business.Services.Implementations
 
         public IReadOnlyList<ExtensionInstance> GetExtensions() => _extensions.AsReadOnly();
 
-        public async Task LoadExtensionsAsync()
+        public async Task LoadExtensionsAsync(string pluginsFolderPath)
         {
-            // В реальном приложении здесь была бы загрузка из DLL файлов через рефлексию
-            // Для демонстрации пока пусто - расширения создаются тестовыми классами
+            if (!Directory.Exists(pluginsFolderPath))
+                throw new DirectoryNotFoundException($"Папка расширений не найдена: {pluginsFolderPath}");
+
+            var dllFiles = Directory.GetFiles(pluginsFolderPath, "*.dll");
+
+            foreach (var dll in dllFiles)
+            {
+                try
+                {
+                    // Загружаем сборку
+                    var assembly = Assembly.LoadFrom(dll);
+                    // Ищем типы, реализующие интерфейс IExtension
+                    var extensionTypes = assembly.GetTypes()
+                        .Where(t => typeof(IExtensionModel).IsAssignableFrom(t) && !t.IsAbstract);
+
+                    foreach (var type in extensionTypes)
+                    {
+                        // Создаем экземпляр расширения (нужен конструктор без параметров или DI)
+                        if (Activator.CreateInstance(type) is IExtensionModel extension)
+                        {
+                            var extensionInstance = new ExtensionInstance(extension);
+                            // Регистрируем расширение (добавляем в список)
+                            RegisterExtension(extensionInstance);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Логируем ошибку загрузки конкретной DLL, но не прерываем загрузку остальных
+                    Debug.WriteLine($"Ошибка загрузки расширения из {dll}: {ex.Message}");
+                }
+            }
+
             await Task.CompletedTask;
         }
 
@@ -71,7 +107,7 @@ namespace Philadelphus.Business.Services.Implementations
             }
         }
 
-        public async Task<IRepositoryElementModel> ExecuteExtensionAsync(ExtensionInstance extension, IRepositoryElementModel element)
+        public async Task<TreeRepositoryMemberBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, TreeRepositoryMemberBaseModel element)
         {
             if (extension == null)
                 throw new ArgumentNullException(nameof(extension));
@@ -112,7 +148,7 @@ namespace Philadelphus.Business.Services.Implementations
             await Task.CompletedTask;
         }
 
-        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(IRepositoryElementModel element)
+        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(TreeRepositoryMemberBaseModel element)
         {
             var compatible = new List<ExtensionInstance>();
 

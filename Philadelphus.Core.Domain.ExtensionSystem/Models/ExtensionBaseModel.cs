@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.ExtensionEntities
+namespace Philadelphus.Core.Domain.ExtensionSystem.Models
 {
     /// <summary>
     /// Базовый класс для расширений
