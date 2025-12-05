@@ -179,16 +179,12 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
 
         private void InitializeWidget()
         {
-            try
+            var widget = Extension.GetWidget();
+            if (widget is IExtensionWidget extWidget)
             {
-                Extension.InitializeWidget();
-                Widget = Extension.GetWidget();
-                IsWidgetInitialized = true;
+                extWidget.SetExtension(Extension);
             }
-            catch
-            {
-                IsWidgetInitialized = false;
-            }
+            Widget = widget;
         }
 
         private void UninitializeWidget()
@@ -233,5 +229,6 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         {
             StateChanged?.Invoke(this, new ExtensionStateChangedEventArgs(oldState, newState));
         }
+
     }
 }

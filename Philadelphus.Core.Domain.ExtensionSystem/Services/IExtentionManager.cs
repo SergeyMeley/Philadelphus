@@ -22,7 +22,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Загрузить все расширения
         /// </summary>
-        Task LoadExtensionsAsync(string pluginsFolderPath);
+        Task LoadExtensionsAsync(IEnumerable<string> pluginsFolderPathes);
 
         /// <summary>
         /// Запустить расширение

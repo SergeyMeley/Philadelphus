@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Philadelphus.Business.Config
@@ -10,6 +11,8 @@ namespace Philadelphus.Business.Config
     public class ApplicationSettings    //TODO: Подумать о переносе в Application
     {
         public string ConfigsDirectoryString { get; set; }
+
+        [JsonIgnore]
         public DirectoryInfo ConfigsDirectory 
         { 
             get
@@ -18,14 +21,16 @@ namespace Philadelphus.Business.Config
                 return new DirectoryInfo(expandedPath);
             }
         }
-        public string[] PluginsDirectoriesString { get; set; }
+        public List<string> PluginsDirectoriesString { get; set; }
+
+        [JsonIgnore]
         public DirectoryInfo[] PluginsDirectories
         {
             get
             {
-                var result = new DirectoryInfo[PluginsDirectoriesString.Length];
+                var result = new DirectoryInfo[PluginsDirectoriesString.Count()];
 
-                for (int i = 0; i < PluginsDirectoriesString.Length; i++)
+                for (int i = 0; i < PluginsDirectoriesString.Count(); i++)
                 {
                     var expandedPath = Environment.ExpandEnvironmentVariables(PluginsDirectoriesString[i] ?? string.Empty);
                     result[i] = new DirectoryInfo(expandedPath); 

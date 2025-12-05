@@ -29,38 +29,41 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public IReadOnlyList<ExtensionInstance> GetExtensions() => _extensions.AsReadOnly();
 
-        public async Task LoadExtensionsAsync(string pluginsFolderPath)
+        public async Task LoadExtensionsAsync(IEnumerable<string> pluginsFolderPathes)
         {
-            if (!Directory.Exists(pluginsFolderPath))
-                throw new DirectoryNotFoundException($"Папка расширений не найдена: {pluginsFolderPath}");
-
-            var dllFiles = Directory.GetFiles(pluginsFolderPath, "*.dll");
-
-            foreach (var dll in dllFiles)
+            foreach (var pluginsFolderPath in pluginsFolderPathes)
             {
-                try
-                {
-                    // Загружаем сборку
-                    var assembly = Assembly.LoadFrom(dll);
-                    // Ищем типы, реализующие интерфейс IExtension
-                    var extensionTypes = assembly.GetTypes()
-                        .Where(t => typeof(IExtensionModel).IsAssignableFrom(t) && !t.IsAbstract);
+                if (!Directory.Exists(pluginsFolderPath))
+                    throw new DirectoryNotFoundException($"Папка расширений не найдена: {pluginsFolderPath}");
 
-                    foreach (var type in extensionTypes)
+                var dllFiles = Directory.GetFiles(pluginsFolderPath, "*.dll");
+
+                foreach (var dll in dllFiles)
+                {
+                    try
                     {
-                        // Создаем экземпляр расширения (нужен конструктор без параметров или DI)
-                        if (Activator.CreateInstance(type) is IExtensionModel extension)
+                        // Загружаем сборку
+                        var assembly = Assembly.LoadFrom(dll);
+                        // Ищем типы, реализующие интерфейс IExtension
+                        var extensionTypes = assembly.GetTypes()
+                            .Where(t => typeof(IExtensionModel).IsAssignableFrom(t) && !t.IsAbstract);
+
+                        foreach (var type in extensionTypes)
                         {
-                            var extensionInstance = new ExtensionInstance(extension);
-                            // Регистрируем расширение (добавляем в список)
-                            RegisterExtension(extensionInstance);
+                            // Создаем экземпляр расширения (нужен конструктор без параметров или DI)
+                            if (Activator.CreateInstance(type) is IExtensionModel extension)
+                            {
+                                var extensionInstance = new ExtensionInstance(extension);
+                                // Регистрируем расширение (добавляем в список)
+                                RegisterExtension(extensionInstance);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    // Логируем ошибку загрузки конкретной DLL, но не прерываем загрузку остальных
-                    Debug.WriteLine($"Ошибка загрузки расширения из {dll}: {ex.Message}");
+                    catch (Exception ex)
+                    {
+                        // Логируем ошибку загрузки конкретной DLL, но не прерываем загрузку остальных
+                        Debug.WriteLine($"Ошибка загрузки расширения из {dll}: {ex.Message}");
+                    }
                 }
             }
 
