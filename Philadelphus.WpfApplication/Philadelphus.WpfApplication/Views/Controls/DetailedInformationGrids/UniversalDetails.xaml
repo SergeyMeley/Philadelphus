@@ -113,16 +113,11 @@
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <Border Background="#FFF9F9F9" Padding="10" CornerRadius="8"
-                                BorderBrush="#FFE0E0E0" BorderThickness="1">
+                                            <Border Background="#FFF9F9F9" Padding="10" CornerRadius="8" BorderBrush="#FFE0E0E0" BorderThickness="1">
                                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                     <TextBlock Text="🚫" FontSize="24" HorizontalAlignment="Center"/>
-                                                    <TextBlock Text="Элемент не выбран" 
-                                           FontSize="16" FontWeight="SemiBold"
-                                           HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                                                    <TextBlock Text="Выберите элемент для просмотра свойств"
-                                           FontStyle="Italic" Foreground="Gray"
-                                           HorizontalAlignment="Center" TextAlignment="Center"/>
+                                                    <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="Gray" HorizontalAlignment="Center" TextAlignment="Center"/>
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>

@@ -124,15 +124,20 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
             }
         }
 
+        private ExtensionVM _extensionVM;
+        public ExtensionVM ExtensionVM { get => _extensionVM; }
+
         #endregion
 
         #region [ Construct ]
 
         public TreeRepositoryVM(
             TreeRepositoryModel treeRepositoryModel,
-            ITreeRepositoryService service)
+            ITreeRepositoryService service,
+            ExtensionVM extensionVM)
         {
             _service = service;
+            _extensionVM = extensionVM;
 
             _model = treeRepositoryModel;
             _storageVM = new DataStorageVM(treeRepositoryModel.OwnDataStorage);

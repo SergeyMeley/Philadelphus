@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace Philadelphus.WpfApplication.Converters
 {
-    public class CanExecuteToColorExtension : IValueConverter
+    public class CanExecuteToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

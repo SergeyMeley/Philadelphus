@@ -2,10 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Philadelphus.Business.Config;
 using Philadelphus.Business.Mapping;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels;
 using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
@@ -15,6 +17,8 @@ using System.Configuration;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Runtime;
+using System.Text.Json;
 using System.Windows;
 
 namespace Philadelphus.WpfApplication
@@ -60,6 +64,7 @@ namespace Philadelphus.WpfApplication
                     services.AddSingleton<StorageConfigService>();      //TODO: Заменить на новый сервис
                     services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
                     services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddScoped<IExtensionManager, ExtensionManager>();
 
                     // Регистрация ViewModel
                     services.AddSingleton<ApplicationVM>();
@@ -96,5 +101,4 @@ namespace Philadelphus.WpfApplication
             base.OnExit(e);
         }
     }
-
 }

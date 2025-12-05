@@ -17,7 +17,7 @@ namespace Philadelphus.WpfApplication.ViewModels
     /// <summary>
     /// ViewModel для управления расширениями
     /// </summary>
-    public class ExtensionsViewModel : ViewModelBase
+    public class ExtensionVM : ViewModelBase
     {
         private readonly IExtensionManager _extensionManager;
         private ExtensionInstance _selectedExtension;
@@ -71,7 +71,8 @@ namespace Philadelphus.WpfApplication.ViewModels
         public ICommand ExecuteExtensionCommand { get; }
         public ICommand OpenMainWindowCommand { get; }
 
-        public ExtensionsViewModel(IExtensionManager extensionManager)
+        public ExtensionVM(
+            IExtensionManager extensionManager)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
             Extensions = new ObservableCollection<ExtensionInstance>();
