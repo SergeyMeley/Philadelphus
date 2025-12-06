@@ -2,7 +2,6 @@
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Infrastructure;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,12 +11,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Philadelphus.WpfApplication.ViewModels
+namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
     /// <summary>
     /// ViewModel для управления расширениями
     /// </summary>
-    public class ExtensionVM : ViewModelBase
+    public class ExtensionControlVM : ControlVM
     {
         private readonly IExtensionManager _extensionManager;
         private ExtensionInstance _selectedExtension;
@@ -25,7 +24,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         private string _statusMessage;
         private bool _isExecuting;
 
-        public TreeRepositoryVM RepositoryViewModel { get; set; }
+        public RepositoryExplorerControlVM RepositoryViewModel { get; set; }
         public ObservableCollection<ExtensionInstance> Extensions { get; }
         public ObservableCollection<OperationLog> RecentOperations { get; }
 
@@ -71,7 +70,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         public ICommand ExecuteExtensionCommand { get; }
         public ICommand OpenMainWindowCommand { get; }
 
-        public ExtensionVM(
+        public ExtensionControlVM(
             IExtensionManager extensionManager)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));

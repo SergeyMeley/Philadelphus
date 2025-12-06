@@ -3,13 +3,14 @@ using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs
 {
-    public class TreeRootVM : MainEntityBaseVM
+    public class TreeRootVM : MainEntityBaseVM  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 

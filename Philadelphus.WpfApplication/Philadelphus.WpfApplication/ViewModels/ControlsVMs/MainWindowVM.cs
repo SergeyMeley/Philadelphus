@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.WpfApplication.Infrastructure;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
@@ -9,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels
+namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
-    public class MainWindowVM : ViewModelBase
+    public class MainWindowVM : ControlVM
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationCommandsVM _applicationCommandsVM;
@@ -21,7 +20,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             get
             {
                 var title = "Чубушник";
-                var repositoryName = RepositoryExplorerVM?.Name;
+                var repositoryName = RepositoryExplorerVM?.CurentRepositoryName;
                 if (String.IsNullOrEmpty(repositoryName) == false)
                 {
                     title = $"{repositoryName} - Чубушник";
@@ -30,8 +29,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             }
         }
 
-        private TreeRepositoryVM _repositoryExplorerVM;
-        public TreeRepositoryVM RepositoryExplorerVM
+        private RepositoryExplorerControlVM _repositoryExplorerVM;
+        public RepositoryExplorerControlVM RepositoryExplorerVM
         {
             get
             {

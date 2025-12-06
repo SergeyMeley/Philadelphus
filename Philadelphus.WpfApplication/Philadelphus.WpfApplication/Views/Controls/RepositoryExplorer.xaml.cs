@@ -1,4 +1,5 @@
-﻿using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+﻿using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,7 +10,7 @@ namespace Philadelphus.WpfApplication.Views.Controls
     /// </summary>
     public partial class RepositoryExplorer : UserControl
     {
-        public TreeRepositoryVM ViewModel { get { return (TreeRepositoryVM)DataContext; } }
+        public RepositoryExplorerControlVM ViewModel { get { return (RepositoryExplorerControlVM)DataContext; } }
         public RepositoryExplorer()
         {
             InitializeComponent();

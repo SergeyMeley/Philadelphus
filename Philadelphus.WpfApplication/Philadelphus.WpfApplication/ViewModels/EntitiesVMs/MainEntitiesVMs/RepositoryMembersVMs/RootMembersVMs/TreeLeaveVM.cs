@@ -2,10 +2,11 @@
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
-    public class TreeLeaveVM : MainEntityBaseVM
+    public class TreeLeaveVM : MainEntityBaseVM //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 

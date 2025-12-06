@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids"
-             xmlns:infrast="clr-namespace:Philadelphus.WpfApplication.ViewModels.InfrastructureVMs"
-             xmlns:mainent="clr-namespace:Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs"
-             xmlns:rootmem="clr-namespace:Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs"
-             xmlns:repomem="clr-namespace:Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs"
+             xmlns:infrast="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs"
+             xmlns:mainent="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs"
+             xmlns:rootmem="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs"
+             xmlns:repomem="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs"
              mc:Ignorable="d">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type infrast:DataStorageVM}">

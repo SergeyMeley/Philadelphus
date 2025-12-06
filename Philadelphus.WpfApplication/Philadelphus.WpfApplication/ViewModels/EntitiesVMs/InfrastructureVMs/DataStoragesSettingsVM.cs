@@ -5,7 +5,6 @@ using Philadelphus.Business.Entities.Infrastructure;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.Models.StorageConfig;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs
 {
     public class DataStoragesSettingsVM : ViewModelBase
     {

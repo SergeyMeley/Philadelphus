@@ -5,13 +5,13 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.ElementsContentVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using System.Collections.ObjectModel;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public abstract class MainEntityBaseVM : ViewModelBase
+    public abstract class MainEntityBaseVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         protected readonly ITreeRepositoryService _service;
 

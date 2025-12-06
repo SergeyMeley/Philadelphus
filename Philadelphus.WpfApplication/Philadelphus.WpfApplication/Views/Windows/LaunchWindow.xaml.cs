@@ -1,4 +1,4 @@
-﻿using Philadelphus.WpfApplication.ViewModels;
+﻿using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace Philadelphus.WpfApplication.Views.Windows
     /// </summary>
     public partial class LaunchWindow : Window
     {
-        public LaunchWindow(LaunchVM vm)
+        public LaunchWindow(LaunchWindowVM vm)
         {
             InitializeComponent();
             DataContext = vm;

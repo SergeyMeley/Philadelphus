@@ -6,16 +6,16 @@ using Philadelphus.Business.Services;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 
-namespace Philadelphus.WpfApplication.ViewModels
+namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
-    public class RepositoryCreationVM : ViewModelBase
+    public class RepositoryCreationControlVM : ControlVM
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<RepositoryCreationVM> _logger;
+        private readonly ILogger<RepositoryCreationControlVM> _logger;
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryCollectionService _collectionService;
         private readonly ITreeRepositoryService _service;
@@ -30,9 +30,9 @@ namespace Philadelphus.WpfApplication.ViewModels
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
-        public RepositoryCreationVM(
+        public RepositoryCreationControlVM(
             IServiceProvider serviceProvider,
-            ILogger<RepositoryCreationVM> logger,
+            ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             ITreeRepositoryCollectionService collectionService,
             ITreeRepositoryService service,
@@ -61,7 +61,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     result.Name = _name;
                     result.Description = _description;
                     _service.SaveChanges(result);
-                    var vm = _serviceProvider.GetRequiredService<TreeRepositoryVM>();
+                    var vm = new TreeRepositoryVM(result, _service);
                     _repositoryCollectionVM.TreeRepositoriesVMs.Add(vm);
                 });
             }

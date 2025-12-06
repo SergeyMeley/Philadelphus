@@ -5,7 +5,7 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,9 +13,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryHeaderVM : ViewModelBase
+    public class TreeRepositoryHeaderVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 

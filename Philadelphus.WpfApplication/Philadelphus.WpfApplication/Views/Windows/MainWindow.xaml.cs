@@ -1,5 +1,5 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.WpfApplication.ViewModels;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using System.Globalization;
 using System.Text;
 using System.Windows;

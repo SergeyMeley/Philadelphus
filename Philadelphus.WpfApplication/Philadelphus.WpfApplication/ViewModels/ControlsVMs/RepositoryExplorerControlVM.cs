@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Business.Entities.ElementsProperties;
 using Philadelphus.Business.Entities.Enums;
@@ -10,57 +11,34 @@ using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
+namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
-    public  class TreeRepositoryVM : ViewModelBase
+    public  class RepositoryExplorerControlVM : ControlVM
     {
         #region [ Props ]
 
         private readonly ITreeRepositoryService _service;
 
-        private readonly TreeRepositoryModel _model;
-        public TreeRepositoryModel TreeRepositoryModel
-        {
-            get
+        private TreeRepositoryVM _treeRepositoryVM;
+        public TreeRepositoryVM TreeRepositoryVM 
+        { 
+            get 
+            { 
+                return _treeRepositoryVM; 
+            }
+            set
             {
-                return _model;
+                _treeRepositoryVM = value;
             }
         }
 
-        public Guid Guid { get => _model.Guid; }
-        public string Name { get => _model.Name; set => _model.Name = value; }
-        public string Description { get => _model.Description; set => _model.Description = value; }
-        public AuditInfoModel AuditInfo { get => _model.AuditInfo; }
-        public State State { get => _model.State; }
-        public IDataStorageModel OwnDataStorage { get => _model.OwnDataStorage; }
-
-        private DataStorageVM _storageVM;
-        public DataStorageVM StorageVM { get => _storageVM; }
-        public string OwnDataStorageName
-        {
-            get
-            {
-                return _model.OwnDataStorageName;
-            }
-        }
-        public Guid OwnDataStorageUuid
-        {
-            get
-            {
-                return _model.OwnDataStorageUuid;
-            }
-        }
-
-        private ObservableCollection<IDataStorageModel> _dataStorages { get; }
-        public ObservableCollection<IDataStorageModel> DataStorages { get => _dataStorages; }
-
-        public ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
-        public ObservableCollection<TreeRootVM> Childs { get => _childs; }
+        public string CurentRepositoryName { get => _treeRepositoryVM.Name; }
 
         //public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
 
@@ -92,62 +70,19 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
             }
         }
 
-        //private List<string> _visibilityList = new List<string> { "Скрытый (private)", "Всем (public)", "Только наследникам (protected)", "Только элементам корня (internal)" };
-        //public List<string> VisibilityList
-        //{
-        //    get { return _visibilityList; }
-        //}
-
-        public string ChildsCount { get => $"Детей: {_model.Childs.Count()}, Корней: {_model?.ChildTreeRoots?.Count()}, Uuids: {_model?.ChildsGuids?.Count}"; }
-
-        public bool IsFavorite 
-        { 
-            get
-            {
-                return _model.IsFavorite;
-            }
-            set
-            {
-                _model.IsFavorite = value;
-            }
-        }
-
-        public DateTime? LastOpening
-        { 
-            get
-            {
-                return _model.LastOpening;
-            }
-            set
-            {
-                _model.LastOpening = value;
-            }
-        }
-
-        private ExtensionVM _extensionVM;
-        public ExtensionVM ExtensionVM { get => _extensionVM; }
+        private ExtensionControlVM _extensionVM;
+        public ExtensionControlVM ExtensionVM { get => _extensionVM; }
 
         #endregion
 
         #region [ Construct ]
 
-        public TreeRepositoryVM(
-            TreeRepositoryModel treeRepositoryModel,
+        public RepositoryExplorerControlVM(
             ITreeRepositoryService service,
-            ExtensionVM extensionVM)
+            ExtensionControlVM extensionVM)
         {
             _service = service;
             _extensionVM = extensionVM;
-
-            _model = treeRepositoryModel;
-            _storageVM = new DataStorageVM(treeRepositoryModel.OwnDataStorage);
-            foreach (var item in treeRepositoryModel.Childs)
-            {
-                if (item.GetType() == typeof(TreeRootModel))
-                {
-                    _childs.Add(new TreeRootVM((TreeRootModel)item, _service));
-                }
-            }
         }
 
         #endregion
@@ -160,7 +95,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 return new RelayCommand(obj =>
                 {
                     UpdateChildsCollection(this);
-                    _service.SaveChanges(_model);
+                    _service.SaveChanges(_treeRepositoryVM.Model);
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
                 });
@@ -233,10 +168,10 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    var result = _service.CreateTreeRoot(_model, _model.OwnDataStorage);
-                    Childs.Add(new TreeRootVM(result, _service));
-                    OnPropertyChanged(nameof(Childs));
-                    OnPropertyChanged(nameof(State));
+                    var result = _service.CreateTreeRoot(_treeRepositoryVM.Model, _treeRepositoryVM.Model.OwnDataStorage);
+                    _treeRepositoryVM.Childs.Add(new TreeRootVM(result, _service));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
                 });
             }
         }
@@ -256,8 +191,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                     {
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeNode();
                     }
-                    OnPropertyChanged(nameof(Childs));
-                    OnPropertyChanged(nameof(State));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
                 });
             }
         }
@@ -273,8 +208,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                     {
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeLeave();
                     }
-                    OnPropertyChanged(nameof(Childs));
-                    OnPropertyChanged(nameof(State));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
                 });
             }
         }
@@ -288,7 +223,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                         return;
                     _selectedRepositoryMember.AddAttribute();
                     
-                    OnPropertyChanged(nameof(State));
+                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
                 });
             }
         }
@@ -332,27 +267,27 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
 
         internal bool LoadTreeRepository()
         {
-            _service.GetRepositoryContent(_model);
-            Childs.Clear();
-            foreach (var item in _model.Childs)
+            _service.GetRepositoryContent(_treeRepositoryVM.Model);
+            _treeRepositoryVM.Childs.Clear();
+            foreach (var item in _treeRepositoryVM.Model.Childs)
             {
-                Childs.Add(new TreeRootVM((TreeRootModel)item, _service));
+                _treeRepositoryVM.Childs.Add(new TreeRootVM((TreeRootModel)item, _service));
             }
-            OnPropertyChanged(nameof(Childs));
-            OnPropertyChanged(nameof(ChildsCount));
-            return Childs != null;
+            OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
+            OnPropertyChanged(nameof(_treeRepositoryVM.ChildsCount));
+            return _treeRepositoryVM.Childs != null;
         }
         public bool CheckTreeRepositoryAvailability()
         {
-            if (_model == null)
+            if (_treeRepositoryVM.Model == null)
                 return false;
-            return _model.OwnDataStorage.IsAvailable;
+            return _treeRepositoryVM.Model.OwnDataStorage.IsAvailable;
         }
 
         internal void NotifyChildsPropertyChangedRecursive()
         {
             OnPropertyChanged(nameof(State));
-            foreach (var item in Childs)
+            foreach (var item in _treeRepositoryVM.Childs)
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }

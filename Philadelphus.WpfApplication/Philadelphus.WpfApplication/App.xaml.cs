@@ -1,4 +1,4 @@
-﻿  using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,8 +10,9 @@ using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 using System.Configuration;
 using System.Data;
@@ -70,12 +71,14 @@ namespace Philadelphus.WpfApplication
                     services.AddSingleton<ApplicationVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
-                    services.AddSingleton<LaunchVM>();
+                    services.AddSingleton<LaunchWindowVM>();
                     services.AddTransient<MainWindowVM>();
                     services.AddSingleton<DataStoragesSettingsVM>();
+                    services.AddScoped<RepositoryExplorerControlVM>();
                     services.AddScoped<TreeRepositoryCollectionVM>();
                     services.AddScoped<TreeRepositoryHeadersCollectionVM>();
-                    services.AddScoped<RepositoryCreationVM>();
+                    services.AddScoped<RepositoryCreationControlVM>();
+                    services.AddScoped<ExtensionControlVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();

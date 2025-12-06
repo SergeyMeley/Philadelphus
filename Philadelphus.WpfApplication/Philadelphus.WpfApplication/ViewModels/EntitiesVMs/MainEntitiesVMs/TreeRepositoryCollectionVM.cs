@@ -10,7 +10,8 @@ using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.Models.Entities.Enums;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 using System;
 using System.Collections.Generic;
@@ -20,9 +21,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryCollectionVM : ViewModelBase
+    public class TreeRepositoryCollectionVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<TreeRepositoryCollectionVM> _logger;
@@ -52,19 +53,19 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
             InitRepositoriesVMsCollection();
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
-        private static TreeRepositoryVM _currentRepositoryExplorerVM;
-        public TreeRepositoryVM CurrentRepositoryExplorerVM
+        private static TreeRepositoryVM _currentRepositoryVM;
+        public TreeRepositoryVM CurrentRepositoryVM
         {
             get
             {
-                return _currentRepositoryExplorerVM;
+                return _currentRepositoryVM;
             }
             set
             {
-                _currentRepositoryExplorerVM = null;
-                _currentRepositoryExplorerVM = value;
-                _currentRepositoryExplorerVM.LoadTreeRepository();
-                OnPropertyChanged(nameof(CurrentRepositoryExplorerVM));
+                _currentRepositoryVM = null;
+                _currentRepositoryVM = value;
+                //_currentRepositoryVM.LoadTreeRepository();    //TODO: Перенести в другое место
+                OnPropertyChanged(nameof(CurrentRepositoryVM));
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(TreeRepositoriesVMs));
             }
@@ -112,7 +113,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         {
             get
             {
-                if (_currentRepositoryExplorerVM == null)
+                if (_currentRepositoryVM == null)
                     return null;
                 //return PropertyGridHelper.GetProperties(_currentRepositoryExplorerVM.TreeRepository);
                 return null;
@@ -138,8 +139,8 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
                 {
                     var builder = new DataStorageBuilder();
                     var repository = _collectionService.CreateNewTreeRepository(builder.Build());
-                    var repositoryExplorerViewModel = new TreeRepositoryVM(repository, _service);
-                    TreeRepositoriesVMs.Add(repositoryExplorerViewModel);
+                    var repositorVM = new TreeRepositoryVM(repository, _service);
+                    TreeRepositoriesVMs.Add(repositorVM);
                      
                 });
             }

@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Philadelphus.WpfApplication.ViewModels.InfrastructureVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs
 {
     public class DataStorageVM : ViewModelBase
     {

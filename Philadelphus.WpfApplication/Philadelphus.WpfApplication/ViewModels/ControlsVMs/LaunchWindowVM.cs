@@ -1,10 +1,10 @@
 ﻿using Philadelphus.WpfApplication.Infrastructure;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 
-namespace Philadelphus.WpfApplication.ViewModels
+namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
-    public class LaunchVM : ViewModelBase
+    public class LaunchWindowVM : ControlVM
     {
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
@@ -15,7 +15,7 @@ namespace Philadelphus.WpfApplication.ViewModels
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
         public string UserName { get => Environment.UserName; }
-        public LaunchVM(
+        public LaunchWindowVM(
             IServiceProvider serviceProvider,
             DataStoragesSettingsVM dataStoragesSettingsVM,
             TreeRepositoryCollectionVM repositoryCollectionVM,
@@ -40,7 +40,7 @@ namespace Philadelphus.WpfApplication.ViewModels
                     obj =>
                 {
                     var headerVM = RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM;
-                    RepositoryCollectionVM.CurrentRepositoryExplorerVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == headerVM.Guid);
+                    RepositoryCollectionVM.CurrentRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == headerVM.Guid);
 
                     if (_openMainWindowCommand.CanExecute(obj))
                         _openMainWindowCommand.Execute(obj);

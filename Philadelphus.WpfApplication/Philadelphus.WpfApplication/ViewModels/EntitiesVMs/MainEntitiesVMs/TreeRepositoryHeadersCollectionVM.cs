@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿  using Microsoft.Extensions.Logging;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 
-namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
+namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryHeadersCollectionVM : ViewModelBase
+    public class TreeRepositoryHeadersCollectionVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         private readonly ILogger<TreeRepositoryHeadersCollectionVM> _logger;
         private readonly INotificationService _notificationService;
@@ -111,7 +112,7 @@ namespace Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs
         }
         internal TreeRepositoryHeaderVM AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
         {
-            var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.TreeRepositoryModel);
+            var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.Model);
             var result = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
             TreeRepositoryHeadersVMs.Add(result);
             return result;
