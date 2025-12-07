@@ -93,7 +93,10 @@ namespace Philadelphus.WpfApplication
 
             var viewModel = _host.Services.GetRequiredService<ApplicationVM>();
             var window = _host.Services.GetRequiredService<LaunchWindow>();
+            window.Topmost = true;
             window.Show();
+            window.Activate();
+            window.Topmost = false;
             base.OnStartup(e);
         }
 

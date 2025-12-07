@@ -162,7 +162,24 @@
 
                 </RibbonTab>
                 <RibbonTab Header="Расширения">
+                    <RibbonGroup Header="Текущее расширение">
+                        <RibbonComboBox></RibbonComboBox>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Состояние: "></TextBlock>
+                            <TextBlock Text=""></TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RibbonButton Label="Запустить"></RibbonButton>
+                            <RibbonButton Label="Остановить"></RibbonButton>
+                        </StackPanel>
+                        <RibbonButton Label="Обработать"></RibbonButton>
+                    </RibbonGroup>
+                    <RibbonGroup Header="Виджет расширения">
 
+                    </RibbonGroup>
+                    <RibbonGroup Header="Окна расширений">
+
+                    </RibbonGroup>
                 </RibbonTab>
                 <RibbonTab Header="Администрирование">
 
