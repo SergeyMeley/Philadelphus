@@ -78,7 +78,7 @@ namespace Philadelphus.WpfApplication
                     services.AddScoped<TreeRepositoryCollectionVM>();
                     services.AddScoped<TreeRepositoryHeadersCollectionVM>();
                     services.AddScoped<RepositoryCreationControlVM>();
-                    services.AddScoped<ExtensionControlVM>();
+                    services.AddScoped<ExtensionsControlVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
@@ -91,7 +91,6 @@ namespace Philadelphus.WpfApplication
         {
             await _host.StartAsync();
 
-            var viewModel = _host.Services.GetRequiredService<ApplicationVM>();
             var window = _host.Services.GetRequiredService<LaunchWindow>();
             window.Topmost = true;
             window.Show();

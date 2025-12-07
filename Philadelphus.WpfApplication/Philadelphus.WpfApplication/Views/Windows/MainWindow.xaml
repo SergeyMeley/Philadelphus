@@ -7,7 +7,7 @@
         xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
         xmlns:i="Microsoft.Xaml.Behaviors;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
-        xmlns:ntf="clr-namespace:Philadelphus.Business.Services;assembly=Philadelphus.Business"
+        xmlns:ntf="clr-namespace:Philadelphus.Business.Services.Interfaces;assembly=Philadelphus.Business"
         d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationVM}"
         mc:Ignorable="d"
         Title="{Binding Title}"
@@ -161,18 +161,18 @@
                 <RibbonTab Header="Вид">
 
                 </RibbonTab>
-                <RibbonTab Header="Расширения">
+                <RibbonTab Header="Расширения" DataContext="{Binding ExtensionVM}">
                     <RibbonGroup Header="Текущее расширение">
-                        <RibbonComboBox></RibbonComboBox>
+                        <RibbonComboBox DataContext="{Binding Extensions}" ItemsSource="{Binding}" DisplayMemberPath="Name"></RibbonComboBox>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Состояние: "></TextBlock>
                             <TextBlock Text=""></TextBlock>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <RibbonButton Label="Запустить"></RibbonButton>
-                            <RibbonButton Label="Остановить"></RibbonButton>
+                            <RibbonButton Label="Запустить" Command="{Binding StartExtensionCommand}"></RibbonButton>
+                            <RibbonButton Label="Остановить" Command="{Binding StopExtensionCommand}"></RibbonButton>
                         </StackPanel>
-                        <RibbonButton Label="Обработать"></RibbonButton>
+                        <RibbonButton Label="Обработать" Command="{Binding ExecuteExtensionCommand}"></RibbonButton>
                     </RibbonGroup>
                     <RibbonGroup Header="Виджет расширения">
 

@@ -1,10 +1,14 @@
 ﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
+using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Infrastructure;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,19 +20,25 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
     /// <summary>
     /// ViewModel для управления расширениями
     /// </summary>
-    public class ExtensionControlVM : ControlVM
+    public class ExtensionsControlVM : ControlVM
     {
         private readonly IExtensionManager _extensionManager;
-        private ExtensionInstance _selectedExtension;
+        private ExtensionInstanceVM _selectedExtension;
         private TreeRepositoryMemberBaseModel _selectedElement;
         private string _statusMessage;
         private bool _isExecuting;
+        private TreeRepositoryVM _repositoryVM;
 
-        public RepositoryExplorerControlVM RepositoryViewModel { get; set; }
-        public ObservableCollection<ExtensionInstance> Extensions { get; }
+        public TreeRepositoryVM RepositoryVM
+        {
+            get => _repositoryVM;
+            set => SetProperty(ref _repositoryVM, value);
+        }
+
+        public ObservableCollection<ExtensionInstanceVM> Extensions { get; }
         public ObservableCollection<OperationLog> RecentOperations { get; }
 
-        public ExtensionInstance SelectedExtension
+        public ExtensionInstanceVM SelectedExtension
         {
             get => _selectedExtension;
             set
@@ -64,34 +74,67 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             set => SetProperty(ref _isExecuting, value);
         }
 
-        // Команды
         public ICommand StartExtensionCommand { get; }
         public ICommand StopExtensionCommand { get; }
         public ICommand ExecuteExtensionCommand { get; }
         public ICommand OpenMainWindowCommand { get; }
 
-        public ExtensionControlVM(
-            IExtensionManager extensionManager)
+        public ExtensionsControlVM(IExtensionManager extensionManager)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
-            Extensions = new ObservableCollection<ExtensionInstance>();
+            Extensions = new ObservableCollection<ExtensionInstanceVM>();
+
             RecentOperations = new ObservableCollection<OperationLog>();
 
             StartExtensionCommand = new AsyncRelayCommand(ExecuteStartExtension, _ => SelectedExtension != null && SelectedExtension.State != ExtensionState.Running);
             StopExtensionCommand = new AsyncRelayCommand(ExecuteStopExtension, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
             ExecuteExtensionCommand = new AsyncRelayCommand(ExecuteMainMethod, _ => CanExecuteMainMethod());
-            OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => SelectedExtension?.Extension.GetMainWindow() != null);
+            OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => false);
         }
 
-        public async Task InitializeAsync(ObservableCollection<ExtensionInstance> extensions)
+        public async Task InitializeAsync(IEnumerable<string> pluginsFolderPaths)
         {
-            foreach (var ext in extensions)
+            try
             {
-                Extensions.Add(ext);
-                ext.PropertyChanged += Extension_PropertyChanged;
+                // Загружаем расширения из DLL
+                await _extensionManager.LoadExtensionsAsync(pluginsFolderPaths);
+                Debug.WriteLine($"Загружено расширений: {_extensionManager.GetExtensions().Count}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка загрузки расширений: {ex.Message}");
+                StatusMessage = $"Ошибка загрузки расширений: {ex.Message}";
+            }
+
+            // Добавляем расширения в коллекцию ViewModel
+            foreach (var ext in _extensionManager.GetExtensions())
+            {
+                var vm = new ExtensionInstanceVM(ext);
+                Extensions.Add(vm);
             }
 
             // Автозагрузка расширений с AutoStart = true
+            await _extensionManager.AutoStartExtensionsAsync();
+
+            if (Extensions.Count > 0)
+            {
+                SelectedExtension = Extensions[0];
+                StatusMessage = $"Загружено расширений: {Extensions.Count}";
+            }
+            else
+            {
+                StatusMessage = "Расширения не найдены";
+            }
+        }
+
+        public async Task InitializeAsync(IEnumerable<ExtensionInstance> extensions)
+        {
+            foreach (var ext in extensions)
+            {
+                var vm = new ExtensionInstanceVM(ext);
+                Extensions.Add(vm);
+            }
+
             await _extensionManager.AutoStartExtensionsAsync();
 
             if (Extensions.Count > 0)
@@ -107,8 +150,12 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             try
             {
                 IsExecuting = true;
-                await _extensionManager.StartExtensionAsync(SelectedExtension);
-                StatusMessage = $"Расширение '{SelectedExtension.Metadata.Name}' запущено";
+                var originalExt = FindOriginalExtension(SelectedExtension);
+                if (originalExt != null)
+                {
+                    await _extensionManager.StartExtensionAsync(originalExt);
+                    StatusMessage = $"Расширение '{SelectedExtension.Name}' запущено";
+                }
             }
             catch (Exception ex)
             {
@@ -128,8 +175,12 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             try
             {
                 IsExecuting = true;
-                await _extensionManager.StopExtensionAsync(SelectedExtension);
-                StatusMessage = $"Расширение '{SelectedExtension.Metadata.Name}' остановлено";
+                var originalExt = FindOriginalExtension(SelectedExtension);
+                if (originalExt != null)
+                {
+                    await _extensionManager.StopExtensionAsync(originalExt);
+                    StatusMessage = $"Расширение '{SelectedExtension.Name}' остановлено";
+                }
             }
             catch (Exception ex)
             {
@@ -149,11 +200,12 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             try
             {
                 IsExecuting = true;
-                var result = await _extensionManager.ExecuteExtensionAsync(SelectedExtension, SelectedElement);
-                StatusMessage = $"Метод расширения '{SelectedExtension.Metadata.Name}' успешно выполнен";
-
-                // Обновляем информацию об операции
-                UpdateOperationsLog(SelectedExtension);
+                var originalExt = FindOriginalExtension(SelectedExtension);
+                if (originalExt != null)
+                {
+                    await _extensionManager.ExecuteExtensionAsync(originalExt, SelectedElement);
+                    StatusMessage = $"Метод расширения '{SelectedExtension.Name}' успешно выполнен";
+                }
             }
             catch (Exception ex)
             {
@@ -168,7 +220,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private void ExecuteOpenMainWindow(object parameter)
         {
-            if (SelectedExtension?.Extension.GetMainWindow() is Window window)
+            if (SelectedExtension?.Widget is Window window)
             {
                 window.ShowDialog();
             }
@@ -176,11 +228,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private bool CanExecuteMainMethod()
         {
-            if (SelectedExtension == null || SelectedElement == null)
-                return false;
-
-            return SelectedExtension.State == ExtensionState.Running &&
-                   SelectedExtension.LastCanExecuteResultModel.CanExecute;
+            return SelectedExtension != null && SelectedElement != null &&
+                   SelectedExtension.State == ExtensionState.Running && SelectedExtension.CanExecute;
         }
 
         private async void UpdateCanExecuteForCurrentElement()
@@ -188,28 +237,13 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             if (SelectedExtension != null && SelectedElement != null)
             {
                 await SelectedExtension.UpdateCanExecuteAsync(SelectedElement);
-                UpdateOperationsLog(SelectedExtension);
             }
         }
 
-        private void UpdateOperationsLog(ExtensionInstance extension)
+        private ExtensionInstance FindOriginalExtension(ExtensionInstanceVM vmExt)
         {
-            RecentOperations.Clear();
-
-            // Показываем последние 10 операций
-            var recent = extension.OperationHistory.Skip(Math.Max(0, extension.OperationHistory.Count - 10)).ToList();
-            foreach (var log in recent)
-            {
-                RecentOperations.Add(log);
-            }
-        }
-
-        private void Extension_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (sender == SelectedExtension && e.PropertyName == nameof(ExtensionInstance.OperationHistory))
-            {
-                UpdateOperationsLog(SelectedExtension);
-            }
+            return _extensionManager.GetExtensions()
+                .FirstOrDefault(e => e.Metadata.Id == vmExt.Name);
         }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Philadelphus.Business.Config;
+using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
 using Philadelphus.WpfApplication.Views.Windows;
@@ -14,6 +17,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationCommandsVM _applicationCommandsVM;
+        private readonly ExtensionsControlVM _extensionVM;
+        public ExtensionsControlVM ExtensionVM => _extensionVM;
 
         public string Title
         {
@@ -47,10 +52,15 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         public MainWindowVM(
             IServiceProvider serviceProvider,
-            ApplicationCommandsVM applicationCommandsVM)
+            IOptions<ApplicationSettings> options,
+            ApplicationCommandsVM applicationCommandsVM,
+            ExtensionsControlVM extensionVM)
         {
             _serviceProvider = serviceProvider;
+            _extensionVM = extensionVM;
             _applicationCommandsVM = applicationCommandsVM;
+
+            extensionVM.InitializeAsync(options.Value.PluginsDirectoriesString);
         }
 
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;

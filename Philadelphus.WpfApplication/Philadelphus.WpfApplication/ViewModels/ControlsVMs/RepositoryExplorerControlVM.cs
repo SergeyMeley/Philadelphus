@@ -70,8 +70,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             }
         }
 
-        private ExtensionControlVM _extensionVM;
-        public ExtensionControlVM ExtensionVM { get => _extensionVM; }
+        private ExtensionsControlVM _extensionVM;
+        public ExtensionsControlVM ExtensionVM { get => _extensionVM; }
 
         #endregion
 
@@ -79,7 +79,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         public RepositoryExplorerControlVM(
             ITreeRepositoryService service,
-            ExtensionControlVM extensionVM)
+            ExtensionsControlVM extensionVM)
         {
             _service = service;
             _extensionVM = extensionVM;
