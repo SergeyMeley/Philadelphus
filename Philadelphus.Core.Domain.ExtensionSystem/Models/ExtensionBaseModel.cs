@@ -1,4 +1,5 @@
-﻿  using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         public virtual Task StartAsync() => Task.CompletedTask;
         public virtual Task StopAsync() => Task.CompletedTask;
 
-        public abstract Task<CanExecuteResultModel> CanExecuteAsync(TreeRepositoryMemberBaseModel element);
-        public abstract Task<TreeRepositoryMemberBaseModel> ExecuteAsync(TreeRepositoryMemberBaseModel element, CancellationToken cancellationToken = default);
+        public abstract Task<CanExecuteResultModel> CanExecuteAsync(MainEntityBaseModel element);
+        public abstract Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default);
 
         public virtual object GetWidget() => null;
         public virtual object GetMainWindow() => null;

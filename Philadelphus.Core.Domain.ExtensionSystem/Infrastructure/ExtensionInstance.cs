@@ -1,4 +1,8 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using System;
 using System.Collections.Generic;
@@ -22,9 +26,19 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         private object _widget;
         private bool _isWidgetInitialized;
 
+        /// <summary>
+        /// Расширение
+        /// </summary>
         public IExtensionModel Extension { get; }
+
+        /// <summary>
+        /// Метаданные расширения
+        /// </summary>
         public IExtensionMetadataModel Metadata => Extension.Metadata;
 
+        /// <summary>
+        /// Состояние расширения
+        /// </summary>
         public ExtensionState State
         {
             get => _state;
@@ -37,6 +51,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
                 }
             }
         }
+
 
         public CanExecuteResultModel LastCanExecuteResultModel
         {
@@ -64,6 +79,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Виджет расширения
+        /// </summary>
         public object Widget
         {
             get => _widget;
@@ -77,6 +95,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Состояние инициализации виджета
+        /// </summary>
         public bool IsWidgetInitialized
         {
             get => _isWidgetInitialized;
@@ -90,6 +111,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
+        /// <summary>
+        /// История операций
+        /// </summary>
         public ObservableCollection<OperationLog> OperationHistory { get; }
 
         public event EventHandler<ExtensionStateChangedEventArgs> StateChanged;
@@ -100,8 +124,19 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             Extension = extension ?? throw new ArgumentNullException(nameof(extension));
             State = ExtensionState.Created;
             OperationHistory = new ObservableCollection<OperationLog>();
+
+            if (extension.Metadata.AutoStart)
+            {
+                extension.InitializeWidget();
+                IsWidgetInitialized = true;
+                InitializeWidget();
+            }
         }
 
+        /// <summary>
+        /// Запустить расширение
+        /// </summary>
+        /// <returns></returns>
         public async Task StartAsync()
         {
             try
@@ -120,6 +155,10 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Остановить расширение
+        /// </summary>
+        /// <returns></returns>
         public async Task StopAsync()
         {
             try
@@ -138,7 +177,13 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
-        public async Task<TreeRepositoryMemberBaseModel> ExecuteAsync(TreeRepositoryMemberBaseModel element, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Выполнить основной метод
+        /// </summary>
+        /// <param name="element">Текущий элемент репозитория</param>
+        /// <param name="cancellationToken">Токен отмены операции</param>
+        /// <returns></returns>
+        public async Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -160,7 +205,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
-        public async Task UpdateCanExecuteAsync(TreeRepositoryMemberBaseModel element)
+        public async Task UpdateCanExecuteAsync(MainEntityBaseModel element)
         {
             try
             {
@@ -172,14 +217,22 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
+
+        /// <summary>
+        /// Обновить виджет обозревателя репозитория
+        /// </summary>
         public void RefreshWidget()
         {
             Widget = Extension.GetWidget();
         }
 
+        /// <summary>
+        /// Инициализировать виджет обозревателя репозитория
+        /// </summary>
         private void InitializeWidget()
         {
             var widget = Extension.GetWidget();
+            Extension.InitializeWidget();
             if (widget is IExtensionWidget extWidget)
             {
                 extWidget.SetExtension(Extension);
@@ -187,6 +240,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             Widget = widget;
         }
 
+        /// <summary>
+        /// Деинициализировать виджет обозревателя репозитория
+        /// </summary>
         private void UninitializeWidget()
         {
             try
@@ -197,12 +253,16 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
             catch
             {
-                // Игнорируем ошибки при деинициализации
+                LogOperation("Деинициализация виджета обозревателя репозитория", "Ошибка деинициализации", isError: true);
             }
         }
 
         private void LogOperation(string operation, string details, bool isError)
         {
+            //NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error;
+            //if (isError == false)
+            //    criticalLevel = NotificationCriticalLevelModel.Info;
+            //_notificationService.SendTextMessage($"{operation}. {details}", criticalLevel);
             var log = new OperationLog
             {
                 Timestamp = DateTime.Now,

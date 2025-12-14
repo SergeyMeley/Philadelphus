@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using System;
@@ -29,41 +30,38 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public IReadOnlyList<ExtensionInstance> GetExtensions() => _extensions.AsReadOnly();
 
-        public async Task LoadExtensionsAsync(IEnumerable<string> pluginsFolderPathes)
+        public async Task LoadExtensionsAsync(string pluginsFolderPath)
         {
-            foreach (var pluginsFolderPath in pluginsFolderPathes)
+            if (!Directory.Exists(pluginsFolderPath))
+                throw new DirectoryNotFoundException($"Папка расширений не найдена: {pluginsFolderPath}");
+
+            var dllFiles = Directory.GetFiles(pluginsFolderPath, "*.dll");
+
+            foreach (var dll in dllFiles)
             {
-                if (!Directory.Exists(pluginsFolderPath))
-                    throw new DirectoryNotFoundException($"Папка расширений не найдена: {pluginsFolderPath}");
-
-                var dllFiles = Directory.GetFiles(pluginsFolderPath, "*.dll");
-
-                foreach (var dll in dllFiles)
+                try
                 {
-                    try
-                    {
-                        // Загружаем сборку
-                        var assembly = Assembly.LoadFrom(dll);
-                        // Ищем типы, реализующие интерфейс IExtension
-                        var extensionTypes = assembly.GetTypes()
-                            .Where(t => typeof(IExtensionModel).IsAssignableFrom(t) && !t.IsAbstract);
+                    // Загружаем сборку
+                    var assembly = Assembly.LoadFrom(dll);
+                    // Ищем типы, реализующие интерфейс IExtension
+                    var extensionTypes = assembly.GetTypes()
+                        .Where(t => typeof(IExtensionModel).IsAssignableFrom(t) && !t.IsAbstract);
 
-                        foreach (var type in extensionTypes)
+                    foreach (var type in extensionTypes)
+                    {
+                        // Создаем экземпляр расширения (нужен конструктор без параметров или DI)
+                        if (Activator.CreateInstance(type) is IExtensionModel extension)
                         {
-                            // Создаем экземпляр расширения (нужен конструктор без параметров или DI)
-                            if (Activator.CreateInstance(type) is IExtensionModel extension)
-                            {
-                                var extensionInstance = new ExtensionInstance(extension);
-                                // Регистрируем расширение (добавляем в список)
-                                RegisterExtension(extensionInstance);
-                            }
+                            var extensionInstance = new ExtensionInstance(extension);
+                            // Регистрируем расширение (добавляем в список)
+                            RegisterExtension(extensionInstance);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        // Логируем ошибку загрузки конкретной DLL, но не прерываем загрузку остальных
-                        Debug.WriteLine($"Ошибка загрузки расширения из {dll}: {ex.Message}");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    // Логируем ошибку загрузки конкретной DLL, но не прерываем загрузку остальных
+                    Debug.WriteLine($"Ошибка загрузки расширения из {dll}: {ex.Message}");
                 }
             }
 
@@ -110,7 +108,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             }
         }
 
-        public async Task<TreeRepositoryMemberBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, TreeRepositoryMemberBaseModel element)
+        public async Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, MainEntityBaseModel element)
         {
             if (extension == null)
                 throw new ArgumentNullException(nameof(extension));
@@ -151,7 +149,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             await Task.CompletedTask;
         }
 
-        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(TreeRepositoryMemberBaseModel element)
+        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(MainEntityBaseModel element)
         {
             var compatible = new List<ExtensionInstance>();
 

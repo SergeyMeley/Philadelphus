@@ -66,7 +66,7 @@ namespace Philadelphus.Business.Services.Implementations
             foreach (var dataStorage in repository?.DataStorages)
             {
                 var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
-                if (infrastructure.GetType().IsAssignableTo(typeof(IMainEntitiesInfrastructureRepository))
+                if (infrastructure is IMainEntitiesInfrastructureRepository
                     && dataStorage.IsAvailable)
                 {
                     var dbRoots = infrastructure.SelectRoots(repository.ChildsGuids?.ToArray());

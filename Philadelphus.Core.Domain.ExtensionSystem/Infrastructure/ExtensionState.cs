@@ -12,7 +12,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
     public enum ExtensionState
     {
         Created,    // Создано, но не запущено
-        Running,    // Работает
+        Running,    // Запущено
         Stopped,    // Остановлено
         Error       // Ошибка
     }

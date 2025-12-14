@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using System;
@@ -22,7 +23,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Загрузить все расширения
         /// </summary>
-        Task LoadExtensionsAsync(IEnumerable<string> pluginsFolderPathes);
+        Task LoadExtensionsAsync(string pluginsFolderPath);
 
         /// <summary>
         /// Запустить расширение
@@ -37,7 +38,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Выполнить основной метод расширения
         /// </summary>
-        Task<TreeRepositoryMemberBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, TreeRepositoryMemberBaseModel element);
+        Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, MainEntityBaseModel element);
 
         /// <summary>
         /// Запустить все расширения с AutoStart = true
@@ -47,7 +48,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Получить расширения, совместимые с элементом
         /// </summary>
-        Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(TreeRepositoryMemberBaseModel element);
+        Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(MainEntityBaseModel element);
 
         event EventHandler<ExtensionLoadedEventArgs> ExtensionLoaded;
         event EventHandler<ExtensionErrorEventArgs> ExtensionError;

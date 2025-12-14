@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +31,13 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         /// <summary>
         /// Проверить возможность выполнения основного метода
         /// </summary>
-        Task<CanExecuteResultModel> CanExecuteAsync(TreeRepositoryMemberBaseModel element);
+        Task<CanExecuteResultModel> CanExecuteAsync(MainEntityBaseModel element);
 
         /// <summary>
         /// Основной метод расширения
         /// Принимает выбранный элемент и может возвращать измененный элемент
         /// </summary>
-        Task<TreeRepositoryMemberBaseModel> ExecuteAsync(TreeRepositoryMemberBaseModel element, CancellationToken cancellationToken = default);
+        Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить виджет расширения (опционально)
