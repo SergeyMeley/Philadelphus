@@ -1,5 +1,7 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
+using Philadelphus.WpfApplication.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,12 +43,12 @@ namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs
             await _extensionInstance.StopAsync();
         }
 
-        public async Task ExecuteAsync(TreeRepositoryMemberBaseModel element)
+        public async Task ExecuteAsync(MainEntityBaseModel element)
         {
             await _extensionInstance.ExecuteAsync(element);
         }
 
-        public async Task UpdateCanExecuteAsync(TreeRepositoryMemberBaseModel element)
+        public async Task UpdateCanExecuteAsync(MainEntityBaseModel element)
         {
             await _extensionInstance.UpdateCanExecuteAsync(element);
         }

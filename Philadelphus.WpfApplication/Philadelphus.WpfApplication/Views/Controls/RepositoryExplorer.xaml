@@ -32,6 +32,7 @@
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="2">
+                        <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
@@ -54,7 +55,7 @@
                
                 <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2" Grid.ColumnSpan="2">
 
-                    <TreeView Name="MainTreeView" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+                    <TreeView Name="MainTreeView" DataContext="{Binding TreeRepositoryVM}" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
                         <TreeView.ItemTemplate>
                             <!--<HierarchicalDataTemplate Template="{StaticResource ResourceKey=}" DataType="{x:Type mainentities:TreeRoot}" ItemsSource="{Binding Childs}">

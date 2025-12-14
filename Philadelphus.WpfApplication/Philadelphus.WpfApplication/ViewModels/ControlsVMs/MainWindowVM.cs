@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Philadelphus.Business.Config;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
 using Philadelphus.WpfApplication.Views.Windows;
@@ -17,9 +18,17 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationCommandsVM _applicationCommandsVM;
-        private readonly ExtensionsControlVM _extensionVM;
-        public ExtensionsControlVM ExtensionVM => _extensionVM;
-
+        private readonly ExtensionsControlVM _extensionsControlVM;
+        private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
+        public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
+        public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
+        public RepositoryExplorerControlVM RepositoryExplorerVM
+        {
+            get
+            {
+                return _repositoryExplorerControlVM;
+            }
+        }
         public string Title
         {
             get
@@ -34,36 +43,37 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             }
         }
 
-        private RepositoryExplorerControlVM _repositoryExplorerVM;
-        public RepositoryExplorerControlVM RepositoryExplorerVM
-        {
-            get
-            {
-                return _repositoryExplorerVM;
-            }
-            set
-            {
-                _repositoryExplorerVM = value;
-            }
-        }
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
-        public ViewModelBase SelectedElementVM { get => _repositoryExplorerVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
+        public ViewModelBase SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
 
         public MainWindowVM(
             IServiceProvider serviceProvider,
             IOptions<ApplicationSettings> options,
             ApplicationCommandsVM applicationCommandsVM,
-            ExtensionsControlVM extensionVM)
+            ExtensionsControlVM extensionVM,
+            RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
             _serviceProvider = serviceProvider;
-            _extensionVM = extensionVM;
             _applicationCommandsVM = applicationCommandsVM;
+            _extensionsControlVM = extensionVM;
+            _repositoryExplorerControlVM = repositoryExplorerControlVM;
 
             extensionVM.InitializeAsync(options.Value.PluginsDirectoriesString);
         }
 
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
-        public RelayCommand OpenRepositoryMemberDetailsWindowCommand => _applicationCommandsVM.OpenRepositoryMemberDetailsWindowCommand;
+        public RelayCommand OpenRepositoryMemberDetailsWindowCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var vm = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(RepositoryExplorerVM);
+                    var window = new DetailsWindow(vm.SelectedElementVM);
+                    window.Show();
+                });
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
@@ -24,7 +25,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
     {
         private readonly IExtensionManager _extensionManager;
         private ExtensionInstanceVM _selectedExtension;
-        private TreeRepositoryMemberBaseModel _selectedElement;
+        private MainEntityBaseModel _selectedElement;
         private string _statusMessage;
         private bool _isExecuting;
         private TreeRepositoryVM _repositoryVM;
@@ -47,10 +48,11 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
                 {
                     UpdateCanExecuteForCurrentElement();
                 }
+                OnPropertyChanged(nameof(SelectedExtension));
             }
         }
 
-        public TreeRepositoryMemberBaseModel SelectedElement
+        public MainEntityBaseModel SelectedElement
         {
             get => _selectedElement;
             set
@@ -94,16 +96,21 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         public async Task InitializeAsync(IEnumerable<string> pluginsFolderPaths)
         {
-            try
+            if (_extensionManager.GetExtensions()?.Count > 0)
+                return;
+            foreach (var path in pluginsFolderPaths)
             {
-                // Загружаем расширения из DLL
-                await _extensionManager.LoadExtensionsAsync(pluginsFolderPaths);
-                Debug.WriteLine($"Загружено расширений: {_extensionManager.GetExtensions().Count}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка загрузки расширений: {ex.Message}");
-                StatusMessage = $"Ошибка загрузки расширений: {ex.Message}";
+                try
+                {
+                    // Загружаем расширения из DLL
+                    await _extensionManager.LoadExtensionsAsync(path);
+                    Debug.WriteLine($"Загружено расширений: {_extensionManager.GetExtensions().Count}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Ошибка загрузки расширений: {ex.Message}");
+                    StatusMessage = $"Ошибка загрузки расширений: {ex.Message}";
+                }
             }
 
             // Добавляем расширения в коллекцию ViewModel
@@ -145,7 +152,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private async Task ExecuteStartExtension(object parameter)
         {
-            if (SelectedExtension == null) return;
+            if (SelectedExtension == null) 
+                return;
 
             try
             {
@@ -228,8 +236,10 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private bool CanExecuteMainMethod()
         {
-            return SelectedExtension != null && SelectedElement != null &&
-                   SelectedExtension.State == ExtensionState.Running && SelectedExtension.CanExecute;
+            UpdateCanExecuteForCurrentElement();
+            return SelectedExtension != null 
+                && SelectedExtension.State == ExtensionState.Running 
+                && SelectedExtension.CanExecute;
         }
 
         private async void UpdateCanExecuteForCurrentElement()
@@ -243,7 +253,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
         private ExtensionInstance FindOriginalExtension(ExtensionInstanceVM vmExt)
         {
             return _extensionManager.GetExtensions()
-                .FirstOrDefault(e => e.Metadata.Id == vmExt.Name);
+                .FirstOrDefault(e => e.Metadata.Name == vmExt.Name);
         }
     }
 }

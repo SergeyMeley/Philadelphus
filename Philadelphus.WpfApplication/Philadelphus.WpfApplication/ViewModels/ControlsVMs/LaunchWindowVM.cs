@@ -14,12 +14,16 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
+
+        private RepositoryCreationControlVM _repositoryCreationVM;
+        public RepositoryCreationControlVM RepositoryCreationVM { get => _repositoryCreationVM; }
         public string UserName { get => Environment.UserName; }
         public LaunchWindowVM(
             IServiceProvider serviceProvider,
             DataStoragesSettingsVM dataStoragesSettingsVM,
             TreeRepositoryCollectionVM repositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
+            RepositoryCreationControlVM repositoryCreationControlVM,
             ApplicationCommandsVM applicationCommandsVM)
         {
             ;
@@ -27,6 +31,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
+            _repositoryCreationVM = repositoryCreationControlVM;
             _openMainWindowCommand = applicationCommandsVM.OpenMainWindowCommand;
         }
 

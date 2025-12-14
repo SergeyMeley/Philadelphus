@@ -19,8 +19,10 @@
     <None Remove="Icons\approval_64.png" />
     <None Remove="Icons\check_64.png" />
     <None Remove="Icons\edit_64.png" />
+    <None Remove="Icons\getwork_64.png" />
     <None Remove="Icons\new-tab_64.png" />
     <None Remove="Icons\open.png" />
+    <None Remove="Icons\philadelphus_logo_64.png" />
     <None Remove="Icons\storage.png" />
     <None Remove="Icons\top_level_64.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_add.png" />
@@ -79,8 +81,10 @@
     <Resource Include="Icons\approval_64.png" />
     <Resource Include="Icons\check_64.png" />
     <Resource Include="Icons\edit_64.png" />
+    <Resource Include="Icons\getwork_64.png" />
     <Resource Include="Icons\new-tab_64.png" />
     <Resource Include="Icons\open.png" />
+    <Resource Include="Icons\philadelphus_logo_64.png" />
     <Resource Include="Icons\storage.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

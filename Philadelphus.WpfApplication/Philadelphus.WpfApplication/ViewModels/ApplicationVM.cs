@@ -29,9 +29,6 @@ namespace Philadelphus.WpfApplication.ViewModels
         private LaunchWindowVM _launchVM;
         public LaunchWindowVM LaunchVM { get { return _launchVM; } }
 
-        private RepositoryCreationControlVM _repositoryCreationVM;
-        public RepositoryCreationControlVM RepositoryCreationVM { get => _repositoryCreationVM; }
-
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
 
@@ -68,7 +65,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = treeRepositoryCollectionVM;
             _repositoryHeadersCollectionVM = treeRepositoryHeadersCollectionVM;
-            _repositoryCreationVM = RepositoryCreationVM;
+            //_repositoryCreationVM = RepositoryCreationVM;
             _launchVM = launchVM;
 
             //CultureInfo.CurrentCulture = new CultureInfo("ru-RU");

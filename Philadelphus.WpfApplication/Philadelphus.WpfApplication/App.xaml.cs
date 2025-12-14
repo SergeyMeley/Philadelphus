@@ -8,6 +8,8 @@ using Philadelphus.Business.Mapping;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.WpfApplication.Factories.Implementations;
+using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
@@ -72,9 +74,9 @@ namespace Philadelphus.WpfApplication
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddSingleton<LaunchWindowVM>();
-                    services.AddTransient<MainWindowVM>();
+                    //services.AddTransient<MainWindowVM>();    // Заменено на фабрику
                     services.AddSingleton<DataStoragesSettingsVM>();
-                    services.AddScoped<RepositoryExplorerControlVM>();
+                    //services.AddScoped<RepositoryExplorerControlVM>();    // Заменено на фабрику
                     services.AddScoped<TreeRepositoryCollectionVM>();
                     services.AddScoped<TreeRepositoryHeadersCollectionVM>();
                     services.AddScoped<RepositoryCreationControlVM>();
@@ -83,6 +85,10 @@ namespace Philadelphus.WpfApplication
                     // Регистрация View
                     services.AddTransient<MainWindow>();
                     services.AddSingleton<LaunchWindow>();
+
+                    // Регистрация фабрик
+                    services.AddScoped<IMainWindowVMFactory, MainWindowVMFactory>();
+                    services.AddScoped<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
                 })
                 .Build();
         }

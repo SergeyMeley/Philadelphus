@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.WpfApplication.Factories.Implementations;
+using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using Philadelphus.WpfApplication.Views.Controls;
@@ -33,12 +35,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                         headerVM.LastOpening = DateTime.UtcNow;
                     }
 
-                    var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-                    var context = _serviceProvider.GetRequiredService<MainWindowVM>();
                     var appVM = _serviceProvider.GetRequiredService<ApplicationVM>();
-                    context.RepositoryExplorerVM = _serviceProvider.GetRequiredService<RepositoryExplorerControlVM>();
-                    context.RepositoryExplorerVM.TreeRepositoryVM = appVM.RepositoryCollectionVM.CurrentRepositoryVM;
-                    mainWindow.DataContext = context;
+                    var repositoryExplorerControlVM = _serviceProvider.GetRequiredService<IRepositoryExplorerControlVMFactory>().Create(currentRepositoryVM);
+                    var mainWindowVM = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(repositoryExplorerControlVM);
+                    var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+                    //context.RepositoryExplorerVM = _serviceProvider.GetRequiredService<RepositoryExplorerControlVM>();
+                    //context.RepositoryExplorerVM.TreeRepositoryVM = appVM.RepositoryCollectionVM.CurrentRepositoryVM;
+                    mainWindow.DataContext = mainWindowVM;
                     mainWindow.Show();
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
                     launchWindow.Hide();
@@ -53,19 +56,6 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
                     launchWindow.Show();
-                });
-            }
-        }
-        public RelayCommand OpenRepositoryMemberDetailsWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    //var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
-                    //var currentRepositoryMemberVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM.SelectedRepositoryMember;
-                    //var window = new DetailsWindow(currentRepositoryMemberVM);
-                    //window.Show();
                 });
             }
         }

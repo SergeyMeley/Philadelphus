@@ -1,6 +1,7 @@
 ﻿using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,13 @@ namespace Philadelphus.WpfApplication.Views.Windows
         {
             InitializeComponent();
             DataContext = vm;
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden;
+            e.Cancel = true;
+            base.OnClosing(e);
         }
     }
 }
