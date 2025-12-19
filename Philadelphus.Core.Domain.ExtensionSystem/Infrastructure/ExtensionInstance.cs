@@ -231,8 +231,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// </summary>
         private void InitializeWidget()
         {
-            var widget = Extension.GetWidget();
             Extension.InitializeWidget();
+            var widget = Extension.GetWidget();
             if (widget is IExtensionWidget extWidget)
             {
                 extWidget.SetExtension(Extension);
