@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Business.Config;
+using Philadelphus.Business.Entities.Enums;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;
@@ -16,7 +19,6 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
     public class MainWindowVM : ControlVM
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationCommandsVM _applicationCommandsVM;
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
@@ -49,17 +51,21 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         public MainWindowVM(
             IServiceProvider serviceProvider,
+            ILogger<RepositoryCreationControlVM> logger,
+            INotificationService notificationService,
             IOptions<ApplicationSettings> options,
             ApplicationCommandsVM applicationCommandsVM,
             ExtensionsControlVM extensionVM,
             RepositoryExplorerControlVM repositoryExplorerControlVM)
+            : base(serviceProvider, logger, notificationService)
         {
-            _serviceProvider = serviceProvider;
             _applicationCommandsVM = applicationCommandsVM;
             _extensionsControlVM = extensionVM;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
 
-            extensionVM.InitializeAsync(options.Value.PluginsDirectoriesString);
+            _notificationService.SendTextMessage("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesString);
+            _notificationService.SendTextMessage($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;

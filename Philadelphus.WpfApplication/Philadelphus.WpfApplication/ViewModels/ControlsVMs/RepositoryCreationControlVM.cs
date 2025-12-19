@@ -14,9 +14,6 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
     public class RepositoryCreationControlVM : ControlVM
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<RepositoryCreationControlVM> _logger;
-        private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryCollectionService _collectionService;
         private readonly ITreeRepositoryService _service;
 
@@ -39,10 +36,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             TreeRepositoryCollectionVM repositoryCollectionVM, 
             DataStoragesSettingsVM dataStoragesSettingsVM,
             IOptions<ApplicationSettings> options)
+            : base(serviceProvider, logger, notificationService)
         {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-            _notificationService = notificationService;
             _collectionService = collectionService;
             _service = service;
 

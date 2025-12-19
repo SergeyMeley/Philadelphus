@@ -174,7 +174,7 @@
         <Grid Grid.Row="0" Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0" Header="Текущий элемент">
@@ -192,7 +192,7 @@
                         <Expander Grid.Row="0" Grid.Column="0" Header="Расширения">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <GroupBox>
-                                    <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsVM}"></ctrls:ExtensionWidgetContainer>
+                                    <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}"></ctrls:ExtensionWidgetContainer>
                                 </GroupBox>
                             </ScrollViewer>
                         </Expander>

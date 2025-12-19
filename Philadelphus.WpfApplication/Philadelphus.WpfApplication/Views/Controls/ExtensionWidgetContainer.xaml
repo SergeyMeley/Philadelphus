@@ -18,10 +18,16 @@
                         <TextBlock Text="Доступные расширения:" Margin="0,0,0,5" FontWeight="Bold" />
                         <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding SelectedExtension}" DisplayMemberPath="Name" SelectedValuePath="Name" Margin="0,0,0,10"></ComboBox>
                         <Ellipse Width="20" Height="20" Margin="0,0,10,0" Fill="{Binding SelectedExtension.LastCanExecuteResult.CanExecute, Converter={StaticResource canExecuteToColorConverter}}" ToolTip="{Binding SelectedExtension.LastCanExecuteResult.Message}"/>
-                        <StackPanel>
-                            <TextBlock Text="{Binding SelectedExtension.Widget, StringFormat='Widget: {0}'}" />
-                            <ContentControl Content="{Binding SelectedExtension.Widget}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Запустить" Command="{Binding StartExtensionCommand}" Margin="1"></Button>
+                            <Button Content="Остановить" Command="{Binding StopExtensionCommand}" Margin="1"></Button>
+                            <Button Content="Выполнить" Command="{Binding ExecuteExtensionCommand}" Margin="1"></Button>
                         </StackPanel>
+                        <GroupBox Header="Виджет расширения">
+                            <StackPanel>
+                                <ContentControl Content="{Binding SelectedExtension.Widget}" />
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>

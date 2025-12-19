@@ -1,4 +1,7 @@
-﻿using Philadelphus.WpfApplication.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Services.Implementations;
+using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 
@@ -20,11 +23,14 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
         public string UserName { get => Environment.UserName; }
         public LaunchWindowVM(
             IServiceProvider serviceProvider,
+            ILogger<RepositoryCreationControlVM> logger,
+            INotificationService notificationService,
             DataStoragesSettingsVM dataStoragesSettingsVM,
             TreeRepositoryCollectionVM repositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
             ApplicationCommandsVM applicationCommandsVM)
+            : base(serviceProvider, logger, notificationService)
         {
             ;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;

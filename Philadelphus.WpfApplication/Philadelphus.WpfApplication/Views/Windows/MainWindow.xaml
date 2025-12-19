@@ -173,7 +173,7 @@
                         <RibbonButton Label="Обработать" Command="{Binding ExecuteExtensionCommand}"></RibbonButton>
                     </RibbonGroup>
                     <RibbonGroup Header="Виджет расширения">
-
+                        <ContentControl Content="{Binding SelectedExtension.Widget}"></ContentControl>
                     </RibbonGroup>
                     <RibbonGroup Header="Окна расширений">
 

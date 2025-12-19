@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
+using Castle.Core.Logging;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Philadelphus.Business.Config;
 using Philadelphus.Business.Entities.ElementsProperties;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
@@ -48,7 +52,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             set
             {
                 _selectedRepositoryMember = value;
-                _extensionVM.SelectedElement = value.Model;
+                _extensionsControlVM.SelectedElement = value.Model;
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
             }
@@ -70,23 +74,32 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             }
         }
 
-        private ExtensionsControlVM _extensionVM;
-        public ExtensionsControlVM ExtensionVM { get => _extensionVM; }
+        private ExtensionsControlVM _extensionsControlVM;
+        public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
 
         #endregion
 
         #region [ Construct ]
 
         public RepositoryExplorerControlVM(
+            IServiceProvider serviceProvider,
+            ILogger<RepositoryCreationControlVM> logger,
+            INotificationService notificationService,
+            IOptions<ApplicationSettings> options,
             ITreeRepositoryService service,
             ExtensionsControlVM extensionVM,
             TreeRepositoryVM treeRepositoryVM)
+            : base(serviceProvider, logger, notificationService)
         {
             _service = service;
-            _extensionVM = extensionVM;
+            _extensionsControlVM = extensionVM;
             _treeRepositoryVM = treeRepositoryVM;
 
             LoadTreeRepository();
+
+            _notificationService.SendTextMessage("Обозреватель репозитория. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesString);
+            _notificationService.SendTextMessage($"Обозреватель репозитория. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 
         #endregion

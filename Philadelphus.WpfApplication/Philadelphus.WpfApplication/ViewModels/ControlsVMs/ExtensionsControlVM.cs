@@ -1,5 +1,7 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Microsoft.Extensions.Logging;
+using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Business.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
@@ -36,7 +38,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             set => SetProperty(ref _repositoryVM, value);
         }
 
-        public ObservableCollection<ExtensionInstanceVM> Extensions { get; }
+        public static ObservableCollection<ExtensionInstanceVM> Extensions { get; } = new ObservableCollection<ExtensionInstanceVM>();
         public ObservableCollection<OperationLog> RecentOperations { get; }
 
         public ExtensionInstanceVM SelectedExtension
@@ -81,10 +83,14 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
         public ICommand ExecuteExtensionCommand { get; }
         public ICommand OpenMainWindowCommand { get; }
 
-        public ExtensionsControlVM(IExtensionManager extensionManager)
+        public ExtensionsControlVM(
+            IServiceProvider serviceProvider,
+            ILogger<RepositoryCreationControlVM> logger,
+            INotificationService notificationService,
+            IExtensionManager extensionManager)
+            : base(serviceProvider, logger, notificationService)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
-            Extensions = new ObservableCollection<ExtensionInstanceVM>();
 
             RecentOperations = new ObservableCollection<OperationLog>();
 
