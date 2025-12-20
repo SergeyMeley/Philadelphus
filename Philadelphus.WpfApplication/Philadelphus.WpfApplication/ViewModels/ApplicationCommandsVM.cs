@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.Factories.Implementations;
+using Philadelphus.WpfApplication.Factories.Interfaces;
+using Philadelphus.WpfApplication.Infrastructure;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using Philadelphus.WpfApplication.Views.Controls;
 using Philadelphus.WpfApplication.Views.Windows;
 
@@ -19,8 +22,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
-                    var launchVM = _serviceProvider.GetRequiredService<LaunchVM>();
-                    var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM;
+                    var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
+                    var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
                     if (currentRepositoryVM != null)
                     {
                         var headerVM = launchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Guid == currentRepositoryVM.Guid);
@@ -32,11 +35,13 @@ namespace Philadelphus.WpfApplication.ViewModels
                         headerVM.LastOpening = DateTime.UtcNow;
                     }
 
-                    var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-                    var context = _serviceProvider.GetRequiredService<MainWindowVM>();
                     var appVM = _serviceProvider.GetRequiredService<ApplicationVM>();
-                    context.RepositoryExplorerVM = appVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM;
-                    mainWindow.DataContext = context;
+                    var repositoryExplorerControlVM = _serviceProvider.GetRequiredService<IRepositoryExplorerControlVMFactory>().Create(currentRepositoryVM);
+                    var mainWindowVM = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(repositoryExplorerControlVM);
+                    var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+                    //context.RepositoryExplorerVM = _serviceProvider.GetRequiredService<RepositoryExplorerControlVM>();
+                    //context.RepositoryExplorerVM.TreeRepositoryVM = appVM.RepositoryCollectionVM.CurrentRepositoryVM;
+                    mainWindow.DataContext = mainWindowVM;
                     mainWindow.Show();
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
                     launchWindow.Hide();
@@ -51,19 +56,6 @@ namespace Philadelphus.WpfApplication.ViewModels
                 {
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
                     launchWindow.Show();
-                });
-            }
-        }
-        public RelayCommand OpenRepositoryMemberDetailsWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var launchVM = _serviceProvider.GetRequiredService<LaunchVM>();
-                    var currentRepositoryMemberVM = launchVM.RepositoryCollectionVM.CurrentRepositoryExplorerVM.SelectedRepositoryMember;
-                    var window = new DetailsWindow(currentRepositoryMemberVM);
-                    window.Show();
                 });
             }
         }

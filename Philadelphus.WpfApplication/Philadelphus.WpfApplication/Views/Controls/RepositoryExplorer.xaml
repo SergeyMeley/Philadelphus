@@ -32,6 +32,7 @@
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="2">
+                        <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
@@ -54,7 +55,7 @@
                
                 <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2" Grid.ColumnSpan="2">
 
-                    <TreeView Name="MainTreeView" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+                    <TreeView Name="MainTreeView" DataContext="{Binding TreeRepositoryVM}" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
                         <TreeView.ItemTemplate>
                             <!--<HierarchicalDataTemplate Template="{StaticResource ResourceKey=}" DataType="{x:Type mainentities:TreeRoot}" ItemsSource="{Binding Childs}">
@@ -173,38 +174,46 @@
         <Grid Grid.Row="0" Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0" Header="Текущий элемент">
                 <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" MinHeight="25"></RowDefinition>
                             <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto" MinHeight="25"></RowDefinition>
-                            <RowDefinition Height="auto" MinHeight="25"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
                             <RowDefinition Height="auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Grid>
-                            <Expander Grid.Row="0" Grid.Column="0" Header="Свойства элемента">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                    <GroupBox>
-                                        <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
-                                    </GroupBox>
-                                </ScrollViewer>
-                            </Expander>
-                        </Grid>
-                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                        <Expander  Grid.Row="2" Grid.Column="0" Header="Внешние атрибуты" Margin="2">
+                        <Expander Grid.Row="0" Grid.Column="0" Header="Расширения">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <GroupBox>
+                                    <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}"></ctrls:ExtensionWidgetContainer>
+                                </GroupBox>
+                            </ScrollViewer>
+                        </Expander>
+                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                        <Expander Grid.Row="2" Grid.Column="0" Header="Свойства элемента">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <GroupBox>
+                                    <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
+                                </GroupBox>
+                            </ScrollViewer>
+                        </Expander>
+                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                        <Expander Grid.Row="4" Grid.Column="0" Header="Внешние атрибуты">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <GroupBox>
                                     <ctrls:OwnAttributes></ctrls:OwnAttributes>
                                 </GroupBox>
                             </ScrollViewer>
                         </Expander>
-                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                        <Expander  Grid.Row="4" Grid.Column="0" Header="Собственные атрибуты" Margin="2">
+                        <GridSplitter Grid.Row="5" Grid.Column="0" ShowsPreview="False" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
+                        <Expander  Grid.Row="6" Grid.Column="0" Header="Собственные атрибуты">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <GroupBox>
                                     <StackPanel>

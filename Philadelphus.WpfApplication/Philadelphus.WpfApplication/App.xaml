@@ -24,8 +24,9 @@
         <Image x:Key="imageEditOld" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageEmpty" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_empty.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageForward" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageGetWork" Source="/Philadelphus.WpfApplication;component/Icons/getwork_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageLink" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNewTab64" Source="/Philadelphus.WpfApplication;component/Iconsnew-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNewTab64" Source="/Philadelphus.WpfApplication;component/Icons/new-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageOpen" Source="/Philadelphus.WpfApplication;component/Icons/open.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imagePaste" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageProtect" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
@@ -35,6 +36,9 @@
         <Image x:Key="imageShowTopLevel64" Source="/Philadelphus.WpfApplication;component/Icons/top_level_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageUp" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
+        <Image x:Key="imagePhiladelphusLogo2" Source="/Philadelphus.WpfApplication;component/Icons/philadelphus_logo_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <BitmapImage x:Key="imagePhiladelphusLogo" UriSource="/Philadelphus.WpfApplication;component/Icons/philadelphus_logo_64.png" x:Shared="false"></BitmapImage>
+        
         <Image x:Key="imageStorage" Source="/Philadelphus.WpfApplication;component/Icons/storage.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageRepository" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/icons8_icon_repository.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageRoot" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_root.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>

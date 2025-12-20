@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids"
-             xmlns:infrast="clr-namespace:Philadelphus.WpfApplication.ViewModels.InfrastructureVMs"
-             xmlns:mainent="clr-namespace:Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs"
-             xmlns:rootmem="clr-namespace:Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs"
-             xmlns:repomem="clr-namespace:Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs.RepositoryMembersVMs"
+             xmlns:infrast="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs"
+             xmlns:mainent="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs"
+             xmlns:rootmem="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs"
+             xmlns:repomem="clr-namespace:Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs"
              mc:Ignorable="d">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type infrast:DataStorageVM}">
@@ -113,16 +113,11 @@
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <Border Background="#FFF9F9F9" Padding="10" CornerRadius="8"
-                                BorderBrush="#FFE0E0E0" BorderThickness="1">
+                                            <Border Background="#FFF9F9F9" Padding="10" CornerRadius="8" BorderBrush="#FFE0E0E0" BorderThickness="1">
                                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                     <TextBlock Text="🚫" FontSize="24" HorizontalAlignment="Center"/>
-                                                    <TextBlock Text="Элемент не выбран" 
-                                           FontSize="16" FontWeight="SemiBold"
-                                           HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                                                    <TextBlock Text="Выберите элемент для просмотра свойств"
-                                           FontStyle="Italic" Foreground="Gray"
-                                           HorizontalAlignment="Center" TextAlignment="Center"/>
+                                                    <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="Gray" HorizontalAlignment="Center" TextAlignment="Center"/>
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>

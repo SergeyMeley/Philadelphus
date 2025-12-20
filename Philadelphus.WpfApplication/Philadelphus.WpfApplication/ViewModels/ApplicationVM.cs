@@ -5,8 +5,9 @@ using Microsoft.Extensions.Options;
 using Philadelphus.Business.Config;
 using Philadelphus.Business.Services;
 using Philadelphus.Business.Services.Interfaces;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.WpfApplication.ViewModels.SupportiveVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 using System.Configuration;
@@ -25,11 +26,8 @@ namespace Philadelphus.WpfApplication.ViewModels
         private ApplicationCommandsVM _applicationCommandsVM;
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
 
-        private LaunchVM _launchVM;
-        public LaunchVM LaunchVM { get { return _launchVM; } }
-
-        private RepositoryCreationVM _repositoryCreationVM;
-        public RepositoryCreationVM RepositoryCreationVM { get => _repositoryCreationVM; }
+        private LaunchWindowVM _launchVM;
+        public LaunchWindowVM LaunchVM { get { return _launchVM; } }
 
         private DataStoragesSettingsVM _dataStoragesSettingsVM;
         public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
@@ -50,8 +48,8 @@ namespace Philadelphus.WpfApplication.ViewModels
             DataStoragesSettingsVM dataStoragesSettingsVM,
             TreeRepositoryCollectionVM treeRepositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM treeRepositoryHeadersCollectionVM,
-            RepositoryCreationVM RepositoryCreationVM,
-            LaunchVM launchVM)
+            RepositoryCreationControlVM RepositoryCreationVM,
+            LaunchWindowVM launchVM)
         {
             //var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
             //if (configPath == null)
@@ -67,7 +65,7 @@ namespace Philadelphus.WpfApplication.ViewModels
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = treeRepositoryCollectionVM;
             _repositoryHeadersCollectionVM = treeRepositoryHeadersCollectionVM;
-            _repositoryCreationVM = RepositoryCreationVM;
+            //_repositoryCreationVM = RepositoryCreationVM;
             _launchVM = launchVM;
 
             //CultureInfo.CurrentCulture = new CultureInfo("ru-RU");

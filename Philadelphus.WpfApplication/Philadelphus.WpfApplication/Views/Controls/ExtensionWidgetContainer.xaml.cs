@@ -1,7 +1,8 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
-using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Philadelphus.WpfApplication.Views.Windows
+namespace Philadelphus.WpfApplication.Views.Controls
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Логика взаимодействия для ExtensionWidgetContainer.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ExtensionWidgetContainer : UserControl
     {
-        public MainWindow()
+        public ExtensionWidgetContainer()
         {
             InitializeComponent();
         }

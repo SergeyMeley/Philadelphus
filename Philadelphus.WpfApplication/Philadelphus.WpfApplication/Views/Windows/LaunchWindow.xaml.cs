@@ -1,6 +1,7 @@
-﻿using Philadelphus.WpfApplication.ViewModels;
+﻿using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,10 +21,17 @@ namespace Philadelphus.WpfApplication.Views.Windows
     /// </summary>
     public partial class LaunchWindow : Window
     {
-        public LaunchWindow(LaunchVM vm)
+        public LaunchWindow(LaunchWindowVM vm)
         {
             InitializeComponent();
             DataContext = vm;
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden;
+            e.Cancel = true;
+            base.OnClosing(e);
         }
     }
 }

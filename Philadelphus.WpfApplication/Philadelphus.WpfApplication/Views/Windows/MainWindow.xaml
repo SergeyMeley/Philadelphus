@@ -7,12 +7,12 @@
         xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
         xmlns:i="Microsoft.Xaml.Behaviors;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
-        xmlns:ntf="clr-namespace:Philadelphus.Business.Services;assembly=Philadelphus.Business"
-        d:DataContext="{d:DesignInstance Type=viewmodels:ApplicationVM}"
+        xmlns:ntf="clr-namespace:Philadelphus.Business.Services.Interfaces;assembly=Philadelphus.Business" 
         mc:Ignorable="d"
         Title="{Binding Title}"
         MinHeight="500" MinWidth="1000"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        Icon="{StaticResource imagePhiladelphusLogo}">
     <Window.CommandBindings>
         <!--<CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
         <CommandBinding Command="Open" CanExecute="CommonCommandBinding_CanExecute" />
@@ -85,6 +85,9 @@
                     </RibbonApplicationMenu>
                 </Ribbon.ApplicationMenu>
                 <RibbonTab Header="Главная">
+                    <RibbonGroup Header="Общее">
+                        <RibbonButton Label="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" />
+                    </RibbonGroup> 
                     <RibbonGroup Header="Буфер обмена">
                         <RibbonButton Label="Копировать" />
                         <RibbonButton Label="Вырезать" />
@@ -92,13 +95,6 @@
                         <RibbonButton Label="Дублировать" />
                         <RibbonButton Label="Переместить" />
                     </RibbonGroup>
-                    <RibbonGroup Header="Общее">
-                        <RibbonSplitButton Label="Добавить элемент">
-                            <RibbonButton Label="Добавить корень"></RibbonButton>
-                            <RibbonButton Label="Добавить узел"></RibbonButton>
-                            <RibbonButton Label="Добавить лист"></RibbonButton>
-                        </RibbonSplitButton>
-                    </RibbonGroup> 
                 </RibbonTab>
                 <RibbonTab Header="Репозиторий">
                     <RibbonGroup Header="Текущий репозиторий">
@@ -116,21 +112,23 @@
                             </RibbonComboBox.Style>
                         </RibbonComboBox>-->
                         <!--<ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>-->
-                        <TextBlock Text="{Binding RepositoryExplorerVM.Name}"></TextBlock>
+                        <TextBlock Text="{Binding RepositoryExplorerVM.TreeRepositoryVM.Name}"></TextBlock>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Состояние: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryExplorerVM.State}"></TextBlock>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.TreeRepositoryVM.State}"></TextBlock>
                         </StackPanel>
-                        <RibbonButton Label="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" />
-
-                        <!--<RibbonButton Label="Настроить список репозиториев" DataContext="{Binding RepositoryCollectionVM}" Command="{Binding OpenRepositoryCollectionSettingsWindow}" />-->
+                        <RibbonButton Label="Открыть стартовое окно" Command="{Binding ApplicationCommandsVM.OpenLaunchWindowCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Информация">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Количество корней: "></TextBlock>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.TreeRepositoryVM.ChildsCount}"></TextBlock>
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Текущий участник репозитория: "></TextBlock>
                             <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}"></TextBlock>
                         </StackPanel>
-                        <RibbonButton Label="Подробнее" DataContext="{Binding ApplicationCommandsVM}" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
+                        <RibbonButton Label="Подробнее" Command="{Binding ApplicationCommandsVM.OpenRepositoryMemberDetailsWindowCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Иерархия репозитория">
                         <RibbonButton Label="Добавить собственный корень" />
@@ -161,8 +159,26 @@
                 <RibbonTab Header="Вид">
 
                 </RibbonTab>
-                <RibbonTab Header="Расширения">
+                <RibbonTab Header="Расширения" DataContext="{Binding ExtensionsControlVM}">
+                    <RibbonGroup Header="Текущее расширение">
+                        <ComboBox ItemsSource="{Binding Extensions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedExtension}" IsEditable="True" IsReadOnly="True" Width="200"></ComboBox>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Состояние: "></TextBlock>
+                            <TextBlock Text="{Binding SelectedExtension.State}"></TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RibbonButton Label="Запустить" Command="{Binding StartExtensionCommand}"></RibbonButton>
+                            <RibbonButton Label="Остановить" Command="{Binding StopExtensionCommand}"></RibbonButton>
+                        </StackPanel>
+                        <RibbonButton Label="Выполнить" Command="{Binding ExecuteExtensionCommand}"></RibbonButton>
+                        <RibbonToggleButton Label="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}"></RibbonToggleButton>
+                    </RibbonGroup>
+                    <RibbonGroup Header="Виджеты расширений">
+                        <ContentControl Content="{Binding SelectedExtension.RibbonWidget}"></ContentControl>
+                    </RibbonGroup>
+                    <RibbonGroup Header="Окна расширений">
 
+                    </RibbonGroup>
                 </RibbonTab>
                 <RibbonTab Header="Администрирование">
 

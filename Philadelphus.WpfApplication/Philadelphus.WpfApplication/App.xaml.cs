@@ -2,19 +2,26 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Philadelphus.Business.Config;
 using Philadelphus.Business.Mapping;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.WpfApplication.Factories.Implementations;
+using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using Philadelphus.WpfApplication.ViewModels;
-using Philadelphus.WpfApplication.ViewModels.InfrastructureVMs;
-using Philadelphus.WpfApplication.ViewModels.MainEntitiesVMs;
+using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Runtime;
+using System.Text.Json;
 using System.Windows;
 
 namespace Philadelphus.WpfApplication
@@ -60,21 +67,28 @@ namespace Philadelphus.WpfApplication
                     services.AddSingleton<StorageConfigService>();      //TODO: Заменить на новый сервис
                     services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
                     services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddScoped<IExtensionManager, ExtensionManager>();
 
                     // Регистрация ViewModel
                     services.AddSingleton<ApplicationVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
-                    services.AddSingleton<LaunchVM>();
-                    services.AddTransient<MainWindowVM>();
+                    services.AddSingleton<LaunchWindowVM>();
+                    //services.AddTransient<MainWindowVM>();    // Заменено на фабрику
                     services.AddSingleton<DataStoragesSettingsVM>();
+                    //services.AddScoped<RepositoryExplorerControlVM>();    // Заменено на фабрику
                     services.AddScoped<TreeRepositoryCollectionVM>();
                     services.AddScoped<TreeRepositoryHeadersCollectionVM>();
-                    services.AddScoped<RepositoryCreationVM>();
+                    services.AddScoped<RepositoryCreationControlVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
                     services.AddSingleton<LaunchWindow>();
+
+                    // Регистрация фабрик
+                    services.AddScoped<IMainWindowVMFactory, MainWindowVMFactory>();
+                    services.AddScoped<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
+                    services.AddScoped<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
                 })
                 .Build();
         }
@@ -83,9 +97,11 @@ namespace Philadelphus.WpfApplication
         {
             await _host.StartAsync();
 
-            var viewModel = _host.Services.GetRequiredService<ApplicationVM>();
             var window = _host.Services.GetRequiredService<LaunchWindow>();
+            window.Topmost = true;
             window.Show();
+            window.Activate();
+            window.Topmost = false;
             base.OnStartup(e);
         }
 
@@ -96,5 +112,4 @@ namespace Philadelphus.WpfApplication
             base.OnExit(e);
         }
     }
-
 }
