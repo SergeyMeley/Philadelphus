@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.10.35027.167
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philadelphus.WpfApplication", "Philadelphus.WpfApplication\Philadelphus.WpfApplication.csproj", "{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philadelphus.Business", "..\..\Philadelphus.Libraries\Philadelphus.Business\Philadelphus.Business.csproj", "{7E94E8B5-C099-418F-B18C-90228D6612F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.WpfApplicationTests", "Philadelphus.WpfApplicationTests\Philadelphus.WpfApplicationTests.csproj", "{C6E76722-B1EA-470E-9AC7-D387F3396AB9}"
@@ -21,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A5FAF0A-10BE-47FF-8BDD-D41C8267F56E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -48,6 +42,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7E94E8B5-C099-418F-B18C-90228D6612F5} = {00000000-0000-0000-0000-000000000000}
+		{C6E76722-B1EA-470E-9AC7-D387F3396AB9} = {00000000-0000-0000-0000-000000000000}
+		{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6} = {00000000-0000-0000-0000-000000000000}
+		{B1B66515-E1F7-8737-AE94-1B9DE76433DC} = {00000000-0000-0000-0000-000000000000}
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2} = {00000000-0000-0000-0000-000000000000}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B9A5A59A-BBFB-4381-9841-53191A4AF0DE}
