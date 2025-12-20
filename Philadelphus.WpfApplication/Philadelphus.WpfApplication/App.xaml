@@ -26,7 +26,7 @@
         <Image x:Key="imageForward" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageGetWork" Source="/Philadelphus.WpfApplication;component/Icons/getwork_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageLink" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNewTab64" Source="/Philadelphus.WpfApplication;component/Iconsnew-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNewTab64" Source="/Philadelphus.WpfApplication;component/Icons/new-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageOpen" Source="/Philadelphus.WpfApplication;component/Icons/open.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imagePaste" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageProtect" Source="/Philadelphus.WpfApplication;component/Icons/without_a_license/Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>

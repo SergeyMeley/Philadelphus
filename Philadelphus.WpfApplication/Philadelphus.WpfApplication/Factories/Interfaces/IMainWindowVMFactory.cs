@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.WpfApplication.Factories.Interfaces
 {
-    public interface IMainWindowVMFactory
+    internal interface IMainWindowVMFactory
     {
         public MainWindowVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM);
     }

@@ -11,11 +11,11 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
     public class ControlVM : ViewModelBase
     {
         protected readonly IServiceProvider _serviceProvider;
-        protected readonly ILogger<RepositoryCreationControlVM> _logger;
+        protected readonly ILogger<ControlVM> _logger;
         protected readonly INotificationService _notificationService;
         public ControlVM(
             IServiceProvider serviceProvider,
-            ILogger<RepositoryCreationControlVM> logger,
+            ILogger<ControlVM> logger,
             INotificationService notificationService)
         {
             _serviceProvider = serviceProvider;

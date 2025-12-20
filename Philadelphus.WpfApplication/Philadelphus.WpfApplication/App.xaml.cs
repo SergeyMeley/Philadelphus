@@ -80,7 +80,6 @@ namespace Philadelphus.WpfApplication
                     services.AddScoped<TreeRepositoryCollectionVM>();
                     services.AddScoped<TreeRepositoryHeadersCollectionVM>();
                     services.AddScoped<RepositoryCreationControlVM>();
-                    services.AddTransient<ExtensionsControlVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
@@ -89,6 +88,7 @@ namespace Philadelphus.WpfApplication
                     // Регистрация фабрик
                     services.AddScoped<IMainWindowVMFactory, MainWindowVMFactory>();
                     services.AddScoped<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
+                    services.AddScoped<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
                 })
                 .Build();
         }

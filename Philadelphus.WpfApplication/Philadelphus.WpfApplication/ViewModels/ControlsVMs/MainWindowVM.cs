@@ -55,13 +55,13 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             INotificationService notificationService,
             IOptions<ApplicationSettings> options,
             ApplicationCommandsVM applicationCommandsVM,
-            ExtensionsControlVM extensionVM,
-            RepositoryExplorerControlVM repositoryExplorerControlVM)
+            RepositoryExplorerControlVM repositoryExplorerControlVM,
+            IExtensionsControlVMFactory extensionVMFactory)
             : base(serviceProvider, logger, notificationService)
         {
             _applicationCommandsVM = applicationCommandsVM;
-            _extensionsControlVM = extensionVM;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
+            _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
 
             _notificationService.SendTextMessage("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesString);

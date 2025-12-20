@@ -28,8 +28,10 @@ namespace Philadelphus.WpfApplication.ViewModels.EntitiesVMs
         public ExtensionState State => _extensionInstance.State;
         public bool CanExecute => _extensionInstance.LastCanExecuteResultModel.CanExecute;
         public string CanExecuteMessage => _extensionInstance.LastCanExecuteResultModel.Message;
-        public object Widget => _extensionInstance.Widget;
-        public bool IsWidgetInitialized => _extensionInstance.IsWidgetInitialized;
+        public object Window => _extensionInstance.Window;
+        public object RibbonWidget => _extensionInstance.RibbonWidget;
+        public object RepositoryExplorerWidget => _extensionInstance.RepositoryExplorerWidget;
+        public bool IsWidgetsInitialized => _extensionInstance.IsWidgetInitialized;
 
         public ObservableCollection<OperationLog> OperationHistory => _extensionInstance.OperationHistory;
 

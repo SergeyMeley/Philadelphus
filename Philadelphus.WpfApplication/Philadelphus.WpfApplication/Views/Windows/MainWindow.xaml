@@ -170,10 +170,11 @@
                             <RibbonButton Label="Запустить" Command="{Binding StartExtensionCommand}"></RibbonButton>
                             <RibbonButton Label="Остановить" Command="{Binding StopExtensionCommand}"></RibbonButton>
                         </StackPanel>
-                        <RibbonButton Label="Обработать" Command="{Binding ExecuteExtensionCommand}"></RibbonButton>
+                        <RibbonButton Label="Выполнить" Command="{Binding ExecuteExtensionCommand}"></RibbonButton>
+                        <RibbonToggleButton Label="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}"></RibbonToggleButton>
                     </RibbonGroup>
-                    <RibbonGroup Header="Виджет расширения">
-                        <ContentControl Content="{Binding SelectedExtension.Widget}"></ContentControl>
+                    <RibbonGroup Header="Виджеты расширений">
+                        <ContentControl Content="{Binding SelectedExtension.RibbonWidget}"></ContentControl>
                     </RibbonGroup>
                     <RibbonGroup Header="Окна расширений">
 

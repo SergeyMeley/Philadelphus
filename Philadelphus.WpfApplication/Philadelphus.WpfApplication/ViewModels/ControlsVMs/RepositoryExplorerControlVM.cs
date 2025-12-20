@@ -14,6 +14,7 @@ using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services.Implementations;
 using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -52,7 +53,6 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             set
             {
                 _selectedRepositoryMember = value;
-                _extensionsControlVM.SelectedElement = value.Model;
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
             }
@@ -87,12 +87,12 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             INotificationService notificationService,
             IOptions<ApplicationSettings> options,
             ITreeRepositoryService service,
-            ExtensionsControlVM extensionVM,
+            IExtensionsControlVMFactory extensionVMFactory,
             TreeRepositoryVM treeRepositoryVM)
             : base(serviceProvider, logger, notificationService)
         {
             _service = service;
-            _extensionsControlVM = extensionVM;
+            _extensionsControlVM = extensionVMFactory.Create(this);
             _treeRepositoryVM = treeRepositoryVM;
 
             LoadTreeRepository();

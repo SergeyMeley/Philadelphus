@@ -26,8 +26,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
     public class ExtensionsControlVM : ControlVM
     {
         private readonly IExtensionManager _extensionManager;
+        private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         private ExtensionInstanceVM _selectedExtension;
-        private MainEntityBaseModel _selectedElement;
         private string _statusMessage;
         private bool _isExecuting;
         private TreeRepositoryVM _repositoryVM;
@@ -56,14 +56,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         public MainEntityBaseModel SelectedElement
         {
-            get => _selectedElement;
-            set
-            {
-                if (SetProperty(ref _selectedElement, value))
-                {
-                    UpdateCanExecuteForCurrentElement();
-                }
-            }
+            get => _repositoryExplorerControlVM.SelectedRepositoryMember?.Model;
         }
 
         public string StatusMessage
@@ -85,19 +78,21 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         public ExtensionsControlVM(
             IServiceProvider serviceProvider,
-            ILogger<RepositoryCreationControlVM> logger,
+            ILogger<ExtensionsControlVM> logger,
             INotificationService notificationService,
-            IExtensionManager extensionManager)
+            IExtensionManager extensionManager,
+            RepositoryExplorerControlVM repositoryExplorerControlVM)
             : base(serviceProvider, logger, notificationService)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
+            _repositoryExplorerControlVM = repositoryExplorerControlVM;
 
             RecentOperations = new ObservableCollection<OperationLog>();
 
             StartExtensionCommand = new AsyncRelayCommand(ExecuteStartExtension, _ => SelectedExtension != null && SelectedExtension.State != ExtensionState.Running);
             StopExtensionCommand = new AsyncRelayCommand(ExecuteStopExtension, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
             ExecuteExtensionCommand = new AsyncRelayCommand(ExecuteMainMethod, _ => CanExecuteMainMethod());
-            OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => false);
+            OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
         }
 
         public async Task InitializeAsync(IEnumerable<string> pluginsFolderPaths)
@@ -209,7 +204,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private async Task ExecuteMainMethod(object parameter)
         {
-            if (SelectedExtension == null || SelectedElement == null) return;
+            if (SelectedExtension == null) return;   // Убрал  "|| SelectedElement == null"
 
             try
             {
@@ -234,9 +229,12 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 
         private void ExecuteOpenMainWindow(object parameter)
         {
-            if (SelectedExtension?.Widget is Window window)
+            if (SelectedExtension?.Window is Window window)
             {
-                window.ShowDialog();
+                if (window.IsVisible == false)
+                    window.Show();
+                else
+                    window.Hide();
             }
         }
 
