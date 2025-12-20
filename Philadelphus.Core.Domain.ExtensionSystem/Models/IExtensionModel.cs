@@ -40,9 +40,14 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Получить виджет расширения (опционально)
+        /// Получить виджет расширения для обозревателя репозитория (опционально)
         /// </summary>
-        object GetWidget();
+        object GetRepositoryExplorerWidget();
+
+        /// <summary>
+        /// Получить виджет расширения для панели инструментов Ribbon (опционально)
+        /// </summary>
+        object GetRibbonWidget();
 
         /// <summary>
         /// Получить основное окно расширения (опционально)
@@ -52,11 +57,11 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         /// <summary>
         /// Инициализировать виджет при запуске расширения
         /// </summary>
-        void InitializeWidget();
+        void InitializeWidgets();
 
         /// <summary>
         /// Деинициализировать виджет при останове расширения
         /// </summary>
-        void UninitializeWidget();
+        void UninitializeWidgets();
     }
 }

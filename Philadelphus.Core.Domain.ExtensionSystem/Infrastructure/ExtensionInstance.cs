@@ -23,8 +23,10 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         private ExtensionState _state;
         private CanExecuteResultModel _lastCanExecuteResultModel;
         private Exception _lastException;
-        private object _widget;
-        private bool _isWidgetInitialized;
+        private object _window;
+        private object _repositoryExplorerWidget;
+        private object _ribbonWidget;
+        private bool _isWidgetsInitialized;
 
         /// <summary>
         /// Расширение
@@ -82,14 +84,46 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <summary>
         /// Виджет расширения
         /// </summary>
-        public object Widget
+        public object Window
         {
-            get => _widget;
+            get => _window;
             private set
             {
-                if (_widget != value)
+                if (_window != value)
                 {
-                    _widget = value;
+                    _window = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Виджет расширения
+        /// </summary>
+        public object RepositoryExplorerWidget
+        {
+            get => _repositoryExplorerWidget;
+            private set
+            {
+                if (_repositoryExplorerWidget != value)
+                {
+                    _repositoryExplorerWidget = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Виджет расширения
+        /// </summary>
+        public object RibbonWidget
+        {
+            get => _ribbonWidget;
+            private set
+            {
+                if (_ribbonWidget != value)
+                {
+                    _ribbonWidget = value;
                     OnPropertyChanged();
                 }
             }
@@ -100,12 +134,12 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// </summary>
         public bool IsWidgetInitialized
         {
-            get => _isWidgetInitialized;
+            get => _isWidgetsInitialized;
             private set
             {
-                if (_isWidgetInitialized != value)
+                if (_isWidgetsInitialized != value)
                 {
-                    _isWidgetInitialized = value;
+                    _isWidgetsInitialized = value;
                     OnPropertyChanged();
                 }
             }
@@ -127,9 +161,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
 
             if (extension.Metadata.AutoStart)
             {
-                extension.InitializeWidget();
+                extension.InitializeWidgets();
                 IsWidgetInitialized = true;
-                InitializeWidget();
+                InitializeWidgets();
             }
         }
 
@@ -143,7 +177,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             {
                 State = ExtensionState.Running;
                 await Extension.StartAsync();
-                InitializeWidget();
+                InitializeWidgets();
                 LogOperation("Start", "Расширение запущено", false);
             }
             catch (Exception ex)
@@ -221,23 +255,40 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <summary>
         /// Обновить виджет обозревателя репозитория
         /// </summary>
-        public void RefreshWidget()
+        public void RefreshWidgets()
         {
-            Widget = Extension.GetWidget();
+            Window = Extension.GetMainWindow();
+            RepositoryExplorerWidget = Extension.GetRepositoryExplorerWidget();
+            RibbonWidget = Extension.GetRibbonWidget();
         }
 
         /// <summary>
         /// Инициализировать виджет обозревателя репозитория
         /// </summary>
-        private void InitializeWidget()
+        private void InitializeWidgets()
         {
-            Extension.InitializeWidget();
-            var widget = Extension.GetWidget();
-            if (widget is IExtensionWidget extWidget)
+            Extension.InitializeWidgets();
+
+            var window = Extension.GetMainWindow();
+            if (window is IExtensionWidget extWindow)
             {
-                extWidget.SetExtension(Extension);
+                extWindow.SetExtension(Extension);
             }
-            Widget = widget;
+            Window = window;
+
+            var repositoryExplorerWidget = Extension.GetRepositoryExplorerWidget();
+            if (repositoryExplorerWidget is IExtensionWidget extRepositoryExplorerWidget)
+            {
+                extRepositoryExplorerWidget.SetExtension(Extension);
+            }
+            RepositoryExplorerWidget = repositoryExplorerWidget;
+
+            var ribbonWidget = Extension.GetRibbonWidget();
+            if (ribbonWidget is IExtensionWidget extRibbonWidget)
+            {
+                extRibbonWidget.SetExtension(Extension);
+            }
+            RibbonWidget = ribbonWidget;
         }
 
         /// <summary>
@@ -247,8 +298,12 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         {
             try
             {
-                Extension.UninitializeWidget();
-                Widget = null;
+                Extension.UninitializeWidgets();
+
+                Window = null;
+                RepositoryExplorerWidget = null;
+                RibbonWidget = null;
+
                 IsWidgetInitialized = false;
             }
             catch

@@ -21,10 +21,11 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         public abstract Task<CanExecuteResultModel> CanExecuteAsync(MainEntityBaseModel element);
         public abstract Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default);
 
-        public virtual object GetWidget() => null;
+        public virtual object GetRepositoryExplorerWidget() => null;
+        public virtual object GetRibbonWidget() => null;
         public virtual object GetMainWindow() => null;
-        public virtual void InitializeWidget() { }
-        public virtual void UninitializeWidget() { }
+        public virtual void InitializeWidgets() { }
+        public virtual void UninitializeWidgets() { }
     }
 
 }
