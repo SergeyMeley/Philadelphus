@@ -64,8 +64,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.Business\Philadelphus.Business.csproj" />
-    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+    <ProjectReference Include="..\Philadelphus.Business\Philadelphus.Business.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
   </ItemGroup>
 
   <ItemGroup>
