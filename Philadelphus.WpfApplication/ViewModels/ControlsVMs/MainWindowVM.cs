@@ -14,12 +14,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
     public class MainWindowVM : ControlVM
     {
-        private readonly ApplicationCommandsVM _applicationCommandsVM;
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
@@ -57,9 +57,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IExtensionsControlVMFactory extensionVMFactory)
-            : base(serviceProvider, logger, notificationService)
+            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
-            _applicationCommandsVM = applicationCommandsVM;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
 

@@ -128,7 +128,7 @@
                             <TextBlock Text="Текущий участник репозитория: "></TextBlock>
                             <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}"></TextBlock>
                         </StackPanel>
-                        <RibbonButton Label="Подробнее" Command="{Binding ApplicationCommandsVM.OpenRepositoryMemberDetailsWindowCommand}" />
+                        <RibbonButton Label="Подробнее" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Иерархия репозитория">
                         <RibbonButton Label="Добавить собственный корень" />

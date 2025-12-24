@@ -38,7 +38,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenDataStoragesSettingsWindowCommand}" Content="Открыть настройки хранилищ" Margin="2"></Button>
+        <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenDataStoragesSettingsControlCommand}" Content="Открыть настройки хранилищ" Margin="2"></Button>
         <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding CreateAndSaveRepositoryCommand}" Content="Создать и сохранить" Margin="2"></Button>
     </Grid>
 </UserControl>

@@ -22,9 +22,66 @@ namespace Philadelphus.Business.Entities.RepositoryElements
     public class TreeRepositoryModel : ITreeRepositoryHeaderModel, IHavingOwnDataStorageModel, IParentModel
     {
         protected virtual string DefaultFixedPartOfName { get => "Новый репозиторий"; }
-        public Guid Guid { get; protected set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+
+        private Guid _guid;
+        public Guid Guid 
+        { 
+            get
+            {
+                return _guid;
+            }
+            protected set
+            {
+                if (_guid != value)
+                {
+                    _guid = value;
+                    if (State != State.Initialized && State != State.SoftDeleted)
+                    {
+                        State = State.Changed;
+                    }
+                }
+            }
+        }
+
+        private string _name;
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    if (State != State.Initialized && State != State.SoftDeleted)
+                    {
+                        State = State.Changed;
+                    }
+                }
+            }
+        }
+
+        private string _description;
+        public string Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                if (_description != value)
+                {
+                    _description = value;
+                    if (State != State.Initialized && State != State.SoftDeleted)
+                    {
+                        State = State.Changed;
+                    }
+                }
+            }
+        }
         public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
         public State State { get; internal set; } = State.Initialized;
         public TreeRepository DbEntity { get; set; }
@@ -38,8 +95,15 @@ namespace Philadelphus.Business.Entities.RepositoryElements
             }
             private set
             {
-                _ownDataStorage = value;
-                DataStorages.Add(value);
+                if (_ownDataStorage != value)
+                {
+                    _ownDataStorage = value;
+                    DataStorages.Add(value);
+                    if (State != State.Initialized && State != State.SoftDeleted)
+                    {
+                        State = State.Changed;
+                    }
+                }
             }
         }
 

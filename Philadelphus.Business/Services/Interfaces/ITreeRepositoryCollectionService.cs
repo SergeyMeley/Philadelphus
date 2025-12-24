@@ -20,7 +20,7 @@ namespace Philadelphus.Business.Services.Interfaces
     {
         #region [ Props ]
 
-        public static Dictionary<Guid, IDataStorageModel> DataStorageModels { get; }
+        public static Dictionary<Guid, IDataStorageModel> DataStorages { get; }
         public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get; }
 
         #endregion

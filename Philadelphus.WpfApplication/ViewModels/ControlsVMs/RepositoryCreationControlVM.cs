@@ -9,6 +9,7 @@ using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.WpfApplication.Views.Windows;
+using System.Windows.Input;
 
 namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
 {
@@ -35,8 +36,9 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             ITreeRepositoryService service,
             TreeRepositoryCollectionVM repositoryCollectionVM, 
             DataStoragesSettingsVM dataStoragesSettingsVM,
-            IOptions<ApplicationSettings> options)
-            : base(serviceProvider, logger, notificationService)
+            IOptions<ApplicationSettings> options,
+            ApplicationCommandsVM applicationCommandsVM)
+            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
             _collectionService = collectionService;
             _service = service;

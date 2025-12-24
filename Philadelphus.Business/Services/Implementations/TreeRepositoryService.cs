@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Castle.Core.Logging;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Business.Entities.Enums;
 using Philadelphus.Business.Entities.Infrastructure;
@@ -7,23 +6,17 @@ using Philadelphus.Business.Entities.RepositoryElements;
 using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Factories;
-using Philadelphus.Business.Helpers;
 using Philadelphus.Business.Helpers.InfrastructureConverters;
 using Philadelphus.Business.Interfaces;
 using Philadelphus.Business.Services.Interfaces;
-using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.OtherEntities;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Philadelphus.Business.Services.Implementations
 {
+    /// <summary>
+    /// Основной сервис для работы с репозиторием и его элементами
+    /// </summary>
     public class TreeRepositoryService : ITreeRepositoryService
     {
         #region [ Props ]
@@ -33,12 +26,21 @@ namespace Philadelphus.Business.Services.Implementations
         private readonly INotificationService _notificationService;
 
         private static RepositoryMembersCollectionModel _mainEntityCollection = new RepositoryMembersCollectionModel();
+        /// <summary>
+        /// Коллекция элементов репозитория
+        /// </summary>
         public static RepositoryMembersCollectionModel MainEntityCollection { get => _mainEntityCollection; }
 
         #endregion
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Основной сервис для работы с репозиторием и его элементами
+        /// </summary>
+        /// <param name="mapper">Автомаппер</param>
+        /// <param name="logger">Сервис логгирования</param>
+        /// <param name="notificationService">Сервис уведомлений</param>
         public TreeRepositoryService(
             IMapper mapper,
             ILogger<TreeRepositoryService> logger,
@@ -53,14 +55,29 @@ namespace Philadelphus.Business.Services.Implementations
 
         #region [ Get + Load ]
 
+        /// <summary>
+        /// Получение элемента репозитория по его UUID
+        /// </summary>
+        /// <param name="guid">UUID элемента репозитория</param>
+        /// <returns>Элемент репозитория</returns>
         public IMainEntity GetEntityFromCollection(Guid guid)
         {
             return GetModelFromCollection(guid).ToDbEntity();
         }
+        /// <summary>
+        /// Получение элемента репозитория (модель) по его UUID
+        /// </summary>
+        /// <param name="guid">UUID элемента репозитория</param>
+        /// <returns>Элемент репозитория (модель)</returns>
         public IMainEntityModel GetModelFromCollection(Guid guid)
         {
             return _mainEntityCollection.FirstOrDefault(x => x.Guid == guid);
         }
+        /// <summary>
+        /// Загрузить коллекцию элементов репозитория
+        /// </summary>
+        /// <param name="repository">Репозиторий</param>
+        /// <returns>Репозиторий с элементами</returns>
         public TreeRepositoryModel LoadMainEntityCollection(TreeRepositoryModel repository)
         {
             foreach (var dataStorage in repository?.DataStorages)
@@ -95,7 +112,11 @@ namespace Philadelphus.Business.Services.Implementations
             }
             return repository;
         }
-
+        /// <summary>
+        /// Получить содержимое репозитория
+        /// </summary>
+        /// <param name="repository">Репозиторий</param>
+        /// <returns>Репозиторий с содержимым</returns>
         public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel repository)
         {
             LoadMainEntityCollection(repository);
@@ -119,7 +140,11 @@ namespace Philadelphus.Business.Services.Implementations
             }
             return repository;
         }
-
+        /// <summary>
+        /// Получить содержимое корня
+        /// </summary>
+        /// <param name="root">Корень</param>
+        /// <returns>Корень с содержимым</returns>
         public TreeRootModel GetRootContent(TreeRootModel root)
         {
             GetPersonalAttributes(root);
@@ -144,6 +169,11 @@ namespace Philadelphus.Business.Services.Implementations
 
             return root;
         }
+        /// <summary>
+        /// Получить содержимое узла
+        /// </summary>
+        /// <param name="node">Узел</param>
+        /// <returns>Узел с содержимым</returns>
         public TreeNodeModel GetNodeContent(TreeNodeModel node)
         {
             GetPersonalAttributes(node);
@@ -184,13 +214,21 @@ namespace Philadelphus.Business.Services.Implementations
 
             return node;
         }
-
+        /// <summary>
+        /// Получить содержимое листа
+        /// </summary>
+        /// <param name="leave">Лист</param>
+        /// <returns>Лист с содержимым</returns>
         public TreeLeaveModel GetLeaveContent(TreeLeaveModel leave)
         {
             GetPersonalAttributes(leave);
             return leave;
         }
-
+        /// <summary>
+        /// Получить собственные атрибуты
+        /// </summary>
+        /// <param name="attributeOwner">Владелец атрибутов</param>
+        /// <returns>Коллекция атрибутов</returns>
         public IEnumerable<ElementAttributeModel> GetPersonalAttributes(IAttributeOwnerModel attributeOwner)
         {
 
@@ -211,7 +249,11 @@ namespace Philadelphus.Business.Services.Implementations
         #endregion
 
         #region [ Save ]
-
+        /// <summary>
+        /// Сохранить изменения
+        /// </summary>
+        /// <param name="treeRepository">Репозиторий для сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
             if (treeRepository == null)
@@ -237,6 +279,11 @@ namespace Philadelphus.Business.Services.Implementations
             result += SaveChanges(treeRepository.ChildTreeRoots);
             return result;
         }
+        /// <summary>
+        /// Сохранить изменения
+        /// </summary>
+        /// <param name="treeRoots">Корни для сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(IEnumerable<TreeRootModel> treeRoots)
         {
             if (treeRoots == null || treeRoots.Count() == 0)
@@ -267,6 +314,11 @@ namespace Philadelphus.Business.Services.Implementations
             }
             return result;
         }
+        /// <summary>
+        /// Сохранить изменения
+        /// </summary>
+        /// <param name="treeNodes">Узлы для сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes)
         {
             if (treeNodes == null || treeNodes.Count() == 0)
@@ -298,6 +350,11 @@ namespace Philadelphus.Business.Services.Implementations
             }
             return result;
         }
+        /// <summary>
+        /// Сохранить изменения
+        /// </summary>
+        /// <param name="treeLeaves">Листы для сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves)
         {
             if (treeLeaves == null || treeLeaves.Count() == 0)
@@ -327,7 +384,11 @@ namespace Philadelphus.Business.Services.Implementations
             }
             return result;
         }
-
+        /// <summary>
+        /// Сохранить изменения
+        /// </summary>
+        /// <param name="elementAttributes">Атрибуты для сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(IEnumerable<ElementAttributeModel> elementAttributes)
         {
             if (elementAttributes == null || elementAttributes.Count() == 0)
@@ -374,6 +435,12 @@ namespace Philadelphus.Business.Services.Implementations
 
         #region [ Create + Add ]
 
+        /// <summary>
+        /// Создать корень и добавить родителю
+        /// </summary>
+        /// <param name="parentElement">Родитель</param>
+        /// <param name="dataStorage">Хранилище</param>
+        /// <returns>Корень</returns>
         public TreeRootModel CreateTreeRoot(TreeRepositoryModel parentElement, IDataStorageModel dataStorage)
         {
             try
@@ -391,6 +458,11 @@ namespace Philadelphus.Business.Services.Implementations
                 throw;
             }
         }
+        /// <summary>
+        /// Создать узел и добавить родителю
+        /// </summary>
+        /// <param name="parentElement">Родитель</param>
+        /// <returns>Узел</returns>
         public TreeNodeModel CreateTreeNode(IParentModel parentElement)
         {
             try
@@ -415,6 +487,11 @@ namespace Philadelphus.Business.Services.Implementations
                 throw;
             }
         }
+        /// <summary>
+        /// Создать лист и добавить родителю
+        /// </summary>
+        /// <param name="parentElement">Родитель</param>
+        /// <returns>Лист</returns>
         public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement)
         {
             try
@@ -442,6 +519,11 @@ namespace Philadelphus.Business.Services.Implementations
                 throw;
             }
         }
+        /// <summary>
+        /// Создать атрибут и добавить владельцу
+        /// </summary>
+        /// <param name="owner">Владелец</param>
+        /// <returns>Атрибут</returns>
         public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner)
         {
             try
@@ -472,6 +554,11 @@ namespace Philadelphus.Business.Services.Implementations
 
         #region [ Delete + Remove ]
 
+        /// <summary>
+        /// Мягкое удаление элемента репозитория
+        /// </summary>
+        /// <param name="element">Элемент</param>
+        /// <returns></returns>
         public bool SoftDeleteRepositoryMember(IChildrenModel element)
         {
             try
@@ -485,9 +572,6 @@ namespace Philadelphus.Business.Services.Implementations
                 //}
                 ////
                 //return true;
-
-
-
 
                 if (element == null)
                     return false;
@@ -525,6 +609,11 @@ namespace Philadelphus.Business.Services.Implementations
 
         #region [ Private methods ]
 
+        /// <summary>
+        /// Изменить статус элемента
+        /// </summary>
+        /// <param name="model">Элемент</param>
+        /// <param name="newState">Новый статус</param>
         private void SetModelState(IMainEntityWritableModel model, State newState)
         {
             model.SetState(newState);

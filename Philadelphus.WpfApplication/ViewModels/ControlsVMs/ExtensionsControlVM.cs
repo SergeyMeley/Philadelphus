@@ -81,8 +81,9 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             ILogger<ExtensionsControlVM> logger,
             INotificationService notificationService,
             IExtensionManager extensionManager,
-            RepositoryExplorerControlVM repositoryExplorerControlVM)
-            : base(serviceProvider, logger, notificationService)
+            RepositoryExplorerControlVM repositoryExplorerControlVM,
+            ApplicationCommandsVM applicationCommandsVM)
+            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
             _repositoryExplorerControlVM = repositoryExplorerControlVM;

@@ -5,6 +5,7 @@ using Philadelphus.WpfApplication.Infrastructure;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using Philadelphus.WpfApplication.Views.Controls;
 using Philadelphus.WpfApplication.Views.Windows;
+using System;
 
 namespace Philadelphus.WpfApplication.ViewModels
 {
@@ -54,6 +55,19 @@ namespace Philadelphus.WpfApplication.ViewModels
             {
                 return new RelayCommand(obj =>
                 {
+                    var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
+                    launchWindow.Show();
+                });
+            }
+        }
+
+        public RelayCommand OpenDataStoragesSettingsControlCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var qwe = obj.GetType();
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
                     launchWindow.Show();
                 });

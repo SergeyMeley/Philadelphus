@@ -104,7 +104,7 @@
                         <Run Text="Выберите репозиторий для начала работы или создайте новый"></Run>
                     </TextBlock>
                     <GroupBox Grid.Row="1" Header="Создать">
-                        <ctrls:RepositoryCreation></ctrls:RepositoryCreation>
+                        <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}"></ctrls:RepositoryCreation>
                     </GroupBox>
                     <GroupBox Grid.Row="2" Header="Открыть">
                         <ctrls:FavoriteAndLastRepositoryHeaders></ctrls:FavoriteAndLastRepositoryHeaders>
@@ -118,7 +118,7 @@
                         <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <ctrls:RepositoryCreation Grid.Row="0"></ctrls:RepositoryCreation>
+                    <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}" Grid.Row="0"></ctrls:RepositoryCreation>
                     <GroupBox Grid.Row="1" Header="Выбор шаблона">
                         <ListBox>
                             <ListBoxItem Content="Пустой репозиторий" Height="50"></ListBoxItem>

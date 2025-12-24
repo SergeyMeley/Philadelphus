@@ -30,7 +30,7 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
             ApplicationCommandsVM applicationCommandsVM)
-            : base(serviceProvider, logger, notificationService)
+            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
             ;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
@@ -38,11 +38,9 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
             _repositoryCreationVM = repositoryCreationControlVM;
-            _openMainWindowCommand = applicationCommandsVM.OpenMainWindowCommand;
         }
 
-        private RelayCommand _openMainWindowCommand;
-        public RelayCommand OpenMainWindowCommand { get => _openMainWindowCommand; }
+        public RelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;
         public RelayCommand OpenMainWindowWithHeaderCommand
         {
             get
@@ -53,8 +51,8 @@ namespace Philadelphus.WpfApplication.ViewModels.ControlsVMs
                     var headerVM = RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM;
                     RepositoryCollectionVM.CurrentRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == headerVM.Guid);
 
-                    if (_openMainWindowCommand.CanExecute(obj))
-                        _openMainWindowCommand.Execute(obj);
+                    if (OpenMainWindowCommand.CanExecute(obj))
+                        OpenMainWindowCommand.Execute(obj);
                 },
                 ce =>
                 {
