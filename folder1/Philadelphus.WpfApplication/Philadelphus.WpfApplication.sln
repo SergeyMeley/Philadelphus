@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philadelphus.Business", "..\..\Philadelphus.Libraries\Philadelphus.Business\Philadelphus.Business.csproj", "{7E94E8B5-C099-418F-B18C-90228D6612F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.WpfApplicationTests", "Philadelphus.WpfApplicationTests\Philadelphus.WpfApplicationTests.csproj", "{C6E76722-B1EA-470E-9AC7-D387F3396AB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.PostgreEfRepository", "..\..\Philadelphus.Libraries\Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj", "{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.InfrastructureEntities", "..\..\Philadelphus.Libraries\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj", "{B1B66515-E1F7-8737-AE94-1B9DE76433DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.JsonRepository", "..\..\Philadelphus.Libraries\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj", "{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{D164079F-7C78-483A-BE1E-E587425E2C9E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{0D029854-3D94-49B7-BBE3-FDB937AE4715}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{8928BBDE-951E-4B45-9F78-5A760C8C1FE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F3CF0BD9-A0E6-45A4-BD14-E439C538F6FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Core.Domain.ExtensionSystem", "..\..\Philadelphus.Libraries\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj", "{F166A17B-703D-B62D-4B57-25EB930B1271}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.WpfApplication", "Philadelphus.WpfApplication\Philadelphus.WpfApplication.csproj", "{FF96A822-2633-DD59-5CF3-B2EDCE1E2A24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E94E8B5-C099-418F-B18C-90228D6612F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6E76722-B1EA-470E-9AC7-D387F3396AB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6E76722-B1EA-470E-9AC7-D387F3396AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6E76722-B1EA-470E-9AC7-D387F3396AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6E76722-B1EA-470E-9AC7-D387F3396AB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B66515-E1F7-8737-AE94-1B9DE76433DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F166A17B-703D-B62D-4B57-25EB930B1271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F166A17B-703D-B62D-4B57-25EB930B1271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F166A17B-703D-B62D-4B57-25EB930B1271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F166A17B-703D-B62D-4B57-25EB930B1271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF96A822-2633-DD59-5CF3-B2EDCE1E2A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF96A822-2633-DD59-5CF3-B2EDCE1E2A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF96A822-2633-DD59-5CF3-B2EDCE1E2A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF96A822-2633-DD59-5CF3-B2EDCE1E2A24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7E94E8B5-C099-418F-B18C-90228D6612F5} = {D164079F-7C78-483A-BE1E-E587425E2C9E}
+		{C6E76722-B1EA-470E-9AC7-D387F3396AB9} = {F3CF0BD9-A0E6-45A4-BD14-E439C538F6FB}
+		{CE5436D7-B580-9463-CFD0-0C0F0B1AD3E6} = {0D029854-3D94-49B7-BBE3-FDB937AE4715}
+		{B1B66515-E1F7-8737-AE94-1B9DE76433DC} = {0D029854-3D94-49B7-BBE3-FDB937AE4715}
+		{B4C46B21-4A2B-86D7-A2F9-069C3A8EBCC2} = {0D029854-3D94-49B7-BBE3-FDB937AE4715}
+		{F166A17B-703D-B62D-4B57-25EB930B1271} = {D164079F-7C78-483A-BE1E-E587425E2C9E}
+		{FF96A822-2633-DD59-5CF3-B2EDCE1E2A24} = {8928BBDE-951E-4B45-9F78-5A760C8C1FE9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9A5A59A-BBFB-4381-9841-53191A4AF0DE}
+	EndGlobalSection
+EndGlobal

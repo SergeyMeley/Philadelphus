@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Philadelphus.WpfApplication.Views.Controls.RepositoryCreation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+             xmlns:converters="clr-namespace:Philadelphus.WpfApplication.Converters"
+             mc:Ignorable="d" 
+             MinWidth="800">
+    <UserControl.Resources>
+        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Name}" Margin="2"></TextBox>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description}" Margin="2"></TextBox>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Хранилище данных" Margin="2"></TextBlock>
+        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DataStoragesSettingsVM.TreeRepositoriesDataStorageVMs}" SelectedValue="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}" Margin="2">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                        <TextBlock Text=". Доступность: "></TextBlock>
+                        <TextBlock Text="{Binding IsAvailable}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenDataStoragesSettingsWindowCommand}" Content="Открыть настройки хранилищ" Margin="2"></Button>
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding CreateAndSaveRepositoryCommand}" Content="Создать и сохранить" Margin="2"></Button>
+    </Grid>
+</UserControl>
