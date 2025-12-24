@@ -1,0 +1,121 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <None Remove="Interfaces\**" />
+    <Page Remove="Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\approval_64.png" />
+    <None Remove="Icons\check_64.png" />
+    <None Remove="Icons\edit_64.png" />
+    <None Remove="Icons\getwork_64.png" />
+    <None Remove="Icons\new-tab_64.png" />
+    <None Remove="Icons\open.png" />
+    <None Remove="Icons\philadelphus_logo_64.png" />
+    <None Remove="Icons\storage.png" />
+    <None Remove="Icons\top_level_64.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_add.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_back.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_copy.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_cut.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_delete.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_delete2.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_duplicate.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_empty.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_forward.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_freeze.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_leave.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_link.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_modify.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_move.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_node.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_node2.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_paste.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_protect.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_remove.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_return.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_root.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_root2.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_save.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_select.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_up.png" />
+    <None Remove="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
+    <None Remove="Icons\without_a_license\icons8_icon_repository.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="PropertyTools.Wpf" Version="3.1.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.Business\Philadelphus.Business.csproj" />
+    <ProjectReference Include="..\..\..\Philadelphus.Libraries\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\approval_64.png" />
+    <Resource Include="Icons\check_64.png" />
+    <Resource Include="Icons\edit_64.png" />
+    <Resource Include="Icons\getwork_64.png" />
+    <Resource Include="Icons\new-tab_64.png" />
+    <Resource Include="Icons\open.png" />
+    <Resource Include="Icons\philadelphus_logo_64.png" />
+    <Resource Include="Icons\storage.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\top_level_64.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_add.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_back.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_copy.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_cut.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_delete.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_delete2.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_duplicate.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_empty.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_forward.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_freeze.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_leave.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_link.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_modify.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_move.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_node.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_node2.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_paste.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_protect.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_remove.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_return.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_root.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_root2.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_save.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_select.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_up.png" />
+    <Resource Include="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
+    <Resource Include="Icons\without_a_license\icons8_icon_repository.png" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Philadelphus.WpfApplication.Views.Controls.DataStorageHeaders"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
+             xmlns:lbs="clr-namespace:Philadelphus.WpfApplication.Views.Controls.CollectionControls.ListBoxes"
+             xmlns:detail="clr-namespace:Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="1" Header="Хранилища">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <lbs:DataStorageHeadersListBox DataStorageHeadersItemsSource="{Binding DataStoragesSettingsVM.DataStorageVMs}" DataStorageHeadersSelectedItem="{Binding DataStoragesSettingsVM.SelectedDataStorageVM, Mode=TwoWay}" Grid.Row="0" Grid.Column="0"></lbs:DataStorageHeadersListBox>
+                <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="1" IsExpanded="False" ExpandDirection="Right">
+                    <Expander.Header>
+                        <TextBlock Text="Детальная информация">
+                            <TextBlock.LayoutTransform>
+                                <RotateTransform Angle="-90"/>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Expander.Header>
+                    <detail:UniversalDetails DataContext="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}" Width="400" MinWidth="400" MaxWidth="700"></detail:UniversalDetails>
+                </Expander>
+            </Grid>
+        </GroupBox>
+    </Grid>
+
+</UserControl>
