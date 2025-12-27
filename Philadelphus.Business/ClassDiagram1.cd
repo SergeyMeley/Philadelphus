@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Philadelphus.Business.Entities.ElementsProperties.EntityElementTypeModel" Collapsed="true">
+    <Position X="23.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ElementsProperties\EntityElementTypeModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent.ElementAttributeModel" Collapsed="true">
+    <Position X="25.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAEAEQAAQAAAAAAAQAAAAAAAAAAgAAAAEAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\ElementsContent\ElementAttributeModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent.ElementAttributeValueModel" Collapsed="true">
+    <Position X="28" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAUAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\ElementsContent\ElementAttributeValueModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers.TreeLeaveModel" Collapsed="true">
+    <Position X="16.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAQAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\TreeRepositoryMembers\TreeRootMembers\TreeLeaveModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers.TreeNodeModel" Collapsed="true">
+    <Position X="19" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAEAACEAAYAABAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\TreeRepositoryMembers\TreeRootMembers\TreeNodeModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers.TreeRootMemberBaseModel" Collapsed="true">
+    <Position X="17.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAQAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\TreeRepositoryMembers\TreeRootMembers\TreeRootMemberBaseModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers.TreeRepositoryMemberBaseModel" Collapsed="true">
+    <Position X="19" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAEAAAEAAAAAAAAAQAAQCAAiAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\TreeRepositoryMembers\TreeRepositoryMemberBaseModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers.TreeRootModel" Collapsed="true">
+    <Position X="21.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAEAACEAAYAAAAAARAAAQAAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\TreeRepositoryMembers\TreeRootModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Philadelphus.Business.Entities.RepositoryElements.MainEntityBaseModel" Collapsed="true">
+    <Position X="22.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAJAEACAMgAAQEBCAACAQAQAAABAACEAAABAAAAAA=</HashCode>
+      <FileName>Entities\TreeRepositoryElements\MainEntityBaseModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Philadelphus.Business.Interfaces.IAttributeOwnerModel">
+    <Position X="10" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAQCAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IAttributeOwnerModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.IChildrenModel">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IChildrenModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.ILinkableByGuidModel">
+    <Position X="6.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ILinkableByGuidModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.IMainEntityModel">
+    <Position X="7.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAMgAAAAACAAAAQAQAAAAAAAEAAABAAAAAA=</HashCode>
+      <FileName>Interfaces\IMainEntityModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.IMainEntityWritableModel">
+    <Position X="10" Y="3" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IMainEntityWritableModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.IParentModel">
+    <Position X="4.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IParentModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.ITreeRepositoryMemberModel">
+    <Position X="4.25" Y="3.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ITreeRepositoryMemberModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Philadelphus.Business.Interfaces.ITreeRootMemberModel">
+    <Position X="4.25" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ITreeRootMemberModel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
