@@ -10,7 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Philadelphus.JsonRepository.Repositories
+namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 {
     public class JsonDataStoragesCollectionInfrastructureRepository : IDataStoragesCollectionInfrastructureRepository
     {

@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
-    <ProjectReference Include="..\Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.Json\Philadelphus.Infrastructure.Persistence.Json.csproj" />
     <ProjectReference Include="..\Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj" />
   </ItemGroup>
 

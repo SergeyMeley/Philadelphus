@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.JsonRepository", "Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj", "{2293A057-A732-4CB2-A55E-4AB40F0608E0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.PostgreEfRepository", "Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj", "{6AD15292-D11C-4F4F-9004-A95CDC6B79F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.MongoRepository", "Philadelphus.MongoRepository\Philadelphus.MongoRepository.csproj", "{E2E884D7-7D88-4F72-9DE8-EEA0B0B72B96}"
@@ -27,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Presentation.W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Infrastructure.Persistence", "Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj", "{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Infrastructure.Persistence.Json", "Philadelphus.Infrastructure.Persistence.Json\Philadelphus.Infrastructure.Persistence.Json.csproj", "{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,18 +37,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|x64.Build.0 = Debug|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|x86.Build.0 = Debug|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Release|x64.ActiveCfg = Release|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Release|x64.Build.0 = Release|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Release|x86.ActiveCfg = Release|Any CPU
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Release|x86.Build.0 = Release|Any CPU
 		{6AD15292-D11C-4F4F-9004-A95CDC6B79F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6AD15292-D11C-4F4F-9004-A95CDC6B79F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AD15292-D11C-4F4F-9004-A95CDC6B79F2}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -145,12 +133,23 @@ Global
 		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x64.Build.0 = Release|Any CPU
 		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x86.ActiveCfg = Release|Any CPU
 		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x86.Build.0 = Release|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Debug|x64.Build.0 = Debug|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Debug|x86.Build.0 = Debug|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Release|x64.ActiveCfg = Release|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Release|x64.Build.0 = Release|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Release|x86.ActiveCfg = Release|Any CPU
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2293A057-A732-4CB2-A55E-4AB40F0608E0} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 		{6AD15292-D11C-4F4F-9004-A95CDC6B79F2} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 		{E2E884D7-7D88-4F72-9DE8-EEA0B0B72B96} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 		{1B7C9538-E1F9-4001-8C73-ADD0F4F6B881} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
@@ -158,6 +157,7 @@ Global
 		{53B08518-A3F4-57A0-334A-58C30F9D12D6} = {6558A576-9D1A-4AB4-AEEB-67817F483F92}
 		{F433DDA5-2381-77F3-D7A3-4556E3A5A7A2} = {17750060-FDCC-46D1-A11C-63FE25B3834B}
 		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
+		{D4AF7CC0-2EEC-7BFC-7F0C-019EF831C64E} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A13A6B9-A071-4F84-A320-35B662A7FE44}

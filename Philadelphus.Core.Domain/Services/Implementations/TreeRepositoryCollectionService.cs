@@ -8,7 +8,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
 using Philadelphus.Infrastructure.Persistence.MainEntities;
-using Philadelphus.JsonRepository.Repositories;
+using Philadelphus.Infrastructure.Persistence.Json.Repositories;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
