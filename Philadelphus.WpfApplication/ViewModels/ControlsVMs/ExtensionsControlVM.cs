@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;

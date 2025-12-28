@@ -1,11 +1,11 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
-using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services.Implementations;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Services.Interfaces
+namespace Philadelphus.Core.Domain.Services.Interfaces
 {
     public interface ITreeRepositoryService
     {

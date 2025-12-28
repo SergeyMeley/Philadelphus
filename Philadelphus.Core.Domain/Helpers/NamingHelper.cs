@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Helpers
+namespace Philadelphus.Core.Domain.Helpers
 {
     public static class NamingHelper
     {

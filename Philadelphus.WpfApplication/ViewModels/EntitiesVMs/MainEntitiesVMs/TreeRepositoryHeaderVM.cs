@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Helpers;
-using Philadelphus.Business.Services.Implementations;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.Services.Implementations;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System;
 using System.Collections.Generic;

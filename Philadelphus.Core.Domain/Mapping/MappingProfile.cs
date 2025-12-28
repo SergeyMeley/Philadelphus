@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Philadelphus.Business.Entities.ElementsProperties;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.ElementsProperties;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using System;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Philadelphus.Business.Mapping
+namespace Philadelphus.Core.Domain.Mapping
 {
     public class MappingProfile : Profile
     {

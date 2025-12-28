@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Factories
+namespace Philadelphus.Core.Domain.Factories
 {
     internal static class InfrastructureFactory
     {

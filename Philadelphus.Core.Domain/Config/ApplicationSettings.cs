@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Config
+namespace Philadelphus.Core.Domain.Config
 {
     public class ApplicationSettings    //TODO: Подумать о переносе в Application
     {

@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.PostgreEfRepository.Repositories;

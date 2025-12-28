@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Business.Config;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.WpfApplication.Factories.Interfaces;
 using Philadelphus.WpfApplication.Infrastructure;

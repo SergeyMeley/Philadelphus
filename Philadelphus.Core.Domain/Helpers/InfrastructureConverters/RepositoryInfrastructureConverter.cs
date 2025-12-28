@@ -1,7 +1,7 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Factories;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Factories;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.InfrastructureEntities.OtherEntities;
 using System;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Helpers.InfrastructureConverters
+namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class RepositoryInfrastructureConverter
     {

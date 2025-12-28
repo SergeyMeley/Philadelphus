@@ -1,9 +1,9 @@
-﻿using Philadelphus.Business.Entities.ElementsProperties;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Business.Services.Interfaces;
+﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;

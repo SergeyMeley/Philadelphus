@@ -1,6 +1,6 @@
-﻿using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
-using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Interfaces;
+﻿using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
+namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers
 {
     public class RepositoryMembersCollectionModel : IEnumerable<IMainEntityModel>, ICollection<IMainEntityModel>
     {

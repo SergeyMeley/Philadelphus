@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.Enums
+namespace Philadelphus.Core.Domain.Entities.Enums
 {
     public enum EntityTypesModel
     {

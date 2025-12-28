@@ -1,6 +1,6 @@
-﻿using Philadelphus.Business.Entities.ElementsProperties;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Helpers.InfrastructureConverters
+namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     internal static class AuditInfoInfrastructureConverter
     {

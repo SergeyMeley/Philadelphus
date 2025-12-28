@@ -1,7 +1,7 @@
-﻿//using Philadelphus.Business.Entities.Enums;
-//using Philadelphus.Business.Entities.RepositoryElements;
-//using Philadelphus.Business.Entities.RepositoryElements.Interfaces;
-//using Philadelphus.Business.Entities.RepositoryElements.RepositoryElementContent;
+﻿//using Philadelphus.Core.Domain.Entities.Enums;
+//using Philadelphus.Core.Domain.Entities.RepositoryElements;
+//using Philadelphus.Core.Domain.Entities.RepositoryElements.Interfaces;
+//using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryElementContent;
 //using Philadelphus.InfrastructureEntities.Enums;
 //using System;
 //using System.Collections.Generic;
@@ -9,7 +9,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace Philadelphus.Business.Factories
+//namespace Philadelphus.Core.Domain.Factories
 //{
 //    internal static class MainEntityFactory
 //    {

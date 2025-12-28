@@ -1,12 +1,12 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Helpers;
-using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.OtherEntities;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent
+namespace Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent
 {
     public class ElementAttributeModel : MainEntityBaseModel, ITreeElementContentModel
     {

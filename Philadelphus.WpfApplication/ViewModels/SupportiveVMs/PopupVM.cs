@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.OtherEntities;
+﻿using Philadelphus.Core.Domain.Entities.OtherEntities;
 using Philadelphus.WpfApplication.Models.Entities;
 using System;
 using System.Collections;

@@ -1,6 +1,6 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.Business.Handlers;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.OtherEntities;
+using Philadelphus.Core.Domain.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Services.Interfaces
+namespace Philadelphus.Core.Domain.Services.Interfaces
 {
     public interface INotificationService
     {

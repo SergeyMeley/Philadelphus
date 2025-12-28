@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
+﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using System.Globalization;
 using System.Text;

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
              xmlns:viewmodels="clr-namespace:Philadelphus.WpfApplication.ViewModels"
-             xmlns:mainentities="clr-namespace:Philadelphus.Business.Entities.RepositoryElements;assembly=Philadelphus.Business"
+             xmlns:mainentities="clr-namespace:Philadelphus.Core.Domain.Entities.RepositoryElements;assembly=Philadelphus.Core.Domain"
              xmlns:ctrls="clr-namespace:Philadelphus.WpfApplication.Views.Controls"
              xmlns:detail="clr-namespace:Philadelphus.WpfApplication.Views.Controls.DetailedInformationGrids"
              mc:Ignorable="d" 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

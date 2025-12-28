@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.Infrastructure;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Interfaces
+namespace Philadelphus.Core.Domain.Interfaces
 {
     /// <summary>
     /// Реализует возможность наличия независимой инфраструктуры (места и способа хранения данных)

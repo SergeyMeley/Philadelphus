@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.Infrastructure
+namespace Philadelphus.Core.Domain.Entities.Infrastructure
 {
     public interface IDataStorageModel
     {

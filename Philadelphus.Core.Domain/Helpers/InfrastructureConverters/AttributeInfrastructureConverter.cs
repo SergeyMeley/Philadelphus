@@ -1,10 +1,10 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
-using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Factories;
-using Philadelphus.Business.Helpers.InfrastructureConverters;
-using Philadelphus.Business.Interfaces;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Factories;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Helpers.InfrastructureConverters
+namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class AttributeInfrastructureConverter
     {

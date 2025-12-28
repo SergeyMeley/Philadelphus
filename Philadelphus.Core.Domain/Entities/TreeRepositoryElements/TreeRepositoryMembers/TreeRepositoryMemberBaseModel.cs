@@ -1,12 +1,12 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.TreeRepositoryElements.ElementsContent;
-using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services.Implementations;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent;
+using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System.Collections.Generic;
 
-namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
+namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers
 {
     public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IAttributeOwnerModel, IChildrenModel, ITypedModel, ISequencableModel
     {

@@ -1,7 +1,7 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Factories;
-using Philadelphus.Business.Services.Implementations;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Factories;
+using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Helpers.InfrastructureConverters
+namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class LeaveInfrastructureConverter
     {

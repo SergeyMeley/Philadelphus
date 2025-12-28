@@ -1,11 +1,11 @@
-﻿using Philadelphus.Business.Entities.ElementsProperties;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.Business.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Business.Helpers;
-using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services.Implementations;
+﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.OtherEntities;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
@@ -19,7 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers
+namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers
 {
     public class TreeRootModel : TreeRepositoryMemberBaseModel, IHavingOwnDataStorageModel, IChildrenModel, IParentModel
     {

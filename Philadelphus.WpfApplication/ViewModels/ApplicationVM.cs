@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Business.Config;
-using Philadelphus.Business.Services;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Services;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;

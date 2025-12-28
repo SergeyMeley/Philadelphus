@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Business.Config;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Services.Implementations;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Services.Implementations;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.WpfApplication.Models.StorageConfig;
 using System;
 using System.Collections.Generic;

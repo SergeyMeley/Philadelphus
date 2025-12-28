@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Helpers.InfrastructureConverters;
-using Philadelphus.Business.Services.Interfaces;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.InfrastructureEntities.Enums;
 using Philadelphus.InfrastructureEntities.Interfaces;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using Philadelphus.JsonRepository.Repositories;
 
-namespace Philadelphus.Business.Services.Implementations
+namespace Philadelphus.Core.Domain.Services.Implementations
 {
     /// <summary>
     /// Сервис работы с коллекцией репозиториев и хранилищами данных

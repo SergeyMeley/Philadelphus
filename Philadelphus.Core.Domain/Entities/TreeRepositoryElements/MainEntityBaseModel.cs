@@ -1,9 +1,9 @@
-﻿using Philadelphus.Business.Entities.ElementsProperties;
-using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.Infrastructure;
-using Philadelphus.Business.Helpers.InfrastructureConverters;
-using Philadelphus.Business.Interfaces;
-using Philadelphus.Business.Services;
+﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services;
 using Philadelphus.InfrastructureEntities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Entities.RepositoryElements
+namespace Philadelphus.Core.Domain.Entities.RepositoryElements
 {
     public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByGuidModel
     {

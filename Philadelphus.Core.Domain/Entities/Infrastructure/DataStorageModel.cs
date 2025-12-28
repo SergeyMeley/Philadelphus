@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Philadelphus.Business.Entities.Infrastructure
+namespace Philadelphus.Core.Domain.Entities.Infrastructure
 {
     public class DataStorageModel : IDataStorageModel
     {

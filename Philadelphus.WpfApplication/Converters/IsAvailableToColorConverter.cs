@@ -1,4 +1,4 @@
-﻿using Philadelphus.Business.Entities.Enums;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

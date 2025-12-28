@@ -1,5 +1,5 @@
-﻿using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Interfaces;
+﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.WpfApplication.ViewModels.ControlsVMs;
 using Philadelphus.WpfApplication.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using System;

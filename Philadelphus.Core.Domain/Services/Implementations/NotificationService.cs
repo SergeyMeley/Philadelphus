@@ -1,7 +1,7 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.OtherEntities;
-using Philadelphus.Business.Handlers;
-using Philadelphus.Business.Services.Interfaces;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.OtherEntities;
+using Philadelphus.Core.Domain.Handlers;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Business.Services.Implementations
+namespace Philadelphus.Core.Domain.Services.Implementations
 {
     public class NotificationService : INotificationService
     {
