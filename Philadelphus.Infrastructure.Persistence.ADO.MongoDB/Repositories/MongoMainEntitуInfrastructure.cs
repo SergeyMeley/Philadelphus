@@ -2,21 +2,24 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Enums;
 
-namespace Philadelphus.MongoRepository.Repositories
+namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
 {
     public class MongoMainEntitуInfrastructure : IMainEntitiesInfrastructureRepository
     {
         MongoClient _client;
         IMongoDatabase _database;
+
+        public InfrastructureEntityGroups EntityGroup => throw new NotImplementedException();
+
         public MongoMainEntitуInfrastructure()
         {
             _client = Context.CreateConnection();
@@ -29,7 +32,7 @@ namespace Philadelphus.MongoRepository.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeRepository>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -39,7 +42,7 @@ namespace Philadelphus.MongoRepository.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeRoot>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -49,7 +52,7 @@ namespace Philadelphus.MongoRepository.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeNode>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -59,17 +62,7 @@ namespace Philadelphus.MongoRepository.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeLeave>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
-                });
-            }
-            catch (Exception)
-            {
-            }
-            try
-            {
-                BsonClassMap.RegisterClassMap<TestEntitie>(c => {
-                    c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new MongoDB.Bson.Serialization.Serializers.GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -82,9 +75,7 @@ namespace Philadelphus.MongoRepository.Repositories
             result.DbTreeRoots = SelectRoots();
             result.DbTreeNodes = SelectNodes();
             result.DbTreeLeaves = SelectLeaves();
-            result.DbAttributes = SelectAttributes();
-            result.DbAttributeEntries = SelectAttributeEntries();
-            result.DbAttributeValues = SelectAttributeValues();
+
             return result;
         }
         # region [ Select ]
@@ -109,24 +100,6 @@ namespace Philadelphus.MongoRepository.Repositories
         public IEnumerable<TreeLeave> SelectLeaves()
         {
             var collection = _database.GetCollection<TreeLeave>("leaves");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
-        public IEnumerable<ElementAttribute> SelectAttributes()
-        {
-            var collection = _database.GetCollection<ElementAttribute>("attributes");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
-        public IEnumerable<AttributeEntry> SelectAttributeEntries()
-        {
-            var collection = _database.GetCollection<AttributeEntry>("attribute_entries");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
-        public IEnumerable<AttributeValue> SelectAttributeValues()
-        {
-            var collection = _database.GetCollection<AttributeValue>("attribute_values");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
@@ -161,16 +134,6 @@ namespace Philadelphus.MongoRepository.Repositories
             long result = new long();
             return result;
         }
-        public long InsertAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
-        {
-            long result = new long();
-            return result;
-        }
-        public long InsertAttributeValues(IEnumerable<AttributeValue> attributeValues)
-        {
-            long result = new long();
-            return result;
-        }
         #endregion
         #region [ Delete ]
         public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
@@ -194,16 +157,6 @@ namespace Philadelphus.MongoRepository.Repositories
             return result;
         }
         public long DeleteAttributes(IEnumerable<ElementAttribute> attributes)
-        {
-            long result = new long();
-            return result;
-        }
-        public long DeleteAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
-        {
-            long result = new long();
-            return result;
-        }
-        public long DeleteAttributeValues(IEnumerable<AttributeValue> attributeValues)
         {
             long result = new long();
             return result;
@@ -235,37 +188,30 @@ namespace Philadelphus.MongoRepository.Repositories
             long result = new long();
             return result;
         }
-        public long UpdateAttributeEntries(IEnumerable<AttributeEntry> attributeEntries)
-        {
-            long result = new long();
-            return result;
-        }
-        public long UpdateAttributeValues(IEnumerable<AttributeValue> attributeValues)
-        {
-            long result = new long();
-            return result;
-        }
         #endregion
 
 
-        public List<TestEntitie> SelectTest()
+        public bool CheckAvailability()
         {
-            var collection = _database.GetCollection<TestEntitie>("test");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
-        public long InsertTest(IEnumerable<TestEntitie> entitie)
-        {
-            
-            var collection = _database.GetCollection<TestEntitie>("test");
-            foreach (var item in entitie)
-            {
-                collection.InsertOne(item);
-            }
-            return entitie.Count();
+            throw new NotImplementedException();
         }
 
-        public bool CheckAvailability()
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] guids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<ElementAttribute> SelectAttributes()
         {
             throw new NotImplementedException();
         }

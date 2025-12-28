@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.MongoRepository
+namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB
 {
     internal static class Context
     {
