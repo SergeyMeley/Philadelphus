@@ -1,8 +1,8 @@
-﻿using Philadelphus.Business.Entities.Enums;
-using Philadelphus.Business.Entities.RepositoryElements;
-using Philadelphus.Business.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Business.Services.Implementations;
-using Philadelphus.Business.Services.Interfaces;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.Services.Implementations;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using System;
 using System.Collections.Generic;

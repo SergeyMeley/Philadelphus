@@ -1,0 +1,154 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
+using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
+{
+    public class PostgreEfTreeRepositoriesInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
+    {
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositories; }
+
+        private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
+
+        private TreeRepositoriesPhiladelphusContext _context;
+        public PostgreEfTreeRepositoriesInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
+        {
+            _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой   
+            _context = new TreeRepositoriesPhiladelphusContext(connectionString);
+
+            if (CheckAvailability())
+            {
+                //_context.Database.EnsureDeleted();
+                _context.Database.EnsureCreated();
+
+                if (_context.Database.GetPendingMigrations().ToList().Any())
+                {
+                    try
+                    {
+                        _context.Database.Migrate();
+                    }
+                    catch (PostgresException ex) when (ex.SqlState == "42P07") { }
+                    catch (Exception ex) { throw; }
+                }
+            }
+        }
+        public bool CheckAvailability()
+        {
+            using (var context = GetNewContext())
+            {
+                if (context.Database.CanConnect() == false)
+                     return false;
+                try
+                {
+                    if (context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
+                        return false;
+                    context.Database.ExecuteSqlRaw($"SELECT {0}", 1);
+                    context.Database.OpenConnection();
+                    context.Database.CloseConnection();
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+        private TreeRepositoriesPhiladelphusContext GetNewContext() => new TreeRepositoriesPhiladelphusContext(_connectionString);
+        public IEnumerable<TreeRepository> SelectRepositories()
+        {
+            if (CheckAvailability() == false)
+                return null;
+
+            List<TreeRepository> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.Repositories.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
+        }
+        public IEnumerable<TreeRepository> SelectRepositories(Guid[] guids)
+        {
+            if (CheckAvailability() == false)
+                return null;
+
+            List<TreeRepository> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.Repositories.Where(x =>
+                x.AuditInfo.IsDeleted == false
+                && guids.Contains(x.Guid)
+                ).ToList();
+            }
+
+            return result;
+        }
+
+        public long InsertRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                item.AuditInfo.CreatedBy = Environment.UserName;
+                context.Repositories.Add(item);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
+        public long UpdateRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                item.AuditInfo.UpdatedBy = Environment.UserName;
+                context.Update(item);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
+        public long DeleteRepository(TreeRepository item)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                item.AuditInfo.IsDeleted = true;
+                item.AuditInfo.DeletedAt = DateTime.UtcNow;
+                item.AuditInfo.DeletedBy = Environment.UserName;
+                context.Update(item);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
+
+
+    }
+}
