@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.PostgreInfrastructure
+namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL
 {
     internal class Context
     {

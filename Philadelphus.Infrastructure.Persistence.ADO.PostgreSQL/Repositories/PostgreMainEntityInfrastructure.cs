@@ -1,17 +1,15 @@
-﻿using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 
-namespace Philadelphus.PostgreInfrastructure.Repositories
+namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
 {
     public class PostgreMainEntityInfrastructure : IMainEntitiesInfrastructureRepository
     {
         private readonly Context _context;
+
+        public InfrastructureEntityGroups EntityGroup => throw new NotImplementedException();
+
         public PostgreMainEntityInfrastructure()
         {
             _context = new Context();
@@ -73,16 +71,6 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
         public IEnumerable<ElementAttribute> SelectAttributes()
         {
             var result = new List<ElementAttribute>();
-            return result;
-        }
-        public IEnumerable<TreeElementAttribute> SelectAttributeEntries()
-        {
-            var result = new List<TreeElementAttribute>();
-            return result;
-        }
-        public IEnumerable<TreeElementAttributeValue> SelectAttributeValues()
-        {
-            var result = new List<TreeElementAttributeValue>();
             return result;
         }
         #endregion
@@ -176,27 +164,7 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeElementAttribute> SelectAttributeEntries(TreeRepository dbTreeRepository)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeElementAttributeValue> SelectAttributeValues(TreeRepository dbTreeRepository)
-        {
-            throw new NotImplementedException();
-        }
-
         public long InsertAttributes(IEnumerable<ElementAttribute> attributes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long InsertAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long InsertAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }
@@ -226,27 +194,7 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public long DeleteAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long DeleteAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
-        {
-            throw new NotImplementedException();
-        }
-
         public long UpdateAttributes(IEnumerable<ElementAttribute> attributes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long UpdateAttributeEntries(IEnumerable<TreeElementAttribute> attributeEntries)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long UpdateAttributeValues(IEnumerable<TreeElementAttributeValue> attributeValues)
         {
             throw new NotImplementedException();
         }
@@ -282,6 +230,21 @@ namespace Philadelphus.PostgreInfrastructure.Repositories
         }
 
         public bool CheckAvailability()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] guids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
         {
             throw new NotImplementedException();
         }
