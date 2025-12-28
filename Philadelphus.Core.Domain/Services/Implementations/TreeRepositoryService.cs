@@ -9,8 +9,8 @@ using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMem
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.InfrastructureEntities.Interfaces;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {

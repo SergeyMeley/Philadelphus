@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

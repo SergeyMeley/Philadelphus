@@ -1,6 +1,6 @@
-﻿using Philadelphus.InfrastructureEntities.MainEntities;
+﻿using Philadelphus.Infrastructure.Persistence.MainEntities;
 
-namespace Philadelphus.InfrastructureEntities.Interfaces
+namespace Philadelphus.Infrastructure.Persistence.Interfaces
 {
     public interface IMainEntitiesInfrastructureRepository : IInfrastructureRepository
     {

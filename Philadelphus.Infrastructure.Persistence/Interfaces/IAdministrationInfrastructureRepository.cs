@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureEntities.Interfaces
+namespace Philadelphus.Infrastructure.Persistence.Interfaces
 {
     public interface IAdministrationInfrastructureRepository : IInfrastructureRepository
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Philadelphus.InfrastructureEntities.MainEntities
+namespace Philadelphus.Infrastructure.Persistence.MainEntities
 {
     public abstract class MainEntityBase : IMainEntity
     {

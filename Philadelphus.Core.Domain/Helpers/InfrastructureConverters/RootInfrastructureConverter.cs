@@ -3,7 +3,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.Factories;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,9 +1,9 @@
 ﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.Interfaces;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

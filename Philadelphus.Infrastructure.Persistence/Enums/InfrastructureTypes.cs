@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureEntities.Enums
+namespace Philadelphus.Infrastructure.Persistence.Enums
 {
     public enum InfrastructureTypes
     {

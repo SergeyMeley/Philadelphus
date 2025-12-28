@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureEntities.OtherEntities
+namespace Philadelphus.Infrastructure.Persistence.OtherEntities
 {
     public class TreeRepositoryHeadersCollection
     {

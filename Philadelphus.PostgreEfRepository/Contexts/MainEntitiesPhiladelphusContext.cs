@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using Philadelphus.PostgreEfRepository.Configurations;
 using System;
 using System.Collections.Generic;

@@ -28,7 +28,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeLeave", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeLeave", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -80,7 +80,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                     b.ToTable("tree_leaves", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -139,7 +139,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                     b.ToTable("tree_nodes", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -186,17 +186,17 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                     b.ToTable("tree_roots", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeLeave", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeLeave", b =>
                 {
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", "ParentTreeNode")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", "ParentTreeNode")
                         .WithMany()
                         .HasForeignKey("ParentGuid");
 
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", "ParentTreeRoot")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", "ParentTreeRoot")
                         .WithMany()
                         .HasForeignKey("ParentTreeRootGuid");
 
-                    b.OwnsOne("Philadelphus.InfrastructureEntities.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeLeaveGuid")
                                 .ValueGeneratedOnAdd()
@@ -261,21 +261,21 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                     b.Navigation("ParentTreeRoot");
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", b =>
                 {
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", "ParentTreeRoot")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", "ParentTreeRoot")
                         .WithMany()
                         .HasForeignKey("ParentGuid");
 
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeNode", "ParentTreeNode")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", "ParentTreeNode")
                         .WithMany()
                         .HasForeignKey("ParentTreeNodeGuid");
 
-                    b.HasOne("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", null)
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", null)
                         .WithMany("ChildTreeNodes")
                         .HasForeignKey("TreeRootGuid");
 
-                    b.OwnsOne("Philadelphus.InfrastructureEntities.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeNodeGuid")
                                 .ValueGeneratedOnAdd()
@@ -340,9 +340,9 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                     b.Navigation("ParentTreeRoot");
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
                 {
-                    b.OwnsOne("Philadelphus.InfrastructureEntities.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeRootGuid")
                                 .ValueGeneratedOnAdd()
@@ -403,7 +403,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations.MainEntitiesPhiladelphusCo
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
                 {
                     b.Navigation("ChildTreeNodes");
                 });

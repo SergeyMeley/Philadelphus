@@ -1,4 +1,4 @@
-﻿using Philadelphus.InfrastructureEntities.Enums;
+﻿using Philadelphus.Infrastructure.Persistence.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

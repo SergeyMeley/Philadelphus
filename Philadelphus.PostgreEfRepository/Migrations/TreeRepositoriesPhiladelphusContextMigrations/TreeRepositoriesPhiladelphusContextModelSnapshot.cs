@@ -25,7 +25,7 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRepository", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRepository", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -62,9 +62,9 @@ namespace Philadelphus.PostgreEfRepository.Migrations.TreeRepositoriesPhiladelph
                     b.ToTable("tree_repositories", "repositories");
                 });
 
-            modelBuilder.Entity("Philadelphus.InfrastructureEntities.MainEntities.TreeRepository", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRepository", b =>
                 {
-                    b.OwnsOne("Philadelphus.InfrastructureEntities.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeRepositoryGuid")
                                 .ValueGeneratedOnAdd()

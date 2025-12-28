@@ -2,8 +2,8 @@
 using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,8 +2,9 @@
 using Philadelphus.Core.Domain.Entities.ElementsProperties;
 using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.OtherEntities;
+using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.OtherEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace Philadelphus.Core.Domain.Mapping
         private IDataStorageModel GetDataStorage(Guid guid)
         {
             var builder = new DataStorageBuilder()
-                    .SetGeneralParameters("test", "test", guid, InfrastructureEntities.Enums.InfrastructureTypes.PostgreSqlEf, isDisabled: false);
+                    .SetGeneralParameters("test", "test", guid, InfrastructureTypes.PostgreSqlEf, isDisabled: false);
             return builder.Build();
         }
     }

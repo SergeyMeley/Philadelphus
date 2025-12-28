@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureEntities.MainEntities
+namespace Philadelphus.Infrastructure.Persistence.MainEntities
 {
-    public class TreeNode : TreeNodeMemberBase
+    public class TreeLeave : TreeNodeMemberBase
     {
-        public TreeNode()
+        public TreeLeave()
         {
 
         }

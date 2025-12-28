@@ -1,11 +1,11 @@
-﻿using Philadelphus.InfrastructureEntities.Interfaces;
+﻿using Philadelphus.Infrastructure.Persistence.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureEntities.MainEntities
+namespace Philadelphus.Infrastructure.Persistence.MainEntities
 {
     public class TreeRepository
     {

@@ -5,9 +5,9 @@ using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.Interfaces;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using Philadelphus.JsonRepository.Repositories;
 
 namespace Philadelphus.Core.Domain.Services.Implementations

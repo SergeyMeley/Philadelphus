@@ -1,5 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.InfrastructureEntities.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -3,7 +3,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Implementations;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using System.Collections.Generic;
 
 namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers

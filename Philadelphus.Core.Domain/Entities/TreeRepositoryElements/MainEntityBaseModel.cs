@@ -4,7 +4,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services;
-using Philadelphus.InfrastructureEntities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -7,7 +7,7 @@ using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.InfrastructureEntities.OtherEntities;
+using Philadelphus.Infrastructure.Persistence.OtherEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Models.Entities.Enums;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;

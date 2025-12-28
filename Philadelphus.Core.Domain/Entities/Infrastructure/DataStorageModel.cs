@@ -1,6 +1,6 @@
-﻿using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.Interfaces;
-using Philadelphus.InfrastructureEntities.OtherEntities;
+﻿using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.OtherEntities;
 using Philadelphus.PostgreEfRepository.Repositories;
 using System;
 using System.Collections.Generic;

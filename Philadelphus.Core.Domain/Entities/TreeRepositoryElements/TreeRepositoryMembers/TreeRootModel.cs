@@ -6,10 +6,10 @@ using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMem
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Implementations;
-using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.Interfaces;
-using Philadelphus.InfrastructureEntities.MainEntities;
-using Philadelphus.InfrastructureEntities.OtherEntities;
+using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.OtherEntities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

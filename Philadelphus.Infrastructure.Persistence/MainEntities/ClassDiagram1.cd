@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbAttribute">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbAttribute">
     <Position X="8" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
       <FileName>MainEntities\DbAttribute.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbAttributeEntry">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbAttributeEntry">
     <Position X="12.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAAAIAAAAAAAAEAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
       <FileName>MainEntities\DbAttributeEntry.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbAttributeValue" Collapsed="true">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbAttributeValue" Collapsed="true">
     <Position X="21.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>MainEntities\DbAttributeValue.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbEntityBase" Collapsed="true">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbEntityBase" Collapsed="true">
     <Position X="13.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gEQCEAAAAQIgAAQAAAAgAAQAAAACAAAAIBAAAQEAAAk=</HashCode>
@@ -29,42 +29,42 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbMainEntitiesCollection" Collapsed="true">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbMainEntitiesCollection" Collapsed="true">
     <Position X="23.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAABAAAAAAAAAAAAAAAAIAAAA=</HashCode>
       <FileName>MainEntities\DbMainEntitiesCollection.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbTreeLeave">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbTreeLeave">
     <Position X="14.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAQAAAEAAAAAAAAAAAAAQAAAAEAAAA=</HashCode>
       <FileName>MainEntities\DbTreeLeave.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbTreeNode">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbTreeNode">
     <Position X="17" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAEAAAAAYAAAAAAEAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>MainEntities\DbTreeNode.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbTreeRepository">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbTreeRepository">
     <Position X="19.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAIAAAAAAAAAAAAEAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
       <FileName>MainEntities\DbTreeRepository.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.InfrastructureEntities.MainEntities.DbTreeRoot">
+  <Class Name="Philadelphus.Infrastructure.Persistence.MainEntities.DbTreeRoot">
     <Position X="10.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAEAAAAAAACAAAAAAAAAAAEAAA=</HashCode>
       <FileName>MainEntities\DbTreeRoot.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="Philadelphus.InfrastructureEntities.MainEntities.IDbEntity" Collapsed="true">
+  <Interface Name="Philadelphus.Infrastructure.Persistence.MainEntities.IDbEntity" Collapsed="true">
     <Position X="21.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gEQCEAAAAQIgAAQAAAAgAAQAAAACAAAAIBAAAQEAAAk=</HashCode>

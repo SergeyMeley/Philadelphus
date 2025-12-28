@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.InfrastructureEntities", "Philadelphus.InfrastructureEntities\Philadelphus.InfrastructureEntities.csproj", "{CD0C41D0-E17A-40A7-BB3B-517CD5925607}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.JsonRepository", "Philadelphus.JsonRepository\Philadelphus.JsonRepository.csproj", "{2293A057-A732-4CB2-A55E-4AB40F0608E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.PostgreEfRepository", "Philadelphus.PostgreEfRepository\Philadelphus.PostgreEfRepository.csproj", "{6AD15292-D11C-4F4F-9004-A95CDC6B79F2}"
@@ -27,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Presentation.Wpf.UI", "Philadelphus.Presentation.Wpf.UI\Philadelphus.Presentation.Wpf.UI.csproj", "{F433DDA5-2381-77F3-D7A3-4556E3A5A7A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Infrastructure.Persistence", "Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj", "{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,18 +37,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Debug|x64.Build.0 = Debug|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Debug|x86.Build.0 = Debug|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Release|x64.ActiveCfg = Release|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Release|x64.Build.0 = Release|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Release|x86.ActiveCfg = Release|Any CPU
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607}.Release|x86.Build.0 = Release|Any CPU
 		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2293A057-A732-4CB2-A55E-4AB40F0608E0}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -145,12 +133,23 @@ Global
 		{F433DDA5-2381-77F3-D7A3-4556E3A5A7A2}.Release|x64.Build.0 = Release|Any CPU
 		{F433DDA5-2381-77F3-D7A3-4556E3A5A7A2}.Release|x86.ActiveCfg = Release|Any CPU
 		{F433DDA5-2381-77F3-D7A3-4556E3A5A7A2}.Release|x86.Build.0 = Release|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Debug|x64.Build.0 = Debug|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Debug|x86.Build.0 = Debug|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x64.ActiveCfg = Release|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x64.Build.0 = Release|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x86.ActiveCfg = Release|Any CPU
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CD0C41D0-E17A-40A7-BB3B-517CD5925607} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 		{2293A057-A732-4CB2-A55E-4AB40F0608E0} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 		{6AD15292-D11C-4F4F-9004-A95CDC6B79F2} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 		{E2E884D7-7D88-4F72-9DE8-EEA0B0B72B96} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
@@ -158,6 +157,7 @@ Global
 		{3E237804-472C-82EB-053F-020551B8CC3A} = {6558A576-9D1A-4AB4-AEEB-67817F483F92}
 		{53B08518-A3F4-57A0-334A-58C30F9D12D6} = {6558A576-9D1A-4AB4-AEEB-67817F483F92}
 		{F433DDA5-2381-77F3-D7A3-4556E3A5A7A2} = {17750060-FDCC-46D1-A11C-63FE25B3834B}
+		{1C7997D1-4C59-DC18-E7A9-F82D5113B6A7} = {A025AF26-72D2-4CA8-8D4D-2C8CE5775DC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A13A6B9-A071-4F84-A320-35B662A7FE44}

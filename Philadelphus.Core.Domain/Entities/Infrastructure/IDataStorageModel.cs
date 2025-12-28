@@ -1,5 +1,5 @@
-﻿using Philadelphus.InfrastructureEntities.Enums;
-using Philadelphus.InfrastructureEntities.Interfaces;
+﻿using Philadelphus.Infrastructure.Persistence.Enums;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
