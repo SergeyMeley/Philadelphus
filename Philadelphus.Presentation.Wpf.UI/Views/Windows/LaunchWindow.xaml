@@ -1,0 +1,141 @@
+﻿<Window x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.LaunchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
+        xmlns:lbs="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.CollectionControls.ListBoxes"
+        xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
+        xmlns:detail="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids"
+        xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters"
+        mc:Ignorable="d"
+        Title="Выбор репозитория"
+        MinHeight="500" MinWidth="1000"
+        WindowState="Maximized">
+    <Window.Visibility>
+        <Binding Path="StartWindowVisibility"/>
+    </Window.Visibility>
+    <Window.Resources>
+        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
+
+        <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
+        <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Padding" Value="4,4,4,4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TabControlNormalBorderBrush}"/>
+            <Setter Property="Background" Value="#F9F9F9"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" 
+                                        Orientation="Vertical" 
+                                        IsItemsHost="True"/>
+                            <Border Grid.Column="1" 
+                                    x:Name="ContentPanel" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    Background="{TemplateBinding Background}" 
+                                    KeyboardNavigation.DirectionalNavigation="Contained" 
+                                    KeyboardNavigation.TabIndex="2" 
+                                    KeyboardNavigation.TabNavigation="Local">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" 
+                                                  ContentSource="SelectedContent" 
+                                                  Margin="{TemplateBinding Padding}" 
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LeftVerticalTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Border Name="Border" BorderThickness="1,1,0,1" BorderBrush="LightSlateGray" Margin="1">
+                                <StackPanel Orientation="Vertical" 
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Height="75"
+                                            Width="90"
+                                            Margin="5,5">
+                                    <ContentControl Content="{TemplateBinding Tag}"
+                                           Width="45" Height="45" 
+                                           Margin="0,5,0,0"/>
+                                    <TextBlock Text="{TemplateBinding Header}" 
+                                               HorizontalAlignment="Center"
+                                               Margin="0,5,0,5"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
+            <TabItem Header="Главная" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageRepository}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto" MaxHeight="300"></RowDefinition>
+                        <RowDefinition Height="4*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" Margin="10">
+                        <Run Text="Здравствуйте, "></Run><Run Text="{Binding UserName, Mode=OneWay}" FontWeight="Bold"></Run><Run Text="!"></Run>
+                        <Run Text="Выберите репозиторий для начала работы или создайте новый"></Run>
+                    </TextBlock>
+                    <GroupBox Grid.Row="1" Header="Создать">
+                        <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}"></ctrls:RepositoryCreation>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Header="Открыть">
+                        <ctrls:FavoriteAndLastRepositoryHeaders></ctrls:FavoriteAndLastRepositoryHeaders>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Создать" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageAdd}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}" Grid.Row="0"></ctrls:RepositoryCreation>
+                    <GroupBox Grid.Row="1" Header="Выбор шаблона">
+                        <ListBox>
+                            <ListBoxItem Content="Пустой репозиторий" Height="50"></ListBoxItem>
+                        </ListBox>
+                    </GroupBox>
+
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Открыть" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageOpen}">
+                <ctrls:RepositoryOpen></ctrls:RepositoryOpen>
+            </TabItem>
+
+            <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+                <!--<ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>-->
+                <ctrls:DataStorageHeaders></ctrls:DataStorageHeaders>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
