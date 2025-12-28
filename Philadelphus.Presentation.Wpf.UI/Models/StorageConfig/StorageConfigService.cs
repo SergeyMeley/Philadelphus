@@ -1,7 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.PostgreEfRepository.Repositories;
+using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
