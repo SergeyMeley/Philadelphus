@@ -27,7 +27,7 @@ namespace Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositor
         public List<TreeLeaveModel> ChildTreeLeaves { get => Childs.Where(x => x.GetType() == typeof(TreeLeaveModel)).Cast<TreeLeaveModel>().ToList(); }
         public List<IChildrenModel> Childs { get; set; } = new List<IChildrenModel>();
         public override IDataStorageModel DataStorage { get => ParentRoot.OwnDataStorage; }
-        internal TreeNodeModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
+        internal TreeNodeModel(Guid uuid, IParentModel parent, IMainEntity dbEntity) : base(uuid, parent, dbEntity)
         {
             if (SetParents(parent))
             {

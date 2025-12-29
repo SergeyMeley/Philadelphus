@@ -16,9 +16,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
         {
             builder.ToTable("tree_roots", "main_entities");
 
-            builder.HasKey(x => x.Guid).HasName("tree_roots_pkey");
+            builder.HasKey(x => x.Uuid).HasName("tree_roots_pkey");
 
-            builder.Property(x => x.Guid)
+            builder.Property(x => x.Uuid)
                 .HasColumnName("uuid")
                 .IsRequired()
                 .ValueGeneratedOnAdd()
@@ -43,7 +43,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
             builder.Property(x => x.IsLegacy)
                 .HasColumnName("is_legacy");
 
-            builder.Property(x => x.OwnDataStorageGuid)
+            builder.Property(x => x.OwnDataStorageUuid)
                 .HasColumnName("data_storage_uuid")
                   .IsRequired();
 

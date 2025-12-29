@@ -16,9 +16,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
         {
             builder.ToTable("tree_nodes", "main_entities");
 
-            builder.HasKey(x => x.Guid).HasName("tree_nodes_pkey");
+            builder.HasKey(x => x.Uuid).HasName("tree_nodes_pkey");
 
-            builder.Property(x => x.Guid)
+            builder.Property(x => x.Uuid)
                 .HasColumnName("uuid")
                 .IsRequired()
                 .ValueGeneratedOnAdd()
@@ -79,21 +79,21 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                     .HasColumnName("deleted_by");
             });
 
-            builder.Property(x => x.ParentTreeRootGuid)
+            builder.Property(x => x.ParentTreeRootUuid)
                 .HasColumnName("parent_tree_root_uuid");
 
-            builder.Property(x => x.ParentTreeNodeGuid)
+            builder.Property(x => x.ParentTreeNodeUuid)
                 .HasColumnName("parent_tree_node_uuid");
 
             builder.Ignore(x => x.Parent);
 
             builder.HasOne(x => x.ParentTreeRoot)
               .WithMany()
-              .HasForeignKey(x => x.ParentTreeRootGuid);
+              .HasForeignKey(x => x.ParentTreeRootUuid);
 
             //builder.HasOne(x => x.ParentTreeNode)
             //      .WithMany()
-            //      .HasForeignKey(x => x.ParentGuid);
+            //      .HasForeignKey(x => x.ParentTreeNodeUuid);
 
         }
     }

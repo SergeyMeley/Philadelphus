@@ -27,7 +27,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
-        public Guid Guid { get => _model.Guid; }
+        public Guid Uuid { get => _model.Uuid; }
         public string Name { get => _model.Name; set => _model.Name = value; }
         public string Description { get => _model.Description; set => _model.Description = value; }
         public AuditInfoModel AuditInfo { get => _model.AuditInfo; }
@@ -57,7 +57,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
         public ObservableCollection<TreeRootVM> Childs { get => _childs; }
 
-        public string ChildsCount { get => $"Детей: {Childs.Count()}, Корней: {_model.ChildTreeRoots?.Count()}, Uuids: {_model.ChildsGuids?.Count}"; }
+        public string ChildsCount { get => $"Детей: {Childs.Count()}, Корней: {_model.ChildTreeRoots?.Count()}, Uuids: {_model.ChildsUuids?.Count}"; }
 
         public bool IsFavorite
         {

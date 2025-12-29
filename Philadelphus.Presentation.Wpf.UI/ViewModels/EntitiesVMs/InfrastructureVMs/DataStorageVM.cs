@@ -22,11 +22,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 return _model;
             }
         }
-        public Guid Guid 
+        public Guid Uuid 
         { 
             get
             {
-                return _model.Guid;
+                return _model.Uuid;
             }
         }
         public string Name 

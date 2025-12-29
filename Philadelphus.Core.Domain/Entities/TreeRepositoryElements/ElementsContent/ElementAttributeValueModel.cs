@@ -21,7 +21,7 @@ namespace Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsConte
 
         public override IDataStorageModel DataStorage => throw new NotImplementedException();
 
-        public ElementAttributeValueModel(Guid guid, IMainEntity dbEntity) : base(guid, dbEntity)
+        public ElementAttributeValueModel(Guid uuid, IMainEntity dbEntity) : base(uuid, dbEntity)
         {
 
         }

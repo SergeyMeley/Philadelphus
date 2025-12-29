@@ -234,17 +234,17 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] guids)
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids)
         {
             throw new NotImplementedException();
         }

@@ -27,7 +27,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                     var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
                     if (currentRepositoryVM != null)
                     {
-                        var headerVM = launchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Guid == currentRepositoryVM.Guid);
+                        var headerVM = launchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Uuid == currentRepositoryVM.Uuid);
                         if (headerVM == null)
                         {
                             headerVM = launchVM.RepositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(currentRepositoryVM);

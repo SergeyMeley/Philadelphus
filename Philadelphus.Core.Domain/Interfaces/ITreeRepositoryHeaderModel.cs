@@ -10,7 +10,7 @@ namespace Philadelphus.Core.Domain.Interfaces
 {
     public interface ITreeRepositoryHeaderModel
     {
-        public Guid Guid { get; }
+        public Guid Uuid { get; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public string OwnDataStorageName { get; set; }

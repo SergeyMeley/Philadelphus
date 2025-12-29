@@ -33,8 +33,8 @@
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="2" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}"></TextBox>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description, Mode=OneWay}" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}" Margin="2"></TextBox>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Guid" Margin="2"></TextBlock>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Guid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="2"></TextBlock>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Тип хранилища" Margin="2"></TextBlock>
         <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding InfrastructureType, Mode=OneWay}" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}" Margin="2"></TextBox>
         <TextBlock Grid.Row="5" Grid.Column="0" Text="Доступен" Margin="2"></TextBlock>

@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.RepositoryElements
 {
-    public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByGuidModel
+    public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByUuidModel
     {
         //TODO: Во всех IMainEntityModel при изменении значения свойств обновлять статус
         protected virtual string DefaultFixedPartOfName { get => "Новая основная сущность"; }
         public abstract EntityTypesModel EntityType { get; }
-        public Guid Guid { get; protected set; }
+        public Guid Uuid { get; protected set; }
 
         private string _name;
         public string Name 
@@ -46,17 +46,17 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements
         public State State { get => _state; }
         public IMainEntity DbEntity { get; set; }
         public abstract IDataStorageModel DataStorage { get; }
-        public MainEntityBaseModel(Guid guid, IMainEntity dbEntity)
+        public MainEntityBaseModel(Guid uuid, IMainEntity dbEntity)
         {
             DbEntity = dbEntity;
-            Guid = guid;
+            Uuid = uuid;
         }
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(Name);
             sb.AppendLine();
-            sb.Append(Guid);
+            sb.Append(Uuid);
             return sb.ToString();
         }
         bool IMainEntityWritableModel.SetState(State newState)

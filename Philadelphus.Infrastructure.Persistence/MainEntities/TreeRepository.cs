@@ -9,13 +9,13 @@ namespace Philadelphus.Infrastructure.Persistence.MainEntities
 {
     public class TreeRepository
     {
-        public Guid Guid { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public virtual AuditInfo AuditInfo { get; set; } = new AuditInfo();
-        public Guid OwnDataStorageGuid { get; set; }
-        public Guid[] DataStoragesGuids { get; set; }
-        public Guid[] ChildTreeRootsGuids { get; set; }
+        public Guid OwnDataStorageUuid { get; set; }
+        public Guid[] DataStoragesUuids { get; set; }
+        public Guid[] ChildTreeRootsUuids { get; set; }
         public TreeRepository()
         {
             

@@ -20,8 +20,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
     {
         #region [ Get + Load ]
 
-        public IMainEntity GetEntityFromCollection(Guid guid);
-        public IMainEntityModel GetModelFromCollection(Guid guid);
+        public IMainEntity GetEntityFromCollection(Guid uuid);
+        public IMainEntityModel GetModelFromCollection(Guid uuid);
         public TreeRepositoryModel LoadMainEntityCollection(TreeRepositoryModel repository);
         public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel repository);
         public TreeRootModel GetRootContent(TreeRootModel root);

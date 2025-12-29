@@ -23,7 +23,7 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers
         public List<ElementAttributeModel> PersonalAttributes { get; set; } = new List<ElementAttributeModel>();
         public List<ElementAttributeModel> ParentElementAttributes { get; set; } = new List<ElementAttributeModel>();
         public override IDataStorageModel DataStorage { get; }
-        internal TreeRepositoryMemberBaseModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, dbEntity)
+        internal TreeRepositoryMemberBaseModel(Guid uuid, IParentModel parent, IMainEntity dbEntity) : base(uuid, dbEntity)
         {
             SetParents(parent);
         }

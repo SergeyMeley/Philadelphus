@@ -13,7 +13,7 @@
 //{
 //    internal static class MainEntityFactory
 //    {
-//        internal static IMainEntityModel CreateMainEntitiesRepositoriesFactory(EntityTypesModel entityType, Guid guid)
+//        internal static IMainEntityModel CreateMainEntitiesRepositoriesFactory(EntityTypesModel entityType, Guid uuid)
 //        {
 //            IMainEntityModel mainEntity;
 //            switch (entityType)
@@ -22,19 +22,19 @@
 //                    mainEntity = null;
 //                    break;
 //                case EntityTypesModel.Repository:
-//                    mainEntity = new TreeRepositoryModel(guid);
+//                    mainEntity = new TreeRepositoryModel(uuid);
 //                    break;
 //                case EntityTypesModel.Root:
-//                    mainEntity = new TreeRootModel(guid, null);
+//                    mainEntity = new TreeRootModel(uuid, null);
 //                    break;
 //                case EntityTypesModel.Node:
-//                    mainEntity = new TreeNodeModel(guid, null);
+//                    mainEntity = new TreeNodeModel(uuid, null);
 //                    break;
 //                case EntityTypesModel.Leave:
-//                    mainEntity = new TreeLeaveModel(guid, null);
+//                    mainEntity = new TreeLeaveModel(uuid, null);
 //                    break;
 //                case EntityTypesModel.Attribute:
-//                    mainEntity = new ElementAttributeModel(guid, null);
+//                    mainEntity = new ElementAttributeModel(uuid, null);
 //                    break;
 //                default:
 //                    mainEntity = null;

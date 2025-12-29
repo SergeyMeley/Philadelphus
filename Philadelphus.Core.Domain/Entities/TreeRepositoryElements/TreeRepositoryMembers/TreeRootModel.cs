@@ -45,7 +45,7 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers
         public IParentModel Parent {  get; private set; }
         public List<TreeNodeModel> ChildTreeNodes { get => Childs.Where(x => x.GetType() == typeof(TreeNodeModel)).Cast<TreeNodeModel>().ToList(); }
         public List<IChildrenModel> Childs { get; set; }
-        internal TreeRootModel(Guid guid, TreeRepositoryModel parent, IDataStorageModel dataStorage, IMainEntity dbEntity) : base(guid, parent, dbEntity)
+        internal TreeRootModel(Guid uuid, TreeRepositoryModel parent, IDataStorageModel dataStorage, IMainEntity dbEntity) : base(uuid, parent, dbEntity)
         {
             if (SetParents(parent))
             {

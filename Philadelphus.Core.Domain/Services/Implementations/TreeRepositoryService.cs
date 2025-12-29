@@ -58,20 +58,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получение элемента репозитория по его UUID
         /// </summary>
-        /// <param name="guid">UUID элемента репозитория</param>
+        /// <param name="uuid">UUID элемента репозитория</param>
         /// <returns>Элемент репозитория</returns>
-        public IMainEntity GetEntityFromCollection(Guid guid)
+        public IMainEntity GetEntityFromCollection(Guid uuid)
         {
-            return GetModelFromCollection(guid).ToDbEntity();
+            return GetModelFromCollection(uuid).ToDbEntity();
         }
         /// <summary>
         /// Получение элемента репозитория (модель) по его UUID
         /// </summary>
-        /// <param name="guid">UUID элемента репозитория</param>
+        /// <param name="uuid">UUID элемента репозитория</param>
         /// <returns>Элемент репозитория (модель)</returns>
-        public IMainEntityModel GetModelFromCollection(Guid guid)
+        public IMainEntityModel GetModelFromCollection(Guid uuid)
         {
-            return _mainEntityCollection.FirstOrDefault(x => x.Guid == guid);
+            return _mainEntityCollection.FirstOrDefault(x => x.Uuid == uuid);
         }
         /// <summary>
         /// Загрузить коллекцию элементов репозитория
@@ -86,11 +86,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (infrastructure is IMainEntitiesInfrastructureRepository
                     && dataStorage.IsAvailable)
                 {
-                    var dbRoots = infrastructure.SelectRoots(repository.ChildsGuids?.ToArray());
+                    var dbRoots = infrastructure.SelectRoots(repository.ChildsUuids?.ToArray());
                     var roots = dbRoots?.ToModelCollection(repository.DataStorages, new List<TreeRepositoryModel>() { repository });
                     MainEntityCollection.DataTreeRoots.AddRange(roots);
 
-                    var dbNodes = infrastructure.SelectNodes(repository.ChildsGuids?.ToArray());
+                    var dbNodes = infrastructure.SelectNodes(repository.ChildsUuids?.ToArray());
                     var nodes = dbNodes?.ToModelCollection(MainEntityCollection.DataTreeRoots);
                     while (nodes.Count > 0)
                     {
@@ -98,7 +98,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         nodes = dbNodes?.ToModelCollection(nodes);
                     }
                     
-                    var dbLeaves = infrastructure.SelectLeaves(repository.ChildsGuids?.ToArray());
+                    var dbLeaves = infrastructure.SelectLeaves(repository.ChildsUuids?.ToArray());
                     var leaves = dbLeaves?.ToModelCollection(MainEntityCollection.DataTreeNodes);
                     MainEntityCollection.DataTreeLeaves.AddRange(leaves);
 
@@ -123,7 +123,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             repository.Childs.Clear();
 
-            var childRoots = MainEntityCollection.DataTreeRoots.Where(x => x.ParentRepository.Guid == repository.Guid);
+            var childRoots = MainEntityCollection.DataTreeRoots.Where(x => x.ParentRepository.Uuid == repository.Uuid);
 
             if (childRoots != null)
             {
@@ -151,7 +151,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             root.Childs.Clear();
 
-            var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == root.Guid);
+            var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Uuid == root.Uuid);
 
             if (childNodes != null)
             {
@@ -180,7 +180,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             node.Childs.Clear();
 
-            var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Guid == node.Guid);
+            var childNodes = MainEntityCollection.DataTreeNodes.Where(x => x.Parent.Uuid == node.Uuid);
 
             if (childNodes != null)
             {
@@ -196,7 +196,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
             }
 
-            var childLeaves = MainEntityCollection.DataTreeLeaves.Where(x => x.Parent.Guid == node.Guid);
+            var childLeaves = MainEntityCollection.DataTreeLeaves.Where(x => x.Parent.Uuid == node.Uuid);
 
             if (childLeaves != null)
             {
@@ -233,7 +233,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
 
             attributeOwner.PersonalAttributes.Clear();
-            var attributes = MainEntityCollection.ElementAttributes.Where(x => x.Owner.Guid == attributeOwner.Guid);
+            var attributes = MainEntityCollection.ElementAttributes.Where(x => x.Owner.Uuid == attributeOwner.Uuid);
             if (attributes != null)
             {
                 foreach (var attribute in attributes)
@@ -290,7 +290,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 return 0;
             foreach (var treeRoot in treeRoots)
             {
-                if (treeRoot.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Guid == treeRoot.Guid) == false)
+                if (treeRoot.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Uuid == treeRoot.Uuid) == false)
                 {
                     _mainEntityCollection.DataTreeRoots.Add(treeRoot);
                 }
@@ -325,7 +325,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 return 0;
             foreach (var treeNode in treeNodes)
             {
-                if (treeNode.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Guid == treeNode.Guid) == false)
+                if (treeNode.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Uuid == treeNode.Uuid) == false)
                 {
                     _mainEntityCollection.DataTreeNodes.Add(treeNode);
                 }
@@ -361,7 +361,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 return 0;
             foreach (var treeLeave in treeLeaves)
             {
-                if (treeLeave.State == State.Initialized && _mainEntityCollection.DataTreeLeaves.Any(x => x.Guid == treeLeave.Guid) == false)
+                if (treeLeave.State == State.Initialized && _mainEntityCollection.DataTreeLeaves.Any(x => x.Uuid == treeLeave.Uuid) == false)
                 {
                     _mainEntityCollection.DataTreeLeaves.Add(treeLeave);
                 }
@@ -396,7 +396,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             //TODO: Вынести в отдельный метод AddInitialized
             foreach (var elementAttribute in elementAttributes)
             {
-                if (elementAttribute.State == State.Initialized && _mainEntityCollection.ElementAttributes.Any(x => x.Guid == elementAttribute.Guid) == false)
+                if (elementAttribute.State == State.Initialized && _mainEntityCollection.ElementAttributes.Any(x => x.Uuid == elementAttribute.Uuid) == false)
                 {
                     _mainEntityCollection.ElementAttributes.Add(elementAttribute);
                 }
@@ -418,7 +418,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             foreach (var elementAttribute in elementAttributes)
             {
                 if ((elementAttribute.State == State.ForHardDelete || elementAttribute.State == State.ForSoftDelete || elementAttribute.State == State.SoftDeleted) 
-                    && _mainEntityCollection.Any(x => x.Guid == elementAttribute.Guid) == false)
+                    && _mainEntityCollection.Any(x => x.Uuid == elementAttribute.Uuid) == false)
                 {
                     _mainEntityCollection.Remove(elementAttribute);
                 }

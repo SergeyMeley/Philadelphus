@@ -9,6 +9,7 @@ using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
 using Philadelphus.Infrastructure.Persistence.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
@@ -68,41 +69,41 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получение репозитория по его UUID
         /// </summary>
-        /// <param name="guid">UUID</param>
+        /// <param name="uuid">UUID</param>
         /// <returns>Репозиторий</returns>
-        public TreeRepository GetTreeRepositoryFromCollection(Guid guid)
+        public TreeRepository GetTreeRepositoryFromCollection(Guid uuid)
         {
-            return GetTreeRepositoryModelFromCollection(guid).ToDbEntity();
+            return GetTreeRepositoryModelFromCollection(uuid).ToDbEntity();
         }
         /// <summary>
         /// Получение коллекции репозиториев по их UUID
         /// </summary>
-        /// <param name="guids">UUIDs</param>
+        /// <param name="uuids">UUIDs</param>
         /// <returns>Коллекция репозиториев</returns>
-        public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> guids)
+        public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> uuids)
         {
-            return GetTreeRepositoryModelFromCollection(guids).ToDbEntityCollection();
+            return GetTreeRepositoryModelFromCollection(uuids).ToDbEntityCollection();
         }
         /// <summary>
         /// Получение репозитория (модель) по его UUID
         /// </summary>
-        /// <param name="guid">UUID</param>
+        /// <param name="uuid">UUID</param>
         /// <returns>Репозиторий (модель)</returns>
-        public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid guid)
+        public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid uuid)
         {
-            return _dataTreeRepositories[guid];
+            return _dataTreeRepositories[uuid];
         }
         /// <summary>
         /// Получение коллекции репозиториев (модели) по их UUID
         /// </summary>
-        /// <param name="guids">UUIDs</param>
+        /// <param name="uuids">UUIDs</param>
         /// <returns>Коллекция репозиториев (модели)</returns>
-        public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> guids)
+        public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> uuids)
         {
             var result = new List<TreeRepositoryModel>();
-            foreach (var guid in guids)
+            foreach (var uuid in uuids)
             {
-                if (_dataTreeRepositories.TryGetValue(guid, out var model))
+                if (_dataTreeRepositories.TryGetValue(uuid, out var model))
                 {
                     result.Add(model);
                 }
@@ -112,23 +113,23 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получение хранилища данных (модель) по его UUID
         /// </summary>
-        /// <param name="guid">UUID</param>
+        /// <param name="uuid">UUID</param>
         /// <returns>Хранилище данных (модель)</returns>
-        public IDataStorageModel GetStorageModelFromCollection(Guid guid)
+        public IDataStorageModel GetStorageModelFromCollection(Guid uuid)
         {
-            return _dataStorages[guid];
+            return _dataStorages[uuid];
         }
         /// <summary>
         /// Получение коллекции хранилищ данных (модели) по их UUID
         /// </summary>
-        /// <param name="guids">UUIDs</param>
+        /// <param name="uuids">UUIDs</param>
         /// <returns>Коллекция хранилищ данных (модели)</returns>
-        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> guids)
+        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> uuids)
         {
             var result = new List<IDataStorageModel>();
-            foreach (var guid in guids)
+            foreach (var uuid in uuids)
             {
-                if (_dataStorages.TryGetValue(guid, out var model))
+                if (_dataStorages.TryGetValue(uuid, out var model))
                 {
                     result.Add(model);
                 }
@@ -150,14 +151,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Получение коллекции репозиториев (модели) по их UUID из заданной коллекции хранилищ
         /// </summary>
         /// <param name="dataStorages">Коллекция хранилищ</param>
-        /// <param name="guids">UUIDs</param>
+        /// <param name="uuids">UUIDs</param>
         /// <returns>Коллекция репозиториев (модели)</returns>
-        public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null)
+        public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null)
         {
             IEnumerable<TreeRepositoryModel> result = DataTreeRepositories.Values;
             if (result == null || result?.Count() == 0)
             {
-                result = ForceLoadTreeRepositoriesCollection(dataStorages, guids);
+                result = ForceLoadTreeRepositoriesCollection(dataStorages, uuids);
             }
             return result;
         }
@@ -165,9 +166,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Загрузка коллекции репозиториев (модели) по их UUID из заданной коллекции хранилищ
         /// </summary>
         /// <param name="dataStorages"></param>
-        /// <param name="guids"></param>
+        /// <param name="uuids"></param>
         /// <returns></returns>
-        public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null)
+        public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null)
         {
             if (dataStorages == null)
                 return null;
@@ -179,10 +180,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     && dataStorage.IsAvailable)
                 {
                     IEnumerable<TreeRepository> dbRepositories = null;
-                    if (guids == null)
+                    if (uuids == null)
                         dbRepositories = infrastructure.SelectRepositories();
                     else
-                        dbRepositories = infrastructure.SelectRepositories(guids);
+                        dbRepositories = infrastructure.SelectRepositories(uuids);
                     //var repositories = _mapper.Map<List<TreeRepositoryModel>>(dbRepositories);
                     var repositories = dbRepositories?.ToModelCollection(dataStorages);
                     if (repositories != null)
@@ -272,11 +273,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         }
         //public bool TryCreateTreeRepositoryFromHeader(ITreeRepositoryHeaderModel header, out TreeRepositoryModel outTreeRepository)
         //{
-        //    var dataStorage = DataStorageModels.FirstOrDefault(x => x.Value.Guid == header.OwnDataStorageUuid).Value;
-        //    var dbTreeRepository = DataTreeRepositories.FirstOrDefault(x => x.Value.Guid == header.Guid).Value.DbEntity;
+        //    var dataStorage = DataStorageModels.FirstOrDefault(x => x.Value.Uuid == header.OwnDataStorageUuid).Value;
+        //    var dbTreeRepository = DataTreeRepositories.FirstOrDefault(x => x.Value.Uuid == header.Uuid).Value.DbEntity;
         //    if (dataStorage != null && dbTreeRepository != null)
         //    {
-        //        var result = new TreeRepositoryModel(header.Guid, dataStorage, dbTreeRepository);
+        //        var result = new TreeRepositoryModel(header.Uuid, dataStorage, dbTreeRepository);
         //        outTreeRepository = result;
         //        return true;
 
@@ -294,7 +295,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel)
         {
             var result = new TreeRepositoryHeaderModel();
-            result.Guid = treeRepositoryModel.Guid;
+            result.Uuid = treeRepositoryModel.Uuid;
             result.Name = treeRepositoryModel.Name;
             result.Description = treeRepositoryModel.Description;
             result.OwnDataStorageName = treeRepositoryModel.OwnDataStorageName;

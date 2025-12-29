@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
-    public interface IAttributeOwnerModel : IMainEntityModel, ILinkableByGuidModel
+    public interface IAttributeOwnerModel : IMainEntityModel, ILinkableByUuidModel
     {
         public bool HasAttributes { get; }
         public List<ElementAttributeModel> Attributes { get; }

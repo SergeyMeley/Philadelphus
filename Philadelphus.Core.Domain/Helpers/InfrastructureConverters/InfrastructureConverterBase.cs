@@ -42,11 +42,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            //dbEntity.ParentGuid = businessEntity.Parent.ToString();
+            //dbEntity.ParentUuid = businessEntity.Parent.ToString();
             //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
             //dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;
             //dbEntity.ConfigPath = businessEntity.ConfigPath;
-            dbEntity.Guid = businessEntity.Guid;
+            dbEntity.Uuid = businessEntity.Uuid;
             dbEntity.Name = businessEntity.Name;
             dbEntity.Alias = businessEntity.Alias;
             dbEntity.CustomCode = businessEntity.CustomCode;

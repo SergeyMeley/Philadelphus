@@ -9,7 +9,7 @@ namespace Philadelphus.Infrastructure.Persistence.OtherEntities
 {
     public class TreeRepositoryHeader
     {
-        public Guid Guid { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public string OwnDataStorageName { get; set; }

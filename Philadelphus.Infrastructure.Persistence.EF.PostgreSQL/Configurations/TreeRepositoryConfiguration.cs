@@ -16,9 +16,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
         {
             builder.ToTable("tree_repositories", "repositories");
 
-            builder.HasKey(x => x.Guid).HasName("tree_repositories_pkey");
+            builder.HasKey(x => x.Uuid).HasName("tree_repositories_pkey");
 
-            builder.Property(x => x.Guid)
+            builder.Property(x => x.Uuid)
                 .HasColumnName("uuid")
                 .IsRequired()
                 .ValueGeneratedOnAdd()
@@ -31,7 +31,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
             builder.Property(x => x.Description)
                 .HasColumnName("description");
 
-            builder.Property(x => x.OwnDataStorageGuid)
+            builder.Property(x => x.OwnDataStorageUuid)
                 .HasColumnName("data_storage_uuid")
                   .IsRequired();
 
@@ -71,11 +71,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                     .HasColumnName("deleted_by");
             });
 
-            builder.Property(x => x.ChildTreeRootsGuids)
+            builder.Property(x => x.ChildTreeRootsUuids)
                 .HasColumnName("child_tree_roots_uuids")
                 .HasColumnType("uuid[]");
 
-            builder.Property(x => x.DataStoragesGuids)
+            builder.Property(x => x.DataStoragesUuids)
                 .HasColumnName("data_storages_uuids")
                 .HasColumnType("uuid[]");
 

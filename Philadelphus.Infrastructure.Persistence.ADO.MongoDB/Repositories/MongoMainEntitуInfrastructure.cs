@@ -32,7 +32,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeRepository>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Uuid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -42,7 +42,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeRoot>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Uuid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -52,7 +52,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeNode>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Uuid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -62,7 +62,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             {
                 BsonClassMap.RegisterClassMap<TreeLeave>(c => {
                     c.AutoMap();
-                    c.MapIdProperty(s => s.Guid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+                    c.MapIdProperty(s => s.Uuid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
             }
             catch (Exception)
@@ -196,17 +196,17 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] guids)
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids)
         {
             throw new NotImplementedException();
         }

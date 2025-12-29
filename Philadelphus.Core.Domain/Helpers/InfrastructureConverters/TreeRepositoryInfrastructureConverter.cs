@@ -17,7 +17,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = new TreeRepositoryHeader();
-            result.Guid = businessEntity.Guid;
+            result.Uuid = businessEntity.Uuid;
             result.Name = businessEntity.Name;
             result.Description = businessEntity.Description;
             result.OwnDataStorageName = businessEntity.OwnDataStorageName;
@@ -42,7 +42,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (dbEntity == null)
                 return null;
             var result = new TreeRepositoryHeaderModel();
-            result.Guid = dbEntity.Guid;
+            result.Uuid = dbEntity.Uuid;
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
             result.OwnDataStorageName = dbEntity.OwnDataStorageName;

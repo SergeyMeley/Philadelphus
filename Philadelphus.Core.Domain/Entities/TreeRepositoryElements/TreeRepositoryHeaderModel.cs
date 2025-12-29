@@ -11,7 +11,7 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements
 {
     public class TreeRepositoryHeaderModel : ITreeRepositoryHeaderModel
     {
-        public Guid Guid { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public string OwnDataStorageName { get; set; }

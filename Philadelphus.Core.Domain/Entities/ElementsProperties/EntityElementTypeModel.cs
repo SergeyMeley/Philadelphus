@@ -18,7 +18,7 @@ namespace Philadelphus.Core.Domain.Entities.ElementsProperties
 
         public override IDataStorageModel DataStorage => throw new NotImplementedException();
 
-        public EntityElementTypeModel(Guid guid, ITypedModel parent, IMainEntity dbEntity) : base(guid, dbEntity)
+        public EntityElementTypeModel(Guid uuid, ITypedModel parent, IMainEntity dbEntity) : base(uuid, dbEntity)
         {
             Name = "TEST TYPE";
         }

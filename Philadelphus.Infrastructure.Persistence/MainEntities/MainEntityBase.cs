@@ -9,7 +9,7 @@ namespace Philadelphus.Infrastructure.Persistence.MainEntities
 {
     public abstract class MainEntityBase : IMainEntity
     {
-        public Guid Guid { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public long? Sequence { get; set; }

@@ -49,7 +49,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     obj =>
                 {
                     var headerVM = RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM;
-                    RepositoryCollectionVM.CurrentRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == headerVM.Guid);
+                    RepositoryCollectionVM.CurrentRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Uuid == headerVM.Uuid);
 
                     if (OpenMainWindowCommand.CanExecute(obj))
                         OpenMainWindowCommand.Execute(obj);
@@ -77,16 +77,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             if (DataStoragesSettingsVM.DataStorageVMs == null)
                 throw new NullReferenceException("Не инициализированы модели представлений хранилищ данных.");
 
-            //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model).FirstOrDefault(x => x.Guid == header.OwnDataStorageUuid);
+            //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model).FirstOrDefault(x => x.Uuid == header.OwnDataStorageUuid);
             //if (dataStorage == null)
             //{
-            //    //var text = $"Не найдено хранилище данных {header.OwnDataStorageName} [{header.OwnDataStorageUuid}] для заголовка репозитория {header.Name} [{header.Guid}]";
+            //    //var text = $"Не найдено хранилище данных {header.OwnDataStorageName} [{header.OwnDataStorageUuid}] для заголовка репозитория {header.Name} [{header.Uuid}]";
             //    //NotificationService.SendNotification(text, NotificationCriticalLevelModel.Warning, NotificationTypesModel.TextMessage);
 
             //    return false;
             //}
 
-            if (RepositoryCollectionVM.CheckTreeRepositoryVMAvailable(header.Guid, out var treeRepositoryVM))
+            if (RepositoryCollectionVM.CheckTreeRepositoryVMAvailable(header.Uuid, out var treeRepositoryVM))
             {
                 if (treeRepositoryVM != null)
                 {
@@ -97,8 +97,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         header.Description = treeRepositoryVM.Description;
                     if (header.OwnDataStorageName != treeRepositoryVM.OwnDataStorage.Name)
                         header.OwnDataStorageName = treeRepositoryVM.OwnDataStorage.Name;
-                    if (header.OwnDataStorageUuid != treeRepositoryVM.OwnDataStorage.Guid)
-                        header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Guid;
+                    if (header.OwnDataStorageUuid != treeRepositoryVM.OwnDataStorage.Uuid)
+                        header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Uuid;
                     return true;
                 }
                 return false;

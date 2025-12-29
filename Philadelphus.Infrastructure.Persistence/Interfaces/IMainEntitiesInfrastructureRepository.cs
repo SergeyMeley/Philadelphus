@@ -7,11 +7,11 @@ namespace Philadelphus.Infrastructure.Persistence.Interfaces
         # region [ Select ]
 
         public IEnumerable<TreeRoot> SelectRoots();
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] guids);
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids);
         public IEnumerable<TreeNode> SelectNodes();
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids);
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids);
         public IEnumerable<TreeLeave> SelectLeaves();
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids);
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids);
         public IEnumerable<ElementAttribute> SelectAttributes();
 
         #endregion

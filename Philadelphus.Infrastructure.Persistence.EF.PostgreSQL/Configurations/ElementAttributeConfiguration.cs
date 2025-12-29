@@ -15,9 +15,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
         {
             builder.ToTable("element_attributes", "main_entities");
 
-            builder.HasKey(x => x.Guid).HasName("element_attributes_pkey");
+            builder.HasKey(x => x.Uuid).HasName("element_attributes_pkey");
 
-            builder.Property(x => x.Guid)
+            builder.Property(x => x.Uuid)
                 .HasColumnName("uuid")
                 .IsRequired()
                 .ValueGeneratedOnAdd()
