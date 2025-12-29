@@ -22,9 +22,9 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 return null;
             var result = (ElementAttribute)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             //result.Owner = businessEntity.Owner.DbEntity;
-            result.OwnerUuid = businessEntity.Owner.Guid;
-            result.ValueTypeUuid = businessEntity.ValueType?.Guid;
-            result.ValueUuid = businessEntity.Value?.Guid;
+            result.OwnerUuid = businessEntity.Owner.Uuid;
+            result.ValueTypeUuid = businessEntity.ValueType?.Uuid;
+            result.ValueUuid = businessEntity.Value?.Uuid;
             return result;
         }
         public static List<ElementAttribute> ToDbEntityCollection(this IEnumerable<ElementAttributeModel> businessEntityCollection)
@@ -42,7 +42,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new ElementAttributeModel(dbEntity.Guid, owner, dbEntity);
+            var result = new ElementAttributeModel(dbEntity.Uuid, owner, dbEntity);
             result = (ElementAttributeModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
@@ -53,7 +53,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             var result = new List<ElementAttributeModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = owners.FirstOrDefault(x => x.Guid == dbEntity.OwnerUuid);
+                var parent = owners.FirstOrDefault(x => x.Uuid == dbEntity.OwnerUuid);
                 if (parent != null)
                 {
                     result.Add(dbEntity.ToModel(parent));

@@ -42,13 +42,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
             var result = new List<IDataStorageModel>();
             foreach (var item in _config.DataStorageModels)
             {
-                result.Add(CreateStorageModel(item.Guid));
+                result.Add(CreateStorageModel(item.Uuid));
             }
             return result;
         }
-        public IDataStorageModel? CreateStorageModel(Guid modelGuid)
+        public IDataStorageModel? CreateStorageModel(Guid modelUuid)
         {
-            var modelConfig = _config?.DataStorageModels.FirstOrDefault(m => m.Guid == modelGuid);
+            var modelConfig = _config?.DataStorageModels.FirstOrDefault(m => m.Uuid == modelUuid);
             if (modelConfig == null) 
                 return null;
             ITreeRepositoriesInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
@@ -60,8 +60,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
                 case InfrastructureTypes.PostgreSqlAdo:
                     break;
                 case InfrastructureTypes.PostgreSqlEf:
-                    treeRepositoryHeadersInfrastructureRepository = new PostgreEfTreeRepositoriesInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Guid.ToString()].ConnectionString);
-                    mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Guid.ToString()].ConnectionString);
+                    treeRepositoryHeadersInfrastructureRepository = new PostgreEfTreeRepositoriesInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Uuid.ToString()].ConnectionString);
+                    mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(ConfigurationManager.ConnectionStrings[modelConfig.Uuid.ToString()].ConnectionString);
                     break;
                 case InfrastructureTypes.MongoDbAdo:
                     break;
@@ -74,7 +74,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
             }
             DataStorageBuilder builder = new DataStorageBuilder();
             builder
-                .SetGeneralParameters(modelConfig.Name, modelConfig.Description, modelConfig.Guid, modelConfig.ProviderType, modelConfig.IsHidden)
+                .SetGeneralParameters(modelConfig.Name, modelConfig.Description, modelConfig.Uuid, modelConfig.ProviderType, modelConfig.IsHidden)
                 .SetRepository(treeRepositoryHeadersInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();
@@ -83,7 +83,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
         //public IDataStorageModel? GetDefaultStorageModel()
         //{
         //    if (_config == null) return null;
-        //    return CreateStorageModel(_config.DefaultStorageGuid);
+        //    return CreateStorageModel(_config.DefaultStorageUuid);
         //}
 
         //public List<IDataStorageModel> GetEnabledStorageModels()
@@ -93,7 +93,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
         //    return _config.DataStorageModels
         //        .Where(m => m.IsEnabled)
         //        .OrderBy(m => m.Priority)
-        //        .Select(m => CreateStorageModel(m.Guid)!)
+        //        .Select(m => CreateStorageModel(m.Uuid)!)
         //        .Where(m => m != null)
         //        .ToList();
         //}

@@ -84,7 +84,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] guids)
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -95,7 +95,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 result = context.TreeRoots.Where(x => 
                 x.AuditInfo.IsDeleted == false
-                && guids.Contains(x.Guid)
+                && uuids.Contains(x.Uuid)
                 ).ToList();
             }
 
@@ -115,7 +115,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootGuids)
+        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -126,8 +126,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 result = context.TreeNodes.Where(x =>
                 x.AuditInfo.IsDeleted == false
-                && (parentRootGuids.Contains(x.ParentTreeRootGuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
-                || parentRootGuids.Contains(x.ParentTreeRoot.Guid))
+                && (parentRootUuids.Contains(x.ParentTreeRootUuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
+                || parentRootUuids.Contains(x.ParentTreeRoot.Uuid))
                 ).ToList();
             }
 
@@ -147,7 +147,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootGuids)
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -158,8 +158,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 result = context.TreeLeaves.Where(x =>
                 x.AuditInfo.IsDeleted == false
-                && (parentRootGuids.Contains(x.ParentTreeRootGuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
-                || parentRootGuids.Contains(x.ParentTreeRoot.Guid))
+                && (parentRootUuids.Contains(x.ParentTreeRootUuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
+                || parentRootUuids.Contains(x.ParentTreeRoot.Uuid))
                 ).ToList();
             }
 

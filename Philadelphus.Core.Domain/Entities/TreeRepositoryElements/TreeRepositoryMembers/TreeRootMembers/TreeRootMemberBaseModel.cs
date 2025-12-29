@@ -15,7 +15,7 @@ namespace Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositor
     {
         public TreeRootModel ParentRoot { get; protected set; }
         public override EntityTypesModel EntityType => throw new NotImplementedException();
-        public TreeRootMemberBaseModel(Guid guid, IParentModel parent, IMainEntity dbEntity) : base(guid, parent, dbEntity)
+        public TreeRootMemberBaseModel(Guid uuid, IParentModel parent, IMainEntity dbEntity) : base(uuid, parent, dbEntity)
         {
             SetParents(parent);
         }

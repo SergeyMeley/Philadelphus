@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
-    public interface ILinkableByGuidModel
+    public interface ILinkableByUuidModel
     {
-        public Guid Guid { get; }
+        public Guid Uuid { get; }
     }
 }

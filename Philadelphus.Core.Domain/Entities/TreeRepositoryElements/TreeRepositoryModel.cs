@@ -23,18 +23,18 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements
     {
         protected virtual string DefaultFixedPartOfName { get => "Новый репозиторий"; }
 
-        private Guid _guid;
-        public Guid Guid 
+        private Guid _uuid;
+        public Guid Uuid 
         { 
             get
             {
-                return _guid;
+                return _uuid;
             }
             protected set
             {
-                if (_guid != value)
+                if (_uuid != value)
                 {
-                    _guid = value;
+                    _uuid = value;
                     if (State != State.Initialized && State != State.SoftDeleted)
                     {
                         State = State.Changed;
@@ -108,19 +108,19 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements
         }
 
         public string OwnDataStorageName { get => _ownDataStorage.Name; set => OwnDataStorageName = value; }    //TODO: Исправить костыль
-        public Guid OwnDataStorageUuid { get => _ownDataStorage.Guid; set => OwnDataStorageUuid = value; }      //TODO: Исправить костыль
+        public Guid OwnDataStorageUuid { get => _ownDataStorage.Uuid; set => OwnDataStorageUuid = value; }      //TODO: Исправить костыль
         public List<IDataStorageModel> DataStorages { get; internal set; } = new List<IDataStorageModel>();
         //TODO
         public List<TreeRootModel> ChildTreeRoots { get => Childs.Where(x => x.GetType() == typeof(TreeRootModel)).Cast<TreeRootModel>().ToList(); }
         //TODO
-        public List<Guid> ChildsGuids {  get; internal set; }
+        public List<Guid> ChildsUuids {  get; internal set; }
         public List<IChildrenModel> Childs { get; internal set; }
         public List<TreeRepositoryMemberBaseModel> ElementsCollection { get; internal set; } = new List<TreeRepositoryMemberBaseModel>();
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
-        internal TreeRepositoryModel(Guid guid, IDataStorageModel dataStorage, TreeRepository dbEntity)
+        internal TreeRepositoryModel(Guid uuid, IDataStorageModel dataStorage, TreeRepository dbEntity)
         {
-            Guid = guid;
+            Uuid = uuid;
             OwnDataStorage = dataStorage;
             DbEntity = dbEntity;
             Initialize();
@@ -128,7 +128,7 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements
 
         internal TreeRepositoryModel(TreeRepositoryHeaderModel headerModel)
         {
-            Guid = headerModel.Guid;
+            Uuid = headerModel.Uuid;
             Initialize();
         }
 
@@ -137,7 +137,7 @@ namespace Philadelphus.Core.Domain.Entities.RepositoryElements
             StringBuilder sb = new StringBuilder();
             sb.Append(Name);
             sb.AppendLine();
-            sb.Append(Guid);
+            sb.Append(Uuid);
             return sb.ToString();
         }
 

@@ -26,17 +26,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         private readonly Action _updateTreeRepositoryHeaders;
 
-        public Guid Guid
+        public Guid Uuid
         {
             get
             {
-                return _model.Guid;
+                return _model.Uuid;
             }
             set
             {
-                _model.Guid = value;
+                _model.Uuid = value;
                 SaveRepositoryHeader();
-                OnPropertyChanged(nameof(Guid));
+                OnPropertyChanged(nameof(Uuid));
             }
         }
         public string Name

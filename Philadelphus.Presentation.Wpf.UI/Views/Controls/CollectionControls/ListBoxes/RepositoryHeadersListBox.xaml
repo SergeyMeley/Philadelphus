@@ -44,7 +44,7 @@
                                                         <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic"></Run>
                                                         <Run Text="   "></Run>
                                                         <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic"></Run>
+                                                        <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic"></Run>
                             </TextBlock>
                             <TextBlock Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Center" Margin="2">
                                                         <Run Text="Хранилище: " FontWeight="Light" Foreground="LightSlateGray"></Run>

@@ -22,7 +22,7 @@ namespace Philadelphus.InfrastructureConverters.Converters
             {
                 Name = model.Name,
                 Description = model.Description,
-                Guid = model.Guid,
+                Uuid = model.Uuid,
                 HasDataStorageInfrastructureRepositoryRepository = model.DataStoragesCollectionInfrastructureRepository != null,
                 HasTreeRepositoryHeadersInfrastructureRepository = model.TreeRepositoriesInfrastructureRepository != null,
                 HasMainEntitiesInfrastructureRepository = model.MainEntitiesInfrastructureRepository != null,
@@ -62,7 +62,7 @@ namespace Philadelphus.InfrastructureConverters.Converters
                     break;
             }
             var builder = new DataStorageBuilder()
-                .SetGeneralParameters(entity.Name, entity.Description, entity.Guid, entity.InfrastructureType, entity.IsDisabled)
+                .SetGeneralParameters(entity.Name, entity.Description, entity.Uuid, entity.InfrastructureType, entity.IsDisabled)
                 .SetRepository(dataStoragesCollectionInfrastructureRepository)
                 .SetRepository(treeRepositoryHeadersCollectionInfrastructureRepository)
                 .SetRepository(treeRepositoriesInfrastructureRepository)

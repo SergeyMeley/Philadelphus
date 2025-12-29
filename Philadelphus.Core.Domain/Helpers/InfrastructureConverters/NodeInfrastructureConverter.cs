@@ -20,10 +20,10 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.ParentGuid = businessEntity.Parent.Guid;
-            result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;     //TODO: ВРЕМЕННО
+            result.ParentUuid = businessEntity.Parent.Uuid;
+            result.ParentTreeRootUuid = businessEntity.ParentRoot.Uuid;     //TODO: ВРЕМЕННО
             //result.ParentRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
-            //result.ParentRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
+            //result.ParentRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
             return result;
         }
         public static List<TreeNode> ToDbEntityCollection(this IEnumerable<TreeNodeModel> businessEntityCollection)
@@ -41,7 +41,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeNodeModel(dbEntity.Guid, parent, dbEntity);
+            var result = new TreeNodeModel(dbEntity.Uuid, parent, dbEntity);
             result = (TreeNodeModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
@@ -52,7 +52,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             var result = new List<TreeNodeModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = parents.FirstOrDefault(x => x.Guid == dbEntity.ParentGuid);
+                var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentUuid);
                 if (parent != null)
                 {
                     result.Add(dbEntity.ToModel(parent));

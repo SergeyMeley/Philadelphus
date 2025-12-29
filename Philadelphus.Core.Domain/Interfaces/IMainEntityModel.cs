@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
-    public interface IMainEntityModel : ILinkableByGuidModel
+    public interface IMainEntityModel : ILinkableByUuidModel
     {
         public abstract EntityTypesModel EntityType { get; }
         public string Name { get; set; }

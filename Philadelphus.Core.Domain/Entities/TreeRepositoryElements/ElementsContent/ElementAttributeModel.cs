@@ -26,7 +26,7 @@ namespace Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsConte
         public IEnumerable<TreeNodeModel>? ValueTypesList { get; set; }
         public TreeLeaveModel Value { get; set; }
         public IEnumerable<TreeLeaveModel>? ValuesList { get; set; }
-        public ElementAttributeModel(Guid guid, IAttributeOwnerModel owner, IMainEntity dbEntity) : base(guid, dbEntity)
+        public ElementAttributeModel(Guid uuid, IAttributeOwnerModel owner, IMainEntity dbEntity) : base(uuid, dbEntity)
         {
             Owner = owner;
             Initialize();

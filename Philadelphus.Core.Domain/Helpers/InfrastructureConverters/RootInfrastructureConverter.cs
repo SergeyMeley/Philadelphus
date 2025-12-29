@@ -19,8 +19,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = (TreeRoot)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.OwnDataStorageGuid = businessEntity.OwnDataStorage.Guid;
-            result.DataStoragesGuids = businessEntity.DataStorages.Select(x => x.Guid).ToArray();
+            result.OwnDataStorageUuid = businessEntity.OwnDataStorage.Uuid;
+            result.DataStoragesUuids = businessEntity.DataStorages.Select(x => x.Uuid).ToArray();
             return result;
         }
         public static List<TreeRoot> ToDbEntityCollection(this IEnumerable<TreeRootModel> businessEntityCollection)
@@ -38,9 +38,9 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var dataStorage = dataStorages.FirstOrDefault(x => x.Guid == dbEntity.OwnDataStorageGuid);
-            var treeRepository = treeRepositories.FirstOrDefault(x => x.ChildsGuids.Any(g => g == dbEntity.Guid));
-            var result = new TreeRootModel(dbEntity.Guid, treeRepository, dataStorage, dbEntity);
+            var dataStorage = dataStorages.FirstOrDefault(x => x.Uuid == dbEntity.OwnDataStorageUuid);
+            var treeRepository = treeRepositories.FirstOrDefault(x => x.ChildsUuids.Any(g => g == dbEntity.Uuid));
+            var result = new TreeRootModel(dbEntity.Uuid, treeRepository, dataStorage, dbEntity);
             result = (TreeRootModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }

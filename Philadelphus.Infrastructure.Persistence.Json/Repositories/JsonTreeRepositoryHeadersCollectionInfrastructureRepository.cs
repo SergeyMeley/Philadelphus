@@ -77,7 +77,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
                 throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
 
 
-            var index = treeRepositoryHeadersCollection.TreeRepositoryHeaders.FindIndex(x => x.Guid == treeRepositoryHeader.Guid);
+            var index = treeRepositoryHeadersCollection.TreeRepositoryHeaders.FindIndex(x => x.Uuid == treeRepositoryHeader.Uuid);
             if (index == null || index == -1)
             {
                 treeRepositoryHeadersCollection.TreeRepositoryHeaders.Add(treeRepositoryHeader);

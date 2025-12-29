@@ -27,15 +27,15 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Get + Load ]
 
-        public TreeRepository GetTreeRepositoryFromCollection(Guid guid);
-        public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> guids);
-        public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid guid);
-        public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> guids);
-        public IDataStorageModel GetStorageModelFromCollection(Guid guid);
-        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> guids);
+        public TreeRepository GetTreeRepositoryFromCollection(Guid uuid);
+        public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> uuids);
+        public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid uuid);
+        public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> uuids);
+        public IDataStorageModel GetStorageModelFromCollection(Guid uuid);
+        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> uuids);
         public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel);
-        public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null);
-        public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] guids = null);
+        public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
+        public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
 
         #endregion
 

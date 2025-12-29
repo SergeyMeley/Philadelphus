@@ -78,7 +78,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeRepository> SelectRepositories(Guid[] guids)
+        public IEnumerable<TreeRepository> SelectRepositories(Guid[] uuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -89,7 +89,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 result = context.Repositories.Where(x =>
                 x.AuditInfo.IsDeleted == false
-                && guids.Contains(x.Guid)
+                && uuids.Contains(x.Uuid)
                 ).ToList();
             }
 

@@ -98,7 +98,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             {
                 if (model != null)
                 {
-                    if (_dataStorageVMs.FirstOrDefault(x => x.Model.Guid == model.Guid) == null)
+                    if (_dataStorageVMs.FirstOrDefault(x => x.Model.Uuid == model.Uuid) == null)
                     {
                         _dataStorageVMs.Add(new DataStorageVM(model));
                     }

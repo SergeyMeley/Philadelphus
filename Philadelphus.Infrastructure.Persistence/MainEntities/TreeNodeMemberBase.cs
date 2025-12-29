@@ -8,7 +8,7 @@ namespace Philadelphus.Infrastructure.Persistence.MainEntities
 {
     public class TreeNodeMemberBase : TreeRootMemberBase
     {
-        public Guid? ParentTreeNodeGuid { get; set; }
+        public Guid? ParentTreeNodeUuid { get; set; }
         public virtual TreeNode ParentTreeNode { get; set; }
         public virtual IMainEntity Parent
         {

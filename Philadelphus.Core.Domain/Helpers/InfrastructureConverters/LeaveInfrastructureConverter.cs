@@ -18,9 +18,9 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.ParentGuid = businessEntity.Parent.Guid;
-            result.ParentTreeRootGuid = businessEntity.ParentRoot.Guid;
-            //result.ParentTreeRoot = (TreeRoot)service.GetEntityFromCollection(businessEntity.ParentRoot.Guid);
+            result.ParentUuid = businessEntity.Parent.Uuid;
+            result.ParentTreeRootUuid = businessEntity.ParentRoot.Uuid;
+            //result.ParentTreeRoot = (TreeRoot)service.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
             return result;
         }
         public static List<TreeLeave> ToDbEntityCollection(this IEnumerable<TreeLeaveModel> businessEntityCollection)
@@ -38,7 +38,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeLeaveModel(dbEntity.Guid, parent, dbEntity);
+            var result = new TreeLeaveModel(dbEntity.Uuid, parent, dbEntity);
             result = (TreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
@@ -49,7 +49,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             var result = new List<TreeLeaveModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = parents.FirstOrDefault(x => x.Guid == dbEntity.ParentGuid);
+                var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentUuid);
                 if (parent != null)
                 {
                     result.Add(dbEntity.ToModel(parent));

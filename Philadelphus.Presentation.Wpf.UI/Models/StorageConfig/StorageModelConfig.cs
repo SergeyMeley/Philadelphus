@@ -11,8 +11,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        //public string GuidString { get => Guid.ToString(); set => Guid = Guid.Parse(GuidString); }
-        public Guid Guid { get; set; }//{ get => Guid.Parse(GuidString); set => GuidString = value.ToString(); }
+        //public string UuidString { get => Uuid.ToString(); set => Uuid = Guid.Parse(UuidString); }
+        public Guid Uuid { get; set; }//{ get => Guid.Parse(UuidString); set => UuidString = value.ToString(); }
         //public string ConnectionString { get; set; } = string.Empty;
         //public string TypeName { get; set; } = string.Empty;
         public string ProviderTypeString { get; set; } = string.Empty;

@@ -107,8 +107,8 @@
                 <Run Text="{Binding Name}" FontStyle="Italic" />
                         </TextBlock>
                         <TextBlock>
-                <Run Text="Guid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic" />
+                <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
+                <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
                         </TextBlock>
 
                     </StackPanel>

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
-    public interface IChildrenModel : ILinkableByGuidModel
+    public interface IChildrenModel : ILinkableByUuidModel
     {
         public IParentModel Parent { get; }
-        //public Guid ParentGuid { get; }
+        //public Guid ParentUuid { get; }
     }
 }

@@ -98,8 +98,8 @@
                                                 <Run Text="{Binding Name}" FontStyle="Italic"  Foreground="Black"/>
                                             </TextBlock>
                                             <TextBlock>
-                                                <Run Text="Guid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                                                <Run Text="{Binding Guid, Mode=OneWay}" FontStyle="Italic"  Foreground="Black"/>
+                                                <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
+                                                <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic"  Foreground="Black"/>
                                             </TextBlock>
                                         </StackPanel>
                                     </StackPanel>
@@ -146,8 +146,8 @@
                                     <TextBlock Text="Родитель: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
                                     <TextBox Text="{Binding SelectedEntity.Name, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
                                     <TextBlock Text="  "></TextBlock>
-                                    <TextBlock Text="Guid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
-                                    <TextBox Text="{Binding SelectedEntity.Guid, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                                    <TextBlock Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
+                                    <TextBox Text="{Binding SelectedEntity.Uuid, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
                                     <Button Content="{StaticResource imageCopy}" Margin="2" Height="20" Width="20" Background="Transparent"></Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
@@ -163,7 +163,7 @@
                                 <DataGridCheckBoxColumn Header="Внешний" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
                                 <DataGridTextColumn Header="Тип элемента" IsReadOnly="True" Binding="{Binding EntityType}"></DataGridTextColumn>
                                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
-                                <DataGridTextColumn Header="Код" IsReadOnly="True" Binding="{Binding Guid}"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Код" IsReadOnly="True" Binding="{Binding Uuid}"></DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

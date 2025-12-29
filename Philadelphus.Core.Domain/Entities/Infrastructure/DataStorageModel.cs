@@ -13,7 +13,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure
 {
     public class DataStorageModel : IDataStorageModel
     {
-        public Guid Guid { get; }
+        public Guid Uuid { get; }
         public string Name { get; set; }
         public string Description { get; set; }
         public InfrastructureTypes InfrastructureType { get; set; }
@@ -86,9 +86,9 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure
 
         private DateTime _lastCheckTime;
         public DateTime LastCheckTime { get => _lastCheckTime; }
-        internal DataStorageModel(Guid guid, string name, string description, InfrastructureTypes infrastructureType, bool isDisabled)
+        internal DataStorageModel(Guid uuid, string name, string description, InfrastructureTypes infrastructureType, bool isDisabled)
         {
-            Guid = guid;
+            Uuid = uuid;
             Name = name;
             Description = description;
             InfrastructureType = infrastructureType;

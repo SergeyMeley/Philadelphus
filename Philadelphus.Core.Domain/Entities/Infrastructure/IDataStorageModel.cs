@@ -10,7 +10,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure
 {
     public interface IDataStorageModel
     {
-        public Guid Guid { get; }
+        public Guid Uuid { get; }
         public string Name { get; set; }
         public string Description { get; set; }
         public InfrastructureTypes InfrastructureType { get; }

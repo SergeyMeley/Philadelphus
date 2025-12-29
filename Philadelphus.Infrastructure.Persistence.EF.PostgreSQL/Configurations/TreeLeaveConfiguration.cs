@@ -16,9 +16,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
         {
             builder.ToTable("tree_leaves", "main_entities");
 
-            builder.HasKey(x => x.Guid).HasName("tree_leaves_pkey");
+            builder.HasKey(x => x.Uuid).HasName("tree_leaves_pkey");
 
-            builder.Property(x => x.Guid)
+            builder.Property(x => x.Uuid)
                 .HasColumnName("uuid")
                 .IsRequired()
                 .ValueGeneratedOnAdd()
@@ -81,7 +81,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 
             builder.HasOne(x => x.ParentTreeNode)
                   .WithMany()
-                  .HasForeignKey(x => x.ParentGuid);
+                  .HasForeignKey(x => x.ParentUuid);
 
             builder.Ignore(x => x.Parent);
         }

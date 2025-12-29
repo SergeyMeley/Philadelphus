@@ -157,23 +157,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
             return true;
         }
-        internal bool CheckTreeRepositoryVMAvailable(Guid guid, out TreeRepositoryVM outTreeRepositoryVM)
+        internal bool CheckTreeRepositoryVMAvailable(Guid uuid, out TreeRepositoryVM outTreeRepositoryVM)
         {
-            outTreeRepositoryVM = TreeRepositoriesVMs.FirstOrDefault(x => x.Guid == guid);
+            outTreeRepositoryVM = TreeRepositoriesVMs.FirstOrDefault(x => x.Uuid == uuid);
             if (outTreeRepositoryVM != null && outTreeRepositoryVM.OwnDataStorage.IsAvailable == true)
                 return true;
-            outTreeRepositoryVM = InitTreeRepositoryVM(guid);
+            outTreeRepositoryVM = InitTreeRepositoryVM(uuid);
             if (outTreeRepositoryVM != null && outTreeRepositoryVM.OwnDataStorage.IsAvailable == true)
                 return true;
             return false;
         }
-        private TreeRepositoryVM InitTreeRepositoryVM(Guid guid)
+        private TreeRepositoryVM InitTreeRepositoryVM(Guid uuid)
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
-            var repositories = _collectionService.GetTreeRepositoriesCollection(storages, new[] { guid });
+            var repositories = _collectionService.GetTreeRepositoriesCollection(storages, new[] { uuid });
             if (repositories == null)
                 return null;
-            var repository = repositories.FirstOrDefault(x => x.Guid == guid);
+            var repository = repositories.FirstOrDefault(x => x.Uuid == uuid);
             if (repository == null)
                 return null;
             var result = new TreeRepositoryVM(repository, _service);

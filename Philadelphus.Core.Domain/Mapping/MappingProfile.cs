@@ -42,17 +42,17 @@ namespace Philadelphus.Core.Domain.Mapping
             {
                 // Специальная логика создания
                 return new TreeRepositoryModel(
-                    guid: src.Guid,
-                    dataStorage: GetDataStorage(src.OwnDataStorageGuid), //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
+                    uuid: src.Uuid,
+                    dataStorage: GetDataStorage(src.OwnDataStorageUuid), //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
                     dbEntity: src
                 );
             });
         }
 
-        private IDataStorageModel GetDataStorage(Guid guid)
+        private IDataStorageModel GetDataStorage(Guid uuid)
         {
             var builder = new DataStorageBuilder()
-                    .SetGeneralParameters("test", "test", guid, InfrastructureTypes.PostgreSqlEf, isDisabled: false);
+                    .SetGeneralParameters("test", "test", uuid, InfrastructureTypes.PostgreSqlEf, isDisabled: false);
             return builder.Build();
         }
     }
