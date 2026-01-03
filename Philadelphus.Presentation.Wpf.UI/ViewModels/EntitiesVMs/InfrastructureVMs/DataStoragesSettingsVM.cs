@@ -79,12 +79,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             _treeRepositoryCollectionService = treeRepositoryCollectionService;
             _storageConfigService = storageConfigService;
 
-            InitMainDataStorageVM(options.Value.ConfigsDirectory);
+            InitMainDataStorageVM(options.Value);
             InitDataStorages();
         }
-        private bool InitMainDataStorageVM(DirectoryInfo configsDirectory)
+        private bool InitMainDataStorageVM(ApplicationSettings applicationSettings)
         {
-            var mainDataStorageModel = _treeRepositoryCollectionService.CreateMainDataStorageModel(configsDirectory);
+            var mainDataStorageModel = _treeRepositoryCollectionService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
             _dataStorageVMs.Add(_mainDataStorageVM);
             return true;

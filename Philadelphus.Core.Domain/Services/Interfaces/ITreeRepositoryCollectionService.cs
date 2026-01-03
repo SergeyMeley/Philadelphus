@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Philadelphus.Core.Domain.Config;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
@@ -48,7 +49,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Create + Add ]
 
-        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo configsDirectory);
+        public IDataStorageModel CreateMainDataStorageModel(FileInfo storagesConfigFullPath, FileInfo repositoryHeadersConfigFullPath);
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage);
         public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel);
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path);

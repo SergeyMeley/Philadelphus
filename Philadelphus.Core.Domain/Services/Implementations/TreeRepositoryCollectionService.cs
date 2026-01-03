@@ -239,9 +239,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="configsDirectory">Путь к настроечному файлу</param>
         /// <returns>Хранилище данных</returns>
-        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo configsDirectory)
+        public IDataStorageModel CreateMainDataStorageModel(
+            FileInfo storagesConfigFullPath,
+            FileInfo repositoryHeadersConfigFullPath)
         {
-            if (configsDirectory == null)
+            if (storagesConfigFullPath == null || repositoryHeadersConfigFullPath == null)
                 return null;
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
@@ -251,8 +253,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     Guid.Empty,
                     InfrastructureTypes.JsonDocument,
                     isDisabled: false)
-                .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(configsDirectory))
-                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(configsDirectory))
+                .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath))
+                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath))
             ;
             var mainDataStorageModel = dataStorageBuilder.Build();
 

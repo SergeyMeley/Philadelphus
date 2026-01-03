@@ -21,6 +21,26 @@ namespace Philadelphus.Core.Domain.Config
                 return new DirectoryInfo(expandedPath);
             }
         }
+        [JsonIgnore]
+        public FileInfo StoragesConfigFullPath
+        {
+            get
+            {
+                var path = Path.Combine(ConfigsDirectoryString, "storages-config.json");
+                var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+                return new FileInfo(expandedPath);
+            }
+        }
+        [JsonIgnore]
+        public FileInfo RepositoryHeadersConfigFullPath
+        { get
+            {
+                var path = Path.Combine(ConfigsDirectoryString, "repository-headers-config.json");
+                var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+                return new FileInfo(expandedPath);
+            }
+        }
+
         public List<string> PluginsDirectoriesString { get; set; }
 
         [JsonIgnore]

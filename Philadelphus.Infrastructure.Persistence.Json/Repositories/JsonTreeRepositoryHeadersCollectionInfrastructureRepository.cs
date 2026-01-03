@@ -18,11 +18,12 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoryHeadersCollection; }
 
         private FileInfo _file;
-        public JsonTreeRepositoryHeadersCollectionInfrastructureRepository(DirectoryInfo directory)
+        public JsonTreeRepositoryHeadersCollectionInfrastructureRepository(
+            FileInfo repositoryHeadersConfigFullPath)
         {
-            if (directory == null)
-                return;
-            _file = new FileInfo(Path.Combine(directory.FullName, "repository-headers-config.json"));
+            if (repositoryHeadersConfigFullPath == null || repositoryHeadersConfigFullPath.Exists == false)
+                throw new Exception($"Некорректный путь к настроечному файлу: '{repositoryHeadersConfigFullPath}'");
+            _file = repositoryHeadersConfigFullPath ;
         }
         public bool CheckAvailability()
         {

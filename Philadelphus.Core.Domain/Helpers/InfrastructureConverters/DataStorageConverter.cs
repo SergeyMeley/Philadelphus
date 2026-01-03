@@ -30,10 +30,14 @@ namespace Philadelphus.InfrastructureConverters.Converters
             };
             return result;
         }
-        public static IDataStorageModel ToModel(this DataStorage entity, string connectionString, DirectoryInfo directory)
+        public static IDataStorageModel ToModel(
+            this DataStorage entity, 
+            string connectionString,
+            FileInfo storagesConfigFullPath,
+            FileInfo repositoryHeadersConfigFullPath)
         {
-            IDataStoragesCollectionInfrastructureRepository dataStoragesCollectionInfrastructureRepository = new JsonDataStoragesCollectionInfrastructureRepository(directory);
-            ITreeRepositoryHeadersCollectionInfrastructureRepository treeRepositoryHeadersCollectionInfrastructureRepository = new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(directory);
+            IDataStoragesCollectionInfrastructureRepository dataStoragesCollectionInfrastructureRepository = new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath);
+            ITreeRepositoryHeadersCollectionInfrastructureRepository treeRepositoryHeadersCollectionInfrastructureRepository = new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath);
             ITreeRepositoriesInfrastructureRepository treeRepositoriesInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
             switch (entity.InfrastructureType)

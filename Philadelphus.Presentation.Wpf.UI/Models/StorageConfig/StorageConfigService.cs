@@ -18,9 +18,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
     {
         private StorageConfig? _config;
 
-        public StorageConfig LoadConfig(string filePath = "storage-config.json")
+        public StorageConfig LoadConfig(string filePath = "storages-config.json")
         {
-            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Philadelphus\\storage-config.json");
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Philadelphus\\Configuration\\storages-config.json");
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Configuration file not found: {filePath}");
@@ -49,7 +49,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.StorageConfig
         public IDataStorageModel? CreateStorageModel(Guid modelUuid)
         {
             var modelConfig = _config?.DataStorageModels.FirstOrDefault(m => m.Uuid == modelUuid);
-            if (modelConfig == null) 
+            if (modelConfig == null)
                 return null;
             ITreeRepositoriesInfrastructureRepository treeRepositoryHeadersInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
