@@ -21,7 +21,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
     {
         #region [ Props ]
 
-        public static Dictionary<Guid, IDataStorageModel> DataStorages { get; }
         public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get; }
 
         #endregion
@@ -32,8 +31,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> uuids);
         public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid uuid);
         public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> uuids);
-        public IDataStorageModel GetStorageModelFromCollection(Guid uuid);
-        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> uuids);
         public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel);
         public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
         public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
@@ -49,7 +46,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Create + Add ]
 
-        public IDataStorageModel CreateMainDataStorageModel(FileInfo storagesConfigFullPath, FileInfo repositoryHeadersConfigFullPath);
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage);
         public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel);
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path);

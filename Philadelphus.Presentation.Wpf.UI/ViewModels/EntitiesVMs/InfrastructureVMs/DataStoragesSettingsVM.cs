@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Config;
 using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Models.StorageConfig;
 using System;
 using System.Collections.Generic;
@@ -20,8 +21,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
     {
         private readonly ILogger<DataStoragesSettingsVM> _logger;
         private readonly INotificationService _notificationService;
-        private readonly ITreeRepositoryCollectionService _treeRepositoryCollectionService;
-        private readonly StorageConfigService _storageConfigService;
+        private readonly IDataStoragesService _dataStoragesService;
 
         private DataStorageVM _mainDataStorageVM;
         public DataStorageVM MainDataStorageVM
@@ -70,30 +70,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         public DataStoragesSettingsVM(
             ILogger<DataStoragesSettingsVM> logger,
             INotificationService notificationService,
-            ITreeRepositoryCollectionService treeRepositoryCollectionService,
-            StorageConfigService storageConfigService,   //TODO: Заменить на новый сервис
-            IOptions<ApplicationSettings> options)
+            IDataStoragesService dataStoragesService,
+            IOptions<ApplicationSettings> applicationSettings,
+            IOptions<ConnectionStringsCollection> connectionStringsCollection)
         {
             _logger = logger;
             _notificationService = notificationService;
-            _treeRepositoryCollectionService = treeRepositoryCollectionService;
-            _storageConfigService = storageConfigService;
+            _dataStoragesService = dataStoragesService;
 
-            InitMainDataStorageVM(options.Value);
-            InitDataStorages();
+            InitMainDataStorageVM(applicationSettings.Value);
+            InitDataStorages(connectionStringsCollection.Value);
         }
         private bool InitMainDataStorageVM(ApplicationSettings applicationSettings)
         {
-            var mainDataStorageModel = _treeRepositoryCollectionService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
+            var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
             _dataStorageVMs.Add(_mainDataStorageVM);
             return true;
         }
-        private bool InitDataStorages()
+        private bool InitDataStorages(ConnectionStringsCollection connectionStrings)
         {
-            var service = new StorageConfigService();
-            service.LoadConfig();
-            var models = service.GetAllStorageModels();
+            
+            var models = _dataStoragesService.GetStoragesModels(connectionStrings);
             foreach (var model in models)
             {
                 if (model != null)

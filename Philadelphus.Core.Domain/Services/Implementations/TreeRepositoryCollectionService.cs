@@ -25,12 +25,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryService _treeRepositoryService;
 
-        private static Dictionary<Guid, IDataStorageModel> _dataStorages = new Dictionary<Guid, IDataStorageModel>();
-        /// <summary>
-        /// Хранилища данных
-        /// </summary>
-        public static Dictionary<Guid, IDataStorageModel> DataStorages { get => _dataStorages; private set => _dataStorages = value; }
-
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
         /// <summary>
         /// Коллекция репозиториев
@@ -104,32 +98,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             foreach (var uuid in uuids)
             {
                 if (_dataTreeRepositories.TryGetValue(uuid, out var model))
-                {
-                    result.Add(model);
-                }
-            }
-            return result;
-        }
-        /// <summary>
-        /// Получение хранилища данных (модель) по его UUID
-        /// </summary>
-        /// <param name="uuid">UUID</param>
-        /// <returns>Хранилище данных (модель)</returns>
-        public IDataStorageModel GetStorageModelFromCollection(Guid uuid)
-        {
-            return _dataStorages[uuid];
-        }
-        /// <summary>
-        /// Получение коллекции хранилищ данных (модели) по их UUID
-        /// </summary>
-        /// <param name="uuids">UUIDs</param>
-        /// <returns>Коллекция хранилищ данных (модели)</returns>
-        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> uuids)
-        {
-            var result = new List<IDataStorageModel>();
-            foreach (var uuid in uuids)
-            {
-                if (_dataStorages.TryGetValue(uuid, out var model))
                 {
                     result.Add(model);
                 }
@@ -233,34 +201,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #endregion
 
         #region [ Create + Add ]
-
-        /// <summary>
-        /// Сохдать хранилище данных
-        /// </summary>
-        /// <param name="configsDirectory">Путь к настроечному файлу</param>
-        /// <returns>Хранилище данных</returns>
-        public IDataStorageModel CreateMainDataStorageModel(
-            FileInfo storagesConfigFullPath,
-            FileInfo repositoryHeadersConfigFullPath)
-        {
-            if (storagesConfigFullPath == null || repositoryHeadersConfigFullPath == null)
-                return null;
-
-            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
-                .SetGeneralParameters(
-                    name: "Основное хранилище настроечных файлов",
-                    description: "Хранилище настроечных файлов и конфигураций в формате json-документов",
-                    Guid.Empty,
-                    InfrastructureTypes.JsonDocument,
-                    isDisabled: false)
-                .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath))
-                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath))
-            ;
-            var mainDataStorageModel = dataStorageBuilder.Build();
-
-            _logger.LogInformation("Хранилище конфигурационных файлов инициализировано.");
-            return mainDataStorageModel;
-        }
 
         /// <summary>
         /// Создать новый репозиторий

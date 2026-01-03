@@ -127,7 +127,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         private void StartCheckingStorage()
         {
             _model.StartAvailableAutoChecking();
-            System.Timers.Timer timer = new System.Timers.Timer(100);
+            System.Timers.Timer timer = new System.Timers.Timer(5000);
             timer.Elapsed += CheckStorage;
             timer.AutoReset = true;
             timer.Enabled = true;

@@ -21,6 +21,7 @@ using System.Configuration;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime;
 using System.Text.Json;
 using System.Windows;
@@ -71,12 +72,20 @@ namespace Philadelphus.Presentation.Wpf.UI
                         //config.AddJsonFile(Path.Combine(appDataPath, "storages-config.json"), optional: true);
                         //config.AddJsonFile(Path.Combine(appDataPath, "repository-headers-config.json"), optional: true);
                     }
+                    var env = hostingContext.HostingEnvironment;
+                    if (env.IsDevelopment() || true /*временно для тестов*/)
+                    {
+                        var appAssembly = Assembly.GetExecutingAssembly();
+                        config.AddUserSecrets(appAssembly, optional: true);
+                    }
                 })
                 .ConfigureServices((context, services) =>
                 {
                     // Регистрация конфигурации
                     services.Configure<ApplicationSettings>(
                         context.Configuration.GetSection(nameof(ApplicationSettings)));
+                    services.Configure<ConnectionStringsCollection>(
+                        context.Configuration.GetSection(nameof(ConnectionStringsCollection)));
                     //services.Configure<DataStoragesCollection>(
                     //    context.Configuration.GetSection(nameof(DataStoragesCollection)));
                     //services.Configure<DataStoragesCollection>(
@@ -88,7 +97,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Регистрация сервисов
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<ApplicationSettings>
                     services.AddSingleton<INotificationService, NotificationService>();
-                    services.AddSingleton<StorageConfigService>();      //TODO: Заменить на новый сервис
+                    services.AddScoped<IDataStoragesService, DataStoragesService>();
                     services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
                     services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
                     services.AddScoped<IExtensionManager, ExtensionManager>();

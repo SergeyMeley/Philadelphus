@@ -8,6 +8,7 @@ namespace Philadelphus.Infrastructure.Persistence.Enums
 {
     public enum InfrastructureTypes
     {
+        Empty,
         WindowsDirectory,
         PostgreSqlAdo,
         PostgreSqlEf,

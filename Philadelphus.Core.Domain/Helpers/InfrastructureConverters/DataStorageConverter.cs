@@ -1,9 +1,11 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
+using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.Infrastructure.Persistence.OtherEntities;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
+using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.OtherEntities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,31 +18,32 @@ namespace Philadelphus.InfrastructureConverters.Converters
 {
     public static class DataStorageConverter
     {
-        public static DataStorage ToDbEntity(this IDataStorageModel model)
+        public static DataStorage ToDbEntity(
+            this IDataStorageModel businessEntity)
         {
+            if (businessEntity == null)
+                return null;
             var result = new DataStorage()
             {
-                Name = model.Name,
-                Description = model.Description,
-                Uuid = model.Uuid,
-                HasDataStorageInfrastructureRepositoryRepository = model.DataStoragesCollectionInfrastructureRepository != null,
-                HasTreeRepositoryHeadersInfrastructureRepository = model.TreeRepositoriesInfrastructureRepository != null,
-                HasMainEntitiesInfrastructureRepository = model.MainEntitiesInfrastructureRepository != null,
-                InfrastructureType = model.InfrastructureType,
+                Name = businessEntity.Name,
+                Description = businessEntity.Description,
+                Uuid = businessEntity.Uuid,
+                HasDataStorageInfrastructureRepositoryRepository = businessEntity.DataStoragesCollectionInfrastructureRepository != null,
+                HasTreeRepositoryHeadersInfrastructureRepository = businessEntity.TreeRepositoriesInfrastructureRepository != null,
+                HasMainEntitiesInfrastructureRepository = businessEntity.MainEntitiesInfrastructureRepository != null,
+                InfrastructureType = businessEntity.InfrastructureType,
             };
             return result;
         }
         public static IDataStorageModel ToModel(
-            this DataStorage entity, 
-            string connectionString,
-            FileInfo storagesConfigFullPath,
-            FileInfo repositoryHeadersConfigFullPath)
+            this DataStorage dbEntity,
+            string connectionString)
         {
-            IDataStoragesCollectionInfrastructureRepository dataStoragesCollectionInfrastructureRepository = new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath);
-            ITreeRepositoryHeadersCollectionInfrastructureRepository treeRepositoryHeadersCollectionInfrastructureRepository = new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath);
+            if (dbEntity == null)
+                return null;
             ITreeRepositoriesInfrastructureRepository treeRepositoriesInfrastructureRepository = null;
             IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
-            switch (entity.InfrastructureType)
+            switch (dbEntity.InfrastructureType)
             {
                 case InfrastructureTypes.WindowsDirectory:
                     break;
@@ -66,9 +69,7 @@ namespace Philadelphus.InfrastructureConverters.Converters
                     break;
             }
             var builder = new DataStorageBuilder()
-                .SetGeneralParameters(entity.Name, entity.Description, entity.Uuid, entity.InfrastructureType, entity.IsDisabled)
-                .SetRepository(dataStoragesCollectionInfrastructureRepository)
-                .SetRepository(treeRepositoryHeadersCollectionInfrastructureRepository)
+                .SetGeneralParameters(dbEntity.Name, dbEntity.Description, dbEntity.Uuid, dbEntity.InfrastructureType, dbEntity.IsDisabled)
                 .SetRepository(treeRepositoriesInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();

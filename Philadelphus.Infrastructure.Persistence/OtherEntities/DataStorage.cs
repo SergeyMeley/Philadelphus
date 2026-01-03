@@ -12,7 +12,6 @@ namespace Philadelphus.Infrastructure.Persistence.OtherEntities
     {
         public Guid Uuid { get; set; }
         public string ProviderName { get; set; }
-        public string ConnectionString { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public InfrastructureTypes InfrastructureType { get; set; }
