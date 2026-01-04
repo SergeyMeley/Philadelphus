@@ -31,4 +31,13 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Aggregates\" />
+    <Folder Include="ValueObjects\" />
+    <Folder Include="RepositoriesInterfaces\" />
+    <Folder Include="Events\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Specifications\" />
+  </ItemGroup>
+
 </Project>

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;

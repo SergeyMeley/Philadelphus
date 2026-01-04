@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
 using Philadelphus.Infrastructure.Persistence.OtherEntities;

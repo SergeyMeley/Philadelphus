@@ -1,20 +1,10 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Json.Repositories;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
 using Philadelphus.Infrastructure.Persistence.OtherEntities;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Philadelphus.InfrastructureConverters.Converters
+namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class DataStorageConverter
     {

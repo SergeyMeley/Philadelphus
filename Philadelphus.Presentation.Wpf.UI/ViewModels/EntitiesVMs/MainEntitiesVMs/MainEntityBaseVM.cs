@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Entities.ElementsProperties;
 using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;

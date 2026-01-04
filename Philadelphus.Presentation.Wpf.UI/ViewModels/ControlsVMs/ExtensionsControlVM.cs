@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
@@ -17,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {

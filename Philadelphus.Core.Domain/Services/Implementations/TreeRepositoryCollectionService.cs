@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
 using Philadelphus.Infrastructure.Persistence.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Json.Repositories;
-using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {

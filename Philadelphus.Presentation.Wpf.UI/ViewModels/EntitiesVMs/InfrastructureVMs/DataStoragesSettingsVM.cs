@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;

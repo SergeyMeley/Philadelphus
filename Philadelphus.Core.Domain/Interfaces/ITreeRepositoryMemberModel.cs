@@ -1,9 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {

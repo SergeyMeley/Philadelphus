@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;

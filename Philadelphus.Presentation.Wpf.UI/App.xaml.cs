@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Implementations;

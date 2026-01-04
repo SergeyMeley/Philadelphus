@@ -1,17 +1,11 @@
-﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
-using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Core.Domain.Services;
 using Philadelphus.Infrastructure.Persistence.MainEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.Entities.RepositoryElements
+namespace Philadelphus.Core.Domain.Entities.MainEntities
 {
     public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByUuidModel
     {

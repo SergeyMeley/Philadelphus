@@ -1,15 +1,8 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.Infrastructure.Persistence.OtherEntities;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
-namespace Philadelphus.Core.Domain.Entities.Infrastructure
+namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
 {
     public class DataStorageModel : IDataStorageModel
     {

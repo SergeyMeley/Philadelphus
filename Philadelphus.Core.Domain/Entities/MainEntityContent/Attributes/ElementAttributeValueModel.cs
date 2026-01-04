@@ -1,17 +1,11 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Enums;
 using Philadelphus.Infrastructure.Persistence.MainEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent
+namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 {
     public class ElementAttributeValueModel : MainEntityBaseModel, ITreeElementContentModel
     {

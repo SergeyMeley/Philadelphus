@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure;
 using Philadelphus.Core.Domain.Entities.RepositoryElements;
 using Philadelphus.Core.Domain.Helpers;

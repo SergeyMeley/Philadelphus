@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace Philadelphus.Core.Domain.Config
+namespace Philadelphus.Core.Domain.Configurations
 {
     public class ApplicationSettings    //TODO: Подумать о переносе в Application
     {

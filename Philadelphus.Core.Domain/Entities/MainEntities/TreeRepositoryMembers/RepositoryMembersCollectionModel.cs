@@ -1,14 +1,9 @@
-﻿using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.ElementsContent;
-using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers
+namespace Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers
 {
     public class RepositoryMembersCollectionModel : IEnumerable<IMainEntityModel>, ICollection<IMainEntityModel>
     {

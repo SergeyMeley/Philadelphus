@@ -1,10 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.ExtensionSystem.Models
 {

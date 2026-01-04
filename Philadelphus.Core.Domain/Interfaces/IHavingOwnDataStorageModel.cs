@@ -1,10 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Infrastructure.Persistence.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
