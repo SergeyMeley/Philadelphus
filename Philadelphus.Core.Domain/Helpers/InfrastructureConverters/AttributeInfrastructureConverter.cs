@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {

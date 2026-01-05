@@ -1,13 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {

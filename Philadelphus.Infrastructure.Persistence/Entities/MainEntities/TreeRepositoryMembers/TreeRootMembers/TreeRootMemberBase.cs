@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Philadelphus.Infrastructure.Persistence.MainEntities
+﻿namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers
 {
     public abstract class TreeRootMemberBase : MainEntityBase
     {

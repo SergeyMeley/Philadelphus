@@ -1,11 +1,6 @@
-﻿using Philadelphus.Infrastructure.Persistence.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 
-namespace Philadelphus.Infrastructure.Persistence.Interfaces
+namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
 {
     public interface IInfrastructureRepository
     {

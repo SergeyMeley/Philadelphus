@@ -1,12 +1,6 @@
-﻿using Philadelphus.Infrastructure.Persistence.Enums;
-using Philadelphus.Infrastructure.Persistence.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 
-namespace Philadelphus.Infrastructure.Persistence.OtherEntities
+namespace Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages
 {
     public class DataStorage
     {

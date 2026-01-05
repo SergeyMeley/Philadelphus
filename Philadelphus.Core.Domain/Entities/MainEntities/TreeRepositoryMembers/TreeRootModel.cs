@@ -4,7 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeR
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers
 {

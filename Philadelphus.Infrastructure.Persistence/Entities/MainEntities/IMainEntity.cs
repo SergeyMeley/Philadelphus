@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
 
-namespace Philadelphus.Infrastructure.Persistence.MainEntities
+namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
 {
     public interface IMainEntity
     {

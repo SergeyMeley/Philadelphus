@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Philadelphus.Infrastructure.Persistence.Enums
+﻿namespace Philadelphus.Infrastructure.Persistence.Common.Enums
 {
     public enum InfrastructureEntityGroups
     {

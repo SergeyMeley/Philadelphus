@@ -1,6 +1,8 @@
-﻿using Philadelphus.Infrastructure.Persistence.MainEntities;
+﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
-namespace Philadelphus.Infrastructure.Persistence.Interfaces
+namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
 {
     public interface IMainEntitiesInfrastructureRepository : IInfrastructureRepository
     {

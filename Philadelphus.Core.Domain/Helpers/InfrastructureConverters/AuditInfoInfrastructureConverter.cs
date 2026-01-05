@@ -1,5 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
