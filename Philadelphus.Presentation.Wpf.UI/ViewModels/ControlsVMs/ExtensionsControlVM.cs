@@ -1,22 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
-using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Philadelphus.Core.Domain.Entities.MainEntities;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {

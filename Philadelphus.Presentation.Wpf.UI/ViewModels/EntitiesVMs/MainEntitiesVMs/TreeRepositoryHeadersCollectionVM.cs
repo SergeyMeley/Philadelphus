@@ -1,11 +1,6 @@
-﻿  using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Services.Implementations;
+﻿using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
-using System.Collections.ObjectModel;
-using System.Configuration;
-using System.IO;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {

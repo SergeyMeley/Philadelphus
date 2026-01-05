@@ -1,15 +1,4 @@
 ﻿using Philadelphus.Core.Domain.Entities.OtherEntities;
-using Philadelphus.Presentation.Wpf.UI.Models.Entities;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
 {

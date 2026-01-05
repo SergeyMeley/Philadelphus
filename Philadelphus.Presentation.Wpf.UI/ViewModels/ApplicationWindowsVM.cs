@@ -1,10 +1,4 @@
-﻿using Philadelphus.Presentation.Wpf.UI.Views;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {

@@ -1,18 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
-using Philadelphus.Core.Domain.Services;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using System.Configuration;
-using System.Globalization;
-using System.IO;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
