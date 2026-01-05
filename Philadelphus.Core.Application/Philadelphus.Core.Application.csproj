@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Abstractions\" />
+    <Folder Include="Common\Constants\" />
+    <Folder Include="Common\Enums\" />
+    <Folder Include="Services\" />
+    <Folder Include="Commands\" />
+    <Folder Include="Queries\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Mappings\" />
+    <Folder Include="Validators\" />
+    <Folder Include="Behaviors\" />
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

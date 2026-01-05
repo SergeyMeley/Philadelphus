@@ -1,15 +1,6 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Core.Domain.Factories;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Core.Domain.Services;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {

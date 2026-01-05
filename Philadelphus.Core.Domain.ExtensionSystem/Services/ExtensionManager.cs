@@ -1,15 +1,8 @@
-﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 {

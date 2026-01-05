@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Seeds\" />
+  </ItemGroup>
+
 </Project>

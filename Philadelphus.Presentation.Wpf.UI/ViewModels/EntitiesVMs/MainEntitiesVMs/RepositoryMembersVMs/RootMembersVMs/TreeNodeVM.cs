@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Core.Domain.Services.Implementations;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 

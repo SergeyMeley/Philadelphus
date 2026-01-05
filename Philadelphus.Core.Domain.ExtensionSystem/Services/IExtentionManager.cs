@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.RepositoryElements;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 
 namespace Philadelphus.Core.Domain.ExtensionSystem.Services

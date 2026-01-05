@@ -1,15 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Config;
-using Philadelphus.Core.Domain.Services;
-using Philadelphus.Core.Domain.Services.Implementations;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {

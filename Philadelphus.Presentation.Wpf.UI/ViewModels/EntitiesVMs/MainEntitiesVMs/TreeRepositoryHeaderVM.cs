@@ -1,17 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Core.Domain.Helpers;
-using Philadelphus.Core.Domain.Services.Implementations;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {

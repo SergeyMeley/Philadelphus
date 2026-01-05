@@ -1,14 +1,8 @@
-﻿using Philadelphus.Infrastructure.Persistence.Enums;
-using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
-using Philadelphus.Infrastructure.Persistence.OtherEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 {
@@ -17,9 +11,12 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.DataStoragesCollection; }
 
         private FileInfo _file;
-        public JsonDataStoragesCollectionInfrastructureRepository(DirectoryInfo directory)
+        public JsonDataStoragesCollectionInfrastructureRepository(
+            FileInfo storagesConfigFullPath)
         {
-            _file = new FileInfo(Path.Combine(directory.FullName, "storage-config.json"));
+            if (storagesConfigFullPath == null || storagesConfigFullPath.Exists == false)
+                throw new Exception($"Некорректный путь к настроечному файлу: '{storagesConfigFullPath}'");
+            _file = storagesConfigFullPath;
         }
         public bool CheckAvailability()
         {
@@ -30,13 +27,12 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 
         public IEnumerable<DataStorage> SelectDataStorages()
         {
-            var filePath = "storage-config.json";
             DataStoragesCollection resultCollection = null;
-            if (!File.Exists(filePath))
+            if (_file.Exists == false)
             {
-                throw new FileNotFoundException($"Конфигурационный файл не найден: {filePath}");
+                throw new FileNotFoundException($"Конфигурационный файл не найден: {_file.FullName}");
             }
-            var json = File.ReadAllText(filePath);
+            var json = File.ReadAllText(_file.FullName);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -49,7 +45,10 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 
         public long UpdateDataStorages(IEnumerable<DataStorage> storages)
         {
-            var filePath = "storages.json";
+            if (_file.Exists == false)
+            {
+                throw new FileNotFoundException($"Конфигурационный файл не найден: {_file.FullName}");
+            }
             var collection = new DataStoragesCollection() { DataStorages = storages.ToList() };
             var options = new JsonSerializerOptions
             {
@@ -58,7 +57,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
                 Converters = { new JsonStringEnumConverter() }
             };
             var json = JsonSerializer.Serialize<DataStoragesCollection>(collection, options);
-            File.WriteAllText(filePath, json);
+            File.WriteAllText(_file.FullName, json);
 
             return storages.Count();
         }

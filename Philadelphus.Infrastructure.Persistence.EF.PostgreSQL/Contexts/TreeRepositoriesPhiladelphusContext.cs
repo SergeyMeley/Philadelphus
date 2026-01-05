@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {

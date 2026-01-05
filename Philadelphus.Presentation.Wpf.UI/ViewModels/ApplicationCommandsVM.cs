@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Controls;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using System;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {

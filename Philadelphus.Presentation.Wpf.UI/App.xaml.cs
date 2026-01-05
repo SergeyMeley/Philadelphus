@@ -2,26 +2,21 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Config;
+using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Models.StorageConfig;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using System.Configuration;
-using System.Data;
 using System.Globalization;
 using System.IO;
-using System.Runtime;
-using System.Text.Json;
+using System.Reflection;
 using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI
@@ -45,18 +40,49 @@ namespace Philadelphus.Presentation.Wpf.UI
                     logging.AddDebug();
                     logging.SetMinimumLevel(LogLevel.Information);
                 })
+                // Добавление конфигурационных файлов
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
+                    // Основной конфигурационный файл
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    
+                    var appDataPath = Environment.ExpandEnvironmentVariables("%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
+                    if (Directory.Exists(appDataPath) == false)
+                    {
+                        try
+                        {
+                            Directory.CreateDirectory(appDataPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Не найдена директория основных настроечных файлов");
+                            throw;
+                        }
+                        
+                    }
+                    if (Directory.Exists(appDataPath))
+                    {
+                        //config.AddJsonFile(Path.Combine(appDataPath, "storages-config.json"), optional: true);
+                        //config.AddJsonFile(Path.Combine(appDataPath, "repository-headers-config.json"), optional: true);
+                    }
+                    var env = hostingContext.HostingEnvironment;
+                    if (env.IsDevelopment() || true /*временно для тестов*/)
+                    {
+                        var appAssembly = Assembly.GetExecutingAssembly();
+                        config.AddUserSecrets(appAssembly, optional: true);
+                    }
                 })
                 .ConfigureServices((context, services) =>
                 {
                     // Регистрация конфигурации
-                    //var builder = new ConfigurationBuilder()
-                    //    .SetBasePath(Directory.GetCurrentDirectory())
-                    //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                    //IConfiguration configuration = builder.Build();
-                    services.Configure<ApplicationSettings>(context.Configuration.GetSection(nameof(ApplicationSettings)));
+                    services.Configure<ApplicationSettings>(
+                        context.Configuration.GetSection(nameof(ApplicationSettings)));
+                    services.Configure<ConnectionStringsCollection>(
+                        context.Configuration.GetSection(nameof(ConnectionStringsCollection)));
+                    //services.Configure<DataStoragesCollection>(
+                    //    context.Configuration.GetSection(nameof(DataStoragesCollection)));
+                    //services.Configure<DataStoragesCollection>(
+                    //    context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollection)));
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(typeof(MappingProfile));
@@ -64,7 +90,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Регистрация сервисов
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<ApplicationSettings>
                     services.AddSingleton<INotificationService, NotificationService>();
-                    services.AddSingleton<StorageConfigService>();      //TODO: Заменить на новый сервис
+                    services.AddScoped<IDataStoragesService, DataStoragesService>();
                     services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
                     services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
                     services.AddScoped<IExtensionManager, ExtensionManager>();

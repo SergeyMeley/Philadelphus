@@ -2,12 +2,7 @@
 using Philadelphus.Core.Domain.Entities.OtherEntities;
 using Philadelphus.Core.Domain.Handlers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {

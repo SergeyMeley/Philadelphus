@@ -1,14 +1,11 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Core.Domain.Entities.RepositoryElements.RepositoryMembers;
-using Philadelphus.Core.Domain.Entities.TreeRepositoryElements.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {

@@ -1,18 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
-using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Core.Domain.Services.Implementations;
-using Philadelphus.Infrastructure.Persistence.Enums;
-using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Json.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
@@ -20,7 +9,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
     {
         #region [ Props ]
 
-        public static Dictionary<Guid, IDataStorageModel> DataStorages { get; }
         public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get; }
 
         #endregion
@@ -31,8 +19,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> uuids);
         public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid uuid);
         public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> uuids);
-        public IDataStorageModel GetStorageModelFromCollection(Guid uuid);
-        public List<IDataStorageModel> GetStorageModelFromCollection(IEnumerable<Guid> uuids);
         public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel);
         public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
         public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
@@ -48,7 +34,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Create + Add ]
 
-        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo configsDirectory);
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage);
         public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel);
         public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path);

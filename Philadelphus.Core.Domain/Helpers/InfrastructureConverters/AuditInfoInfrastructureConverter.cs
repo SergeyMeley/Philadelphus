@@ -1,12 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.ElementsProperties;
-using Philadelphus.Core.Domain.Entities.Infrastructure;
-using Philadelphus.Core.Domain.Entities.RepositoryElements;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {

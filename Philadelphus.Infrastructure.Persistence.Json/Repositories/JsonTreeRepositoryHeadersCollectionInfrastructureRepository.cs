@@ -1,15 +1,8 @@
-﻿using Philadelphus.Infrastructure.Persistence.Enums;
-using Philadelphus.Infrastructure.Persistence.Interfaces;
-using Philadelphus.Infrastructure.Persistence.MainEntities;
-using Philadelphus.Infrastructure.Persistence.OtherEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 {
@@ -18,11 +11,12 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositoryHeadersCollection; }
 
         private FileInfo _file;
-        public JsonTreeRepositoryHeadersCollectionInfrastructureRepository(DirectoryInfo directory)
+        public JsonTreeRepositoryHeadersCollectionInfrastructureRepository(
+            FileInfo repositoryHeadersConfigFullPath)
         {
-            if (directory == null)
-                return;
-            _file = new FileInfo(Path.Combine(directory.FullName, "repository-headers-config.json"));
+            if (repositoryHeadersConfigFullPath == null || repositoryHeadersConfigFullPath.Exists == false)
+                throw new Exception($"Некорректный путь к настроечному файлу: '{repositoryHeadersConfigFullPath}'");
+            _file = repositoryHeadersConfigFullPath ;
         }
         public bool CheckAvailability()
         {
