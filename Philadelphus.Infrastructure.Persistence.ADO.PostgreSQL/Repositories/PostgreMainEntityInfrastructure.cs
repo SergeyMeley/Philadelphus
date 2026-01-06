@@ -7,7 +7,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
 {
-    public class PostgreMainEntityInfrastructure : IMainEntitiesInfrastructureRepository
+    public class PostgreMainEntityInfrastructure : ITreeRepositoriesMembersInfrastructureRepository
     {
         private readonly Context _context;
 
@@ -202,32 +202,32 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
             throw new NotImplementedException();
         }
 
-        long IMainEntitiesInfrastructureRepository.InsertRoots(IEnumerable<TreeRoot> roots)
+        long ITreeRepositoriesMembersInfrastructureRepository.InsertRoots(IEnumerable<TreeRoot> roots)
         {
             return InsertRoots(roots);
         }
 
-        long IMainEntitiesInfrastructureRepository.InsertNodes(IEnumerable<TreeNode> nodes)
+        long ITreeRepositoriesMembersInfrastructureRepository.InsertNodes(IEnumerable<TreeNode> nodes)
         {
             return InsertNodes(nodes);
         }
 
-        long IMainEntitiesInfrastructureRepository.InsertLeaves(IEnumerable<TreeLeave> leaves)
+        long ITreeRepositoriesMembersInfrastructureRepository.InsertLeaves(IEnumerable<TreeLeave> leaves)
         {
             return InsertLeaves(leaves);
         }
 
-        long IMainEntitiesInfrastructureRepository.UpdateRoots(IEnumerable<TreeRoot> roots)
+        long ITreeRepositoriesMembersInfrastructureRepository.UpdateRoots(IEnumerable<TreeRoot> roots)
         {
             return UpdateRoots(roots);
         }
 
-        long IMainEntitiesInfrastructureRepository.UpdateNodes(IEnumerable<TreeNode> nodes)
+        long ITreeRepositoriesMembersInfrastructureRepository.UpdateNodes(IEnumerable<TreeNode> nodes)
         {
             return UpdateNodes(nodes);
         }
 
-        long IMainEntitiesInfrastructureRepository.UpdateLeaves(IEnumerable<TreeLeave> leaves)
+        long ITreeRepositoriesMembersInfrastructureRepository.UpdateLeaves(IEnumerable<TreeLeave> leaves)
         {
             return UpdateLeaves(leaves);
         }

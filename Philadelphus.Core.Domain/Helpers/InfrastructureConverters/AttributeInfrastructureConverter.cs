@@ -6,6 +6,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class AttributeInfrastructureConverter
     {
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
         public static ElementAttribute ToDbEntity(this ElementAttributeModel businessEntity)
         {
             if (businessEntity == null)
@@ -17,6 +22,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.ValueUuid = businessEntity.Value?.Uuid;
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию доменных моделей в коллекцию сущностей БД
+        /// </summary>
+        /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
+        /// <returns></returns>
         public static List<ElementAttribute> ToDbEntityCollection(this IEnumerable<ElementAttributeModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
@@ -28,6 +39,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="owner">Владелец</param>
+        /// <returns></returns>
         public static ElementAttributeModel ToModel(this ElementAttribute dbEntity, IAttributeOwnerModel owner)
         {
             if (dbEntity == null)

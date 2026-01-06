@@ -1,17 +1,43 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
 {
+    /// <summary>
+    /// Хранилище данных  
+    /// </summary>
     public class DataStorageModel : IDataStorageModel
     {
+        /// <summary>
+        /// Уникальный идентификатор
+        /// </summary>
         public Guid Uuid { get; }
+
+        /// <summary>
+        /// Наименование
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Описание
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// Тип хранилища данных
+        /// </summary>
         public InfrastructureTypes InfrastructureType { get; set; }
 
+        /// <summary>
+        /// Репозитории БД
+        /// </summary>
         private Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> _infrastructureRepositories;
+
+        /// <summary>
+        /// Репозитории БД
+        /// </summary>
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories 
         { 
             get
@@ -27,6 +53,10 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 _infrastructureRepositories = value;
             }
         }
+
+        /// <summary>
+        /// Репозиторий  БД работы с хранилищами данных Чубушника
+        /// </summary>
         public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository
         {
             get
@@ -38,6 +68,10 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 return (IDataStoragesCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.DataStoragesCollection];
             }
         }
+
+        /// <summary>
+        /// Репозиторий БД работы с заголовками репозиториев Чубушника
+        /// </summary>
         public ITreeRepositoryHeadersCollectionInfrastructureRepository TreeRepositoryHeadersCollectionInfrastructureRepository
         {
             get
@@ -49,6 +83,10 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 return (ITreeRepositoryHeadersCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoryHeadersCollection];
             }
         }
+
+        /// <summary>
+        /// Репозиторий БД работы с репозиториями Чубушника
+        /// </summary>
         public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository
         {
             get
@@ -60,7 +98,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 return (ITreeRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositories];
             }
         }
-        public IMainEntitiesInfrastructureRepository MainEntitiesInfrastructureRepository
+
+        /// <summary>
+        /// Репозиторий БД работы с участниками репозитория Чубушника
+        /// </summary>
+        public ITreeRepositoriesMembersInfrastructureRepository TreeRepositoryMembersInfrastructureRepository
         {
             get
             {
@@ -68,17 +110,49 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                     return null;
                 if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.MainEntities) == false)
                     return null;
-                return (IMainEntitiesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
+                return (ITreeRepositoriesMembersInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
             }
         }
+
+        /// <summary>
+        /// Доступность хранилища (доступность всех репозиториев БД)
+        /// </summary>
         private bool _isAvailable = false;
+
+        /// <summary>
+        /// Доступность хранилища (доступность всех репозиториев БД)
+        /// </summary>
         public bool IsAvailable { get => _isAvailable; }
 
+        /// <summary>
+        /// Состояние отключенности
+        /// </summary>
         private bool _isDisabled;
+
+        /// <summary>
+        /// Состояние отключенности
+        /// </summary>
         public bool IsDisabled { get => _isDisabled; set => _isDisabled = value; }
 
+
+        /// <summary>
+        /// Время последней проверки доступности
+        /// </summary>
         private DateTime _lastCheckTime;
+
+        /// <summary>
+        /// Время последней проверки доступности
+        /// </summary>
         public DateTime LastCheckTime { get => _lastCheckTime; }
+
+        /// <summary>
+        /// Хранилище данных
+        /// </summary>
+        /// <param name="uuid">Уникальный идентификатор</param>
+        /// <param name="name">Наименование</param>
+        /// <param name="description">Описание</param>
+        /// <param name="infrastructureType">Тип</param>
+        /// <param name="isDisabled">Состояние отключенности</param>
         internal DataStorageModel(Guid uuid, string name, string description, InfrastructureTypes infrastructureType, bool isDisabled)
         {
             Uuid = uuid;
@@ -92,16 +166,27 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             }
             CheckAvailable();
         }
-        public bool StartAvailableAutoChecking()
+
+        /// <summary>
+        /// Запустить автоматическую проверку доступности всех репозиториев
+        /// </summary>
+        /// <param name="interval">Интервал проверки (сек.)</param>
+        /// <returns></returns>
+        public bool StartAvailableAutoChecking(int interval)
         {
             if (_isDisabled)
                 return false;
-            System.Timers.Timer timer = new System.Timers.Timer(10000);
+            Timer timer = new Timer(interval * 1000);
             timer.Elapsed += CheckAvailable;
             timer.AutoReset = true;
             timer.Enabled = true;
             return true;
         }
+
+        /// <summary>
+        /// Проверить доступность всех репозиториев
+        /// </summary>
+        /// <returns></returns>
         public bool CheckAvailable()
         {
             if (_isDisabled)
@@ -119,6 +204,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             _isAvailable = result;
             return _isAvailable;
         }
+
+        /// <summary>
+        /// Проверить доступность всех репозиториев (обертка для таймера)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         private void CheckAvailable(Object source, ElapsedEventArgs e)
         {
             CheckAvailable();

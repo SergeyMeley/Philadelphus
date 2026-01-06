@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
@@ -84,8 +85,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             foreach (var dataStorage in repository?.DataStorages)
             {
-                var infrastructure = dataStorage.MainEntitiesInfrastructureRepository;
-                if (infrastructure is IMainEntitiesInfrastructureRepository
+                var infrastructure = dataStorage.TreeRepositoryMembersInfrastructureRepository;
+                if (infrastructure is ITreeRepositoriesMembersInfrastructureRepository
                     && dataStorage.IsAvailable)
                 {
                     var dbRoots = infrastructure.SelectRoots(repository.ChildsUuids?.ToArray());
@@ -302,11 +303,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 List<TreeRoot> dbCollection;
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.InsertRoots(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.InsertRoots(dbCollection);
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.UpdateRoots(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.UpdateRoots(dbCollection);
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.DeleteRoots(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteRoots(dbCollection);
             }
             result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes));
             result += SaveChanges(treeRoots.SelectMany(x => x.PersonalAttributes));
@@ -337,11 +338,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 List<TreeNode> dbCollection;
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.InsertNodes(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.InsertNodes(dbCollection);
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.UpdateNodes(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.UpdateNodes(dbCollection);
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.DeleteNodes(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteNodes(dbCollection);
             }
             result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes));
             result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves));
@@ -373,11 +374,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 List<TreeLeave> dbCollection;
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.InsertLeaves(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.InsertLeaves(dbCollection);
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.UpdateLeaves(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.UpdateLeaves(dbCollection);
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.DeleteLeaves(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteLeaves(dbCollection);
             }
             result += SaveChanges(treeLeaves.SelectMany(x => x.PersonalAttributes));
             foreach (var treeLeave in treeLeaves)
@@ -409,11 +410,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 List<ElementAttribute> dbCollection;
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.InsertAttributes(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.InsertAttributes(dbCollection);
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.UpdateAttributes(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.UpdateAttributes(dbCollection);
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.MainEntitiesInfrastructureRepository.DeleteAttributes(dbCollection);
+                result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteAttributes(dbCollection);
             }
             //TODO: Вынести в отдельный метод RemoveDeleted
             //TODO: ПОЧИНИТЬ!!!

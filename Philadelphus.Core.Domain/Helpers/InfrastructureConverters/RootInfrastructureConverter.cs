@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
 
@@ -6,6 +7,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     internal static class RootInfrastructureConverter
     {
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
         public static TreeRoot ToDbEntity(this TreeRootModel businessEntity)
         {
             if (businessEntity == null)
@@ -15,6 +21,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.DataStoragesUuids = businessEntity.DataStorages.Select(x => x.Uuid).ToArray();
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию доменных моделей в коллекцию сущностей БД
+        /// </summary>
+        /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
+        /// <returns></returns>
         public static List<TreeRoot> ToDbEntityCollection(this IEnumerable<TreeRootModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
@@ -26,6 +38,14 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="dataStorages">Доступные хранилища данных</param>
+        /// <param name="treeRepositories">Доступные репозитории Чубушника</param>
+        /// <returns></returns>
         public static TreeRootModel ToModel(this TreeRoot dbEntity, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<TreeRepositoryModel> treeRepositories)
         {
             if (dbEntity == null)
@@ -36,6 +56,14 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result = (TreeRootModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
+        /// </summary>
+        /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
+        /// <param name="dataStorages">Коллекция доступных хранилищ данных</param>
+        /// <param name="treeRepositories">Коллекция доступных репозиториев Чубушника</param>
+        /// <returns></returns>
         public static List<TreeRootModel> ToModelCollection(this IEnumerable<TreeRoot> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<TreeRepositoryModel> treeRepositories)
         {
             if (dbEntityCollection == null)

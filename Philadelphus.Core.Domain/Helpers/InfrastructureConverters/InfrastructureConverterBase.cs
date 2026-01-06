@@ -11,30 +11,56 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     internal static class InfrastructureConverterBase
     {
-        public static MainEntityBaseModel ToModelGeneralProperties(this IMainEntity dbEntity, MainEntityBaseModel businessEntity)
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static IMainEntity ToDbEntity(this IMainEntityModel businessEntity)
         {
-            if (dbEntity == null)
+            if (businessEntity == null)
                 return null;
-            //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
-            //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
-            //businessEntity.ConfigPath = dbEntity.ConfigPath;
-            businessEntity.DbEntity = dbEntity;
-            businessEntity.Name = dbEntity.Name;
-            businessEntity.Alias = dbEntity.Alias;
-            businessEntity.CustomCode = dbEntity.CustomCode;
-            businessEntity.Description = dbEntity.Description;
-            businessEntity.IsLegacy = dbEntity.IsLegacy;
-            businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
-            businessEntity.AuditInfo.CreatedAt = dbEntity.AuditInfo.CreatedAt;
-            businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;
-            businessEntity.AuditInfo.UpdatedAt = dbEntity.AuditInfo.UpdatedAt;
-            businessEntity.AuditInfo.UpdatedBy = dbEntity.AuditInfo.UpdatedBy;
-            businessEntity.AuditInfo.ContentUpdatedAt = dbEntity.AuditInfo.ContentUpdatedAt;
-            businessEntity.AuditInfo.ContentUpdatedBy = dbEntity.AuditInfo.ContentUpdatedBy;
-            businessEntity.AuditInfo.DeletedAt = dbEntity.AuditInfo.DeletedAt;
-            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
-            return businessEntity;
+            IMainEntity result = null;
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeRootModel)))
+            {
+                TreeRootModel model = (TreeRootModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeNodeModel)))
+            {
+                TreeNodeModel model = (TreeNodeModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            if (businessEntity.GetType().IsAssignableTo(typeof(TreeLeaveModel)))
+            {
+                TreeLeaveModel model = (TreeLeaveModel)businessEntity;
+                return model.ToDbEntity();
+            }
+            throw new Exception();
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию доменных моделей в коллекцию сущностей БД
+        /// </summary>
+        /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
+        /// <returns></returns>
+        public static List<IMainEntity> ToDbEntityCollection(this IEnumerable<IMainEntityModel> businessEntityCollection)
+        {
+            List<IMainEntity> result = null;
+            foreach (var item in businessEntityCollection)
+            {
+                result.Add(item.ToDbEntity());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Конвертировать основные свойства доменной модели в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <returns></returns>
         public static IMainEntity ToDbEntityGeneralProperties(this MainEntityBaseModel businessEntity, IMainEntity dbEntity)
         {
             if (businessEntity == null)
@@ -61,37 +87,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             return dbEntity;
         }
 
-        public static IMainEntity ToDbEntity(this IMainEntityModel businessEntity)
-        {
-            if (businessEntity == null)
-                return null;
-            IMainEntity result = null;
-            if (businessEntity.GetType().IsAssignableTo(typeof(TreeRootModel)))
-            {
-                TreeRootModel model = (TreeRootModel)businessEntity;
-                return model.ToDbEntity();
-            }
-            if (businessEntity.GetType().IsAssignableTo(typeof(TreeNodeModel)))
-            {
-                TreeNodeModel model = (TreeNodeModel)businessEntity;
-                return model.ToDbEntity();
-            }
-            if (businessEntity.GetType().IsAssignableTo(typeof(TreeLeaveModel)))
-            {
-                TreeLeaveModel model = (TreeLeaveModel)businessEntity;
-                return model.ToDbEntity();
-            }
-            throw new Exception();
-        }
-        public static List<IMainEntity> ToDbEntityCollection(this IEnumerable<IMainEntityModel> businessEntityCollection)
-        {
-            List<IMainEntity> result = null;
-            foreach (var item in businessEntityCollection)
-            {
-                result.Add(item.ToDbEntity());
-            }
-            return result;
-        }
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="dataStorages">Доступные хранилища данных</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static IMainEntityModel ToModel(this IMainEntity dbEntity, IEnumerable<IDataStorageModel> dataStorages)
         {
             if (dbEntity == null)
@@ -114,6 +116,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             throw new Exception();
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
+        /// </summary>
+        /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
+        /// <param name="dataStorages">Доступные хранилища данных</param>
+        /// <returns></returns>
         public static List<IMainEntityModel> ToModelCollection(this IEnumerable<IMainEntity> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
         {
             List<IMainEntityModel> result = null;
@@ -122,6 +131,37 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 result.Add(item.ToModel(dataStorages));
             }
             return result;
+        }
+
+        /// <summary>
+        /// Конвертировать основные свойства сущности БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
+        public static MainEntityBaseModel ToModelGeneralProperties(this IMainEntity dbEntity, MainEntityBaseModel businessEntity)
+        {
+            if (dbEntity == null)
+                return null;
+            //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
+            //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
+            //businessEntity.ConfigPath = dbEntity.ConfigPath;
+            businessEntity.DbEntity = dbEntity;
+            businessEntity.Name = dbEntity.Name;
+            businessEntity.Alias = dbEntity.Alias;
+            businessEntity.CustomCode = dbEntity.CustomCode;
+            businessEntity.Description = dbEntity.Description;
+            businessEntity.IsLegacy = dbEntity.IsLegacy;
+            businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
+            businessEntity.AuditInfo.CreatedAt = dbEntity.AuditInfo.CreatedAt;
+            businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;
+            businessEntity.AuditInfo.UpdatedAt = dbEntity.AuditInfo.UpdatedAt;
+            businessEntity.AuditInfo.UpdatedBy = dbEntity.AuditInfo.UpdatedBy;
+            businessEntity.AuditInfo.ContentUpdatedAt = dbEntity.AuditInfo.ContentUpdatedAt;
+            businessEntity.AuditInfo.ContentUpdatedBy = dbEntity.AuditInfo.ContentUpdatedBy;
+            businessEntity.AuditInfo.DeletedAt = dbEntity.AuditInfo.DeletedAt;
+            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
+            return businessEntity;
         }
     }
 }

@@ -2,10 +2,19 @@
 
 namespace Philadelphus.Core.Domain.Configurations
 {
+    /// <summary>
+    /// Основные настройки приложения
+    /// </summary>
     public class ApplicationSettings    //TODO: Подумать о переносе в Application
     {
+        /// <summary>
+        /// Директория конфигурационных файлов
+        /// </summary>
         public string ConfigsDirectoryString { get; set; }
 
+        /// <summary>
+        /// Директория конфигурационных файлов 
+        /// </summary>
         [JsonIgnore]
         public DirectoryInfo ConfigsDirectory 
         { 
@@ -15,6 +24,10 @@ namespace Philadelphus.Core.Domain.Configurations
                 return new DirectoryInfo(expandedPath);
             }
         }
+
+        /// <summary>
+        /// Полный путь конфигурационного файла хранилищ данных
+        /// </summary>
         [JsonIgnore]
         public FileInfo StoragesConfigFullPath
         {
@@ -25,6 +38,10 @@ namespace Philadelphus.Core.Domain.Configurations
                 return new FileInfo(expandedPath);
             }
         }
+
+        /// <summary>
+        /// Полный путь конфигурационного файла заголовков репозиториев
+        /// </summary>
         [JsonIgnore]
         public FileInfo RepositoryHeadersConfigFullPath
         { get
@@ -35,8 +52,14 @@ namespace Philadelphus.Core.Domain.Configurations
             }
         }
 
+        /// <summary>
+        /// Коллекция директорий расположения расширений
+        /// </summary>
         public List<string> PluginsDirectoriesString { get; set; }
 
+        /// <summary>
+        /// Массив директорий расположения расширений
+        /// </summary>
         [JsonIgnore]
         public DirectoryInfo[] PluginsDirectories
         {
