@@ -1,4 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
@@ -73,18 +74,18 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         #region [ Save ]
 
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (репозиторий без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepository">Репозиторий для сохранения</param>
-        /// <returns></returns>
+        /// <param name="treeRepository">Репозиторий</param>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryModel treeRepository);
 
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (заголовок репозитория без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepositoryHeader">Заголовок репозитория для сохранения</param>
+        /// <param name="treeRepositoryHeader">Заголовок репозитория</param>
         /// <param name="dataStorageModel">Хранилище данных</param>
-        /// <returns></returns>
+        /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel);
 
         #endregion

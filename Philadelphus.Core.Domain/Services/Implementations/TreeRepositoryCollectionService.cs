@@ -170,20 +170,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Save ]
 
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (репозиторий без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepository">Репозиторий для сохранения</param>
+        /// <param name="treeRepository">Репозиторий</param>
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
             long result = 0;
-            result = _treeRepositoryService.SaveChanges(treeRepository);
+            result = _treeRepositoryService.SaveChanges(treeRepository, SaveMode.OnlyHeader);
             return result;
         }
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (заголовок репозитория без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepositoryHeader">Заголовок репозитория для сохранения</param>
+        /// <param name="treeRepositoryHeader">Заголовок репозитория</param>
         /// <param name="dataStorageModel">Хранилище данных</param>
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel)

@@ -81,7 +81,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns>Репозиторий с элементами</returns>
-        public TreeRepositoryModel LoadMainEntityCollection(TreeRepositoryModel repository)
+        public TreeRepositoryModel ForceLoadTreeRepositoryMembersCollection(TreeRepositoryModel repository)
         {
             foreach (var dataStorage in repository?.DataStorages)
             {
@@ -120,9 +120,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns>Репозиторий с содержимым</returns>
-        public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel repository)
+        public TreeRepositoryModel GetTreeRepositoryMembersAndContent(TreeRepositoryModel repository)
         {
-            LoadMainEntityCollection(repository);
+            ForceLoadTreeRepositoryMembersCollection(repository);
 
             repository.Childs.Clear();
 
@@ -138,7 +138,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childRoots)
                 {
-                    GetRootContent(child);
+                    GetTreeRootMembersAndContent(child);
                 }
             }
             return repository;
@@ -148,7 +148,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="root">Корень</param>
         /// <returns>Корень с содержимым</returns>
-        public TreeRootModel GetRootContent(TreeRootModel root)
+        public TreeRootModel GetTreeRootMembersAndContent(TreeRootModel root)
         {
             GetPersonalAttributes(root);
 
@@ -166,7 +166,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childNodes)
                 {
-                    GetNodeContent(child);
+                    GetTreeNodeMembersAndContent(child);
                 }
             }
 
@@ -177,7 +177,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="node">Узел</param>
         /// <returns>Узел с содержимым</returns>
-        public TreeNodeModel GetNodeContent(TreeNodeModel node)
+        public TreeNodeModel GetTreeNodeMembersAndContent(TreeNodeModel node)
         {
             GetPersonalAttributes(node);
 
@@ -195,7 +195,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childNodes)
                 {
-                    GetNodeContent(child);
+                    GetTreeNodeMembersAndContent(child);
                 }
             }
 
@@ -211,7 +211,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childLeaves)
                 {
-                    GetLeaveContent(child);
+                    GetTreeLeaveContent(child);
                 }
             }
 
@@ -222,7 +222,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="leave">Лист</param>
         /// <returns>Лист с содержимым</returns>
-        public TreeLeaveModel GetLeaveContent(TreeLeaveModel leave)
+        public TreeLeaveModel GetTreeLeaveContent(TreeLeaveModel leave)
         {
             GetPersonalAttributes(leave);
             return leave;
@@ -252,15 +252,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #endregion
 
         #region [ Save ]
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (репозиторий)
         /// </summary>
-        /// <param name="treeRepository">Репозиторий для сохранения</param>
+        /// <param name="treeRepository">Репозиторий</param>
+        /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(TreeRepositoryModel treeRepository)
+        public long SaveChanges(TreeRepositoryModel treeRepository, SaveMode saveMode)
         {
+            // Проверка исходных данных
             if (treeRepository == null)
                 return 0;
+
+            // Сохранение изменений
             long result = 0;
             switch (treeRepository.State)
             {
@@ -278,19 +283,38 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 default:
                     break;
             }
+
+            // Актуализация статуса
             treeRepository.State = State.SavedOrLoaded;
-            result += SaveChanges(treeRepository.ChildTreeRoots);
+
+            // Сохранение содержимого
+            if (saveMode == SaveMode.WithContent || 
+                saveMode == SaveMode.WithContentAndMembers)
+            {
+            }
+
+            // Сохранение участников
+            if (saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveChanges(treeRepository.ChildTreeRoots, saveMode);
+            }
+
             return result;
         }
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (корни)
         /// </summary>
-        /// <param name="treeRoots">Корни для сохранения</param>
+        /// <param name="treeRoots">Коллекция корней</param>
+        /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<TreeRootModel> treeRoots)
+        public long SaveChanges(IEnumerable<TreeRootModel> treeRoots, SaveMode saveMode)
         {
+            // Проверка исходных данных
             if (treeRoots == null || treeRoots.Count() == 0)
                 return 0;
+
+            // Добавление элементов в коллекцию
             foreach (var treeRoot in treeRoots)
             {
                 if (treeRoot.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Uuid == treeRoot.Uuid) == false)
@@ -298,6 +322,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     _mainEntityCollection.DataTreeRoots.Add(treeRoot);
                 }
             }
+
+            // Сохранение изменений
             long result = 0;
             foreach (var storage in treeRoots.Select(x => x.DataStorage).Distinct())
             {
@@ -309,23 +335,42 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteRoots(dbCollection);
             }
-            result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes));
-            result += SaveChanges(treeRoots.SelectMany(x => x.PersonalAttributes));
+            
+            // Актуализация статуса
             foreach (var treeRoot in treeRoots)
             {
                 SetModelState(treeRoot, State.SavedOrLoaded);
             }
+
+            // Сохранение содержимого
+            if (saveMode == SaveMode.WithContent || 
+                saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveContentChanges(treeRoots.SelectMany(x => x.PersonalAttributes));
+            }
+
+            // Сохранение участников
+            if (saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveChanges(treeRoots.SelectMany(x => x.ChildTreeNodes), saveMode);
+            }
+
             return result;
         }
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (узлы)
         /// </summary>
-        /// <param name="treeNodes">Узлы для сохранения</param>
+        /// <param name="treeNodes">Коллекция узлов</param>
+        /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes)
+        public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes, SaveMode saveMode)
         {
+            // Проверка исходных данных
             if (treeNodes == null || treeNodes.Count() == 0)
                 return 0;
+
+            // Добавление элементов в коллекцию
             foreach (var treeNode in treeNodes)
             {
                 if (treeNode.State == State.Initialized && _mainEntityCollection.DataTreeRoots.Any(x => x.Uuid == treeNode.Uuid) == false)
@@ -333,6 +378,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     _mainEntityCollection.DataTreeNodes.Add(treeNode);
                 }
             }
+
+            // Сохранение изменений
             long result = 0;
             foreach (var storage in treeNodes.Select(x => x.DataStorage).Distinct())
             {
@@ -344,24 +391,43 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteNodes(dbCollection);
             }
-            result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes));
-            result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves));
-            result += SaveChanges(treeNodes.SelectMany(x => x.PersonalAttributes));
+
+            // Актуализация статуса
             foreach (var treeNode in treeNodes)
             {
                 SetModelState(treeNode, State.SavedOrLoaded);
             }
+
+            // Сохранение содержимого
+            if (saveMode == SaveMode.WithContent || 
+                saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveContentChanges(treeNodes.SelectMany(x => x.PersonalAttributes));
+            }
+
+            // Сохранение участников
+            if (saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes), saveMode);
+                result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves), saveMode);
+            }
+
             return result;
         }
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (листы)
         /// </summary>
-        /// <param name="treeLeaves">Листы для сохранения</param>
+        /// <param name="treeLeaves">Коллекция листов</param>
+        /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves)
+        public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves, SaveMode saveMode)
         {
+            // Проверка исходных данных
             if (treeLeaves == null || treeLeaves.Count() == 0)
                 return 0;
+
+            // Добавление элементов в коллекцию
             foreach (var treeLeave in treeLeaves)
             {
                 if (treeLeave.State == State.Initialized && _mainEntityCollection.DataTreeLeaves.Any(x => x.Uuid == treeLeave.Uuid) == false)
@@ -369,6 +435,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     _mainEntityCollection.DataTreeLeaves.Add(treeLeave);
                 }
             }
+
+            // Сохранение изменений
             long result = 0;
             foreach (var storage in treeLeaves.Select(x => x.DataStorage).Distinct())
             {
@@ -380,22 +448,40 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteLeaves(dbCollection);
             }
-            result += SaveChanges(treeLeaves.SelectMany(x => x.PersonalAttributes));
+
+            // Актуализация статуса
             foreach (var treeLeave in treeLeaves)
             {
                 SetModelState(treeLeave, State.SavedOrLoaded);
             }
+
+            // Сохранение содержимого
+            if (saveMode == SaveMode.WithContent || 
+                saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveContentChanges(treeLeaves.SelectMany(x => x.PersonalAttributes));
+            }
+
+            // Сохранение участников
+            if (saveMode == SaveMode.WithContentAndMembers)
+            {
+            }
+
             return result;
         }
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (атрибуты элемента)
         /// </summary>
-        /// <param name="elementAttributes">Атрибуты для сохранения</param>
+        /// <param name="elementAttributes">Коллекция атрибутов</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<ElementAttributeModel> elementAttributes)
+        public long SaveContentChanges(IEnumerable<ElementAttributeModel> elementAttributes)
         {
+            // Проверка исходных данных
             if (elementAttributes == null || elementAttributes.Count() == 0)
                 return 0;
+
+            // Добавление элементов в коллекцию
             //TODO: Вынести в отдельный метод AddInitialized
             foreach (var elementAttribute in elementAttributes)
             {
@@ -404,7 +490,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     _mainEntityCollection.ElementAttributes.Add(elementAttribute);
                 }
             }
-            //TODO: Вынести в отдельный метод AddInitialized
+
+            // Сохранение изменений
             long result = 0;
             foreach (var storage in elementAttributes.Select(x => x.DataStorage).Distinct())
             {
@@ -416,21 +503,27 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
                 result += storage.TreeRepositoryMembersInfrastructureRepository.DeleteAttributes(dbCollection);
             }
+
+            // Актуализация статуса
+            foreach (var elementAttribute in elementAttributes)
+            {
+                SetModelState(elementAttribute, State.SavedOrLoaded);
+            }
+
+
             //TODO: Вынести в отдельный метод RemoveDeleted
             //TODO: ПОЧИНИТЬ!!!
             foreach (var elementAttribute in elementAttributes)
             {
-                if ((elementAttribute.State == State.ForHardDelete || elementAttribute.State == State.ForSoftDelete || elementAttribute.State == State.SoftDeleted) 
+                if ((elementAttribute.State == State.ForHardDelete 
+                    || elementAttribute.State == State.ForSoftDelete 
+                    || elementAttribute.State == State.SoftDeleted) 
                     && _mainEntityCollection.Any(x => x.Uuid == elementAttribute.Uuid) == false)
                 {
                     _mainEntityCollection.Remove(elementAttribute);
                 }
             }
-            //TODO: Вынести в отдельный метод RemoveDeleted
-            foreach (var elementAttribute in elementAttributes)
-            {
-                SetModelState(elementAttribute, State.SavedOrLoaded);
-            }
+
             return result;
         }
 

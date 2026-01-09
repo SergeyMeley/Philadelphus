@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 {
