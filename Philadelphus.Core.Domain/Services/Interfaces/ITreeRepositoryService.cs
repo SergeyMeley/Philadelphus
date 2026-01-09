@@ -8,6 +8,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
+
     public interface ITreeRepositoryService
     {
         #region [ Get + Load ]
