@@ -17,8 +17,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            this.Visibility = Visibility.Hidden;
-            e.Cancel = true;
+            var mainWindows = Application.Current.Windows
+                .OfType<MainWindow>()
+                .Count();
+
+            if (mainWindows != 0)
+            {
+                this.Visibility = Visibility.Hidden;
+                e.Cancel = true;
+            }
+
             base.OnClosing(e);
         }
     }
