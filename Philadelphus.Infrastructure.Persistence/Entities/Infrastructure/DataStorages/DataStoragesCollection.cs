@@ -2,6 +2,6 @@
 {
     public class DataStoragesCollection
     {
-        public List<DataStorage> DataStorages { get; set; }
+        public List<DataStorage> DataStorages { get; set; } = new List<DataStorage>();
     }
 }

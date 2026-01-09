@@ -7,6 +7,8 @@ using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
@@ -46,7 +48,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Основной конфигурационный файл
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                     
-                    var appDataPath = Environment.ExpandEnvironmentVariables("%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
+                    var appDataPath = Environment.ExpandEnvironmentVariables("%USERPROFILE%\\AppData\\Local\\Philadelphus");
                     if (Directory.Exists(appDataPath) == false)
                     {
                         try
@@ -60,10 +62,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                         }
                         
                     }
-                    if (Directory.Exists(appDataPath))
+                    if (Directory.Exists(appDataPath))  // TODO: ВРЕМЕННО!!
                     {
-                        //config.AddJsonFile(Path.Combine(appDataPath, "storages-config.json"), optional: true);
-                        //config.AddJsonFile(Path.Combine(appDataPath, "repository-headers-config.json"), optional: true);
+                        config.AddJsonFile(Path.Combine(appDataPath, "Configuration", "storages-config.json"), optional: true);
+                        config.AddJsonFile(Path.Combine(appDataPath, "Configuration", "repository-headers-config.json"), optional: true);
                     }
                     var env = hostingContext.HostingEnvironment;
                     if (env.IsDevelopment() || true /*временно для тестов*/)
@@ -79,10 +81,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(ApplicationSettings)));
                     services.Configure<ConnectionStringsCollection>(
                         context.Configuration.GetSection(nameof(ConnectionStringsCollection)));
-                    //services.Configure<DataStoragesCollection>(
-                    //    context.Configuration.GetSection(nameof(DataStoragesCollection)));
-                    //services.Configure<DataStoragesCollection>(
-                    //    context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollection)));
+                    services.Configure<DataStoragesCollection>(
+                        context.Configuration.GetSection(nameof(DataStoragesCollection)));
+                    services.Configure<TreeRepositoryHeadersCollection>(
+                        context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollection)));
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(typeof(MappingProfile));
