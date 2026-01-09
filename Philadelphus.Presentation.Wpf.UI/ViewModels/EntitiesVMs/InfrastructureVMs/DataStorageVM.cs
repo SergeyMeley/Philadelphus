@@ -90,7 +90,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         {
             get
             {
-                if (_model.MainEntitiesInfrastructureRepository == null)
+                if (_model.TreeRepositoryMembersInfrastructureRepository == null)
                     return false;
                 return true;
             }
@@ -118,7 +118,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
         private void StartCheckingStorage()
         {
-            _model.StartAvailableAutoChecking();
+            _model.StartAvailableAutoChecking(interval: 20);
             System.Timers.Timer timer = new System.Timers.Timer(5000);
             timer.Elapsed += CheckStorage;
             timer.AutoReset = true;

@@ -11,7 +11,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
-    public class PostgreEfMainEntitiesInfrastructureRepository : IMainEntitiesInfrastructureRepository
+    public class PostgreEfMainEntitiesInfrastructureRepository : ITreeRepositoriesMembersInfrastructureRepository
     {
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntities; }
 

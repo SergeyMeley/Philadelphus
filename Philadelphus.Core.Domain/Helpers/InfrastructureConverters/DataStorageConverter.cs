@@ -8,6 +8,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class DataStorageConverter
     {
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
         public static DataStorage ToDbEntity(
             this IDataStorageModel businessEntity)
         {
@@ -20,11 +25,18 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 Uuid = businessEntity.Uuid,
                 HasDataStorageInfrastructureRepositoryRepository = businessEntity.DataStoragesCollectionInfrastructureRepository != null,
                 HasTreeRepositoryHeadersInfrastructureRepository = businessEntity.TreeRepositoriesInfrastructureRepository != null,
-                HasMainEntitiesInfrastructureRepository = businessEntity.MainEntitiesInfrastructureRepository != null,
+                HasMainEntitiesInfrastructureRepository = businessEntity.TreeRepositoryMembersInfrastructureRepository != null,
                 InfrastructureType = businessEntity.InfrastructureType,
             };
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="connectionString">Строка подключения</param>
+        /// <returns></returns>
         public static IDataStorageModel ToModel(
             this DataStorage dbEntity,
             string connectionString)
@@ -32,7 +44,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (dbEntity == null)
                 return null;
             ITreeRepositoriesInfrastructureRepository treeRepositoriesInfrastructureRepository = null;
-            IMainEntitiesInfrastructureRepository mainEntitiesInfrastructureRepository = null;
+            ITreeRepositoriesMembersInfrastructureRepository mainEntitiesInfrastructureRepository = null;
             switch (dbEntity.InfrastructureType)
             {
                 case InfrastructureTypes.WindowsDirectory:

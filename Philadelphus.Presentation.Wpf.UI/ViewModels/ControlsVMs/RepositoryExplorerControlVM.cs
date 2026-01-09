@@ -96,7 +96,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         #endregion
 
         #region [Commands]
-        public RelayCommand GetWorkCommandа
+        public RelayCommand GetWorkCommand
         {
             get
             {
@@ -114,7 +114,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     UpdateChildsCollection(this);
-                    _service.SaveChanges(_treeRepositoryVM.Model);
+                    _service.SaveChanges(_treeRepositoryVM.Model, SaveMode.WithContentAndMembers);
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
                 });
@@ -222,10 +222,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         #endregion
 
         #region [ Methods ]
-
+         
         internal bool LoadTreeRepository()
         {
-            _service.GetRepositoryContent(_treeRepositoryVM.Model);
+            _service.ForceLoadTreeRepositoryMembersCollection(_treeRepositoryVM.Model);
+            _service.GetTreeRepositoryMembersAndContent(_treeRepositoryVM.Model);
             _treeRepositoryVM.Childs.Clear();
             foreach (var item in _treeRepositoryVM.Model.Childs)
             {
@@ -252,8 +253,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        #endregion
-
+        
 
         private bool UpdateChildsCollection(ViewModelBase parent)    //TODO: Переделать временный костыль
         {
@@ -315,5 +315,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
             return true;
         }
+
+        #endregion
     }
 }

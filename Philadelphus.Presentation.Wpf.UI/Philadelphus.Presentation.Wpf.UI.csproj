@@ -7,6 +7,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UserSecretsId>9d9f6ea9-cd34-412e-b854-8fc4186804fc</UserSecretsId>
+    <ApplicationIcon>Icons\philadelphus_logo_64.ico</ApplicationIcon>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,6 +55,10 @@
     <None Remove="Icons\without_a_license\Flaticon_icon_up.png" />
     <None Remove="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
     <None Remove="Icons\without_a_license\icons8_icon_repository.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\philadelphus_logo_64.ico" />
   </ItemGroup>
 
   <ItemGroup>

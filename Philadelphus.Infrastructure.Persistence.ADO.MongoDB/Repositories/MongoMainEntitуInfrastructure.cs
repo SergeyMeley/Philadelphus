@@ -11,7 +11,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
 {
-    public class MongoMainEntitуInfrastructure : IMainEntitiesInfrastructureRepository
+    public class MongoMainEntitуInfrastructure : ITreeRepositoriesMembersInfrastructureRepository
     {
         MongoClient _client;
         IMongoDatabase _database;

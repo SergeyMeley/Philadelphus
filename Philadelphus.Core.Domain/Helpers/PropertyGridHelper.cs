@@ -1,7 +1,15 @@
 ﻿namespace Philadelphus.Core.Domain.Helpers
 {
+    /// <summary>
+    /// Помощник работы с таблицей свойств
+    /// </summary>
     public static class PropertyGridHelper
     {
+        /// <summary>
+        /// Получить словарь свойств
+        /// </summary>
+        /// <param name="instance">Элемент</param>
+        /// <returns></returns>
         public static Dictionary<string, string> GetProperties(object instance)
         {
             if (instance == null)

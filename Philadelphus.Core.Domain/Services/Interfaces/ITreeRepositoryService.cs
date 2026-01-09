@@ -1,4 +1,6 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
@@ -7,29 +9,97 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
+    /// <summary>
+    /// Сервис работы с репозиторием, его участниками и содержимым
+    /// </summary>
     public interface ITreeRepositoryService
     {
         #region [ Get + Load ]
 
-        public IMainEntity GetEntityFromCollection(Guid uuid);
-        public IMainEntityModel GetModelFromCollection(Guid uuid);
-        public TreeRepositoryModel LoadMainEntityCollection(TreeRepositoryModel repository);
-        public TreeRepositoryModel GetRepositoryContent(TreeRepositoryModel repository);
-        public TreeRootModel GetRootContent(TreeRootModel root);
-        public TreeNodeModel GetNodeContent(TreeNodeModel node);
-        public TreeLeaveModel GetLeaveContent(TreeLeaveModel leave);
+        /// <summary>
+        /// Принудительная загрузка из хранилища участников и содержимого репозитория
+        /// </summary>
+        /// <param name="repository">Репозиторий</param>
+        /// <returns>Репозиторий с участниками и содержимым</returns>
+        public TreeRepositoryModel ForceLoadTreeRepositoryMembersCollection(TreeRepositoryModel repository);
+
+        /// <summary>
+        /// Получить участников и содержимое репозитория
+        /// </summary>
+        /// <param name="repository">Репозиторий</param>
+        /// <returns></returns>
+        public TreeRepositoryModel GetTreeRepositoryMembersAndContent(TreeRepositoryModel repository);
+
+        /// <summary>
+        /// Получить участников и содержимое корня
+        /// </summary>
+        /// <param name="root">Корень</param>
+        /// <returns>Корень с участниками и содержимым</returns>
+        public TreeRootModel GetTreeRootMembersAndContent(TreeRootModel root);
+
+        /// <summary>
+        /// Получить участников и содержимое узла
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns>Узел с участниками и содержимым</returns>
+        public TreeNodeModel GetTreeNodeMembersAndContent(TreeNodeModel node);
+
+        /// <summary>
+        /// Получить содержимое листа
+        /// </summary>
+        /// <param name="leave"></param>
+        /// <returns>Лист с содержимым</returns>
+        public TreeLeaveModel GetTreeLeaveContent(TreeLeaveModel leave);
+
+        /// <summary>
+        /// Получить атрибуты элемента
+        /// </summary>
+        /// <param name="attributeOwner">Владелец</param>
+        /// <returns>Владелец с атрибутами</returns>
         public IEnumerable<ElementAttributeModel> GetPersonalAttributes(IAttributeOwnerModel attributeOwner);
 
-    #endregion
+        #endregion
 
         #region [ Save ]
 
-        public long SaveChanges(TreeRepositoryModel treeRepository);
-        public long SaveChanges(IEnumerable<TreeRootModel> treeRoots);
-        public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes);
-        public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves);
+        /// <summary>
+        /// Сохранить изменения (репозиторий)
+        /// </summary>
+        /// <param name="treeRepository">Репозиторий</param>
+        /// <param name="saveMode">Параметры сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public long SaveChanges(TreeRepositoryModel treeRepository, SaveMode saveMode);
 
-        public long SaveChanges(IEnumerable<ElementAttributeModel> elementAttributes);
+        /// <summary>
+        /// Сохранить изменения (корни)
+        /// </summary>
+        /// <param name="treeRoots">Коллекция корней</param>
+        /// <param name="saveMode">Параметры сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public long SaveChanges(IEnumerable<TreeRootModel> treeRoots, SaveMode saveMode);
+
+        /// <summary>
+        /// Сохранить изменения (узлы)
+        /// </summary>
+        /// <param name="treeNodes">Коллекция узлов</param>
+        /// <param name="saveMode">Параметры сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes, SaveMode saveMode);
+
+        /// <summary>
+        /// Сохранить изменения (листы)
+        /// </summary>
+        /// <param name="treeLeaves">Коллекция листов</param>
+        /// <param name="saveMode">Параметры сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves, SaveMode saveMode);
+
+        /// <summary>
+        /// Сохранить изменения (атрибуты элемента)
+        /// </summary>
+        /// <param name="elementAttributes">Коллекция атрибутов</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public long SaveContentChanges(IEnumerable<ElementAttributeModel> elementAttributes);
 
         #endregion
 

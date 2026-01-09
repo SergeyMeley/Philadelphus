@@ -52,7 +52,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     var result = _collectionService.CreateNewTreeRepository(_dataStoragesSettingsVM.SelectedDataStorageVM.Model);
                     result.Name = _name;
                     result.Description = _description;
-                    _service.SaveChanges(result);
+                    _collectionService.SaveChanges(result);
                     var vm = new TreeRepositoryVM(result, _service);
                     _repositoryCollectionVM.TreeRepositoriesVMs.Add(vm);
                 });

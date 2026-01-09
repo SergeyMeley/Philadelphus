@@ -5,6 +5,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     public static class TreeRepositoryHeaderInfrastructureConverter
     {
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
         public static TreeRepositoryHeader ToDbEntity(this TreeRepositoryHeaderModel businessEntity)
         {
             if (businessEntity == null)
@@ -19,6 +24,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.IsFavorite = businessEntity.IsFavorite;
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию доменных моделей в коллекцию сущностей БД
+        /// </summary>
+        /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
+        /// <returns></returns>
         public static List<TreeRepositoryHeader> ToDbEntityCollection(this IEnumerable<TreeRepositoryHeaderModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
@@ -30,6 +41,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <returns></returns>
         public static TreeRepositoryHeaderModel ToModel(this TreeRepositoryHeader dbEntity)
         {
             if (dbEntity == null)
@@ -44,6 +61,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.IsFavorite = dbEntity.IsFavorite;
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
+        /// </summary>
+        /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
+        /// <returns></returns>
         public static List<TreeRepositoryHeaderModel> ToModelCollection(this IEnumerable<TreeRepositoryHeader> dbEntityCollection)
         {
             if (dbEntityCollection == null)

@@ -99,7 +99,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<ApplicationVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
-                    services.AddSingleton<LaunchWindowVM>();
+                    services.AddTransient<LaunchWindowVM>();
                     //services.AddTransient<MainWindowVM>();    // Заменено на фабрику
                     services.AddSingleton<DataStoragesSettingsVM>();
                     //services.AddScoped<RepositoryExplorerControlVM>();    // Заменено на фабрику

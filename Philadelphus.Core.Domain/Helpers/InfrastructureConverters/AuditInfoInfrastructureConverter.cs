@@ -5,6 +5,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     internal static class AuditInfoInfrastructureConverter
     {
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
         public static AuditInfo ToDbEntity(this AuditInfoModel businessEntity)
         {
             if (businessEntity == null)
@@ -21,6 +26,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.DeletedBy = businessEntity.DeletedBy;
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию доменных моделей в коллекцию сущностей БД
+        /// </summary>
+        /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
+        /// <returns></returns>
         public static List<AuditInfo> ToDbEntityCollection(this IEnumerable<AuditInfoModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
@@ -32,6 +43,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <returns></returns>
         public static AuditInfoModel ToModel(this AuditInfo dbEntity)
         {
             if (dbEntity == null)
@@ -48,6 +65,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.DeletedBy = dbEntity.DeletedBy;
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
+        /// </summary>
+        /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
+        /// <returns></returns>
         public static List<AuditInfoModel> ToModelCollection(this IEnumerable<AuditInfo> dbEntityCollection)
         {
             if (dbEntityCollection == null)

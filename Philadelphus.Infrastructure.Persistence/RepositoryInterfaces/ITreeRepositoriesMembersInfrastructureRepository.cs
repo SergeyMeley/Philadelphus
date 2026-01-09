@@ -4,7 +4,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attribu
 
 namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
 {
-    public interface IMainEntitiesInfrastructureRepository : IInfrastructureRepository
+    public interface ITreeRepositoriesMembersInfrastructureRepository : IInfrastructureRepository
     {
         # region [ Select ]
 

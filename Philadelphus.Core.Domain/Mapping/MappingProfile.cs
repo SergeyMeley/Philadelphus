@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
@@ -8,8 +8,14 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Propert
 
 namespace Philadelphus.Core.Domain.Mapping
 {
+    /// <summary>
+    /// Профиль маппинга для Автомаппера
+    /// </summary>
     public class MappingProfile : Profile
     {
+        /// <summary>
+        /// Профиль маппинга для Автомаппера
+        /// </summary>
         public MappingProfile()
         {
             //// Entity → DTO

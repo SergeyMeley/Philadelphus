@@ -1,7 +1,16 @@
 ﻿namespace Philadelphus.Core.Domain.Helpers
 {
+    /// <summary>
+    /// Помощник наименования
+    /// </summary>
     public static class NamingHelper
     {
+        /// <summary>
+        /// Получить новое наименование
+        /// </summary>
+        /// <param name="existNames">Коллекция занятых наименований</param>
+        /// <param name="fixPart">Фиксированная часть наименования</param>
+        /// <returns></returns>
         public static string GetNewName(IEnumerable<string> existNames, string fixPart)
         {
             bool IsIndexExist = true;

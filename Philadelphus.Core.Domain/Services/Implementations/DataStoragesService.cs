@@ -10,13 +10,31 @@ using Philadelphus.Infrastructure.Persistence.Json.Repositories;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
+    /// <summary>
+    /// Сервис работы с хранилищами данных
+    /// </summary>
     public class DataStoragesService : IDataStoragesService
     {
         #region [ Props ]
 
+        /// <summary>
+        /// Автомаппер
+        /// </summary>
         private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Логгер
+        /// </summary>
         private readonly ILogger<TreeRepositoryCollectionService> _logger;
+
+        /// <summary>
+        /// Сервис уведомлений
+        /// </summary>
         private readonly INotificationService _notificationService;
+
+        /// <summary>
+        /// Модель основного хранилища настроечных файлов
+        /// </summary>
         private readonly IDataStorageModel _mainDataStorageModel;
 
         #endregion
@@ -51,6 +69,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
         #region [ Get + Load ]
 
+        /// <summary>
+        /// Получить коллекцию хранилищ данных
+        /// </summary>
+        /// <param name="connectionStrings">Строки подключения</param>
+        /// <returns></returns>
         public IEnumerable<IDataStorageModel> GetStoragesModels(ConnectionStringsCollection connectionStrings)
         {
             var dbEntities = _mainDataStorageModel.DataStoragesCollectionInfrastructureRepository.SelectDataStorages();
@@ -73,10 +96,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Create + Add ]
 
         /// <summary>
-        /// Сохдать хранилище данных
+        /// Создать основное хранилище данных
         /// </summary>
-        /// <param name="configsDirectory">Путь к настроечному файлу</param>
-        /// <returns>Хранилище данных</returns>
+        /// <param name="storagesConfigFullPath">Путь к настроечному файлу хранилищ данных</param>
+        /// <param name="repositoryHeadersConfigFullPath">Путь к настроечному файлу запусков репозиториев</param>
+        /// <returns></returns>
         public IDataStorageModel CreateMainDataStorageModel(
             FileInfo storagesConfigFullPath,
             FileInfo repositoryHeadersConfigFullPath)

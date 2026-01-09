@@ -6,6 +6,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
     internal static class NodeInfrastructureConverter
     {
+        /// <summary>
+        /// Конвертировать доменную модель в сущность БД
+        /// </summary>
+        /// <param name="businessEntity">Доменная модель</param>
+        /// <returns></returns>
         public static TreeNode ToDbEntity(this TreeNodeModel businessEntity)
         {
             if (businessEntity == null)
@@ -17,6 +22,12 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             //result.ParentRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию доменных моделей в коллекцию сущностей БД
+        /// </summary>
+        /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
+        /// <returns></returns>
         public static List<TreeNode> ToDbEntityCollection(this IEnumerable<TreeNodeModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
@@ -28,6 +39,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="parent">Родитель</param>
+        /// <returns></returns>
         public static TreeNodeModel ToModel(this TreeNode dbEntity, IParentModel parent)
         {
             if (dbEntity == null)
@@ -36,6 +54,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result = (TreeNodeModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
+
+        /// <summary>
+        /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
+        /// </summary>
+        /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
+        /// <param name="parents">Коллекция доступных ролдителей</param>
+        /// <returns></returns>
         public static List<TreeNodeModel> ToModelCollection(this IEnumerable<TreeNode> dbEntityCollection, IEnumerable<IParentModel> parents)
         {
             if (dbEntityCollection == null)

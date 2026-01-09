@@ -1,9 +1,8 @@
-﻿using AutoMapper;
+﻿ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
@@ -12,7 +11,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
     /// <summary>
-    /// Сервис работы с коллекцией репозиториев и хранилищами данных
+    /// Сервис работы с коллекцией репозиториев
     /// </summary>
     public class TreeRepositoryCollectionService : ITreeRepositoryCollectionService
     {
@@ -24,6 +23,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly ITreeRepositoryService _treeRepositoryService;
 
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
+
         /// <summary>
         /// Коллекция репозиториев
         /// </summary>
@@ -37,9 +37,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Серсис работы с коллекцией репозиториев и хранилищами данных
         /// </summary>
         /// <param name="mapper">Автомаппер</param>
-        /// <param name="logger">Сервис логгирования</param>
+        /// <param name="logger">Логгер</param>
         /// <param name="notificationService">Сервис уведомлений</param>
-        /// <param name="treeRepositoryService">Сервис для работы с репозиторием и его элементами</param>
+        /// <param name="treeRepositoryService">Сервис работы с репозиторием и его элементами</param>
         public TreeRepositoryCollectionService(
             IMapper mapper,
             ILogger<TreeRepositoryCollectionService> logger,
@@ -59,27 +59,27 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Get + Load ]
 
         /// <summary>
-        /// Получение репозитория по его UUID
+        /// Получение репозитория по его уникальному идентификатору
         /// </summary>
-        /// <param name="uuid">UUID</param>
+        /// <param name="uuid">Уникальный идентификатор</param>
         /// <returns>Репозиторий</returns>
         public TreeRepository GetTreeRepositoryFromCollection(Guid uuid)
         {
             return GetTreeRepositoryModelFromCollection(uuid).ToDbEntity();
         }
         /// <summary>
-        /// Получение коллекции репозиториев по их UUID
+        /// Получение коллекции репозиториев по их уникальным идентификаторам
         /// </summary>
-        /// <param name="uuids">UUIDs</param>
+        /// <param name="uuids">Уникальные идентификаторы</param>
         /// <returns>Коллекция репозиториев</returns>
         public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> uuids)
         {
             return GetTreeRepositoryModelFromCollection(uuids).ToDbEntityCollection();
         }
         /// <summary>
-        /// Получение репозитория (модель) по его UUID
+        /// Получение репозитория (модель) по его уникальному идентификатору
         /// </summary>
-        /// <param name="uuid">UUID</param>
+        /// <param name="uuid">Уникальный идентификатор</param>
         /// <returns>Репозиторий (модель)</returns>
         public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid uuid)
         {
@@ -88,7 +88,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получение коллекции репозиториев (модели) по их UUID
         /// </summary>
-        /// <param name="uuids">UUIDs</param>
+        /// <param name="uuids">Уникальные идентификаторы</param>
         /// <returns>Коллекция репозиториев (модели)</returns>
         public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> uuids)
         {
@@ -170,20 +170,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Save ]
 
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (репозиторий без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepository">Репозиторий для сохранения</param>
+        /// <param name="treeRepository">Репозиторий</param>
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryModel treeRepository)
         {
             long result = 0;
-            result = _treeRepositoryService.SaveChanges(treeRepository);
+            result = _treeRepositoryService.SaveChanges(treeRepository, SaveMode.OnlyHeader);
             return result;
         }
+
         /// <summary>
-        /// Сохранить изменения
+        /// Сохранить изменения (заголовок репозитория без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepositoryHeader">Заголовок репозитория для сохранения</param>
+        /// <param name="treeRepositoryHeader">Заголовок репозитория</param>
         /// <param name="dataStorageModel">Хранилище данных</param>
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel)
@@ -211,21 +212,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             result.OwnDataStorage.TreeRepositoriesInfrastructureRepository.InsertRepository(result.ToDbEntity());
             return result;
         }
-        //public bool TryCreateTreeRepositoryFromHeader(ITreeRepositoryHeaderModel header, out TreeRepositoryModel outTreeRepository)
-        //{
-        //    var dataStorage = DataStorageModels.FirstOrDefault(x => x.Value.Uuid == header.OwnDataStorageUuid).Value;
-        //    var dbTreeRepository = DataTreeRepositories.FirstOrDefault(x => x.Value.Uuid == header.Uuid).Value.DbEntity;
-        //    if (dataStorage != null && dbTreeRepository != null)
-        //    {
-        //        var result = new TreeRepositoryModel(header.Uuid, dataStorage, dbTreeRepository);
-        //        outTreeRepository = result;
-        //        return true;
-
-        //    }
-        //    //((ITreeRepositoriesInfrastructureRepository)result.OwnDataStorage).InsertRepository(result.ToDbEntity());
-        //    outTreeRepository = null;
-        //    return false;
-        //}
 
         /// <summary>
         /// Создать заголовок репозитория из репозитория
