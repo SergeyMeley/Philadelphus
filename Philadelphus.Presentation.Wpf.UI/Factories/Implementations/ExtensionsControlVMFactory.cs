@@ -13,6 +13,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         }
         public ExtensionsControlVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
+            if (repositoryExplorerControlVM == null)
+                throw new ArgumentNullException();
             return ActivatorUtilities.CreateInstance<ExtensionsControlVM>(_serviceProvider, repositoryExplorerControlVM);
         }
     }

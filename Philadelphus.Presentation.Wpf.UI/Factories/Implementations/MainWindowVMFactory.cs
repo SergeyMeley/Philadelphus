@@ -13,6 +13,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         }
         public MainWindowVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
+            if (repositoryExplorerControlVM == null)
+                throw new ArgumentNullException();
             return ActivatorUtilities.CreateInstance<MainWindowVM>(_serviceProvider, repositoryExplorerControlVM);
         }
     }
