@@ -78,8 +78,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IOptions<ApplicationSettings> options,
             ITreeRepositoryService service,
             IExtensionsControlVMFactory extensionVMFactory,
-            TreeRepositoryVM treeRepositoryVM,
-            ApplicationCommandsVM applicationCommandsVM)
+            ApplicationCommandsVM applicationCommandsVM,
+            TreeRepositoryVM treeRepositoryVM)
             : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
             _service = service;

@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
@@ -61,14 +64,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             INotificationService notificationService,
             IDataStoragesService dataStoragesService,
             IOptions<ApplicationSettings> applicationSettings,
-            IOptions<ConnectionStringsCollection> connectionStringsCollection)
+            IOptions<ConnectionStringsCollection> connectionStringsCollection,
+            IOptions<DataStoragesCollection> dataStoragesCollection)
         {
             _logger = logger;
             _notificationService = notificationService;
             _dataStoragesService = dataStoragesService;
 
             InitMainDataStorageVM(applicationSettings.Value);
-            InitDataStorages(connectionStringsCollection.Value);
+            //InitDataStorages(connectionStringsCollection.Value);
+            InitDataStorages(dataStoragesCollection.Value, connectionStringsCollection.Value);
         }
         private bool InitMainDataStorageVM(ApplicationSettings applicationSettings)
         {
@@ -88,6 +93,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                     if (_dataStorageVMs.FirstOrDefault(x => x.Model.Uuid == model.Uuid) == null)
                     {
                         _dataStorageVMs.Add(new DataStorageVM(model));
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool InitDataStorages(DataStoragesCollection dataStoragesCollection, ConnectionStringsCollection connectionStrings)
+        {
+            foreach (var entity in dataStoragesCollection.DataStorages)
+            {
+                if (entity != null)
+                {
+                    var connectionString = connectionStrings.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == entity.Uuid).ConnectionString;
+                    var model = entity.ToModel(connectionString);
+
+                    if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                    {
+                        _dataStorageVMs.Add(new DataStorageVM(model));
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException();
                     }
                 }
             }

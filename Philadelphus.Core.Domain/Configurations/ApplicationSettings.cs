@@ -33,7 +33,7 @@ namespace Philadelphus.Core.Domain.Configurations
         {
             get
             {
-                var path = Path.Combine(ConfigsDirectoryString, "storages-config.json");
+                var path = Path.Combine(ConfigsDirectoryString, "storages-config-old.json");
                 var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
                 return new FileInfo(expandedPath);
             }
@@ -46,7 +46,7 @@ namespace Philadelphus.Core.Domain.Configurations
         public FileInfo RepositoryHeadersConfigFullPath
         { get
             {
-                var path = Path.Combine(ConfigsDirectoryString, "repository-headers-config.json");
+                var path = Path.Combine(ConfigsDirectoryString, "repository-headers-config-old.json");
                 var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
                 return new FileInfo(expandedPath);
             }
