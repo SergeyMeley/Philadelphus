@@ -48,25 +48,55 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Основной конфигурационный файл
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                     
-                    var appDataPath = Environment.ExpandEnvironmentVariables("%USERPROFILE%\\AppData\\Local\\Philadelphus");
-                    if (Directory.Exists(appDataPath) == false)
+
+                    // Дополнительные конфигурационные файлы
+                    var additionalConfigsPath = Environment.ExpandEnvironmentVariables("%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
+                    if (Directory.Exists(additionalConfigsPath) == false)
                     {
                         try
                         {
-                            Directory.CreateDirectory(appDataPath);
+                            Directory.CreateDirectory(additionalConfigsPath);
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Не найдена директория основных настроечных файлов");
+                            MessageBox.Show($"Ошибка поиска или создания директории основных настроечных файлов {additionalConfigsPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
                             throw;
                         }
-                        
                     }
-                    if (Directory.Exists(appDataPath))  // TODO: ВРЕМЕННО!!
+                    if (Directory.Exists(additionalConfigsPath))  // TODO: ВРЕМЕННО!!
                     {
-                        config.AddJsonFile(Path.Combine(appDataPath, "Configuration", "storages-config.json"), optional: true);
-                        config.AddJsonFile(Path.Combine(appDataPath, "Configuration", "repository-headers-config.json"), optional: true);
+                        var storageConfigPath = Path.Combine(additionalConfigsPath, "storages-config.json");
+                        if (File.Exists(storageConfigPath) == false)
+                        {
+                            try
+                            {
+                                File.Create(storageConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла хранилищ данных {storageConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+
+                        var repositoryHeadersConfigPath = Path.Combine(additionalConfigsPath, "repository-headers-config.json");
+                        if (File.Exists(repositoryHeadersConfigPath) == false)
+                        {
+                            try
+                            {
+                                File.Create(repositoryHeadersConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла заголовков репозиториев {repositoryHeadersConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+
+                        config.AddJsonFile(storageConfigPath, optional: true);
+                        config.AddJsonFile(repositoryHeadersConfigPath, optional: true);
                     }
+
                     var env = hostingContext.HostingEnvironment;
                     if (env.IsDevelopment() || true /*временно для тестов*/)
                     {
@@ -89,8 +119,11 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Регистрация AutoMapper
                     services.AddAutoMapper(typeof(MappingProfile));
 
+                    // TODO: Проработать кеширование
+                    services.AddMemoryCache();
+                    
                     // Регистрация сервисов
-                    //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<ApplicationSettings>
+                    //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
                     services.AddScoped<IDataStoragesService, DataStoragesService>();
                     services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
