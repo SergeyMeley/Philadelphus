@@ -125,7 +125,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Регистрация сервисов
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
-                    services.AddTransient<IDataStoragesService, DataStoragesService>();
+                    services.AddSingleton<IDataStoragesService, DataStoragesService>();
                     services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
                     services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
@@ -136,7 +136,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
-                    services.AddTransient<DataStoragesSettingsVM>();
+                    services.AddSingleton<DataStoragesSettingsVM>();
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
                     services.AddTransient<TreeRepositoryCollectionVM>();
                     services.AddTransient<TreeRepositoryHeadersCollectionVM>();

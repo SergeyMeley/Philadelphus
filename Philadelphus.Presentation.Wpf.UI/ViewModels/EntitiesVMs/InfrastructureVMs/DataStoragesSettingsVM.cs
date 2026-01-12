@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
-    public class DataStoragesSettingsVM : ViewModelBase
+    public class DataStoragesSettingsVM : ViewModelBase, IDisposable
     {
         private readonly ILogger<DataStoragesSettingsVM> _logger;
         private readonly INotificationService _notificationService;
@@ -119,6 +119,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 }
             }
             return true;
+        }
+
+        public void Dispose()
+        {
+            foreach (var vm in DataStorageVMs)
+                vm.Dispose();
+            DataStorageVMs.Clear();
         }
     }
 }
