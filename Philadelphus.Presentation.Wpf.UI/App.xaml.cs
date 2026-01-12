@@ -92,45 +92,54 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Регистрация сервисов
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<ApplicationSettings>
                     services.AddSingleton<INotificationService, NotificationService>();
-                    services.AddScoped<IDataStoragesService, DataStoragesService>();
-                    services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
-                    services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
-                    services.AddScoped<IExtensionManager, ExtensionManager>();
+                    services.AddTransient<IDataStoragesService, DataStoragesService>();
+                    services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                    services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddTransient<IExtensionManager, ExtensionManager>();
 
                     // Регистрация ViewModel
                     services.AddSingleton<ApplicationVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
-                    //services.AddTransient<MainWindowVM>();    // Заменено на фабрику
-                    services.AddSingleton<DataStoragesSettingsVM>();
-                    //services.AddScoped<RepositoryExplorerControlVM>();    // Заменено на фабрику
-                    services.AddScoped<TreeRepositoryCollectionVM>();
-                    services.AddScoped<TreeRepositoryHeadersCollectionVM>();
-                    services.AddScoped<RepositoryCreationControlVM>();
+                    //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
+                    services.AddTransient<DataStoragesSettingsVM>();
+                    //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
+                    services.AddTransient<TreeRepositoryCollectionVM>();
+                    services.AddTransient<TreeRepositoryHeadersCollectionVM>();
+                    services.AddTransient<RepositoryCreationControlVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
-                    services.AddSingleton<LaunchWindow>();
+                    services.AddTransient<LaunchWindow>();
 
                     // Регистрация фабрик
-                    services.AddScoped<IMainWindowVMFactory, MainWindowVMFactory>();
-                    services.AddScoped<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
-                    services.AddScoped<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
+                    services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
+                    services.AddTransient<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
+                    services.AddTransient<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
                 })
                 .Build();
         }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            await _host.StartAsync();
+            try
+            {
+                await _host.StartAsync();
 
-            var window = _host.Services.GetRequiredService<LaunchWindow>();
-            window.Topmost = true;
-            window.Show();
-            window.Activate();
-            window.Topmost = false;
-            base.OnStartup(e);
+                var window = _host.Services.GetRequiredService<LaunchWindow>();
+                window.Topmost = true;
+                window.Show();
+                window.Activate();
+                window.Topmost = false;
+                base.OnStartup(e);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка запуска приложения, обратитесь к разработчику.\r\nПодробнее:\r\n{ex.Message}\r\nТрассировка:\r\n{ex.StackTrace}");
+                Shutdown(-1);
+            }
+            
         }
 
         protected override async void OnExit(ExitEventArgs e)
