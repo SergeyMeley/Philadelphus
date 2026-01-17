@@ -19,6 +19,7 @@ using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI
@@ -60,7 +61,6 @@ namespace Philadelphus.Presentation.Wpf.UI
                         catch (Exception ex)
                         {
                             MessageBox.Show($"Ошибка поиска или создания директории основных настроечных файлов {additionalConfigsPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
-                            throw;
                         }
                     }
                     if (Directory.Exists(additionalConfigsPath))  // TODO: ВРЕМЕННО!!
@@ -71,11 +71,15 @@ namespace Philadelphus.Presentation.Wpf.UI
                             try
                             {
                                 File.Create(storageConfigPath);
+                                using (var fileStream = File.Create(storageConfigPath))
+                                {
+                                    var storageConfig = new DataStoragesCollection { DataStorages = new List<DataStorage>() };
+                                    InitEmptyConfig<DataStoragesCollection>(storageConfig, storageConfigPath);
+                                }
                             }
                             catch (Exception ex)
                             {
                                 MessageBox.Show($"Ошибка поиска или создания настроечного файла хранилищ данных {storageConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
-                                throw;
                             }
                         }
 
@@ -84,12 +88,18 @@ namespace Philadelphus.Presentation.Wpf.UI
                         {
                             try
                             {
-                                File.Create(repositoryHeadersConfigPath);
+                                using (var fileStream = File.Create(storageConfigPath))
+                                {
+                                    var repositoryHeadersConfig = new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new List<TreeRepositoryHeader>() };
+                                    InitEmptyConfig<TreeRepositoryHeadersCollection>(repositoryHeadersConfig, repositoryHeadersConfigPath);
+                                }
+
+                                var emptyConfig = new DataStoragesCollection { DataStorages = new List<DataStorage>() };
+                                InitEmptyConfig<DataStoragesCollection>(emptyConfig, repositoryHeadersConfigPath);
                             }
                             catch (Exception ex)
                             {
                                 MessageBox.Show($"Ошибка поиска или создания настроечного файла заголовков репозиториев {repositoryHeadersConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
-                                throw;
                             }
                         }
 
@@ -180,6 +190,12 @@ namespace Philadelphus.Presentation.Wpf.UI
             await _host.StopAsync();
             _host.Dispose();
             base.OnExit(e);
+        }
+
+        private async Task<bool> InitEmptyConfig<T>(T json, string path)
+        {
+            await File.WriteAllTextAsync(path, JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true }));
+            return true;
         }
     }
 }
