@@ -1,7 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.InteropServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Mapping;
@@ -29,83 +33,96 @@ namespace Philadelphus.Presentation.Wpf.UI
     /// </summary>
     public partial class App : Application
     {
-        //private ApplicationVM _viewModel;
         private readonly IHost _host;
+        private readonly IConfiguration _configuration;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll")]
+        private static extern bool FreeConsole();
+
         public App()
         {
+            AllocConsole();
+            Console.Title = "Philadelphus Startup Log";
+
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
+            // 1. Startup Logger: Console + File
+            var startupConfig = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(startupConfig)  // Читает "Serilog" секцию
+                .MinimumLevel.Information()
+                .CreateLogger();
+
+            Log.Information("=== Philadelphus Startup: Console + File Logging ===");
+
+            // Создание временной конфигурации для Host
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            _configuration = builder.Build();
+
             _host = Host.CreateDefaultBuilder()
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConsole();
-                    logging.AddDebug();
-                    logging.SetMinimumLevel(LogLevel.Information);
-                })
+                .UseSerilog()
                 // Добавление конфигурационных файлов
-                .ConfigureAppConfiguration((hostingContext, config) =>
+                .ConfigureAppConfiguration(async (hostingContext, config) =>
                 {
                     // Основной конфигурационный файл
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    config.AddConfiguration(_configuration);  // Временная конфигурация
                     
-
                     // Дополнительные конфигурационные файлы
-                    var additionalConfigsPath = Environment.ExpandEnvironmentVariables("%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
+                    var additionalConfigsPath = Environment.ExpandEnvironmentVariables(_configuration["AdditionalConfigs:BasePath"] ?? "%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
+
+                    Log.Information($"Проверка базовой директории: {additionalConfigsPath}");
+
                     if (Directory.Exists(additionalConfigsPath) == false)
                     {
+                        Log.Warning($"Директория не существует: {additionalConfigsPath}. Создаётся...");
                         try
                         {
                             Directory.CreateDirectory(additionalConfigsPath);
+                            Log.Information($"Директория создана: {additionalConfigsPath}");
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Ошибка поиска или создания директории основных настроечных файлов {additionalConfigsPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                            Log.Error(ex, $"Ошибка создания директории {additionalConfigsPath}");
                         }
                     }
-                    if (Directory.Exists(additionalConfigsPath))  // TODO: ВРЕМЕННО!!
+
+                    // Фиксированный список конфигов
+                    var configFiles = new Dictionary<string, Func<object>>
                     {
-                        var storageConfigPath = Path.Combine(additionalConfigsPath, "storages-config.json");
-                        if (File.Exists(storageConfigPath) == false)
+                        ["storages-config.json"] = () => new DataStoragesCollection { DataStorages = new() },
+                        ["repository-headers-config.json"] = () => new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new() }
+                    };
+
+                    foreach (var kvp in configFiles)
+                    {
+                        var fullPath = Path.Combine(additionalConfigsPath, kvp.Key);
+                        Log.Information($"Проверка конфига: {additionalConfigsPath}", fullPath);
+
+                        if (File.Exists(fullPath) == false)
                         {
-                            try
-                            {
-                                File.Create(storageConfigPath);
-                                using (var fileStream = File.Create(storageConfigPath))
-                                {
-                                    var storageConfig = new DataStoragesCollection { DataStorages = new List<DataStorage>() };
-                                    InitEmptyConfig<DataStoragesCollection>(storageConfig, storageConfigPath);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"Ошибка поиска или создания настроечного файла хранилищ данных {storageConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
-                            }
+                            Log.Warning($"Не найден {additionalConfigsPath}, создаётся default", fullPath);
+                            var emptyConfig = kvp.Value();
+                            await InitEmptyConfigAsync(emptyConfig, fullPath);
+                            Log.Information($"Создан default: {additionalConfigsPath}", fullPath);
+                        }
+                        else
+                        {
+                            Log.Debug($"Найден и будет загружен: {additionalConfigsPath}", fullPath);
                         }
 
-                        var repositoryHeadersConfigPath = Path.Combine(additionalConfigsPath, "repository-headers-config.json");
-                        if (File.Exists(repositoryHeadersConfigPath) == false)
-                        {
-                            try
-                            {
-                                using (var fileStream = File.Create(storageConfigPath))
-                                {
-                                    var repositoryHeadersConfig = new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new List<TreeRepositoryHeader>() };
-                                    InitEmptyConfig<TreeRepositoryHeadersCollection>(repositoryHeadersConfig, repositoryHeadersConfigPath);
-                                }
-
-                                var emptyConfig = new DataStoragesCollection { DataStorages = new List<DataStorage>() };
-                                InitEmptyConfig<DataStoragesCollection>(emptyConfig, repositoryHeadersConfigPath);
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"Ошибка поиска или создания настроечного файла заголовков репозиториев {repositoryHeadersConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
-                            }
-                        }
-
-                        config.AddJsonFile(storageConfigPath, optional: true);
-                        config.AddJsonFile(repositoryHeadersConfigPath, optional: true);
+                        config.AddJsonFile(fullPath, optional: true, reloadOnChange: true);
                     }
+
 
                     var env = hostingContext.HostingEnvironment;
                     if (env.IsDevelopment() || true /*временно для тестов*/)
@@ -128,10 +145,10 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(typeof(MappingProfile));
-
+                    
                     // TODO: Проработать кеширование
                     services.AddMemoryCache();
-                    
+
                     // Регистрация сервисов
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
@@ -168,7 +185,24 @@ namespace Philadelphus.Presentation.Wpf.UI
         {
             try
             {
+                Log.Information("Запуск Host...");
                 await _host.StartAsync();
+
+                // 2. Переконфигурация: только File (закрыть Console)
+                Log.Information("Startup завершён. Переключение на File-only logging...");
+
+                await Task.Delay(3000);
+
+                var runtimeLogger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(_configuration)
+                    .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Fatal)  // Только Fatal в Console
+                    .MinimumLevel.Information()
+                    .CreateLogger();
+
+                Log.Logger = runtimeLogger;
+                FreeConsole();  // Закрыть консольное окно
+
+                Log.Information("UI запущен. Логи → только файл logs/philadelphus-.log");
 
                 var window = _host.Services.GetRequiredService<LaunchWindow>();
                 window.Topmost = true;
@@ -179,23 +213,25 @@ namespace Philadelphus.Presentation.Wpf.UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка запуска приложения, обратитесь к разработчику.\r\nПодробнее:\r\n{ex.Message}\r\nТрассировка:\r\n{ex.StackTrace}");
+                Log.Fatal(ex, "Критическая ошибка запуска приложения");
+                MessageBox.Show($"Ошибка запуска: {ex.Message}");
                 Shutdown(-1);
             }
-            
         }
 
         protected override async void OnExit(ExitEventArgs e)
         {
+            Log.Information("Завершение приложения...");
             await _host.StopAsync();
             _host.Dispose();
+            Log.CloseAndFlush();
             base.OnExit(e);
         }
 
-        private async Task<bool> InitEmptyConfig<T>(T json, string path)
+        private async Task InitEmptyConfigAsync<T>(T configObject, string path)
         {
-            await File.WriteAllTextAsync(path, JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true }));
-            return true;
+            var json = JsonSerializer.Serialize(configObject, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(path, json);
         }
     }
 }
