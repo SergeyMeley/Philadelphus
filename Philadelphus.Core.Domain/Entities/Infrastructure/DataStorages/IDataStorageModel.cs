@@ -81,5 +81,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="interval"></param>
         /// <returns></returns>
         public bool StartAvailableAutoChecking(int interval);
+
+        /// <summary>
+        /// Остановить автоматическую проверку доступности
+        /// </summary>
+        /// <returns></returns>
+        public bool StopAvailableAutoChecking();
     }
 }

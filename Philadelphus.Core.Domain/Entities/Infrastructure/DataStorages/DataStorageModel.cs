@@ -8,8 +8,10 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
     /// <summary>
     /// Хранилище данных  
     /// </summary>
-    public class DataStorageModel : IDataStorageModel
+    public class DataStorageModel : IDataStorageModel, IDisposable
     {
+        private System.Timers.Timer? _timer;
+
         /// <summary>
         /// Уникальный идентификатор
         /// </summary>
@@ -176,11 +178,16 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             if (_isDisabled)
                 return false;
-            Timer timer = new Timer(interval * 1000);
-            timer.Elapsed += CheckAvailable;
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            _timer = new Timer(interval * 1000);
+            _timer.Elapsed += OnAvailabilityCheckTimerElapsed;
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
             return true;
+        }
+
+        private void OnAvailabilityCheckTimerElapsed(object source, ElapsedEventArgs e)
+        {
+            _ = Task.Run(() => CheckAvailable());
         }
 
         /// <summary>
@@ -213,6 +220,23 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         private void CheckAvailable(Object source, ElapsedEventArgs e)
         {
             CheckAvailable();
+        }
+
+        /// <summary>
+        /// Остановить автоматическую проверку доступности
+        /// </summary>
+        /// <returns></returns>
+        public bool StopAvailableAutoChecking()
+        {
+            _timer?.Stop();
+            return true;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Stop();
+            _timer?.Dispose();
+            _timer = null;
         }
     }
 }

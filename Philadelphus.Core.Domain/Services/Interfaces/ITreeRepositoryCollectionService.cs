@@ -49,9 +49,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Принудительная загрузка коллекции заголовков репозиториев из хранилищ
         /// </summary>
-        /// <param name="dataStorageModel">Хранилище данных</param>
         /// <returns></returns>
-        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel);
+        public IEnumerable<TreeRepositoryHeaderModel> GetTreeRepositoryHeadersCollection();
 
         /// <summary>
         /// Получить коллекцию репозиториев
