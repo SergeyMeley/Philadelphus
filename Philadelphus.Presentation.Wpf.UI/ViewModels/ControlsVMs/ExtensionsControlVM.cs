@@ -16,7 +16,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     /// <summary>
     /// ViewModel для управления расширениями
     /// </summary>
-    public class ExtensionsControlVM : ControlVM
+    public class ExtensionsControlVM : ControlBaseVM
     {
         private readonly IExtensionManager _extensionManager;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;

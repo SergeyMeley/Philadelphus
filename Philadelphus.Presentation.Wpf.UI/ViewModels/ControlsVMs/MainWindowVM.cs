@@ -11,7 +11,7 @@ using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
-    public class MainWindowVM : ControlVM
+    public class MainWindowVM : ControlBaseVM
     {
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
@@ -56,7 +56,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
 
             _notificationService.SendTextMessage("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
-            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesString);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesStrings);
             _notificationService.SendTextMessage($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 

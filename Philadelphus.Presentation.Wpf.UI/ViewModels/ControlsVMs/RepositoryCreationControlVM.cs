@@ -8,7 +8,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
-    public class RepositoryCreationControlVM : ControlVM
+    public class RepositoryCreationControlVM : ControlBaseVM
     {
         private readonly ITreeRepositoryCollectionService _collectionService;
         private readonly ITreeRepositoryService _service;
@@ -19,8 +19,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private string _description;
         public string Description { get => _description; set => _description = value; }
 
-        private DataStoragesSettingsVM _dataStoragesSettingsVM;
-        public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
+        private DataStoragesCollectionVM _dataStoragesSettingsVM;
+        public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; set => _dataStoragesSettingsVM = value; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
         public RepositoryCreationControlVM(
@@ -30,7 +30,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ITreeRepositoryCollectionService collectionService,
             ITreeRepositoryService service,
             TreeRepositoryCollectionVM repositoryCollectionVM, 
-            DataStoragesSettingsVM dataStoragesSettingsVM,
+            DataStoragesCollectionVM dataStoragesSettingsVM,
             IOptions<ApplicationSettings> options,
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, logger, notificationService, applicationCommandsVM)

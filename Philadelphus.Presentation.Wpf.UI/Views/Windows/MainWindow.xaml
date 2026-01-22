@@ -270,6 +270,9 @@
                                 <TabItem Header="Импорт / экспорт">
                                     <ctrls:DataExchange></ctrls:DataExchange>
                                 </TabItem>
+                                <TabItem Header="Настройки">
+                                    <ctrls:ApplicationSettings></ctrls:ApplicationSettings>
+                                </TabItem>
                             </TabControl>
                         </GroupBox>
                     </Grid>

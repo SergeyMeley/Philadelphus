@@ -1,11 +1,8 @@
-﻿using System.Runtime.InteropServices;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
-using Serilog.Events;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Mapping;
@@ -20,11 +17,16 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using Serilog;
+using Serilog.Events;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI
 {
@@ -78,49 +80,26 @@ namespace Philadelphus.Presentation.Wpf.UI
                     config.AddConfiguration(_configuration);  // Временная конфигурация
                     
                     // Дополнительные конфигурационные файлы
-                    var additionalConfigsPath = Environment.ExpandEnvironmentVariables(_configuration["AdditionalConfigs:BasePath"] ?? "%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
+                    var basePath = Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:BasePath"] ?? "%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
 
-                    Log.Information($"Проверка базовой директории: {additionalConfigsPath}");
+                    Log.Information($"Проверка базовой директории: {basePath}");
 
-                    if (Directory.Exists(additionalConfigsPath) == false)
-                    {
-                        Log.Warning($"Директория не существует: {additionalConfigsPath}. Создаётся...");
-                        try
-                        {
-                            Directory.CreateDirectory(additionalConfigsPath);
-                            Log.Information($"Директория создана: {additionalConfigsPath}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex, $"Ошибка создания директории {additionalConfigsPath}");
-                        }
-                    }
+                    CheckOrInitDirectory(new DirectoryInfo(basePath));
+
 
                     // Фиксированный список конфигов
                     var configFiles = new Dictionary<string, Func<object>>
                     {
-                        ["storages-config.json"] = () => new DataStoragesCollection { DataStorages = new() },
-                        ["repository-headers-config.json"] = () => new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new() }
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:StoragesConfigFullPathString"])] = () => new DataStoragesCollection { DataStorages = new() },
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:RepositoryHeadersConfigFullPathString"])] = () => new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new() }
                     };
 
                     foreach (var kvp in configFiles)
                     {
-                        var fullPath = Path.Combine(additionalConfigsPath, kvp.Key);
-                        Log.Information($"Проверка конфига: {additionalConfigsPath}", fullPath);
-
-                        if (File.Exists(fullPath) == false)
-                        {
-                            Log.Warning($"Не найден {additionalConfigsPath}, создаётся default", fullPath);
-                            var emptyConfig = kvp.Value();
-                            await InitEmptyConfigAsync(emptyConfig, fullPath);
-                            Log.Information($"Создан default: {additionalConfigsPath}", fullPath);
-                        }
-                        else
-                        {
-                            Log.Debug($"Найден и будет загружен: {additionalConfigsPath}", fullPath);
-                        }
-
-                        config.AddJsonFile(fullPath, optional: true, reloadOnChange: true);
+                        var file = new FileInfo(kvp.Key);
+                        CheckOrInitDirectory(file.Directory);
+                        CheckOrInitFile(new FileInfo(kvp.Key), kvp.Value);
+                        config.AddJsonFile(file.FullName, optional: true, reloadOnChange: true);
                     }
 
 
@@ -159,11 +138,12 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                     // Регистрация ViewModel
                     services.AddSingleton<ApplicationVM>();
+                    services.AddSingleton<ApplicationSettingsVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
-                    services.AddSingleton<DataStoragesSettingsVM>();
+                    services.AddSingleton<DataStoragesCollectionVM>();
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
                     services.AddTransient<TreeRepositoryCollectionVM>();
                     services.AddTransient<TreeRepositoryHeadersCollectionVM>();
@@ -191,7 +171,9 @@ namespace Philadelphus.Presentation.Wpf.UI
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Startup завершён. Переключение на File-only logging...");
 
+                Log.Information("Искусственная задержка запуска 3 сек.");
                 await Task.Delay(3000);
+
 
                 var runtimeLogger = new LoggerConfiguration()
                     .ReadFrom.Configuration(_configuration)
@@ -228,10 +210,43 @@ namespace Philadelphus.Presentation.Wpf.UI
             base.OnExit(e);
         }
 
-        private async Task InitEmptyConfigAsync<T>(T configObject, string path)
+        private async Task CheckOrInitDirectory(DirectoryInfo path)
         {
-            var json = JsonSerializer.Serialize(configObject, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(path, json);
+            if (path.Exists == false)
+            {
+                Log.Warning($"Директория не существует: '{path.FullName}', Создаётся...");
+                try
+                {
+                    path.Create();
+                    Log.Information($"Директория создана: '{path.FullName}'");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Ошибка создания директории '{path.FullName}'");
+                }
+            }
+        }
+
+        private async Task CheckOrInitFile<T>(FileInfo file, T configObject)
+        {
+            if (file.Exists == false)
+            {
+                try
+                {
+                    Log.Warning($"Не найден '{file.FullName}', создаётся файл по умолчанию");
+                    var json = JsonSerializer.Serialize(configObject, new JsonSerializerOptions { WriteIndented = true });
+                    await File.WriteAllTextAsync(file.FullName, json);
+                    Log.Information($"Создан настроечный файл по умолчанию: '{file.FullName}'");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Ошибка создания настроечного файла по умолчанию: '{file.FullName}'");
+                }
+            }
+            else
+            {
+                Log.Debug($"Найден и будет загружен настроечный файл: '{file.FullName}'");
+            }
         }
     }
 }

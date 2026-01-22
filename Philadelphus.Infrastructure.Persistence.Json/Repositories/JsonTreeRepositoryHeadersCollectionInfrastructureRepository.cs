@@ -65,11 +65,17 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
-            var treeRepositoryHeadersCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options);
+            var root = JsonSerializer.Deserialize<JsonElement>(json);
+
+            TreeRepositoryHeadersCollection treeRepositoryHeadersCollection = null;
+
+            if (root.TryGetProperty("TreeRepositoryHeadersCollection", out var collectionNode))
+            {
+                treeRepositoryHeadersCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(collectionNode, options);
+            }
 
             if (treeRepositoryHeadersCollection == null)
                 throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
-
 
             var index = treeRepositoryHeadersCollection.TreeRepositoryHeaders.FindIndex(x => x.Uuid == treeRepositoryHeader.Uuid);
             if (index == null || index == -1)
@@ -81,7 +87,11 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
                 treeRepositoryHeadersCollection.TreeRepositoryHeaders[index] = treeRepositoryHeader;
             }
 
-            json = JsonSerializer.Serialize<TreeRepositoryHeadersCollection>(treeRepositoryHeadersCollection, options);
+            var wrapper = new
+            {
+                TreeRepositoryHeadersCollection = treeRepositoryHeadersCollection
+            };
+            json = JsonSerializer.Serialize(wrapper, options);
 
             File.WriteAllText(_file.FullName, json);
 

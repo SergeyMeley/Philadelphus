@@ -17,9 +17,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Получить коллекцию хранилищ данных
         /// </summary>
-        /// <param name="connectionStrings">Строки подключения</param>
         /// <returns></returns>
-        public IEnumerable<IDataStorageModel> GetStoragesModels(ConnectionStringsCollection connectionStrings);
+        public IEnumerable<IDataStorageModel> GetStoragesModels();
 
         #endregion
 
