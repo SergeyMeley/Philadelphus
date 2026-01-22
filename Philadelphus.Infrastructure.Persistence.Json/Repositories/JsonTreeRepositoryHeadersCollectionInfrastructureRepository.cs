@@ -50,7 +50,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             return result;
         }
 
-        public long UpdateRepository(TreeRepositoryHeader treeRepositoryHeader)
+        public long UpdateRepository(TreeRepositoryHeader treeRepositoryHeader) // TODO: Тех. долг по задаче #276
         {
             if (CheckAvailability() == false)
                 return -1;
