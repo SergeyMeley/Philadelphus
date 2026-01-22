@@ -88,17 +88,17 @@ namespace Philadelphus.Presentation.Wpf.UI
 
 
                     // Фиксированный список конфигов
-                    var configFiles = new Dictionary<string, Func<object>>
+                    var configFiles = new Dictionary<string, object>
                     {
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:StoragesConfigFullPathString"])] = () => new DataStoragesCollection { DataStorages = new() },
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:RepositoryHeadersConfigFullPathString"])] = () => new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new() }
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:StoragesConfigFullPathString"])] = new DataStoragesCollection { DataStorages = new() },
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new() }
                     };
 
                     foreach (var kvp in configFiles)
                     {
                         var file = new FileInfo(kvp.Key);
                         CheckOrInitDirectory(file.Directory);
-                        CheckOrInitFile(new FileInfo(kvp.Key), kvp.Value);
+                        CheckOrInitFile(file, kvp.Value);
                         config.AddJsonFile(file.FullName, optional: true, reloadOnChange: true);
                     }
 
