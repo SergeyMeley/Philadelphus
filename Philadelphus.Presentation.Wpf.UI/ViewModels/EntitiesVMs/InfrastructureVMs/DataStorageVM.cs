@@ -4,8 +4,9 @@ using System.Timers;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
-    public class DataStorageVM : ViewModelBase
+    public class DataStorageVM : ViewModelBase, IDisposable
     {
+        private System.Timers.Timer? _timer;
         private IDataStorageModel? _model;
         public IDataStorageModel? Model
         { 
@@ -30,6 +31,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             set
             {
                 _model.Name = value;
+                OnPropertyChanged(nameof(Name));
             }
         }
         public string Description
@@ -41,6 +43,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             set
             {
                 _model.Description = value;
+                OnPropertyChanged(nameof(Description));
             }
         }
         public InfrastructureTypes InfrastructureType
@@ -119,20 +122,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         private void StartCheckingStorage()
         {
             _model.StartAvailableAutoChecking(interval: 20);
-            System.Timers.Timer timer = new System.Timers.Timer(5000);
-            timer.Elapsed += CheckStorage;
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            _timer = new System.Timers.Timer(5000);
+            _timer.Elapsed += (s, e) => 
+            {
+                OnPropertyChanged(nameof(IsAvailable));
+                OnPropertyChanged(nameof(LastCheckTime));
+            }
+            ;
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
         }
-        private void CheckStorage()
+        public void Dispose()
         {
-            OnPropertyChanged(nameof(Model));
-            OnPropertyChanged(nameof(Model.IsAvailable));
-            OnPropertyChanged(nameof(Model.LastCheckTime));
-        }
-        private void CheckStorage(object source, ElapsedEventArgs e)
-        {
-            CheckStorage();
+            _timer?.Stop();
+            _timer?.Dispose();
+            Model?.StopAvailableAutoChecking();
+            _timer = null;
         }
     }
 }

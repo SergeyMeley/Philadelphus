@@ -19,16 +19,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly ITreeRepositoryCollectionService _collectionService;
         private readonly ITreeRepositoryService _service;
 
-        private DataStoragesSettingsVM _dataStoragesSettingsVM;
-        public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
+        private DataStoragesCollectionVM _dataStoragesSettingsVM;
+        public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
         public TreeRepositoryCollectionVM(
             IServiceProvider serviceProvider,
             ILogger<TreeRepositoryCollectionVM> logger,
             INotificationService notificationService,
             ITreeRepositoryCollectionService collectionService, 
             ITreeRepositoryService service,
-            DataStoragesSettingsVM dataStoragesSettings,
-            IOptions<ApplicationSettings> options)
+            DataStoragesCollectionVM dataStoragesSettings,
+            IOptions<ApplicationSettingsConfig> options)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

@@ -270,6 +270,9 @@
                                 <TabItem Header="Импорт / экспорт">
                                     <ctrls:DataExchange></ctrls:DataExchange>
                                 </TabItem>
+                                <TabItem Header="Настройки">
+                                    <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
+                                </TabItem>
                             </TabControl>
                         </GroupBox>
                     </Grid>

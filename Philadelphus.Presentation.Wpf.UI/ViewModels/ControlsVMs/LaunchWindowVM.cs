@@ -6,10 +6,13 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
-    public class LaunchWindowVM : ControlVM
+    public class LaunchWindowVM : ControlBaseVM
     {
-        private DataStoragesSettingsVM _dataStoragesSettingsVM;
-        public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
+        private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
+        public ApplicationSettingsControlVM ApplicationSettingsControlVM { get => _applicationSettingsControlVM; }
+
+        private DataStoragesCollectionVM _dataStoragesCollectionVM;
+        public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesCollectionVM; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
         public TreeRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
@@ -24,19 +27,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IServiceProvider serviceProvider,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
-            DataStoragesSettingsVM dataStoragesSettingsVM,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             TreeRepositoryCollectionVM repositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
-            ApplicationCommandsVM applicationCommandsVM)
+            ApplicationCommandsVM applicationCommandsVM,
+            ApplicationSettingsControlVM applicationSettingsControlVM)
             : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
-            ;
-            _dataStoragesSettingsVM = dataStoragesSettingsVM;
+            _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
             _repositoryCreationVM = repositoryCreationControlVM;
+            _applicationSettingsControlVM = applicationSettingsControlVM;
         }
 
         public RelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;

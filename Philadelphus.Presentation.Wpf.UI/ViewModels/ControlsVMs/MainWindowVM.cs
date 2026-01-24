@@ -11,10 +11,11 @@ using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
-    public class MainWindowVM : ControlVM
+    public class MainWindowVM : ControlBaseVM
     {
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
+        private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
         public RepositoryExplorerControlVM RepositoryExplorerVM
@@ -24,15 +25,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return _repositoryExplorerControlVM;
             }
         }
+        public ApplicationSettingsControlVM ApplicationSettingsControlVM
+        {
+            get
+            {
+                return _applicationSettingsControlVM;
+            }
+        }
         public string Title
         {
             get
             {
                 var title = "Чубушник";
-                var repositoryName = RepositoryExplorerVM?.CurentRepositoryName;
-                if (String.IsNullOrEmpty(repositoryName) == false)
+                if (string.IsNullOrEmpty(RepositoryExplorerVM?.CurentRepositoryName) == false)
                 {
-                    title = $"{repositoryName} - Чубушник";
+                    title = $"{RepositoryExplorerVM?.CurentRepositoryName} - Чубушник";
                 }
                 return title;
             }
@@ -46,17 +53,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IServiceProvider serviceProvider,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
-            IOptions<ApplicationSettings> options,
+            IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
-            IExtensionsControlVMFactory extensionVMFactory)
+            IExtensionsControlVMFactory extensionVMFactory,
+            ApplicationSettingsControlVM applicationSettingsControlVM)
             : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
+            _applicationSettingsControlVM = applicationSettingsControlVM;
 
             _notificationService.SendTextMessage("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
-            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesString);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesStrings);
             _notificationService.SendTextMessage($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 

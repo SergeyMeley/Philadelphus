@@ -136,6 +136,10 @@
                 <!--<ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>-->
                 <ctrls:DataStorageHeaders></ctrls:DataStorageHeaders>
             </TabItem>
+
+            <TabItem Header="Настройки" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageSettings}">
+                <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

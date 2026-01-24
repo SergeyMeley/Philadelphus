@@ -14,7 +14,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
-    public  class RepositoryExplorerControlVM : ControlVM
+    public  class RepositoryExplorerControlVM : ControlBaseVM
     {
         #region [ Props ]
 
@@ -75,7 +75,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IServiceProvider serviceProvider,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
-            IOptions<ApplicationSettings> options,
+            IOptions<ApplicationSettingsConfig> options,
             ITreeRepositoryService service,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
@@ -89,7 +89,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             LoadTreeRepository();
 
             _notificationService.SendTextMessage("Обозреватель репозитория. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
-            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesString);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesStrings);
             _notificationService.SendTextMessage($"Обозреватель репозитория. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 

@@ -33,6 +33,7 @@
         <Image x:Key="imageRemove" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageReturn" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageSave" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageSettings" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/settings_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageShowTopLevel64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/top_level_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageUp" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 

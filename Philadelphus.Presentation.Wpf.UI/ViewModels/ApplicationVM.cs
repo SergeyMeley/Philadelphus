@@ -22,8 +22,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         private LaunchWindowVM _launchVM;
         public LaunchWindowVM LaunchVM { get { return _launchVM; } }
 
-        private DataStoragesSettingsVM _dataStoragesSettingsVM;
-        public DataStoragesSettingsVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
+        private DataStoragesCollectionVM _dataStoragesSettingsVM;
+        public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
 
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
         public TreeRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
@@ -36,9 +36,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             IMapper mapper,
             ILogger<ApplicationVM> logger,
             INotificationService notificationService,
-            IOptions<ApplicationSettings> options,
+            IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,
-            DataStoragesSettingsVM dataStoragesSettingsVM,
+            DataStoragesCollectionVM dataStoragesSettingsVM,
             TreeRepositoryCollectionVM treeRepositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM treeRepositoryHeadersCollectionVM,
             RepositoryCreationControlVM RepositoryCreationVM,

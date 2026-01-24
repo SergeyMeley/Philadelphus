@@ -9,11 +9,14 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
-    public class DataStoragesSettingsVM : ViewModelBase
+    public class DataStoragesCollectionVM : ViewModelBase, IDisposable
     {
-        private readonly ILogger<DataStoragesSettingsVM> _logger;
+        private readonly ILogger<DataStoragesCollectionVM> _logger;
         private readonly INotificationService _notificationService;
         private readonly IDataStoragesService _dataStoragesService;
+        private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
+        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
+        private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
 
         private DataStorageVM _mainDataStorageVM;
         public DataStorageVM MainDataStorageVM
@@ -59,47 +62,34 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             }
         }
 
-        public DataStoragesSettingsVM(
-            ILogger<DataStoragesSettingsVM> logger,
+        public DataStoragesCollectionVM(
+            ILogger<DataStoragesCollectionVM> logger,
             INotificationService notificationService,
             IDataStoragesService dataStoragesService,
-            IOptions<ApplicationSettings> applicationSettings,
-            IOptions<ConnectionStringsCollection> connectionStringsCollection,
-            IOptions<DataStoragesCollection> dataStoragesCollection)
+            IOptions<ApplicationSettingsConfig> applicationSettings,
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
+            IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
         {
             _logger = logger;
             _notificationService = notificationService;
             _dataStoragesService = dataStoragesService;
+            _applicationSettings = applicationSettings;
+            _connectionStringsCollection = connectionStringsCollection;
+            _dataStoragesCollection = dataStoragesCollection;
 
             InitMainDataStorageVM(applicationSettings.Value);
             //InitDataStorages(connectionStringsCollection.Value);
             InitDataStorages(dataStoragesCollection.Value, connectionStringsCollection.Value);
         }
-        private bool InitMainDataStorageVM(ApplicationSettings applicationSettings)
+        private bool InitMainDataStorageVM(ApplicationSettingsConfig applicationSettings)
         {
             var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
             _dataStorageVMs.Add(_mainDataStorageVM);
             return true;
         }
-        private bool InitDataStorages(ConnectionStringsCollection connectionStrings)
-        {
-            
-            var models = _dataStoragesService.GetStoragesModels(connectionStrings);
-            foreach (var model in models)
-            {
-                if (model != null)
-                {
-                    if (_dataStorageVMs.FirstOrDefault(x => x.Model.Uuid == model.Uuid) == null)
-                    {
-                        _dataStorageVMs.Add(new DataStorageVM(model));
-                    }
-                }
-            }
-            return true;
-        }
 
-        private bool InitDataStorages(DataStoragesCollection dataStoragesCollection, ConnectionStringsCollection connectionStrings)
+        private bool InitDataStorages(DataStoragesCollectionConfig dataStoragesCollection, ConnectionStringsCollectionConfig connectionStrings)
         {
             foreach (var entity in dataStoragesCollection.DataStorages)
             {
@@ -119,6 +109,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 }
             }
             return true;
+        }
+
+        public void Dispose()
+        {
+            foreach (var vm in DataStorageVMs)
+                vm.Dispose();
+            DataStorageVMs.Clear();
         }
     }
 }

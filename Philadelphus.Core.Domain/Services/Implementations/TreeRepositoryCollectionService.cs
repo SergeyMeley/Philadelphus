@@ -1,5 +1,7 @@
 ﻿ using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -21,6 +23,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly ILogger<TreeRepositoryCollectionService> _logger;
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryService _treeRepositoryService;
+        private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
+        private readonly IOptions<TreeRepositoryHeadersCollectionConfig> _treeRepositoryHeadersCollection;
 
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
 
@@ -40,16 +44,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="logger">Логгер</param>
         /// <param name="notificationService">Сервис уведомлений</param>
         /// <param name="treeRepositoryService">Сервис работы с репозиторием и его элементами</param>
+        /// <param name="applicationSettings"></param>
+        /// <param name="treeRepositoryHeadersCollection"></param>
         public TreeRepositoryCollectionService(
             IMapper mapper,
             ILogger<TreeRepositoryCollectionService> logger,
             INotificationService notificationService,
-            ITreeRepositoryService treeRepositoryService)
+            ITreeRepositoryService treeRepositoryService,
+            IOptions<ApplicationSettingsConfig> applicationSettings,
+            IOptions<TreeRepositoryHeadersCollectionConfig> treeRepositoryHeadersCollection)
         {
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
             _treeRepositoryService = treeRepositoryService;
+            _applicationSettings = applicationSettings;
+            _treeRepositoryHeadersCollection = treeRepositoryHeadersCollection;
 
             _logger.LogInformation("TreeRepositoryCollectionService инициализирован.");
         }
@@ -107,11 +117,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Загрузка коллекции заголовков репозиториев (избранные или последние запускаемые) из настроечного файла
         /// </summary>
         /// <returns>Коллекция заголовков репозиториев (модели)</returns>
-        public IEnumerable<TreeRepositoryHeaderModel> ForceLoadTreeRepositoryHeadersCollection(IDataStorageModel dataStorageModel)
+        public IEnumerable<TreeRepositoryHeaderModel> GetTreeRepositoryHeadersCollection()
         {
-            if (dataStorageModel == null)
-                return null;
-            return dataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.SelectRepositoryCollection().ToModelCollection();
+            var dbEntities = _treeRepositoryHeadersCollection.Value.TreeRepositoryHeaders;
+            var result = dbEntities.ToModelCollection();
+            return result;
         }
         /// <summary>
         /// Получение коллекции репозиториев (модели) по их UUID из заданной коллекции хранилищ

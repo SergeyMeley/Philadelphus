@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
@@ -17,29 +18,17 @@ namespace Philadelphus.Core.Domain.Services.Implementations
     {
         #region [ Props ]
 
-        /// <summary>
-        /// Автомаппер
-        /// </summary>
         private readonly IMapper _mapper;
-
-        /// <summary>
-        /// Логгер
-        /// </summary>
         private readonly ILogger<TreeRepositoryCollectionService> _logger;
-
-        /// <summary>
-        /// Сервис уведомлений
-        /// </summary>
         private readonly INotificationService _notificationService;
-
-        /// <summary>
-        /// Модель основного хранилища настроечных файлов
-        /// </summary>
-        private readonly IDataStorageModel _mainDataStorageModel;
+        private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
+        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
+        private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
 
         #endregion
 
         #region [ Construct ]
+
 
         /// <summary>
         /// Серсис работы с коллекцией репозиториев и хранилищами данных
@@ -47,22 +36,25 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="mapper">Автомаппер</param>
         /// <param name="logger">Сервис логгирования</param>
         /// <param name="notificationService">Сервис уведомлений</param>
-        /// <param name="treeRepositoryService">Сервис для работы с репозиторием и его элементами</param>
+        /// <param name="applicationSettings"></param>
+        /// <param name="connectionStringsCollection"></param>
+        /// <param name="dataStoragesCollection"></param>
         public DataStoragesService(
             IMapper mapper,
             ILogger<TreeRepositoryCollectionService> logger,
             INotificationService notificationService,
-            ITreeRepositoryService treeRepositoryService,
-            IOptions<ApplicationSettings> applicationSettings)
+            IOptions<ApplicationSettingsConfig> applicationSettings,
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
+            IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
         {
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
+            _applicationSettings = applicationSettings;
+            _connectionStringsCollection = connectionStringsCollection;
+            _dataStoragesCollection = dataStoragesCollection;
 
             _logger.LogInformation("DataStoragesService инициализирован.");
-
-            _mainDataStorageModel = CreateMainDataStorageModel(applicationSettings.Value.StoragesConfigFullPath, applicationSettings.Value.RepositoryHeadersConfigFullPath);
-            _logger.LogInformation("Основное хранилище конфигурационных файлов инициализировано.");
         }
 
         #endregion
@@ -72,15 +64,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получить коллекцию хранилищ данных
         /// </summary>
-        /// <param name="connectionStrings">Строки подключения</param>
         /// <returns></returns>
-        public IEnumerable<IDataStorageModel> GetStoragesModels(ConnectionStringsCollection connectionStrings)
+        public IEnumerable<IDataStorageModel> GetStoragesModels()
         {
-            var dbEntities = _mainDataStorageModel.DataStoragesCollectionInfrastructureRepository.SelectDataStorages();
+            var connectionStrings = _connectionStringsCollection.Value.ConnectionStringContainers;
+            var dbEntities = _dataStoragesCollection.Value.DataStorages;
             var models = new List<IDataStorageModel>();
             foreach (var dbEntity in dbEntities)
             {
-                var cs = connectionStrings.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == dbEntity.Uuid);
+                var cs = connectionStrings.SingleOrDefault(x => x.Uuid == dbEntity.Uuid);
                 var model = dbEntity.ToModel(cs.ConnectionString);
                 models.Add(model);
             }
@@ -110,17 +102,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
-                    name: "Основное хранилище настроечных файлов",
-                    description: "Хранилище настроечных файлов и конфигураций в формате json-документов",
+                    name: "Основное хранилище",
+                    description: "Основное хранилище",
                     Guid.Empty,
                     InfrastructureTypes.JsonDocument,
-                    isDisabled: false)
-                .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath))
-                .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath))
-            ;
+                isDisabled: false)
+            .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath))
+            .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath))
+        ;
             var mainDataStorageModel = dataStorageBuilder.Build();
 
             _logger.LogInformation("Хранилище конфигурационных файлов инициализировано.");
+
             return mainDataStorageModel;
         }
 
