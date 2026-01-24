@@ -98,7 +98,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                         [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:StoragesConfigFullPathString"])] = new DataStoragesCollectionConfig { DataStorages = new() },
                         [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
                     };
-
+                    }
                     foreach (var kvp in configFiles)
                     {
                         var file = new FileInfo(kvp.Key);
@@ -106,6 +106,75 @@ namespace Philadelphus.Presentation.Wpf.UI
                         CheckOrInitFile(file, kvp.Value);
                         config.AddJsonFile(file.FullName, optional: true, reloadOnChange: true);
                     }
+                                File.Create(storageConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла хранилищ данных {storageConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+                    }
+                        var repositoryHeadersConfigPath = Path.Combine(additionalConfigsPath, "repository-headers-config.json");
+                        if (File.Exists(repositoryHeadersConfigPath) == false)
+                        {
+                            try
+                            {
+                                File.Create(repositoryHeadersConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла заголовков репозиториев {repositoryHeadersConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+                                File.Create(storageConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла хранилищ данных {storageConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+                    }
+                    services.AddSingleton<IDataStoragesService, DataStoragesService>();
+                    services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                    services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddTransient<IExtensionManager, ExtensionManager>();
+                    // Слой Presentation
+                    services.AddSingleton<IConfigurationService, ConfigurationService>();
+                            {
+                                File.Create(repositoryHeadersConfigPath);
+                            }
+                    services.AddSingleton<ApplicationSettingsControlVM>();
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла заголовков репозиториев {repositoryHeadersConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+                                File.Create(storageConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла хранилищ данных {storageConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
+
+                    services.AddScoped<IDataStoragesService, DataStoragesService>();
+                    services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                    services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddScoped<IExtensionManager, ExtensionManager>();
+                            {
+                                File.Create(repositoryHeadersConfigPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка поиска или создания настроечного файла заголовков репозиториев {repositoryHeadersConfigPath}, обратитесь к разработчику. \r\n Подробности:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                                throw;
+                            }
+                        }
 
 
                     var env = hostingContext.HostingEnvironment;
@@ -115,10 +184,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                         config.AddUserSecrets(appAssembly, optional: true);
                     }
                 })
-                .ConfigureServices((context, services) =>
-                {
-                    // Регистрация конфигурации
-                    services.Configure<ApplicationSettingsConfig>(
+                    services.AddScoped<IDataStoragesService, DataStoragesService>();
+                    services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                    services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddScoped<IExtensionManager, ExtensionManager>();
                         context.Configuration.GetSection(nameof(ApplicationSettingsConfig)));
                     services.Configure<ConnectionStringsCollectionConfig>(
                         context.Configuration.GetSection(nameof(ConnectionStringsCollectionConfig)));
@@ -137,16 +206,13 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Слой Core
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
-                    services.AddSingleton<IDataStoragesService, DataStoragesService>();
-                    services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
-                    services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
-                    services.AddTransient<IExtensionManager, ExtensionManager>();
-                    // Слой Presentation
-                    services.AddSingleton<IConfigurationService, ConfigurationService>();
+                    services.AddScoped<IDataStoragesService, DataStoragesService>();
+                    services.AddScoped<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
+                    services.AddScoped<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddScoped<IExtensionManager, ExtensionManager>();
 
                     // Регистрация ViewModel
                     services.AddSingleton<ApplicationVM>();
-                    services.AddSingleton<ApplicationSettingsControlVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
