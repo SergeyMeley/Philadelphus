@@ -42,7 +42,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
-            result = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(json, options).TreeRepositoryHeaders;
+            result = JsonSerializer.Deserialize<TreeRepositoryHeadersCollectionConfig>(json, options).TreeRepositoryHeaders;
 
             if (result == null)
                 throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
@@ -67,11 +67,11 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 
             var root = JsonSerializer.Deserialize<JsonElement>(json);
 
-            TreeRepositoryHeadersCollection treeRepositoryHeadersCollection = null;
+            TreeRepositoryHeadersCollectionConfig treeRepositoryHeadersCollection = null;
 
-            if (root.TryGetProperty("TreeRepositoryHeadersCollection", out var collectionNode))
+            if (root.TryGetProperty(nameof(TreeRepositoryHeadersCollectionConfig), out var collectionNode))
             {
-                treeRepositoryHeadersCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollection>(collectionNode, options);
+                treeRepositoryHeadersCollection = JsonSerializer.Deserialize<TreeRepositoryHeadersCollectionConfig>(collectionNode, options);
             }
 
             if (treeRepositoryHeadersCollection == null)
@@ -89,7 +89,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 
             var wrapper = new
             {
-                TreeRepositoryHeadersCollection = treeRepositoryHeadersCollection
+                TreeRepositoryHeadersCollectionConfig = treeRepositoryHeadersCollection
             };
             json = JsonSerializer.Serialize(wrapper, options);
 

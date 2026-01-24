@@ -55,7 +55,7 @@
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             MinHeight="20"
-                                            MinWidth="150"
+                                            Width="150"
                                             Margin="5,5">
                                     <TextBlock Text="{TemplateBinding Header}" 
                                                HorizontalAlignment="Center"
@@ -78,36 +78,45 @@
     </UserControl.Resources>
     <Grid>
         <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
-            <TabItem Header="Общие настройки" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Общие настройки" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
-            <TabItem Header="Интерфейс" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Интерфейс" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
-            <TabItem Header="Инструменты" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Инструменты" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
-            <TabItem Header="Системные" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Системные" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
-            <TabItem Header="Настроечные файлы" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Настроечные файлы" Style="{StaticResource LeftVerticalTabItemStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <DataGrid Grid.Row="0" AutoGenerateColumns="False" ItemsSource="{Binding ApplicationSettingsVM}" SelectedItem="{Binding SelecredConfigVM}">
+                    <DataGrid Grid.Row="0" AutoGenerateColumns="False" ItemsSource="{Binding ConfigFiles}" SelectedItem="{Binding SelectedConfigFile}" Margin="1">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Настроечный файл"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Путь к файлу"></DataGridTextColumn>
-                            <DataGridCheckBoxColumn Header="Доступность файла"></DataGridCheckBoxColumn>
+                            <DataGridTextColumn Header="Настроечный файл" Binding="{Binding ConfigName, Mode=OneWay}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Путь к файлу" Binding="{Binding FilePath, Mode=OneWay}"></DataGridTextColumn>
+                            <DataGridCheckBoxColumn Header="Доступность файла" Binding="{Binding Exists, Mode=OneWay}"></DataGridCheckBoxColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Grid.Row="1">
-                        <Button Content="Открыть файл" Margin="2"></Button>
-                        <Button Content="Указать другой путь файл" Margin="2"></Button>
+                        <Button Content="Открыть файл" Command="{Binding OpenConfigCommand}" Height="30" Margin="1"></Button>
+                        <Button Content="Переместить файл" Command="{Binding MoveConfigCommand}" Height="30" Margin="1"></Button>
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Строки подключения" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Строки подключения" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
-            <TabItem Header="Учетная запись" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
+            <TabItem Header="Конфиденциальная информация" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
+            </TabItem>
+            <TabItem Header="Учетная запись" Style="{StaticResource LeftVerticalTabItemStyle}">
+                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
         </TabControl>
 

@@ -1,6 +1,6 @@
 ﻿namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
 {
-    public class TreeRepositoryHeadersCollection
+    public class TreeRepositoryHeadersCollectionConfig
     {
         public List<TreeRepositoryHeader> TreeRepositoryHeaders { get; set; }
     }

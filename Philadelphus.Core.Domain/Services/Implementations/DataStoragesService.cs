@@ -21,9 +21,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger<TreeRepositoryCollectionService> _logger;
         private readonly INotificationService _notificationService;
-        private readonly IOptions<ApplicationSettings> _applicationSettings;
-        private readonly IOptions<ConnectionStringsCollection> _connectionStringsCollection;
-        private readonly IOptions<DataStoragesCollection> _dataStoragesCollection;
+        private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
+        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
+        private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
 
         #endregion
 
@@ -43,9 +43,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IMapper mapper,
             ILogger<TreeRepositoryCollectionService> logger,
             INotificationService notificationService,
-            IOptions<ApplicationSettings> applicationSettings,
-            IOptions<ConnectionStringsCollection> connectionStringsCollection,
-            IOptions<DataStoragesCollection> dataStoragesCollection)
+            IOptions<ApplicationSettingsConfig> applicationSettings,
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
+            IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
         {
             _mapper = mapper;
             _logger = logger;

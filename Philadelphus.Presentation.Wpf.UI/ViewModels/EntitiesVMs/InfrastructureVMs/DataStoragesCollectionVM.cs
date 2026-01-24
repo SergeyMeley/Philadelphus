@@ -14,9 +14,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         private readonly ILogger<DataStoragesCollectionVM> _logger;
         private readonly INotificationService _notificationService;
         private readonly IDataStoragesService _dataStoragesService;
-        private readonly IOptions<ApplicationSettings> _applicationSettings;
-        private readonly IOptions<ConnectionStringsCollection> _connectionStringsCollection;
-        private readonly IOptions<DataStoragesCollection> _dataStoragesCollection;
+        private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
+        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
+        private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
 
         private DataStorageVM _mainDataStorageVM;
         public DataStorageVM MainDataStorageVM
@@ -66,9 +66,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             ILogger<DataStoragesCollectionVM> logger,
             INotificationService notificationService,
             IDataStoragesService dataStoragesService,
-            IOptions<ApplicationSettings> applicationSettings,
-            IOptions<ConnectionStringsCollection> connectionStringsCollection,
-            IOptions<DataStoragesCollection> dataStoragesCollection)
+            IOptions<ApplicationSettingsConfig> applicationSettings,
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
+            IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
         {
             _logger = logger;
             _notificationService = notificationService;
@@ -81,7 +81,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             //InitDataStorages(connectionStringsCollection.Value);
             InitDataStorages(dataStoragesCollection.Value, connectionStringsCollection.Value);
         }
-        private bool InitMainDataStorageVM(ApplicationSettings applicationSettings)
+        private bool InitMainDataStorageVM(ApplicationSettingsConfig applicationSettings)
         {
             var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
@@ -89,7 +89,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             return true;
         }
 
-        private bool InitDataStorages(DataStoragesCollection dataStoragesCollection, ConnectionStringsCollection connectionStrings)
+        private bool InitDataStorages(DataStoragesCollectionConfig dataStoragesCollection, ConnectionStringsCollectionConfig connectionStrings)
         {
             foreach (var entity in dataStoragesCollection.DataStorages)
             {

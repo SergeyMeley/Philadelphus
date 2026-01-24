@@ -1,6 +1,6 @@
 ﻿namespace Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages
 {
-    public class DataStoragesCollection
+    public class DataStoragesCollectionConfig
     {
         public List<DataStorage> DataStorages { get; set; } = new List<DataStorage>();
     }

@@ -27,7 +27,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 
         public IEnumerable<DataStorage> SelectDataStorages()
         {
-            DataStoragesCollection resultCollection = null;
+            DataStoragesCollectionConfig resultCollection = null;
             if (_file.Exists == false)
             {
                 throw new FileNotFoundException($"Конфигурационный файл не найден: {_file.FullName}");
@@ -39,7 +39,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter() }
             };
-            resultCollection = JsonSerializer.Deserialize<DataStoragesCollection>(json, options);
+            resultCollection = JsonSerializer.Deserialize<DataStoragesCollectionConfig>(json, options);
             return resultCollection.DataStorages ?? throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
         }
 
@@ -49,14 +49,14 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             {
                 throw new FileNotFoundException($"Конфигурационный файл не найден: {_file.FullName}");
             }
-            var collection = new DataStoragesCollection() { DataStorages = storages.ToList() };
+            var collection = new DataStoragesCollectionConfig() { DataStorages = storages.ToList() };
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 Converters = { new JsonStringEnumConverter() }
             };
-            var json = JsonSerializer.Serialize<DataStoragesCollection>(collection, options);
+            var json = JsonSerializer.Serialize<DataStoragesCollectionConfig>(collection, options);
             File.WriteAllText(_file.FullName, json);
 
             return storages.Count();

@@ -36,7 +36,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             IMapper mapper,
             ILogger<ApplicationVM> logger,
             INotificationService notificationService,
-            IOptions<ApplicationSettings> options,
+            IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,
             DataStoragesCollectionVM dataStoragesSettingsVM,
             TreeRepositoryCollectionVM treeRepositoryCollectionVM,

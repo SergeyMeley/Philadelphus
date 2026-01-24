@@ -8,6 +8,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
     public class LaunchWindowVM : ControlBaseVM
     {
+        private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
+        public ApplicationSettingsControlVM ApplicationSettingsControlVM { get => _applicationSettingsControlVM; }
+
         private DataStoragesCollectionVM _dataStoragesCollectionVM;
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesCollectionVM; }
 
@@ -28,7 +31,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             TreeRepositoryCollectionVM repositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
-            ApplicationCommandsVM applicationCommandsVM)
+            ApplicationCommandsVM applicationCommandsVM,
+            ApplicationSettingsControlVM applicationSettingsControlVM)
             : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -36,6 +40,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
             _repositoryCreationVM = repositoryCreationControlVM;
+            _applicationSettingsControlVM = applicationSettingsControlVM;
         }
 
         public RelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;

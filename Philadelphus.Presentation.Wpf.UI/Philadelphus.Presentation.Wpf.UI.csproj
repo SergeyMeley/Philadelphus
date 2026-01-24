@@ -26,6 +26,7 @@
     <None Remove="Icons\new-tab_64.png" />
     <None Remove="Icons\open.png" />
     <None Remove="Icons\philadelphus_logo_64.png" />
+    <None Remove="Icons\settings_64.png" />
     <None Remove="Icons\storage.png" />
     <None Remove="Icons\top_level_64.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_add.png" />
@@ -85,7 +86,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
@@ -97,6 +98,7 @@
     <Resource Include="Icons\new-tab_64.png" />
     <Resource Include="Icons\open.png" />
     <Resource Include="Icons\philadelphus_logo_64.png" />
+    <Resource Include="Icons\settings_64.png" />
     <Resource Include="Icons\storage.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

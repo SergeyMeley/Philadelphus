@@ -75,7 +75,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IServiceProvider serviceProvider,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
-            IOptions<ApplicationSettings> options,
+            IOptions<ApplicationSettingsConfig> options,
             ITreeRepositoryService service,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,

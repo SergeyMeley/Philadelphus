@@ -31,7 +31,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ITreeRepositoryService service,
             TreeRepositoryCollectionVM repositoryCollectionVM, 
             DataStoragesCollectionVM dataStoragesSettingsVM,
-            IOptions<ApplicationSettings> options,
+            IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, logger, notificationService, applicationCommandsVM)
         {

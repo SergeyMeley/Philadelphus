@@ -12,6 +12,8 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
+using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -20,6 +22,7 @@ using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Events;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -69,6 +72,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
+            Log.Information($"Загружаю конфиг из: {Directory.GetCurrentDirectory()}");
+
             _configuration = builder.Build();
 
             _host = Host.CreateDefaultBuilder()
@@ -90,8 +95,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Фиксированный список конфигов
                     var configFiles = new Dictionary<string, object>
                     {
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:StoragesConfigFullPathString"])] = new DataStoragesCollection { DataStorages = new() },
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettings:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollection { TreeRepositoryHeaders = new() }
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:StoragesConfigFullPathString"])] = new DataStoragesCollectionConfig { DataStorages = new() },
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
                     };
 
                     foreach (var kvp in configFiles)
@@ -113,14 +118,14 @@ namespace Philadelphus.Presentation.Wpf.UI
                 .ConfigureServices((context, services) =>
                 {
                     // Регистрация конфигурации
-                    services.Configure<ApplicationSettings>(
-                        context.Configuration.GetSection(nameof(ApplicationSettings)));
-                    services.Configure<ConnectionStringsCollection>(
-                        context.Configuration.GetSection(nameof(ConnectionStringsCollection)));
-                    services.Configure<DataStoragesCollection>(
-                        context.Configuration.GetSection(nameof(DataStoragesCollection)));
-                    services.Configure<TreeRepositoryHeadersCollection>(
-                        context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollection)));
+                    services.Configure<ApplicationSettingsConfig>(
+                        context.Configuration.GetSection(nameof(ApplicationSettingsConfig)));
+                    services.Configure<ConnectionStringsCollectionConfig>(
+                        context.Configuration.GetSection(nameof(ConnectionStringsCollectionConfig)));
+                    services.Configure<DataStoragesCollectionConfig>(
+                        context.Configuration.GetSection(nameof(DataStoragesCollectionConfig)));
+                    services.Configure<TreeRepositoryHeadersCollectionConfig>(
+                        context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollectionConfig)));
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(typeof(MappingProfile));
@@ -129,16 +134,19 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddMemoryCache();
 
                     // Регистрация сервисов
+                    // Слой Core
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
                     services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
                     services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
+                    // Слой Presentation
+                    services.AddSingleton<IConfigurationService, ConfigurationService>();
 
                     // Регистрация ViewModel
                     services.AddSingleton<ApplicationVM>();
-                    services.AddSingleton<ApplicationSettingsVM>();
+                    services.AddSingleton<ApplicationSettingsControlVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();

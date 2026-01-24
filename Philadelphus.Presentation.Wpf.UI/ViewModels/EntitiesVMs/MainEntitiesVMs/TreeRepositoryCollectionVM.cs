@@ -28,7 +28,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             ITreeRepositoryCollectionService collectionService, 
             ITreeRepositoryService service,
             DataStoragesCollectionVM dataStoragesSettings,
-            IOptions<ApplicationSettings> options)
+            IOptions<ApplicationSettingsConfig> options)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

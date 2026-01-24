@@ -23,8 +23,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly ILogger<TreeRepositoryCollectionService> _logger;
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryService _treeRepositoryService;
-        private readonly IOptions<ApplicationSettings> _applicationSettings;
-        private readonly IOptions<TreeRepositoryHeadersCollection> _treeRepositoryHeadersCollection;
+        private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
+        private readonly IOptions<TreeRepositoryHeadersCollectionConfig> _treeRepositoryHeadersCollection;
 
         private static Dictionary<Guid, TreeRepositoryModel> _dataTreeRepositories = new Dictionary<Guid, TreeRepositoryModel>();
 
@@ -51,8 +51,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             ILogger<TreeRepositoryCollectionService> logger,
             INotificationService notificationService,
             ITreeRepositoryService treeRepositoryService,
-            IOptions<ApplicationSettings> applicationSettings,
-            IOptions<TreeRepositoryHeadersCollection> treeRepositoryHeadersCollection)
+            IOptions<ApplicationSettingsConfig> applicationSettings,
+            IOptions<TreeRepositoryHeadersCollectionConfig> treeRepositoryHeadersCollection)
         {
             _mapper = mapper;
             _logger = logger;

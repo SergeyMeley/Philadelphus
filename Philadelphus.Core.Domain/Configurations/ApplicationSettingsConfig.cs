@@ -5,7 +5,7 @@ namespace Philadelphus.Core.Domain.Configurations
     /// <summary>
     /// Основные настройки приложения
     /// </summary>
-    public class ApplicationSettings    //TODO: Подумать о переносе в Application
+    public class ApplicationSettingsConfig    //TODO: Подумать о переносе в Application
     {
         /// <summary>
         /// Директория конфигурационных файлов

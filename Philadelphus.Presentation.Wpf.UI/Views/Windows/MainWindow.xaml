@@ -271,7 +271,7 @@
                                     <ctrls:DataExchange></ctrls:DataExchange>
                                 </TabItem>
                                 <TabItem Header="Настройки">
-                                    <ctrls:ApplicationSettings></ctrls:ApplicationSettings>
+                                    <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
                                 </TabItem>
                             </TabControl>
                         </GroupBox>

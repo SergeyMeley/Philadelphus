@@ -3,7 +3,7 @@
     /// <summary>
     /// Коллекция строк подключения
     /// </summary>
-    public class ConnectionStringsCollection
+    public class ConnectionStringsCollectionConfig
     {
         /// <summary>
         /// Коллекция контейнеров строк подключения
