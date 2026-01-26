@@ -79,7 +79,6 @@
     </UserControl.Resources>
     <Grid>
         <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
-            ы
             <TabItem Header="Настроечные файлы" Style="{StaticResource LeftVerticalTabItemStyle}">
                 <settings:ConfigurationFilesSettings></settings:ConfigurationFilesSettings>
             </TabItem>
