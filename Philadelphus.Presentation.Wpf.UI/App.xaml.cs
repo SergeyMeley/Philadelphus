@@ -12,6 +12,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.Mapping;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
@@ -95,6 +96,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Фиксированный список конфигов
                     var configFiles = new Dictionary<string, object>
                     {
+                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:ConnectionStringsConfigFullPathString"])] = new ConnectionStringsCollectionConfig { ConnectionStringContainers = new() },
                         [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:StoragesConfigFullPathString"])] = new DataStoragesCollectionConfig { DataStorages = new() },
                         [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
                     };
@@ -107,9 +109,15 @@ namespace Philadelphus.Presentation.Wpf.UI
                         config.AddJsonFile(file.FullName, optional: true, reloadOnChange: true);
                     }
 
+                    Console.WriteLine("=== ДИАГНОСТИКА СРЕДЫ ===");
+                    Console.WriteLine($"DOTNET_ENVIRONMENT: '{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")}'");
+                    Console.WriteLine($"ASPNETCORE_ENVIRONMENT: '{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}'");
+                    Console.WriteLine($"DOTNET_ENVIRONMENT (все): {Environment.GetEnvironmentVariables()["DOTNET_ENVIRONMENT"]}");
+                    Console.WriteLine($"Launch Profile: {Environment.GetEnvironmentVariable("DOTNET_LAUNCH_PROFILE")}");
+                    Console.WriteLine("=========================");
 
                     var env = hostingContext.HostingEnvironment;
-                    if (env.IsDevelopment() || true /*временно для тестов*/)
+                    if (env.IsDevelopment())
                     {
                         var appAssembly = Assembly.GetExecutingAssembly();
                         config.AddUserSecrets(appAssembly, optional: true);
@@ -128,7 +136,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollectionConfig)));
 
                     // Регистрация AutoMapper
-                    services.AddAutoMapper(typeof(MappingProfile));
+                    services.AddAutoMapper(
+                        typeof(DomainMappingProfile),       // Model <-> Db Entity
+                        typeof(ViewModelsMappingProfile)    // Model <-> ViewModel
+                        );
                     
                     // TODO: Проработать кеширование
                     services.AddMemoryCache();
@@ -179,8 +190,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Startup завершён. Переключение на File-only logging...");
 
-                Log.Information("Искусственная задержка запуска 3 сек.");
-                await Task.Delay(3000);
+                Log.Information("Искусственная задержка запуска 5 сек.");
+                await Task.Delay(5000);
 
 
                 var runtimeLogger = new LoggerConfiguration()

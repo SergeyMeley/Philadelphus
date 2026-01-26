@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
@@ -73,6 +74,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         public RepositoryExplorerControlVM(
             IServiceProvider serviceProvider,
+            IMapper mapper,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
@@ -80,7 +82,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             TreeRepositoryVM treeRepositoryVM)
-            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _service = service;
             _extensionsControlVM = extensionVMFactory.Create(this);
