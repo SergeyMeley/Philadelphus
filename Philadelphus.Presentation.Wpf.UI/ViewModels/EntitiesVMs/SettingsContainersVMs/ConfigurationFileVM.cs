@@ -24,5 +24,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
                 return true;
             return false;
         }
+
+        public bool ChangeFile(FileInfo newFile)
+        {
+            FileInfo = newFile;
+            OnPropertyChanged(nameof(FileInfo));
+            return true;
+        }
     }
 }

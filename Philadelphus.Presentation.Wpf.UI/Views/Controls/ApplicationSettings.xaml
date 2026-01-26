@@ -79,25 +79,14 @@
     </UserControl.Resources>
     <Grid>
         <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
-            <TabItem Header="Общие настройки" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
-            <TabItem Header="Интерфейс" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
-            <TabItem Header="Инструменты" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
-            <TabItem Header="Системные" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
+            ы
             <TabItem Header="Настроечные файлы" Style="{StaticResource LeftVerticalTabItemStyle}">
                 <settings:ConfigurationFilesSettings></settings:ConfigurationFilesSettings>
             </TabItem>
             <TabItem Header="Строки подключения" Style="{StaticResource LeftVerticalTabItemStyle}">
                 <settings:ConnectionStringContainersSettings></settings:ConnectionStringContainersSettings>
             </TabItem>
-            <TabItem Header="Конфиденциальная информация" Style="{StaticResource LeftVerticalTabItemStyle}">
+            <!--<TabItem Header="Конфиденциальная информация" Style="{StaticResource LeftVerticalTabItemStyle}">
                 <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
             </TabItem>
             <TabItem Header="Учетная запись" Style="{StaticResource LeftVerticalTabItemStyle}">
@@ -105,7 +94,7 @@
             </TabItem>
             <TabItem Header="Сочетания клавиш" Style="{StaticResource LeftVerticalTabItemStyle}">
                 <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
 
     </Grid>

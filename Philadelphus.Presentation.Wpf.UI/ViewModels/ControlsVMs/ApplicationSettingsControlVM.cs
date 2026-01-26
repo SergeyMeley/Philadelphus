@@ -114,7 +114,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         var originPath = SelectedConfigFile.FileInfo.DirectoryName;
                         _configurationService.MoveConfigFile(SelectedConfigFile.FileInfo, new DirectoryInfo(path));
-                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' перемещен\r\nиз\r\n'{originPath}'\r\nв\r\n'{SelectedConfigFile.FilePath}'");
+                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' перемещен\r\nиз\r\n'{originPath}'\r\nв\r\n'{SelectedConfigFile.FileInfo.DirectoryName}'");
                     }
                     catch (Exception)
                     {
@@ -122,6 +122,46 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
                     
                     SelectedConfigFile.OnPropertyChanged(nameof(SelectedConfigFile.FilePath));
+                });
+            }
+        }
+
+        public RelayCommand SelectAnotherConfigCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var path = string.Empty;
+                    var dialog = new OpenFileDialog
+                    {
+                        Title = "Выберите директорию",
+                        Multiselect = false,
+                        Filter = "JSON файлы (*.json)|*.json|" +
+                                    "Все файлы (*.*)|*.*",
+                        FilterIndex = 1,
+                        InitialDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
+                        DefaultDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        path = dialog.FileName;
+                    }
+                    try
+                    {
+                        var originPath = SelectedConfigFile.FileInfo.FullName;
+
+                        _configurationService.SelectAnotherConfigFile(SelectedConfigFile, new FileInfo(path));
+                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' заменен\r\nс\r\n'{originPath}'\r\nна\r\n'{SelectedConfigFile.FilePath}'");
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
+                    }
+
+                    SelectedConfigFile.OnPropertyChanged(nameof(SelectedConfigFile.FilePath));
+
                 });
             }
         }

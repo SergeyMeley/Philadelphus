@@ -23,6 +23,7 @@
         <StackPanel Grid.Row="1">
             <Button Content="Открыть файл" Command="{Binding OpenConfigCommand}" Height="30" Margin="1"></Button>
             <Button Content="Переместить файл" Command="{Binding MoveConfigCommand}" Height="30" Margin="1"></Button>
+            <Button Content="Выбрать другой файл" Command="{Binding SelectAnotherConfigCommand}" Height="30" Margin="1"></Button>
         </StackPanel>
     </Grid>
 </UserControl>

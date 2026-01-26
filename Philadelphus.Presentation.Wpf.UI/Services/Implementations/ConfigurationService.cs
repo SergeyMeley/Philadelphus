@@ -4,6 +4,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls;
 using System;
 using System.Collections.Generic;
@@ -58,6 +59,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             UpdateConfigPath(oldFullPath, newFullPath);
 
             return true;
+        }
+        public bool SelectAnotherConfigFile(ConfigurationFileVM configurationFileVM, FileInfo newFile)
+        {
+            var originPath = configurationFileVM.FileInfo;
+            var result = configurationFileVM.ChangeFile(newFile);
+            if (result)
+            {
+                UpdateConfigPath(originPath, newFile);
+            }
+            return result;
         }
 
         private bool UpdateConfigPath(FileInfo oldFullPath, FileInfo newFullPath)
