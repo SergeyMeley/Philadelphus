@@ -10,8 +10,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
     public class ConnectionStringContainerVM : ViewModelBase
     {
         private ConnectionStringContainer _connectionStringContainer;
-        private string _connectionString;
         private string _providerName;
+        private string _connectionString;
+        private bool _forDelete;
         public Guid Uuid { get; internal set; } = Guid.NewGuid();
         public string ProviderName 
         { 
@@ -37,6 +38,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
                 {
                     _connectionString = value;
                     OnPropertyChanged(nameof(ConnectionString));
+                }
+            }
+        }
+        public bool ForDelete 
+        { 
+            get
+            {
+                return _forDelete;
+            }
+            set
+            {
+                if (_forDelete != value)
+                {
+                    _forDelete = value;
+                    OnPropertyChanged(nameof(ForDelete));
                 }
             }
         }

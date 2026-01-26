@@ -15,6 +15,24 @@ namespace Philadelphus.Core.Domain.Configurations
         /// <summary>
         /// Полный путь конфигурационного файла хранилищ данных
         /// </summary>
+        public string ConnectionStringsConfigFullPathString { get; set; }
+
+        /// <summary>
+        /// Полный путь конфигурационного файла хранилищ данных
+        /// </summary>
+        [JsonIgnore]
+        public FileInfo ConnectionStringsConfigFullPath
+        {
+            get
+            {
+                var expandedPath = Environment.ExpandEnvironmentVariables(ConnectionStringsConfigFullPathString ?? string.Empty);
+                return new FileInfo(expandedPath);
+            }
+        }
+
+        /// <summary>
+        /// Полный путь конфигурационного файла хранилищ данных
+        /// </summary>
         public string StoragesConfigFullPathString { get; set; }
 
         /// <summary>
@@ -27,9 +45,6 @@ namespace Philadelphus.Core.Domain.Configurations
             {
                 var expandedPath = Environment.ExpandEnvironmentVariables(StoragesConfigFullPathString ?? string.Empty);
                 return new FileInfo(expandedPath);
-                //var path = Path.Combine(ConfigsDirectoryString, "storages-config-old.json");
-                //var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
-                //return new FileInfo(expandedPath);
             }
         }
 
@@ -48,9 +63,6 @@ namespace Philadelphus.Core.Domain.Configurations
             {
                 var expandedPath = Environment.ExpandEnvironmentVariables(RepositoryHeadersConfigFullPathString ?? string.Empty);
                 return new FileInfo(expandedPath);
-                //var path = Path.Combine(ConfigsDirectoryString, "repository-headers-config-old.json");
-                //var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
-                //return new FileInfo(expandedPath);
             }
         }
 

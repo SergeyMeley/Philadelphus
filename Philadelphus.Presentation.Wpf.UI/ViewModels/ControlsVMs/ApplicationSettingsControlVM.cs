@@ -61,6 +61,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
 
+            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл строк подключения", appConfig.Value.ConnectionStringsConfigFullPath));
             ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath));
             ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath));
 
@@ -128,27 +129,85 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             get
             {
+                return new RelayCommand(
+                    obj =>
+                    {
+                        var vm = new ConnectionStringContainerVM()
+                        {
+                            Uuid = Guid.NewGuid(),
+                            ProviderName = NewConnectionStringContainerSelectedProvider,
+                            ConnectionString = NewConnectionStringContainerConnectionString
+                        };
+                        ConnectionStringContainersVMs.Add(vm);
+                        SaveConnectionStringContainersCommand.Execute(obj);
+                    },
+                    ce =>
+                    {
+                        if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedProvider))
+                            return false;
+                        if (string.IsNullOrEmpty(NewConnectionStringContainerConnectionString))
+                            return false;
+                        return true;
+                    });
+            }
+        }
+        public RelayCommand SaveConnectionStringContainersCommand
+        {
+            get
+            {
                 return new RelayCommand(obj =>
                 {
-                    var cs = new ConnectionStringContainer()
+                    // Изменение существующих строк подключения
+                    for (int i = 0; i < _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Count; i++)
                     {
-                        Uuid = Guid.NewGuid(),
-                        ProviderName = NewConnectionStringContainerSelectedProvider,
-                        ConnectionString = NewConnectionStringContainerSelectedConnectionString
-                    };
-                    var vm = _mapper.Map<ConnectionStringContainerVM>(cs);
-                    ConnectionStringContainersVMs.Add(vm);
-                    return;
-                },
-                ce =>
-                {
-                    if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedProvider))
-                        return false;
-                    if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedConnectionString))
-                        return false;
-                    return true;
+                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers[i];
+                        var vm = ConnectionStringContainersVMs.SingleOrDefault(x => x.Uuid == cs.Uuid);
+                        if (vm != null)
+                        {
+                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers[i] = _mapper.Map<ConnectionStringContainer>(vm);
+                        }
+                    }
+
+                    // Добавление новых строк подключения
+                    var newVms = ConnectionStringContainersVMs.Where(x => _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Any(c => c.Uuid == x.Uuid) == false);
+                    foreach (var newVm in newVms)
+                    {
+                        _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Add(_mapper.Map<ConnectionStringContainer>(newVm));
+                    }
+
+                    // Исключение удаленных строк подключения
+                    foreach (var vm in ConnectionStringContainersVMs)
+                    {
+                        if (vm.ForDelete == true)
+                        {
+                            var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
+                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
+                        }
+                    }
+                    for (int i = ConnectionStringContainersVMs.Count - 1; i >= 0; i--)
+                    {
+                        if (ConnectionStringContainersVMs[i].ForDelete == true)
+                        {
+                            ConnectionStringContainersVMs.RemoveAt(i);
+                        }
+                    }
+
+                    // Обновление настроечного файла
+                    _configurationService.UpdateConfigFile(_appConfig.Value.ConnectionStringsConfigFullPath, _connectionStringsCollectionConfig);
                 });
             }
         }
+
+        public RelayCommand DeleteConnectionStringContainersCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedConnectionStringContainerVM.ForDelete = true;
+                });
+            }
+        }
+
     }
 }

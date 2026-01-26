@@ -11,7 +11,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
     {
         public FileInfo FileInfo { get; private set; }
         public string ConfigName { get; init; }
-        public string FilePath => FileInfo.Directory.FullName;
+        public string FilePath => FileInfo.FullName;
         public bool Exists { get => FileInfo.Exists; }
         public ConfigurationFileVM(string name, FileInfo fileInfo)
         {

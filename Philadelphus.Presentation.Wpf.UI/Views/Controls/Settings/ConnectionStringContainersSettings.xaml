@@ -39,16 +39,19 @@
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <DataGrid Grid.Row="0" ItemsSource="{Binding ConnectionStringContainersVMs}" SelectedItem="{Binding SelectedConnectionStringContainerVM}" AutoGenerateColumns="False" ColumnWidth="*" Margin="1">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="UUID" IsReadOnly="True" Binding="{Binding Uuid}" Width="auto"></DataGridTextColumn>
                             <DataGridComboBoxColumn Header="Провайдер" ItemsSource="{Binding Source={StaticResource ProvidersNames}}" SelectedValueBinding="{Binding ProviderName}" Width="auto"></DataGridComboBoxColumn>
                             <DataGridTextColumn Header="Строка подключения" Binding="{Binding ConnectionString}" Width="*"></DataGridTextColumn>
+                            <DataGridCheckBoxColumn Header="Для удаления" Binding="{Binding ForDelete}" Width="auto"></DataGridCheckBoxColumn>
                         </DataGrid.Columns>
 
                     </DataGrid>
-                    <Button Grid.Row="1" Content="Сохранить изменения" Height="30" Margin="1"></Button>
+                    <Button Grid.Row="1" Content="Удалить" Command="{Binding DeleteConnectionStringContainersCommand}" Height="30" Margin="1"></Button>
+                    <Button Grid.Row="2" Content="Сохранить изменения" Command="{Binding SaveConnectionStringContainersCommand}" Height="30" Margin="1"></Button>
                 </Grid>
             </ScrollViewer>
         </GroupBox>

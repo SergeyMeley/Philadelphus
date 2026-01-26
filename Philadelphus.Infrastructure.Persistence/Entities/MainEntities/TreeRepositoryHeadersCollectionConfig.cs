@@ -2,6 +2,6 @@
 {
     public class TreeRepositoryHeadersCollectionConfig
     {
-        public List<TreeRepositoryHeader> TreeRepositoryHeaders { get; set; }
+        public List<TreeRepositoryHeader> TreeRepositoryHeaders { get; set; } = new List<TreeRepositoryHeader>();
     }
 }

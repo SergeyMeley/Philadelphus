@@ -8,6 +8,6 @@
         /// <summary>
         /// Коллекция контейнеров строк подключения
         /// </summary>
-        public IEnumerable<ConnectionStringContainer> ConnectionStringContainers { get; set; } = new List<ConnectionStringContainer>();
+        public List<ConnectionStringContainer> ConnectionStringContainers { get; set; } = new List<ConnectionStringContainer>();
     }
 }
