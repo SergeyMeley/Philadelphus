@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -25,6 +26,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private TreeRepositoryCollectionVM _repositoryCollectionVM;
         public RepositoryCreationControlVM(
             IServiceProvider serviceProvider,
+            IMapper mapper,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             ITreeRepositoryCollectionService collectionService,
@@ -33,7 +35,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             DataStoragesCollectionVM dataStoragesSettingsVM,
             IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM)
-            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _collectionService = collectionService;
             _service = service;

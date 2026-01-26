@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
@@ -95,16 +96,25 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             {
                 if (entity != null)
                 {
-                    var connectionString = connectionStrings.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == entity.Uuid).ConnectionString;
-                    var model = entity.ToModel(connectionString);
+                    var connectionString = connectionStrings.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == entity.Uuid)?.ConnectionString;
 
-                    if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                    if (connectionString == null)
                     {
-                        _dataStorageVMs.Add(new DataStorageVM(model));
+                        _logger.LogError($"Не найдена строка подключения для хранилища {entity.Name}");
+                        MessageBox.Show($"Не найдена строка подключения для хранилища {entity.Name}");
                     }
                     else
                     {
-                        throw new InvalidOperationException();
+                        var model = entity.ToModel(connectionString);
+
+                        if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                        {
+                            _dataStorageVMs.Add(new DataStorageVM(model));
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException();
+                        }
                     }
                 }
             }

@@ -4,6 +4,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
             return true;
         }
+        public bool SelectAnotherConfigFile(ConfigurationFileVM configurationFileVM, FileInfo newFile)
+        {
+            var originPath = configurationFileVM.FileInfo;
+            var result = configurationFileVM.ChangeFile(newFile);
+            if (result)
+            {
+                UpdateConfigPath(originPath, newFile);
+            }
+            return result;
+        }
 
         private bool UpdateConfigPath(FileInfo oldFullPath, FileInfo newFullPath)
         {
@@ -75,36 +86,55 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public bool UpdateConfigFile<T>(FileInfo configFile, IOptions<T> newConfigObject) where T : class
         {
-            //var jsonSection = newConfigObject.Value.GetType().Name;
+            var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+                ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                ?? "Production";
+            if (env.Equals("Development", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("В режиме разработки изменения не могут быть сохранены. Повторите попытку в режиме Продакшн.");
+                return false;
+            }
 
-            //var json = System.IO.File.ReadAllText(configFile.FullName);
-            //var options = new JsonSerializerOptions
-            //{
-            //    PropertyNameCaseInsensitive = true,
-            //    WriteIndented = true,
-            //    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            //};
+            var jsonSection = newConfigObject.Value.GetType().Name;
 
-            //var root = JsonSerializer.Deserialize<JsonElement>(json);
+            var json = System.IO.File.ReadAllText(configFile.FullName);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            };
 
-            //T configContent = null;
+            var root = JsonSerializer.Deserialize<JsonElement>(json);
 
-            //if (root.TryGetProperty(jsonSection, out var collectionNode))
-            //{
-            //    configContent = JsonSerializer.Deserialize<T>(collectionNode, options);
-            //}
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
 
-            //if (configContent == null)
-            //    throw new InvalidOperationException("Ошибка десериализации конфигурационного файла");
+            writer.WriteStartObject();
 
-            //var json2 = json.Replace(
-            //    "\"ApplicationSettings\": {",
-            //    $"\"ApplicationSettings\": {JsonSerializer.Serialize(configContent, options)}");
+            foreach (var property in root.EnumerateObject())
+            {
+                if (property.Name == jsonSection)
+                {
+                    writer.WritePropertyName(jsonSection);
+                    var newSectionJson = JsonSerializer.Serialize(newConfigObject.Value, options);
+                    using var newSectionDoc = JsonDocument.Parse(newSectionJson);
+                    newSectionDoc.RootElement.WriteTo(writer);
+                }
+                else
+                {
+                    property.WriteTo(writer);
+                }
+            }
 
-            //MessageBox.Show(json);
-            ////File.WriteAllText(_file.FullName, json);
+            writer.WriteEndObject();
+            writer.Flush();
 
-            return false;
+            var resultText = Encoding.UTF8.GetString(stream.ToArray());
+
+            System.IO.File.WriteAllText(configFile.FullName, resultText);
+
+            return true;
         }
 
         public static string ContractEnvironmentVariables(string expandedPath)

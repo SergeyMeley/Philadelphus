@@ -11,12 +11,12 @@ namespace Philadelphus.Core.Domain.Mapping
     /// <summary>
     /// Профиль маппинга для Автомаппера
     /// </summary>
-    public class MappingProfile : Profile
+    public class DomainMappingProfile : Profile
     {
         /// <summary>
         /// Профиль маппинга для Автомаппера
         /// </summary>
-        public MappingProfile()
+        public DomainMappingProfile()
         {
             //// Entity → DTO
             //CreateMap<AuditInfo, AuditInfoDto>();

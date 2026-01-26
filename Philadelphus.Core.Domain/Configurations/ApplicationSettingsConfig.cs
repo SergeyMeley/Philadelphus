@@ -15,6 +15,24 @@ namespace Philadelphus.Core.Domain.Configurations
         /// <summary>
         /// Полный путь конфигурационного файла хранилищ данных
         /// </summary>
+        public string ConnectionStringsConfigFullPathString { get; set; }
+
+        /// <summary>
+        /// Полный путь конфигурационного файла хранилищ данных
+        /// </summary>
+        [JsonIgnore]
+        public FileInfo ConnectionStringsConfigFullPath
+        {
+            get
+            {
+                var expandedPath = Environment.ExpandEnvironmentVariables(ConnectionStringsConfigFullPathString ?? string.Empty);
+                return new FileInfo(expandedPath);
+            }
+        }
+
+        /// <summary>
+        /// Полный путь конфигурационного файла хранилищ данных
+        /// </summary>
         public string StoragesConfigFullPathString { get; set; }
 
         /// <summary>

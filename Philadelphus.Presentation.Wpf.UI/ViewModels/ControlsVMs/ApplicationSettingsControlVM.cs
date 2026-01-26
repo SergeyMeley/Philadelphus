@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
@@ -7,12 +8,15 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shapes;
@@ -23,22 +27,48 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-
-        public HashSet<ConfigurationFileVM> ConfigFiles { get; set; } = new HashSet<ConfigurationFileVM>();
+        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
+        public HashSet<ConfigurationFileVM> ConfigFiles { get; } = new HashSet<ConfigurationFileVM>();
         public ConfigurationFileVM SelectedConfigFile { get; set; }
+        public ObservableCollection<ConnectionStringContainerVM> ConnectionStringContainersVMs { get; } = new ObservableCollection<ConnectionStringContainerVM>();
+        public ConnectionStringContainerVM SelectedConnectionStringContainerVM {  get; set; } 
+        public string[] ProvidersNames
+        { 
+            get
+            {
+                return new[] {
+                    "Npgsql.EntityFrameworkCore.PostgreSQL",
+                    "System.Text.Json.JsonSerializer"
+                };
+            }
+        }
+
+        public string NewConnectionStringContainerSelectedProvider { get; set; }
+        public string NewConnectionStringContainerConnectionString { get; set; }
+
+
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
+            IMapper mapper,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             IConfigurationService configurationService,
             ApplicationCommandsVM applicationCommandsVM,
-            IOptions<ApplicationSettingsConfig> appConfig)
-            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
+            IOptions<ApplicationSettingsConfig> appConfig,
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _configurationService = configurationService;
             _appConfig = appConfig;
+            _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
 
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath, appConfig));
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath, appConfig));
+            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл строк подключения", appConfig.Value.ConnectionStringsConfigFullPath));
+            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath));
+            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath));
+
+            foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringContainers) 
+            {
+                ConnectionStringContainersVMs.Add(_mapper.Map<ConnectionStringContainerVM>(cs));
+        }
         }
         public RelayCommand OpenConfigCommand
         {
@@ -84,7 +114,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         var originPath = SelectedConfigFile.FileInfo.DirectoryName;
                         _configurationService.MoveConfigFile(SelectedConfigFile.FileInfo, new DirectoryInfo(path));
-                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' перемещен\r\nиз\r\n'{originPath}'\r\nв\r\n'{SelectedConfigFile.FilePath}'");
+                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' перемещен\r\nиз\r\n'{originPath}'\r\nв\r\n'{SelectedConfigFile.FileInfo.DirectoryName}'");
                     }
                     catch (Exception)
                     {
@@ -96,27 +126,128 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public RelayCommand SelectAnotherConfigCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var path = string.Empty;
+                    var dialog = new OpenFileDialog
+                    {
+                        Title = "Выберите директорию",
+                        Multiselect = false,
+                        Filter = "JSON файлы (*.json)|*.json|" +
+                                    "Все файлы (*.*)|*.*",
+                        FilterIndex = 1,
+                        InitialDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
+                        DefaultDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        path = dialog.FileName;
+        }
+                    try
+                    {
+                        var originPath = SelectedConfigFile.FileInfo.FullName;
+
+                        _configurationService.SelectAnotherConfigFile(SelectedConfigFile, new FileInfo(path));
+                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' заменен\r\nс\r\n'{originPath}'\r\nна\r\n'{SelectedConfigFile.FilePath}'");
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
     }
 
-    public class ConfigurationFileVM : ViewModelBase
-    {
-        private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-        public FileInfo FileInfo { get; private set; }
-        public string ConfigName { get; init; }
-        public string FilePath => FileInfo.Directory.FullName;
-        public bool Exists { get => FileInfo.Exists; }
-        public ConfigurationFileVM(string name, FileInfo fileInfo, IOptions<ApplicationSettingsConfig> appConfig)
+                    SelectedConfigFile.OnPropertyChanged(nameof(SelectedConfigFile.FilePath));
+
+                });
+            }
+        }
+        public RelayCommand CreateAndSaveNewConnectionStringContainerCommand
         {
-            ConfigName = name;
-            FileInfo = fileInfo;
-            _appConfig = appConfig;
+            get
+            {
+                return new RelayCommand(
+                    obj =>
+                    {
+                        var vm = new ConnectionStringContainerVM()
+                        {
+                            Uuid = Guid.NewGuid(),
+                            ProviderName = NewConnectionStringContainerSelectedProvider,
+                            ConnectionString = NewConnectionStringContainerConnectionString
+                        };
+                        ConnectionStringContainersVMs.Add(vm);
+                        SaveConnectionStringContainersCommand.Execute(obj);
+                    },
+                    ce =>
+                    {
+                        if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedProvider))
+                            return false;
+                        if (string.IsNullOrEmpty(NewConnectionStringContainerConnectionString))
+                            return false;
+                        return true;
+                    });
+            }
+        }
+        public RelayCommand SaveConnectionStringContainersCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    // Изменение существующих строк подключения
+                    for (int i = 0; i < _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Count; i++)
+                    {
+                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers[i];
+                        var vm = ConnectionStringContainersVMs.SingleOrDefault(x => x.Uuid == cs.Uuid);
+                        if (vm != null)
+                        {
+                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers[i] = _mapper.Map<ConnectionStringContainer>(vm);
+                        }
+                    }
+
+                    // Добавление новых строк подключения
+                    var newVms = ConnectionStringContainersVMs.Where(x => _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Any(c => c.Uuid == x.Uuid) == false);
+                    foreach (var newVm in newVms)
+                    {
+                        _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Add(_mapper.Map<ConnectionStringContainer>(newVm));
+                    }
+
+                    // Исключение удаленных строк подключения
+                    foreach (var vm in ConnectionStringContainersVMs)
+                    {
+                        if (vm.ForDelete == true)
+                        {
+                            var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
+                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
+                        }
+                    }
+                    for (int i = ConnectionStringContainersVMs.Count - 1; i >= 0; i--)
+    {
+                        if (ConnectionStringContainersVMs[i].ForDelete == true)
+        {
+                            ConnectionStringContainersVMs.RemoveAt(i);
+                        }
+                    }
+
+                    // Обновление настроечного файла
+                    _configurationService.UpdateConfigFile(_appConfig.Value.ConnectionStringsConfigFullPath, _connectionStringsCollectionConfig);
+                });
+            }
         }
 
-        public override bool Equals(object? obj)
+        public RelayCommand DeleteConnectionStringContainersCommand
         {
-            if (obj is ConfigurationFileVM cf && cf?.ConfigName == this.ConfigName)
-                return true;
-            return false;
+            get
+            {
+                return new RelayCommand(obj =>
+        {
+                    SelectedConnectionStringContainerVM.ForDelete = true;
+                });
+            }
         }
+
     }
 }
