@@ -45,6 +45,9 @@ namespace Philadelphus.Core.Domain.Configurations
             {
                 var expandedPath = Environment.ExpandEnvironmentVariables(StoragesConfigFullPathString ?? string.Empty);
                 return new FileInfo(expandedPath);
+                //var path = Path.Combine(ConfigsDirectoryString, "storages-config-old.json");
+                //var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+                //return new FileInfo(expandedPath);
             }
         }
 
@@ -63,6 +66,9 @@ namespace Philadelphus.Core.Domain.Configurations
             {
                 var expandedPath = Environment.ExpandEnvironmentVariables(RepositoryHeadersConfigFullPathString ?? string.Empty);
                 return new FileInfo(expandedPath);
+                //var path = Path.Combine(ConfigsDirectoryString, "repository-headers-config-old.json");
+                //var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+                //return new FileInfo(expandedPath);
             }
         }
 
