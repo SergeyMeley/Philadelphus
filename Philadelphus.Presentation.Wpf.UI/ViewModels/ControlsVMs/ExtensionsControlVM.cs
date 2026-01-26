@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
@@ -71,12 +72,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         public ExtensionsControlVM(
             IServiceProvider serviceProvider,
+            IMapper mapper,
             ILogger<ExtensionsControlVM> logger,
             INotificationService notificationService,
             IExtensionManager extensionManager,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             ApplicationCommandsVM applicationCommandsVM)
-            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
             _repositoryExplorerControlVM = repositoryExplorerControlVM;

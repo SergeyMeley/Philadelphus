@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
@@ -7,12 +8,15 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shapes;
@@ -23,22 +27,47 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-
-        public HashSet<ConfigurationFileVM> ConfigFiles { get; set; } = new HashSet<ConfigurationFileVM>();
+        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
+        public HashSet<ConfigurationFileVM> ConfigFiles { get; } = new HashSet<ConfigurationFileVM>();
         public ConfigurationFileVM SelectedConfigFile { get; set; }
+        public ObservableCollection<ConnectionStringContainerVM> ConnectionStringContainersVMs { get; } = new ObservableCollection<ConnectionStringContainerVM>();
+        public ConnectionStringContainerVM SelectedConnectionStringContainerVM {  get; set; } 
+        public string[] ProvidersNames
+        { 
+            get
+            {
+                return new[] {
+                    "Npgsql.EntityFrameworkCore.PostgreSQL",
+                    "System.Text.Json.JsonSerializer"
+                };
+            }
+        }
+
+        public string NewConnectionStringContainerSelectedProvider { get; set; }
+        public string NewConnectionStringContainerConnectionString { get; set; }
+
+
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
+            IMapper mapper,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             IConfigurationService configurationService,
             ApplicationCommandsVM applicationCommandsVM,
-            IOptions<ApplicationSettingsConfig> appConfig)
-            : base(serviceProvider, logger, notificationService, applicationCommandsVM)
+            IOptions<ApplicationSettingsConfig> appConfig,
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _configurationService = configurationService;
             _appConfig = appConfig;
+            _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
 
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath, appConfig));
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath, appConfig));
+            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath));
+            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath));
+
+            foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringContainers) 
+            {
+                ConnectionStringContainersVMs.Add(_mapper.Map<ConnectionStringContainerVM>(cs));
+            }
         }
         public RelayCommand OpenConfigCommand
         {
@@ -95,28 +124,31 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
-
-    }
-
-    public class ConfigurationFileVM : ViewModelBase
-    {
-        private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-        public FileInfo FileInfo { get; private set; }
-        public string ConfigName { get; init; }
-        public string FilePath => FileInfo.Directory.FullName;
-        public bool Exists { get => FileInfo.Exists; }
-        public ConfigurationFileVM(string name, FileInfo fileInfo, IOptions<ApplicationSettingsConfig> appConfig)
+        public RelayCommand CreateAndSaveNewConnectionStringContainerCommand
         {
-            ConfigName = name;
-            FileInfo = fileInfo;
-            _appConfig = appConfig;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is ConfigurationFileVM cf && cf?.ConfigName == this.ConfigName)
-                return true;
-            return false;
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var cs = new ConnectionStringContainer()
+                    {
+                        Uuid = Guid.NewGuid(),
+                        ProviderName = NewConnectionStringContainerSelectedProvider,
+                        ConnectionString = NewConnectionStringContainerSelectedConnectionString
+                    };
+                    var vm = _mapper.Map<ConnectionStringContainerVM>(cs);
+                    ConnectionStringContainersVMs.Add(vm);
+                    return;
+                },
+                ce =>
+                {
+                    if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedProvider))
+                        return false;
+                    if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedConnectionString))
+                        return false;
+                    return true;
+                });
+            }
         }
     }
 }

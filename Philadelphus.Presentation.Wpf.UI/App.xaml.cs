@@ -12,6 +12,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.Mapping;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
@@ -128,7 +129,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollectionConfig)));
 
                     // Регистрация AutoMapper
-                    services.AddAutoMapper(typeof(MappingProfile));
+                    services.AddAutoMapper(
+                        typeof(DomainMappingProfile),       // Model <-> Db Entity
+                        typeof(ViewModelsMappingProfile)    // Model <-> ViewModel
+                        );
                     
                     // TODO: Проработать кеширование
                     services.AddMemoryCache();
