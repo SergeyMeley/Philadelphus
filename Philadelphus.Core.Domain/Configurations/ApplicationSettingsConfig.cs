@@ -100,6 +100,12 @@ namespace Philadelphus.Core.Domain.Configurations
             }
         }
 
+        /// <summary>
+        /// Попытаться получить конфигурационный файл
+        /// </summary>
+        /// <typeparam name="TConfig">Тип конфигурации для получения ключа поиска пути в основном настроечном файле</typeparam>
+        /// <param name="fileInfo">Информация об искомом настроечном файле</param>
+        /// <returns>Успешность нахождения</returns>
         public bool TryGetConfigFileFullPath<TConfig>(out FileInfo fileInfo)
         {
             return ConfigurationFilesPathes.TryGetValue(typeof(TConfig).Name, out fileInfo);
