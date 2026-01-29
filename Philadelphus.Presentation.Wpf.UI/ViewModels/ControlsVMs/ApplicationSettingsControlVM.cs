@@ -248,13 +248,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
 
                     // Исключение удаленных строк подключения
-                    foreach (var vm in ConnectionStringContainersVMs)
+                    foreach (var vm in ConnectionStringContainersVMs.Where(x => x.ForDelete == true))
                     {
-                        if (vm.ForDelete == true)
-                        {
-                            var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
-                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
-                        }
+                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
+                        _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
                     }
                     for (int i = ConnectionStringContainersVMs.Count - 1; i >= 0; i--)
     {

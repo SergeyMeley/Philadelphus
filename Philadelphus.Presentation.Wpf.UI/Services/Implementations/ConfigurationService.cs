@@ -6,6 +6,7 @@ using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -159,5 +160,52 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
             return result.Replace("\\", "\\\\");
         }
+
+        public static async Task CheckOrInitDirectory(DirectoryInfo path)
+        {
+            if (path.Exists == false)
+            {
+                Log.Warning($"Директория не существует: '{path.FullName}', Создаётся...");
+                try
+                {
+                    path.Create();
+                    Log.Information($"Директория создана: '{path.FullName}'");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Ошибка создания директории '{path.FullName}'");
+                }
+            }
+        }
+
+        public static async Task CheckOrInitFile<T>(FileInfo file, T configObject)
+        {
+            if (file.Exists == false)
+            {
+                try
+                {
+                    Log.Warning($"Не найден '{file.FullName}', создаётся файл по умолчанию");
+
+                    Dictionary<string, object> jsonContent = new()
+                    {
+                        { configObject.GetType().Name, configObject }
+                    };
+                    var json = JsonSerializer.Serialize(jsonContent, new JsonSerializerOptions() { WriteIndented = true });
+                    
+                    await System.IO.File.WriteAllTextAsync(file.FullName, json);
+                    Log.Information($"Создан настроечный файл по умолчанию: '{file.FullName}'");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Ошибка создания настроечного файла по умолчанию: '{file.FullName}'");
+                }
+            }
+            else
+            {
+                Log.Debug($"Найден и будет загружен настроечный файл: '{file.FullName}'");
+            }
+            Task.Delay(10);
+        }
+
     }
 }

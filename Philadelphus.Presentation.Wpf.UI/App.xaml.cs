@@ -90,8 +90,7 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                     Log.Information($"Проверка базовой директории: {basePath}");
 
-                    CheckOrInitDirectory(new DirectoryInfo(basePath));
-
+                    await ConfigurationService.CheckOrInitDirectory(new DirectoryInfo(basePath));
 
                     // Фиксированный список конфигов
                      var configFiles = new Dictionary<string, object>
@@ -110,8 +109,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     foreach (var kvp in configFiles)
                     {
                         var file = new FileInfo(kvp.Key);
-                        CheckOrInitDirectory(file.Directory);
-                        CheckOrInitFile(file, kvp.Value);
+                        await ConfigurationService.CheckOrInitDirectory(file.Directory);
+                        await ConfigurationService.CheckOrInitFile(file, kvp.Value);
                         config.AddJsonFile(file.FullName, optional: true, reloadOnChange: true);
                     }
 
@@ -235,43 +234,5 @@ namespace Philadelphus.Presentation.Wpf.UI
             base.OnExit(e);
         }
 
-        private async Task CheckOrInitDirectory(DirectoryInfo path)
-        {
-            if (path.Exists == false)
-            {
-                Log.Warning($"Директория не существует: '{path.FullName}', Создаётся...");
-                try
-                {
-                    path.Create();
-                    Log.Information($"Директория создана: '{path.FullName}'");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Ошибка создания директории '{path.FullName}'");
-                }
-            }
-        }
-
-        private async Task CheckOrInitFile<T>(FileInfo file, T configObject)
-        {
-            if (file.Exists == false)
-            {
-                try
-                {
-                    Log.Warning($"Не найден '{file.FullName}', создаётся файл по умолчанию");
-                    var json = JsonSerializer.Serialize(configObject, new JsonSerializerOptions { WriteIndented = true });
-                    await File.WriteAllTextAsync(file.FullName, json);
-                    Log.Information($"Создан настроечный файл по умолчанию: '{file.FullName}'");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Ошибка создания настроечного файла по умолчанию: '{file.FullName}'");
-                }
-            }
-            else
-            {
-                Log.Debug($"Найден и будет загружен настроечный файл: '{file.FullName}'");
-            }
-        }
     }
 }
