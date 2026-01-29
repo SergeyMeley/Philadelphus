@@ -91,55 +91,40 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
-            <TabItem Header="Главная" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageRepository}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="auto" MaxHeight="300"></RowDefinition>
-                        <RowDefinition Height="4*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" Margin="10">
-                        <Run Text="Здравствуйте, "></Run><Run Text="{Binding UserName, Mode=OneWay}" FontWeight="Bold"></Run><Run Text="!"></Run>
-                        <Run Text="Выберите репозиторий для начала работы или создайте новый"></Run>
-                    </TextBlock>
-                    <GroupBox Grid.Row="1" Header="Создать">
-                        <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}"></ctrls:RepositoryCreation>
-                    </GroupBox>
-                    <GroupBox Grid.Row="2" Header="Открыть">
-                        <ctrls:FavoriteAndLastRepositoryHeaders></ctrls:FavoriteAndLastRepositoryHeaders>
-                    </GroupBox>
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="Создать" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageAdd}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}" Grid.Row="0"></ctrls:RepositoryCreation>
-                    <GroupBox Grid.Row="1" Header="Выбор шаблона">
-                        <ListBox>
-                            <ListBoxItem Content="Пустой репозиторий" Height="50"></ListBoxItem>
-                        </ListBox>
-                    </GroupBox>
-
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="Открыть" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageOpen}">
-                <ctrls:RepositoryOpen></ctrls:RepositoryOpen>
-            </TabItem>
+        <!--<TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
 
             <TabItem Header="Хранилища" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageStorage}">
-                <!--<ctrls:DataStoragesOpen DataContext="{Binding DataStoragesSettingsVM}"></ctrls:DataStoragesOpen>-->
                 <ctrls:DataStorageHeaders></ctrls:DataStorageHeaders>
             </TabItem>
 
             <TabItem Header="Настройки" Style="{StaticResource LeftVerticalTabItemStyle}" Tag="{DynamicResource imageSettings}">
                 <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
             </TabItem>
+        </TabControl>-->
+        <TabControl Style="{StaticResource LeftVerticalTabControlStyle}"
+            ItemsSource="{Binding LaunchWindowTabItemsVMs}"
+            SelectedItem="{Binding SelectedLaunchWindowTabItemVM, Mode=TwoWay}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Name="Border" BorderThickness="1,1,0,1" BorderBrush="LightSlateGray" Margin="1">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" 
+                                VerticalAlignment="Center" Height="75" Width="90" Margin="5,5">
+                                <!--<ContentControl Content="{Binding IconKey, Converter={StaticResource IconConverter}}"
+                                       Width="45" Height="45" Margin="0,5,0,0"/>-->
+                                <TextBlock Text="{Binding Header}" HorizontalAlignment="Center" 
+                                   Margin="0,5,0,5" FontSize="14" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding Content}"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
         </TabControl>
+
     </Grid>
 </Window>

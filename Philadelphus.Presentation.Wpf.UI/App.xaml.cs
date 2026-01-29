@@ -17,6 +17,7 @@ using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
@@ -172,6 +173,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<TreeRepositoryCollectionVM>();
                     services.AddTransient<TreeRepositoryHeadersCollectionVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
+                    services.AddTransient<LaunchWindowTabItemVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
@@ -195,8 +197,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Startup завершён. Переключение на File-only logging...");
 
-                Log.Information("Искусственная задержка запуска 5 сек.");
-                await Task.Delay(5000);
+                Log.Information("Искусственная задержка запуска 2 сек.");
+                await Task.Delay(2000);
 
 
                 var runtimeLogger = new LoggerConfiguration()
