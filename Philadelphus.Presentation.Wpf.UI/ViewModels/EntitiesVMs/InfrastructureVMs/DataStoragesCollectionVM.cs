@@ -84,10 +84,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
         private bool InitMainDataStorageVM(ApplicationSettingsConfig applicationSettings)
         {
-            var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
-            _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
-            _dataStorageVMs.Add(_mainDataStorageVM);
-            return true;
+            if (applicationSettings.TryGetConfigFileFullPath<ConnectionStringsCollectionConfig>(out var config1)
+                && applicationSettings.TryGetConfigFileFullPath<TreeRepositoryHeadersCollectionConfig>(out var config2))
+            {
+                var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(config1, config2);
+                _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
+                _dataStorageVMs.Add(_mainDataStorageVM);
+                return true;
+            }
+            else
+            {
+                throw new Exception();
+            }
         }
 
         private bool InitDataStorages(DataStoragesCollectionConfig dataStoragesCollection, ConnectionStringsCollectionConfig connectionStrings)

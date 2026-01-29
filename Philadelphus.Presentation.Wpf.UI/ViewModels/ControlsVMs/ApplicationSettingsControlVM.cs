@@ -4,6 +4,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -12,9 +14,11 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainers
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -57,18 +61,46 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
-            _configurationService = configurationService;
+            _configurationService = configurationService; 
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
 
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл строк подключения", appConfig.Value.ConnectionStringsConfigFullPath));
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath));
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath));
+            Dictionary<string, Type> existingTypes = new()
+                {
+                    { nameof(ConnectionStringsCollectionConfig), typeof(ConnectionStringsCollectionConfig) },
+                    { nameof(DataStoragesCollectionConfig), typeof(DataStoragesCollectionConfig) },
+                    { nameof(TreeRepositoryHeadersCollectionConfig), typeof(TreeRepositoryHeadersCollectionConfig) }
+                };
+
+            foreach (var configFile in _appConfig.Value.ConfigurationFilesPathes)
+            {
+                string displayName = string.Empty;
+
+                if (existingTypes.TryGetValue(configFile.Key, out var type) == false)
+                {
+                    type = Type.GetType(configFile.Key);
+                    if (type == null)
+                    {
+                        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.StartsWith("Philadelphus")))
+                        {
+                            type = Array.Find(assembly.GetTypes(), t => t.Name.Equals(configFile.Key) || t.Name == configFile.Key);
+                            if (type != null)
+                                break;
+                        }
+                    }
+                }
+
+                displayName = type?.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName
+                        ?? type?.Name
+                        ?? configFile.Key;
+
+                ConfigFiles.Add(new ConfigurationFileVM(displayName, configFile.Value));
+            }
 
             foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringContainers) 
             {
                 ConnectionStringContainersVMs.Add(_mapper.Map<ConnectionStringContainerVM>(cs));
-        }
+            }
         }
         public RelayCommand OpenConfigCommand
         {
@@ -233,7 +265,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
 
                     // Обновление настроечного файла
-                    _configurationService.UpdateConfigFile(_appConfig.Value.ConnectionStringsConfigFullPath, _connectionStringsCollectionConfig);
+                    if (_appConfig.Value.TryGetConfigFileFullPath<ConnectionStringsCollectionConfig>(out var config))
+                    {
+                        _configurationService.UpdateConfigFile(config, _connectionStringsCollectionConfig);
+                    }
+                    else
+                    {
+                        var message = "Путь к конфигурационному файлу 'ConnectionStringsCollectionConfig' не найден, изменения не сохранены";
+                        _logger.LogError(message);
+                        MessageBox.Show(message);
+                    }
                 });
             }
         }

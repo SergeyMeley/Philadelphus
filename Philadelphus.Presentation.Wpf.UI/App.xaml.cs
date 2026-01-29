@@ -94,12 +94,18 @@ namespace Philadelphus.Presentation.Wpf.UI
 
 
                     // Фиксированный список конфигов
-                    var configFiles = new Dictionary<string, object>
+                     var configFiles = new Dictionary<string, object>
                     {
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:ConnectionStringsConfigFullPathString"])] = new ConnectionStringsCollectionConfig { ConnectionStringContainers = new() },
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:StoragesConfigFullPathString"])] = new DataStoragesCollectionConfig { DataStorages = new() },
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
-                    };
+                        [Environment.ExpandEnvironmentVariables(
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(ConnectionStringsCollectionConfig)}"])]
+                            = new ConnectionStringsCollectionConfig { ConnectionStringContainers = new() },
+                         [Environment.ExpandEnvironmentVariables(
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(DataStoragesCollectionConfig)}"])]
+                            = new DataStoragesCollectionConfig { DataStorages = new() },
+                         [Environment.ExpandEnvironmentVariables(
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(TreeRepositoryHeadersCollectionConfig)}"])]
+                            = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
+                     };
 
                     foreach (var kvp in configFiles)
                     {
