@@ -60,5 +60,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
+
+        public RelayCommand OpenDataStoragesSettingsControlCommand { get; set; }
     }
 }

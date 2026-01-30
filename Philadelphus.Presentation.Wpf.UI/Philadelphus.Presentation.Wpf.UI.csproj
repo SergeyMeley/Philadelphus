@@ -132,8 +132,4 @@
     <Resource Include="Icons\without_a_license\icons8_icon_repository.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Controls\LaunchWindowTabItemsControls\" />
-  </ItemGroup>
-
 </Project>

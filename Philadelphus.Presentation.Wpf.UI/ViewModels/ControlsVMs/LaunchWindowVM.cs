@@ -64,6 +64,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _repositoryCreationVM = repositoryCreationControlVM;
             _applicationSettingsControlVM = applicationSettingsControlVM;
 
+            _repositoryCreationVM.OpenDataStoragesSettingsControlCommand = OpenDataStoragesSettingsControlCommand;
+
             InitializeTabs();
         }
 
@@ -94,7 +96,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 
             }
         }
-
+        public RelayCommand OpenDataStoragesSettingsControlCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowStoragesTabControl);
+                    OnPropertyChanged();
+                });
+            }
+        }
         private bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
         {
             if (header == null)
