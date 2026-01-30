@@ -64,34 +64,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _repositoryCreationVM = repositoryCreationControlVM;
             _applicationSettingsControlVM = applicationSettingsControlVM;
 
-            var tab1 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
-            tab1.Header = "Главная";
-            tab1.IconKey = "imageRepository";
-            tab1.Content = new LaunchWindowMainTabControl() { DataContext = this };
-
-            var tab2 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
-            tab2.Header = "Создать";
-            tab2.IconKey = "imageAdd";
-            tab2.Content = new LaunchWindowCreatingTabControl() { DataContext = this };
-
-            var tab3 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
-            tab3.Header = "Открыть";
-            tab3.IconKey = "imageOpen";
-            tab3.Content = new LaunchWindowOpeningTabControl() { DataContext = this };
-
-            var tab4 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
-            tab4.Header = "Хранилища";
-            tab4.IconKey = "imageStorage";
-            tab4.Content = new LaunchWindowStoragesTabControl() { DataContext = this };
-
-            var tab5 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
-            tab5.Header = "Настройки";
-            tab5.IconKey = "imageSettings";
-            tab5.Content = new LaunchWindowSettingsTabControl() { DataContext = this };
-
-            LaunchWindowTabItemsVMs = new List<LaunchWindowTabItemVM> { tab1, tab2, tab3, tab4, tab5 };
-
-            SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.FirstOrDefault(t => t.Content is LaunchWindowSettingsTabControl);
+            InitializeTabs();
         }
 
         public RelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;
@@ -163,6 +136,37 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return false;
             }
                 
+        }
+        private void InitializeTabs()
+        {
+            var tab1 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            tab1.Header = "Главная";
+            tab1.IconKey = "imageRepository";
+            tab1.Content = new LaunchWindowMainTabControl() { DataContext = this };
+
+            var tab2 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            tab2.Header = "Создать";
+            tab2.IconKey = "imageAdd";
+            tab2.Content = new LaunchWindowCreatingTabControl() { DataContext = this };
+
+            var tab3 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            tab3.Header = "Открыть";
+            tab3.IconKey = "imageOpen";
+            tab3.Content = new LaunchWindowOpeningTabControl() { DataContext = this };
+
+            var tab4 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            tab4.Header = "Хранилища";
+            tab4.IconKey = "imageStorage";
+            tab4.Content = new LaunchWindowStoragesTabControl() { DataContext = this };
+
+            var tab5 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            tab5.Header = "Настройки";
+            tab5.IconKey = "imageSettings";
+            tab5.Content = new LaunchWindowSettingsTabControl() { DataContext = this };
+
+            LaunchWindowTabItemsVMs = new List<LaunchWindowTabItemVM> { tab1, tab2, tab3, tab4, tab5 };
+
+            SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.FirstOrDefault(t => t.Content is LaunchWindowMainTabControl);
         }
     }
 }
