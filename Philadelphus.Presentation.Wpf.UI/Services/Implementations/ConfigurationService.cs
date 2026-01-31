@@ -14,6 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using System.Windows;
 using static System.Net.WebRequestMethods;
@@ -99,17 +101,31 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             var jsonSection = newConfigObject.Value.GetType().Name;
 
             var json = System.IO.File.ReadAllText(configFile.FullName);
+
+            var encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,   // A-Z, 0-9, знаки препинания
+                UnicodeRanges.Cyrillic      // А-Я, а-я
+            );
+
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Encoder = encoder,
+                Converters = { new JsonStringEnumConverter() },
             };
 
             var root = JsonSerializer.Deserialize<JsonElement>(json);
 
             using var stream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+            using var writer = new Utf8JsonWriter(
+                stream,
+                new JsonWriterOptions
+                {
+                    Indented = true,
+                    Encoder = encoder
+                });
 
             writer.WriteStartObject();
 
