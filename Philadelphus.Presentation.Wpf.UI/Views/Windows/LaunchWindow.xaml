@@ -17,10 +17,6 @@
     <Window.Resources>
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
         <converters:IconToImageConverter x:Key="iconToImageConverter"/>
-        
-        <DataTemplate x:Key="IconTemplate">
-            <Image Source="{Binding}" Stretch="Uniform"/>
-        </DataTemplate>
 
         <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
         <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">

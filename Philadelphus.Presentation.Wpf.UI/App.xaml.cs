@@ -172,8 +172,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
                     services.AddTransient<TreeRepositoryCollectionVM>();
                     services.AddTransient<TreeRepositoryHeadersCollectionVM>();
+                    services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
-                    services.AddTransient<LaunchWindowTabItemVM>();
+                    services.AddTransient<LaunchWindowTabItemControlVM>();
+                    services.AddTransient<ApplicationSettingsTabItemControlVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();

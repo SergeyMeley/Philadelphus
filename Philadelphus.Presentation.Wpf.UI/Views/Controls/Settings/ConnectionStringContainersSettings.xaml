@@ -21,16 +21,15 @@
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Строка подключения" Margin="1"></TextBlock>
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewConnectionStringContainerConnectionString}" Margin="1"></TextBox>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Провайдер" Margin="1"></TextBlock>
                 <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ProvidersNames}" SelectedValue="{Binding NewConnectionStringContainerSelectedProvider}" Margin="1"></ComboBox>
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="10" Content="Создать и сохранить" Command="{Binding CreateAndSaveNewConnectionStringContainerCommand}" Height="30" Margin="1"></Button>
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="10" Content="Создать и сохранить" Command="{Binding CreateAndSaveNewConnectionStringContainerCommand}" Margin="1"></Button>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Изменить">

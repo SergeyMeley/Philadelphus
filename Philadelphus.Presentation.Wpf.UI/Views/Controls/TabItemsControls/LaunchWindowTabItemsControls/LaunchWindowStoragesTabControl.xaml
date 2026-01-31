@@ -8,6 +8,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ctrls:DataStorageHeaders></ctrls:DataStorageHeaders>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" MaxHeight="300"></RowDefinition>
+            <RowDefinition Height="4*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Header="Создать">
+            <ctrls:StoragesCreation DataContext="{Binding StorageCreationControlVM}"></ctrls:StoragesCreation>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="Открыть">
+            <ctrls:DataStorageHeaders></ctrls:DataStorageHeaders>
+        </GroupBox>
+        
     </Grid>
 </UserControl>

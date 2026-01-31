@@ -6,6 +6,7 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 
@@ -13,10 +14,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
     public class LaunchWindowVM : ControlBaseVM
     {
-        public List<LaunchWindowTabItemVM> LaunchWindowTabItemsVMs { get; set; }
+        public List<LaunchWindowTabItemControlVM> LaunchWindowTabItemsVMs { get; set; }
 
-        private LaunchWindowTabItemVM _selectedLaunchWindowTabItemVM;
-        public LaunchWindowTabItemVM SelectedLaunchWindowTabItemVM
+        private LaunchWindowTabItemControlVM _selectedLaunchWindowTabItemVM;
+        public LaunchWindowTabItemControlVM SelectedLaunchWindowTabItemVM
         {
             get => _selectedLaunchWindowTabItemVM;
             set
@@ -41,6 +42,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
         public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
 
+        private StorageCreationControlVM _storageCreationControlVM;
+        public StorageCreationControlVM StorageCreationControlVM { get => _storageCreationControlVM; }
+
         private RepositoryCreationControlVM _repositoryCreationVM;
         public RepositoryCreationControlVM RepositoryCreationVM { get => _repositoryCreationVM; }
         public string UserName { get => Environment.UserName; }
@@ -52,6 +56,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             DataStoragesCollectionVM dataStoragesCollectionVM,
             TreeRepositoryCollectionVM repositoryCollectionVM,
             TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
+            StorageCreationControlVM storageCreationControlVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
             ApplicationCommandsVM applicationCommandsVM,
             ApplicationSettingsControlVM applicationSettingsControlVM)
@@ -61,9 +66,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
             _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
+            _storageCreationControlVM = storageCreationControlVM;
             _repositoryCreationVM = repositoryCreationControlVM;
             _applicationSettingsControlVM = applicationSettingsControlVM;
 
+            _storageCreationControlVM.OpenConnectionStringsSettingsControlCommand = OpenConnectionStringsSettingsControlCommand;
             _repositoryCreationVM.OpenDataStoragesSettingsControlCommand = OpenDataStoragesSettingsControlCommand;
 
             InitializeTabs();
@@ -103,7 +110,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowStoragesTabControl);
-                    OnPropertyChanged();
+                });
+            }
+        }
+
+        public RelayCommand OpenConnectionStringsSettingsControlCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowSettingsTabControl);
+                    _applicationSettingsControlVM.SelectedApplicationSettingsTabItemVM = _applicationSettingsControlVM.ApplicationSettingsTabItemsVMs.Find(x => x.Content is ConnectionStringsTabControl);
                 });
             }
         }
@@ -151,32 +169,32 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
         private void InitializeTabs()
         {
-            var tab1 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            var tab1 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab1.Header = "Главная";
             tab1.IconKey = "imageRepository";
             tab1.Content = new LaunchWindowMainTabControl() { DataContext = this };
 
-            var tab2 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            var tab2 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab2.Header = "Создать";
             tab2.IconKey = "imageAdd";
             tab2.Content = new LaunchWindowCreatingTabControl() { DataContext = this };
 
-            var tab3 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            var tab3 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab3.Header = "Открыть";
             tab3.IconKey = "imageOpen";
             tab3.Content = new LaunchWindowOpeningTabControl() { DataContext = this };
 
-            var tab4 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            var tab4 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab4.Header = "Хранилища";
             tab4.IconKey = "imageStorage";
             tab4.Content = new LaunchWindowStoragesTabControl() { DataContext = this };
 
-            var tab5 = _serviceProvider.GetRequiredService<LaunchWindowTabItemVM>();
+            var tab5 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab5.Header = "Настройки";
             tab5.IconKey = "imageSettings";
             tab5.Content = new LaunchWindowSettingsTabControl() { DataContext = this };
 
-            LaunchWindowTabItemsVMs = new List<LaunchWindowTabItemVM> { tab1, tab2, tab3, tab4, tab5 };
+            LaunchWindowTabItemsVMs = new List<LaunchWindowTabItemControlVM> { tab1, tab2, tab3, tab4, tab5 };
 
             SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.FirstOrDefault(t => t.Content is LaunchWindowMainTabControl);
         }

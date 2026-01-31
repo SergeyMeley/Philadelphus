@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs
 {
-    public class LaunchWindowTabItemControlVM : TabItemControlBaseVM
+    public class ApplicationSettingsTabItemControlVM : TabItemControlBaseVM
     {
-        public string IconKey { get; set; }
-        public LaunchWindowTabItemControlVM(IServiceProvider serviceProvider, 
+        public ApplicationSettingsTabItemControlVM(
+            IServiceProvider serviceProvider, 
             IMapper mapper, 
             ILogger<ControlBaseVM> logger, 
             INotificationService notificationService, 

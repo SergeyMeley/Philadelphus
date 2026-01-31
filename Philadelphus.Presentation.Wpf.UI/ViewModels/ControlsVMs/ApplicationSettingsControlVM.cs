@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
@@ -8,9 +9,12 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
+using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,6 +36,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
+        public List<ApplicationSettingsTabItemControlVM> ApplicationSettingsTabItemsVMs { get; set; }
+
+        private ApplicationSettingsTabItemControlVM _selectedApplicationSettingsTabItemVM;
+        public ApplicationSettingsTabItemControlVM SelectedApplicationSettingsTabItemVM
+        {
+            get => _selectedApplicationSettingsTabItemVM;
+            set
+            {
+                if (_selectedApplicationSettingsTabItemVM != value)
+                {
+                    _selectedApplicationSettingsTabItemVM = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public HashSet<ConfigurationFileVM> ConfigFiles { get; } = new HashSet<ConfigurationFileVM>();
         public ConfigurationFileVM SelectedConfigFile { get; set; }
         public ObservableCollection<ConnectionStringContainerVM> ConnectionStringContainersVMs { get; } = new ObservableCollection<ConnectionStringContainerVM>();
@@ -101,6 +120,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 ConnectionStringContainersVMs.Add(_mapper.Map<ConnectionStringContainerVM>(cs));
             }
+
+            InitializeTabs();
         }
         public RelayCommand OpenConfigCommand
         {
@@ -286,6 +307,31 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
+        private void InitializeTabs()
+        {
+            var tab1 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            tab1.Header = "Настроечные файлы";
+            tab1.Content = new ConfigFilesPathesTabControl() { DataContext = this };
 
+            var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            tab2.Header = "Строки подключения";
+            tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
+
+            //var tab3 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab3.Header = "Конфиденциальная информация";
+            //tab3.Content = new () { DataContext = this };
+
+            //var tab4 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab4.Header = "Учетная запись";
+            //tab4.Content = new () { DataContext = this };
+
+            //var tab5 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab5.Header = "Сочетания клавиш";
+            //tab5.Content = new HotKeysSettingsTabControl() { DataContext = this };
+
+            ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1, tab2 };
+
+            SelectedApplicationSettingsTabItemVM = ApplicationSettingsTabItemsVMs.FirstOrDefault(t => t.Content is ConfigFilesPathesTabControl);
+        }
     }
 }
