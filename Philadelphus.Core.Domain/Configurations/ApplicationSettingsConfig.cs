@@ -1,4 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using System.Text.Json.Serialization;
 
 namespace Philadelphus.Core.Domain.Configurations
 {
@@ -8,14 +11,31 @@ namespace Philadelphus.Core.Domain.Configurations
     public class ApplicationSettingsConfig    //TODO: Подумать о переносе в Application
     {
         /// <summary>
+        /// Пути к конфигурационным файлам
+        /// </summary>
+        public Dictionary<string, string> ConfigurationFilesPathesStrings { get; set; }
+
+        /// <summary>
+        /// Пути к конфигурационным файлам
+        /// </summary>
+        [JsonIgnore]
+        public Dictionary<string, FileInfo> ConfigurationFilesPathes 
+        {
+            get
+            {
+                var result = new Dictionary<string, FileInfo>();
+                foreach(var path in ConfigurationFilesPathesStrings)
+                {
+                    result.Add(path.Key, GetFileInfo(path.Value));
+                }
+                return result;
+            } 
+        }
+
+        /// <summary>
         /// Директория конфигурационных файлов
         /// </summary>
         public string ConfigsDirectoryString { get; set; }
-
-        /// <summary>
-        /// Полный путь конфигурационного файла хранилищ данных
-        /// </summary>
-        public string ConnectionStringsConfigFullPathString { get; set; }
 
         /// <summary>
         /// Полный путь конфигурационного файла хранилищ данных
@@ -25,15 +45,10 @@ namespace Philadelphus.Core.Domain.Configurations
         {
             get
             {
-                var expandedPath = Environment.ExpandEnvironmentVariables(ConnectionStringsConfigFullPathString ?? string.Empty);
-                return new FileInfo(expandedPath);
+                TryGetConfigFileFullPath<ConnectionStringsCollectionConfig>(out var result);
+                return result;
             }
         }
-
-        /// <summary>
-        /// Полный путь конфигурационного файла хранилищ данных
-        /// </summary>
-        public string StoragesConfigFullPathString { get; set; }
 
         /// <summary>
         /// Полный путь конфигурационного файла хранилищ данных
@@ -43,32 +58,21 @@ namespace Philadelphus.Core.Domain.Configurations
         {
             get
             {
-                var expandedPath = Environment.ExpandEnvironmentVariables(StoragesConfigFullPathString ?? string.Empty);
-                return new FileInfo(expandedPath);
-                //var path = Path.Combine(ConfigsDirectoryString, "storages-config-old.json");
-                //var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
-                //return new FileInfo(expandedPath);
+                TryGetConfigFileFullPath<DataStoragesCollectionConfig>(out var result);
+                return result;
             }
         }
 
         /// <summary>
         /// Полный путь конфигурационного файла заголовков репозиториев
         /// </summary>
-        public string RepositoryHeadersConfigFullPathString { get; set; }
-
-        /// <summary>
-        /// Полный путь конфигурационного файла заголовков репозиториев
-        /// </summary>
         [JsonIgnore]
         public FileInfo RepositoryHeadersConfigFullPath
-        { 
+        {
             get
             {
-                var expandedPath = Environment.ExpandEnvironmentVariables(RepositoryHeadersConfigFullPathString ?? string.Empty);
-                return new FileInfo(expandedPath);
-                //var path = Path.Combine(ConfigsDirectoryString, "repository-headers-config-old.json");
-                //var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
-                //return new FileInfo(expandedPath);
+                TryGetConfigFileFullPath<TreeRepositoryHeadersCollectionConfig>(out var result);
+                return result;
             }
         }
 
@@ -89,13 +93,35 @@ namespace Philadelphus.Core.Domain.Configurations
 
                 for (int i = 0; i < PluginsDirectoriesStrings.Count(); i++)
                 {
-                    var expandedPath = Environment.ExpandEnvironmentVariables(PluginsDirectoriesStrings[i] ?? string.Empty);
-                    result[i] = new DirectoryInfo(expandedPath); 
-                    
+                    result[i] = GetDirectoryInfo(PluginsDirectoriesStrings[i]); 
                 }
 
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Попытаться получить конфигурационный файл
+        /// </summary>
+        /// <typeparam name="TConfig">Тип конфигурации для получения ключа поиска пути в основном настроечном файле</typeparam>
+        /// <param name="fileInfo">Информация об искомом настроечном файле</param>
+        /// <returns>Успешность нахождения</returns>
+        public bool TryGetConfigFileFullPath<TConfig>(out FileInfo fileInfo)
+        {
+            return ConfigurationFilesPathes.TryGetValue(typeof(TConfig).Name, out fileInfo);
+        }
+
+        private FileInfo GetFileInfo(string path)
+        {
+            var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+            var result = new FileInfo(expandedPath);
+            return result;
+        }
+        private DirectoryInfo GetDirectoryInfo(string path)
+        {
+            var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+            var result = new DirectoryInfo(expandedPath);
+            return result;
         }
     }
 }

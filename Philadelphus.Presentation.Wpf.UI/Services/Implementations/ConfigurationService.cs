@@ -6,6 +6,7 @@ using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using System.Windows;
 using static System.Net.WebRequestMethods;
@@ -98,17 +101,31 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             var jsonSection = newConfigObject.Value.GetType().Name;
 
             var json = System.IO.File.ReadAllText(configFile.FullName);
+
+            var encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,   // A-Z, 0-9, знаки препинания
+                UnicodeRanges.Cyrillic      // А-Я, а-я
+            );
+
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Encoder = encoder,
+                Converters = { new JsonStringEnumConverter() },
             };
 
             var root = JsonSerializer.Deserialize<JsonElement>(json);
 
             using var stream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+            using var writer = new Utf8JsonWriter(
+                stream,
+                new JsonWriterOptions
+                {
+                    Indented = true,
+                    Encoder = encoder
+                });
 
             writer.WriteStartObject();
 
@@ -159,5 +176,52 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
             return result.Replace("\\", "\\\\");
         }
+
+        public static async Task CheckOrInitDirectory(DirectoryInfo path)
+        {
+            if (path.Exists == false)
+            {
+                Log.Warning($"Директория не существует: '{path.FullName}', Создаётся...");
+                try
+                {
+                    path.Create();
+                    Log.Information($"Директория создана: '{path.FullName}'");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Ошибка создания директории '{path.FullName}'");
+                }
+            }
+        }
+
+        public static async Task CheckOrInitFile<T>(FileInfo file, T configObject)
+        {
+            if (file.Exists == false)
+            {
+                try
+                {
+                    Log.Warning($"Не найден '{file.FullName}', создаётся файл по умолчанию");
+
+                    Dictionary<string, object> jsonContent = new()
+                    {
+                        { configObject.GetType().Name, configObject }
+                    };
+                    var json = JsonSerializer.Serialize(jsonContent, new JsonSerializerOptions() { WriteIndented = true });
+                    
+                    await System.IO.File.WriteAllTextAsync(file.FullName, json);
+                    Log.Information($"Создан настроечный файл по умолчанию: '{file.FullName}'");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Ошибка создания настроечного файла по умолчанию: '{file.FullName}'");
+                }
+            }
+            else
+            {
+                Log.Debug($"Найден и будет загружен настроечный файл: '{file.FullName}'");
+            }
+            Task.Delay(10);
+        }
+
     }
 }

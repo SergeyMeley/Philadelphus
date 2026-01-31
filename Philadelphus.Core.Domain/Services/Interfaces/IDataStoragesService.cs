@@ -36,6 +36,16 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <returns></returns>
         public IDataStorageModel CreateMainDataStorageModel(FileInfo storagesConfigFullPath, FileInfo repositoryHeadersConfigFullPath);
 
+        /// <summary>
+        /// /// <summary>
+        /// Создать хранилище данных
+        /// <param name="name">Наименование</param>
+        /// <param name="desctiption">Описание</param>
+        /// <param name="connectionString">Строка подключенияя</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringContainer connectionString);
+
         #endregion
 
         #region [ Modify ]

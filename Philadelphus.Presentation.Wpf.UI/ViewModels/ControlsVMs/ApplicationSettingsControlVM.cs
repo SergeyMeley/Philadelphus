@@ -1,20 +1,28 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
+using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -28,6 +36,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
+        public List<ApplicationSettingsTabItemControlVM> ApplicationSettingsTabItemsVMs { get; set; }
+
+        private ApplicationSettingsTabItemControlVM _selectedApplicationSettingsTabItemVM;
+        public ApplicationSettingsTabItemControlVM SelectedApplicationSettingsTabItemVM
+        {
+            get => _selectedApplicationSettingsTabItemVM;
+            set
+            {
+                if (_selectedApplicationSettingsTabItemVM != value)
+                {
+                    _selectedApplicationSettingsTabItemVM = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public HashSet<ConfigurationFileVM> ConfigFiles { get; } = new HashSet<ConfigurationFileVM>();
         public ConfigurationFileVM SelectedConfigFile { get; set; }
         public ObservableCollection<ConnectionStringContainerVM> ConnectionStringContainersVMs { get; } = new ObservableCollection<ConnectionStringContainerVM>();
@@ -57,18 +80,48 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
-            _configurationService = configurationService;
+            _configurationService = configurationService; 
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
 
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл строк подключения", appConfig.Value.ConnectionStringsConfigFullPath));
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл хранилищ данных", appConfig.Value.StoragesConfigFullPath));
-            ConfigFiles.Add(new ConfigurationFileVM("Настроечный файл заголовков репозиториев", appConfig.Value.RepositoryHeadersConfigFullPath));
+            Dictionary<string, Type> existingTypes = new()
+                {
+                    { nameof(ConnectionStringsCollectionConfig), typeof(ConnectionStringsCollectionConfig) },
+                    { nameof(DataStoragesCollectionConfig), typeof(DataStoragesCollectionConfig) },
+                    { nameof(TreeRepositoryHeadersCollectionConfig), typeof(TreeRepositoryHeadersCollectionConfig) }
+                };
+
+            foreach (var configFile in _appConfig.Value.ConfigurationFilesPathes)
+            {
+                string displayName = string.Empty;
+
+                if (existingTypes.TryGetValue(configFile.Key, out var type) == false)
+                {
+                    type = Type.GetType(configFile.Key);
+                    if (type == null)
+                    {
+                        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.StartsWith("Philadelphus")))
+                        {
+                            type = Array.Find(assembly.GetTypes(), t => t.Name.Equals(configFile.Key) || t.Name == configFile.Key);
+                            if (type != null)
+                                break;
+                        }
+                    }
+                }
+
+                displayName = type?.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName
+                        ?? type?.Name
+                        ?? configFile.Key;
+
+                ConfigFiles.Add(new ConfigurationFileVM(displayName, configFile.Value));
+            }
 
             foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringContainers) 
             {
                 ConnectionStringContainersVMs.Add(_mapper.Map<ConnectionStringContainerVM>(cs));
-        }
+            }
+
+            InitializeTabs();
         }
         public RelayCommand OpenConfigCommand
         {
@@ -216,13 +269,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
 
                     // Исключение удаленных строк подключения
-                    foreach (var vm in ConnectionStringContainersVMs)
+                    foreach (var vm in ConnectionStringContainersVMs.Where(x => x.ForDelete == true))
                     {
-                        if (vm.ForDelete == true)
-                        {
-                            var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
-                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
-                        }
+                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
+                        _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
                     }
                     for (int i = ConnectionStringContainersVMs.Count - 1; i >= 0; i--)
     {
@@ -233,7 +283,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
 
                     // Обновление настроечного файла
-                    _configurationService.UpdateConfigFile(_appConfig.Value.ConnectionStringsConfigFullPath, _connectionStringsCollectionConfig);
+                    if (_appConfig.Value.TryGetConfigFileFullPath<ConnectionStringsCollectionConfig>(out var config))
+                    {
+                        _configurationService.UpdateConfigFile(config, _connectionStringsCollectionConfig);
+                    }
+                    else
+                    {
+                        var message = "Путь к конфигурационному файлу 'ConnectionStringsCollectionConfig' не найден, изменения не сохранены";
+                        _logger.LogError(message);
+                        MessageBox.Show(message);
+                    }
                 });
             }
         }
@@ -248,6 +307,31 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
+        private void InitializeTabs()
+        {
+            var tab1 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            tab1.Header = "Настроечные файлы";
+            tab1.Content = new ConfigFilesPathesTabControl() { DataContext = this };
 
+            var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            tab2.Header = "Строки подключения";
+            tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
+
+            //var tab3 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab3.Header = "Конфиденциальная информация";
+            //tab3.Content = new () { DataContext = this };
+
+            //var tab4 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab4.Header = "Учетная запись";
+            //tab4.Content = new () { DataContext = this };
+
+            //var tab5 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab5.Header = "Сочетания клавиш";
+            //tab5.Content = new HotKeysSettingsTabControl() { DataContext = this };
+
+            ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1, tab2 };
+
+            SelectedApplicationSettingsTabItemVM = ApplicationSettingsTabItemsVMs.FirstOrDefault(t => t.Content is ConfigFilesPathesTabControl);
+        }
     }
 }
