@@ -83,6 +83,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий с элементами</returns>
         public TreeRepositoryModel ForceLoadTreeRepositoryMembersCollection(TreeRepositoryModel repository)
         {
+            repository.Childs.Clear();
+
             foreach (var dataStorage in repository?.DataStorages)
             {
                 var infrastructure = dataStorage.TreeRepositoryMembersInfrastructureRepository;
@@ -122,8 +124,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий с содержимым</returns>
         public TreeRepositoryModel GetTreeRepositoryMembersAndContent(TreeRepositoryModel repository)
         {
-            ForceLoadTreeRepositoryMembersCollection(repository);
-
             repository.Childs.Clear();
 
             var childRoots = MainEntityCollection.DataTreeRoots.Where(x => x.ParentRepository.Uuid == repository.Uuid);
