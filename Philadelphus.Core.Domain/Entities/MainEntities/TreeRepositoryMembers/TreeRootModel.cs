@@ -55,11 +55,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers
         public List<IDataStorageModel> DataStorages { get; internal set; } = new List<IDataStorageModel>();
 
         /// <summary>
-        /// Тип элемента (устар.)
-        /// </summary>
-        public EntityElementTypeModel ElementType { get; set; }
-
-        /// <summary>
         /// Непосредственный родитель (репозиторий)
         /// </summary>
         public IParentModel Parent {  get; private set; }
@@ -106,7 +101,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers
             //}
             Name = NamingHelper.GetNewName(existNames, DefaultFixedPartOfName);
             Childs = new List<IChildrenModel>();
-            ElementType = new EntityElementTypeModel(Guid.NewGuid(), this, null);
         }
 
         /// <summary>

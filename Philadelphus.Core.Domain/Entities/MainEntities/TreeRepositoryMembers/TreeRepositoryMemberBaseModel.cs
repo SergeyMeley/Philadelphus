@@ -8,7 +8,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers
     /// <summary>
     /// Участник репозитория Чубушника
     /// </summary>
-    public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IAttributeOwnerModel, IChildrenModel, ITypedModel, ISequencableModel
+    public abstract class TreeRepositoryMemberBaseModel : MainEntityBaseModel, ITreeRepositoryMemberModel, IAttributeOwnerModel, IChildrenModel, ISequencableModel
     {
         /// <summary>
         /// Фиксированная часть наименования по умолчанию

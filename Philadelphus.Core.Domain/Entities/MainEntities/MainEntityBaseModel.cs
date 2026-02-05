@@ -81,11 +81,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
 
         /// <summary>
-        /// Тип элемента (устар.)
-        /// </summary>
-        public EntityElementTypeModel ElementType { get; set; }
-        
-        /// <summary>
         /// Состояние
         /// </summary>
         private State _state = State.Initialized;
