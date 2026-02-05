@@ -101,6 +101,16 @@ namespace Philadelphus.Core.Domain.Configurations
         }
 
         /// <summary>
+        /// Настройки подключения к Redis
+        /// </summary>
+        public RedisOptions RedisOptions { get; set; }
+
+        /// <summary>
+        /// Настройки подключения к Redis
+        /// </summary>
+        public KafkaOptions KafkaOptions { get; set; }
+
+        /// <summary>
         /// Попытаться получить конфигурационный файл
         /// </summary>
         /// <typeparam name="TConfig">Тип конфигурации для получения ключа поиска пути в основном настроечном файле</typeparam>

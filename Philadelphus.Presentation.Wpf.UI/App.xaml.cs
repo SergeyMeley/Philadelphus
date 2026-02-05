@@ -147,8 +147,19 @@ namespace Philadelphus.Presentation.Wpf.UI
                         typeof(ViewModelsMappingProfile)    // Model <-> ViewModel
                         );
                     
-                    // TODO: Проработать кеширование
-                    services.AddMemoryCache();
+
+                    services.AddStackExchangeRedisCache(options =>
+                    {
+                        var settings = services.BuildServiceProvider()
+                            .GetRequiredService<IOptions<ApplicationSettingsConfig>>().Value;
+
+                        options.Configuration = settings.RedisOptions.Socket +
+                            (string.IsNullOrEmpty(settings.RedisOptions.Password)
+                                ? "" : $",password={settings.RedisOptions.Password}");
+                        options.InstanceName = "Philadelphus:";
+
+                        options.Configuration = "localhost:6379,password=philapass";
+                    });
 
                     // Регистрация сервисов
                     // Слой Core
