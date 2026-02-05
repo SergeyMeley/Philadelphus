@@ -57,36 +57,6 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         }
 
         /// <summary>
-        /// Репозиторий  БД работы с хранилищами данных Чубушника
-        /// </summary>
-        public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_isDisabled)
-                    return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.DataStoragesCollection) == false)
-                    return null;
-                return (IDataStoragesCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.DataStoragesCollection];
-            }
-        }
-
-        /// <summary>
-        /// Репозиторий БД работы с заголовками репозиториев Чубушника
-        /// </summary>
-        public ITreeRepositoryHeadersCollectionInfrastructureRepository TreeRepositoryHeadersCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_isDisabled)
-                    return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.TreeRepositoryHeadersCollection) == false)
-                    return null;
-                return (ITreeRepositoryHeadersCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoryHeadersCollection];
-            }
-        }
-
-        /// <summary>
         /// Репозиторий БД работы с репозиториями Чубушника
         /// </summary>
         public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository

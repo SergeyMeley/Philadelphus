@@ -23,7 +23,6 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 Name = businessEntity.Name,
                 Description = businessEntity.Description,
                 Uuid = businessEntity.Uuid,
-                HasDataStorageInfrastructureRepositoryRepository = businessEntity.DataStoragesCollectionInfrastructureRepository != null,
                 HasTreeRepositoryHeadersInfrastructureRepository = businessEntity.TreeRepositoriesInfrastructureRepository != null,
                 HasMainEntitiesInfrastructureRepository = businessEntity.TreeRepositoryMembersInfrastructureRepository != null,
                 InfrastructureType = businessEntity.InfrastructureType,

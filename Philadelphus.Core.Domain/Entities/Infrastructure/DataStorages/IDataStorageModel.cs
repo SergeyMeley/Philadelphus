@@ -34,16 +34,6 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories { get; }
 
         /// <summary>
-        /// Репозиторий  БД работы с хранилищами данных Чубушника
-        /// </summary>
-        public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository { get; }
-
-        /// <summary>
-        /// Репозиторий БД работы с заголовками репозиториев Чубушника
-        /// </summary>
-        public ITreeRepositoryHeadersCollectionInfrastructureRepository TreeRepositoryHeadersCollectionInfrastructureRepository { get; }
-
-        /// <summary>
         /// Репозиторий БД работы с репозиториями Чубушника
         /// </summary>
         public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository { get; }

@@ -11,6 +11,40 @@ namespace Philadelphus.Core.Domain.Configurations
     public class ApplicationSettingsConfig    //TODO: Подумать о переносе в Application
     {
         /// <summary>
+        /// Базовый путь к файлам приложения
+        /// </summary>
+        public string BasePathString { get; set; }
+
+        /// <summary>
+        /// Базовый путь к файлам приложения
+        /// </summary>
+        [JsonIgnore]
+        public DirectoryInfo BasePath
+        {
+            get
+            {
+                return GetDirectoryInfo(BasePathString);
+            }
+        }
+
+        /// <summary>
+        /// Путь к базовому хранилищу
+        /// </summary>
+        public string MainDataStorageString { get; set; }
+
+        /// <summary>
+        /// Путь к базовому хранилищу
+        /// </summary>
+        [JsonIgnore]
+        public DirectoryInfo MainDataStorage
+        {
+            get
+            {
+                return GetDirectoryInfo(MainDataStorageString);
+            }
+        }
+
+        /// <summary>
         /// Пути к конфигурационным файлам
         /// </summary>
         public Dictionary<string, string> ConfigurationFilesPathesStrings { get; set; }
@@ -31,11 +65,6 @@ namespace Philadelphus.Core.Domain.Configurations
                 return result;
             } 
         }
-
-        /// <summary>
-        /// Директория конфигурационных файлов
-        /// </summary>
-        public string ConfigsDirectoryString { get; set; }
 
         /// <summary>
         /// Полный путь конфигурационного файла хранилищ данных

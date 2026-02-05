@@ -235,7 +235,7 @@ namespace Philadelphus.Presentation.Wpf.UI
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Критическая ошибка запуска приложения");
-                MessageBox.Show($"Ошибка запуска: {ex.Message}");
+                MessageBox.Show($"Ошибка запуска:\r\n{ex.Message}\r\nПодробности:{ex.StackTrace}");
                 Shutdown(-1);
             }
         }

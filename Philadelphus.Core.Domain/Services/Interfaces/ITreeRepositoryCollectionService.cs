@@ -79,14 +79,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(TreeRepositoryModel treeRepository);
 
-        /// <summary>
-        /// Сохранить изменения (заголовок репозитория без содержимого и участников)
-        /// </summary>
-        /// <param name="treeRepositoryHeader">Заголовок репозитория</param>
-        /// <param name="dataStorageModel">Хранилище данных</param>
-        /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel);
-
         #endregion
 
         #region [ Create + Add ]

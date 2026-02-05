@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
@@ -10,6 +14,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly INotificationService _notificationService;
         private readonly ITreeRepositoryCollectionService _service;
         private readonly DataStoragesCollectionVM _dataStoragesSettingsVM;
+        private readonly IConfigurationService _configurationService;
+        private readonly IOptions<ApplicationSettingsConfig> _appConfig;
+        private readonly IOptions<TreeRepositoryHeadersCollectionConfig> _treeRepositoryHeadersCollectionConfig;
 
         private List<TreeRepositoryHeaderVM> _treeRepositoryHeadersVMs;
         public List<TreeRepositoryHeaderVM> TreeRepositoryHeadersVMs
@@ -73,12 +80,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             ILogger<TreeRepositoryHeadersCollectionVM> logger,
             INotificationService notificationService,
             ITreeRepositoryCollectionService service,
-            DataStoragesCollectionVM dataStoragesSettingsVM)
+            DataStoragesCollectionVM dataStoragesSettingsVM,
+            IConfigurationService configurationService,
+            IOptions<ApplicationSettingsConfig> appConfig,
+            IOptions<TreeRepositoryHeadersCollectionConfig> treeRepositoryHeadersCollectionConfig)
         {
             _logger = logger;
             _notificationService = notificationService;
             _service = service;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
+            _configurationService = configurationService;
+            _appConfig = appConfig;
+            _treeRepositoryHeadersCollectionConfig = treeRepositoryHeadersCollectionConfig;
         }
         public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
         {
@@ -99,7 +112,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
             foreach (var header in headers)
             {
-                var vm = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
+                var vm = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders, _configurationService, _appConfig, _treeRepositoryHeadersCollectionConfig);
                 CheckTreeRepositoryAvailable(vm);
                 _treeRepositoryHeadersVMs.Add(vm);
             }
@@ -108,7 +121,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         internal TreeRepositoryHeaderVM AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
         {
             var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.Model);
-            var result = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
+            var result = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders, _configurationService, _appConfig, _treeRepositoryHeadersCollectionConfig);
             TreeRepositoryHeadersVMs.Add(result);
             return result;
         }
