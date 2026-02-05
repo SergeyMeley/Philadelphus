@@ -191,22 +191,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             return result;
         }
 
-        /// <summary>
-        /// Сохранить изменения (заголовок репозитория без содержимого и участников)
-        /// </summary>
-        /// <param name="treeRepositoryHeader">Заголовок репозитория</param>
-        /// <param name="dataStorageModel">Хранилище данных</param>
-        /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(TreeRepositoryHeaderModel treeRepositoryHeader, IDataStorageModel dataStorageModel)
-        {
-            if (dataStorageModel == null)
-                return -1;
-            long result = 0;
-            var dbEntity = treeRepositoryHeader.ToDbEntity();
-            result += dataStorageModel.TreeRepositoryHeadersCollectionInfrastructureRepository.UpdateRepository(dbEntity);
-            return result;
-        }
-
         #endregion
 
         #region [ Create + Add ]

@@ -62,24 +62,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 return true;
             }
         }
-        public bool HasDataStoragesCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_model.DataStoragesCollectionInfrastructureRepository == null)
-                    return false;
-                return true;
-            }
-        }
-        public bool HasTreeRepositoryHeadersCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_model.TreeRepositoryHeadersCollectionInfrastructureRepository == null)
-                    return false;
-                return true;
-            }
-        }
+
         public bool HasTreeRepositoriesInfrastructureRepository
         {
             get

@@ -93,19 +93,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return _model.AuditInfo;
             }
         }
-        public EntityElementTypeModel ElementType
-        {
-            get
-            {
-                return _model.ElementType;
-            }
-            set
-            {
-                _model.ElementType = value;
-                OnPropertyChanged(nameof(ElementType));
-                OnPropertyChanged(nameof(State));
-            }
-        }
         public State State
         {
             get

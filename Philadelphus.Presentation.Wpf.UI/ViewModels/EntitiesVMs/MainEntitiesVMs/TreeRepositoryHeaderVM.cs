@@ -1,6 +1,11 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
+﻿using Microsoft.Extensions.Options;
+using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
@@ -11,6 +16,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         private readonly ITreeRepositoryCollectionService _service;
         private readonly DataStorageVM _dataStoragesVM;
+        private readonly IConfigurationService _configurationService;
+        private readonly IOptions<ApplicationSettingsConfig> _appConfig;
+        private readonly IOptions<TreeRepositoryHeadersCollectionConfig> _treeRepositoryHeadersCollectionConfig;
 
         private readonly TreeRepositoryHeaderModel _model;
 
@@ -150,11 +158,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             TreeRepositoryHeaderModel treeRepositoryHeader,
             ITreeRepositoryCollectionService service,
             DataStorageVM dataStoragesVM, 
-            Action updateTreeRepositoryHeaders)
+            Action updateTreeRepositoryHeaders,
+            IConfigurationService configurationService,
+            IOptions<ApplicationSettingsConfig> appConfig,
+            IOptions<TreeRepositoryHeadersCollectionConfig> treeRepositoryHeadersCollectionConfig)
         {
             _model = treeRepositoryHeader;
             _service = service;
             _dataStoragesVM = dataStoragesVM;
+            _configurationService = configurationService;
+            _appConfig = appConfig;
+            _treeRepositoryHeadersCollectionConfig = treeRepositoryHeadersCollectionConfig;
 
             _updateTreeRepositoryHeaders = updateTreeRepositoryHeaders;
         }
@@ -171,7 +185,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         private bool SaveRepositoryHeader()
         {
-            _service.SaveChanges(_model, _dataStoragesVM.Model);
+
+            var headers = _treeRepositoryHeadersCollectionConfig.Value.TreeRepositoryHeaders;
+
+            if (headers.Any(x => x.Uuid == _model.Uuid) == false)
+            {
+                headers.Add(_model.ToDbEntity());
+            }
+            else
+            {
+                for (int i = 0; i < headers.Count; i++)
+                {
+                    if (headers[i].Uuid == _model.Uuid)
+                    {
+                        headers[i] = _model.ToDbEntity();
+                        break;
+                    }
+                }
+            }
+
+            _configurationService.UpdateConfigFile(_appConfig.Value.RepositoryHeadersConfigFullPath, _treeRepositoryHeadersCollectionConfig);
+
             return true;
         }
 

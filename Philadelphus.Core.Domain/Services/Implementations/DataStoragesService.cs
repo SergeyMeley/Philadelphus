@@ -94,12 +94,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="storagesConfigFullPath">Путь к настроечному файлу хранилищ данных</param>
         /// <param name="repositoryHeadersConfigFullPath">Путь к настроечному файлу запусков репозиториев</param>
         /// <returns></returns>
-        public IDataStorageModel CreateMainDataStorageModel(
-            FileInfo storagesConfigFullPath,
-            FileInfo repositoryHeadersConfigFullPath)
+        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo basePath)
         {
-            if (storagesConfigFullPath == null || repositoryHeadersConfigFullPath == null)
-                throw new ArgumentNullException($"{nameof(storagesConfigFullPath)}, {repositoryHeadersConfigFullPath}");
+            if (basePath == null)
+                throw new ArgumentNullException($"{nameof(basePath)}");
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
@@ -108,12 +106,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     uuid: Guid.Empty,
                     infrastructureType: InfrastructureTypes.JsonDocument,
                     isDisabled: false)
-            .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath))
-            .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath))
+            .SetRepository(new JsonMainEntitiesInfrastructureRepository(basePath))
+            .SetRepository(new JsonTreeRepositoriesInfrastructureRepository(basePath))
         ;
             var mainDataStorageModel = dataStorageBuilder.Build();
 
-            _logger.LogInformation("Хранилище конфигурационных файлов инициализировано.");
+            _logger.LogInformation("Базовое хранилище инициализировано.");
 
             return mainDataStorageModel;
         }

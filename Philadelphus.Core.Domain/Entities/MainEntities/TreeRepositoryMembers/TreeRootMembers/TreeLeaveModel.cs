@@ -57,7 +57,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.T
             //}
             Name = NamingHelper.GetNewName(existNames, DefaultFixedPartOfName);
             //Childs = new ObservableCollection<IChildren>();
-            ElementType = new EntityElementTypeModel(Guid.NewGuid(), this, null);
         }
     }
 }
