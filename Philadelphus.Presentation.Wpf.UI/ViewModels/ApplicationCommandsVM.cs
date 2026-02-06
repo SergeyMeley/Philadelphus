@@ -28,7 +28,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                         if (headerVM == null)
                         {
                             headerVM = launchVM.RepositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(currentRepositoryVM);
-
                         }
                         headerVM.LastOpening = DateTime.UtcNow;
                     }

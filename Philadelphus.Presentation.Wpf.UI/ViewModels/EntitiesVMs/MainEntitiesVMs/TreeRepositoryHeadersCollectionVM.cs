@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
@@ -18,33 +22,25 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<TreeRepositoryHeadersCollectionConfig> _treeRepositoryHeadersCollectionConfig;
 
-        private List<TreeRepositoryHeaderVM> _treeRepositoryHeadersVMs;
-        public List<TreeRepositoryHeaderVM> TreeRepositoryHeadersVMs
+        private ObservableCollection<TreeRepositoryHeaderVM> _treeRepositoryHeadersVMs;
+        public ObservableCollection<TreeRepositoryHeaderVM> TreeRepositoryHeadersVMs
         {
             get
             {
-                if (_treeRepositoryHeadersVMs == null)
-                {
-                    _treeRepositoryHeadersVMs = new List<TreeRepositoryHeaderVM>();
-                    LoadTreeRepositoryHeadersVMs();
-                }
                 return _treeRepositoryHeadersVMs;
             }
-        }
-        public List<TreeRepositoryHeaderVM> FavoriteTreeRepositoryHeadersVMs
-        {
-            get
+            private set
             {
-                return TreeRepositoryHeadersVMs.Where(x => x.IsFavorite).ToList();
+                if (_treeRepositoryHeadersVMs != value)
+                {
+                    _treeRepositoryHeadersVMs = value;
+                    OnPropertyChanged();
+                }
             }
         }
-        public List<TreeRepositoryHeaderVM> LastTreeRepositoryHeadersVMs
-        {
-            get
-            {
-                return TreeRepositoryHeadersVMs.OrderByDescending(x => x.LastOpening).Where(x => DateTime.UtcNow - x.LastOpening <= TimeSpan.FromDays(90)).ToList();
-            }
-        }
+
+        public CollectionViewSource FavoriteTreeRepositoryHeadersVMs { get; }
+        public CollectionViewSource LastTreeRepositoryHeadersVMs { get; }
 
         private TreeRepositoryHeaderVM _selectedTreeRepositoryHeaderVM;
         public TreeRepositoryHeaderVM SelectedTreeRepositoryHeaderVM 
@@ -73,6 +69,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                     OnPropertyChanged(nameof(TreeRepositoryHeadersVMs));
                     OnPropertyChanged(nameof(FavoriteTreeRepositoryHeadersVMs));
                     OnPropertyChanged(nameof(LastTreeRepositoryHeadersVMs));
+                    FavoriteTreeRepositoryHeadersVMs.View.Refresh();
+                    LastTreeRepositoryHeadersVMs.View.Refresh();
                 });
             }
         }
@@ -92,6 +90,39 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _configurationService = configurationService;
             _appConfig = appConfig;
             _treeRepositoryHeadersCollectionConfig = treeRepositoryHeadersCollectionConfig;
+
+            _treeRepositoryHeadersVMs = new ObservableCollection<TreeRepositoryHeaderVM>();
+            LoadTreeRepositoryHeadersVMs();
+
+            FavoriteTreeRepositoryHeadersVMs = new CollectionViewSource { Source = TreeRepositoryHeadersVMs };
+            FavoriteTreeRepositoryHeadersVMs.Filter += (s, e) =>
+            {
+                var item = e.Item as TreeRepositoryHeaderVM;
+                if (item == null) 
+                { 
+                    e.Accepted = false; 
+                    return; 
+                }
+                e.Accepted = item.IsFavorite;
+            };
+
+            LastTreeRepositoryHeadersVMs = new CollectionViewSource { Source = TreeRepositoryHeadersVMs };
+            LastTreeRepositoryHeadersVMs.Filter += (s, e) =>
+            {
+                var item = e.Item as TreeRepositoryHeaderVM;
+                if (item == null)
+                {
+                    e.Accepted = false;
+                    return;
+                }
+                e.Accepted = DateTime.UtcNow - item.LastOpening <= TimeSpan.FromDays(90);
+            };
+
+            TreeRepositoryHeadersVMs.CollectionChanged += (s, e) =>
+            {
+                FavoriteTreeRepositoryHeadersVMs.View.Refresh();
+                LastTreeRepositoryHeadersVMs.View.Refresh();
+            };
         }
         public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
         {
@@ -102,7 +133,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             CheckTreeRepositoryAvailableAction.Invoke(header);
             return header.IsTreeRepositoryAvailable;
         }
-        private List<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs() 
+        private ObservableCollection<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs() 
         {
             _treeRepositoryHeadersVMs.Clear();
             var headers = _service.GetTreeRepositoryHeadersCollection();
@@ -118,9 +149,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
             return TreeRepositoryHeadersVMs;
         }
-        internal TreeRepositoryHeaderVM AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
+        internal TreeRepositoryHeaderVM  AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
         {
             var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.Model);
+
+            _treeRepositoryHeadersCollectionConfig.Value.TreeRepositoryHeaders.Add(header.ToDbEntity());
+            _configurationService.UpdateConfigFile(_appConfig.Value.RepositoryHeadersConfigFullPath, _treeRepositoryHeadersCollectionConfig);
+
             var result = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders, _configurationService, _appConfig, _treeRepositoryHeadersCollectionConfig);
             TreeRepositoryHeadersVMs.Add(result);
             return result;
