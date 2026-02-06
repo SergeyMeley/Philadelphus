@@ -203,7 +203,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage)
         {
             var result = new TreeRepositoryModel(Guid.NewGuid(), dataStorage, new TreeRepository());
-            result.OwnDataStorage.TreeRepositoriesInfrastructureRepository.InsertRepository(result.ToDbEntity());
             return result;
         }
 
@@ -222,6 +221,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             result.OwnDataStorageUuid = treeRepositoryModel.OwnDataStorageUuid;
             result.IsFavorite = treeRepositoryModel.IsFavorite;
             result.State = treeRepositoryModel.State;
+            result.LastOpening = DateTime.UtcNow;
             return result;
         }
         /// <summary>

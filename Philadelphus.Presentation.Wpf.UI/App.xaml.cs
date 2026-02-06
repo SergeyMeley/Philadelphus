@@ -181,8 +181,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
                     services.AddSingleton<DataStoragesCollectionVM>();
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
-                    services.AddTransient<TreeRepositoryCollectionVM>();
-                    services.AddTransient<TreeRepositoryHeadersCollectionVM>();
+                    services.AddSingleton<TreeRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
+                    services.AddSingleton<TreeRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
                     services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
                     services.AddTransient<LaunchWindowTabItemControlVM>();

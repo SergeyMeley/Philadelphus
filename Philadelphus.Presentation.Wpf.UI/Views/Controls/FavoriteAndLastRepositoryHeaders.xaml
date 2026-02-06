@@ -19,10 +19,16 @@
             <ColumnDefinition Width="auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0" Header="Избранные">
-            <lbs:RepositoryHeadersListBox RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs}" RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
+            <lbs:RepositoryHeadersListBox 
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs.View}"
+                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}">
+            </lbs:RepositoryHeadersListBox>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Недавние">
-            <lbs:RepositoryHeadersListBox RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs}" RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}"></lbs:RepositoryHeadersListBox>
+            <lbs:RepositoryHeadersListBox 
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs.View}" 
+                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}">
+            </lbs:RepositoryHeadersListBox>
         </GroupBox>
         <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" IsExpanded="False" ExpandDirection="Right">
             <Expander.Header>

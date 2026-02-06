@@ -27,7 +27,7 @@
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description}" Margin="2"></TextBox>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Хранилище данных" Margin="2"></TextBlock>
-        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DataStoragesSettingsVM.TreeRepositoriesDataStorageVMs}" SelectedValue="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}" Margin="2">
+        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DataStoragesCollectionVM.TreeRepositoriesDataStorageVMs}" SelectedValue="{Binding DataStoragesCollectionVM.SelectedDataStorageVM}" Margin="2">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
