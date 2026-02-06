@@ -4,6 +4,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<AssemblyVersion>1.0.0.0</AssemblyVersion>
+	  
+	<FileVersion>1.0.0.0</FileVersion>
+	<Product>Philadelphus</Product>
+	<Company>Sergey Meley</Company>
+	<Copyright>© 2026 Sergey Meley</Copyright>
+	<PublishSingleFile>true</PublishSingleFile>
+	<SelfContained>false</SelfContained>
+	<PublishTrimmed>false</PublishTrimmed>
+	<AssemblyName>Philadelphus.Wpf</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
