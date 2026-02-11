@@ -9,6 +9,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -91,16 +92,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
         }
 
-        public async Task InitializeAsync(IEnumerable<string> pluginsFolderPaths)
+        public async Task InitializeAsync(IEnumerable<DirectoryInfo> pluginsFolderPaths)
         {
-            if (_extensionManager.GetExtensions()?.Count > 0)
+            if (Extensions.Count > 0
+                || _extensionManager.GetExtensions()?.Count > 0)
                 return;
             foreach (var path in pluginsFolderPaths)
             {
                 try
                 {
                     // Загружаем расширения из DLL
-                    await _extensionManager.LoadExtensionsAsync(path);
+                    await _extensionManager.LoadExtensionsAsync(path.FullName);
                     Debug.WriteLine($"Загружено расширений: {_extensionManager.GetExtensions().Count}");
                 }
                 catch (Exception ex)
