@@ -91,7 +91,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             LoadPhiladelphusRepository();
 
             _notificationService.SendTextMessage("Обозреватель репозитория. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
-            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesStrings);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
             _notificationService.SendTextMessage($"Обозреватель репозитория. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 
