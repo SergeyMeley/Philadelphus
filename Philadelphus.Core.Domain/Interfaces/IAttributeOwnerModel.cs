@@ -1,11 +1,12 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
     /// <summary>
     /// Владелец атрибутов
     /// </summary>
-    public interface IAttributeOwnerModel : IMainEntityModel, ILinkableByUuidModel
+    public interface IAttributeOwnerModel : IOwnerModel, IMainEntityModel, ILinkableByUuidModel
     {
         /// <summary>
         /// Имеет атрибуты

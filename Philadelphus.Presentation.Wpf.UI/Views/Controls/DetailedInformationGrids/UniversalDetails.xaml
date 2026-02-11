@@ -13,11 +13,11 @@
         <DataTemplate DataType="{x:Type infrast:DataStorageVM}">
             <local:DataStorageDetails></local:DataStorageDetails>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type mainent:TreeRepositoryHeaderVM}">
-            <local:TreeRepositoryHeaderDetails></local:TreeRepositoryHeaderDetails>
+        <DataTemplate DataType="{x:Type mainent:PhiladelphusRepositoryHeaderVM}">
+            <local:PhiladelphusRepositoryHeaderDetails></local:PhiladelphusRepositoryHeaderDetails>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type mainent:TreeRepositoryVM}">
-            <local:TreeRepositoryDetails></local:TreeRepositoryDetails>
+        <DataTemplate DataType="{x:Type mainent:PhiladelphusRepositoryVM}">
+            <local:PhiladelphusRepositoryDetails></local:PhiladelphusRepositoryDetails>
         </DataTemplate>
         <DataTemplate DataType="{x:Type repomem:TreeRootVM}">
             <Grid>
@@ -33,7 +33,7 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <local:TreeRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" ></local:TreeRepositoryMemberDetails>
+                <local:PhiladelphusRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" ></local:PhiladelphusRepositoryMemberDetails>
                 <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Text="Свойства корня:" FontWeight="Bold" Margin="2"></TextBlock>
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Количество узлов" Margin="2"></TextBlock>
 

@@ -88,7 +88,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     { nameof(ConnectionStringsCollectionConfig), typeof(ConnectionStringsCollectionConfig) },
                     { nameof(DataStoragesCollectionConfig), typeof(DataStoragesCollectionConfig) },
-                    { nameof(TreeRepositoryHeadersCollectionConfig), typeof(TreeRepositoryHeadersCollectionConfig) }
+                    { nameof(PhiladelphusRepositoryHeadersCollectionConfig), typeof(PhiladelphusRepositoryHeadersCollectionConfig) }
                 };
 
             foreach (var configFile in _appConfig.Value.ConfigurationFilesPathes)

@@ -36,12 +36,12 @@ namespace Philadelphus.Core.Domain.Mapping
             CreateMap<AuditInfoModel, AuditInfo>()
                 .ReverseMap();
 
-            CreateMap<TreeRepositoryModel, TreeRepository>()
+            CreateMap<PhiladelphusRepositoryModel, PhiladelphusRepository>()
             .ReverseMap()
             .ConstructUsing((src, dst) =>
             {
                 // Специальная логика создания
-                return new TreeRepositoryModel(
+                return new PhiladelphusRepositoryModel(
                     uuid: src.Uuid,
                     dataStorage: GetDataStorage(src.OwnDataStorageUuid), //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
                     dbEntity: src

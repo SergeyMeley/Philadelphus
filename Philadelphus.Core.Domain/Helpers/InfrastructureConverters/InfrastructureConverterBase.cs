@@ -1,11 +1,9 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -71,10 +69,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             //dbEntity.ConfigPath = businessEntity.ConfigPath;
             dbEntity.Uuid = businessEntity.Uuid;
             dbEntity.Name = businessEntity.Name;
-            dbEntity.Alias = businessEntity.Alias;
-            dbEntity.CustomCode = businessEntity.CustomCode;
             dbEntity.Description = businessEntity.Description;
-            dbEntity.IsLegacy = businessEntity.IsLegacy;
+            dbEntity.IsLegacy = businessEntity.IsHidden;
             dbEntity.AuditInfo.IsDeleted = businessEntity.AuditInfo.IsDeleted;
             dbEntity.AuditInfo.CreatedAt = businessEntity.AuditInfo.CreatedAt;
             dbEntity.AuditInfo.CreatedBy = businessEntity.AuditInfo.CreatedBy;
@@ -148,10 +144,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             //businessEntity.ConfigPath = dbEntity.ConfigPath;
             businessEntity.DbEntity = dbEntity;
             businessEntity.Name = dbEntity.Name;
-            businessEntity.Alias = dbEntity.Alias;
-            businessEntity.CustomCode = dbEntity.CustomCode;
             businessEntity.Description = dbEntity.Description;
-            businessEntity.IsLegacy = dbEntity.IsLegacy;
+            businessEntity.IsHidden = dbEntity.IsLegacy;
             businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
             businessEntity.AuditInfo.CreatedAt = dbEntity.AuditInfo.CreatedAt;
             businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;

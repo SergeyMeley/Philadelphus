@@ -1,4 +1,4 @@
-﻿namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers
+﻿namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers
 {
     public class TreeNodeMemberBase : TreeRootMemberBase
     {

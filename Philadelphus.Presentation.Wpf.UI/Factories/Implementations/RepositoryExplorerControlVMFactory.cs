@@ -12,7 +12,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         {
             _serviceProvider = serviceProvider;
         }
-        public RepositoryExplorerControlVM Create(TreeRepositoryVM repositoryVM)
+        public RepositoryExplorerControlVM Create(PhiladelphusRepositoryVM repositoryVM)
         {
             if (repositoryVM == null)
                 throw new ArgumentNullException();

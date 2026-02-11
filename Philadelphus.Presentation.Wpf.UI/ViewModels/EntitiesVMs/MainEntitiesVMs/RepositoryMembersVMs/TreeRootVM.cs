@@ -1,5 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
@@ -11,11 +10,30 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     {
         #region [ Props ]
 
-        private readonly ITreeRepositoryService _service;
-
-        private readonly TreeRootModel _model;
+        private readonly IPhiladelphusRepositoryService _service;
 
         private readonly ObservableCollection<TreeNodeVM> _childNodes = new ObservableCollection<TreeNodeVM>();
+
+        public string CustomCode
+        {
+            get
+            {
+                if (_model is TreeRootModel m)
+                {
+                    return m.CustomCode;
+                }
+                return string.Empty;
+            }
+            set
+            {
+                if (_model is TreeRootModel m)
+                {
+                    m.CustomCode = value;
+                    OnPropertyChanged(nameof(CustomCode));
+                    OnPropertyChanged(nameof(State));
+                }
+            }
+        }
         public ObservableCollection<TreeNodeVM> ChildNodes { get => _childNodes; }
         public CompositeCollection Childs { get; }
 
@@ -25,17 +43,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeRootVM(
             TreeRootModel treeRoot,
-            ITreeRepositoryService service) 
+            IPhiladelphusRepositoryService service) 
             : base(treeRoot, service)
         {
-                _service = service;
+            _service = service;
 
-            _model = treeRoot;
             if (treeRoot.Childs != null)
             {
-                foreach (var item in treeRoot.Childs)
+                foreach (var item in treeRoot.Childs.Values)
                 {
-                    if (item.GetType() == typeof(TreeNodeModel))
+                    if (item is TreeNodeModel)
                     {
                         _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
                     }
@@ -57,7 +74,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeNodeVM CreateTreeNode()
         {
-            var resultModel = _service.CreateTreeNode(_model);
+            var resultModel = _service.CreateTreeNode(_model as TreeRootModel);
             if (resultModel == null)
                 return null;
             var result = new TreeNodeVM(resultModel, _service);

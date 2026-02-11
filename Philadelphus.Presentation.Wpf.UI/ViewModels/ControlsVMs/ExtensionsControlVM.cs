@@ -24,9 +24,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private ExtensionInstanceVM _selectedExtension;
         private string _statusMessage;
         private bool _isExecuting;
-        private TreeRepositoryVM _repositoryVM;
+        private PhiladelphusRepositoryVM _repositoryVM;
 
-        public TreeRepositoryVM RepositoryVM
+        public PhiladelphusRepositoryVM RepositoryVM
         {
             get => _repositoryVM;
             set => SetProperty(ref _repositoryVM, value);

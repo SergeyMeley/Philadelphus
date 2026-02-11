@@ -36,11 +36,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private DataStoragesCollectionVM _dataStoragesCollectionVM;
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesCollectionVM; }
 
-        private TreeRepositoryCollectionVM _repositoryCollectionVM;
-        public TreeRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
+        private PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
+        public PhiladelphusRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
 
-        private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
-        public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
+        private PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
+        public PhiladelphusRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
 
         private StorageCreationControlVM _storageCreationControlVM;
         public StorageCreationControlVM StorageCreationControlVM { get => _storageCreationControlVM; }
@@ -54,8 +54,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             DataStoragesCollectionVM dataStoragesCollectionVM,
-            TreeRepositoryCollectionVM repositoryCollectionVM,
-            TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
+            PhiladelphusRepositoryCollectionVM repositoryCollectionVM,
+            PhiladelphusRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
             StorageCreationControlVM storageCreationControlVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
             ApplicationCommandsVM applicationCommandsVM,
@@ -65,7 +65,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
-            _repositoryHeadersCollectionVM.CheckTreeRepositoryAvailableAction = x => CheckTreeRepositoryAvailable(x);
+            _repositoryHeadersCollectionVM.CheckPhiladelphusRepositoryAvailableAction = x => CheckPhiladelphusRepositoryAvailable(x);
             _storageCreationControlVM = storageCreationControlVM;
             _repositoryCreationVM = repositoryCreationControlVM;
             _applicationSettingsControlVM = applicationSettingsControlVM;
@@ -84,8 +84,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(
                     obj =>
                 {
-                    var headerVM = RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM;
-                    RepositoryCollectionVM.CurrentRepositoryVM = RepositoryCollectionVM.TreeRepositoriesVMs.FirstOrDefault(x => x.Uuid == headerVM.Uuid);
+                    var headerVM = RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM;
+                    RepositoryCollectionVM.CurrentRepositoryVM = RepositoryCollectionVM.PhiladelphusRepositoriesVMs.FirstOrDefault(x => x.Uuid == headerVM.Uuid);
 
                     if (OpenMainWindowCommand.CanExecute(obj))
                         OpenMainWindowCommand.Execute(obj);
@@ -94,11 +94,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     if (RepositoryHeadersCollectionVM == null)
                         return false;
-                    if (RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM == null)
+                    if (RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM == null)
                         return false;
-                    if (RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM is TreeRepositoryHeaderVM == false)
+                    if (RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM is PhiladelphusRepositoryHeaderVM == false)
                         return false;
-                    return RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM.IsTreeRepositoryAvailable;
+                    return RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM.IsPhiladelphusRepositoryAvailable;
                 });
                 
             }
@@ -125,7 +125,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
-        private bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
+        private bool CheckPhiladelphusRepositoryAvailable(PhiladelphusRepositoryHeaderVM header)
         {
             if (header == null)
                 return false;
@@ -143,26 +143,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             //    return false;
             //}
 
-            if (RepositoryCollectionVM.CheckTreeRepositoryVMAvailable(header.Uuid, out var treeRepositoryVM))
+            if (RepositoryCollectionVM.CheckPhiladelphusRepositoryVMAvailable(header.Uuid, out var PhiladelphusRepositoryVM))
             {
-                if (treeRepositoryVM != null)
+                if (PhiladelphusRepositoryVM != null)
                 {
-                    header.IsTreeRepositoryAvailable = true;
-                    if (header.Name != treeRepositoryVM.Name)
-                        header.Name = treeRepositoryVM.Name;
-                    if (header.Description != treeRepositoryVM.Description)
-                        header.Description = treeRepositoryVM.Description;
-                    if (header.OwnDataStorageName != treeRepositoryVM.OwnDataStorage.Name)
-                        header.OwnDataStorageName = treeRepositoryVM.OwnDataStorage.Name;
-                    if (header.OwnDataStorageUuid != treeRepositoryVM.OwnDataStorage.Uuid)
-                        header.OwnDataStorageUuid = treeRepositoryVM.OwnDataStorage.Uuid;
+                    header.IsPhiladelphusRepositoryAvailable = true;
+                    if (header.Name != PhiladelphusRepositoryVM.Name)
+                        header.Name = PhiladelphusRepositoryVM.Name;
+                    if (header.Description != PhiladelphusRepositoryVM.Description)
+                        header.Description = PhiladelphusRepositoryVM.Description;
+                    if (header.OwnDataStorageName != PhiladelphusRepositoryVM.OwnDataStorage.Name)
+                        header.OwnDataStorageName = PhiladelphusRepositoryVM.OwnDataStorage.Name;
+                    if (header.OwnDataStorageUuid != PhiladelphusRepositoryVM.OwnDataStorage.Uuid)
+                        header.OwnDataStorageUuid = PhiladelphusRepositoryVM.OwnDataStorage.Uuid;
                     return true;
                 }
                 return false;
             }
             else
             {
-                header.IsTreeRepositoryAvailable = false;
+                header.IsPhiladelphusRepositoryAvailable = false;
                 return false;
             }
                 

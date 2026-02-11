@@ -68,6 +68,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
+                    if (string.IsNullOrEmpty(Name)
+                        || SelectedConnectionStringContainer == null)
+                    {
+                        MessageBox.Show($"Некорректно заполнены параметры, операция не выполнена.");
+                        return;
+                    }
+                    if (_dataStoragesCollectionConfig.Value.DataStorages.Any(x => x.Name == Name))
+                    {
+                        MessageBox.Show($"Хранилище '{Name}' уже существует, операция не выполнена.");
+                        return;
+                    }
+
                     var model = _service.CreateDataStorageModel(Name, Description, SelectedConnectionStringContainer);
                     var vm = new DataStorageVM(model);
                     var entity = model.ToDbEntity();

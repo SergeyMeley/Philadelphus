@@ -1,6 +1,8 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -17,9 +19,9 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 return null;
             var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             result.ParentUuid = businessEntity.Parent.Uuid;
-            result.ParentTreeRootUuid = businessEntity.ParentRoot.Uuid;     //TODO: ВРЕМЕННО
+            result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.Uuid;     //TODO: ВРЕМЕННО
             //result.ParentRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
-            //result.ParentRoot = (TreeRoot)TreeRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
+            //result.ParentRoot = (TreeRoot)PhiladelphusRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
             return result;
         }
 
@@ -50,7 +52,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeNodeModel(dbEntity.Uuid, parent, dbEntity);
+
+            WorkingTreeModel owner = null;
+            if (parent is TreeNodeModel node)
+                owner = node.OwningWorkingTree;
+            if (parent is TreeRootModel root)
+                owner = root.OwningWorkingTree;
+            var result = new TreeNodeModel(dbEntity.Uuid, parent, owner, dbEntity);
             result = (TreeNodeModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }

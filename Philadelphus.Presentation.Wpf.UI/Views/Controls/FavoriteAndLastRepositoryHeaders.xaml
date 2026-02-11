@@ -20,14 +20,14 @@
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0" Header="Избранные">
             <lbs:RepositoryHeadersListBox 
-                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoriteTreeRepositoryHeadersVMs.View}"
-                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}">
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoritePhiladelphusRepositoryHeadersVMs.View}"
+                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}">
             </lbs:RepositoryHeadersListBox>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Недавние">
             <lbs:RepositoryHeadersListBox 
-                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastTreeRepositoryHeadersVMs.View}" 
-                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM, Mode=TwoWay}">
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastPhiladelphusRepositoryHeadersVMs.View}" 
+                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}">
             </lbs:RepositoryHeadersListBox>
         </GroupBox>
         <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" IsExpanded="False" ExpandDirection="Right">
@@ -38,7 +38,7 @@
                     </TextBlock.LayoutTransform>
                 </TextBlock>
             </Expander.Header>
-            <detail:UniversalDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedTreeRepositoryHeaderVM}"></detail:UniversalDetails>
+            <detail:UniversalDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM}"></detail:UniversalDetails>
         </Expander>
         <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
     </Grid>

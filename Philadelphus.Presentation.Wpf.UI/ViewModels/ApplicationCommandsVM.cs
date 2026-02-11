@@ -24,10 +24,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                     var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
                     if (currentRepositoryVM != null)
                     {
-                        var headerVM = launchVM.RepositoryHeadersCollectionVM.TreeRepositoryHeadersVMs.FirstOrDefault(x => x.Uuid == currentRepositoryVM.Uuid);
+                        var headerVM = launchVM.RepositoryHeadersCollectionVM.PhiladelphusRepositoryHeadersVMs.FirstOrDefault(x => x.Uuid == currentRepositoryVM.Uuid);
                         if (headerVM == null)
                         {
-                            headerVM = launchVM.RepositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(currentRepositoryVM);
+                            headerVM = launchVM.RepositoryHeadersCollectionVM.AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(currentRepositoryVM);
                         }
                         headerVM.LastOpening = DateTime.UtcNow;
                     }
@@ -37,7 +37,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                     var mainWindowVM = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(repositoryExplorerControlVM);
                     var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
                     //context.RepositoryExplorerVM = _serviceProvider.GetRequiredService<RepositoryExplorerControlVM>();
-                    //context.RepositoryExplorerVM.TreeRepositoryVM = appVM.RepositoryCollectionVM.CurrentRepositoryVM;
+                    //context.RepositoryExplorerVM.PhiladelphusRepositoryVM = appVM.RepositoryCollectionVM.CurrentRepositoryVM;
                     mainWindow.DataContext = mainWindowVM;
                     mainWindow.Show();
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();

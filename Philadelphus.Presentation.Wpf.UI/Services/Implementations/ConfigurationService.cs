@@ -27,17 +27,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollectionConfig;
-        private readonly IOptions<TreeRepositoryHeadersCollectionConfig> _treeRepositoryHeadersCollectionConfig;
+        private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _PhiladelphusRepositoryHeadersCollectionConfig;
         public ConfigurationService(
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
             IOptions<DataStoragesCollectionConfig> dataStoragesCollectionConfig,
-            IOptions<TreeRepositoryHeadersCollectionConfig> treeRepositoryHeadersCollectionConfig)
+            IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollectionConfig)
         {
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _dataStoragesCollectionConfig = dataStoragesCollectionConfig;
-            _treeRepositoryHeadersCollectionConfig = treeRepositoryHeadersCollectionConfig;
+            _PhiladelphusRepositoryHeadersCollectionConfig = PhiladelphusRepositoryHeadersCollectionConfig;
         }
 
         public bool MoveConfigFile(FileInfo configFile, DirectoryInfo newDirectory)

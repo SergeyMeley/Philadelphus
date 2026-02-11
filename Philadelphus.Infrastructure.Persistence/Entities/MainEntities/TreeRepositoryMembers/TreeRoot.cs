@@ -1,12 +1,11 @@
-﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 
-namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers
+namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers
 {
 
     public class TreeRoot : MainEntityBase
     {
         public Guid OwnDataStorageUuid { get; set; }
-        public Guid[] DataStoragesUuids { get; set; }   //TODO: Удалить
         public virtual TreeNode[] ChildTreeNodes { get; set; }
         public TreeRoot()
         {

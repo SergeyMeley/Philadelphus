@@ -1,7 +1,10 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -17,8 +20,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = (TreeRoot)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.OwnDataStorageUuid = businessEntity.OwnDataStorage.Uuid;
-            result.DataStoragesUuids = businessEntity.DataStorages.Select(x => x.Uuid).ToArray();
+            result.OwnDataStorageUuid = businessEntity.DataStorage.Uuid;
             return result;
         }
 
@@ -44,17 +46,21 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="dbEntity">Сущность БД</param>
         /// <param name="dataStorages">Доступные хранилища данных</param>
-        /// <param name="treeRepositories">Доступные репозитории Чубушника</param>
+        /// <param name="repositories">Доступные репозитории Чубушника</param>
         /// <returns></returns>
-        public static TreeRootModel ToModel(this TreeRoot dbEntity, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<TreeRepositoryModel> treeRepositories)
+        public static TreeRootModel ToModel(this TreeRoot dbEntity, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<PhiladelphusRepositoryModel> repositories)
         {
             if (dbEntity == null)
                 return null;
             var dataStorage = dataStorages.FirstOrDefault(x => x.Uuid == dbEntity.OwnDataStorageUuid);
-            var treeRepository = treeRepositories.FirstOrDefault(x => x.ChildsUuids.Any(g => g == dbEntity.Uuid));
-            var result = new TreeRootModel(dbEntity.Uuid, treeRepository, dataStorage, dbEntity);
-            result = (TreeRootModel)dbEntity.ToModelGeneralProperties(result);
-            return result;
+            var repository = repositories.FirstOrDefault(x => x.ContentShrub.ContentTreesUuids.Any(g => g == dbEntity.Uuid));
+            var shrub = new ShrubModel(dbEntity.Uuid, repository.DbEntity as PhiladelphusRepository, repository);
+            var tree = new WorkingTreeModel(dbEntity.Uuid, dataStorage, dbEntity, shrub);
+            var root = new TreeRootModel(dbEntity.Uuid, tree, dbEntity);
+            root = (TreeRootModel)dbEntity.ToModelGeneralProperties(root);
+            tree.ContentRoot = root;
+            root = tree.ContentRoot;
+            return root;
         }
 
         /// <summary>
@@ -62,16 +68,16 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
         /// <param name="dataStorages">Коллекция доступных хранилищ данных</param>
-        /// <param name="treeRepositories">Коллекция доступных репозиториев Чубушника</param>
+        /// <param name="PhiladelphusRepositories">Коллекция доступных репозиториев Чубушника</param>
         /// <returns></returns>
-        public static List<TreeRootModel> ToModelCollection(this IEnumerable<TreeRoot> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<TreeRepositoryModel> treeRepositories)
+        public static List<TreeRootModel> ToModelCollection(this IEnumerable<TreeRoot> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages, IEnumerable<PhiladelphusRepositoryModel> PhiladelphusRepositories)
         {
             if (dbEntityCollection == null)
                 return null;
             var result = new List<TreeRootModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                result.Add(dbEntity.ToModel(dataStorages, treeRepositories));
+                result.Add(dbEntity.ToModel(dataStorages, PhiladelphusRepositories));
             }
             return result;
         }

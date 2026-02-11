@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
@@ -9,8 +9,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     {
         #region [ Props ]
 
-        private readonly ITreeRepositoryService _service;
+        private readonly IPhiladelphusRepositoryService _service;
         private readonly TreeNodeModel _model;
+
+        public string Alias
+        {
+            get
+            {
+                return _model.Alias;
+            }
+            set
+            {
+                _model.Alias = value;
+                OnPropertyChanged(nameof(Alias));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+
+        public string CustomCode
+        {
+            get
+            {
+                return _model.CustomCode;
+            }
+            set
+            {
+                _model.CustomCode = value;
+                OnPropertyChanged(nameof(CustomCode));
+                OnPropertyChanged(nameof(State));
+            }
+        }
 
         private readonly ObservableCollection<TreeNodeVM> _childNodes = new ObservableCollection<TreeNodeVM>();
         public ObservableCollection<TreeNodeVM> ChildNodes { get => _childNodes; }
@@ -25,23 +53,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeNodeVM(
             TreeNodeModel treeNode,
-            ITreeRepositoryService service) 
+            IPhiladelphusRepositoryService service) 
             : base(treeNode,  service)
         {
             _service = service;
 
             _model = treeNode;
-            foreach (var item in treeNode.Childs)
+            foreach (var item in treeNode.ChildTreeNodes)
             {
-                if (item.GetType() == typeof(TreeNodeModel))
-                {
-                    _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
-                }
-                else if (item.GetType() == typeof(TreeLeaveModel))
-                {
-                    _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, _service));
-                }
+                _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
             }
+            foreach (var item in treeNode.ChildTreeLeaves)
+            {
+                _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, _service));
+            }
+
             Childs = new CompositeCollection()
             {
                 new CollectionContainer { Collection = _childNodes },

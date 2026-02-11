@@ -71,18 +71,18 @@
       <FileName>Interfaces\IMainEntitiesInfrastructureRepository.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Philadelphus.Infrastructure.Persistence.Interfaces.ITreeRepositoriesInfrastructureRepository">
+  <Interface Name="Philadelphus.Infrastructure.Persistence.Interfaces.IPhiladelphusRepositoriesInfrastructureRepository">
     <Position X="13.5" Y="2.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAACACAAAAAIAAAAAAAAAAAEAAAAAAAAA=</HashCode>
-      <FileName>Interfaces\ITreeRepositoriesInfrastructureRepository.cs</FileName>
+      <FileName>Interfaces\IPhiladelphusRepositoriesInfrastructureRepository.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Philadelphus.Infrastructure.Persistence.Interfaces.ITreeRepositoryHeadersCollectionInfrastructureRepository">
+  <Interface Name="Philadelphus.Infrastructure.Persistence.Interfaces.IPhiladelphusRepositoryHeadersCollectionInfrastructureRepository">
     <Position X="1.25" Y="2.5" Width="4" />
     <TypeIdentifier>
       <HashCode>AAAAAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces\ITreeRepositoryHeadersCollectionInfrastructureRepository.cs</FileName>
+      <FileName>Interfaces\IPhiladelphusRepositoryHeadersCollectionInfrastructureRepository.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

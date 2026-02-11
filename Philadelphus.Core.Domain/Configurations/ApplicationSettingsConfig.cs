@@ -100,7 +100,7 @@ namespace Philadelphus.Core.Domain.Configurations
         {
             get
             {
-                TryGetConfigFileFullPath<TreeRepositoryHeadersCollectionConfig>(out var result);
+                TryGetConfigFileFullPath<PhiladelphusRepositoryHeadersCollectionConfig>(out var result);
                 return result;
             }
         }

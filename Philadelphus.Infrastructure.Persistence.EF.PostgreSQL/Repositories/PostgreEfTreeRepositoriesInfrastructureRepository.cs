@@ -9,17 +9,17 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
-    public class PostgreEfTreeRepositoriesInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
+    public class PostgreEfPhiladelphusRepositoriesInfrastructureRepository : IPhiladelphusRepositoriesInfrastructureRepository
     {
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.TreeRepositories; }
+        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.PhiladelphusRepositories; }
 
         private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
 
-        private TreeRepositoriesPhiladelphusContext _context;
-        public PostgreEfTreeRepositoriesInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
+        private PhiladelphusRepositoriesPhiladelphusContext _context;
+        public PostgreEfPhiladelphusRepositoriesInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
         {
             _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой   
-            _context = new TreeRepositoriesPhiladelphusContext(connectionString);
+            _context = new PhiladelphusRepositoriesPhiladelphusContext(connectionString);
 
             if (CheckAvailability())
             {
@@ -58,13 +58,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 return true;
             }
         }
-        private TreeRepositoriesPhiladelphusContext GetNewContext() => new TreeRepositoriesPhiladelphusContext(_connectionString);
-        public IEnumerable<TreeRepository> SelectRepositories()
+        private PhiladelphusRepositoriesPhiladelphusContext GetNewContext() => new PhiladelphusRepositoriesPhiladelphusContext(_connectionString);
+        public IEnumerable<PhiladelphusRepository> SelectRepositories()
         {
             if (CheckAvailability() == false)
                 return null;
 
-            List<TreeRepository> result = null;
+            List<PhiladelphusRepository> result = null;
 
             using (var context = GetNewContext())
             {
@@ -73,12 +73,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeRepository> SelectRepositories(Guid[] uuids)
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(Guid[] uuids)
         {
             if (CheckAvailability() == false)
                 return null;
 
-            List<TreeRepository> result = null;
+            List<PhiladelphusRepository> result = null;
 
             using (var context = GetNewContext())
             {
@@ -91,7 +91,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             return result;
         }
 
-        public long InsertRepository(TreeRepository item)
+        public long InsertRepository(PhiladelphusRepository item)
         {
             if (CheckAvailability() == false)
                 return -1;
@@ -108,7 +108,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public long UpdateRepository(TreeRepository item)
+        public long UpdateRepository(PhiladelphusRepository item)
         {
             if (CheckAvailability() == false)
                 return -1;
@@ -125,7 +125,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public long DeleteRepository(TreeRepository item)
+        public long DeleteRepository(PhiladelphusRepository item)
         {
             if (CheckAvailability() == false)
                 return -1;

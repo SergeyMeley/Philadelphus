@@ -2,7 +2,7 @@
 {
     public enum InfrastructureEntityGroups
     {
-        TreeRepositories,
+        PhiladelphusRepositories,
         MainEntities,
     }
 }

@@ -4,22 +4,22 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {
-    public partial class TreeRepositoriesPhiladelphusContext : DbContext
+    public partial class PhiladelphusRepositoriesPhiladelphusContext : DbContext
     {
         private readonly string _connectionString;
-        public TreeRepositoriesPhiladelphusContext()
+        public PhiladelphusRepositoriesPhiladelphusContext()
         {
         }
-        public TreeRepositoriesPhiladelphusContext(string connectionString)
+        public PhiladelphusRepositoriesPhiladelphusContext(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public TreeRepositoriesPhiladelphusContext(DbContextOptions<TreeRepositoriesPhiladelphusContext> options)
+        public PhiladelphusRepositoriesPhiladelphusContext(DbContextOptions<PhiladelphusRepositoriesPhiladelphusContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<TreeRepository> Repositories { get; set; }
+        public virtual DbSet<PhiladelphusRepository> Repositories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,7 +33,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new TreeRepositoryConfiguration());
+            modelBuilder.ApplyConfiguration(new PhiladelphusRepositoryConfiguration());
             OnModelCreatingPartial(modelBuilder);
         }
 

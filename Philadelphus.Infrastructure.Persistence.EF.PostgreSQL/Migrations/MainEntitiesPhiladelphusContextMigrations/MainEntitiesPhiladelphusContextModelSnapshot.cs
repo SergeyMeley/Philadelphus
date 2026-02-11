@@ -25,7 +25,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.ElementAttribute", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRoot", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
@@ -41,6 +41,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("custom_code");
 
+                    b.PrimitiveCollection<Guid[]>("DataStoragesUuids")
+                        .IsRequired()
+                        .HasColumnType("uuid[]");
+
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
@@ -54,29 +58,21 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("OwnerUuid")
+                    b.Property<Guid>("OwnDataStorageUuid")
                         .HasColumnType("uuid")
-                        .HasColumnName("owner_uuid");
+                        .HasColumnName("data_storage_uuid");
 
                     b.Property<long?>("Sequence")
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
-                    b.Property<Guid?>("ValueTypeUuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("value_type_uuid");
-
-                    b.Property<Guid?>("ValueUuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("value_uuid");
-
                     b.HasKey("Uuid")
-                        .HasName("element_attributes_pkey");
+                        .HasName("tree_roots_pkey");
 
-                    b.ToTable("element_attributes", "main_entities");
+                    b.ToTable("tree_roots", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeLeave", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers.TreeLeave", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
@@ -128,7 +124,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.ToTable("tree_leaves", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers.TreeNode", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
@@ -187,7 +183,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.ToTable("tree_nodes", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
@@ -203,10 +199,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("custom_code");
 
-                    b.PrimitiveCollection<Guid[]>("DataStoragesUuids")
-                        .IsRequired()
-                        .HasColumnType("uuid[]");
-
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
@@ -220,25 +212,33 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("OwnDataStorageUuid")
+                    b.Property<Guid>("OwnerUuid")
                         .HasColumnType("uuid")
-                        .HasColumnName("data_storage_uuid");
+                        .HasColumnName("owner_uuid");
 
                     b.Property<long?>("Sequence")
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
-                    b.HasKey("Uuid")
-                        .HasName("tree_roots_pkey");
+                    b.Property<Guid?>("ValueTypeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("value_type_uuid");
 
-                    b.ToTable("tree_roots", "main_entities");
+                    b.Property<Guid?>("ValueUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("value_uuid");
+
+                    b.HasKey("Uuid")
+                        .HasName("element_attributes_pkey");
+
+                    b.ToTable("element_attributes", "main_entities");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.ElementAttribute", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRoot", b =>
                 {
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
-                            b1.Property<Guid>("ElementAttributeUuid")
+                            b1.Property<Guid>("TreeRootUuid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
@@ -251,12 +251,16 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnName("content_updated_by");
 
                             b1.Property<DateTime>("CreatedAt")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at");
+                                .HasColumnName("created_at")
+                                .HasDefaultValueSql("NOW()");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("text")
+                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
@@ -281,29 +285,29 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnType("text")
                                 .HasColumnName("updated_by");
 
-                            b1.HasKey("ElementAttributeUuid");
+                            b1.HasKey("TreeRootUuid");
 
-                            b1.ToTable("element_attributes", "main_entities");
+                            b1.ToTable("tree_roots", "main_entities");
 
                             b1.WithOwner()
-                                .HasForeignKey("ElementAttributeUuid");
+                                .HasForeignKey("TreeRootUuid");
                         });
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeLeave", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers.TreeLeave", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", "ParentTreeRoot")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRoot", "ParentTreeRoot")
                         .WithMany()
                         .HasForeignKey("ParentTreeRootUuid");
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", "ParentTreeNode")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers.TreeNode", "ParentTreeNode")
                         .WithMany()
                         .HasForeignKey("ParentUuid");
 
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeLeaveUuid")
                                 .ValueGeneratedOnAdd()
@@ -368,21 +372,21 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Navigation("ParentTreeRoot");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers.TreeNode", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", "ParentTreeNode")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers.TreeNode", "ParentTreeNode")
                         .WithMany()
                         .HasForeignKey("ParentTreeNodeUuid");
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", "ParentTreeRoot")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRoot", "ParentTreeRoot")
                         .WithMany()
                         .HasForeignKey("ParentTreeRootUuid");
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", null)
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRoot", null)
                         .WithMany("ChildTreeNodes")
                         .HasForeignKey("TreeRootUuid");
 
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeNodeUuid")
                                 .ValueGeneratedOnAdd()
@@ -447,11 +451,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Navigation("ParentTreeRoot");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
-                            b1.Property<Guid>("TreeRootUuid")
+                            b1.Property<Guid>("ElementAttributeUuid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
@@ -464,16 +468,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnName("content_updated_by");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at")
-                                .HasDefaultValueSql("NOW()");
+                                .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("text")
-                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
@@ -498,19 +498,19 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnType("text")
                                 .HasColumnName("updated_by");
 
-                            b1.HasKey("TreeRootUuid");
+                            b1.HasKey("ElementAttributeUuid");
 
-                            b1.ToTable("tree_roots", "main_entities");
+                            b1.ToTable("element_attributes", "main_entities");
 
                             b1.WithOwner()
-                                .HasForeignKey("TreeRootUuid");
+                                .HasForeignKey("ElementAttributeUuid");
                         });
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRoot", b =>
                 {
                     b.Navigation("ChildTreeNodes");
                 });

@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
-    public class PostgreEfMainEntitiesInfrastructureRepository : ITreeRepositoriesMembersInfrastructureRepository
+    public class PostgreEfMainEntitiesInfrastructureRepository : IPhiladelphusRepositoriesMembersInfrastructureRepository
     {
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntities; }
 

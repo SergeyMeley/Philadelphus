@@ -1,5 +1,5 @@
-﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities

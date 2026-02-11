@@ -36,12 +36,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Репозиторий БД работы с репозиториями Чубушника
         /// </summary>
-        public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository { get; }
+        public IPhiladelphusRepositoriesInfrastructureRepository PhiladelphusRepositoriesInfrastructureRepository { get; }
 
         /// <summary>
         /// Репозиторий БД работы с участниками репозитория Чубушника
         /// </summary>
-        public ITreeRepositoriesMembersInfrastructureRepository TreeRepositoryMembersInfrastructureRepository { get; }
+        public IPhiladelphusRepositoriesMembersInfrastructureRepository PhiladelphusRepositoryMembersInfrastructureRepository { get; }
 
 
         /// <summary>
