@@ -1,4 +1,6 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
@@ -170,7 +172,83 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ Methods ]
 
+        /// <summary>
+        /// Добавить атрибут
+        /// </summary>
+        /// <param name="attribute">Атрибут</param>
+        public void AddAttribute(ElementAttributeModel attribute)
+        {
+            Attributes.Add(attribute);
+         }
 
+        /// <summary>
+        /// Удалить атрибут
+        /// </summary>
+        /// <param name="attribute">Атрибут</param>
+        public void RemoveAttribute(ElementAttributeModel attribute)
+        {
+            Attributes.Remove(attribute);
+        }
+
+        public IEnumerable<ElementAttributeModel> GetVisibleAttributes(IWorkingTreeMemberModel? viewer)
+        {
+            if (viewer == null) yield break;
+
+            foreach (var attr in Attributes)
+            {
+                var res = attr.Visibility switch
+                {
+                    VisibilityScope.Public => true,
+                    VisibilityScope.Private => IsSameNodeOrLeaf(viewer),
+                    VisibilityScope.Internal => IsSameRoot(viewer),
+                    VisibilityScope.Protected => IsDescendantOrSelf(viewer),
+                    VisibilityScope.InternalProtected => IsSameRoot(viewer) || IsDescendantOrSelf(viewer),
+                    _ => false
+                };
+
+                if (res)
+                    yield return attr;
+            }
+        }
+
+        private bool IsSameNodeOrLeaf(IWorkingTreeMemberModel viewer)
+        {
+            if (viewer is TreeNodeModel n
+                && n.Uuid == Uuid)
+            {
+                return true;
+            }
+            if (viewer is TreeLeaveModel l
+                && l.ParentNode.Uuid == Uuid)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsSameRoot(IWorkingTreeMemberModel viewer)
+        {
+            if (this is IWorkingTreeMemberModel wtm)
+            {
+                if (viewer.OwningWorkingTree.Uuid == wtm.Uuid)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsDescendantOrSelf(IWorkingTreeMemberModel viewer)
+        {
+            //var current = this;
+            //while (current != null)
+            //{
+            //    if (current.Id == viewer.Id) return true;
+            //    // Подняться к родителю (требует ссылки на родителя или рекурсия по дереву)
+            //    current = OwningShrub.ContentTrees.SelectMany(x => x.AllContentRecursive);
+            //}
+            return false;
+        }
 
         #endregion
     }

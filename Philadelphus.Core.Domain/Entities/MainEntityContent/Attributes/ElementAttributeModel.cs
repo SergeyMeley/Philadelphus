@@ -47,6 +47,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public IEnumerable<TreeLeaveModel>? ValuesList { get; set; }
 
+        /// <summary>
+        /// Область видимости
+        /// </summary>
+        public VisibilityScope Visibility { get; set; } = VisibilityScope.Public;
+
+        /// <summary>
+        /// Возможность переопределения
+        /// </summary>
+        public OverrideType Override { get; set; } = OverrideType.None;
+
         #endregion
 
         #region [ Hierarchy Properties ]
@@ -65,7 +75,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Все владельцы (рекурсивно)
         /// </summary>
-        public ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive { get => throw new NotImplementedException(); }
+        public ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive 
+        { 
+            get => throw new NotImplementedException(); 
+        }
 
         #endregion
 
@@ -114,25 +127,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 
         #region [ Methods ]
 
-
-
-        #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// Сменить владельца
         /// </summary>
@@ -140,5 +134,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             throw new NotImplementedException();
         }
+
+        #endregion
     }
 }

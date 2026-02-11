@@ -27,5 +27,17 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Коллекция атрибутов унаследованных
         /// </summary>
         public List<ElementAttributeModel> ParentElementAttributes { get; }
+
+        /// <summary>
+        /// Добавить атрибут
+        /// </summary>
+        /// <param name="attribute">Атрибут</param>
+        public void AddAttribute(ElementAttributeModel attribute);
+
+        /// <summary>
+        /// Удалить атрибут
+        /// </summary>
+        /// <param name="attribute">Атрибут</param>
+        public void RemoveAttribute(ElementAttributeModel attribute);
     }
 }
