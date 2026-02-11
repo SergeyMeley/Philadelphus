@@ -4,9 +4,9 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 {
-    public class TreeRepositoryConfiguration : IEntityTypeConfiguration<TreeRepository>
+    public class PhiladelphusRepositoryConfiguration : IEntityTypeConfiguration<PhiladelphusRepository>
     {
-        public void Configure(EntityTypeBuilder<TreeRepository> builder)
+        public void Configure(EntityTypeBuilder<PhiladelphusRepository> builder)
         {
             builder.ToTable("tree_repositories", "repositories");
 
@@ -24,6 +24,14 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 
             builder.Property(x => x.Description)
                 .HasColumnName("description");
+            builder.Property(x => x.Sequence)
+                .HasColumnName("sequence");
+            builder.Property(x => x.Alias)
+                .HasColumnName("alias");
+            builder.Property(x => x.CustomCode)
+                .HasColumnName("custom_code");
+            builder.Property(x => x.IsLegacy)
+                .HasColumnName("is_legacy").HasDefaultValue(false);
 
             builder.Property(x => x.OwnDataStorageUuid)
                 .HasColumnName("data_storage_uuid")

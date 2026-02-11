@@ -3,11 +3,11 @@
 namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids
 {
     /// <summary>
-    /// Логика взаимодействия для TreeRepositoryDetails.xaml
+    /// Логика взаимодействия для PhiladelphusRepositoryDetails.xaml
     /// </summary>
-    public partial class TreeRepositoryDetails : UserControl
+    public partial class PhiladelphusRepositoryDetails : UserControl
     {
-        public TreeRepositoryDetails()
+        public PhiladelphusRepositoryDetails()
         {
             InitializeComponent();
         }

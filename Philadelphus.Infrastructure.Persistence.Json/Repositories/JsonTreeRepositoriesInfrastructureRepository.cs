@@ -9,45 +9,45 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 {
-    public class JsonTreeRepositoriesInfrastructureRepository : ITreeRepositoriesInfrastructureRepository
+    public class JsonPhiladelphusRepositoriesInfrastructureRepository : IPhiladelphusRepositoriesInfrastructureRepository
     {
         private DirectoryInfo _baseDirectory;
-        public JsonTreeRepositoriesInfrastructureRepository(DirectoryInfo baseDirectory)
+        public JsonPhiladelphusRepositoriesInfrastructureRepository(DirectoryInfo baseDirectory)
         {
             _baseDirectory = baseDirectory;
         }
-        public InfrastructureEntityGroups EntityGroup => InfrastructureEntityGroups.TreeRepositories;
+        public InfrastructureEntityGroups EntityGroup => InfrastructureEntityGroups.PhiladelphusRepositories;
 
         public bool CheckAvailability()
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteRepository(TreeRepository item)
+        public long DeleteRepository(PhiladelphusRepository item)
         {
             throw new NotImplementedException();
         }
 
-        public long InsertRepository(TreeRepository item)
+        public long InsertRepository(PhiladelphusRepository item)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeRepository> SelectRepositories()
-        {
-            //TODO: Временный костыль
-            return new List<TreeRepository>();
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeRepository> SelectRepositories(Guid[] uuids)
+        public IEnumerable<PhiladelphusRepository> SelectRepositories()
         {
             //TODO: Временный костыль
-            return new List<TreeRepository>();
+            return new List<PhiladelphusRepository>();
             throw new NotImplementedException();
         }
 
-        public long UpdateRepository(TreeRepository item)
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(Guid[] uuids)
+        {
+            //TODO: Временный костыль
+            return new List<PhiladelphusRepository>();
+            throw new NotImplementedException();
+        }
+
+        public long UpdateRepository(PhiladelphusRepository item)
         {
             throw new NotImplementedException();
         }

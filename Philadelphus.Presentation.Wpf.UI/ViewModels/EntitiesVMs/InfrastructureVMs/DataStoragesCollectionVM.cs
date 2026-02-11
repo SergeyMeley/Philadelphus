@@ -41,11 +41,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 OnPropertyChanged(nameof(DataStorageVMs));
             }
         }
-        public IEnumerable<DataStorageVM>? TreeRepositoriesDataStorageVMs
+        public IEnumerable<DataStorageVM>? PhiladelphusRepositoriesDataStorageVMs
         {
             get
             {
-                return _dataStorageVMs.Where(x => x.HasTreeRepositoriesInfrastructureRepository);
+                return _dataStorageVMs.Where(x => x.HasPhiladelphusRepositoriesInfrastructureRepository);
             }
         }
 

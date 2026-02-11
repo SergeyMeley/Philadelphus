@@ -3,18 +3,18 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
-    public static class TreeRepositoryHeaderInfrastructureConverter
+    public static class PhiladelphusRepositoryHeaderInfrastructureConverter
     {
         /// <summary>
         /// Конвертировать доменную модель в сущность БД
         /// </summary>
         /// <param name="businessEntity">Доменная модель</param>
         /// <returns></returns>
-        public static TreeRepositoryHeader ToDbEntity(this TreeRepositoryHeaderModel businessEntity)
+        public static PhiladelphusRepositoryHeader ToDbEntity(this PhiladelphusRepositoryHeaderModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
-            var result = new TreeRepositoryHeader();
+            var result = new PhiladelphusRepositoryHeader();
             result.Uuid = businessEntity.Uuid;
             result.Name = businessEntity.Name;
             result.Description = businessEntity.Description;
@@ -30,11 +30,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
         /// <returns></returns>
-        public static List<TreeRepositoryHeader> ToDbEntityCollection(this IEnumerable<TreeRepositoryHeaderModel> businessEntityCollection)
+        public static List<PhiladelphusRepositoryHeader> ToDbEntityCollection(this IEnumerable<PhiladelphusRepositoryHeaderModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
                 return null;
-            var result = new List<TreeRepositoryHeader>();
+            var result = new List<PhiladelphusRepositoryHeader>();
             foreach (var businessEntity in businessEntityCollection)
             {
                 result.Add(businessEntity.ToDbEntity());
@@ -47,12 +47,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="dbEntity">Сущность БД</param>
         /// <returns></returns>
-        public static TreeRepositoryHeaderModel ToModel(this TreeRepositoryHeader dbEntity)
+        public static PhiladelphusRepositoryHeaderModel ToModel(this PhiladelphusRepositoryHeader dbEntity)
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeRepositoryHeaderModel();
-            result.Uuid = dbEntity.Uuid;
+            var result = new PhiladelphusRepositoryHeaderModel(dbEntity.Uuid);
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
             result.OwnDataStorageName = dbEntity.OwnDataStorageName;
@@ -67,11 +66,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
         /// <returns></returns>
-        public static List<TreeRepositoryHeaderModel> ToModelCollection(this IEnumerable<TreeRepositoryHeader> dbEntityCollection)
+        public static List<PhiladelphusRepositoryHeaderModel> ToModelCollection(this IEnumerable<PhiladelphusRepositoryHeader> dbEntityCollection)
         {
             if (dbEntityCollection == null)
                 return null;
-            var result = new List<TreeRepositoryHeaderModel>();
+            var result = new List<PhiladelphusRepositoryHeaderModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
                 result.Add(dbEntity.ToModel());

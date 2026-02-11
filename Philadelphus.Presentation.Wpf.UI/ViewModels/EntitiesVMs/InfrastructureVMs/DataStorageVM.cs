@@ -63,11 +63,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             }
         }
 
-        public bool HasTreeRepositoriesInfrastructureRepository
+        public bool HasPhiladelphusRepositoriesInfrastructureRepository
         {
             get
             {
-                if (_model.TreeRepositoriesInfrastructureRepository == null)
+                if (_model.PhiladelphusRepositoriesInfrastructureRepository == null)
                     return false;
                 return true;
             }
@@ -76,7 +76,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         {
             get
             {
-                if (_model.TreeRepositoryMembersInfrastructureRepository == null)
+                if (_model.PhiladelphusRepositoryMembersInfrastructureRepository == null)
                     return false;
                 return true;
             }

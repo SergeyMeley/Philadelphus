@@ -103,8 +103,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                             _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(DataStoragesCollectionConfig)}"])]
                             = new DataStoragesCollectionConfig { DataStorages = new() },
                          [Environment.ExpandEnvironmentVariables(
-                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(TreeRepositoryHeadersCollectionConfig)}"])]
-                            = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(PhiladelphusRepositoryHeadersCollectionConfig)}"])]
+                            = new PhiladelphusRepositoryHeadersCollectionConfig { PhiladelphusRepositoryHeaders = new() }
                      };
 
                     foreach (var kvp in configFiles)
@@ -138,8 +138,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(ConnectionStringsCollectionConfig)));
                     services.Configure<DataStoragesCollectionConfig>(
                         context.Configuration.GetSection(nameof(DataStoragesCollectionConfig)));
-                    services.Configure<TreeRepositoryHeadersCollectionConfig>(
-                        context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollectionConfig)));
+                    services.Configure<PhiladelphusRepositoryHeadersCollectionConfig>(
+                        context.Configuration.GetSection(nameof(PhiladelphusRepositoryHeadersCollectionConfig)));
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(
@@ -166,8 +166,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
-                    services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
-                    services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();
+                    services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
@@ -181,8 +181,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
                     services.AddSingleton<DataStoragesCollectionVM>();
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
-                    services.AddSingleton<TreeRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
-                    services.AddSingleton<TreeRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
+                    services.AddSingleton<PhiladelphusRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
+                    services.AddSingleton<PhiladelphusRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
                     services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
                     services.AddTransient<LaunchWindowTabItemControlVM>();

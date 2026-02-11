@@ -1,128 +1,152 @@
-﻿ using Philadelphus.Core.Domain.Entities.Enums;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities
 {
     /// <summary>
     /// Основная сущность Чубушника
     /// </summary>
-    public abstract class MainEntityBaseModel : IMainEntityWritableModel, ILinkableByUuidModel
+    public abstract class MainEntityBaseModel : IMainEntityWritableModel
     {
-        //TODO: Во всех IMainEntityModel при изменении значения свойств обновлять статус
+        #region [ Fields ]
+
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
         /// </summary>
-        protected virtual string DefaultFixedPartOfName { get => "Новая основная сущность"; }
+        protected virtual string _defaultFixedPartOfName => "Новая основная сущность";
 
-        /// <summary>
-        /// Тип сущности (устар.)
-        /// </summary>
-        public abstract EntityTypesModel EntityType { get; }
+        private string _name;
+        private string? _description;
+        private bool _isHidden = false;
+        private State _state = State.Initialized;
+
+        #endregion
+
+        #region [ Properties ]
+
+        #region [ General Properties ]
 
         /// <summary>
         /// Уникальный идентификатор
         /// </summary>
-        public Guid Uuid { get; protected set; }
+        public Guid Uuid { get; }
 
         /// <summary>
         /// Наименование
         /// </summary>
-        private string _name;
-
-        /// <summary>
-        /// Наименование
-        /// </summary>
-        public string Name 
-        { 
+        public string Name
+        {
             get
             {
                 return _name;
             }
             set
             {
-                _name = value;
-               if(_state != State.Initialized)
-                    _state = State.Changed;
+                if (_name != value)
+                {
+                    _name = value;
+                    UpdateStateAfterChange();
+                }
             }
         }
 
         /// <summary>
-        /// Псевдоним
-        /// </summary>
-        public string Alias { get; set; }
-
-        /// <summary>
-        /// Пользовательский код
-        /// </summary>
-        public string CustomCode { get; set; }
-
-        /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Имеет атрибуты
-        /// </summary>
-        public bool HasAttributes { get; set; }
-
-        /// <summary>
-        /// Устаревший
-        /// </summary>
-        public bool IsLegacy { get; set; }
+        public string? Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                if (_description != value)
+                {
+                    _description = value;
+                    UpdateStateAfterChange();
+                }
+            }
+        }
 
         /// <summary>
         /// Информация для аудита
         /// </summary>
-        public AuditInfoModel AuditInfo { get; private set; } = new AuditInfoModel();
+        public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
+
+        /// <summary>
+        /// Скрыт от нового использования (устаревший для бизнеса)
+        /// </summary>
+        public bool IsHidden
+        {
+            get
+            {
+                return _isHidden;
+            }
+            set
+            {
+                if (_isHidden != value)
+                {
+                    _isHidden = value;
+                    UpdateStateAfterChange();
+                }
+            }
+        }
+
+        #endregion
+
+        #region [ Infrastructure Properties ]
 
         /// <summary>
         /// Состояние
         /// </summary>
-        private State _state = State.Initialized;
-
-        /// <summary>
-        /// Состояние
-        /// </summary>
-        public State State { get => _state; }
-
-        /// <summary>
-        /// Сущность БД
-        /// </summary>
-        public IMainEntity DbEntity { get; set; }
+        public State State 
+        { 
+            get
+            {
+                return _state; 
+            }
+        }
 
         /// <summary>
         /// Хранилище данных
         /// </summary>
         public abstract IDataStorageModel DataStorage { get; }
 
+        #endregion
+
+        #endregion
+
+        #region [ Construct ]
+
         /// <summary>
         /// Основная сущность Чубушника
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="dbEntity">Сущность БД</param>
-        public MainEntityBaseModel(Guid uuid, IMainEntity dbEntity)
+        internal MainEntityBaseModel(
+            Guid uuid, 
+            IMainEntity dbEntity)
         {
-            DbEntity = dbEntity;
+            if (uuid == Guid.Empty)
+                throw new ArgumentNullException(nameof(uuid));
+            if (dbEntity == null)
+                throw new ArgumentNullException(nameof(dbEntity));
+
             Uuid = uuid;
+            Name = NamingHelper.GetNewName(new List<string>(), _defaultFixedPartOfName);
+            DbEntity = dbEntity;    // TODO: Исключить и применить автомаппер
         }
 
-        /// <summary>
-        /// Получить сущность в виде строки
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(Name);
-            sb.AppendLine();
-            sb.Append(Uuid);
-            return sb.ToString();
-        }
+        #endregion
+
+        #region [ Methods ]
 
         /// <summary>
         /// Назначить статус
@@ -134,5 +158,31 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             _state = newState;
             return true;
         }
+
+        /// <summary>
+        /// Пересчитать статус при изменении значений свойств
+        /// </summary>
+        protected bool UpdateStateAfterChange()
+        {
+            if (_state != State.Initialized
+                && _state != State.ForHardDelete
+                && _state != State.ForHardDelete)
+            {
+                _state = State.Changed;
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region OLD     
+
+        /// <summary>
+        /// Сущность БД
+        /// </summary>
+        public IMainEntity DbEntity { get; set; }   // TODO: Исключить и применить автомаппер
+
+        #endregion
     }
 }

@@ -56,18 +56,18 @@
       <FileName>ViewModels\EntitiesVMs\InfrastructureVMs\DataStorageVM.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.TreeRepositoryCollectionVM">
+  <Class Name="Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.PhiladelphusRepositoryCollectionVM">
     <Position X="27.75" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAQAQCgAEAAWAAAUAAIAAAEAIAAAEIIKAAAAAAABAQA=</HashCode>
-      <FileName>ViewModels\EntitiesVMs\MainEntitiesVMs\TreeRepositoryCollectionVM.cs</FileName>
+      <FileName>ViewModels\EntitiesVMs\MainEntitiesVMs\PhiladelphusRepositoryCollectionVM.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.TreeRepositoryVM">
+  <Class Name="Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.PhiladelphusRepositoryVM">
     <Position X="30.25" Y="1.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>EgAAAgAACAEgAIAAAwABBQQAAAAABAAAAggABABBAAA=</HashCode>
-      <FileName>ViewModels\EntitiesVMs\MainEntitiesVMs\TreeRepositoryVM.cs</FileName>
+      <FileName>ViewModels\EntitiesVMs\MainEntitiesVMs\PhiladelphusRepositoryVM.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.ExtensionInstanceVM">

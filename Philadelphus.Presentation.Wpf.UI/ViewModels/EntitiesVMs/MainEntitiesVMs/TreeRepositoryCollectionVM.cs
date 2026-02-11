@@ -11,22 +11,22 @@ using System.IO;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryCollectionVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public class PhiladelphusRepositoryCollectionVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<TreeRepositoryCollectionVM> _logger;
+        private readonly ILogger<PhiladelphusRepositoryCollectionVM> _logger;
         private readonly INotificationService _notificationService;
-        private readonly ITreeRepositoryCollectionService _collectionService;
-        private readonly ITreeRepositoryService _service;
+        private readonly IPhiladelphusRepositoryCollectionService _collectionService;
+        private readonly IPhiladelphusRepositoryService _service;
 
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
-        public TreeRepositoryCollectionVM(
+        public PhiladelphusRepositoryCollectionVM(
             IServiceProvider serviceProvider,
-            ILogger<TreeRepositoryCollectionVM> logger,
+            ILogger<PhiladelphusRepositoryCollectionVM> logger,
             INotificationService notificationService,
-            ITreeRepositoryCollectionService collectionService, 
-            ITreeRepositoryService service,
+            IPhiladelphusRepositoryCollectionService collectionService, 
+            IPhiladelphusRepositoryService service,
             DataStoragesCollectionVM dataStoragesSettings,
             IOptions<ApplicationSettingsConfig> options)
         {
@@ -41,8 +41,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             InitRepositoriesVMsCollection();
             PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
-        private static TreeRepositoryVM _currentRepositoryVM;
-        public TreeRepositoryVM CurrentRepositoryVM
+        private static PhiladelphusRepositoryVM _currentRepositoryVM;
+        public PhiladelphusRepositoryVM CurrentRepositoryVM
         {
             get
             {
@@ -52,21 +52,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 _currentRepositoryVM = null;
                 _currentRepositoryVM = value;
-                //_currentRepositoryVM.LoadTreeRepository();    //TODO: Перенести в другое место
+                //_currentRepositoryVM.LoadPhiladelphusRepository();    //TODO: Перенести в другое место
                 OnPropertyChanged(nameof(CurrentRepositoryVM));
                 OnPropertyChanged(nameof(PropertyList));
-                OnPropertyChanged(nameof(TreeRepositoriesVMs));
+                OnPropertyChanged(nameof(PhiladelphusRepositoriesVMs));
             }
         }
 
-        private ObservableCollection<TreeRepositoryVM> _treeRepositoriesVMs = new ObservableCollection<TreeRepositoryVM>();
-        public ObservableCollection<TreeRepositoryVM> TreeRepositoriesVMs
+        private ObservableCollection<PhiladelphusRepositoryVM> _PhiladelphusRepositoriesVMs = new ObservableCollection<PhiladelphusRepositoryVM>();
+        public ObservableCollection<PhiladelphusRepositoryVM> PhiladelphusRepositoriesVMs
         {
-            get => _treeRepositoriesVMs;
+            get => _PhiladelphusRepositoriesVMs;
             //private set
             //{
-            //    _treeRepositoriesVMs = value.ToList();
-            //    OnPropertyChanged(nameof(TreeRepositoriesVMs));
+            //    _PhiladelphusRepositoriesVMs = value.ToList();
+            //    OnPropertyChanged(nameof(PhiladelphusRepositoriesVMs));
             //}
         }
 
@@ -103,7 +103,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 if (_currentRepositoryVM == null)
                     return null;
-                //return PropertyGridHelper.GetProperties(_currentRepositoryExplorerVM.TreeRepository);
+                //return PropertyGridHelper.GetProperties(_currentRepositoryExplorerVM.PhiladelphusRepository);
                 return null;
             }
         }
@@ -114,7 +114,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 return new RelayCommand(obj =>
                 {
-                    _collectionService.AddExistTreeRepository(new DirectoryInfo(""));
+                    _collectionService.AddExistPhiladelphusRepository(new DirectoryInfo(""));
                 });
             }
         }
@@ -126,9 +126,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return new RelayCommand(obj =>
                 {
                     var builder = new DataStorageBuilder();
-                    var repository = _collectionService.CreateNewTreeRepository(builder.Build());
-                    var repositorVM = new TreeRepositoryVM(repository, _service);
-                    TreeRepositoriesVMs.Add(repositorVM);
+                    var repository = _collectionService.CreateNewPhiladelphusRepository(builder.Build());
+                    var repositorVM = new PhiladelphusRepositoryVM(repository, _service);
+                    PhiladelphusRepositoriesVMs.Add(repositorVM);
                      
                 });
             }
@@ -136,36 +136,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private bool InitRepositoriesVMsCollection()
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
-            var repositories = _collectionService.GetTreeRepositoriesCollection(storages);
+            var repositories = _collectionService.GetPhiladelphusRepositoriesCollection(storages);
             if (repositories == null)
                 return false;
             foreach (var item in repositories)
             {
-                _treeRepositoriesVMs.Add(new TreeRepositoryVM(item, _service));
+                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _service));
             }
             return true;
         }
-        internal bool CheckTreeRepositoryVMAvailable(Guid uuid, out TreeRepositoryVM outTreeRepositoryVM)
+        internal bool CheckPhiladelphusRepositoryVMAvailable(Guid uuid, out PhiladelphusRepositoryVM outPhiladelphusRepositoryVM)
         {
-            outTreeRepositoryVM = TreeRepositoriesVMs.FirstOrDefault(x => x.Uuid == uuid);
-            if (outTreeRepositoryVM != null && outTreeRepositoryVM.OwnDataStorage.IsAvailable == true)
+            outPhiladelphusRepositoryVM = PhiladelphusRepositoriesVMs.FirstOrDefault(x => x.Uuid == uuid);
+            if (outPhiladelphusRepositoryVM != null && outPhiladelphusRepositoryVM.OwnDataStorage.IsAvailable == true)
                 return true;
-            outTreeRepositoryVM = InitTreeRepositoryVM(uuid);
-            if (outTreeRepositoryVM != null && outTreeRepositoryVM.OwnDataStorage.IsAvailable == true)
+            outPhiladelphusRepositoryVM = InitPhiladelphusRepositoryVM(uuid);
+            if (outPhiladelphusRepositoryVM != null && outPhiladelphusRepositoryVM.OwnDataStorage.IsAvailable == true)
                 return true;
             return false;
         }
-        private TreeRepositoryVM InitTreeRepositoryVM(Guid uuid)
+        private PhiladelphusRepositoryVM InitPhiladelphusRepositoryVM(Guid uuid)
         {
             var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
-            var repositories = _collectionService.GetTreeRepositoriesCollection(storages, new[] { uuid });
+            var repositories = _collectionService.GetPhiladelphusRepositoriesCollection(storages, new[] { uuid });
             if (repositories == null)
                 return null;
             var repository = repositories.FirstOrDefault(x => x.Uuid == uuid);
             if (repository == null)
                 return null;
-            var result = new TreeRepositoryVM(repository, _service);
-            _treeRepositoriesVMs.Add(result);
+            var result = new PhiladelphusRepositoryVM(repository, _service);
+            _PhiladelphusRepositoriesVMs.Add(result);
             return result;
         }
     }

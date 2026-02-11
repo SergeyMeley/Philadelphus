@@ -1,6 +1,6 @@
 ﻿namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
 {
-    public class TreeRepositoryHeader
+    public class PhiladelphusRepositoryHeader
     {
         public Guid Uuid { get; set; }
         public string Name { get; set; }

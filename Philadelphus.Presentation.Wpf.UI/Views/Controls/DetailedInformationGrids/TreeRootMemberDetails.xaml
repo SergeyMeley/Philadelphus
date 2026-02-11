@@ -19,7 +19,7 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <local:TreeRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100"></local:TreeRepositoryMemberDetails>
+        <local:PhiladelphusRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100"></local:PhiladelphusRepositoryMemberDetails>
         <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Родительский корень">
             <GroupBox>
                 <local:UniversalDetails DataContext="{Binding Model.ParentRepository}"></local:UniversalDetails>

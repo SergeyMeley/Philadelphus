@@ -55,7 +55,7 @@
                             </TextBlock>
                             <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
                                                         <Run Text="Доступность:" FontWeight="Light" Foreground="LightSlateGray"></Run>
-                                                        <Run Text="{Binding IsTreeRepositoryAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsTreeRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run>
+                                                        <Run Text="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></Run>
                             </TextBlock>
                             <TextBlock Grid.Column="3" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
                                                         <Run Text="Последний запуск: " FontWeight="Light" Foreground="LightSlateGray"></Run>

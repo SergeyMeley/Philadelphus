@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -11,12 +11,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     {
         #region [ Props ]
 
-        private readonly ITreeRepositoryService _service;
+        private readonly IPhiladelphusRepositoryService _service;
 
         private readonly ElementAttributeModel _model;
 
-        public EntityTypesModel EntityType { get => _model.EntityType; }
-        public IAttributeOwnerModel Owner { get => _model.Owner; }
+        public IOwnerModel Owner { get => _model.Owner; }
         public IDataStorageModel DataStorage { get => _model.DataStorage; }
         public TreeNodeModel ValueType 
         { 
@@ -51,7 +50,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public ElementAttributeVM(
             ElementAttributeModel elementAttribute,
-            ITreeRepositoryService service) 
+            IPhiladelphusRepositoryService service) 
             : base(elementAttribute, service)
         {
             _service = service;

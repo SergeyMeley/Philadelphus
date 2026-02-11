@@ -30,9 +30,9 @@
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="2" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" Margin="2" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}"></TextBox>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="2"></TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description, Mode=OneWay}" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}" Margin="2"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" IsReadOnly="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=IsReadOnly}" Margin="2"></TextBox>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="2"></TextBlock>
         <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Тип хранилища" Margin="2"></TextBlock>
@@ -42,7 +42,7 @@
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Последняя проверка" Margin="2"></TextBlock>
         <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LastCheckTime, Mode=OneWay}" Margin="2"></TextBlock>
         <TextBlock Grid.Row="7" Grid.Column="0" Text="Отключен" Margin="2"></TextBlock>
-        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding IsDisabled, Mode=OneWay}" Margin="2"></TextBlock>
+        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding IsDisabled}" Margin="2"></TextBlock>
         <GroupBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="100" Header="Хранимые сущности">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -68,14 +68,10 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Настройки хранилищ данных" Margin="2"></TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HasDataStoragesCollectionInfrastructureRepository, Mode=OneWay}" Margin="2"></TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Настройки заголовков репозиториев" Margin="2"></TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding HasTreeRepositoryHeadersCollectionInfrastructureRepository, Mode=OneWay}" Margin="2"></TextBlock>
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Репозитории" Margin="2"></TextBlock>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding HasTreeRepositoriesInfrastructureRepository, Mode=OneWay}" Margin="2"></TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding HasPhiladelphusRepositoriesInfrastructureRepository}" Margin="2"></TextBlock>
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Участники репозитория" Margin="2"></TextBlock>
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding HasMainEntitiesInfrastructureRepository, Mode=OneWay}" Margin="2"></TextBlock>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding HasMainEntitiesInfrastructureRepository}" Margin="2"></TextBlock>
             </Grid>
         </GroupBox>
     </Grid>

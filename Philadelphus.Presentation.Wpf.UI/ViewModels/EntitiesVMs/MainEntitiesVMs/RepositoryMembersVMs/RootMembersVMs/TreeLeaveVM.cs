@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
@@ -7,9 +7,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     {
         #region [ Props ]
 
-        private readonly ITreeRepositoryService _service;
+        private readonly IPhiladelphusRepositoryService _service;
 
-        private readonly TreeLeaveModel _model;
+        public string Alias
+        {
+            get
+            {
+                if (_model is TreeLeaveModel m)
+                {
+                    return m.Alias;
+                }
+                return string.Empty;
+            }
+            set
+            {
+                if (_model is TreeLeaveModel m)
+                {
+                    m.Alias = value;
+                    OnPropertyChanged(nameof(Alias));
+                    OnPropertyChanged(nameof(State));
+                }
+            }
+        }
 
         #endregion
 
@@ -17,11 +36,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeLeaveVM(
             TreeLeaveModel treeLeave,
-            ITreeRepositoryService service) 
+            IPhiladelphusRepositoryService service) 
             : base(treeLeave, service)
         {
             _service = service;
-            _model = treeLeave;
         }
 
         #endregion

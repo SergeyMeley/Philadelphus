@@ -3,8 +3,8 @@
 namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
 {
     [DisplayName("Конфигурация заголовков репозиториев")]
-    public class TreeRepositoryHeadersCollectionConfig
+    public class PhiladelphusRepositoryHeadersCollectionConfig
     {
-        public List<TreeRepositoryHeader> TreeRepositoryHeaders { get; set; } = new List<TreeRepositoryHeader>();
+        public List<PhiladelphusRepositoryHeader> PhiladelphusRepositoryHeaders { get; set; } = new List<PhiladelphusRepositoryHeader>();
     }
 }

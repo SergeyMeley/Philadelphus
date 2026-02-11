@@ -20,7 +20,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger<TreeRepositoryCollectionService> _logger;
+        private readonly ILogger<PhiladelphusRepositoryCollectionService> _logger;
         private readonly INotificationService _notificationService;
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
@@ -42,7 +42,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="dataStoragesCollection"></param>
         public DataStoragesService(
             IMapper mapper,
-            ILogger<TreeRepositoryCollectionService> logger,
+            ILogger<PhiladelphusRepositoryCollectionService> logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
@@ -107,7 +107,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     infrastructureType: InfrastructureTypes.JsonDocument,
                     isDisabled: false)
             .SetRepository(new JsonMainEntitiesInfrastructureRepository(basePath))
-            .SetRepository(new JsonTreeRepositoriesInfrastructureRepository(basePath))
+            .SetRepository(new JsonPhiladelphusRepositoriesInfrastructureRepository(basePath))
         ;
             var mainDataStorageModel = dataStorageBuilder.Build();
 
@@ -136,7 +136,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     uuid: connectionString.Uuid,
                     infrastructureType: InfrastructureTypes.PostgreSqlEf,
                     isDisabled: false)
-            .SetRepository(new PostgreEfTreeRepositoriesInfrastructureRepository(connectionString.ConnectionString))
+            .SetRepository(new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(connectionString.ConnectionString))
             .SetRepository(new PostgreEfMainEntitiesInfrastructureRepository(connectionString.ConnectionString))
         ;
             var dataStorageModel = dataStorageBuilder.Build();

@@ -1,37 +1,31 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 {
     /// <summary>
     /// Атрибут элемента Чубушника
     /// </summary>
-    public class ElementAttributeModel : MainEntityBaseModel, ITreeElementContentModel
+    public class ElementAttributeModel : MainEntityBaseModel, IContentModel
     {
+        #region [ Fields ]
+
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
         /// </summary>
-        protected override string DefaultFixedPartOfName { get => "Новый атрибут"; }
+        protected override string _defaultFixedPartOfName => "Новый атрибут";
 
-        /// <summary>
-        /// Тип сущности (устар.)
-        /// </summary>
-        public override EntityTypesModel EntityType { get => EntityTypesModel.Attribute; }
+        #endregion
 
-        /// <summary>
-        /// Владелец атрибута
-        /// </summary>
-        public IAttributeOwnerModel Owner { get; set; }
+        #region [ Properties ] 
 
-        /// <summary>
-        /// Хранилище данных
-        /// </summary>
-        public override IDataStorageModel DataStorage { get => Owner.DataStorage; }
+        #region [ General Properties ]
 
         /// <summary>
         /// Тип данных (узел дерева репозитория Чубушника)
@@ -53,24 +47,98 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public IEnumerable<TreeLeaveModel>? ValuesList { get; set; }
 
+        #endregion
+
+        #region [ Hierarchy Properties ]
+
+
+
+        #endregion
+
+        #region [ Ownership Properties ]
+
+        /// <summary>
+        /// Владелец
+        /// </summary>
+        public IOwnerModel Owner { get; }
+
+        /// <summary>
+        /// Все владельцы (рекурсивно)
+        /// </summary>
+        public ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive { get => throw new NotImplementedException(); }
+
+        #endregion
+
+        #region [ Infrastructure Properties ]
+
+        /// <summary>
+        /// Хранилище данных
+        /// </summary>
+        public override IDataStorageModel DataStorage
+        {
+            get
+            {
+                if (Owner is IMainEntityModel m)
+                {
+                    return m.DataStorage;
+                }
+                return null;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region [ Construct ]
+
         /// <summary>
         /// Атрибут элемента Чубушника
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="owner">Владелец атрибута</param>
         /// <param name="dbEntity">Сущность БД</param>
-        public ElementAttributeModel(Guid uuid, IAttributeOwnerModel owner, IMainEntity dbEntity) : base(uuid, dbEntity)
+        public ElementAttributeModel(
+            Guid uuid, 
+            IOwnerModel owner, 
+            IMainEntity dbEntity) 
+            : base(uuid, dbEntity)
         {
+            if (owner == null)
+                throw new ArgumentNullException(nameof(owner));
+
             Owner = owner;
-            Initialize();
         }
 
+        #endregion
+
+        #region [ Methods ]
+
+
+
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /// <summary>
-        /// Инициализировать
+        /// Сменить владельца
         /// </summary>
-        private void Initialize()
+        public bool ChangeOwner(IOwnerModel newOwner)
         {
-            Name = NamingHelper.GetNewName(new List<string>(), DefaultFixedPartOfName);
+            throw new NotImplementedException();
         }
     }
 }

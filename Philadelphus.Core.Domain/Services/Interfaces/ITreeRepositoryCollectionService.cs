@@ -5,52 +5,20 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
-    public interface ITreeRepositoryCollectionService
+    public interface IPhiladelphusRepositoryCollectionService
     {
         #region [ Props ]
 
         /// <summary>
         /// Коллекция (словарь) репозиториев
         /// </summary>
-        public static Dictionary<Guid, TreeRepositoryModel> DataTreeRepositories { get; }
+        public static Dictionary<Guid, PhiladelphusRepositoryModel> DataPhiladelphusRepositories { get; }
 
         #endregion
 
         #region [ Get + Load ]
 
-        /// <summary>
-        /// Получить репозиторий из коллекции по уникальному идлентификатору
-        /// </summary>
-        /// <param name="uuid">Уникальный идентификатор</param>
-        /// <returns></returns>
-        public TreeRepository GetTreeRepositoryFromCollection(Guid uuid);
-
-        /// <summary>
-        /// Получить коллекцию репозиториев из коллекции по уникальным идлентификаторам
-        /// </summary>
-        /// <param name="uuids">Уникальные идентификаторы</param>
-        /// <returns></returns>
-        public List<TreeRepository> GetTreeRepositoryFromCollection(IEnumerable<Guid> uuids);
-
-        /// <summary>
-        /// Получить репозиторий из коллекции по уникальному идлентификатору
-        /// </summary>
-        /// <param name="uuid">Уникальный идентификатор</param>
-        /// <returns></returns>
-        public TreeRepositoryModel GetTreeRepositoryModelFromCollection(Guid uuid);
-
-        /// <summary>
-        /// Получить коллекцию репозиториев из коллекции по уникальным идлентификаторам
-        /// </summary>
-        /// <param name="uuids">Уникальные идентификаторы</param>
-        /// <returns></returns>
-        public List<TreeRepositoryModel> GetTreeRepositoryModelFromCollection(IEnumerable<Guid> uuids);
-
-        /// <summary>
-        /// Принудительная загрузка коллекции заголовков репозиториев из хранилищ
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<TreeRepositoryHeaderModel> GetTreeRepositoryHeadersCollection();
+        public IEnumerable<PhiladelphusRepositoryHeaderModel> GetPhiladelphusRepositoryHeadersCollection();
 
         /// <summary>
         /// Получить коллекцию репозиториев
@@ -58,7 +26,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="dataStorages">Хранилища данных</param>
         /// <param name="uuids">Уникальные идентификаторы</param>
         /// <returns></returns>
-        public IEnumerable<TreeRepositoryModel> GetTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
+        public IEnumerable<PhiladelphusRepositoryModel> GetPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
 
         /// <summary>
         /// Принудительная загрузка коллекции репозиториев из хранилищ
@@ -66,7 +34,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="dataStorages">Хранилище данных</param>
         /// <param name="uuids">Уникальные идентификаторы</param>
         /// <returns></returns>
-        public IEnumerable<TreeRepositoryModel> ForceLoadTreeRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
+        public IEnumerable<PhiladelphusRepositoryModel> ForceLoadPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
 
         #endregion
 
@@ -75,9 +43,9 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Сохранить изменения (репозиторий без содержимого и участников)
         /// </summary>
-        /// <param name="treeRepository">Репозиторий</param>
+        /// <param name="PhiladelphusRepository">Репозиторий</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(TreeRepositoryModel treeRepository);
+        public long SaveChanges(ref PhiladelphusRepositoryModel PhiladelphusRepository);
 
         #endregion
 
@@ -88,21 +56,21 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="dataStorage"></param>
         /// <returns>Репозиторий</returns>
-        public TreeRepositoryModel CreateNewTreeRepository(IDataStorageModel dataStorage);
+        public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage);
 
         /// <summary>
         /// Создать заголовок репозитория из репозитория
         /// </summary>
-        /// <param name="treeRepositoryModel">Репозиторий</param>
+        /// <param name="PhiladelphusRepositoryModel">Репозиторий</param>
         /// <returns>Заголовок репозитория</returns>
-        public TreeRepositoryHeaderModel CreateTreeRepositoryHeaderFromTreeRepository(TreeRepositoryModel treeRepositoryModel);
+        public PhiladelphusRepositoryHeaderModel CreatePhiladelphusRepositoryHeaderFromPhiladelphusRepository(PhiladelphusRepositoryModel PhiladelphusRepositoryModel);
 
         /// <summary>
         /// Добавить существующий репозиторий
         /// </summary>
         /// <param name="path">Путь к файлу</param>
         /// <returns>Коллекция репозиториев</returns>
-        public IEnumerable<TreeRepositoryModel> AddExistTreeRepository(DirectoryInfo path);
+        public IEnumerable<PhiladelphusRepositoryModel> AddExistPhiladelphusRepository(DirectoryInfo path);
 
         #endregion
 

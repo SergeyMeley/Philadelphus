@@ -11,7 +11,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 {
     public abstract class MainEntityBaseVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
-        protected readonly ITreeRepositoryService _service;
+        protected readonly IPhiladelphusRepositoryService _service;
 
         protected readonly MainEntityBaseModel _model;
         public MainEntityBaseModel Model 
@@ -19,13 +19,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             { 
                 return _model; 
             } 
-        }
-        public EntityTypesModel EntityType
-        {
-            get
-            {
-                return _model.EntityType;
-            }
         }
         public Guid Uuid 
         { 
@@ -47,32 +40,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 OnPropertyChanged(nameof(State));
             }
         }
-        public string Alias
-        {
-            get
-            {
-                return _model.Alias;
-            }
-            set
-            {
-                _model.Alias = value;
-                OnPropertyChanged(nameof(Alias));
-                OnPropertyChanged(nameof(State));
-            }
-        }
-        public string CustomCode
-        {
-            get
-            {
-                return _model.CustomCode;
-            }
-            set
-            {
-                _model.CustomCode = value;
-                OnPropertyChanged(nameof(CustomCode));
-                OnPropertyChanged(nameof(State));
-            }
-        }
+        
         public string Description
         {
             get
@@ -107,7 +75,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         public DataStorageVM StorageVM { get => _storageVM; }
         public MainEntityBaseVM(
             MainEntityBaseModel mainEntityBaseModel, 
-            ITreeRepositoryService service)
+            IPhiladelphusRepositoryService service)
         {
             _service = service;
 

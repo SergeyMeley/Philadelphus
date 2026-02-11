@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 {

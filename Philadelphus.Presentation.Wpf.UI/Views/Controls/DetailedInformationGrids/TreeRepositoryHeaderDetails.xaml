@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids.TreeRepositoryHeaderDetails"
+﻿<UserControl x:Class="Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids.PhiladelphusRepositoryHeaderDetails"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -42,7 +42,7 @@
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="2"></TextBlock>
         <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" Margin="2"></TextBlock>
-        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsTreeRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsTreeRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}" IsReadOnly="True" Margin="2"></TextBox>
         <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="100" Text="Хранилище:" FontWeight="Bold" Margin="2"></TextBlock>
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Наименование" Margin="2"></TextBlock>
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding OwnDataStorageName, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>

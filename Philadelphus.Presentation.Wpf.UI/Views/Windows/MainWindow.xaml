@@ -98,7 +98,7 @@
                 </RibbonTab>
                 <RibbonTab Header="Репозиторий">
                     <RibbonGroup Header="Текущий репозиторий">
-                        <!--<RibbonComboBox ItemsSource="{Binding TreeRepositories}" DisplayMemberPath="Name">
+                        <!--<RibbonComboBox ItemsSource="{Binding PhiladelphusRepositories}" DisplayMemberPath="Name">
                             <RibbonComboBox.Style>
                                 <Style TargetType="RibbonComboBox" BasedOn="{StaticResource SyncfusionRibbonComboBoxStyle}">
                                     <Style.Triggers>
@@ -111,18 +111,18 @@
                                 </Style>
                             </RibbonComboBox.Style>
                         </RibbonComboBox>-->
-                        <!--<ComboBox ItemsSource="{Binding RepositoryCollectionVM.TreeRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>-->
-                        <TextBlock Text="{Binding RepositoryExplorerVM.TreeRepositoryVM.Name}"></TextBlock>
+                        <!--<ComboBox ItemsSource="{Binding RepositoryCollectionVM.PhiladelphusRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>-->
+                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}"></TextBlock>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Состояние: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryExplorerVM.TreeRepositoryVM.State}"></TextBlock>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.State}"></TextBlock>
                         </StackPanel>
                         <RibbonButton Label="Открыть стартовое окно" Command="{Binding ApplicationCommandsVM.OpenLaunchWindowCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Информация">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Количество корней: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryExplorerVM.TreeRepositoryVM.ChildsCount}"></TextBlock>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.ChildsCount}"></TextBlock>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Текущий участник репозитория: "></TextBlock>

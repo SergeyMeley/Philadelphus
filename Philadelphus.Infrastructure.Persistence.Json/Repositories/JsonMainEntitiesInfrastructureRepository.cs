@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using System;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 {
-    public class JsonMainEntitiesInfrastructureRepository : ITreeRepositoriesMembersInfrastructureRepository
+    public class JsonMainEntitiesInfrastructureRepository : IPhiladelphusRepositoriesMembersInfrastructureRepository
     {
         private DirectoryInfo _baseDirectory;
         public JsonMainEntitiesInfrastructureRepository(DirectoryInfo baseDirectory)

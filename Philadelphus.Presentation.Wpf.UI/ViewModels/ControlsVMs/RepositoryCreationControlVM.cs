@@ -4,24 +4,28 @@ using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using System.IO;
 using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
     public class RepositoryCreationControlVM : ControlBaseVM
     {
-        private readonly ITreeRepositoryCollectionService _collectionService;
-        private readonly ITreeRepositoryService _service;
+        private readonly IPhiladelphusRepositoryCollectionService _collectionService;
+        private readonly IPhiladelphusRepositoryService _repositoryService;
         private readonly IConfigurationService _configurationService;
+        private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _headersCollectionConfig;
+        private readonly FileInfo _configFile;
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
-        private readonly TreeRepositoryCollectionVM _repositoryCollectionVM;
-        private readonly TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
+        private readonly PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
+        private readonly PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
 
 
         private string _name;
@@ -37,21 +41,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IMapper mapper,
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
-            ITreeRepositoryCollectionService collectionService,
-            ITreeRepositoryService service,
+            IPhiladelphusRepositoryCollectionService collectionService,
+            IPhiladelphusRepositoryService repositoryService,
             IConfigurationService configurationService,
-            TreeRepositoryCollectionVM repositoryCollectionVM, 
-            TreeRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
-            DataStoragesCollectionVM dataStoragesSettingsVM,
+            PhiladelphusRepositoryCollectionVM repositoryCollectionVM, 
+            PhiladelphusRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
+            DataStoragesCollectionVM dataStoragesSettingsVM, 
+            IOptions<ApplicationSettingsConfig> options,
+            IOptions<PhiladelphusRepositoryHeadersCollectionConfig> headersCollectionConfig,
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _collectionService = collectionService;
-            _service = service;
+            _repositoryService = repositoryService;
             _configurationService = configurationService;
+            _headersCollectionConfig = headersCollectionConfig;
+
             _dataStoragesCollectionVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
+
+            _configFile = options.Value.RepositoryHeadersConfigFullPath;
         }
         public RelayCommand CreateAndSaveRepositoryCommand
         {
@@ -59,21 +69,29 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_dataStoragesCollectionVM.SelectedDataStorageVM == null)
-                        return;
-                    if (_repositoryCollectionVM.TreeRepositoriesVMs.Any(x => x.Name == _name))
+                    if (string.IsNullOrEmpty(Name)
+                        || _dataStoragesCollectionVM.SelectedDataStorageVM == null)
                     {
-                        MessageBox.Show($"Репозиторий '{_name}' уже существует. Операция не выполнена.");
+                        MessageBox.Show($"Некорректно заполнены параметры, операция не выполнена.");
                         return;
                     }
-                    var model = _collectionService.CreateNewTreeRepository(_dataStoragesCollectionVM.SelectedDataStorageVM.Model);
-                    model.Name = _name;
-                    model.Description = _description;
-                    _collectionService.SaveChanges(model);      //TODO: Переделать
+                    if (_repositoryCollectionVM.PhiladelphusRepositoriesVMs.Any(x => x.Name == _name))
+                    {
+                        MessageBox.Show($"Репозиторий '{_name}' уже существует, операция не выполнена.");
+                        return;
+                    }
 
-                    var vm = new TreeRepositoryVM(model, _service);
-                    _repositoryCollectionVM.TreeRepositoriesVMs.Add(vm);
-                    var headerVm = _repositoryHeadersCollectionVM.AddTreeRepositoryHeaderVMFromTreeRepositoryVM(vm);
+                    var model = _collectionService.CreateNewPhiladelphusRepository(_dataStoragesCollectionVM.SelectedDataStorageVM.Model);
+                    model.Name = Name;
+                    model.Description = Description;
+                    _collectionService.SaveChanges(ref model);
+
+                    var vm = new PhiladelphusRepositoryVM(model, _repositoryService);
+                    
+                    _repositoryCollectionVM.PhiladelphusRepositoriesVMs.Add(vm);
+                    _repositoryCollectionVM.CurrentRepositoryVM = vm;
+
+                    var headerVm = _repositoryHeadersCollectionVM.AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(vm);
                 });
             }
         }

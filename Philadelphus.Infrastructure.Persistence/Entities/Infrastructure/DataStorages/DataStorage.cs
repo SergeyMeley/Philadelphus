@@ -10,7 +10,7 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataSt
         public string Description { get; set; }
         public InfrastructureTypes InfrastructureType { get; set; }
         public bool HasDataStorageInfrastructureRepositoryRepository { get; set; }
-        public bool HasTreeRepositoryHeadersInfrastructureRepository { get; set; }
+        public bool HasPhiladelphusRepositoryHeadersInfrastructureRepository { get; set; }
         public bool HasMainEntitiesInfrastructureRepository { get; set; }
         public bool IsDisabled { get; set; }
     }

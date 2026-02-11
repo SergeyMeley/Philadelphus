@@ -1,5 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -10,13 +10,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="businessEntity">Доменная модель</param>
         /// <returns></returns>
-        public static TreeLeave ToDbEntity(this TreeLeaveModel businessEntity/*, TreeRepositoryService service*/)   //TODO: Заменить на сервис кеширования
+        public static TreeLeave ToDbEntity(this TreeLeaveModel businessEntity/*, PhiladelphusRepositoryService service*/)   //TODO: Заменить на сервис кеширования
         {
             if (businessEntity == null)
                 return null;
             var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             result.ParentUuid = businessEntity.Parent.Uuid;
-            result.ParentTreeRootUuid = businessEntity.ParentRoot.Uuid;
+            result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.Uuid;
             //result.ParentTreeRoot = (TreeRoot)service.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
             return result;
         }
@@ -48,7 +48,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeLeaveModel(dbEntity.Uuid, parent, dbEntity);
+            var result = new TreeLeaveModel(dbEntity.Uuid, parent, parent.OwningWorkingTree, dbEntity);
             result = (TreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }

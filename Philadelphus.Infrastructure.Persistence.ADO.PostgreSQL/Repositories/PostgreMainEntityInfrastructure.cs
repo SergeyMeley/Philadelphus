@@ -1,13 +1,13 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
 {
-    public class PostgreMainEntityInfrastructure : ITreeRepositoriesMembersInfrastructureRepository
+    public class PostgreMainEntityInfrastructure : IPhiladelphusRepositoriesMembersInfrastructureRepository
     {
         private readonly Context _context;
 
@@ -25,15 +25,15 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
             return collection;
         }
         #region [Select]
-        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(List<string> pathes)
         {
-            var dataCollection = new List<TreeRepository>();
+            var dataCollection = new List<PhiladelphusRepository>();
             using (var cmd = _context.CreateConnection().CreateCommand(""))
             using (var reader = cmd.ExecuteReaderAsync().Result)
             {
                 while (reader.Read())
                 {
-                    var record = new TreeRepository();
+                    var record = new PhiladelphusRepository();
                     record.Name = reader.GetString(1);
                     if (!reader.IsDBNull(3))
                     {
@@ -78,7 +78,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
         }
         #endregion
         #region [Insert]
-        public int InsertRepositories(IEnumerable<TreeRepository> projects)
+        public int InsertRepositories(IEnumerable<PhiladelphusRepository> projects)
         {
             try
             {
@@ -125,7 +125,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
         }
         #endregion
         #region [Update]
-        public int UpdateRepositories(IEnumerable<TreeRepository> projects)
+        public int UpdateRepositories(IEnumerable<PhiladelphusRepository> projects)
         {
             throw new NotImplementedException();
         }
@@ -142,27 +142,27 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeRepository> SelectRepositories(string configPath)
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(string configPath)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeRoot> SelectRoots(TreeRepository dbTreeRepository)
+        public IEnumerable<TreeRoot> SelectRoots(PhiladelphusRepository dbPhiladelphusRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeNode> SelectNodes(TreeRepository dbTreeRepository)
+        public IEnumerable<TreeNode> SelectNodes(PhiladelphusRepository dbPhiladelphusRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TreeLeave> SelectLeaves(TreeRepository dbTreeRepository)
+        public IEnumerable<TreeLeave> SelectLeaves(PhiladelphusRepository dbPhiladelphusRepository)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<ElementAttribute> SelectAttributes(TreeRepository dbTreeRepository)
+        public IEnumerable<ElementAttribute> SelectAttributes(PhiladelphusRepository dbPhiladelphusRepository)
         {
             throw new NotImplementedException();
         }
@@ -172,7 +172,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
             throw new NotImplementedException();
         }
 
-        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
+        public long DeleteRepositories(IEnumerable<PhiladelphusRepository> repositories)
         {
             throw new NotImplementedException();
         }
@@ -202,32 +202,32 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
             throw new NotImplementedException();
         }
 
-        long ITreeRepositoriesMembersInfrastructureRepository.InsertRoots(IEnumerable<TreeRoot> roots)
+        long IPhiladelphusRepositoriesMembersInfrastructureRepository.InsertRoots(IEnumerable<TreeRoot> roots)
         {
             return InsertRoots(roots);
         }
 
-        long ITreeRepositoriesMembersInfrastructureRepository.InsertNodes(IEnumerable<TreeNode> nodes)
+        long IPhiladelphusRepositoriesMembersInfrastructureRepository.InsertNodes(IEnumerable<TreeNode> nodes)
         {
             return InsertNodes(nodes);
         }
 
-        long ITreeRepositoriesMembersInfrastructureRepository.InsertLeaves(IEnumerable<TreeLeave> leaves)
+        long IPhiladelphusRepositoriesMembersInfrastructureRepository.InsertLeaves(IEnumerable<TreeLeave> leaves)
         {
             return InsertLeaves(leaves);
         }
 
-        long ITreeRepositoriesMembersInfrastructureRepository.UpdateRoots(IEnumerable<TreeRoot> roots)
+        long IPhiladelphusRepositoriesMembersInfrastructureRepository.UpdateRoots(IEnumerable<TreeRoot> roots)
         {
             return UpdateRoots(roots);
         }
 
-        long ITreeRepositoriesMembersInfrastructureRepository.UpdateNodes(IEnumerable<TreeNode> nodes)
+        long IPhiladelphusRepositoriesMembersInfrastructureRepository.UpdateNodes(IEnumerable<TreeNode> nodes)
         {
             return UpdateNodes(nodes);
         }
 
-        long ITreeRepositoriesMembersInfrastructureRepository.UpdateLeaves(IEnumerable<TreeLeave> leaves)
+        long IPhiladelphusRepositoriesMembersInfrastructureRepository.UpdateLeaves(IEnumerable<TreeLeave> leaves)
         {
             return UpdateLeaves(leaves);
         }
