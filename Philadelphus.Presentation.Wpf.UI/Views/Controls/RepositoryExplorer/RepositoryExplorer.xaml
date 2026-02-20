@@ -43,11 +43,11 @@
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="1">
                         <TextBlock VerticalAlignment="Center" Text="Представление "></TextBlock>
-                        <ComboBox MinWidth="50">
+                        <ComboBox MinWidth="50" SelectedIndex="0">
                             <ComboBoxItem Content="Основной"></ComboBoxItem>
-                            <ComboBoxItem Content="По тегам"></ComboBoxItem>
+                            <ComboBoxItem Content="По иерархии наследования"></ComboBoxItem>
                             <ComboBoxItem Content="По содержимому"></ComboBoxItem>
-                            <ComboBoxItem Content="По наследованию"></ComboBoxItem>
+                            <ComboBoxItem Content="По меткам"></ComboBoxItem>
                             <ComboBoxItem Content="По связям (Trace)"></ComboBoxItem>
                         </ComboBox>
                     </StackPanel>
