@@ -51,7 +51,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 if (_name != value)
                 {
                     _name = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 if (_description != value)
                 {
                     _description = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 if (_isHidden != value)
                 {
                     _isHidden = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -162,7 +162,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Пересчитать статус при изменении значений свойств
         /// </summary>
-        protected bool UpdateStateAfterChange()
+        protected bool UpdateStateStateAfterChange()
         {
             if (_state != State.Initialized
                 && _state != State.ForHardDelete

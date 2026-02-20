@@ -7,6 +7,7 @@
         xmlns:viewmodels="clr-namespace:Philadelphus.Presentation.Wpf.UI.ViewModels"
         xmlns:i="Microsoft.Xaml.Behaviors;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
+        xmlns:re="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer"
         xmlns:ntf="clr-namespace:Philadelphus.Core.Domain.Services.Interfaces;assembly=Philadelphus.Core.Domain" 
         mc:Ignorable="d"
         Title="{Binding Title}"
@@ -259,7 +260,7 @@
                         <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2" Background="White">
                             <TabControl Margin="2">
                                 <TabItem Header="Репозиторий">
-                                    <ctrls:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></ctrls:RepositoryExplorer>
+                                    <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></re:RepositoryExplorer>
                                 </TabItem>
                                 <TabItem Header="Отчеты">
                                     <ctrls:ReportProcessor></ctrls:ReportProcessor>

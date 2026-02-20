@@ -109,13 +109,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                     {
                         var model = entity.ToModel(connectionString);
 
-                        if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                        if (model != null)
                         {
-                            _dataStorageVMs.Add(new DataStorageVM(model));
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException();
+                            if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                            {
+                                _dataStorageVMs.Add(new DataStorageVM(model));
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException();
+                            }
                         }
                     }
                 }

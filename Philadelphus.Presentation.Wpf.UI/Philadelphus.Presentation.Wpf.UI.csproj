@@ -31,6 +31,7 @@
     <None Remove="Icons\check_64.png" />
     <None Remove="Icons\edit_64.png" />
     <None Remove="Icons\getwork_64.png" />
+    <None Remove="Icons\list_64.png" />
     <None Remove="Icons\new-tab_64.png" />
     <None Remove="Icons\open.png" />
     <None Remove="Icons\philadelphus_logo_64.png" />
@@ -67,6 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icons\list_64.png" />
     <Resource Include="Icons\philadelphus_logo_64.ico" />
   </ItemGroup>
 

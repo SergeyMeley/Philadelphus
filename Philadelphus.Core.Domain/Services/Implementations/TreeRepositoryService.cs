@@ -68,7 +68,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // TODO: Добавить кэш
 
-            return GetShrubFromDb(repository);
+            var result = GetShrubFromDb(repository);
+
+            InitSystemWorkingTree(repository.ContentShrub);
+
+            return result;
         }
 
         /// <summary>
@@ -103,6 +107,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
             }
 
+            InitSystemWorkingTree(repository.ContentShrub);
+
             return repository;
         }
 
@@ -113,7 +119,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Корень с содержимым</returns>
         public TreeRootModel GetWorkingTree(TreeRootModel root)
         {
-            root.ContentNodes.Clear();
+            root.ChildNodes.Clear();
 
             // TODO: Добавить кэш
 
@@ -129,9 +135,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             var tree = root.OwningWorkingTree;
 
-            root.ContentNodes.Clear();
-            tree.ContentAllNodes.Clear();
-            tree.ContentAllLeaves.Clear();
+            root.ChildNodes.Clear();
 
             if (tree.DataStorage.IsAvailable)
             {
@@ -162,7 +166,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             GetPersonalAttributes(root);
 
-            root.ContentNodes.Clear();
+            root.ChildNodes.Clear();
 
             var childNodes = allNodes.Where(x => x.Parent.Uuid == root.Uuid);
 
@@ -172,7 +176,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     SetModelState(child, State.SavedOrLoaded);
                 }
-                root.ContentNodes.AddRange(childNodes);
+                root.ChildNodes.AddRange(childNodes);
 
                 foreach (var child in childNodes)
                 {
@@ -192,8 +196,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             GetPersonalAttributes(node);
 
-            node.ChildTreeNodes.Clear();
-            node.ChildTreeLeaves.Clear();
+            node.ChildNodes.Clear();
+            node.ChildLeaves.Clear();
 
             var childNodes = allNodes.Where(x => x.Parent.Uuid == node.Uuid);
 
@@ -203,7 +207,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     SetModelState(child, State.SavedOrLoaded);
                 }
-                node.ChildTreeNodes.AddRange(childNodes);
+                node.ChildNodes.AddRange(childNodes);
 
                 foreach (var child in childNodes)
                 {
@@ -219,7 +223,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     SetModelState(child, State.SavedOrLoaded);
                 }
-                node.ChildTreeLeaves.AddRange(childLeaves);
+                node.ChildLeaves.AddRange(childLeaves);
 
                 foreach (var child in childLeaves)
                 {
@@ -248,7 +252,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Коллекция атрибутов</returns>
         public IEnumerable<ElementAttributeModel> GetPersonalAttributes(IAttributeOwnerModel attributeOwner)
         {
-            attributeOwner.PersonalAttributes.Clear();
+            attributeOwner.ClearAttributes();
 
             if (attributeOwner is IShrubMemberModel me)
             {
@@ -261,8 +265,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     foreach (var attribute in attributes)
                     {
                         SetModelState(attribute, State.SavedOrLoaded);
+                        attributeOwner.AddAttribute(attribute);
                     }
-                    attributeOwner.PersonalAttributes.AddRange(attributes);
 
                     return attributes;
                 }
@@ -372,7 +376,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             // Сохранение участников
             if (saveMode == SaveMode.WithContentAndMembers)
             {
-                result += SaveChanges(treeRoots.SelectMany(x => x.ContentNodes), saveMode);
+                result += SaveChanges(treeRoots.SelectMany(x => x.ChildNodes), saveMode);
             }
 
             return result;
@@ -413,14 +417,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (saveMode == SaveMode.WithContent || 
                 saveMode == SaveMode.WithContentAndMembers)
             {
-                result += SaveContentChanges(treeNodes.SelectMany(x => x.PersonalAttributes));
+                result += SaveContentChanges(treeNodes.SelectMany(x => x.PersonalAttributes).Where(x => treeNodes.Any(y => y.Uuid == x.Owner.Uuid)));
             }
 
             // Сохранение участников
             if (saveMode == SaveMode.WithContentAndMembers)
             {
-                result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeNodes), saveMode);
-                result += SaveChanges(treeNodes.SelectMany(x => x.ChildTreeLeaves), saveMode);
+                result += SaveChanges(treeNodes.SelectMany(x => x.ChildNodes), saveMode);
+                result += SaveChanges(treeNodes.SelectMany(x => x.ChildLeaves), saveMode);
             }
 
             return result;
@@ -550,13 +554,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 var result = new TreeNodeModel(Guid.NewGuid(), parentElement, (parentElement as IWorkingTreeMemberModel)?.OwningWorkingTree, new TreeNode());
-                if (parentElement is IAttributeOwnerModel)
-                    result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
+                // Переработал на pull-модель
+                //if (parentElement is IAttributeOwnerModel)
+                //    result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
 
                 if (parentElement is TreeNodeModel node)
-                    node.ChildTreeNodes.Add(result);
+                    node.ChildNodes.Add(result);
                 if (parentElement is TreeRootModel root)
-                    root.ContentNodes.Add(result);
+                    root.ChildNodes.Add(result);
 
                 SetModelState(result, State.Initialized);
                 return result;
@@ -577,16 +582,25 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             try
             {
-                if (parentElement.GetType().IsAssignableTo(typeof(IPhiladelphusRepositoryMemberModel)) == false || parentElement.GetType() != typeof(TreeNodeModel))
+                if (parentElement is IPhiladelphusRepositoryMemberModel == false || parentElement is TreeNodeModel == false)
                 {
                     _notificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
                     return null;
                 }
                 else
                 {
-                    var result = new TreeLeaveModel(Guid.NewGuid(), parentElement, parentElement.OwningWorkingTree, new TreeLeave());
-                    result.ParentElementAttributes = parentElement.Attributes;
-                    parentElement.ChildTreeLeaves.Add(result);
+                    TreeLeaveModel result = null;
+                    if (parentElement is SystemBaseTreeNodeModel sbn)
+                    {
+                        result = new SystemBaseTreeLeaveModel(Guid.NewGuid(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType);
+                    }
+                    else
+                    {
+                        result = new TreeLeaveModel(Guid.NewGuid(), parentElement, parentElement.OwningWorkingTree, new TreeLeave());
+                    }
+                    // Переработал на pull-модель
+                    //result.ParentElementAttributes = parentElement.Attributes;
+                    parentElement.ChildLeaves.Add(result);
                     //parentElement.State = State.Changed;
                     SetModelState(result, State.Initialized);
                     return result;
@@ -599,6 +613,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 throw;
             }
         }
+
         /// <summary>
         /// Создать атрибут и добавить владельцу
         /// </summary>
@@ -608,14 +623,35 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             try
             {
-                var result = new ElementAttributeModel(Guid.NewGuid(), owner, new ElementAttribute());
-                owner.PersonalAttributes.Add(result);
-
-                if (owner is IMainEntityWritableModel)
+                var uuid = Guid.NewGuid();
+                var result = new ElementAttributeModel(uuid, owner, uuid, owner, new ElementAttribute())
                 {
-                    SetModelState((IMainEntityWritableModel)owner, State.SavedOrLoaded);
-                }
-                
+                    Visibility = /*visibility*/ VisibilityScope.Public,
+                    Override = OverrideType.Virtual
+                };
+
+                SetModelState(result, State.Initialized);
+
+                owner.AddAttribute(result);
+
+                // Наследование атрибута дочерним узлам
+                // Пытаюсь переделать push-модель на pull-модель, т.к. владельцы атрибутов сами высчитывают свой список атрибутов при обращении к нему
+                //if (this is IParentModel p)
+                //{
+                //    foreach (var child in p.Childs)
+                //    {
+                //        if (child.Value is IAttributeOwnerModel ao)
+                //        {
+                //            CreateElementAttribute(ao, visibility);
+                //        }
+                //    }
+                //}
+
+                //if (owner is IMainEntityWritableModel o)
+                //{
+                //    SetModelState(o, State.SavedOrLoaded);
+                //}
+
                 return result;
             }
             catch (Exception ex)
@@ -686,6 +722,57 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private void SetModelState(IMainEntityWritableModel model, State newState)
         {
             model.SetState(newState);
+        }
+
+
+        /// <summary>
+        /// Инициализировать системное рабочее дерево базовых типов
+        /// </summary>
+        /// <param name="shrub"></param>
+        /// <returns></returns>
+        private bool InitSystemWorkingTree(ShrubModel shrub)
+        {
+            var existTree = shrub.ContentTrees.SingleOrDefault(x => x.Uuid == Guid.Parse("00000000-0000-0000-0000-0000002018ee"));
+            if (existTree != null)
+                return false;
+
+            // TODO: ех. долг #61187115
+            var newUuid = Guid.Parse("00000000-0000-0000-0000-0000002018ee");
+
+            var tree = new WorkingTreeModel(
+                uuid: newUuid,
+                dataStorage: shrub.DataStorage,
+                dbEntity: new TreeRoot(),
+                owner: shrub);
+
+            var root = new TreeRootModel(
+                uuid: newUuid,
+                owner: tree,
+                dbEntity: tree.DbEntity)
+            {
+                Name = "Базовые типы данных"
+            };
+
+            tree.ContentRoot = root;
+
+            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT);
+            root.ChildNodes.Add(obj);
+
+            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING);
+            obj.ChildNodes.Add(str);
+
+            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC);
+            obj.ChildNodes.Add(num);
+
+            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER);
+            num.ChildNodes.Add(integer);
+
+            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT);
+            num.ChildNodes.Add(flt);
+
+            shrub.ContentTrees.Add(tree);
+            shrub.ContentTreesUuids.Add(tree.Uuid);
+            return true;
         }
 
         #endregion

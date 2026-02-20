@@ -1,4 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
@@ -17,9 +18,13 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 return null;
             var result = (ElementAttribute)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
             //result.Owner = businessEntity.Owner.DbEntity;
+            result.DeclaringUuid = businessEntity.DeclaringUuid;
             result.OwnerUuid = businessEntity.Owner.Uuid;
+            result.DeclaringOwnerUuid = businessEntity.DeclaringOwner.Uuid;
             result.ValueTypeUuid = businessEntity.ValueType?.Uuid;
             result.ValueUuid = businessEntity.Value?.Uuid;
+            result.VisibilityId = (int)businessEntity.Visibility;
+            result.OverrideId = (int)businessEntity.Override;
             return result;
         }
 
@@ -46,12 +51,15 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// <param name="dbEntity">Сущность БД</param>
         /// <param name="owner">Владелец</param>
         /// <returns></returns>
-        public static ElementAttributeModel ToModel(this ElementAttribute dbEntity, IAttributeOwnerModel owner)
+        public static ElementAttributeModel ToModel(this ElementAttribute dbEntity, IAttributeOwnerModel owner, 
+            IAttributeOwnerModel declaringOwner)
         {
             if (dbEntity == null)
                 return null;
-            var result = new ElementAttributeModel(dbEntity.Uuid, owner, dbEntity);
+            var result = new ElementAttributeModel(dbEntity.Uuid, owner, dbEntity.DeclaringUuid, declaringOwner, dbEntity);
             result = (ElementAttributeModel)dbEntity.ToModelGeneralProperties(result);
+            result.Visibility = (VisibilityScope)dbEntity.VisibilityId;
+            result.Override = (OverrideType)dbEntity.OverrideId;
             return result;
         }
         public static List<ElementAttributeModel> ToModelCollection(this IEnumerable<ElementAttribute> dbEntityCollection, IEnumerable<IAttributeOwnerModel> owners)
@@ -61,10 +69,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             var result = new List<ElementAttributeModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = owners.FirstOrDefault(x => x.Uuid == dbEntity.OwnerUuid);
-                if (parent != null)
+                var owner = owners.FirstOrDefault(x => x.Uuid == dbEntity.OwnerUuid);
+                var declaringOwner = owners.FirstOrDefault(x => x.Uuid == dbEntity.DeclaringOwnerUuid);
+                if (owner != null)
                 {
-                    result.Add(dbEntity.ToModel(parent));
+                    result.Add(dbEntity.ToModel(owner, declaringOwner));
                 }
             }
             return result;

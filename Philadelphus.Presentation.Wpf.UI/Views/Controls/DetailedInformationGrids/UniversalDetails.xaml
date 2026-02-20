@@ -96,7 +96,22 @@
                 <local:TreeRootMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" ></local:TreeRootMemberDetails>
                 <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Свойства листа">
                     <GroupBox>
-                        <TextBlock Text="У листа пока нет особых свойств"></TextBlock>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
+                                <ColumnDefinition Width="*" MinWidth="100"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="2"></TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StringValue}" Margin="2"></TextBox>
+                        </Grid>
                     </GroupBox>
                 </Expander>
             </Grid>

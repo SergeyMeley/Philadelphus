@@ -2,6 +2,7 @@
 {
     public class TreeLeave : TreeNodeMemberBase
     {
+        public int SystemBaseTypeId { get; set; }
         public TreeLeave()
         {
 

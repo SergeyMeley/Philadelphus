@@ -59,12 +59,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Дочерние узлы
         /// </summary>
-        public List<TreeNodeModel> ChildTreeNodes { get; }
+        public List<TreeNodeModel> ChildNodes { get; }
 
         /// <summary>
         /// Дочерние листы
         /// </summary>
-        public List<TreeLeaveModel> ChildTreeLeaves { get; }
+        public List<TreeLeaveModel> ChildLeaves { get; }
 
         /// <summary>
         /// Наследники
@@ -75,12 +75,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 var result = new Dictionary<Guid, IChildrenModel>();
 
-                foreach (var node in ChildTreeNodes)
+                foreach (var node in ChildNodes)
                 {
                     result.Add(node.Uuid, node);
                 }
 
-                foreach (var leave in ChildTreeLeaves)
+                foreach (var leave in ChildLeaves)
                 {
                     result.Add(leave.Uuid, leave);
                 }
@@ -134,8 +134,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             if (parent is TreeNodeModel node)
                 ParentNode = node;
 
-            ChildTreeNodes = new List<TreeNodeModel>();
-            ChildTreeLeaves = new List<TreeLeaveModel>();
+            ChildNodes = new List<TreeNodeModel>();
+            ChildLeaves = new List<TreeLeaveModel>();
         }
 
         #endregion

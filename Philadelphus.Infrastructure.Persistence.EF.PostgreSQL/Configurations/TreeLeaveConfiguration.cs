@@ -73,6 +73,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                     .HasColumnName("deleted_by");
             });
 
+            builder.Property(p => p.SystemBaseTypeId)
+                .HasColumnName("data_type_id")
+                .IsRequired()
+                .HasDefaultValue(0);
+
             builder.HasOne(x => x.ParentTreeNode)
                   .WithMany()
                   .HasForeignKey(x => x.ParentUuid);

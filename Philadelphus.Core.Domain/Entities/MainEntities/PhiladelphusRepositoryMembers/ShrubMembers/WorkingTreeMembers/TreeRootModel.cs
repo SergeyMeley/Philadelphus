@@ -37,7 +37,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Дочерние узлы репозитория Чубушника
         /// </summary>
-        public List<TreeNodeModel> ContentNodes { get; }
+        public List<TreeNodeModel> ChildNodes { get; }
 
         /// <summary>
         /// Наследники
@@ -48,9 +48,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 var result = new Dictionary<Guid, IChildrenModel>();
 
-                if (ContentNodes != null)
+                if (ChildNodes != null)
                 {
-                    foreach (var node in ContentNodes)
+                    foreach (var node in ChildNodes)
                     {
                         result.Add(node.Uuid, node);
                     }
@@ -95,7 +95,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IMainEntity dbEntity)
             : base(uuid, owner, dbEntity)
         {
-            ContentNodes = new List<TreeNodeModel>();
+            ChildNodes = new List<TreeNodeModel>();
         }
 
         #endregion

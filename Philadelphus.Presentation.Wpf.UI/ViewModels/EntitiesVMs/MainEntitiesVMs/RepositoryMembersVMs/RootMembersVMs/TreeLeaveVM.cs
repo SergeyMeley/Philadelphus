@@ -1,4 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+﻿using Microsoft.Extensions.Primitives;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
@@ -30,6 +31,29 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
+        public string StringValue
+        {
+            get
+            {
+                if (_model is SystemBaseTreeLeaveModel m)
+                { 
+                    return m.StringValue; 
+                }
+                return Name;
+            }
+            set
+            {
+                if (_model is SystemBaseTreeLeaveModel m)
+                {
+                    m.StringValue = value;
+                }
+                OnPropertyChanged(nameof(StringValue));
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(State));
+            }
+        }
+
         #endregion
 
         #region [ Construct ]
@@ -54,7 +78,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         internal void NotifyChildsPropertyChangedRecursive()
         {
             OnPropertyChanged(nameof(State));
-            foreach (var item in PersonalAttributesVMs)
+            foreach (var item in AttributesVMs)
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }

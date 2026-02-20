@@ -18,6 +18,10 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.ParentUuid = businessEntity.Parent.Uuid;
             result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.Uuid;
             //result.ParentTreeRoot = (TreeRoot)service.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
+            if (businessEntity is SystemBaseTreeLeaveModel st)
+            {
+                result.SystemBaseTypeId = (int)st.SystemBaseType;
+            }
             return result;
         }
 
@@ -54,6 +58,22 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         }
 
         /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="parent">Родитель</param>
+        /// <returns></returns>
+        public static SystemBaseTreeLeaveModel ToModel(this TreeLeave dbEntity, SystemBaseTreeNodeModel parent)
+        {
+            if (dbEntity == null)
+                 return null;
+            var type = SystemBaseTreeNodeModel.GetTypeByUuid(parent.Uuid);
+            var result = new SystemBaseTreeLeaveModel(dbEntity.Uuid, parent, parent.OwningWorkingTree, type);
+            result = (SystemBaseTreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
+            return result;
+        }
+
+        /// <summary>
         /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
         /// </summary>
         /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
@@ -69,7 +89,14 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentUuid);
                 if (parent != null)
                 {
-                    result.Add(dbEntity.ToModel(parent));
+                    if (dbEntity.SystemBaseTypeId != 0)
+                    {
+                        result.Add(dbEntity.ToModel(parent as SystemBaseTreeNodeModel));
+                    }
+                    else
+                    {
+                        result.Add(dbEntity.ToModel(parent));
+                    }
                 }
             }
             return result;

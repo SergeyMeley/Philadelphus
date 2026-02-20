@@ -44,7 +44,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (_alias != value)
                 {
                     _alias = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }

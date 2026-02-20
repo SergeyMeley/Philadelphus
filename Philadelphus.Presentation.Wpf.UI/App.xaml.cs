@@ -190,7 +190,8 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
-                    services.AddTransient<LaunchWindow>();
+                    services.AddSingleton<LaunchWindow>();      // Не менять. Требуется для автоматического закрытия окна при открытии основного
+                    services.AddTransient<AttributeValuesCollectionWindow>();
 
                     // Регистрация фабрик
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();

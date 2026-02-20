@@ -59,11 +59,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _service = service;
 
             _model = treeNode;
-            foreach (var item in treeNode.ChildTreeNodes)
+            foreach (var item in treeNode.ChildNodes)
             {
                 _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
             }
-            foreach (var item in treeNode.ChildTreeLeaves)
+            foreach (var item in treeNode.ChildLeaves)
             {
                 _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, _service));
             }
@@ -125,7 +125,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }
-            foreach (var item in PersonalAttributesVMs)
+            foreach (var item in AttributesVMs)
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }

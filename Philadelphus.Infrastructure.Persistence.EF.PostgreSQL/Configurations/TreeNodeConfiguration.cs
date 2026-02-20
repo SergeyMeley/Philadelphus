@@ -79,6 +79,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
             builder.Property(x => x.ParentTreeNodeUuid)
                 .HasColumnName("parent_tree_node_uuid");
 
+            builder.Property(p => p.SystemBaseTypeId)
+                .HasColumnName("data_type_id")
+                .IsRequired()
+                .HasDefaultValue(0);
+
             builder.Ignore(x => x.Parent);
 
             builder.HasOne(x => x.ParentTreeRoot)
