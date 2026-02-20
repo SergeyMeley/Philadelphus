@@ -200,7 +200,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (dialog.ShowDialog() == true)
                     {
                         path = dialog.FileName;
-        }
+                    }
                     try
                     {
                         var originPath = SelectedConfigFile.FileInfo.FullName;
@@ -211,7 +211,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     catch (Exception)
                     {
                         MessageBox.Show("Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
-    }
+                    }
 
                     SelectedConfigFile.OnPropertyChanged(nameof(SelectedConfigFile.FilePath));
 

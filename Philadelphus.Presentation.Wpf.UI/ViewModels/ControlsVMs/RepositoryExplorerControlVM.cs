@@ -2,8 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
@@ -15,7 +17,11 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -280,10 +286,85 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public RelayCommand ExportToPjsonCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var model = SelectedRepositoryMember.Model as TreeRootModel;
+                    var json = JsonImportExportHelper.GetJson(model.OwningWorkingTree);
+
+                    Clipboard.SetText(json);
+
+                    var path = string.Empty;
+
+                    var dialog = new OpenFolderDialog
+                    {
+                        Title = "Выберите директорию",
+                        Multiselect = false,
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        path = dialog.FolderName;
+                    }
+
+                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.NewGuid()}.pjson");
+                    File.WriteAllText(file, json, Encoding.UTF8);
+
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = file,
+                        UseShellExecute = true
+                    });
+                },
+                ce =>
+                {
+                    return SelectedRepositoryMember is TreeRootVM;
+                });
+            }
+        }
+
+        public RelayCommand ImportFromPjsonCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var model = SelectedRepositoryMember.Model as TreeRootModel;
+
+                    var path = string.Empty;
+
+                    var dialog = new OpenFileDialog
+                    {
+                        Title = "Выберите файл",
+                        Multiselect = false,
+                        Filter = "PJSON файлы (*.pjson)|*.pjson",
+                        FilterIndex = 1,
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        string file = dialog.FileName;
+                        var json = File.ReadAllText(file);
+
+                        JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model);
+
+                        PhiladelphusRepositoryVM.Childs.Add(new TreeRootVM(PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentTrees?.Last()?.ContentRoot, _service));
+                    }
+                },
+                ce =>
+                {
+                    return SelectedRepositoryMember is TreeRootVM;
+                });
+            }
+        }
+
         #endregion
 
         #region [ Methods ]
-         
+
         internal bool LoadPhiladelphusRepository()
         {
             var newRepo = _service.GetShrub(_philadelphusRepositoryVM.Model);

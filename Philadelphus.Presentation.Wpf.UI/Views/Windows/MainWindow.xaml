@@ -157,6 +157,13 @@
                 <RibbonTab Header="Рассылки">
 
                 </RibbonTab>
+                <RibbonTab Header="Данные">
+                    <RibbonGroup Header="Экспорт / импорт">
+                        <RibbonButton Label="Экспорт .pjson" Command="{Binding RepositoryExplorerVM.ExportToPjsonCommand}" />
+                        <RibbonButton Label="Импорт из .pjson" Command="{Binding RepositoryExplorerVM.ImportFromPjsonCommand}" />
+                    </RibbonGroup>
+
+                </RibbonTab>
                 <RibbonTab Header="Вид">
 
                 </RibbonTab>
@@ -185,9 +192,7 @@
 
                 </RibbonTab>
                 <RibbonTab Header="Настройки">
-                    <RibbonGroup Header="Хранилища">
-                        <RibbonButton Label="Открыть настройки хранилищ" Command="{Binding OpenDataStorageSettings}"></RibbonButton>
-                    </RibbonGroup>
+                    
                 </RibbonTab>
                 <RibbonTab Header="Справка">
                     <RibbonGroup>
