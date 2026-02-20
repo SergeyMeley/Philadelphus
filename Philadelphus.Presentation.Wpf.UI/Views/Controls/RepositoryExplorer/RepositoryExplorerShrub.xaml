@@ -15,7 +15,7 @@
 
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
-                    <StackPanel Margin="2" Background="Snow">
+                    <StackPanel Margin="1" Background="Snow">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
                             <Image Width="24" 

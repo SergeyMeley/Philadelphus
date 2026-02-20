@@ -40,6 +40,6 @@
             </Expander.Header>
             <detail:UniversalDetails DataContext="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM}"></detail:UniversalDetails>
         </Expander>
-        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="2"></Button>
+        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="1"></Button>
     </Grid>
 </UserControl>

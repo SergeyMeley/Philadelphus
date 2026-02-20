@@ -22,7 +22,7 @@
             <ColumnDefinition Width="auto"></ColumnDefinition>
             <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="2" Grid.RowSpan="2">
+        <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="1" Grid.RowSpan="2">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -31,17 +31,17 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="2">
-                        <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элемент репозитория" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageProtect}" Command="{Binding ProtectCommand}" ToolTip="Защитить" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1">
+                        <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элемент репозитория" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageProtect}" Command="{Binding ProtectCommand}" ToolTip="Защитить" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                     </StackPanel>
-                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="2">
+                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="1">
                         <TextBlock VerticalAlignment="Center" Text="Представление "></TextBlock>
                         <ComboBox MinWidth="50">
                             <ComboBoxItem Content="Основной"></ComboBoxItem>
@@ -53,11 +53,11 @@
                     </StackPanel>
                 </DockPanel>
 
-                <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerShrub></local:RepositoryExplorerShrub>
                 </GroupBox>
                 <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerLeavesList></local:RepositoryExplorerLeavesList>
                 </GroupBox>
             </Grid>
@@ -104,7 +104,7 @@
                 </ScrollViewer>
             </GroupBox>
             <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-            <GroupBox Visibility="Collapsed" Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2">
+            <GroupBox Visibility="Collapsed" Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="1">
                 <StackPanel>
                     <TabControl Visibility="Visible">
                         <TabItem Header="Плоская таблица допустимых значений (для узла)">
@@ -135,12 +135,12 @@
                                             <ColumnDefinition Width="auto"></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="2"></TextBlock>
-                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="2"></ComboBox>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="2"></TextBlock>
-                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="2"></ComboBox>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="2"></TextBlock>
-                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="2"></ComboBox>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="1"></ComboBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="1"></ComboBox>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="1"></ComboBox>
                                     </Grid>
                                 </Grid>
                                 <DataGrid></DataGrid>

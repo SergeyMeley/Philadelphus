@@ -48,14 +48,14 @@
         <Image x:Key="imageList" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/list_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
 
-        <Button x:Key="buttonBack" Content="{StaticResource imageBack}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonCopy" Content="{StaticResource imageCopy}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonCut" Content="{StaticResource imageCut}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonDuplicate" Content="{StaticResource imageDuplicate}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonForward" Content="{StaticResource imageForward}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonPaste" Content="{StaticResource imagePaste}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonReturn" Content="{StaticResource imageReturn}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
-        <Button x:Key="buttonUp" Content="{StaticResource imageUp}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonBack" Content="{StaticResource imageBack}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonCopy" Content="{StaticResource imageCopy}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonCut" Content="{StaticResource imageCut}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonDuplicate" Content="{StaticResource imageDuplicate}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonForward" Content="{StaticResource imageForward}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonPaste" Content="{StaticResource imagePaste}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonReturn" Content="{StaticResource imageReturn}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
+        <Button x:Key="buttonUp" Content="{StaticResource imageUp}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
 
         <Style x:Key="PlaceholderTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Template">

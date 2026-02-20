@@ -34,8 +34,8 @@
                     <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <local:PhiladelphusRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" ></local:PhiladelphusRepositoryMemberDetails>
-                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Text="Свойства корня:" FontWeight="Bold" Margin="2"></TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Количество узлов" Margin="2"></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Text="Свойства корня:" FontWeight="Bold" Margin="1"></TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Количество узлов" Margin="1"></TextBlock>
 
             </Grid>
         </DataTemplate>
@@ -69,9 +69,9 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Количество узлов" Margin="2"></TextBlock>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Количество узлов" Margin="1"></TextBlock>
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Количество листов" Margin="2"></TextBlock>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Количество листов" Margin="1"></TextBlock>
 
                         </Grid>
                     </GroupBox>
@@ -109,8 +109,8 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="2"></TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StringValue}" Margin="2"></TextBox>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="1"></TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StringValue}" Margin="1"></TextBox>
                         </Grid>
                     </GroupBox>
                 </Expander>
