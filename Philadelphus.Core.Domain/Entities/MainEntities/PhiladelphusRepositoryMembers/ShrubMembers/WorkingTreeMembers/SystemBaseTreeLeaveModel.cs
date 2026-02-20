@@ -13,7 +13,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     {
         private string _stringValue;
 
-        public SystemBaseType SystemBaseType { get; }
+        public override SystemBaseType SystemBaseType { get; }
         public string StringValue 
         { 
             get

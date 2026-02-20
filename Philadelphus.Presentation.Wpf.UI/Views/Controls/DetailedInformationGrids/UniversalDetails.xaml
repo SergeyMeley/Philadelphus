@@ -109,8 +109,6 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="1"></TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StringValue}" Margin="1"></TextBox>
                         </Grid>
                     </GroupBox>
                 </Expander>

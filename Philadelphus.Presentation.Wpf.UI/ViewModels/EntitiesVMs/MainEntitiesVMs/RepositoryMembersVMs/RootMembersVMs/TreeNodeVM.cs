@@ -1,4 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows.Data;

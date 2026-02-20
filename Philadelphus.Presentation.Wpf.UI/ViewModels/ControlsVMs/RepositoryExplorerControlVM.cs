@@ -16,6 +16,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using PropertyTools.Wpf;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -39,6 +40,30 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public Visibility SystemBaseLeaveControlVisibility
+        {
+            get
+            {
+                if (SelectedRepositoryMember?.Model is SystemBaseTreeLeaveModel)
+                {
+                    return Visibility.Visible;
+                }
+                return Visibility.Collapsed;
+            }
+        }
+
+        public Visibility ParentControlVisibility
+        {
+            get
+            {
+                if (SelectedRepositoryMember is TreeRootVM 
+                    || SelectedRepositoryMember is TreeNodeVM)
+                {
+                    return Visibility.Visible;
+                }
+                return Visibility.Collapsed;
+            }
+        }
 
         public string CurentRepositoryName { get => _philadelphusRepositoryVM.Name; }
 
@@ -56,6 +81,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 _selectedRepositoryMember = value;
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
+                OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
+                OnPropertyChanged(nameof(ParentControlVisibility));
             }
         }
         //public List<InfrastructureTypes> InfrastructureTypes
