@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer"
+             xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:StateToColorConverter x:Key="stateToColorConverter"/>
+    </UserControl.Resources>
     <Grid>
         <TreeView Name="MainTreeView" DataContext="{Binding PhiladelphusRepositoryVM}" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
@@ -20,20 +24,8 @@
                                    Source="{Binding ., Converter={StaticResource mainEntityToIconConverter}}"></Image>
                             <StackPanel Margin="0,2,10,2">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Тип элемента: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Center"></TextBlock>
-                                    <Grid MinWidth="30" x:Name="ContentPanel" Margin="0,0,12,0" VerticalAlignment="Center">
-                                        <Rectangle Fill="DeepPink" RadiusX="5" RadiusY="5" Width="{Binding Width,ElementName=textBlock}" Height="{Binding Height,ElementName=textBlock}" Stroke="Black" StrokeThickness="0.5"/>
-                                        <TextBlock Name="textBlock" Padding="5,0" Text="{Binding ElementType.Name}" FontSize="10" Height="14" Width="Auto" Foreground="Black"/>
-                                    </Grid>
-                                    <Grid VerticalAlignment="Center">
-                                        <Border BorderThickness="1"></Border>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Теги: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray"></TextBlock>
-                                            <TextBlock Text="#xxx1, #xxx2, #xxx3" Foreground="DarkBlue"></TextBlock>
-                                        </StackPanel>
-                                    </Grid>
                                     <Grid MinWidth="30" Margin="0,0,12,0" VerticalAlignment="Center">
-                                        <Rectangle Fill="DeepPink" RadiusX="5" RadiusY="5" Width="{Binding Width,ElementName=textBlock}" Height="{Binding Height,ElementName=textBlock}" Stroke="Black" StrokeThickness="0.5"/>
+                                        <Rectangle Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" RadiusX="5" RadiusY="5" Width="{Binding Width,ElementName=textBlock}" Height="{Binding Height,ElementName=textBlock}" Stroke="Black" StrokeThickness="0.5"/>
                                         <TextBlock Padding="5,0" Text="{Binding State}" FontSize="10" Height="14" Width="Auto" Foreground="Black"/>
                                     </Grid>
                                 </StackPanel>
