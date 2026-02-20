@@ -22,16 +22,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
                         return Brushes.DeepPink;
                         break;
                     case State.Changed:
-                        return Brushes.Yellow;
+                        return Brushes.Cyan;
                         break;
                     case State.SavedOrLoaded:
-                        return Brushes.Green;
+                        return Brushes.YellowGreen;
                         break;
                     case State.ForSoftDelete:
-                        return Brushes.Red;
+                        return Brushes.OrangeRed;
                         break;
                     case State.ForHardDelete:
-                        return Brushes.OrangeRed;
+                        return Brushes.Red;
                         break;
                     case State.SoftDeleted:
                         return Brushes.IndianRed;
