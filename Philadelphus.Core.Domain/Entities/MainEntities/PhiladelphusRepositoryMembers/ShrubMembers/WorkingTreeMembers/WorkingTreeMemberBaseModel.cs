@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
@@ -103,6 +104,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 throw new ArgumentNullException(nameof(owner));
 
             OwningWorkingTree = owner;
+
+            Name = NamingHelper.GetNewName(OwningWorkingTree.UnavailableNames, _defaultFixedPartOfName);
+            OwningWorkingTree.UnavailableNames.Add(Name);
         }
 
         #endregion

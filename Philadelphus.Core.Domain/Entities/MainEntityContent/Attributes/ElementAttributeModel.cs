@@ -302,6 +302,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             Owner = localOwner;
             DeclaringUuid = declaringUuid;
             DeclaringOwner = declaringOwner;
+
+            if (Owner is IWorkingTreeMemberModel wtm)
+            {
+                Name = NamingHelper.GetNewName(wtm.OwningWorkingTree.UnavailableNames, _defaultFixedPartOfName);
+                wtm.OwningWorkingTree.UnavailableNames.Add(Name);
+            }
         }
 
         #endregion
