@@ -24,7 +24,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         protected override string _defaultFixedPartOfName => "Новый участник кустарника";
 
         private long _sequence;
-        private List<ElementAttributeModel> _parentElementAttributes;
+        private List<ElementAttributeModel> _attributes;
 
         #endregion
 
@@ -46,7 +46,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (_sequence != value)
                 {
                     _sequence = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -69,7 +69,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Владелец
         /// </summary>
-        public IOwnerModel Owner { get; }
+        public IOwnerModel Owner { get => OwningShrub; }
 
         /// <summary>
         /// Содержимое
@@ -87,36 +87,46 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Атрибуты (собственные и унаследованные)
         /// </summary>
-        public List<ElementAttributeModel> Attributes
-        {
+        public IReadOnlyList<ElementAttributeModel> Attributes 
+        { 
             get
             {
-                return PersonalAttributes.Concat(ParentElementAttributes).ToList();
+                var attributes = _attributes?.Where(x => x.IsOwn).ToList();
+                if (this is IChildrenModel c)
+                {
+                    if (c.Parent is IAttributeOwnerModel ao)
+                    {
+                        if (ao is IWorkingTreeMemberModel wtm)
+                        {
+                            foreach (var attribute in ao.GetVisibleAttributesRecursive(wtm))
+                            {
+                                if (attributes.Any(x => x.DeclaringUuid == attribute.DeclaringUuid) == false)   // Пропускаем атрибуты, которые уже унаследованы с ближайшегго родителя
+                                {
+                                    attributes.Add(attribute.CloneForChild(this));
+                                }
+                            }
+                        }
+                    }
+                }
+                _attributes = attributes;
+                return attributes;
             }
         }
 
         /// <summary>
         /// Собственные атрибуты
         /// </summary>
-        public List<ElementAttributeModel> PersonalAttributes { get; } = new List<ElementAttributeModel>();
+        public IReadOnlyList<ElementAttributeModel> PersonalAttributes 
+        { 
+            get => _attributes?.Where(x => x.IsOwn).ToList(); 
+        }
 
         /// <summary>
         /// Унаследованные атрибуты
         /// </summary>
-        public List<ElementAttributeModel> ParentElementAttributes
+        public IReadOnlyList<ElementAttributeModel> ParentElementAttributes
         {
-            get
-            {
-                return _parentElementAttributes;
-            }
-            set
-            {
-                if (_parentElementAttributes != value)
-                {
-                    _parentElementAttributes = value;
-                    UpdateStateAfterChange();
-                }
-            }
+            get => _attributes?.Where(x => x.IsOwn == false).ToList();
         }
 
         /// <summary>
@@ -126,11 +136,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             get
             {
-                if (Attributes?.Count > 0)
+                if (Attributes.Count() > 0)
                     return true;
-                if (PersonalAttributes?.Count > 0)
+                if (PersonalAttributes.Count() > 0)
                     return true;
-                if (ParentElementAttributes?.Count > 0)
+                if (ParentElementAttributes.Count() > 0)
                     return true;
                 return false;
             }
@@ -164,8 +174,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 throw new ArgumentNullException(nameof(owner));
 
             OwningShrub = owner;
-
-            ParentElementAttributes = new List<ElementAttributeModel>();
+            _attributes = new List<ElementAttributeModel>();
         }
 
         #endregion
@@ -178,7 +187,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="attribute">Атрибут</param>
         public void AddAttribute(ElementAttributeModel attribute)
         {
-            Attributes.Add(attribute);
+            _attributes.Add(attribute);
          }
 
         /// <summary>
@@ -187,10 +196,23 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="attribute">Атрибут</param>
         public void RemoveAttribute(ElementAttributeModel attribute)
         {
-            Attributes.Remove(attribute);
+            _attributes.Remove(attribute);
         }
 
-        public IEnumerable<ElementAttributeModel> GetVisibleAttributes(IWorkingTreeMemberModel? viewer)
+        /// <summary>
+        /// Очистить атрибуты
+        /// </summary>
+        public void ClearAttributes()
+        {
+            _attributes.Clear();
+        }
+
+        /// <summary>
+        /// Получить видимые атрибуты родителей
+        /// </summary>
+        /// <param name="viewer">Текущий элемент</param>
+        /// <returns></returns>
+        public IEnumerable<ElementAttributeModel> GetVisibleAttributesRecursive(IWorkingTreeMemberModel? viewer)
         {
             if (viewer == null) yield break;
 
@@ -208,6 +230,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
                 if (res)
                     yield return attr;
+            }
+            
+            if (this is IChildrenModel c)
+            {
+                if (c.Parent is IAttributeOwnerModel ao)
+                {
+                    foreach (var item in ao.GetVisibleAttributesRecursive(viewer))
+                    {
+                        yield return item;
+                    }
+                 }
             }
         }
 
@@ -230,7 +263,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             if (this is IWorkingTreeMemberModel wtm)
             {
-                if (viewer.OwningWorkingTree.Uuid == wtm.Uuid)
+                if (viewer.OwningWorkingTree.Uuid == wtm.OwningWorkingTree.Uuid)
                 {
                     return true;
                 }
@@ -240,14 +273,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         private bool IsDescendantOrSelf(IWorkingTreeMemberModel viewer)
         {
-            //var current = this;
-            //while (current != null)
-            //{
-            //    if (current.Id == viewer.Id) return true;
-            //    // Подняться к родителю (требует ссылки на родителя или рекурсия по дереву)
-            //    current = OwningShrub.ContentTrees.SelectMany(x => x.AllContentRecursive);
-            //}
-            return false;
+            if (viewer is IChildrenModel c)
+            {
+                if (c.AllParentsRecursive.ContainsKey(Uuid))
+                {
+                    return true;
+                }
+            }
+            return IsSameNodeOrLeaf(viewer);
         }
 
         #endregion

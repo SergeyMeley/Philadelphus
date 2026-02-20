@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Core.Domain.Interfaces
@@ -16,17 +17,17 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// <summary>
         /// Коллекция атрибутов (собственных и унаследованных)
         /// </summary>
-        public List<ElementAttributeModel> Attributes { get; }
+        public IReadOnlyList<ElementAttributeModel> Attributes { get; }
 
         /// <summary>
         /// Коллекция атрибутов собственных
         /// </summary>
-        public List<ElementAttributeModel> PersonalAttributes { get; }
+        public IReadOnlyList<ElementAttributeModel> PersonalAttributes { get; }
 
         /// <summary>
         /// Коллекция атрибутов унаследованных
         /// </summary>
-        public List<ElementAttributeModel> ParentElementAttributes { get; }
+        public IReadOnlyList<ElementAttributeModel> ParentElementAttributes { get; }
 
         /// <summary>
         /// Добавить атрибут
@@ -39,5 +40,17 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// </summary>
         /// <param name="attribute">Атрибут</param>
         public void RemoveAttribute(ElementAttributeModel attribute);
+
+        /// <summary>
+        /// Очистить атрибуты
+        /// </summary>
+        public void ClearAttributes();
+
+        /// <summary>
+        /// Получить видимые атрибуты родителей
+        /// </summary>
+        /// <param name="viewer">Текущий элемент</param>
+        /// <returns></returns>
+        public IEnumerable<ElementAttributeModel> GetVisibleAttributesRecursive(IWorkingTreeMemberModel? viewer);
     }
 }

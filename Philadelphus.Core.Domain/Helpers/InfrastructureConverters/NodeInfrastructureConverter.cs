@@ -22,6 +22,10 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.Uuid;     //TODO: ВРЕМЕННО
             //result.ParentRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
             //result.ParentRoot = (TreeRoot)PhiladelphusRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
+            if (businessEntity is SystemBaseTreeNodeModel st)
+            {
+                result.SystemBaseTypeId = (int)st.SystemBaseType;
+            }
             return result;
         }
 
@@ -64,6 +68,27 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         }
 
         /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="parent">Родитель</param>
+        /// <returns></returns>
+        public static SystemBaseTreeNodeModel ToBaseModel(this TreeNode dbEntity, IParentModel parent)
+        {
+            if (dbEntity == null)
+                return null;
+
+            WorkingTreeModel owner = null;
+            if (parent is TreeNodeModel node)
+                owner = node.OwningWorkingTree;
+            if (parent is TreeRootModel root)
+                owner = root.OwningWorkingTree;
+            var result = new SystemBaseTreeNodeModel(dbEntity.Uuid, parent, owner);
+            result = (SystemBaseTreeNodeModel)dbEntity.ToModelGeneralProperties(result);
+            return result;
+        }
+
+        /// <summary>
         /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
         /// </summary>
         /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
@@ -79,7 +104,14 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentUuid);
                 if (parent != null)
                 {
-                    result.Add(dbEntity.ToModel(parent));
+                    if (dbEntity.SystemBaseTypeId != 0)
+                    {
+                        result.Add(dbEntity.ToBaseModel(parent));
+                    }
+                    else
+                    {
+                        result.Add(dbEntity.ToModel(parent));
+                    }
                 }
             }
             return result;

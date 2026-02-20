@@ -48,7 +48,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 if (_lastOpening != value)
                 {
                     _lastOpening = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 if (_isFavorite != value)
                 {
                     _isFavorite = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                     _ownDataStorage = value;
                     if (DataStorages.Any(x => x.Uuid == value.Uuid) == false)
                         DataStorages.Add(value);
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -149,7 +149,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 if (OwnDataStorage.Name != value)
                 {
                     OwnDataStorage.Name = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }

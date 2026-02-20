@@ -54,8 +54,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 return null;
             var dataStorage = dataStorages.FirstOrDefault(x => x.Uuid == dbEntity.OwnDataStorageUuid);
             var repository = repositories.FirstOrDefault(x => x.ContentShrub.ContentTreesUuids.Any(g => g == dbEntity.Uuid));
-            var shrub = new ShrubModel(dbEntity.Uuid, repository.DbEntity as PhiladelphusRepository, repository);
-            var tree = new WorkingTreeModel(dbEntity.Uuid, dataStorage, dbEntity, shrub);
+            var tree = new WorkingTreeModel(dbEntity.Uuid, dataStorage, dbEntity, repository.ContentShrub);
             var root = new TreeRootModel(dbEntity.Uuid, tree, dbEntity);
             root = (TreeRootModel)dbEntity.ToModelGeneralProperties(root);
             tree.ContentRoot = root;

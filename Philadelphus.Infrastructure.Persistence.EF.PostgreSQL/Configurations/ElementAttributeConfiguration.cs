@@ -18,6 +18,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                 .ValueGeneratedOnAdd()
                 .HasDefaultValueSql("gen_random_uuid()");
 
+            builder.Property(x => x.DeclaringUuid)
+                .HasColumnName("declaring_uuid")
+                .IsRequired();
+
             builder.Property(x => x.Name)
                 .HasColumnName("name")
                 .IsRequired();
@@ -75,11 +79,23 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                 .HasColumnName("owner_uuid")
                 .IsRequired();
 
+            builder.Property(x => x.DeclaringOwnerUuid)
+                .HasColumnName("declaring_owner_uuid")
+                .IsRequired();
+
             builder.Property(x => x.ValueTypeUuid)
                 .HasColumnName("value_type_uuid");
 
             builder.Property(x => x.ValueUuid)
                 .HasColumnName("value_uuid");
+
+            builder.Property(x => x.VisibilityId)
+                .HasColumnName("visibility_id")
+                .HasDefaultValue(0);
+
+            builder.Property(x => x.OverrideId)
+                .HasColumnName("override_id")
+                .HasDefaultValue(0);
         }
     }
 }

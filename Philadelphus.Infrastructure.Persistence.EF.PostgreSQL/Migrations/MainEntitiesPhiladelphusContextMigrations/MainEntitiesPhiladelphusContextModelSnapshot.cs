@@ -41,10 +41,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("custom_code");
 
-                    b.PrimitiveCollection<Guid[]>("DataStoragesUuids")
-                        .IsRequired()
-                        .HasColumnType("uuid[]");
-
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
@@ -114,6 +110,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
+                    b.Property<int>("SystemBaseTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("data_type_id");
+
                     b.HasKey("Uuid")
                         .HasName("tree_leaves_pkey");
 
@@ -168,6 +170,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
+                    b.Property<int>("SystemBaseTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("data_type_id");
+
                     b.Property<Guid?>("TreeRootUuid")
                         .HasColumnType("uuid");
 
@@ -199,6 +207,14 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("custom_code");
 
+                    b.Property<Guid>("DeclaringOwnerUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("declaring_owner_uuid");
+
+                    b.Property<Guid>("DeclaringUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("declaring_uuid");
+
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
@@ -211,6 +227,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<int>("OverrideId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("override_id");
 
                     b.Property<Guid>("OwnerUuid")
                         .HasColumnType("uuid")
@@ -227,6 +249,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Property<Guid?>("ValueUuid")
                         .HasColumnType("uuid")
                         .HasColumnName("value_uuid");
+
+                    b.Property<int>("VisibilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("visibility_id");
 
                     b.HasKey("Uuid")
                         .HasName("element_attributes_pkey");

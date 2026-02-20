@@ -101,7 +101,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (_contentTreesUuids != value)
                 {
                     _contentTreesUuids = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }

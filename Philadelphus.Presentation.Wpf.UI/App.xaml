@@ -45,6 +45,9 @@
         <Image x:Key="imageNode" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_node.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageLeave" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_leave.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
+        <Image x:Key="imageList" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/list_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+
+
         <Button x:Key="buttonBack" Content="{StaticResource imageBack}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
         <Button x:Key="buttonCopy" Content="{StaticResource imageCopy}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />
         <Button x:Key="buttonCut" Content="{StaticResource imageCut}" Margin="2" MinHeight="20" MinWidth="20" Background="Transparent" />

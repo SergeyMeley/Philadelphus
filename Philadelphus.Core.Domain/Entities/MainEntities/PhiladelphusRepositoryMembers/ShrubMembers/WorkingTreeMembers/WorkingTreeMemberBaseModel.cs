@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
@@ -43,7 +44,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (_customCode != value)
                 {
                     _customCode = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
@@ -108,7 +109,57 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ Methods ]
 
+        internal IEnumerable<TreeNodeModel> GetAllNodesRecursive()
+        {
+            var nodes = new List<TreeNodeModel>();
 
+            if (this is TreeRootModel root)
+            {
+                nodes.AddRange(root.ChildNodes);
+
+                foreach (var nodeItem in root.ChildNodes)
+                {
+                    nodes.AddRange(nodeItem.GetAllNodesRecursive());
+                }
+            }
+
+            if (this is TreeNodeModel node)
+            {
+                nodes.AddRange(node.ChildNodes);
+
+                foreach (var nodeItem in node.ChildNodes)
+                {
+                    nodes.AddRange(nodeItem.GetAllNodesRecursive());
+                }
+            }
+
+            return nodes;
+        }
+
+        internal IEnumerable<TreeLeaveModel> GetAllLeavesRecursive()
+        {
+            var leaves = new List<TreeLeaveModel>();
+
+            if (this is TreeRootModel root)
+            {
+                foreach (var nodeItem in root.ChildNodes)
+                {
+                    leaves.AddRange(nodeItem.GetAllLeavesRecursive());
+                }
+            }
+
+            if (this is TreeNodeModel node)
+            {
+                leaves.AddRange(node.ChildLeaves);
+
+                foreach (var leaveItem in node.ChildLeaves)
+                {
+                    leaves.AddRange(leaveItem.GetAllLeavesRecursive());
+                }
+            }
+
+            return leaves;
+        }
 
         #endregion
     }

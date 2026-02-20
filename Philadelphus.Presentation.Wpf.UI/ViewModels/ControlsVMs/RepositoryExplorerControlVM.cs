@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
@@ -12,6 +13,9 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -208,6 +212,60 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
+        public RelayCommand SoftDeleteRepositoryMemberAttributeCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (_selectedRepositoryMember.SelectedAttributeVM.Model is IContentModel c)
+                    {
+                        _service.SoftDeleteRepositoryMember(c);
+                    }
+                    OnPropertyChanged(nameof(State));
+                });
+            }
+        }
+
+        public RelayCommand OpenModifyAttributesListWindowCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = _serviceProvider.GetRequiredService<AttributeValuesCollectionWindow>();
+                    window.DataContext = this;
+                    window.Show();
+                },
+                ce =>
+                {
+                    return _selectedRepositoryMember?.SelectedAttributeVM?.IsCollectionValue ?? false;
+                });
+            }
+        }
+
+        public RelayCommand AddAttributeValueCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
+                });
+            }
+        }
+
+        public RelayCommand RemoveAttributeValueCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
+                });
+            }
+        }
+
         public RelayCommand ProtectCommand
         {
             get

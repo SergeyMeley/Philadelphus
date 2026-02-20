@@ -2,6 +2,7 @@
 {
     public class TreeNode : TreeNodeMemberBase
     {
+        public int SystemBaseTypeId { get; set; }
         public TreeNode()
         {
 

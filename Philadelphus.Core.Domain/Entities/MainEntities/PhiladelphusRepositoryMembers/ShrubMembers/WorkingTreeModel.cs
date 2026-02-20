@@ -58,12 +58,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
                 result.Add(ContentRoot.Uuid, ContentRoot);
 
-                foreach (var node in ContentAllNodes)
+                foreach (var node in GetAllNodesRecursive())
                 {
                     result.Add(node.Uuid, node);
                 }
 
-                foreach (var leave in ContentAllLeaves)
+                foreach (var leave in GetAllLeavesRecursive())
                 {
                     result.Add(leave.Uuid, leave);
                 }
@@ -95,20 +95,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (_contentRoot != value)
                 {
                     _contentRoot = value;
-                    UpdateStateAfterChange();
+                    UpdateStateStateAfterChange();
                 }
             }
         }
-
-        /// <summary>
-        /// Все узлы рабочего дерева (рекурсивно)
-        /// </summary>
-        public List<TreeNodeModel> ContentAllNodes { get; }
-
-        /// <summary>
-        /// Все листы рабочего дерева (рекурсивно)
-        /// </summary>
-        public List<TreeLeaveModel> ContentAllLeaves { get; }
 
         #endregion
 
@@ -154,9 +144,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 throw new ArgumentNullException(nameof(dataStorage));
 
             _ownDataStorage = dataStorage;
-
-            ContentAllNodes = new List<TreeNodeModel>();
-            ContentAllLeaves = new List<TreeLeaveModel>();
         }
 
         #endregion
@@ -172,6 +159,22 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool ChangeDataStorage(IDataStorageModel storage)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Получить все узлы рабочего дерева (рекурсивно)
+        /// </summary>
+        public IEnumerable<TreeNodeModel> GetAllNodesRecursive()
+        {
+            return ContentRoot.GetAllNodesRecursive();
+        }
+
+        /// <summary>
+        /// Получить все листы рабочего дерева (рекурсивно)
+        /// </summary>
+        public IEnumerable<TreeLeaveModel> GetAllLeavesRecursive()
+        {
+            return ContentRoot.GetAllLeavesRecursive();
         }
 
         #endregion

@@ -94,7 +94,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }
-            foreach (var item in PersonalAttributesVMs)
+            foreach (var item in AttributesVMs)
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }
