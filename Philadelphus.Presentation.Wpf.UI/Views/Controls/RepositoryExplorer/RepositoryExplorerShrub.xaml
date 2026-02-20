@@ -10,18 +10,14 @@
         <TreeView Name="MainTreeView" DataContext="{Binding PhiladelphusRepositoryVM}" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
             <TreeView.ItemTemplate>
-                <!--<HierarchicalDataTemplate Template="{StaticResource ResourceKey=}" DataType="{x:Type mainentities:TreeRoot}" ItemsSource="{Binding Childs}">
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Width="24" Height="24" Margin="10,0,10,0" Source="C:\Users\MeleychukSV\Downloads\icons8_icon_repository.png" />
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </HierarchicalDataTemplate>-->
-
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
                     <StackPanel Margin="2" Background="Snow">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
-                            <Image Width="24" Height="24" Margin="10,0,10,0" Source="{Binding ., Converter={StaticResource mainEntityToIconConverter}}"></Image>
+                            <Image Width="24" 
+                                   Height="24" 
+                                   Margin="10,0,10,0" 
+                                   Source="{Binding ., Converter={StaticResource mainEntityToIconConverter}}"></Image>
                             <StackPanel Margin="0,2,10,2">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Тип элемента: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Center"></TextBlock>
