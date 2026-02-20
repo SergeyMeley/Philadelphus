@@ -41,15 +41,15 @@
             </StackPanel>
         </Popup>
         <DockPanel>
-            <Ribbon DockPanel.Dock="Top" Background="Transparent">
-                <Ribbon.HelpPaneContent>
+            <Ribbon DockPanel.Dock="Top" Background="Transparent" Margin="0,-20,0,0">
+                <!--<Ribbon.HelpPaneContent>
                     <RibbonButton  />
                 </Ribbon.HelpPaneContent>
                 <Ribbon.QuickAccessToolBar>
                     <RibbonQuickAccessToolBar >
                         
                     </RibbonQuickAccessToolBar>
-                </Ribbon.QuickAccessToolBar>
+                </Ribbon.QuickAccessToolBar>-->
                 <Ribbon.ApplicationMenu>
                     <RibbonApplicationMenu>
                         <!--<RibbonApplicationMenu.SmallImageSource>
