@@ -20,6 +20,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Events;
@@ -187,11 +188,13 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<RepositoryCreationControlVM>();
                     services.AddTransient<LaunchWindowTabItemControlVM>();
                     services.AddTransient<ApplicationSettingsTabItemControlVM>();
+                    services.AddSingleton<NotificationsVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
                     services.AddSingleton<LaunchWindow>();      // Не менять. Требуется для автоматического закрытия окна при открытии основного
                     services.AddTransient<AttributeValuesCollectionWindow>();
+                    services.AddSingleton<SplashWindow>();
 
                     // Регистрация фабрик
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
@@ -226,11 +229,15 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                 Log.Information("UI запущен. Логи → только файл logs/philadelphus-.log");
 
-                var window = _host.Services.GetRequiredService<LaunchWindow>();
-                window.Topmost = true;
+                //var window = _host.Services.GetRequiredService<LaunchWindow>();
+                //window.Topmost = true;
+                //window.Show();
+                //window.Activate();
+                //window.Topmost = false;
+
+                var window = _host.Services.GetRequiredService<SplashWindow>();
                 window.Show();
-                window.Activate();
-                window.Topmost = false;
+
                 base.OnStartup(e);
             }
             catch (Exception ex)

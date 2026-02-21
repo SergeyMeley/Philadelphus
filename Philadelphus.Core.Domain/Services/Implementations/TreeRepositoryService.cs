@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -96,7 +97,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     foreach (var root in roots.Where(x => x.OwningRepository.Uuid == repository.Uuid))
                     {
                         var tree = new WorkingTreeModel(root.Uuid, root.DataStorage, root.DbEntity as TreeRoot, repository.ContentShrub);
+                        tree.UnavailableNames.Add(tree.Name);
                         tree.ContentRoot = root;
+                        tree.UnavailableNames.Add(root.Name);
                         repository.ContentShrub.ContentTrees.Add(tree);
 
                         SetModelState(tree.ContentRoot, State.SavedOrLoaded);
@@ -150,6 +153,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
                 var dbLeaves = infrastructure.SelectLeaves(new[] { tree.ContentRoot.Uuid });
                 var allLeaves = dbLeaves?.ToModelCollection(allNodes);
+
+                foreach (var item in allNodes)
+                {
+                    tree.UnavailableNames.Add(item.Name);
+                }
+                foreach (var item in allLeaves)
+                {
+                    tree.UnavailableNames.Add(item.Name);
+                }
 
                 GetTreeRootMembersAndContent(tree.ContentRoot, allNodes, allLeaves);
             }

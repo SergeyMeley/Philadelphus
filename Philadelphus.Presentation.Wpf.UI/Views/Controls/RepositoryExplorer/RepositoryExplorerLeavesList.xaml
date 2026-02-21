@@ -13,9 +13,9 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="2">
-                    <Button Content="{StaticResource imageBack}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                    <Button Content="{StaticResource imageUp}" Margin="2" Height="25" Width="25" Background="Transparent" />
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Button Content="{StaticResource imageBack}" Margin="1" Height="25" Width="25" Background="Transparent" />
+                    <Button Content="{StaticResource imageUp}" Margin="1" Height="25" Width="25" Background="Transparent" />
                 </StackPanel>
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
@@ -24,7 +24,7 @@
                         <TextBlock Text="  "></TextBlock>
                         <TextBlock Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
                         <TextBox Text="{Binding SelectedEntity.Uuid, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
-                        <Button Content="{StaticResource imageCopy}" Margin="2" Height="20" Width="20" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageCopy}" Margin="1" Height="20" Width="20" Background="Transparent"></Button>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <TextBlock Text="{Binding SelectedIndex,ElementName=SelectedElementChildsDataGrid,Converter={StaticResource selectedIndexConverter}}"></TextBlock>
@@ -33,7 +33,7 @@
                     </StackPanel>
                 </DockPanel>
             </StackPanel>
-            <DataGrid Name="SelectedElementChildsDataGrid"  Grid.Row="1" Grid.Column="0" Margin="2" MinHeight="50" ItemsSource="{Binding SelectedRepositoryMember.Childs}" AutoGenerateColumns="False">
+            <DataGrid Name="SelectedElementChildsDataGrid"  Grid.Row="1" Grid.Column="0" Margin="1" MinHeight="50" ItemsSource="{Binding SelectedRepositoryMember.Childs}" AutoGenerateColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
                     <DataGridCheckBoxColumn Header="Внешний" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>

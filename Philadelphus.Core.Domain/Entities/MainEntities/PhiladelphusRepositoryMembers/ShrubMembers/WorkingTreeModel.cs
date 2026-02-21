@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
@@ -144,6 +145,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 throw new ArgumentNullException(nameof(dataStorage));
 
             _ownDataStorage = dataStorage;
+
+            Name = NamingHelper.GetNewName(UnavailableNames, _defaultFixedPartOfName);
+            UnavailableNames.Add(Name);
         }
 
         #endregion

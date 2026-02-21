@@ -27,7 +27,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ General Properties ]
 
-
+        public virtual SystemBaseType SystemBaseType { get => SystemBaseType.USER_DEFINED; }
 
         #endregion
 

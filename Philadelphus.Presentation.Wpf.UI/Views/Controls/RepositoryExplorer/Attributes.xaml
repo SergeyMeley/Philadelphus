@@ -11,9 +11,9 @@
             <GroupBox>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                        <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="2" Height="25" Width="25" Background="Transparent" />
-                        <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="2" Height="25" Width="25" Background="Transparent" />
+                        <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
+                        <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
+                        <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
                     </StackPanel>
                     <DataGrid Height="auto" DataContext="{Binding SelectedRepositoryMember}" ItemsSource="{Binding AttributesVMs}" SelectedItem="{Binding SelectedAttributeVM}" AutoGenerateColumns="false">
                         <DataGrid.Columns>

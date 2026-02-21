@@ -22,7 +22,7 @@
             <ColumnDefinition Width="auto"></ColumnDefinition>
             <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="2" Grid.RowSpan="2">
+        <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="1" Grid.RowSpan="2">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -31,94 +31,63 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="2">
-                        <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элемент репозитория" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageProtect}" Command="{Binding ProtectCommand}" ToolTip="Защитить" Margin="2" Height="25" Width="25" Background="Transparent"></Button>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1">
+                        <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элемент репозитория" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageProtect}" Command="{Binding ProtectCommand}" ToolTip="Защитить" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                     </StackPanel>
-                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="2">
+                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="1">
                         <TextBlock VerticalAlignment="Center" Text="Представление "></TextBlock>
-                        <ComboBox MinWidth="50">
+                        <ComboBox MinWidth="50" SelectedIndex="0">
                             <ComboBoxItem Content="Основной"></ComboBoxItem>
-                            <ComboBoxItem Content="По тегам"></ComboBoxItem>
+                            <ComboBoxItem Content="По иерархии наследования"></ComboBoxItem>
                             <ComboBoxItem Content="По содержимому"></ComboBoxItem>
-                            <ComboBoxItem Content="По наследованию"></ComboBoxItem>
+                            <ComboBoxItem Content="По меткам"></ComboBoxItem>
                             <ComboBoxItem Content="По связям (Trace)"></ComboBoxItem>
                         </ComboBox>
                     </StackPanel>
                 </DockPanel>
 
-                <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="2" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerShrub></local:RepositoryExplorerShrub>
                 </GroupBox>
                 <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="2" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerLeavesList></local:RepositoryExplorerLeavesList>
                 </GroupBox>
             </Grid>
         </GroupBox>
         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
-        <Grid Grid.Row="0" Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-            </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="Текущий элемент">
-                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+        <GroupBox Grid.Row="0" Grid.Column="2" Header="Текущий элемент">
+            <TabControl>
+                <TabItem Header="Значение" Visibility="{Binding SystemBaseLeaveControlVisibility}">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
+                            <ColumnDefinition Width="*" MinWidth="100"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Expander Grid.Row="0" Grid.Column="0" Header="Расширения" IsExpanded="True">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <GroupBox>
-                                    <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}"></ctrls:ExtensionWidgetContainer>
-                                </GroupBox>
-                            </ScrollViewer>
-                        </Expander>
-                        <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                        <Expander Grid.Row="2" Grid.Column="0" Header="Свойства элемента">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <GroupBox>
-                                    <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
-                                </GroupBox>
-                            </ScrollViewer>
-                        </Expander>
-                        <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                        <Expander  Grid.Row="4" Grid.Column="0" Header="Атрибуты" IsExpanded="True">
-                            <local:Attributes></local:Attributes>
-                        </Expander>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="1"></TextBlock>
+                        <TextBox Grid.Row="0" Grid.Column="1" DataContext="{Binding SelectedRepositoryMember}" Text="{Binding StringValue}" Margin="1"></TextBox>
                     </Grid>
-                </ScrollViewer>
-            </GroupBox>
-            <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-            <GroupBox Visibility="Collapsed" Grid.Row="2" Grid.Column="0" Header="Значения атрибутов" Margin="2">
-                <StackPanel>
-                    <TabControl Visibility="Visible">
-                        <TabItem Header="Плоская таблица допустимых значений (для узла)">
-                            <DataGrid  Height="auto">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                    </Grid.RowDefinitions>
+                </TabItem>
+                <TabItem Header="Атрибуты">
+                    <local:Attributes></local:Attributes>
+                </TabItem>
+                <TabItem Header="Атрибуты детей" Visibility="{Binding ParentControlVisibility}">
+                    <TabControl>
+                        <TabItem Header="Плоская таблица значений">
 
-                                </Grid>
-                            </DataGrid>
                         </TabItem>
-                        <TabItem Header="Кросс-таблица допустимых значений (для узла)">
+                        <TabItem Header="Перекрестная таблица значений">
                             <StackPanel>
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -135,47 +104,40 @@
                                             <ColumnDefinition Width="auto"></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="2"></TextBlock>
-                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="2"></ComboBox>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="2"></TextBlock>
-                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="2"></ComboBox>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="2"></TextBlock>
-                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="2"></ComboBox>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="1"></ComboBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="1"></ComboBox>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="1"></ComboBox>
                                     </Grid>
                                 </Grid>
                                 <DataGrid></DataGrid>
                             </StackPanel>
                         </TabItem>
-                        <TabItem Header="Значения дочерних элементов (для узла)">
-                            <DataGrid  Height="auto">
+                        <TabItem Header="Плоская таблица допустимых значений">
 
-                            </DataGrid>
+                        </TabItem>
+                        <TabItem Header="Перекрестная таблица допустимых значений">
+
                         </TabItem>
                     </TabControl>
-                    <TabControl Visibility="Visible">
-                        <TabItem Header="Вертикальная таблица (для листа)">
-                            <DataGrid  Height="auto">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Наименование вхождения"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Значение"></DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </TabItem>
-                        <TabItem Header="Плоская таблица значений (для листа)">
-                            <DataGrid  Height="auto">
-
-                            </DataGrid>
-                        </TabItem>
-                    </TabControl>
-                    <DataGrid  Height="auto">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Атрибут"></DataGridTextColumn>
-                            <DataGridComboBoxColumn Header="Значение"></DataGridComboBoxColumn>
-                            <DataGridCheckBoxColumn Header="Собственное значение"></DataGridCheckBoxColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </StackPanel>
-            </GroupBox>
-        </Grid>
+                </TabItem>
+                <TabItem Header="Свойства">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <GroupBox>
+                            <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
+                        </GroupBox>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Расширения">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <GroupBox>
+                            <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}"></ctrls:ExtensionWidgetContainer>
+                        </GroupBox>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </GroupBox>
     </Grid>
 </UserControl>

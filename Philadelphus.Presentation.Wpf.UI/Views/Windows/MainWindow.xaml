@@ -41,15 +41,15 @@
             </StackPanel>
         </Popup>
         <DockPanel>
-            <Ribbon DockPanel.Dock="Top" Background="Transparent">
-                <Ribbon.HelpPaneContent>
+            <Ribbon DockPanel.Dock="Top" Background="Transparent" Margin="0,-20,0,0">
+                <!--<Ribbon.HelpPaneContent>
                     <RibbonButton  />
                 </Ribbon.HelpPaneContent>
                 <Ribbon.QuickAccessToolBar>
                     <RibbonQuickAccessToolBar >
                         
                     </RibbonQuickAccessToolBar>
-                </Ribbon.QuickAccessToolBar>
+                </Ribbon.QuickAccessToolBar>-->
                 <Ribbon.ApplicationMenu>
                     <RibbonApplicationMenu>
                         <!--<RibbonApplicationMenu.SmallImageSource>
@@ -157,6 +157,13 @@
                 <RibbonTab Header="Рассылки">
 
                 </RibbonTab>
+                <RibbonTab Header="Данные">
+                    <RibbonGroup Header="Экспорт / импорт">
+                        <RibbonButton Label="Экспорт .pjson" Command="{Binding RepositoryExplorerVM.ExportToPjsonCommand}" />
+                        <RibbonButton Label="Импорт из .pjson" Command="{Binding RepositoryExplorerVM.ImportFromPjsonCommand}" />
+                    </RibbonGroup>
+
+                </RibbonTab>
                 <RibbonTab Header="Вид">
 
                 </RibbonTab>
@@ -185,9 +192,7 @@
 
                 </RibbonTab>
                 <RibbonTab Header="Настройки">
-                    <RibbonGroup Header="Хранилища">
-                        <RibbonButton Label="Открыть настройки хранилищ" Command="{Binding OpenDataStorageSettings}"></RibbonButton>
-                    </RibbonGroup>
+                    
                 </RibbonTab>
                 <RibbonTab Header="Справка">
                     <RibbonGroup>
@@ -217,7 +222,7 @@
                             <ColumnDefinition Width="auto"></ColumnDefinition>
                             <ColumnDefinition Width="5*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="2">
+                        <Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="1">
                             <Expander.Header>
                                 <TextBlock Text="Навигационная панель">
                                     <TextBlock.LayoutTransform>
@@ -231,7 +236,7 @@
                                     <RowDefinition Height="auto"></RowDefinition>
                                     <RowDefinition Height="*"></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <GroupBox Grid.Row="0" Grid.Column="0" Header="Сервисы" Margin="2" Background="White">
+                                <GroupBox Grid.Row="0" Grid.Column="0" Header="Сервисы" Margin="1" Background="White">
                                     <ListBox>
                                         <ListBoxItem Content="Дерево данных"></ListBoxItem>
                                         <ListBoxItem Content="Атрибуты"></ListBoxItem>
@@ -245,7 +250,7 @@
                                     </ListBox>
                                 </GroupBox>
                                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                                <GroupBox Grid.Row="2" Grid.Column="0" Header="Надстройки" Margin="2" Background="White">
+                                <GroupBox Grid.Row="2" Grid.Column="0" Header="Надстройки" Margin="1" Background="White">
                                     <ListBox>
                                         <ListBoxItem Content="Git"></ListBoxItem>
                                         <ListBoxItem Content="Расчет трубопроводных элементов"></ListBoxItem>
@@ -257,8 +262,8 @@
                             </Grid>
                         </Expander>
                         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
-                        <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="2" Background="White">
-                            <TabControl Margin="2">
+                        <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="1" Background="White">
+                            <TabControl Margin="1">
                                 <TabItem Header="Репозиторий">
                                     <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></re:RepositoryExplorer>
                                 </TabItem>
@@ -280,7 +285,7 @@
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                 </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="2" IsExpanded="True">
+                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="1" IsExpanded="True">
                     <DataGrid ItemsSource="{Binding NotificationsVM.Notifications, Mode=OneWay}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Уровень критичности" Binding="{Binding CriticalLevel}" Width="35"></DataGridTextColumn>

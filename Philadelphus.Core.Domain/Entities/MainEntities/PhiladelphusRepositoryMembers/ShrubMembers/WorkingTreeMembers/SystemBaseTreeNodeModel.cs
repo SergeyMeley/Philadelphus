@@ -24,7 +24,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             { Guid.Parse("00000000-0000-0000-0000-0000f1215a20"), SystemBaseType.FLOAT },
         };
 
-        public SystemBaseType SystemBaseType { get; }
+        public override SystemBaseType SystemBaseType { get; }
+
         internal SystemBaseTreeNodeModel(
             IParentModel parent, 
             WorkingTreeModel owner, 

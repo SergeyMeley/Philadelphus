@@ -29,26 +29,26 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Text="Заголовок:" FontWeight="Bold" Margin="2"></TextBlock>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Кто создал" Margin="2"></TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CreatedBy, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Когда создал" Margin="2"></TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CreatedAt, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Кто изменил" Margin="2"></TextBlock>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding UpdatedBy, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Когда изменил" Margin="2"></TextBlock>
-        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding UpdatedAt, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="Удален" Margin="2"></TextBlock>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Text="Заголовок:" FontWeight="Bold" Margin="1"></TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Кто создал" Margin="1"></TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CreatedBy, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Когда создал" Margin="1"></TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CreatedAt, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Кто изменил" Margin="1"></TextBlock>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding UpdatedBy, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Когда изменил" Margin="1"></TextBlock>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding UpdatedAt, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Удален" Margin="1"></TextBlock>
         <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding IsDeleted}"></CheckBox>
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="Кто удалил" Margin="2"></TextBlock>
-        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding DeletedBy, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
-        <TextBlock Grid.Row="7" Grid.Column="0" Text="Когда удалил" Margin="2"></TextBlock>
-        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding DeletedAt, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Кто удалил" Margin="1"></TextBlock>
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding DeletedBy, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Когда удалил" Margin="1"></TextBlock>
+        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding DeletedAt, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
 
-        <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="100" Text="Содержимое:" FontWeight="Bold" Margin="2"></TextBlock>
-        <TextBlock Grid.Row="11" Grid.Column="0" Text="Кто изменил" Margin="2"></TextBlock>
-        <TextBox Grid.Row="11" Grid.Column="1" Text="{Binding ContentUpdatedAt, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
-        <TextBlock Grid.Row="12" Grid.Column="0" Text="Когда изменил" Margin="2"></TextBlock>
-        <TextBox Grid.Row="12" Grid.Column="1" Text="{Binding ContentUpdatedBy, Mode=OneWay}" IsReadOnly="True" Margin="2"></TextBox>
+        <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="100" Text="Содержимое:" FontWeight="Bold" Margin="1"></TextBlock>
+        <TextBlock Grid.Row="11" Grid.Column="0" Text="Кто изменил" Margin="1"></TextBlock>
+        <TextBox Grid.Row="11" Grid.Column="1" Text="{Binding ContentUpdatedAt, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBlock Grid.Row="12" Grid.Column="0" Text="Когда изменил" Margin="1"></TextBlock>
+        <TextBox Grid.Row="12" Grid.Column="1" Text="{Binding ContentUpdatedBy, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
     </Grid>
 </UserControl>
