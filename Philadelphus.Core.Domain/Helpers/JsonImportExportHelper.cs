@@ -35,9 +35,8 @@ namespace Philadelphus.Core.Domain.Helpers
             PropertyNameCaseInsensitive = true,
             WriteIndented = true,
             Encoder = JavaScriptEncoder.Create(
-                UnicodeRanges.BasicLatin,   // A-Z, 0-9, знаки препинания
-                UnicodeRanges.Cyrillic      // А-Я, а-я
-            ),
+                UnicodeRanges.BasicLatin,       // A-Z, 0-9, знаки препинания
+                UnicodeRanges.Cyrillic),        // А-Я, а-я
             Converters = { new JsonStringEnumConverter() },
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

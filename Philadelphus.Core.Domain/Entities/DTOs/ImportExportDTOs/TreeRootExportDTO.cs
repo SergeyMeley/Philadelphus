@@ -11,7 +11,7 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
     {
         public string Name { get; }
         public string Description { get; }
-        public List<TreeNodeExportDTO> ChildNodes { get; }
+        public List<TreeNodeExportDTO> ChildNodes { get; } = new();
         public List<AttributeExportDTO> Attributes { get; set; } = new();
 
         public TreeRootExportDTO(TreeRootModel root)
@@ -20,6 +20,11 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
             Description = root.Description;
             ChildNodes = root.ChildNodes?.Select(n => new TreeNodeExportDTO(n)).ToList() ?? new();
             Attributes = root.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
+        }
+        public TreeRootExportDTO(string name, string description)
+        {
+            Name = name;
+            Description = description;
         }
     }
 }

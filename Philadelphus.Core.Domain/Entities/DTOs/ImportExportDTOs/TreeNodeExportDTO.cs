@@ -18,4 +18,10 @@ public class TreeNodeExportDTO
         ChildLeaves = node.ChildLeaves.Select(l => new TreeLeaveExportDTO(l)).ToList();
         Attributes = node.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
     }
+
+    public TreeNodeExportDTO(string name, string description)
+    {
+        Name = name;
+        Description = description;
+    }
 }
