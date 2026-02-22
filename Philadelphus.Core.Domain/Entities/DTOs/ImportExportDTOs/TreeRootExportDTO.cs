@@ -21,5 +21,9 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
             ChildNodes = root.ChildNodes?.Select(n => new TreeNodeExportDTO(n)).ToList() ?? new();
             Attributes = root.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
         }
+        public TreeRootExportDTO(List<TreeNodeExportDTO> childNodes, List<AttributeExportDTO> attributes)
+        {
+            
+        }
     }
 }
