@@ -744,12 +744,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns></returns>
         private bool InitSystemWorkingTree(ShrubModel shrub)
         {
-            var existTree = shrub.ContentTrees.SingleOrDefault(x => x.Uuid == Guid.Parse("00000000-0000-0000-0000-0000002018ee"));
+            var newUuid = Guid.Parse("00000000-0000-0000-0000-0000002018ee");
+            var existTree = shrub.ContentTrees.SingleOrDefault(x => x.Uuid == newUuid);
             if (existTree != null)
                 return false;
 
             // TODO: ех. долг #61187115
-            var newUuid = Guid.Parse("00000000-0000-0000-0000-0000002018ee");
 
             var tree = new WorkingTreeModel(
                 uuid: newUuid,
