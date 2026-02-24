@@ -1,7 +1,7 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
@@ -16,13 +16,6 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.PostgreSQL.Repositories
         public PostgreMainEntityInfrastructure()
         {
             _context = new Context();
-        }
-        public MainEntitiesCollection GetMainEntitiesCollection()
-        {
-            MainEntitiesCollection collection = new MainEntitiesCollection();
-            //collection.DbTreeRoots = (List<DbTreeRoot>)SelectRoots();
-            collection.DbTreeNodes = (List<TreeNode>)SelectNodes();
-            return collection;
         }
         #region [Select]
         public IEnumerable<PhiladelphusRepository> SelectRepositories(List<string> pathes)

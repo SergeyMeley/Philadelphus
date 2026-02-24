@@ -10,7 +10,7 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
         public long? Sequence { get; set; }
         public string? Alias { get; set; }
         public string? CustomCode { get; set; }
-        public bool IsLegacy { get; set; }
+        public bool IsHidden { get; set; }
         public AuditInfo AuditInfo { get; set; } = new AuditInfo();
         public MainEntityBase()
         {

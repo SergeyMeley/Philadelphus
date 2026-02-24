@@ -396,9 +396,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             var newRepo = _service.GetShrub(_philadelphusRepositoryVM.Model);
             _philadelphusRepositoryVM.Childs.Clear();
-            foreach (var item in newRepo.ContentShrub.ContentTrees.Select(x => x.ContentRoot))
+            foreach (var item in newRepo.ContentShrub.ContentTrees)
             {
-                _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item, _service));
+                if (item.ContentRoot != null)
+                {
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _service));
+                }
             }
             OnPropertyChanged(nameof(_philadelphusRepositoryVM));
             OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));

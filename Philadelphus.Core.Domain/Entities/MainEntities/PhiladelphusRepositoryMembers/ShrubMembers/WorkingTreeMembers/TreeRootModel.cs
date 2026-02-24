@@ -28,7 +28,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ General Properties ]
 
+        /// <summary>
+        /// Системный корень
+        /// </summary>
+        public bool IsSystemBase { get; } = false;
 
+        /// <summary>
+        /// Уникальный идентификатор системного корня
+        /// </summary>
+        internal static Guid SystemBaseGuid { get => Guid.Parse("00000000-0000-0000-0000-000018151520"); }
 
         #endregion
 
@@ -96,6 +104,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             : base(uuid, owner, dbEntity)
         {
             ChildNodes = new List<TreeNodeModel>();
+
+            if (uuid == SystemBaseGuid)
+            {
+                IsSystemBase = true;
+            }
         }
 
         #endregion

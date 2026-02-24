@@ -1,8 +1,9 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -18,10 +19,10 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (businessEntity == null)
                 return null;
             var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.ParentUuid = businessEntity.Parent.Uuid;
-            result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.Uuid;     //TODO: ВРЕМЕННО
-            //result.ParentRoot = (TreeRoot)businessEntity.ParentRoot.DbEntity;
-            //result.ParentRoot = (TreeRoot)PhiladelphusRepositoryService.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
+            result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.ContentRoot.Uuid;     //TODO: ВРЕМЕННО
+            result.ParentTreeNodeUuid = businessEntity.ParentNode?.Uuid;
+            result.OwningWorkingTreeUuid = businessEntity.OwningWorkingTree.Uuid;
+            result.OwningWorkingTree = businessEntity.OwningWorkingTree.ToDbEntity();
             if (businessEntity is SystemBaseTreeNodeModel st)
             {
                 result.SystemBaseTypeId = (int)st.SystemBaseType;
@@ -56,7 +57,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-
+            if (parent == null)
+                throw new ArgumentNullException();
             WorkingTreeModel owner = null;
             if (parent is TreeNodeModel node)
                 owner = node.OwningWorkingTree;
@@ -77,7 +79,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-
+            if (parent == null)
+                throw new ArgumentNullException();
             WorkingTreeModel owner = null;
             if (parent is TreeNodeModel node)
                 owner = node.OwningWorkingTree;
@@ -98,10 +101,15 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntityCollection == null)
                 return null;
+            if (dbEntityCollection.Count() == 0)
+                return new List<TreeNodeModel>();
+            if (parents == null || parents.Count() == 0)
+                throw new ArgumentNullException();
             var result = new List<TreeNodeModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentUuid);
+                var parentUuid = dbEntity.ParentTreeNodeUuid ?? dbEntity.ParentTreeRootUuid;
+                var parent = parents.FirstOrDefault(x => x.Uuid == parentUuid);
                 if (parent != null)
                 {
                     if (dbEntity.SystemBaseTypeId != 0)

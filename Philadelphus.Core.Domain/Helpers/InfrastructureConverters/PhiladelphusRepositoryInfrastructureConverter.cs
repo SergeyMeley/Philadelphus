@@ -1,29 +1,28 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
-    internal static class RootInfrastructureConverter
+    public static class PhiladelphusRepositoryInfrastructureConverter
     {
         /// <summary>
         /// Конвертировать доменную модель в сущность БД
         /// </summary>
         /// <param name="businessEntity">Доменная модель</param>
         /// <returns></returns>
-        public static TreeRoot ToDbEntity(this TreeRootModel businessEntity)
+        public static PhiladelphusRepository ToDbEntity(this PhiladelphusRepositoryModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeRoot)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.OwningWorkingTreeUuid = businessEntity.OwningWorkingTree.Uuid;
-            result.OwningWorkingTree = businessEntity.OwningWorkingTree.ToDbEntity();
+            var result = businessEntity.DbEntity as PhiladelphusRepository;
+            result.Uuid = businessEntity.Uuid;
+            result.Name = businessEntity.Name;
+            result.Description = businessEntity.Description;
+            result.AuditInfo = businessEntity.AuditInfo.ToDbEntity();
+            result.ContentWorkingTreesUuids = businessEntity.ContentShrub.ContentTreesUuids.ToArray();
+            result.OwnDataStorageUuid = businessEntity.OwnDataStorage.Uuid;
             return result;
         }
 
@@ -32,11 +31,11 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="businessEntityCollection">Коллекция доменных моделей</param>
         /// <returns></returns>
-        public static List<TreeRoot> ToDbEntityCollection(this IEnumerable<TreeRootModel> businessEntityCollection)
+        public static List<PhiladelphusRepository> ToDbEntityCollection(this IEnumerable<PhiladelphusRepositoryModel> businessEntityCollection)
         {
             if (businessEntityCollection == null)
                 return null;
-            var result = new List<TreeRoot>();
+            var result = new List<PhiladelphusRepository>();
             foreach (var businessEntity in businessEntityCollection)
             {
                 result.Add(businessEntity.ToDbEntity());
@@ -49,39 +48,44 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="dbEntity">Сущность БД</param>
         /// <param name="dataStorages">Доступные хранилища данных</param>
-        /// <param name="repositories">Доступные репозитории Чубушника</param>
         /// <returns></returns>
-        public static TreeRootModel ToModel(this TreeRoot dbEntity, WorkingTreeModel workingTree)
+        public static PhiladelphusRepositoryModel ToModel(this PhiladelphusRepository dbEntity, IDataStorageModel dataStorage)
         {
             if (dbEntity == null)
                 return null;
-            if (workingTree == null)
+            if (dataStorage == null)
                 throw new ArgumentNullException();
-            var root = new TreeRootModel(dbEntity.Uuid, workingTree, dbEntity);
-            root = (TreeRootModel)dbEntity.ToModelGeneralProperties(root);
-            workingTree.ContentRoot = root;
-            return root;
+            var result = new PhiladelphusRepositoryModel(dbEntity.Uuid, dataStorage, dbEntity);
+            result.DbEntity = dbEntity;
+            result.Name = dbEntity.Name;
+            result.Description = dbEntity.Description;
+            result.AuditInfo = dbEntity.AuditInfo.ToModel();
+            result.ContentShrub.ContentTreesUuids = dbEntity.ContentWorkingTreesUuids.ToList();
+            result.AuditInfo = dbEntity.AuditInfo.ToModel();
+            result = (PhiladelphusRepositoryModel)dbEntity.ToModelGeneralProperties(result);
+            return result;
         }
+
 
         /// <summary>
         /// Конвертировать коллекцию сущностей БД в коллекцию доменных моделей
         /// </summary>
         /// <param name="dbEntityCollection">Коллекция сущностей БД</param>
-        /// <param name="workingTrees">Коллекция рабочих деревьев</param>
+        /// <param name="dataStorages">Коллекция доступных хранилищ данных</param>
         /// <returns></returns>
-        public static List<TreeRootModel> ToModelCollection(this IEnumerable<TreeRoot> dbEntityCollection, IEnumerable<WorkingTreeModel> workingTrees)
+        public static List<PhiladelphusRepositoryModel> ToModelCollection(this IEnumerable<PhiladelphusRepository> dbEntityCollection, IEnumerable<IDataStorageModel> dataStorages)
         {
             if (dbEntityCollection == null)
                 return null;
             if (dbEntityCollection.Count() == 0)
-                return new List<TreeRootModel>();
-            if (workingTrees == null || workingTrees.Count() == 0)
+                return new List<PhiladelphusRepositoryModel>();
+            if (dataStorages == null || dataStorages.Count() == 0)
                 throw new ArgumentNullException();
-            var result = new List<TreeRootModel>();
+            var result = new List<PhiladelphusRepositoryModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var tree = workingTrees.FirstOrDefault(x => x.Uuid == dbEntity.OwningWorkingTreeUuid);
-                result.Add(dbEntity.ToModel(tree));
+                var dataStorage = dataStorages.FirstOrDefault(x => x.Uuid == dbEntity.OwnDataStorageUuid);
+                result.Add(dbEntity.ToModel(dataStorage));
             }
             return result;
         }

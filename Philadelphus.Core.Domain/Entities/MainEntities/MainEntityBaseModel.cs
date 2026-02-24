@@ -155,6 +155,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <returns></returns>
         bool IMainEntityWritableModel.SetState(State newState)
         {
+            if (_state == State.Initialized
+                && newState != State.SavedOrLoaded)
+            {
+                return false;
+            }
             _state = newState;
             return true;
         }
@@ -165,7 +170,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         protected bool UpdateStateStateAfterChange()
         {
             if (_state != State.Initialized
-                && _state != State.ForHardDelete
+                && _state != State.ForSoftDelete
                 && _state != State.ForHardDelete)
             {
                 _state = State.Changed;
