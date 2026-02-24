@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
@@ -13,8 +14,8 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using System.Xml.Linq;
@@ -65,6 +66,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий с содержимым</returns>
         public PhiladelphusRepositoryModel GetShrub(PhiladelphusRepositoryModel repository)
         {
+            //var oldShrub = repository.ContentShrub;
+            //repository.ContentShrub = new ShrubModel(oldShrub.Uuid, oldShrub.DbEntity as PhiladelphusRepository, repository);
             repository.ContentShrub.ContentTrees.Clear();
 
             // TODO: Добавить кэш
@@ -90,27 +93,27 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (dataStorage.IsAvailable)
                 {
                     var infrastructure = dataStorage.PhiladelphusRepositoryMembersInfrastructureRepository;
-                    var uuids = repository.ContentShrub.ContentTreesUuids?.ToArray();
-                    var dbRoots = infrastructure.SelectRoots(uuids);
-                    var roots = dbRoots?.ToModelCollection(repository.DataStorages, new List<PhiladelphusRepositoryModel>() { repository });
+                    var treesUuids = repository.ContentShrub.ContentTreesUuids?.ToArray();
+                    var dbTrees = infrastructure.SelectTrees(treesUuids);
+                    var trees = dbTrees.ToModelCollection(repository.DataStorages, repository);
 
-                    foreach (var root in roots.Where(x => x.OwningRepository.Uuid == repository.Uuid))
+                    foreach (var tree in trees.Where(x => x.OwningRepository.Uuid == repository.Uuid))
                     {
-                        var tree = new WorkingTreeModel(root.Uuid, root.DataStorage, root.DbEntity as TreeRoot, repository.ContentShrub);
                         tree.UnavailableNames.Add(tree.Name);
-                        tree.ContentRoot = root;
-                        tree.UnavailableNames.Add(root.Name);
+
                         repository.ContentShrub.ContentTrees.Add(tree);
 
-                        SetModelState(tree.ContentRoot, State.SavedOrLoaded);
+                        GetPersonalAttributes(tree);
+                        GetWorkingTree(tree);
 
-                        GetPersonalAttributes(tree.ContentRoot);
-                        GetWorkingTree(tree.ContentRoot);
+                        SetModelState(tree, State.SavedOrLoaded);
                     }
                 }
             }
 
             InitSystemWorkingTree(repository.ContentShrub);
+
+            SetModelState(repository, State.SavedOrLoaded);
 
             return repository;
         }
@@ -118,55 +121,67 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получить рабочее дерево
         /// </summary>
-        /// <param name="root">Корень</param>
+        /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с содержимым</returns>
-        public TreeRootModel GetWorkingTree(TreeRootModel root)
+        public WorkingTreeModel GetWorkingTree(WorkingTreeModel tree)
         {
-            root.ChildNodes.Clear();
+            tree.ContentRoot = null;
 
             // TODO: Добавить кэш
 
-            return GetWorkingTreeFromDb(root);
+            return GetWorkingTreeFromDb(tree);
         }
 
         /// <summary>
         /// Получить рабочее дерево
         /// </summary>
-        /// <param name="root">Корень</param>
+        /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с содержимым</returns>
-        public TreeRootModel GetWorkingTreeFromDb(TreeRootModel root)
+        public WorkingTreeModel GetWorkingTreeFromDb(WorkingTreeModel tree)
         {
-            var tree = root.OwningWorkingTree;
-
-            root.ChildNodes.Clear();
+            tree.ContentRoot = null;
 
             if (tree.DataStorage.IsAvailable)
             {
                 var infrastructure = tree.DataStorage.PhiladelphusRepositoryMembersInfrastructureRepository;
-                var dbNodes = infrastructure.SelectNodes(new[] { tree.ContentRoot.Uuid });
-                var nodes = dbNodes?.ToModelCollection(new List<IParentModel>() { root });
-                var allNodes = new List<TreeNodeModel>();
-                while (nodes.Count > 0)
-                {
-                    allNodes.AddRange(nodes);
-                    nodes = dbNodes?.ToModelCollection(nodes);
-                }
-                var dbLeaves = infrastructure.SelectLeaves(new[] { tree.ContentRoot.Uuid });
-                var allLeaves = dbLeaves?.ToModelCollection(allNodes);
 
-                foreach (var item in allNodes)
-                {
-                    tree.UnavailableNames.Add(item.Name);
-                }
-                foreach (var item in allLeaves)
-                {
-                    tree.UnavailableNames.Add(item.Name);
-                }
+                var dbRoots = infrastructure.SelectRoots(new Guid[] { tree.Uuid });
+                var roots = dbRoots.ToModelCollection(new List<WorkingTreeModel> { tree });
+                var root = roots.SingleOrDefault(x => x.OwningWorkingTree.Uuid == tree.Uuid);
 
-                GetTreeRootMembersAndContent(tree.ContentRoot, allNodes, allLeaves);
+                if (root != null)
+                {
+                    tree.ContentRoot = root;
+                    SetModelState(root, State.SavedOrLoaded);
+                    GetPersonalAttributes(root);
+
+                    tree.UnavailableNames.Add(root.Name);
+
+                    var dbNodes = infrastructure.SelectNodes(new[] { tree.Uuid });
+                    var nodes = dbNodes?.ToModelCollection(new List<IParentModel>() { tree.ContentRoot });
+                    var allNodes = new List<TreeNodeModel>();
+                    while (nodes.Count > 0)
+                    {
+                        allNodes.AddRange(nodes);
+                        nodes = dbNodes?.ToModelCollection(nodes);
+                    }
+                    var dbLeaves = infrastructure.SelectLeaves(new[] { tree.Uuid });
+                    var allLeaves = dbLeaves?.ToModelCollection(allNodes);
+
+                    foreach (var item in allNodes)
+                    {
+                        tree.UnavailableNames.Add(item.Name);
+                    }
+                    foreach (var item in allLeaves)
+                    {
+                        tree.UnavailableNames.Add(item.Name);
+                    }
+
+                    GetTreeRootMembersAndContent(tree.ContentRoot, allNodes, allLeaves);
+                }
             }
 
-            return tree.ContentRoot;
+            return tree;
         }
 
         /// <summary>
@@ -306,7 +321,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             long result = 0;
             var infrastructure = repository.OwnDataStorage.PhiladelphusRepositoriesInfrastructureRepository;
             var entity = repository.ToDbEntity();
-            var storages = repository.DataStorages;
+            var storage = repository.OwnDataStorage;
 
             switch (repository.State)
             {
@@ -336,13 +351,60 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             // Сохранение участников
             if (saveMode == SaveMode.WithContentAndMembers)
             {
-                result += SaveChanges(repository.ContentShrub.ContentTrees.Select(x => x.ContentRoot), saveMode);
+                result += SaveChanges(repository.ContentShrub.ContentTrees, saveMode);
             }
 
             // Возвращение обновленной информации
             // Не переносить, ломается логика
-            repository = infrastructure.SelectRepositories(new Guid[] { repository.Uuid }).First().ToModel(storages);  
+            repository = infrastructure.SelectRepositories(new Guid[] { repository.Uuid }).First().ToModel(storage);  
             repository = GetShrub(repository);      // Не переносить, ломается логика
+
+            return result;
+        }
+
+        /// <summary>
+        /// Сохранить изменения (корни)
+        /// </summary>
+        /// <param name="treeRoots">Коллекция корней</param>
+        /// <param name="saveMode">Параметры сохранения</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public long SaveChanges(IEnumerable<WorkingTreeModel> workingTrees, SaveMode saveMode)
+        {
+            // Проверка исходных данных
+            if (workingTrees == null || workingTrees.Count() == 0)
+                return 0;
+
+            // Сохранение изменений
+            long result = 0;
+            foreach (var storage in workingTrees.Select(x => x.DataStorage).Distinct())
+            {
+                List<WorkingTree> dbCollection;
+                dbCollection = workingTrees.Where(x => x.DataStorage == storage && x.State == State.Initialized).ToDbEntityCollection();
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.InsertTrees(dbCollection);
+                dbCollection = workingTrees.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.UpdateTrees(dbCollection);
+                dbCollection = workingTrees.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.SoftDeleteTrees(dbCollection);
+            }
+
+            // Актуализация статуса
+            foreach (var workingTree in workingTrees)
+            {
+                SetModelState(workingTree, State.SavedOrLoaded);
+            }
+
+            // Сохранение содержимого
+            if (saveMode == SaveMode.WithContent ||
+                saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveContentChanges(workingTrees.SelectMany(x => x.PersonalAttributes));
+            }
+
+            // Сохранение участников
+            if (saveMode == SaveMode.WithContentAndMembers)
+            {
+                result += SaveChanges(workingTrees.Select(x => x.ContentRoot), saveMode);
+            }
 
             return result;
         }
@@ -369,7 +431,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.UpdateRoots(dbCollection);
                 dbCollection = treeRoots.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.DeleteRoots(dbCollection);
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.SoftDeleteRoots(dbCollection);
             }
             
             // Актуализация статуса
@@ -416,7 +478,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.UpdateNodes(dbCollection);
                 dbCollection = treeNodes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.DeleteNodes(dbCollection);
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.SoftDeleteNodes(dbCollection);
             }
 
             // Актуализация статуса
@@ -464,7 +526,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.UpdateLeaves(dbCollection);
                 dbCollection = treeLeaves.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.DeleteLeaves(dbCollection);
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.SoftDeleteLeaves(dbCollection);
             }
 
             // Актуализация статуса
@@ -509,7 +571,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.Changed).ToDbEntityCollection();
                 result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.UpdateAttributes(dbCollection);
                 dbCollection = elementAttributes.Where(x => x.DataStorage == storage && x.State == State.ForSoftDelete).ToDbEntityCollection();
-                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.DeleteAttributes(dbCollection);
+                result += storage.PhiladelphusRepositoryMembersInfrastructureRepository.SoftDeleteAttributes(dbCollection);
             }
 
             // Актуализация статуса
@@ -536,9 +598,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 // TODO: Вынести в отдельный метод
-                var dbRoot = new TreeRoot();
-                var tree = new WorkingTreeModel(Guid.NewGuid(), dataStorage, dbRoot, parentElement.ContentShrub);
-                var root = new TreeRootModel(tree.Uuid, tree, dbRoot);
+                var tree = new WorkingTreeModel(Guid.NewGuid(), dataStorage, new WorkingTree(), parentElement.ContentShrub);
+                var root = new TreeRootModel(tree.Uuid, tree, new TreeRoot());
                 tree.ContentRoot = root;
 
                 var result = tree.ContentRoot;
@@ -708,6 +769,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     SetModelState(me, State.ForSoftDelete);
                 }
+                if (element is WorkingTreeModel wt)
+                {
+                    wt.OwningShrub.ContentTreesUuids.Remove(wt.Uuid);
+                    SetModelState(wt.OwningShrub, State.Changed);
+                    SetModelState(wt.ContentRoot, State.ForSoftDelete);
+                }
+                if (element is TreeRootModel r)
+                {
+                    SetModelState(r.OwningWorkingTree, State.ForSoftDelete);
+                    r.OwningShrub.ContentTreesUuids.Remove(r.Uuid);
+                    SetModelState(r.OwningShrub, State.Changed);
+                }
+
                 return true;
             }
             catch (Exception)
@@ -744,23 +818,32 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns></returns>
         private bool InitSystemWorkingTree(ShrubModel shrub)
         {
-            var newUuid = Guid.Parse("00000000-0000-0000-0000-0000002018ee");
-            var existTree = shrub.ContentTrees.SingleOrDefault(x => x.Uuid == newUuid);
+            var existTree = shrub.ContentTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseGuid);
             if (existTree != null)
                 return false;
+            var dbExistTree = shrub.DataStorage.PhiladelphusRepositoryMembersInfrastructureRepository
+                .SelectTrees(new Guid[] { WorkingTreeModel.SystemBaseGuid })
+                .ToModelCollection(new List<IDataStorageModel>() { shrub.DataStorage }, shrub.OwningRepository)
+                .SingleOrDefault();
+            if (dbExistTree != null)
+            {
+                shrub.ContentTrees.Add(dbExistTree);
+                shrub.ContentTreesUuids.Add(dbExistTree.Uuid);
+                return true;
+            }
 
             // TODO: ех. долг #61187115
 
             var tree = new WorkingTreeModel(
-                uuid: newUuid,
+                uuid: WorkingTreeModel.SystemBaseGuid,
                 dataStorage: shrub.DataStorage,
-                dbEntity: new TreeRoot(),
+                dbEntity: new WorkingTree(),
                 owner: shrub);
 
             var root = new TreeRootModel(
-                uuid: newUuid,
+                uuid: TreeRootModel.SystemBaseGuid,
                 owner: tree,
-                dbEntity: tree.DbEntity)
+                dbEntity: new TreeRoot())
             {
                 Name = "Базовые типы данных"
             };

@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
@@ -30,11 +31,18 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         public PhiladelphusRepositoryModel GetShrub(PhiladelphusRepositoryModel repository);
 
         /// <summary>
+        /// Получить рабочее дерево
+        /// </summary>
+        /// <param name="tree">Рабочее дерево</param>
+        /// <returns>Корень с содержимым</returns>
+        public WorkingTreeModel GetWorkingTree(WorkingTreeModel tree);
+
+        /// <summary>
         /// Получить участников и содержимое корня
         /// </summary>
-        /// <param name="root">Корень</param>
+        /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с участниками и содержимым</returns>
-        public TreeRootModel GetWorkingTreeFromDb(TreeRootModel root);
+        public WorkingTreeModel GetWorkingTreeFromDb(WorkingTreeModel tree);
 
         /// <summary>
         /// Получить участников и содержимое узла

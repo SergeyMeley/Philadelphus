@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
@@ -21,6 +21,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
         {
         }
 
+        public virtual DbSet<WorkingTree> WorkingTrees { get; set; }
         public virtual DbSet<TreeRoot> TreeRoots { get; set; }
         public virtual DbSet<TreeNode> TreeNodes { get; set; }
         public virtual DbSet<TreeLeave> TreeLeaves { get; set; }
@@ -38,7 +39,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Ignore<TreeRootMemberBase>();
+            modelBuilder.Ignore<WorkingTreeMemberBase>();
+            modelBuilder.ApplyConfiguration(new WorkingTreeConfiguration());
             modelBuilder.ApplyConfiguration(new TreeRootConfiguration());
             modelBuilder.ApplyConfiguration(new TreeNodeConfiguration());
             modelBuilder.ApplyConfiguration(new TreeLeaveConfiguration());
