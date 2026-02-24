@@ -82,6 +82,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 {
                     _model.Value = value;
                 }
+                OnPropertyChanged(nameof(State));
                 OnPropertyChanged(nameof(AssignedValue));
             }
         }
@@ -165,6 +166,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
             _model = elementAttribute;
 
+            foreach (var item in _model.Values)
+            {
+                _assignedValues.Add(item);
+            }
+
             VisibilityScopesList = new List<VisibilityScopeItem>(
             Enum.GetValues<VisibilityScope>()
                 .Select(e => new VisibilityScopeItem
@@ -211,6 +217,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 _assignedValues?.Add(SelectedValue);
                 OnPropertyChanged(nameof(AssignedValues)); 
                 OnPropertyChanged(nameof(AssignedValuesString));
+                OnPropertyChanged(nameof(State));
                 return true;
             }
             
@@ -231,6 +238,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 _assignedValues?.Remove(SelectedValue);
                 OnPropertyChanged(nameof(AssignedValues));
                 OnPropertyChanged(nameof(AssignedValuesString));
+                OnPropertyChanged(nameof(State));
                 return true;
             }
 

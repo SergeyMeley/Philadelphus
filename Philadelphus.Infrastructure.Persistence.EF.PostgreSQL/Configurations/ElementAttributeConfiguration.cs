@@ -85,6 +85,14 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
             builder.Property(x => x.ValueUuid)
                 .HasColumnName("value_uuid");
 
+            builder.Property(x => x.IsCollectionValue)
+                .HasColumnName("is_collection_value").
+                IsRequired().
+                HasDefaultValue(false);
+
+            builder.Property(x => x.ValuesUuids)
+                .HasColumnName("values_uuids");
+
             builder.Property(x => x.VisibilityId)
                 .HasColumnName("visibility_id")
                 .HasDefaultValue(0);

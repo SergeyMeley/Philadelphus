@@ -103,8 +103,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                         repository.ContentShrub.ContentTrees.Add(tree);
 
-                        GetPersonalAttributes(tree);
                         GetWorkingTree(tree);
+                        GetPersonalAttributes(tree);
 
                         SetModelState(tree, State.SavedOrLoaded);
                     }
@@ -285,17 +285,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 var infrastructure = me.DataStorage.PhiladelphusRepositoryMembersInfrastructureRepository;
                 var dbEntities = infrastructure.SelectAttributes().Where(x => x.OwnerUuid == attributeOwner.Uuid);
-                var attributes = dbEntities?.ToModelCollection(new List<IAttributeOwnerModel>() { attributeOwner });
-
-                if (attributes != null)
+                if (attributeOwner is IShrubMemberModel sm)
                 {
-                    foreach (var attribute in attributes)
+                    var valueTypes = sm.OwningShrub.ContentTrees.SelectMany(x => x.GetAllNodesRecursive())?.ToList();
+                    var values = sm.OwningShrub.ContentTrees.SelectMany(x => x.GetAllLeavesRecursive())?.ToList();
+                    var attributes = dbEntities?.ToModelCollection(new List<IAttributeOwnerModel>() { attributeOwner }, valueTypes, values);
+                    if (attributes != null)
                     {
-                        SetModelState(attribute, State.SavedOrLoaded);
-                        attributeOwner.AddAttribute(attribute);
-                    }
+                        foreach (var attribute in attributes)
+                        {
+                            SetModelState(attribute, State.SavedOrLoaded);
+                            attributeOwner.AddAttribute(attribute);
+                        }
 
-                    return attributes;
+                        return attributes;
+                    }
                 }
             }
             return null;

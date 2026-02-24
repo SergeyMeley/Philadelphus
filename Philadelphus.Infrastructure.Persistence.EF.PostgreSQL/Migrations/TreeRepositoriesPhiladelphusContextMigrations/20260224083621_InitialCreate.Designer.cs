@@ -12,7 +12,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeRepositoriesPhiladelphusContextMigrations
 {
     [DbContext(typeof(PhiladelphusRepositoriesPhiladelphusContext))]
-    [Migration("20260224022751_InitialCreate")]
+    [Migration("20260224083621_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
