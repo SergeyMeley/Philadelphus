@@ -28,6 +28,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     declaring_owner_uuid = table.Column<Guid>(type: "uuid", nullable: false),
                     value_type_uuid = table.Column<Guid>(type: "uuid", nullable: true),
                     value_uuid = table.Column<Guid>(type: "uuid", nullable: true),
+                    is_collection_value = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    values_uuids = table.Column<Guid[]>(type: "uuid[]", nullable: true),
                     visibility_id = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     override_id = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     name = table.Column<string>(type: "text", nullable: false),

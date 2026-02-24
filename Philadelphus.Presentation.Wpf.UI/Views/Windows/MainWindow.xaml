@@ -89,13 +89,13 @@
                     <RibbonGroup Header="Общее">
                         <RibbonButton Label="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" />
                     </RibbonGroup> 
-                    <RibbonGroup Header="Буфер обмена">
+                    <!--<RibbonGroup Header="Буфер обмена">
                         <RibbonButton Label="Копировать" />
                         <RibbonButton Label="Вырезать" />
                         <RibbonButton Label="Вставить" />
                         <RibbonButton Label="Дублировать" />
                         <RibbonButton Label="Переместить" />
-                    </RibbonGroup>
+                    </RibbonGroup>-->
                 </RibbonTab>
                 <RibbonTab Header="Репозиторий">
                     <RibbonGroup Header="Текущий репозиторий">
@@ -131,7 +131,7 @@
                         </StackPanel>
                         <RibbonButton Label="Подробнее" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
                     </RibbonGroup>
-                    <RibbonGroup Header="Иерархия репозитория">
+                    <!--<RibbonGroup Header="Иерархия репозитория">
                         <RibbonButton Label="Добавить собственный корень" />
                         <RibbonButton Label="Добавить внешний корень" />
                         <RibbonButton Label="Добавить узел" />
@@ -149,14 +149,14 @@
                     <RibbonGroup Header="Пресеты">
                         <RibbonButton Label="Добавить пресет" />
                         <RibbonButton Label="Удалить пресет" />
-                    </RibbonGroup>
+                    </RibbonGroup>-->
                 </RibbonTab>
-                <RibbonTab Header="Вставка">
+                <!--<RibbonTab Header="Вставка">
 
                 </RibbonTab>
                 <RibbonTab Header="Рассылки">
 
-                </RibbonTab>
+                </RibbonTab>-->
                 <RibbonTab Header="Данные">
                     <RibbonGroup Header="Экспорт / импорт">
                         <RibbonButton Label="Экспорт .pjson" Command="{Binding RepositoryExplorerVM.ExportToPjsonCommand}" />
@@ -164,9 +164,9 @@
                     </RibbonGroup>
 
                 </RibbonTab>
-                <RibbonTab Header="Вид">
+                <!--<RibbonTab Header="Вид">
 
-                </RibbonTab>
+                </RibbonTab>-->
                 <RibbonTab Header="Расширения" DataContext="{Binding ExtensionsControlVM}">
                     <RibbonGroup Header="Текущее расширение">
                         <ComboBox ItemsSource="{Binding Extensions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedExtension}" IsEditable="True" IsReadOnly="True" Width="200"></ComboBox>
@@ -184,11 +184,11 @@
                     <RibbonGroup Header="Виджеты расширений">
                         <ContentControl Content="{Binding SelectedExtension.RibbonWidget}"></ContentControl>
                     </RibbonGroup>
-                    <RibbonGroup Header="Окна расширений">
+                    <!--<RibbonGroup Header="Окна расширений">
 
-                    </RibbonGroup>
+                    </RibbonGroup>-->
                 </RibbonTab>
-                <RibbonTab Header="Администрирование">
+                <!--<RibbonTab Header="Администрирование">
 
                 </RibbonTab>
                 <RibbonTab Header="Настройки">
@@ -199,7 +199,7 @@
                         <RibbonButton Label="О нас"></RibbonButton>
                     </RibbonGroup>
 
-                </RibbonTab>
+                </RibbonTab>-->
             </Ribbon>
             <Grid DockPanel.Dock="Top">
                 <Grid.RowDefinitions>
@@ -222,7 +222,7 @@
                             <ColumnDefinition Width="auto"></ColumnDefinition>
                             <ColumnDefinition Width="5*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="1">
+                        <!--<Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="1">
                             <Expander.Header>
                                 <TextBlock Text="Навигационная панель">
                                     <TextBlock.LayoutTransform>
@@ -261,13 +261,13 @@
                                 </GroupBox>
                             </Grid>
                         </Expander>
-                        <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
+                        <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>-->
                         <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="1" Background="White">
                             <TabControl Margin="1">
                                 <TabItem Header="Репозиторий">
                                     <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></re:RepositoryExplorer>
                                 </TabItem>
-                                <TabItem Header="Отчеты">
+                                <!--<TabItem Header="Отчеты">
                                     <ctrls:ReportProcessor></ctrls:ReportProcessor>
                                 </TabItem>
                                 <TabItem Header="Настраиваемый отчет">
@@ -275,7 +275,7 @@
                                 </TabItem>
                                 <TabItem Header="Импорт / экспорт">
                                     <ctrls:DataExchange></ctrls:DataExchange>
-                                </TabItem>
+                                </TabItem>-->
                                 <TabItem Header="Настройки">
                                     <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
                                 </TabItem>
@@ -288,9 +288,9 @@
                 <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="1" IsExpanded="True">
                     <DataGrid ItemsSource="{Binding NotificationsVM.Notifications, Mode=OneWay}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Уровень критичности" Binding="{Binding CriticalLevel}" Width="35"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="auto"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Критичность" Binding="{Binding CriticalLevel}" Width="auto" MinWidth="35"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="*"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Expander>
@@ -302,7 +302,8 @@
                     <StackPanel x:Name="popupTarget" Grid.Column="1"></StackPanel>
                 </Grid>
                 <StatusBar Grid.Row="4">
-                    <TextBlock Text="Приложение запущено"></TextBlock>
+                    <TextBlock Text="{Binding UserName}"></TextBlock>
+                    <!--<TextBlock Text="Приложение запущено"></TextBlock>-->
                 </StatusBar>
                 <ProgressBar Grid.Row="5" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
             </Grid>

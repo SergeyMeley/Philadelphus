@@ -12,7 +12,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
     [DbContext(typeof(MainEntitiesPhiladelphusContext))]
-    [Migration("20260224022800_InitialCreate")]
+    [Migration("20260224083629_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -270,6 +270,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<bool>("IsCollectionValue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_collection_value");
+
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -302,6 +308,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Property<Guid?>("ValueUuid")
                         .HasColumnType("uuid")
                         .HasColumnName("value_uuid");
+
+                    b.PrimitiveCollection<Guid[]>("ValuesUuids")
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("values_uuids");
 
                     b.Property<int>("VisibilityId")
                         .ValueGeneratedOnAdd()
