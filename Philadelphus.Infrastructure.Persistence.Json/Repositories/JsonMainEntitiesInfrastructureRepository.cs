@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using System;
@@ -25,22 +25,27 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             return _baseDirectory.Exists;
         }
 
-        public long DeleteAttributes(IEnumerable<ElementAttribute> items)
+        public long SoftDeleteAttributes(IEnumerable<ElementAttribute> items)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteLeaves(IEnumerable<TreeLeave> items)
+        public long SoftDeleteLeaves(IEnumerable<TreeLeave> items)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteNodes(IEnumerable<TreeNode> items)
+        public long SoftDeleteNodes(IEnumerable<TreeNode> items)
         {
             throw new NotImplementedException();
         }
 
-        public long DeleteRoots(IEnumerable<TreeRoot> items)
+        public long SoftDeleteRoots(IEnumerable<TreeRoot> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long SoftDeleteTrees(IEnumerable<WorkingTree> items)
         {
             throw new NotImplementedException();
         }
@@ -61,6 +66,11 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
         }
 
         public long InsertRoots(IEnumerable<TreeRoot> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long InsertTrees(IEnumerable<WorkingTree> items)
         {
             throw new NotImplementedException();
         }
@@ -100,6 +110,16 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             throw new NotImplementedException();
         }
 
+        public IEnumerable<WorkingTree> SelectTrees()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids)
+        {
+            throw new NotImplementedException();
+        }
+
         public long UpdateAttributes(IEnumerable<ElementAttribute> items)
         {
             throw new NotImplementedException();
@@ -116,6 +136,11 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
         }
 
         public long UpdateRoots(IEnumerable<TreeRoot> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long UpdateTrees(IEnumerable<WorkingTree> items)
         {
             throw new NotImplementedException();
         }

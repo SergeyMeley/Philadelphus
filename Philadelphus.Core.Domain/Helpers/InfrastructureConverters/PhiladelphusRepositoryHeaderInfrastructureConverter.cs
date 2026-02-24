@@ -1,5 +1,8 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -70,6 +73,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntityCollection == null)
                 return null;
+            if (dbEntityCollection.Count() == 0)
+                return new List<PhiladelphusRepositoryHeaderModel>();
             var result = new List<PhiladelphusRepositoryHeaderModel>();
             foreach (var dbEntity in dbEntityCollection)
             {

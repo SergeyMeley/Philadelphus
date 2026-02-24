@@ -25,7 +25,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         private string _alias;
         private string _customCode;
-        private List<Guid> _contentTreesUuids;
+        private List<Guid> _contentTreesUuids = new List<Guid>();
 
         #endregion
 

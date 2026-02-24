@@ -5,9 +5,11 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
@@ -203,6 +205,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage)
         {
             var result = new PhiladelphusRepositoryModel(Guid.NewGuid(), dataStorage, new PhiladelphusRepository());
+            result.ContentShrub.ContentTreesUuids.Add(WorkingTreeModel.SystemBaseGuid);
             return result;
         }
 

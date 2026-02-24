@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
@@ -64,6 +64,39 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
         #region [ Select ]
 
+        public IEnumerable<WorkingTree> SelectTrees()
+        {
+            if (CheckAvailability() == false)
+                return null;
+
+            List<WorkingTree> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.WorkingTrees.Where(x => x.AuditInfo.IsDeleted == false).ToList();
+            }
+
+            return result;
+        }
+
+        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids)
+        {
+            if (CheckAvailability() == false)
+                return null;
+
+            List<WorkingTree> result = null;
+
+            using (var context = GetNewContext())
+            {
+                result = context.WorkingTrees.Where(x =>
+                x.AuditInfo.IsDeleted == false
+                && uuids.Contains(x.Uuid)
+                ).ToList();
+            }
+
+            return result;
+        }
+
         public IEnumerable<TreeRoot> SelectRoots()
         {
             if (CheckAvailability() == false)
@@ -78,7 +111,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids)
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] owningTreesUuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -87,9 +120,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             using (var context = GetNewContext())
             {
-                result = context.TreeRoots.Where(x => 
+                result = context.TreeRoots.Where(x =>
                 x.AuditInfo.IsDeleted == false
-                && uuids.Contains(x.Uuid)
+                && (owningTreesUuids.Contains(x.OwningWorkingTreeUuid)
+                || owningTreesUuids.Contains(x.OwningWorkingTree.Uuid))
                 ).ToList();
             }
 
@@ -109,7 +143,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids)
+        public IEnumerable<TreeNode> SelectNodes(Guid[] owningTreesUuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -120,8 +154,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 result = context.TreeNodes.Where(x =>
                 x.AuditInfo.IsDeleted == false
-                && (parentRootUuids.Contains(x.ParentTreeRootUuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
-                || parentRootUuids.Contains(x.ParentTreeRoot.Uuid))
+                && (owningTreesUuids.Contains(x.OwningWorkingTreeUuid)
+                || owningTreesUuids.Contains(x.OwningWorkingTree.Uuid))
                 ).ToList();
             }
 
@@ -141,7 +175,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids)
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] owningTreesUuids)
         {
             if (CheckAvailability() == false)
                 return null;
@@ -152,8 +186,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 result = context.TreeLeaves.Where(x =>
                 x.AuditInfo.IsDeleted == false
-                && (parentRootUuids.Contains(x.ParentTreeRootUuid ?? Guid.Empty) //TODO: Избавиться от костыля Guid.Empty
-                || parentRootUuids.Contains(x.ParentTreeRoot.Uuid))
+                && (owningTreesUuids.Contains(x.OwningWorkingTreeUuid)
+                || owningTreesUuids.Contains(x.OwningWorkingTree.Uuid))
                 ).ToList();
             }
 
@@ -178,6 +212,28 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
         #region [ Insert ]
 
+        public long InsertTrees(IEnumerable<WorkingTree> items)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                foreach (var item in items)
+                {
+                    item.AuditInfo.CreatedBy = Environment.UserName;
+                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
+                }
+
+                context.WorkingTrees.AddRange(items);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
+
         public long InsertRoots(IEnumerable<TreeRoot> items)
         {
             if (CheckAvailability() == false)
@@ -191,14 +247,17 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.CreatedAt = DateTime.UtcNow;
                     item.AuditInfo.CreatedBy = Environment.UserName;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
-                
+
                 context.TreeRoots.AddRange(items);
                 result = context.SaveChanges();
             }
 
             return result;
         }
+
         public long InsertNodes(IEnumerable<TreeNode> items)
         {
             if (CheckAvailability() == false)
@@ -212,8 +271,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.CreatedBy = Environment.UserName;
                     item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeNodes.AddRange(items);
@@ -235,8 +294,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.CreatedBy = Environment.UserName;
                     item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeLeaves.AddRange(items);
@@ -258,8 +317,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.CreatedBy = Environment.UserName;
                     item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
                 }
 
                 context.ElementAttributes.AddRange(items);
@@ -272,6 +329,28 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
         #endregion
 
         #region [ Update ]
+
+        public long UpdateTrees(IEnumerable<WorkingTree> items)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                foreach (var item in items)
+                {
+                    item.AuditInfo.UpdatedBy = Environment.UserName;
+                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                }
+
+                context.WorkingTrees.UpdateRange(items);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
 
         public long UpdateRoots(IEnumerable<TreeRoot> items)
         {
@@ -286,6 +365,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.UpdatedBy = Environment.UserName;
                     item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeRoots.UpdateRange(items);
@@ -307,6 +388,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.UpdatedBy = Environment.UserName;
                     item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeNodes.UpdateRange(items);
@@ -328,6 +411,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     item.AuditInfo.UpdatedBy = Environment.UserName;
                     item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeLeaves.UpdateRange(items);
@@ -362,7 +447,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
         #region [ Delete ]
 
-        public long DeleteRoots(IEnumerable<TreeRoot> items)
+        public long SoftDeleteTrees(IEnumerable<WorkingTree> items)
         {
             if (CheckAvailability() == false)
                 return -1;
@@ -374,8 +459,33 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 foreach (var item in items)
                 {
                     item.AuditInfo.IsDeleted = true;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                    item.AuditInfo.DeletedBy = Environment.UserName;
+                    item.AuditInfo.DeletedAt = DateTime.UtcNow;
+                }
+
+                context.WorkingTrees.UpdateRange(items);
+                result = context.SaveChanges();
+            }
+
+            return result;
+        }
+
+        public long SoftDeleteRoots(IEnumerable<TreeRoot> items)
+        {
+            if (CheckAvailability() == false)
+                return -1;
+
+            long result = 0;
+
+            using (var context = GetNewContext())
+            {
+                foreach (var item in items)
+                {
+                    item.AuditInfo.IsDeleted = true;
+                    item.AuditInfo.DeletedBy = Environment.UserName;
+                    item.AuditInfo.DeletedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeRoots.UpdateRange(items);
@@ -384,7 +494,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public long DeleteNodes(IEnumerable<TreeNode> items)
+        public long SoftDeleteNodes(IEnumerable<TreeNode> items)
         {
             if (CheckAvailability() == false)
                 return -1;
@@ -396,8 +506,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 foreach (var item in items)
                 {
                     item.AuditInfo.IsDeleted = true;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                    item.AuditInfo.DeletedBy = Environment.UserName;
+                    item.AuditInfo.DeletedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeNodes.UpdateRange(items);
@@ -406,7 +518,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public long DeleteLeaves(IEnumerable<TreeLeave> items)
+        public long SoftDeleteLeaves(IEnumerable<TreeLeave> items)
         {
             if (CheckAvailability() == false)
                 return -1;
@@ -418,8 +530,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 foreach (var item in items)
                 {
                     item.AuditInfo.IsDeleted = true;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                    item.AuditInfo.DeletedBy = Environment.UserName;
+                    item.AuditInfo.DeletedAt = DateTime.UtcNow;
+
+                    item.OwningWorkingTree = context.WorkingTrees.SingleOrDefault(x => x.Uuid == item.OwningWorkingTreeUuid);
                 }
 
                 context.TreeLeaves.UpdateRange(items);
@@ -428,7 +542,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 
             return result;
         }
-        public long DeleteAttributes(IEnumerable<ElementAttribute> items)
+        public long SoftDeleteAttributes(IEnumerable<ElementAttribute> items)
         {
             if (CheckAvailability() == false)
                 return -1;
@@ -440,8 +554,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 foreach (var item in items)
                 {
                     item.AuditInfo.IsDeleted = true;
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
+                    item.AuditInfo.DeletedBy = Environment.UserName;
+                    item.AuditInfo.DeletedAt = DateTime.UtcNow;
                 }
 
                 context.ElementAttributes.UpdateRange(items);
@@ -452,6 +566,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
         }
 
         #endregion
-        
+
     }
 }

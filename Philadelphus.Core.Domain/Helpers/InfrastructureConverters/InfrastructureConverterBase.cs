@@ -2,8 +2,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -63,21 +62,15 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            //dbEntity.ParentUuid = businessEntity.Parent.ToString();
-            //dbEntity.DirectoryPath = businessEntity.DirectoryPath;
-            //dbEntity.DirectoryFullPath = businessEntity.DirectoryFullPath;
-            //dbEntity.ConfigPath = businessEntity.ConfigPath;
             dbEntity.Uuid = businessEntity.Uuid;
             dbEntity.Name = businessEntity.Name;
             dbEntity.Description = businessEntity.Description;
-            dbEntity.IsLegacy = businessEntity.IsHidden;
+            dbEntity.IsHidden = businessEntity.IsHidden;
             dbEntity.AuditInfo.IsDeleted = businessEntity.AuditInfo.IsDeleted;
             dbEntity.AuditInfo.CreatedAt = businessEntity.AuditInfo.CreatedAt;
             dbEntity.AuditInfo.CreatedBy = businessEntity.AuditInfo.CreatedBy;
             dbEntity.AuditInfo.UpdatedAt = businessEntity.AuditInfo.UpdatedAt;
             dbEntity.AuditInfo.UpdatedBy = businessEntity.AuditInfo.UpdatedBy;
-            dbEntity.AuditInfo.ContentUpdatedAt = businessEntity.AuditInfo.ContentUpdatedAt;
-            dbEntity.AuditInfo.ContentUpdatedBy = businessEntity.AuditInfo.ContentUpdatedBy;
             dbEntity.AuditInfo.DeletedAt = businessEntity.AuditInfo.DeletedAt;
             dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
             return dbEntity;
@@ -139,20 +132,15 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            //businessEntity.DirectoryPath = dbEntity.DirectoryPath;
-            //businessEntity.DirectoryFullPath = dbEntity.DirectoryFullPath;
-            //businessEntity.ConfigPath = dbEntity.ConfigPath;
             businessEntity.DbEntity = dbEntity;
             businessEntity.Name = dbEntity.Name;
             businessEntity.Description = dbEntity.Description;
-            businessEntity.IsHidden = dbEntity.IsLegacy;
+            businessEntity.IsHidden = dbEntity.IsHidden;
             businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
             businessEntity.AuditInfo.CreatedAt = dbEntity.AuditInfo.CreatedAt;
             businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;
             businessEntity.AuditInfo.UpdatedAt = dbEntity.AuditInfo.UpdatedAt;
             businessEntity.AuditInfo.UpdatedBy = dbEntity.AuditInfo.UpdatedBy;
-            businessEntity.AuditInfo.ContentUpdatedAt = dbEntity.AuditInfo.ContentUpdatedAt;
-            businessEntity.AuditInfo.ContentUpdatedBy = dbEntity.AuditInfo.ContentUpdatedBy;
             businessEntity.AuditInfo.DeletedAt = dbEntity.AuditInfo.DeletedAt;
             businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
             return businessEntity;

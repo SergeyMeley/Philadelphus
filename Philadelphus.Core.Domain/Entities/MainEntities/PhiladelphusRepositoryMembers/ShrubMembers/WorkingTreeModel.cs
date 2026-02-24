@@ -2,16 +2,9 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
-using System;
-using System.Collections.Generic;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
 {
@@ -32,6 +25,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         #region [ Properties ] 
 
         #region [ General Properties ]
+
+        /// <summary>
+        /// Системное рабочее дерево
+        /// </summary>
+        public bool IsSystemBase { get; } = false;
+
+        /// <summary>
+        /// Уникальный идентификатор системного рабочего дерева
+        /// </summary>
+        internal static Guid SystemBaseGuid { get => Guid.Parse("00000000-0000-0000-0000-0000002018ee"); }
 
         /// <summary>
         /// Недоступные (занятые) имена
@@ -137,7 +140,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal WorkingTreeModel(
             Guid uuid,
             IDataStorageModel dataStorage,
-            TreeRoot dbEntity,
+            WorkingTree dbEntity,
             ShrubModel owner)
             : base(uuid, owner, dbEntity)
         {
@@ -148,6 +151,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             Name = NamingHelper.GetNewName(UnavailableNames, _defaultFixedPartOfName);
             UnavailableNames.Add(Name);
+
+            if (uuid == SystemBaseGuid)
+            {
+                IsSystemBase = true;
+            }
         }
 
         #endregion

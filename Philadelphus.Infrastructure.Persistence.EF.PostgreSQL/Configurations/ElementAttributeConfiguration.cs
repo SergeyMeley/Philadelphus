@@ -8,7 +8,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
     {
         public void Configure(EntityTypeBuilder<ElementAttribute> builder)
         {
-            builder.ToTable("element_attributes", "main_entities");
+            builder.ToTable("element_attributes", "shrub_members_content");
 
             builder.HasKey(x => x.Uuid).HasName("element_attributes_pkey");
 
@@ -38,8 +38,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
             builder.Property(x => x.CustomCode)
                 .HasColumnName("custom_code");
 
-            builder.Property(x => x.IsLegacy)
-                .HasColumnName("is_legacy");
+            builder.Property(x => x.IsHidden)
+                .HasColumnName("is_hidden")
+                .IsRequired()
+                .HasDefaultValue(false);
 
             builder.OwnsOne(x => x.AuditInfo, audit =>
             {
@@ -61,12 +63,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 
                 audit.Property(a => a.UpdatedBy)
                     .HasColumnName("updated_by");
-
-                audit.Property(a => a.ContentUpdatedAt)
-                    .HasColumnName("content_updated_at");
-
-                audit.Property(a => a.ContentUpdatedBy)
-                    .HasColumnName("content_updated_by");
 
                 audit.Property(a => a.DeletedAt)
                     .HasColumnName("deleted_at");

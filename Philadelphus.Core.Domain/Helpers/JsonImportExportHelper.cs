@@ -1,27 +1,13 @@
-﻿using AutoMapper.Internal;
-using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
-using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Helpers
 {

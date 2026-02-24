@@ -12,8 +12,8 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeRepositoriesPhiladelphusContextMigrations
 {
     [DbContext(typeof(PhiladelphusRepositoriesPhiladelphusContext))]
-    [Migration("20260212151257_attributes")]
-    partial class attributes
+    [Migration("20260224022751_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,29 +40,24 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeR
                         .HasColumnType("text")
                         .HasColumnName("alias");
 
-                    b.PrimitiveCollection<Guid[]>("ChildTreeRootsUuids")
+                    b.PrimitiveCollection<Guid[]>("ContentWorkingTreesUuids")
                         .IsRequired()
                         .HasColumnType("uuid[]")
-                        .HasColumnName("child_tree_roots_uuids");
+                        .HasColumnName("content_working_trees_uuids");
 
                     b.Property<string>("CustomCode")
                         .HasColumnType("text")
                         .HasColumnName("custom_code");
 
-                    b.PrimitiveCollection<Guid[]>("DataStoragesUuids")
-                        .IsRequired()
-                        .HasColumnType("uuid[]")
-                        .HasColumnName("data_storages_uuids");
-
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<bool>("IsLegacy")
+                    b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
-                        .HasColumnName("is_legacy");
+                        .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -78,9 +73,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeR
                         .HasColumnName("sequence");
 
                     b.HasKey("Uuid")
-                        .HasName("tree_repositories_pkey");
+                        .HasName("philadelphus_repositories_pkey");
 
-                    b.ToTable("tree_repositories", "repositories");
+                    b.ToTable("philadelphus_repositories", "repositories");
                 });
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepository", b =>
@@ -91,25 +86,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeR
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
-                            b1.Property<DateTime?>("ContentUpdatedAt")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("content_updated_at");
-
-                            b1.Property<string>("ContentUpdatedBy")
-                                .HasColumnType("text")
-                                .HasColumnName("content_updated_by");
-
                             b1.Property<DateTime>("CreatedAt")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at")
-                                .HasDefaultValueSql("NOW()");
+                                .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("text")
-                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
@@ -136,7 +119,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeR
 
                             b1.HasKey("PhiladelphusRepositoryUuid");
 
-                            b1.ToTable("tree_repositories", "repositories");
+                            b1.ToTable("philadelphus_repositories", "repositories");
 
                             b1.WithOwner()
                                 .HasForeignKey("PhiladelphusRepositoryUuid");

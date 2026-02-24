@@ -199,6 +199,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             OwnDataStorage = dataStorage;
 
             ContentShrub = new ShrubModel(uuid, dbEntity, this);
+
         }
 
         #endregion

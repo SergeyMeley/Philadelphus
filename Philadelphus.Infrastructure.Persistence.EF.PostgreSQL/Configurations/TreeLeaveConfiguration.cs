@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 {
@@ -8,7 +8,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
     {
         public void Configure(EntityTypeBuilder<TreeLeave> builder)
         {
-            builder.ToTable("tree_leaves", "main_entities");
+            builder.ToTable("tree_leaves", "shrub_members");
 
             builder.HasKey(x => x.Uuid).HasName("tree_leaves_pkey");
 
@@ -34,8 +34,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
             builder.Property(x => x.CustomCode)
                 .HasColumnName("custom_code");
 
-            builder.Property(x => x.IsLegacy)
-                .HasColumnName("is_legacy");
+            builder.Property(x => x.IsHidden)
+                .HasColumnName("is_hidden")
+                .IsRequired()
+                .HasDefaultValue(false);
 
             builder.OwnsOne(x => x.AuditInfo, audit =>
             {
@@ -60,12 +62,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                 audit.Property(a => a.UpdatedBy)
                     .HasColumnName("updated_by");
 
-                audit.Property(a => a.ContentUpdatedAt)
-                    .HasColumnName("content_updated_at");
-
-                audit.Property(a => a.ContentUpdatedBy)
-                    .HasColumnName("content_updated_by");  
-
                 audit.Property(a => a.DeletedAt)
                     .HasColumnName("deleted_at");
 
@@ -78,11 +74,20 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                 .IsRequired()
                 .HasDefaultValue(0);
 
+            builder.Property(x => x.OwningWorkingTreeUuid)
+                .HasColumnName("owning_working_tree_uuid")
+                .IsRequired();
+
+            builder.Property(x => x.ParentTreeNodeUuid)
+                .HasColumnName("parent_tree_node_uuid");
+
+            builder.HasOne(x => x.OwningWorkingTree)
+              .WithMany()
+              .HasForeignKey(x => x.OwningWorkingTreeUuid);
+
             builder.HasOne(x => x.ParentTreeNode)
                   .WithMany()
-                  .HasForeignKey(x => x.ParentUuid);
-
-            builder.Ignore(x => x.Parent);
+                  .HasForeignKey(x => x.ParentTreeNodeUuid);
         }
     }
 }

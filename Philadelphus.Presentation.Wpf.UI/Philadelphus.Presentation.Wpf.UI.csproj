@@ -17,6 +17,7 @@
 	  <Company>Sergey Meley</Company>
 	  <Copyright>© 2026 Sergey Meley</Copyright>
 	  <PublishSingleFile>true</PublishSingleFile>
+	  <SignAssembly>True</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
