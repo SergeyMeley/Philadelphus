@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
+using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 {
@@ -31,7 +32,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Выполнить основной метод расширения
         /// </summary>
-        Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, MainEntityBaseModel element);
+        Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, MainEntityBaseModel element);
 
         /// <summary>
         /// Запустить все расширения с AutoStart = true

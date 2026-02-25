@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.ExtensionSystem.Models
 {
@@ -31,7 +32,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         /// Основной метод расширения
         /// Принимает выбранный элемент и может возвращать измененный элемент
         /// </summary>
-        Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default);
+        Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить виджет расширения для обозревателя репозитория (опционально)

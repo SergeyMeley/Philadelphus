@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -208,7 +209,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <param name="element">Текущий элемент репозитория</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns></returns>
-        public async Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default)
+        public async Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -217,7 +218,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
                     throw new InvalidOperationException("Расширение не запущено");
                 }
 
-                var result = await Extension.ExecuteAsync(element, cancellationToken);
+                var result = await Extension.ExecuteAsync(element, service, cancellationToken);
                 LogOperation("Execute", $"Выполнено для элемента: {element.Name}", false);
                 return result;
             }

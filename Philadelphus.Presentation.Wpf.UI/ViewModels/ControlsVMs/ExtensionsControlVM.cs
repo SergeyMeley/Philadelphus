@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
@@ -210,7 +211,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 var originalExt = FindOriginalExtension(SelectedExtension);
                 if (originalExt != null)
                 {
-                    await _extensionManager.ExecuteExtensionAsync(originalExt, SelectedElement);
+                    await _extensionManager.ExecuteExtensionAsync(originalExt, _serviceProvider.GetRequiredService<IPhiladelphusRepositoryService>(), SelectedElement);
                     StatusMessage = $"Метод расширения '{SelectedExtension.Name}' успешно выполнен";
                 }
             }

@@ -83,6 +83,7 @@
                         <RibbonButton Label="Открыть удаленный репозиторий"/>
                         <RibbonButton Label="Создать пустой репозиторий"/>
                         <RibbonButton Label="Создать из шаблона"/>
+                        <RibbonButton Label="Тест" Command="{Binding RepositoryExplorerVM.TestCommand}"/>
                     </RibbonApplicationMenu>
                 </Ribbon.ApplicationMenu>
                 <RibbonTab Header="Главная">

@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -101,7 +102,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             }
         }
 
-        public async Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, MainEntityBaseModel element)
+        public async Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, MainEntityBaseModel element)
         {
             if (extension == null)
                 throw new ArgumentNullException(nameof(extension));
@@ -110,7 +111,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
             try
             {
-                return await extension.ExecuteAsync(element);
+                return await extension.ExecuteAsync(element, service);
             }
             catch (Exception ex)
             {
