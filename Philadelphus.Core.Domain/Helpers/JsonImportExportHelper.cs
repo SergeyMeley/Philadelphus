@@ -1,13 +1,19 @@
-﻿using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
+﻿using Npgsql.Internal.Postgres;
+using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Helpers
 {
@@ -41,12 +47,10 @@ namespace Philadelphus.Core.Domain.Helpers
             using var document = JsonDocument.Parse(json);
             var root = document.RootElement;
 
-            // ✅ БЕЗОПАСНО читаем name дерева
             var treeName = root.TryGetProperty("name", out var nameProp)
                 ? nameProp.GetString() ?? "Импортированное дерево"
                 : "Импортированное дерево";
 
-            // ✅ Читаем корень
             if (!root.TryGetProperty("contentRoot", out var contentRootElement))
                 throw new InvalidOperationException("Нет contentRoot");
 
@@ -59,77 +63,153 @@ namespace Philadelphus.Core.Domain.Helpers
             var treeRoot = service.CreateTreeRoot(repository, dataStorage);
             treeRoot.Name = rootName;
 
-            var attributeLinkMap = new Dictionary<Guid, (string, string)>();
+            var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
 
-            // 2. Создаём узлы корня
+            // 2. Создаём структуру + сохраняем атрибуты для привязки
             if (contentRootElement.TryGetProperty("childNodes", out var childNodesElement) &&
                 childNodesElement.ValueKind == JsonValueKind.Array)
             {
                 foreach (var nodeElement in childNodesElement.EnumerateArray())
                 {
-                    if (nodeElement.TryGetProperty("name", out var nodeNameProp))
-                    {
-                        var node = service.CreateTreeNode(treeRoot);
-                        node.Name = nodeNameProp.GetString() ?? "Узел";
-
-                        // Листы узла
-                        CreateLeavesFromNode(service, node, nodeElement, attributeLinkMap);
-
-                        // Атрибуты узла
-                        CreateAttributesFromElement(service, node, nodeElement, attributeLinkMap);
-                    }
+                    CreateNodeRecursive(service, treeRoot, nodeElement, attributeLinkMap);
                 }
             }
 
             // 3. Атрибуты корня
             CreateAttributesFromElement(service, treeRoot, contentRootElement, attributeLinkMap);
 
-            return treeRoot.OwningWorkingTree;
+            // ✅ 4. Загружаем полную структуру (узлы + листы)
+            service.GetWorkingTree(treeRoot.OwningWorkingTree);
+            treeRoot.OwningWorkingTree.ContentRoot = treeRoot;
+
+            // ✅ 5. ПРИВЯЗЫВАЕМ типы данных и значения к атрибутам!
+            LinkAttributesToRealEntities(service, treeRoot, attributeLinkMap);
+
+            // 6. Загружаем атрибуты
+            service.GetPersonalAttributes(treeRoot);
+
+                        return treeRoot.OwningWorkingTree;
         }
 
-        private static void CreateLeavesFromNode(IPhiladelphusRepositoryService service, TreeNodeModel node, JsonElement nodeElement, Dictionary<Guid, (string, string)> attributeLinkMap)
+        private static void CreateNodeRecursive(IPhiladelphusRepositoryService service, IParentModel parent, JsonElement nodeElement, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
         {
-            if (nodeElement.TryGetProperty("childLeaves", out var leavesElement) &&
-                leavesElement.ValueKind == JsonValueKind.Array)
+            if (!nodeElement.TryGetProperty("name", out var nodeNameProp)) return;
+
+            var node = service.CreateTreeNode(parent);
+            node.Name = nodeNameProp.GetString() ?? "Узел";
+
+            CreateAttributesFromElement(service, node, nodeElement, attributeLinkMap);
+
+            if (nodeElement.TryGetProperty("childNodes", out var childNodes) && childNodes.ValueKind == JsonValueKind.Array)
             {
-                foreach (var leafElement in leavesElement.EnumerateArray())
+                foreach (var child in childNodes.EnumerateArray())
+                    CreateNodeRecursive(service, node, child, attributeLinkMap);
+            }
+
+            CreateLeavesFromNode(service, node, nodeElement, attributeLinkMap);
+        }
+
+        private static void CreateLeavesFromNode(IPhiladelphusRepositoryService service, TreeNodeModel node, JsonElement nodeElement, Dictionary<Guid, (string, string, ElementAttributeModel)> attributeLinkMap)
+        {
+            if (!nodeElement.TryGetProperty("childLeaves", out var leavesElement) || leavesElement.ValueKind != JsonValueKind.Array)
+                return;
+
+            foreach (var leafElement in leavesElement.EnumerateArray())
+            {
+                if (leafElement.TryGetProperty("name", out var leafNameProp))
                 {
-                    if (leafElement.TryGetProperty("name", out var leafNameProp))
-                    {
-                        var leaf = service.CreateTreeLeave(node);
-                        leaf.Name = leafNameProp.GetString() ?? "Лист";
-                    }
+                    var leaf = service.CreateTreeLeave(node);
+                    leaf.Name = leafNameProp.GetString() ?? "Лист";
+
+                    CreateAttributesFromElement(service, leaf, leafElement, attributeLinkMap);
                 }
             }
         }
 
-        private static void CreateAttributesFromElement(IPhiladelphusRepositoryService service, IAttributeOwnerModel element, JsonElement elementJson, Dictionary<Guid, (string, string)> attributeLinkMap)
+        private static void CreateAttributesFromElement(IPhiladelphusRepositoryService service, IAttributeOwnerModel element, JsonElement elementJson, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
         {
-            if (elementJson.TryGetProperty("attributes", out var attributesElement) &&
-                attributesElement.ValueKind == JsonValueKind.Array)
+            if (!elementJson.TryGetProperty("attributes", out var attributesElement) || attributesElement.ValueKind != JsonValueKind.Array)
+                return;
+
+            foreach (var attrElement in attributesElement.EnumerateArray())
             {
-                foreach (var attrElement in attributesElement.EnumerateArray())
+                // Заполняем свойства
+                var name = attrElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() ?? "Атрибут" : "Атрибут";
+
+                var attr = element.Attributes.ToList().FirstOrDefault(x => x.Name == name);
+                if (attr == null)
                 {
-                    var attr = service.CreateElementAttribute(element);
-
-                    attr.Name = attrElement.TryGetProperty("name", out var nameProp)
-                        ? nameProp.GetString() ?? "Атрибут"
-                        : "Атрибут";
-
-                    attr.IsCollectionValue = attrElement.TryGetProperty("isCollectionValue", out var isCollProp)
-                        && isCollProp.GetBoolean();
-
-                    // Сохраняем ссылки
-                    var dataTypeName = attrElement.TryGetProperty("dataTypeNodeName", out var dtProp)
-                        ? dtProp.GetString() ?? "Не определён"
-                        : "Не определён";
-
-                    var valueLeafName = attrElement.TryGetProperty("valueLeaveName", out var vlProp)
-                        ? vlProp.GetString() ?? "Не задано"
-                        : "Не задано";
-
-                    attributeLinkMap[attr.Uuid] = (dataTypeName, valueLeafName);
+                    attr = service.CreateElementAttribute(element);
+                    attr.Name = name;
                 }
+
+                if (attrElement.TryGetProperty("isCollectionValue", out var isCollProp)) attr.IsCollectionValue = isCollProp.GetBoolean();
+
+                if (attrElement.TryGetProperty("visibility", out var visibilityProp))
+                {
+                    var visibilityString = visibilityProp.GetString();
+                    Enum.TryParse<VisibilityScope>(visibilityString, true, out var visibility);
+                    attr.Visibility = visibility;
+                }
+
+                if (attrElement.TryGetProperty("override", out var overrideProp))
+                {
+                    var overrideString = overrideProp.GetString();
+                    Enum.TryParse<OverrideType>(overrideString, true, out var overrideValue);
+                    attr.Override = overrideValue;
+                }
+
+                if (attrElement.TryGetProperty("description", out var descProp))
+                    attr.Description = descProp.GetString();
+
+                // ✅ СОХРАНЯЕМ АТРИБУТ + ССЫЛКИ для привязки
+                var dataTypeName = attrElement.TryGetProperty("dataTypeNodeName", out var dtProp) ? dtProp.GetString() ?? "Текст" : "Текст";
+                dataTypeName = dataTypeName == "Строка" ? "Текст" : dataTypeName;
+                var valueLeafName = attrElement.TryGetProperty("valueLeaveName", out var vlProp)
+                    && vlProp.ValueKind != JsonValueKind.Null
+                    ? vlProp.ToString()  // Работает для всех типов!
+                    : null;
+
+                attributeLinkMap[attr.LocalUuid] = (dataTypeName, valueLeafName, attr);
+           }
+        }
+
+        /// <summary>
+        /// ✅ ГЛАВНЫЙ МЕТОД: Привязывает реальные DataType и ValueLeaf к атрибутам
+        /// </summary>
+        private static void LinkAttributesToRealEntities(IPhiladelphusRepositoryService service, TreeRootModel treeRoot, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
+        {
+            // Получаем ВСЕ узлы и листы дерева
+            var allNodes = treeRoot.OwningShrub.ContentTrees.SelectMany(x => x.ContentRoot.GetAllNodesRecursive())?.ToList();
+            var allLeaves = treeRoot.OwningShrub.ContentTrees.SelectMany(x => x.ContentRoot.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>())?.ToList();
+
+            foreach (var kvp in attributeLinkMap)
+            {
+                var attr = kvp.Value.attribute;
+                var (dataTypeName, valueLeafName, attribute) = kvp.Value;
+
+                if (attr.Owner is IShrubMemberModel sm)
+                {
+                    var ownAtt = sm.Attributes.SingleOrDefault(x => x.Name == attr.Name) ?? throw new Exception();
+
+                    ownAtt.ValueType = allNodes.SingleOrDefault(x => x.Name == dataTypeName);
+                    ownAtt.Value = allLeaves.Where(x => x.ParentNode.Uuid == ownAtt.ValueType.Uuid).FirstOrDefault(x => x.Name == valueLeafName);
+
+                    if (string.IsNullOrEmpty(valueLeafName) == false)
+                    {
+                        if (ownAtt.Value == null)
+                        {
+                            var newValue = service.CreateTreeLeave(ownAtt.ValueType);
+                            newValue.Name = valueLeafName;
+                            ownAtt.Value = newValue;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception();
+                }
+                
             }
         }
     }

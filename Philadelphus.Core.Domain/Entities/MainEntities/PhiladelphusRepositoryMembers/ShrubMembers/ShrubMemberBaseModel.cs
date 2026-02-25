@@ -92,22 +92,38 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             get
             {
                 var attributes = _attributes?.Where(x => x.IsOwn).ToList();
+
+                var oldParentAttributes = _attributes?.Where(x => x.IsOwn == false).ToList();
+
+                var newParentAttributes = new List<ElementAttributeModel>();
                 if (this is IChildrenModel c)
                 {
                     if (c.Parent is IAttributeOwnerModel ao)
                     {
                         if (ao is IWorkingTreeMemberModel wtm)
                         {
-                            foreach (var attribute in ao.GetVisibleAttributesRecursive(wtm))
+                            var allCurrentParentAttributes = ao.GetVisibleAttributesRecursive(wtm).ToList();
+                            foreach (var attribute in allCurrentParentAttributes)
                             {
-                                if (attributes.Any(x => x.DeclaringUuid == attribute.DeclaringUuid) == false)   // Пропускаем атрибуты, которые уже унаследованы с ближайшегго родителя
+                                if (newParentAttributes.Any(x => x.DeclaringUuid == attribute.DeclaringUuid) == false)   // Пропускаем атрибуты, которые уже унаследованы с ближайшегго родителя
                                 {
-                                    attributes.Add(attribute.CloneForChild(this));
+                                    var oldParentAttribute = oldParentAttributes.SingleOrDefault(x => x.DeclaringUuid == attribute.DeclaringUuid);
+                                    if (oldParentAttribute != null)
+                                    {
+                                        newParentAttributes.Add(oldParentAttribute);
+                                    }
+                                    else
+                                    {
+                                        newParentAttributes.Add(attribute.CloneForChild(this));
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                attributes.AddRange(newParentAttributes);
+
                 _attributes = attributes;
                 return attributes;
             }
