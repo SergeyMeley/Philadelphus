@@ -10,7 +10,6 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Plugins.NR.PipingCalculation;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -389,8 +388,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    var ext = new PipingElementsCalculationExtension();
-                    ext.ExecuteAsync(SelectedRepositoryMember.Model, _service);
+                    //var ext = new PipingElementsCalculationExtension();
+                    //ext.ExecuteAsync(SelectedRepositoryMember.Model, _service);
                 });
             }
         }
