@@ -1,6 +1,5 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using System;
 using System.Collections.Generic;
