@@ -97,7 +97,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     var dbTrees = infrastructure.SelectTrees(treesUuids);
                     var trees = dbTrees.ToModelCollection(repository.DataStorages, repository);
 
-                    foreach (var tree in trees.Where(x => x.OwningRepository.Uuid == repository.Uuid))
+                    foreach (var tree in trees?.Where(x => x.OwningRepository.Uuid == repository.Uuid))
                     {
                         tree.UnavailableNames.Add(tree.Name);
 

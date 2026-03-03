@@ -225,7 +225,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                     {
                         if (c.Parent is IAttributeOwnerModel ao)
                         {
-                            var originalAttribute = ao.Attributes.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
+                            var originalAttribute = ao.Attributes?.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
                             if (originalAttribute != null)
                             {
                                 depth = originalAttribute.InheritanceDepth + 1;
