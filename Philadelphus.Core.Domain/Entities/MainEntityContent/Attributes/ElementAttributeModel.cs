@@ -27,7 +27,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeLeaveModel _value;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private VisibilityScope _visibility = VisibilityScope.Public;
-        private OverrideType _override = OverrideType.None;
+        private OverrideType _override = OverrideType.Virtual;
 
         #endregion
 
@@ -225,7 +225,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                     {
                         if (c.Parent is IAttributeOwnerModel ao)
                         {
-                            var originalAttribute = ao.Attributes.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
+                            var originalAttribute = ao.Attributes?.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
                             if (originalAttribute != null)
                             {
                                 depth = originalAttribute.InheritanceDepth + 1;

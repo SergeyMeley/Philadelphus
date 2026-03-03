@@ -359,8 +359,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    var model = SelectedRepositoryMember.Model as TreeRootModel;
-
                     var path = string.Empty;
 
                     var dialog = new OpenFileDialog
@@ -380,10 +378,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                         PhiladelphusRepositoryVM.Childs.Add(new TreeRootVM(PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentTrees?.Last()?.ContentRoot, _service));
                     }
-                },
-                ce =>
-                {
-                    return SelectedRepositoryMember is TreeRootVM;
                 });
             }
         }

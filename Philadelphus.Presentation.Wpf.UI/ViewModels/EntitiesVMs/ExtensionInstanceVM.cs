@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs
@@ -38,9 +39,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs
             await _extensionInstance.StopAsync();
         }
 
-        public async Task ExecuteAsync(MainEntityBaseModel element)
+        public async Task ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service)
         {
-            await _extensionInstance.ExecuteAsync(element);
+            await _extensionInstance.ExecuteAsync(element, service);
         }
 
         public async Task UpdateCanExecuteAsync(MainEntityBaseModel element)
