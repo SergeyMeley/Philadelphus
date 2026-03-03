@@ -9,9 +9,10 @@
         Width="400" Height="300" 
         ResizeMode="NoResize">
 
-    <Border Background="#E0F7FA" CornerRadius="20" 
+    <Border x:Name="MainBorder" Background="#E0F7FA" CornerRadius="20" 
             Width="380" Height="280" Margin="10"
-            BorderBrush="#00BCD4" BorderThickness="2">
+            BorderBrush="#00BCD4" BorderThickness="2"
+            Opacity="0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -21,53 +22,47 @@
             </Grid.RowDefinitions>
 
             <!-- Логотип/Заголовок -->
-            <TextBlock Grid.Row="1" Text="Чубушник" FontSize="48" FontWeight="Bold" 
+            <TextBlock x:Name="TitleText" Grid.Row="1" Text="Чубушник" FontSize="48" FontWeight="Bold" 
                        HorizontalAlignment="Center" VerticalAlignment="Center" 
-                       Foreground="#00695C"/>
+                       Foreground="#00695C" Opacity="0">
+                <TextBlock.RenderTransform>
+                    <TranslateTransform Y="20"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
 
-            <!-- Анимация загрузки -->
-            <Ellipse x:Name="Spinner" Grid.Row="2" Width="80" Height="80" 
-                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                     Margin="0,20" Fill="#26C6DA">
-                <Ellipse.RenderTransform>
-                    <RotateTransform x:Name="RotateTransform" CenterX="40" CenterY="40"/>
-                </Ellipse.RenderTransform>
-                <Ellipse.Effect>
-                    <DropShadowEffect Color="#00ACC1" ShadowDepth="0" BlurRadius="15" Opacity="0.7"/>
-                </Ellipse.Effect>
-                <Ellipse.Triggers>
-                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation 
-                                    Storyboard.TargetName="RotateTransform"
-                                    Storyboard.TargetProperty="Angle"
-                                    From="0" To="360" Duration="0:0:1.5"
-                                    RepeatBehavior="Forever"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Ellipse.Triggers>
-            </Ellipse>
+            <!-- Спиннер (три элемента) -->
+            <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20">
+                <Ellipse x:Name="SpinnerOuter" Width="80" Height="80" 
+                         Fill="#26C6DA" Opacity="0.6">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform x:Name="RotateOuter" CenterX="40" CenterY="40"/>
+                    </Ellipse.RenderTransform>
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="#00ACC1" ShadowDepth="0" BlurRadius="15" Opacity="0.7"/>
+                    </Ellipse.Effect>
+                </Ellipse>
 
-            <!-- Текст прогресса с пульсацией -->
-            <TextBlock Grid.Row="2" x:Name="LoadingText" Text="Загрузка..." 
+                <Ellipse x:Name="SpinnerInner" Width="60" Height="60" 
+                         Fill="#E0F7FA" Margin="10">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform x:Name="RotateInner" CenterX="30" CenterY="30"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <Ellipse x:Name="SpinnerDot" Width="16" Height="16" 
+                         Fill="#00695C" HorizontalAlignment="Center" 
+                         VerticalAlignment="Top" Margin="0,0,0,0">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform x:Name="RotateDot" CenterX="40" CenterY="40"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+            </Grid>
+
+            <!-- Текст прогресса -->
+            <TextBlock x:Name="LoadingText" Grid.Row="2" Text="Загрузка" 
                        FontSize="20" HorizontalAlignment="Center" 
                        VerticalAlignment="Bottom" Margin="0,0,0,20" 
-                       Foreground="#00695C">
-                <TextBlock.Triggers>
-                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation 
-                                    Storyboard.TargetProperty="(UIElement.Opacity)"
-                                    From="0.4" To="1.0" Duration="0:0:1.2"
-                                    RepeatBehavior="Forever" AutoReverse="True"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </TextBlock.Triggers>
-            </TextBlock>
+                       Foreground="#00695C"/>
         </Grid>
     </Border>
 </Window>
