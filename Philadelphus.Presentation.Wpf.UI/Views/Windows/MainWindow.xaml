@@ -161,7 +161,9 @@
                     <RibbonGroup Header="Экспорт / импорт">
                         <RibbonButton Label="Экспорт .pjson" Command="{Binding RepositoryExplorerVM.ExportToPjsonCommand}" />
                         <RibbonButton Label="Импорт из .pjson" Command="{Binding RepositoryExplorerVM.ImportFromPjsonCommand}" />
-                        <RibbonButton Label="Импорт из Excel .xlsx" Command="{Binding RepositoryExplorerVM.ImportFromXlsxCommand}" />
+                    </RibbonGroup>
+                    <RibbonGroup Header="Конвертация">
+                        <RibbonButton Label="Конвертировать .xlsx в .pjson" Command="{Binding RepositoryExplorerVM.XlsxToPjsonCommand}" />
                     </RibbonGroup>
 
                 </RibbonTab>
