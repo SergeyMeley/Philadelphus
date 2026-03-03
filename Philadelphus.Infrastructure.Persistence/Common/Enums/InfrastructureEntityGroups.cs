@@ -2,9 +2,7 @@
 {
     public enum InfrastructureEntityGroups
     {
-        DataStoragesCollection,
-        TreeRepositoryHeadersCollection,
-        TreeRepositories,
+        PhiladelphusRepositories,
         MainEntities,
     }
 }

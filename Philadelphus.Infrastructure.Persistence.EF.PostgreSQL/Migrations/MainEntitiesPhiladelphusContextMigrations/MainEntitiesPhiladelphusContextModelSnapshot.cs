@@ -25,7 +25,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.ElementAttribute", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
@@ -45,14 +45,250 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<bool>("IsLegacy")
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasColumnName("is_legacy");
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<Guid>("OwnDataStorageUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("data_storage_uuid");
+
+                    b.Property<long?>("Sequence")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("Uuid")
+                        .HasName("working_trees_pkey");
+
+                    b.ToTable("working_trees", "shrub_members");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeave", b =>
+                {
+                    b.Property<Guid>("Uuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("text")
+                        .HasColumnName("alias");
+
+                    b.Property<string>("CustomCode")
+                        .HasColumnType("text")
+                        .HasColumnName("custom_code");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OwningWorkingTreeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owning_working_tree_uuid");
+
+                    b.Property<Guid?>("ParentTreeNodeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_tree_node_uuid");
+
+                    b.Property<long?>("Sequence")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    b.Property<int>("SystemBaseTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("data_type_id");
+
+                    b.HasKey("Uuid")
+                        .HasName("tree_leaves_pkey");
+
+                    b.HasIndex("OwningWorkingTreeUuid");
+
+                    b.HasIndex("ParentTreeNodeUuid");
+
+                    b.ToTable("tree_leaves", "shrub_members");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", b =>
+                {
+                    b.Property<Guid>("Uuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("text")
+                        .HasColumnName("alias");
+
+                    b.Property<string>("CustomCode")
+                        .HasColumnType("text")
+                        .HasColumnName("custom_code");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OwningWorkingTreeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owning_working_tree_uuid");
+
+                    b.Property<Guid?>("ParentTreeNodeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_tree_node_uuid");
+
+                    b.Property<Guid?>("ParentTreeRootUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_tree_root_uuid");
+
+                    b.Property<long?>("Sequence")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    b.Property<int>("SystemBaseTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("data_type_id");
+
+                    b.HasKey("Uuid")
+                        .HasName("tree_nodes_pkey");
+
+                    b.HasIndex("OwningWorkingTreeUuid");
+
+                    b.HasIndex("ParentTreeRootUuid");
+
+                    b.ToTable("tree_nodes", "shrub_members");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", b =>
+                {
+                    b.Property<Guid>("Uuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("text")
+                        .HasColumnName("alias");
+
+                    b.Property<string>("CustomCode")
+                        .HasColumnType("text")
+                        .HasColumnName("custom_code");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OwningWorkingTreeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owning_working_tree_uuid");
+
+                    b.Property<long?>("Sequence")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    b.HasKey("Uuid")
+                        .HasName("tree_roots_pkey");
+
+                    b.HasIndex("OwningWorkingTreeUuid");
+
+                    b.ToTable("tree_roots", "shrub_members");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
+                {
+                    b.Property<Guid>("Uuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("text")
+                        .HasColumnName("alias");
+
+                    b.Property<string>("CustomCode")
+                        .HasColumnType("text")
+                        .HasColumnName("custom_code");
+
+                    b.Property<Guid>("DeclaringOwnerUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("declaring_owner_uuid");
+
+                    b.Property<Guid>("DeclaringUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("declaring_uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsCollectionValue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_collection_value");
+
+                    b.Property<bool>("IsHidden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int>("OverrideId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("override_id");
 
                     b.Property<Guid>("OwnerUuid")
                         .HasColumnType("uuid")
@@ -70,185 +306,29 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("uuid")
                         .HasColumnName("value_uuid");
 
+                    b.PrimitiveCollection<Guid[]>("ValuesUuids")
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("values_uuids");
+
+                    b.Property<int>("VisibilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("visibility_id");
+
                     b.HasKey("Uuid")
                         .HasName("element_attributes_pkey");
 
-                    b.ToTable("element_attributes", "main_entities");
+                    b.ToTable("element_attributes", "shrub_members_content");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeLeave", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", b =>
                 {
-                    b.Property<Guid>("Uuid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Alias")
-                        .HasColumnType("text")
-                        .HasColumnName("alias");
-
-                    b.Property<string>("CustomCode")
-                        .HasColumnType("text")
-                        .HasColumnName("custom_code");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsLegacy")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_legacy");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<Guid?>("ParentTreeNodeUuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ParentTreeRootUuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ParentUuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
-                        .HasColumnName("sequence");
-
-                    b.HasKey("Uuid")
-                        .HasName("tree_leaves_pkey");
-
-                    b.HasIndex("ParentTreeRootUuid");
-
-                    b.HasIndex("ParentUuid");
-
-                    b.ToTable("tree_leaves", "main_entities");
-                });
-
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", b =>
-                {
-                    b.Property<Guid>("Uuid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Alias")
-                        .HasColumnType("text")
-                        .HasColumnName("alias");
-
-                    b.Property<string>("CustomCode")
-                        .HasColumnType("text")
-                        .HasColumnName("custom_code");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsLegacy")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_legacy");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<Guid?>("ParentTreeNodeUuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_tree_node_uuid");
-
-                    b.Property<Guid?>("ParentTreeRootUuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_tree_root_uuid");
-
-                    b.Property<Guid?>("ParentUuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
-                        .HasColumnName("sequence");
-
-                    b.Property<Guid?>("TreeRootUuid")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Uuid")
-                        .HasName("tree_nodes_pkey");
-
-                    b.HasIndex("ParentTreeNodeUuid");
-
-                    b.HasIndex("ParentTreeRootUuid");
-
-                    b.HasIndex("TreeRootUuid");
-
-                    b.ToTable("tree_nodes", "main_entities");
-                });
-
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
-                {
-                    b.Property<Guid>("Uuid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Alias")
-                        .HasColumnType("text")
-                        .HasColumnName("alias");
-
-                    b.Property<string>("CustomCode")
-                        .HasColumnType("text")
-                        .HasColumnName("custom_code");
-
-                    b.PrimitiveCollection<Guid[]>("DataStoragesUuids")
-                        .IsRequired()
-                        .HasColumnType("uuid[]");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsLegacy")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_legacy");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<Guid>("OwnDataStorageUuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("data_storage_uuid");
-
-                    b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
-                        .HasColumnName("sequence");
-
-                    b.HasKey("Uuid")
-                        .HasName("tree_roots_pkey");
-
-                    b.ToTable("tree_roots", "main_entities");
-                });
-
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.ElementAttribute", b =>
-                {
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
-                            b1.Property<Guid>("ElementAttributeUuid")
+                            b1.Property<Guid>("WorkingTreeUuid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
-
-                            b1.Property<DateTime?>("ContentUpdatedAt")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("content_updated_at");
-
-                            b1.Property<string>("ContentUpdatedBy")
-                                .HasColumnType("text")
-                                .HasColumnName("content_updated_by");
 
                             b1.Property<DateTime>("CreatedAt")
                                 .HasColumnType("timestamp with time zone")
@@ -281,41 +361,35 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnType("text")
                                 .HasColumnName("updated_by");
 
-                            b1.HasKey("ElementAttributeUuid");
+                            b1.HasKey("WorkingTreeUuid");
 
-                            b1.ToTable("element_attributes", "main_entities");
+                            b1.ToTable("working_trees", "shrub_members");
 
                             b1.WithOwner()
-                                .HasForeignKey("ElementAttributeUuid");
+                                .HasForeignKey("WorkingTreeUuid");
                         });
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeLeave", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeave", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", "ParentTreeRoot")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
                         .WithMany()
-                        .HasForeignKey("ParentTreeRootUuid");
+                        .HasForeignKey("OwningWorkingTreeUuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", "ParentTreeNode")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", "ParentTreeNode")
                         .WithMany()
-                        .HasForeignKey("ParentUuid");
+                        .HasForeignKey("ParentTreeNodeUuid");
 
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeLeaveUuid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
-
-                            b1.Property<DateTime?>("ContentUpdatedAt")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("content_updated_at");
-
-                            b1.Property<string>("ContentUpdatedBy")
-                                .HasColumnType("text")
-                                .HasColumnName("content_updated_by");
 
                             b1.Property<DateTime>("CreatedAt")
                                 .ValueGeneratedOnAdd()
@@ -354,7 +428,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
                             b1.HasKey("TreeLeaveUuid");
 
-                            b1.ToTable("tree_leaves", "main_entities");
+                            b1.ToTable("tree_leaves", "shrub_members");
 
                             b1.WithOwner()
                                 .HasForeignKey("TreeLeaveUuid");
@@ -363,50 +437,36 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Navigation("AuditInfo")
                         .IsRequired();
 
-                    b.Navigation("ParentTreeNode");
+                    b.Navigation("OwningWorkingTree");
 
-                    b.Navigation("ParentTreeRoot");
+                    b.Navigation("ParentTreeNode");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeNode", "ParentTreeNode")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
                         .WithMany()
-                        .HasForeignKey("ParentTreeNodeUuid");
+                        .HasForeignKey("OwningWorkingTreeUuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", "ParentTreeRoot")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", "ParentTreeRoot")
                         .WithMany()
                         .HasForeignKey("ParentTreeRootUuid");
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", null)
-                        .WithMany("ChildTreeNodes")
-                        .HasForeignKey("TreeRootUuid");
-
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeNodeUuid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
-                            b1.Property<DateTime?>("ContentUpdatedAt")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("content_updated_at");
-
-                            b1.Property<string>("ContentUpdatedBy")
-                                .HasColumnType("text")
-                                .HasColumnName("content_updated_by");
-
                             b1.Property<DateTime>("CreatedAt")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at")
-                                .HasDefaultValueSql("NOW()");
+                                .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("text")
-                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
@@ -433,7 +493,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
                             b1.HasKey("TreeNodeUuid");
 
-                            b1.ToTable("tree_nodes", "main_entities");
+                            b1.ToTable("tree_nodes", "shrub_members");
 
                             b1.WithOwner()
                                 .HasForeignKey("TreeNodeUuid");
@@ -442,26 +502,24 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Navigation("AuditInfo")
                         .IsRequired();
 
-                    b.Navigation("ParentTreeNode");
+                    b.Navigation("OwningWorkingTree");
 
                     b.Navigation("ParentTreeRoot");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", b =>
                 {
-                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.MainEntities.AuditInfo", "AuditInfo", b1 =>
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
+                        .WithMany()
+                        .HasForeignKey("OwningWorkingTreeUuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("TreeRootUuid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
-
-                            b1.Property<DateTime?>("ContentUpdatedAt")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("content_updated_at");
-
-                            b1.Property<string>("ContentUpdatedBy")
-                                .HasColumnType("text")
-                                .HasColumnName("content_updated_by");
 
                             b1.Property<DateTime>("CreatedAt")
                                 .ValueGeneratedOnAdd()
@@ -500,7 +558,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
                             b1.HasKey("TreeRootUuid");
 
-                            b1.ToTable("tree_roots", "main_entities");
+                            b1.ToTable("tree_roots", "shrub_members");
 
                             b1.WithOwner()
                                 .HasForeignKey("TreeRootUuid");
@@ -508,11 +566,59 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
+
+                    b.Navigation("OwningWorkingTree");
                 });
 
-            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.MainEntities.TreeRoot", b =>
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
-                    b.Navigation("ChildTreeNodes");
+                    b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
+                        {
+                            b1.Property<Guid>("ElementAttributeUuid")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("created_at");
+
+                            b1.Property<string>("CreatedBy")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("created_by");
+
+                            b1.Property<DateTime?>("DeletedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("deleted_at");
+
+                            b1.Property<string>("DeletedBy")
+                                .HasColumnType("text")
+                                .HasColumnName("deleted_by");
+
+                            b1.Property<bool>("IsDeleted")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("boolean")
+                                .HasDefaultValue(false)
+                                .HasColumnName("is_deleted");
+
+                            b1.Property<DateTime?>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("updated_at");
+
+                            b1.Property<string>("UpdatedBy")
+                                .HasColumnType("text")
+                                .HasColumnName("updated_by");
+
+                            b1.HasKey("ElementAttributeUuid");
+
+                            b1.ToTable("element_attributes", "shrub_members_content");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ElementAttributeUuid");
+                        });
+
+                    b.Navigation("AuditInfo")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

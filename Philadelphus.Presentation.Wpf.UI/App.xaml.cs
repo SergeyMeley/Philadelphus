@@ -17,8 +17,10 @@ using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Events;
@@ -90,22 +92,27 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                     Log.Information($"Проверка базовой директории: {basePath}");
 
-                    CheckOrInitDirectory(new DirectoryInfo(basePath));
-
+                    await ConfigurationService.CheckOrInitDirectory(new DirectoryInfo(basePath));
 
                     // Фиксированный список конфигов
-                    var configFiles = new Dictionary<string, object>
+                     var configFiles = new Dictionary<string, object>
                     {
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:ConnectionStringsConfigFullPathString"])] = new ConnectionStringsCollectionConfig { ConnectionStringContainers = new() },
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:StoragesConfigFullPathString"])] = new DataStoragesCollectionConfig { DataStorages = new() },
-                        [Environment.ExpandEnvironmentVariables(_configuration["ApplicationSettingsConfig:RepositoryHeadersConfigFullPathString"])] = new TreeRepositoryHeadersCollectionConfig { TreeRepositoryHeaders = new() }
-                    };
+                        [Environment.ExpandEnvironmentVariables(
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(ConnectionStringsCollectionConfig)}"])]
+                            = new ConnectionStringsCollectionConfig { ConnectionStringContainers = new() },
+                         [Environment.ExpandEnvironmentVariables(
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(DataStoragesCollectionConfig)}"])]
+                            = new DataStoragesCollectionConfig { DataStorages = new() },
+                         [Environment.ExpandEnvironmentVariables(
+                            _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(PhiladelphusRepositoryHeadersCollectionConfig)}"])]
+                            = new PhiladelphusRepositoryHeadersCollectionConfig { PhiladelphusRepositoryHeaders = new() }
+                     };
 
                     foreach (var kvp in configFiles)
                     {
                         var file = new FileInfo(kvp.Key);
-                        CheckOrInitDirectory(file.Directory);
-                        CheckOrInitFile(file, kvp.Value);
+                        await ConfigurationService.CheckOrInitDirectory(file.Directory);
+                        await ConfigurationService.CheckOrInitFile(file, kvp.Value);
                         config.AddJsonFile(file.FullName, optional: true, reloadOnChange: true);
                     }
 
@@ -132,8 +139,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(ConnectionStringsCollectionConfig)));
                     services.Configure<DataStoragesCollectionConfig>(
                         context.Configuration.GetSection(nameof(DataStoragesCollectionConfig)));
-                    services.Configure<TreeRepositoryHeadersCollectionConfig>(
-                        context.Configuration.GetSection(nameof(TreeRepositoryHeadersCollectionConfig)));
+                    services.Configure<PhiladelphusRepositoryHeadersCollectionConfig>(
+                        context.Configuration.GetSection(nameof(PhiladelphusRepositoryHeadersCollectionConfig)));
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(
@@ -141,16 +148,27 @@ namespace Philadelphus.Presentation.Wpf.UI
                         typeof(ViewModelsMappingProfile)    // Model <-> ViewModel
                         );
                     
-                    // TODO: Проработать кеширование
-                    services.AddMemoryCache();
+
+                    services.AddStackExchangeRedisCache(options =>
+                    {
+                        var settings = services.BuildServiceProvider()
+                            .GetRequiredService<IOptions<ApplicationSettingsConfig>>().Value;
+
+                        options.Configuration = settings.RedisOptions.Socket +
+                            (string.IsNullOrEmpty(settings.RedisOptions.Password)
+                                ? "" : $",password={settings.RedisOptions.Password}");
+                        options.InstanceName = "Philadelphus:";
+
+                        options.Configuration = "localhost:6379,password=philapass";
+                    });
 
                     // Регистрация сервисов
                     // Слой Core
                     //services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>();     Заменено на IOptions<T>
                     services.AddSingleton<INotificationService, NotificationService>();
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
-                    services.AddTransient<ITreeRepositoryCollectionService, TreeRepositoryCollectionService>();
-                    services.AddTransient<ITreeRepositoryService, TreeRepositoryService>();
+                    services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();
+                    services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
@@ -164,13 +182,20 @@ namespace Philadelphus.Presentation.Wpf.UI
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
                     services.AddSingleton<DataStoragesCollectionVM>();
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
-                    services.AddTransient<TreeRepositoryCollectionVM>();
-                    services.AddTransient<TreeRepositoryHeadersCollectionVM>();
+                    services.AddSingleton<PhiladelphusRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
+                    services.AddSingleton<PhiladelphusRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
+                    services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
+                    services.AddTransient<LaunchWindowTabItemControlVM>();
+                    services.AddTransient<ApplicationSettingsTabItemControlVM>();
+                    services.AddSingleton<NotificationsVM>();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
-                    services.AddTransient<LaunchWindow>();
+                    services.AddSingleton<LaunchWindow>();      // Не менять. Требуется для автоматического закрытия окна при открытии основного
+                    services.AddTransient<AttributeValuesCollectionWindow>();
+                    services.AddSingleton<SplashWindow>();
+                    services.AddTransient<ImportFromExcelWindow>();
 
                     // Регистрация фабрик
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
@@ -190,8 +215,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Startup завершён. Переключение на File-only logging...");
 
-                Log.Information("Искусственная задержка запуска 5 сек.");
-                await Task.Delay(5000);
+                Log.Information("Искусственная задержка запуска 2 сек.");
+                await Task.Delay(2000);
 
 
                 var runtimeLogger = new LoggerConfiguration()
@@ -205,17 +230,21 @@ namespace Philadelphus.Presentation.Wpf.UI
 
                 Log.Information("UI запущен. Логи → только файл logs/philadelphus-.log");
 
-                var window = _host.Services.GetRequiredService<LaunchWindow>();
-                window.Topmost = true;
+                //var window = _host.Services.GetRequiredService<LaunchWindow>();
+                //window.Topmost = true;
+                //window.Show();
+                //window.Activate();
+                //window.Topmost = false;
+
+                var window = _host.Services.GetRequiredService<SplashWindow>();
                 window.Show();
-                window.Activate();
-                window.Topmost = false;
+
                 base.OnStartup(e);
             }
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Критическая ошибка запуска приложения");
-                MessageBox.Show($"Ошибка запуска: {ex.Message}");
+                MessageBox.Show($"Ошибка запуска:\r\n{ex.Message}\r\nПодробности:{ex.StackTrace}");
                 Shutdown(-1);
             }
         }
@@ -229,43 +258,5 @@ namespace Philadelphus.Presentation.Wpf.UI
             base.OnExit(e);
         }
 
-        private async Task CheckOrInitDirectory(DirectoryInfo path)
-        {
-            if (path.Exists == false)
-            {
-                Log.Warning($"Директория не существует: '{path.FullName}', Создаётся...");
-                try
-                {
-                    path.Create();
-                    Log.Information($"Директория создана: '{path.FullName}'");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Ошибка создания директории '{path.FullName}'");
-                }
-            }
-        }
-
-        private async Task CheckOrInitFile<T>(FileInfo file, T configObject)
-        {
-            if (file.Exists == false)
-            {
-                try
-                {
-                    Log.Warning($"Не найден '{file.FullName}', создаётся файл по умолчанию");
-                    var json = JsonSerializer.Serialize(configObject, new JsonSerializerOptions { WriteIndented = true });
-                    await File.WriteAllTextAsync(file.FullName, json);
-                    Log.Information($"Создан настроечный файл по умолчанию: '{file.FullName}'");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Ошибка создания настроечного файла по умолчанию: '{file.FullName}'");
-                }
-            }
-            else
-            {
-                Log.Debug($"Найден и будет загружен настроечный файл: '{file.FullName}'");
-            }
-        }
     }
 }

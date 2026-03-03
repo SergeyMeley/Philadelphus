@@ -46,6 +46,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public string UserName { get => Environment.UserName; }
+
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
         public ViewModelBase SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
@@ -59,15 +61,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IExtensionsControlVMFactory extensionVMFactory,
-            ApplicationSettingsControlVM applicationSettingsControlVM)
+            ApplicationSettingsControlVM applicationSettingsControlVM,
+            NotificationsVM notificationsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
+            _notificationsVM = notificationsVM;
 
             _notificationService.SendTextMessage("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
-            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesStrings);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
             _notificationService.SendTextMessage($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 

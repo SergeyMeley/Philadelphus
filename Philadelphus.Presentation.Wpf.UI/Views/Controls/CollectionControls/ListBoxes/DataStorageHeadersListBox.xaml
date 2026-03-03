@@ -11,7 +11,7 @@ mc:Ignorable="d"
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
     </UserControl.Resources>
     <Grid>
-        <ListBox Margin="2" BorderBrush="LightGray" BorderThickness="1"
+        <ListBox Margin="1" BorderBrush="LightGray" BorderThickness="1"
              ItemsSource="{Binding DataStorageHeadersItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
              SelectedItem="{Binding DataStorageHeadersSelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
             <ListBox.ItemContainerStyle>
@@ -38,7 +38,7 @@ mc:Ignorable="d"
                                 <RowDefinition></RowDefinition>
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="2">
+                            <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="1">
                                                 <Run Text="Хранилище: " FontWeight="Light" Foreground="LightSlateGray"></Run>
                                                 <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic"></Run>
                                                 <Run Text="   "></Run>

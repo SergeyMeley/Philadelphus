@@ -1,115 +1,163 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryHeadersCollectionVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public class PhiladelphusRepositoryHeadersCollectionVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
-        private readonly ILogger<TreeRepositoryHeadersCollectionVM> _logger;
+        private readonly ILogger<PhiladelphusRepositoryHeadersCollectionVM> _logger;
         private readonly INotificationService _notificationService;
-        private readonly ITreeRepositoryCollectionService _service;
+        private readonly IPhiladelphusRepositoryCollectionService _service;
         private readonly DataStoragesCollectionVM _dataStoragesSettingsVM;
+        private readonly IConfigurationService _configurationService;
+        private readonly IOptions<ApplicationSettingsConfig> _appConfig;
+        private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _PhiladelphusRepositoryHeadersCollectionConfig;
 
-        private List<TreeRepositoryHeaderVM> _treeRepositoryHeadersVMs;
-        public List<TreeRepositoryHeaderVM> TreeRepositoryHeadersVMs
+        private ObservableCollection<PhiladelphusRepositoryHeaderVM> _PhiladelphusRepositoryHeadersVMs;
+        public ObservableCollection<PhiladelphusRepositoryHeaderVM> PhiladelphusRepositoryHeadersVMs
         {
             get
             {
-                if (_treeRepositoryHeadersVMs == null)
+                return _PhiladelphusRepositoryHeadersVMs;
+            }
+            private set
+            {
+                if (_PhiladelphusRepositoryHeadersVMs != value)
                 {
-                    _treeRepositoryHeadersVMs = new List<TreeRepositoryHeaderVM>();
-                    LoadTreeRepositoryHeadersVMs();
+                    _PhiladelphusRepositoryHeadersVMs = value;
+                    OnPropertyChanged();
                 }
-                return _treeRepositoryHeadersVMs;
-            }
-        }
-        public List<TreeRepositoryHeaderVM> FavoriteTreeRepositoryHeadersVMs
-        {
-            get
-            {
-                return TreeRepositoryHeadersVMs.Where(x => x.IsFavorite).ToList();
-            }
-        }
-        public List<TreeRepositoryHeaderVM> LastTreeRepositoryHeadersVMs
-        {
-            get
-            {
-                return TreeRepositoryHeadersVMs.OrderByDescending(x => x.LastOpening).Where(x => DateTime.UtcNow - x.LastOpening <= TimeSpan.FromDays(90)).ToList();
             }
         }
 
-        private TreeRepositoryHeaderVM _selectedTreeRepositoryHeaderVM;
-        public TreeRepositoryHeaderVM SelectedTreeRepositoryHeaderVM 
+        public CollectionViewSource FavoritePhiladelphusRepositoryHeadersVMs { get; }
+        public CollectionViewSource LastPhiladelphusRepositoryHeadersVMs { get; }
+
+        private PhiladelphusRepositoryHeaderVM _selectedPhiladelphusRepositoryHeaderVM;
+        public PhiladelphusRepositoryHeaderVM SelectedPhiladelphusRepositoryHeaderVM 
         {
             get
             { 
-                return _selectedTreeRepositoryHeaderVM; 
+                return _selectedPhiladelphusRepositoryHeaderVM; 
             }
             set
             {
-                _selectedTreeRepositoryHeaderVM = value;
-                if (_selectedTreeRepositoryHeaderVM != null)
-                    CheckTreeRepositoryAvailable(_selectedTreeRepositoryHeaderVM);
-                OnPropertyChanged(nameof(SelectedTreeRepositoryHeaderVM));
+                _selectedPhiladelphusRepositoryHeaderVM = value;
+                if (_selectedPhiladelphusRepositoryHeaderVM != null)
+                    CheckPhiladelphusRepositoryAvailable(_selectedPhiladelphusRepositoryHeaderVM);
+                OnPropertyChanged(nameof(SelectedPhiladelphusRepositoryHeaderVM));
             }
         }
 
-        public Predicate<TreeRepositoryHeaderVM> CheckTreeRepositoryAvailableAction;
+        public Predicate<PhiladelphusRepositoryHeaderVM> CheckPhiladelphusRepositoryAvailableAction;
 
-        private Action _updateTreeRepositoryHeaders
+        private Action _updatePhiladelphusRepositoryHeaders
         {
             get
             {
                 return new Action(() =>
                 {
-                    OnPropertyChanged(nameof(TreeRepositoryHeadersVMs));
-                    OnPropertyChanged(nameof(FavoriteTreeRepositoryHeadersVMs));
-                    OnPropertyChanged(nameof(LastTreeRepositoryHeadersVMs));
+                    OnPropertyChanged(nameof(PhiladelphusRepositoryHeadersVMs));
+                    OnPropertyChanged(nameof(FavoritePhiladelphusRepositoryHeadersVMs));
+                    OnPropertyChanged(nameof(LastPhiladelphusRepositoryHeadersVMs));
+                    FavoritePhiladelphusRepositoryHeadersVMs.View.Refresh();
+                    LastPhiladelphusRepositoryHeadersVMs.View.Refresh();
                 });
             }
         }
-        public TreeRepositoryHeadersCollectionVM(
-            ILogger<TreeRepositoryHeadersCollectionVM> logger,
+        public PhiladelphusRepositoryHeadersCollectionVM(
+            ILogger<PhiladelphusRepositoryHeadersCollectionVM> logger,
             INotificationService notificationService,
-            ITreeRepositoryCollectionService service,
-            DataStoragesCollectionVM dataStoragesSettingsVM)
+            IPhiladelphusRepositoryCollectionService service,
+            DataStoragesCollectionVM dataStoragesSettingsVM,
+            IConfigurationService configurationService,
+            IOptions<ApplicationSettingsConfig> appConfig,
+            IOptions<PhiladelphusRepositoryHeadersCollectionConfig> philadelphusRepositoryHeadersCollectionConfig)
         {
             _logger = logger;
             _notificationService = notificationService;
             _service = service;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
+            _configurationService = configurationService;
+            _appConfig = appConfig;
+            _PhiladelphusRepositoryHeadersCollectionConfig = philadelphusRepositoryHeadersCollectionConfig;
+
+            _PhiladelphusRepositoryHeadersVMs = new ObservableCollection<PhiladelphusRepositoryHeaderVM>();
+            LoadPhiladelphusRepositoryHeadersVMs(philadelphusRepositoryHeadersCollectionConfig);
+
+            FavoritePhiladelphusRepositoryHeadersVMs = new CollectionViewSource { Source = PhiladelphusRepositoryHeadersVMs };
+            FavoritePhiladelphusRepositoryHeadersVMs.Filter += (s, e) =>
+            {
+                var item = e.Item as PhiladelphusRepositoryHeaderVM;
+                if (item == null) 
+                { 
+                    e.Accepted = false; 
+                    return; 
+                }
+                e.Accepted = item.IsFavorite;
+            };
+
+            LastPhiladelphusRepositoryHeadersVMs = new CollectionViewSource { Source = PhiladelphusRepositoryHeadersVMs };
+            LastPhiladelphusRepositoryHeadersVMs.Filter += (s, e) =>
+            {
+                var item = e.Item as PhiladelphusRepositoryHeaderVM;
+                if (item == null)
+                {
+                    e.Accepted = false;
+                    return;
+                }
+                e.Accepted = DateTime.UtcNow - item.LastOpening <= TimeSpan.FromDays(90);
+            };
+
+            PhiladelphusRepositoryHeadersVMs.CollectionChanged += (s, e) =>
+            {
+                FavoritePhiladelphusRepositoryHeadersVMs.View.Refresh();
+                LastPhiladelphusRepositoryHeadersVMs.View.Refresh();
+            };
         }
-        public bool CheckTreeRepositoryAvailable(TreeRepositoryHeaderVM header)
+        public bool CheckPhiladelphusRepositoryAvailable(PhiladelphusRepositoryHeaderVM header)
         {
             if (header == null)
                 return false;
-            if (CheckTreeRepositoryAvailableAction == null)
+            if (CheckPhiladelphusRepositoryAvailableAction == null)
                 return false;
-            CheckTreeRepositoryAvailableAction.Invoke(header);
-            return header.IsTreeRepositoryAvailable;
+            CheckPhiladelphusRepositoryAvailableAction.Invoke(header);
+            return header.IsPhiladelphusRepositoryAvailable;
         }
-        private List<TreeRepositoryHeaderVM> LoadTreeRepositoryHeadersVMs() 
+        private ObservableCollection<PhiladelphusRepositoryHeaderVM> LoadPhiladelphusRepositoryHeadersVMs(IOptions<PhiladelphusRepositoryHeadersCollectionConfig> config) 
         {
-            _treeRepositoryHeadersVMs.Clear();
-            var headers = _service.GetTreeRepositoryHeadersCollection();
+            _PhiladelphusRepositoryHeadersVMs.Clear();
+            var headers = config.Value.PhiladelphusRepositoryHeaders;
             if (headers == null)
                 return null;
             headers.OrderByDescending(x => x.LastOpening);
 
             foreach (var header in headers)
             {
-                var vm = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
-                CheckTreeRepositoryAvailable(vm);
-                _treeRepositoryHeadersVMs.Add(vm);
+                var vm = new PhiladelphusRepositoryHeaderVM(header.ToModel(), _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _PhiladelphusRepositoryHeadersCollectionConfig);
+                CheckPhiladelphusRepositoryAvailable(vm);
+                _PhiladelphusRepositoryHeadersVMs.Add(vm);
             }
-            return TreeRepositoryHeadersVMs;
+            return PhiladelphusRepositoryHeadersVMs;
         }
-        internal TreeRepositoryHeaderVM AddTreeRepositoryHeaderVMFromTreeRepositoryVM(TreeRepositoryVM treeRepositoryVM)
+        internal PhiladelphusRepositoryHeaderVM  AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(PhiladelphusRepositoryVM PhiladelphusRepositoryVM)
         {
-            var header = _service.CreateTreeRepositoryHeaderFromTreeRepository(treeRepositoryVM.Model);
-            var result = new TreeRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updateTreeRepositoryHeaders);
-            TreeRepositoryHeadersVMs.Add(result);
+            var header = _service.CreatePhiladelphusRepositoryHeaderFromPhiladelphusRepository(PhiladelphusRepositoryVM.Model);
+
+            _PhiladelphusRepositoryHeadersCollectionConfig.Value.PhiladelphusRepositoryHeaders.Add(header.ToDbEntity());
+            _configurationService.UpdateConfigFile(_appConfig.Value.RepositoryHeadersConfigFullPath, _PhiladelphusRepositoryHeadersCollectionConfig);
+
+            var result = new PhiladelphusRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _PhiladelphusRepositoryHeadersCollectionConfig);
+            PhiladelphusRepositoryHeadersVMs.Add(result);
             return result;
         }
     }

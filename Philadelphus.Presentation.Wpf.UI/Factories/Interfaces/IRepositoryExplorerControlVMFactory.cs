@@ -5,6 +5,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Interfaces
 {
     internal interface IRepositoryExplorerControlVMFactory
     {
-        public RepositoryExplorerControlVM Create(TreeRepositoryVM repositoryVM);
+        public RepositoryExplorerControlVM Create(PhiladelphusRepositoryVM repositoryVM);
     }
 }

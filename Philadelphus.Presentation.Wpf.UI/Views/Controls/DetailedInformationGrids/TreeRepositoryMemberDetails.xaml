@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids.TreeRepositoryMemberDetails"
+﻿<UserControl x:Class="Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids.PhiladelphusRepositoryMemberDetails"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -26,7 +26,7 @@
         </Expander>
         <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Родительский репозиторий">
             <GroupBox>
-                <local:TreeRepositoryDetails DataContext="{Binding Model.ParentRepository}"></local:TreeRepositoryDetails>
+                <local:PhiladelphusRepositoryDetails DataContext="{Binding Model.ParentRepository}"></local:PhiladelphusRepositoryDetails>
             </GroupBox>
         </Expander>
     </Grid>

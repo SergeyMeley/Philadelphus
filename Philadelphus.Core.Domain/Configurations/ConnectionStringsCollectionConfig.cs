@@ -1,8 +1,11 @@
-﻿namespace Philadelphus.Core.Domain.Configurations
+﻿using System.ComponentModel;
+
+namespace Philadelphus.Core.Domain.Configurations
 {
     /// <summary>
     /// Коллекция строк подключения
     /// </summary>
+    [DisplayName("Конфигурация строк подключения")]
     public class ConnectionStringsCollectionConfig
     {
         /// <summary>

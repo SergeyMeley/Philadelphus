@@ -9,6 +9,15 @@
     <UserSecretsId>9d9f6ea9-cd34-412e-b854-8fc4186804fc</UserSecretsId>
     <ApplicationIcon>Icons\philadelphus_logo_64.ico</ApplicationIcon>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
+	  
+	<SignManifests>true</SignManifests>
+
+	  <FileVersion>1.0.0.0</FileVersion>
+	  <Product>Philadelphus</Product>
+	  <Company>Sergey Meley</Company>
+	  <Copyright>© 2026 Sergey Meley</Copyright>
+	  <PublishSingleFile>true</PublishSingleFile>
+	  <SignAssembly>True</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +32,7 @@
     <None Remove="Icons\check_64.png" />
     <None Remove="Icons\edit_64.png" />
     <None Remove="Icons\getwork_64.png" />
+    <None Remove="Icons\list_64.png" />
     <None Remove="Icons\new-tab_64.png" />
     <None Remove="Icons\open.png" />
     <None Remove="Icons\philadelphus_logo_64.png" />
@@ -59,11 +69,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icons\list_64.png" />
     <Resource Include="Icons\philadelphus_logo_64.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
@@ -73,10 +85,12 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.10.14" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
   </ItemGroup>

@@ -1,5 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -11,7 +13,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 {
     public abstract class MainEntityBaseVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
-        protected readonly ITreeRepositoryService _service;
+        protected readonly IPhiladelphusRepositoryService _service;
 
         protected readonly MainEntityBaseModel _model;
         public MainEntityBaseModel Model 
@@ -19,13 +21,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             { 
                 return _model; 
             } 
-        }
-        public EntityTypesModel EntityType
-        {
-            get
-            {
-                return _model.EntityType;
-            }
         }
         public Guid Uuid 
         { 
@@ -47,32 +42,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 OnPropertyChanged(nameof(State));
             }
         }
-        public string Alias
-        {
-            get
-            {
-                return _model.Alias;
-            }
-            set
-            {
-                _model.Alias = value;
-                OnPropertyChanged(nameof(Alias));
-                OnPropertyChanged(nameof(State));
-            }
-        }
-        public string CustomCode
-        {
-            get
-            {
-                return _model.CustomCode;
-            }
-            set
-            {
-                _model.CustomCode = value;
-                OnPropertyChanged(nameof(CustomCode));
-                OnPropertyChanged(nameof(State));
-            }
-        }
+        
         public string Description
         {
             get
@@ -93,19 +63,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return _model.AuditInfo;
             }
         }
-        public EntityElementTypeModel ElementType
-        {
-            get
-            {
-                return _model.ElementType;
-            }
-            set
-            {
-                _model.ElementType = value;
-                OnPropertyChanged(nameof(ElementType));
-                OnPropertyChanged(nameof(State));
-            }
-        }
         public State State
         {
             get
@@ -113,33 +70,34 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return _model.State;
             }
         }
-        public ObservableCollection<ElementAttributeVM> PersonalAttributesVMs { get; } = new ObservableCollection<ElementAttributeVM>();
-        public ObservableCollection<ElementAttributeVM> ParentElementAttributesVMs { get; } = new ObservableCollection<ElementAttributeVM>();
+        public ObservableCollection<ElementAttributeVM> AttributesVMs 
+        { 
+            get
+            {
+                var result = new ObservableCollection<ElementAttributeVM>();
+                if (_model is ShrubMemberBaseModel sm)
+                {
+                    foreach (var attribute in sm.Attributes)
+                    {
+                        var attributeVM = new ElementAttributeVM(attribute, _service);
+                        result.Add(attributeVM);
+                    }
+                }
+                return result;
+            }
+        }
+        public ElementAttributeVM SelectedAttributeVM { get; set; }
 
         private DataStorageVM _storageVM;
         public DataStorageVM StorageVM { get => _storageVM; }
         public MainEntityBaseVM(
             MainEntityBaseModel mainEntityBaseModel, 
-            ITreeRepositoryService service)
+            IPhiladelphusRepositoryService service)
         {
             _service = service;
 
             _model = mainEntityBaseModel;
             _storageVM = new DataStorageVM(mainEntityBaseModel.DataStorage);
-            if (_model is IAttributeOwnerModel)
-            {
-                var attributeOwnerModel = (IAttributeOwnerModel)_model;
-                foreach (var attribute in attributeOwnerModel.ParentElementAttributes)
-                {
-                    var attributeVM = new ElementAttributeVM(attribute, _service);
-                    ParentElementAttributesVMs.Add(attributeVM);
-                }
-                foreach (var attribute in attributeOwnerModel.PersonalAttributes)
-                {
-                    var attributeVM = new ElementAttributeVM(attribute, _service);
-                    PersonalAttributesVMs.Add(attributeVM);
-                }
-            }
         }
         public ElementAttributeVM AddAttribute()
         {
@@ -147,10 +105,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 var attributeOwnerModel = (IAttributeOwnerModel)_model;
                 var attribute = _service.CreateElementAttribute(attributeOwnerModel);
-                attributeOwnerModel.PersonalAttributes.Add(attribute);
+                attributeOwnerModel.AddAttribute(attribute);
                 var attributeVM = new ElementAttributeVM(attribute, _service);
-                PersonalAttributesVMs.Add(attributeVM);
-                OnPropertyChanged(nameof(PersonalAttributesVMs));
+                AttributesVMs.Add(attributeVM);
+                OnPropertyChanged(nameof(AttributesVMs));
                 return attributeVM;
             }
             return null;

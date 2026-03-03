@@ -25,11 +25,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
 
-        private TreeRepositoryCollectionVM _repositoryCollectionVM;
-        public TreeRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
+        private PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
+        public PhiladelphusRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
 
-        private TreeRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
-        public TreeRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
+        private PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
+        public PhiladelphusRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
 
         public ApplicationVM(
             IServiceProvider serviceProvider,
@@ -39,8 +39,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,
             DataStoragesCollectionVM dataStoragesSettingsVM,
-            TreeRepositoryCollectionVM treeRepositoryCollectionVM,
-            TreeRepositoryHeadersCollectionVM treeRepositoryHeadersCollectionVM,
+            PhiladelphusRepositoryCollectionVM PhiladelphusRepositoryCollectionVM,
+            PhiladelphusRepositoryHeadersCollectionVM PhiladelphusRepositoryHeadersCollectionVM,
             RepositoryCreationControlVM RepositoryCreationVM,
             LaunchWindowVM launchVM)
         {
@@ -56,22 +56,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             _notificationService = notificationService;
             _applicationCommandsVM = applicationCommandsVM;    // Зависает приложение
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
-            _repositoryCollectionVM = treeRepositoryCollectionVM;
-            _repositoryHeadersCollectionVM = treeRepositoryHeadersCollectionVM;
+            _repositoryCollectionVM = PhiladelphusRepositoryCollectionVM;
+            _repositoryHeadersCollectionVM = PhiladelphusRepositoryHeadersCollectionVM;
             //_repositoryCreationVM = RepositoryCreationVM;
             _launchVM = launchVM;
 
             //CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
 
-            //var treeRepositoryCollectionService = new TreeRepositoryCollectionService(configDirectory);
+            //var PhiladelphusRepositoryCollectionService = new PhiladelphusRepositoryCollectionService(configDirectory);
 
             //_applicationWindowsVM = new ApplicationWindowsVM();
             //_applicationCommandsVM = new ApplicationCommandsVM(this, _applicationWindowsVM);
             //_dataStoragesSettingsVM = new DataStoragesSettingsVM();
-            //_repositoryCollectionVM = new TreeRepositoryCollectionVM(treeRepositoryCollectionService, _dataStoragesSettingsVM);
-            //_repositoryHeadersCollectionVM = new TreeRepositoryHeadersCollectionVM(treeRepositoryCollectionService);
-            //_repositoryCreationVM = new RepositoryCreationVM(treeRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
+            //_repositoryCollectionVM = new PhiladelphusRepositoryCollectionVM(PhiladelphusRepositoryCollectionService, _dataStoragesSettingsVM);
+            //_repositoryHeadersCollectionVM = new PhiladelphusRepositoryHeadersCollectionVM(PhiladelphusRepositoryCollectionService);
+            //_repositoryCreationVM = new RepositoryCreationVM(PhiladelphusRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
             //_launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenMainWindowCommand);
             //_applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
             //_applicationWindowsVM.LaunchWindow.Show();

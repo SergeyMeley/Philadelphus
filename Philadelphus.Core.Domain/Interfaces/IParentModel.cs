@@ -1,4 +1,6 @@
-﻿namespace Philadelphus.Core.Domain.Interfaces
+﻿using System.Collections.ObjectModel;
+
+namespace Philadelphus.Core.Domain.Interfaces
 {
     /// <summary>
     /// Родитель
@@ -6,8 +8,13 @@
     public interface IParentModel : ILinkableByUuidModel
     {
         /// <summary>
-        /// Наследник
+        /// Наследники
         /// </summary>
-        List<IChildrenModel> Childs { get; }
+        public ReadOnlyDictionary<Guid, IChildrenModel> Childs { get; }
+
+        /// <summary>
+        /// Все наследники (рекурсивно)
+        /// </summary>
+        public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive { get; }
     }
 }

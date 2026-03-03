@@ -1,32 +1,34 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
+﻿using Microsoft.Extensions.Options;
+using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryHeaderVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public class PhiladelphusRepositoryHeaderVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 
-        private readonly ITreeRepositoryCollectionService _service;
+        private readonly IPhiladelphusRepositoryCollectionService _service;
         private readonly DataStorageVM _dataStoragesVM;
+        private readonly IConfigurationService _configurationService;
+        private readonly IOptions<ApplicationSettingsConfig> _appConfig;
+        private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _PhiladelphusRepositoryHeadersCollectionConfig;
 
-        private readonly TreeRepositoryHeaderModel _model;
+        private readonly PhiladelphusRepositoryHeaderModel _model;
 
-        private readonly Action _updateTreeRepositoryHeaders;
+        private readonly Action _updatePhiladelphusRepositoryHeaders;
 
         public Guid Uuid
         {
             get
             {
                 return _model.Uuid;
-            }
-            set
-            {
-                _model.Uuid = value;
-                SaveRepositoryHeader();
-                OnPropertyChanged(nameof(Uuid));
             }
         }
         public string Name
@@ -104,7 +106,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 _model.IsFavorite = value;
                 SaveRepositoryHeader();
-                _updateTreeRepositoryHeaders.Invoke();
+                _updatePhiladelphusRepositoryHeaders.Invoke();
                 OnPropertyChanged(nameof(IsFavorite));
             }
         }
@@ -128,17 +130,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return _model.State;
             }
         }
-        private bool _isTreeRepositoryAvailable;
-        public bool IsTreeRepositoryAvailable 
+        private bool _isPhiladelphusRepositoryAvailable;
+        public bool IsPhiladelphusRepositoryAvailable 
         { 
             get
             {
-                return _isTreeRepositoryAvailable;
+                return _isPhiladelphusRepositoryAvailable;
             }
             set
             {
-                _isTreeRepositoryAvailable = value;
-                OnPropertyChanged(nameof(IsTreeRepositoryAvailable));
+                _isPhiladelphusRepositoryAvailable = value;
+                OnPropertyChanged(nameof(IsPhiladelphusRepositoryAvailable));
             }
         }
 
@@ -146,17 +148,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         #region [ Construct ]
 
-        public TreeRepositoryHeaderVM(
-            TreeRepositoryHeaderModel treeRepositoryHeader,
-            ITreeRepositoryCollectionService service,
+        public PhiladelphusRepositoryHeaderVM(
+            PhiladelphusRepositoryHeaderModel PhiladelphusRepositoryHeader,
+            IPhiladelphusRepositoryCollectionService service,
             DataStorageVM dataStoragesVM, 
-            Action updateTreeRepositoryHeaders)
+            Action updatePhiladelphusRepositoryHeaders,
+            IConfigurationService configurationService,
+            IOptions<ApplicationSettingsConfig> appConfig,
+            IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollectionConfig)
         {
-            _model = treeRepositoryHeader;
+            _model = PhiladelphusRepositoryHeader;
             _service = service;
             _dataStoragesVM = dataStoragesVM;
+            _configurationService = configurationService;
+            _appConfig = appConfig;
+            _PhiladelphusRepositoryHeadersCollectionConfig = PhiladelphusRepositoryHeadersCollectionConfig;
 
-            _updateTreeRepositoryHeaders = updateTreeRepositoryHeaders;
+            _updatePhiladelphusRepositoryHeaders = updatePhiladelphusRepositoryHeaders;
         }
 
         #endregion
@@ -171,7 +179,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         private bool SaveRepositoryHeader()
         {
-            _service.SaveChanges(_model, _dataStoragesVM.Model);
+
+            var headers = _PhiladelphusRepositoryHeadersCollectionConfig.Value.PhiladelphusRepositoryHeaders;
+
+            if (headers.Any(x => x.Uuid == _model.Uuid) == false)
+            {
+                headers.Add(_model.ToDbEntity());
+            }
+            else
+            {
+                for (int i = 0; i < headers.Count; i++)
+                {
+                    if (headers[i].Uuid == _model.Uuid)
+                    {
+                        headers[i] = _model.ToDbEntity();
+                        break;
+                    }
+                }
+            }
+
+            _configurationService.UpdateConfigFile(_appConfig.Value.RepositoryHeadersConfigFullPath, _PhiladelphusRepositoryHeadersCollectionConfig);
+
             return true;
         }
 

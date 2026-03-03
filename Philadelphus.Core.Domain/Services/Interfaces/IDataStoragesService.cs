@@ -34,7 +34,17 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="storagesConfigFullPath">Путь к настроечному файлу хранилищ данных</param>
         /// <param name="repositoryHeadersConfigFullPath">Путь к настроечному файлу запусков репозиториев</param>
         /// <returns></returns>
-        public IDataStorageModel CreateMainDataStorageModel(FileInfo storagesConfigFullPath, FileInfo repositoryHeadersConfigFullPath);
+        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo basePath);
+
+        /// <summary>
+        /// /// <summary>
+        /// Создать хранилище данных
+        /// <param name="name">Наименование</param>
+        /// <param name="desctiption">Описание</param>
+        /// <param name="connectionString">Строка подключенияя</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringContainer connectionString);
 
         #endregion
 

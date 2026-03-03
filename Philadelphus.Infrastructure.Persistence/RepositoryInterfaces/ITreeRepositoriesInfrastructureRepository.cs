@@ -2,12 +2,12 @@
 
 namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
 {
-    public interface ITreeRepositoriesInfrastructureRepository : IInfrastructureRepository
+    public interface IPhiladelphusRepositoriesInfrastructureRepository : IInfrastructureRepository
     {
-        public IEnumerable<TreeRepository> SelectRepositories();
-        public IEnumerable<TreeRepository> SelectRepositories(Guid[] uuids);
-        public long InsertRepository(TreeRepository item);
-        public long DeleteRepository(TreeRepository item);
-        public long UpdateRepository(TreeRepository item);
+        public IEnumerable<PhiladelphusRepository> SelectRepositories();
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(Guid[] uuids);
+        public long InsertRepository(PhiladelphusRepository item);
+        public long DeleteRepository(PhiladelphusRepository item);
+        public long UpdateRepository(PhiladelphusRepository item);
     }
 }

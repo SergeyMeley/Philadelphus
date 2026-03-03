@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -12,6 +15,14 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using PropertyTools.Wpf;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Windows;
+using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -19,18 +30,42 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         #region [ Props ]
 
-        private readonly ITreeRepositoryService _service;
-        private readonly TreeRepositoryVM _treeRepositoryVM;
-        public TreeRepositoryVM TreeRepositoryVM 
+        private readonly IPhiladelphusRepositoryService _service;
+        private PhiladelphusRepositoryVM _philadelphusRepositoryVM;     // TODO: Тех. долг. Вернуть readonly
+        public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
         { 
             get 
             { 
-                return _treeRepositoryVM; 
+                return _philadelphusRepositoryVM; 
             }
         }
 
+        public Visibility SystemBaseLeaveControlVisibility
+        {
+            get
+            {
+                if (SelectedRepositoryMember?.Model is SystemBaseTreeLeaveModel)
+                {
+                    return Visibility.Visible;
+                }
+                return Visibility.Collapsed;
+            }
+        }
 
-        public string CurentRepositoryName { get => _treeRepositoryVM.Name; }
+        public Visibility ParentControlVisibility
+        {
+            get
+            {
+                if (SelectedRepositoryMember is TreeRootVM 
+                    || SelectedRepositoryMember is TreeNodeVM)
+                {
+                    return Visibility.Visible;
+                }
+                return Visibility.Collapsed;
+            }
+        }
+
+        public string CurentRepositoryName { get => _philadelphusRepositoryVM.Name; }
 
         //public List<MainEntityBaseModel> ElementsCollection { get; internal set; } = new List<MainEntityBaseModel>();
 
@@ -46,6 +81,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 _selectedRepositoryMember = value;
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
+                OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
+                OnPropertyChanged(nameof(ParentControlVisibility));
             }
         }
         //public List<InfrastructureTypes> InfrastructureTypes
@@ -78,20 +115,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ILogger<RepositoryCreationControlVM> logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
-            ITreeRepositoryService service,
+            IPhiladelphusRepositoryService service,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
-            TreeRepositoryVM treeRepositoryVM)
+            PhiladelphusRepositoryVM PhiladelphusRepositoryVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _service = service;
             _extensionsControlVM = extensionVMFactory.Create(this);
-            _treeRepositoryVM = treeRepositoryVM;
+            _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
 
-            LoadTreeRepository();
+            LoadPhiladelphusRepository();
 
             _notificationService.SendTextMessage("Обозреватель репозитория. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
-            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectoriesStrings);
+            _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
             _notificationService.SendTextMessage($"Обозреватель репозитория. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
         }
 
@@ -104,7 +141,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    LoadTreeRepository();
+                    LoadPhiladelphusRepository();
                 });
             }
         }
@@ -115,8 +152,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    UpdateChildsCollection(this);
-                    _service.SaveChanges(_treeRepositoryVM.Model, SaveMode.WithContentAndMembers);
+                    UpdateChildsCollection(this);   // TODO
+                    var repo = _philadelphusRepositoryVM.Model;
+                    _service.SaveChanges(ref repo, SaveMode.WithContentAndMembers);
+                    LoadPhiladelphusRepository();   // TODO: Тех. долг #60855129
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
                 });
@@ -128,10 +167,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    var result = _service.CreateTreeRoot(_treeRepositoryVM.Model, _treeRepositoryVM.Model.OwnDataStorage);
-                    _treeRepositoryVM.Childs.Add(new TreeRootVM(result, _service));
-                    OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
-                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
+                    var result = _service.CreateTreeRoot(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _service));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
                 });
             }
         }
@@ -151,8 +190,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeNode();
                     }
-                    OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
-                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
                 });
             }
         }
@@ -168,8 +207,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         ((TreeNodeVM)_selectedRepositoryMember).CreateTreeLeave();
                     }
-                    OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
-                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
                 });
             }
         }
@@ -183,7 +222,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         return;
                     _selectedRepositoryMember.AddAttribute();
                     
-                    OnPropertyChanged(nameof(_treeRepositoryVM.State));
+                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
                 });
             }
         }
@@ -193,20 +232,73 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_selectedRepositoryMember.Model is IChildrenModel)
+                    if (_selectedRepositoryMember.Model is IContentModel c)
                     {
-                        var member = (IChildrenModel)_selectedRepositoryMember.Model;
-                        _service.SoftDeleteRepositoryMember(member);
+                        _service.SoftDeleteRepositoryMember(c);
                     }
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
                 },
                 ce =>
                 {
-                    return _selectedRepositoryMember?.Model is IChildrenModel;
+                    return _selectedRepositoryMember?.Model is IContentModel;
                 });
             }
         }
+        public RelayCommand SoftDeleteRepositoryMemberAttributeCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (_selectedRepositoryMember.SelectedAttributeVM.Model is IContentModel c)
+                    {
+                        _service.SoftDeleteRepositoryMember(c);
+                    }
+                    OnPropertyChanged(nameof(State));
+                });
+            }
+        }
+
+        public RelayCommand OpenModifyAttributesListWindowCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = _serviceProvider.GetRequiredService<AttributeValuesCollectionWindow>();
+                    window.DataContext = this;
+                    window.Show();
+                },
+                ce =>
+                {
+                    return _selectedRepositoryMember?.SelectedAttributeVM?.IsCollectionValue ?? false;
+                });
+            }
+        }
+
+        public RelayCommand AddAttributeValueCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
+                });
+            }
+        }
+
+        public RelayCommand RemoveAttributeValueCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
+                });
+            }
+        }
+
         public RelayCommand ProtectCommand
         {
             get
@@ -221,35 +313,118 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public RelayCommand ExportToPhjsonCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var model = SelectedRepositoryMember.Model as TreeRootModel;
+                    var json = JsonImportExportHelper.GetJson(model.OwningWorkingTree);
+
+                    Clipboard.SetText(json);
+
+                    var path = string.Empty;
+
+                    var dialog = new OpenFolderDialog
+                    {
+                        Title = "Выберите директорию",
+                        Multiselect = false,
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        path = dialog.FolderName;
+                    }
+
+                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.NewGuid()}.phjson");
+                    File.WriteAllText(file, json, Encoding.UTF8);
+
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = file,
+                        UseShellExecute = true
+                    });
+                },
+                ce =>
+                {
+                    return SelectedRepositoryMember is TreeRootVM;
+                });
+            }
+        }
+
+        public RelayCommand ImportFromPhjsonCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var path = string.Empty;
+
+                    var dialog = new OpenFileDialog
+                    {
+                        Title = "Выберите файл",
+                        Multiselect = false,
+                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
+                        FilterIndex = 1,
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        string file = dialog.FileName;
+                        var json = File.ReadAllText(file);
+
+                        JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model);
+
+                        PhiladelphusRepositoryVM.Childs.Add(new TreeRootVM(PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentTrees?.Last()?.ContentRoot, _service));
+                    }
+                });
+            }
+        }
+
+        public RelayCommand ConvertXlsxToPhjsonCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
+                    window.ShowDialog();
+                });
+            }
+        }
+
         #endregion
 
         #region [ Methods ]
-         
-        internal bool LoadTreeRepository()
+
+        internal bool LoadPhiladelphusRepository()
         {
-            _service.ForceLoadTreeRepositoryMembersCollection(_treeRepositoryVM.Model);
-            _service.GetTreeRepositoryMembersAndContent(_treeRepositoryVM.Model);
-            _treeRepositoryVM.Childs.Clear();
-            foreach (var item in _treeRepositoryVM.Model.Childs)
+            var newRepo = _service.GetShrub(_philadelphusRepositoryVM.Model);
+            _philadelphusRepositoryVM.Childs.Clear();
+            foreach (var item in newRepo.ContentShrub.ContentTrees)
             {
-                _treeRepositoryVM.Childs.Add(new TreeRootVM((TreeRootModel)item, _service));
+                if (item.ContentRoot != null)
+                {
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _service));
+                }
             }
-            OnPropertyChanged(nameof(_treeRepositoryVM));
-            OnPropertyChanged(nameof(_treeRepositoryVM.Childs));
-            OnPropertyChanged(nameof(_treeRepositoryVM.ChildsCount));
-            return _treeRepositoryVM.Childs != null;
+            OnPropertyChanged(nameof(_philadelphusRepositoryVM));
+            OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
+            OnPropertyChanged(nameof(_philadelphusRepositoryVM.ChildsCount));
+            return _philadelphusRepositoryVM.Childs != null;
         }
-        public bool CheckTreeRepositoryAvailability()
+        public bool CheckPhiladelphusRepositoryAvailability()
         {
-            if (_treeRepositoryVM.Model == null)
+            if (_philadelphusRepositoryVM.Model == null)
                 return false;
-            return _treeRepositoryVM.Model.OwnDataStorage.IsAvailable;
+            return _philadelphusRepositoryVM.Model.OwnDataStorage.IsAvailable;
         }
 
         internal void NotifyChildsPropertyChangedRecursive()
         {
             OnPropertyChanged(nameof(State));
-            foreach (var item in _treeRepositoryVM.Childs)
+            foreach (var item in _philadelphusRepositoryVM.Childs)
             {
                 item.NotifyChildsPropertyChangedRecursive();
             }
@@ -259,9 +434,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private bool UpdateChildsCollection(ViewModelBase parent)    //TODO: Переделать временный костыль
         {
-            if (parent is TreeRepositoryVM)
+            if (parent is PhiladelphusRepositoryVM)
             {
-                var repository = (TreeRepositoryVM)parent;
+                var repository = (PhiladelphusRepositoryVM)parent;
                 for (int i = repository.Childs.Count - 1; i >= 0; i--)
                 {
                     if (repository.Childs[i].State == State.ForHardDelete

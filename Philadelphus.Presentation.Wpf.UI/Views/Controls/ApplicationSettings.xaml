@@ -46,7 +46,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="LeftVerticalTabItemStyle" TargetType="TabItem">
+        <!--<Style x:Key="LeftVerticalTabItemStyle" TargetType="TabItem">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
@@ -55,8 +55,8 @@
                                 <StackPanel Orientation="Vertical" 
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            MinHeight="20"
-                                            Width="150"
+                                            Height="75"
+                                            Width="90"
                                             Margin="5,5">
                                     <TextBlock Text="{TemplateBinding Header}" 
                                                HorizontalAlignment="Center"
@@ -75,26 +75,61 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
+        </Style>-->
     </UserControl.Resources>
     <Grid>
-        <TabControl Style="{StaticResource LeftVerticalTabControlStyle}">
-            <TabItem Header="Настроечные файлы" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <settings:ConfigurationFilesSettings></settings:ConfigurationFilesSettings>
-            </TabItem>
-            <TabItem Header="Строки подключения" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <settings:ConnectionStringContainersSettings></settings:ConnectionStringContainersSettings>
-            </TabItem>
-            <!--<TabItem Header="Конфиденциальная информация" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
-            <TabItem Header="Учетная запись" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>
-            <TabItem Header="Сочетания клавиш" Style="{StaticResource LeftVerticalTabItemStyle}">
-                <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Margin="100"></TextBlock>
-            </TabItem>-->
+        <TabControl Style="{StaticResource LeftVerticalTabControlStyle}"
+            ItemsSource="{Binding ApplicationSettingsTabItemsVMs}"
+            SelectedItem="{Binding SelectedApplicationSettingsTabItemVM, Mode=TwoWay}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Border Name="Border" 
+                            BorderThickness="1,1,0,1" 
+                            BorderBrush="LightSlateGray" 
+                            Margin="1">
+                                        <ContentPresenter ContentSource="Header"/>
+                                    </Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#E0F0FF"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.ItemContainerStyle>
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <StackPanel Orientation="Vertical"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Width="150"
+                                    Margin="5,5">
+                            <TextBlock Text="{Binding Header}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,5,0,5"
+                                       FontSize="14"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding Content}"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
         </TabControl>
-
     </Grid>
 </UserControl>

@@ -1,7 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -10,10 +10,10 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class TreeRepositoryVM : ViewModelBase   
+    public class PhiladelphusRepositoryVM : ViewModelBase   
     {
-        private readonly TreeRepositoryModel _model;
-        public TreeRepositoryModel Model
+        private readonly PhiladelphusRepositoryModel _model;
+        public PhiladelphusRepositoryModel Model
         {
             get
             {
@@ -51,7 +51,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
         public ObservableCollection<TreeRootVM> Childs { get => _childs; }
 
-        public string ChildsCount { get => $"Детей: {Childs.Count()}, Корней: {_model.ChildTreeRoots?.Count()}, Uuids: {_model.ChildsUuids?.Count}"; }
+        public string ChildsCount { get => $"Детей: {Childs?.Count()}, Корней: {_model?.ContentShrub?.ContentTrees?.Count()}, Uuids: NOT IMPLEMENTED"; }
 
         public bool IsFavorite
         {
@@ -78,18 +78,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
 
 
-        public TreeRepositoryVM(
-            TreeRepositoryModel treeRepositoryModel,
-            ITreeRepositoryService service)
+        public PhiladelphusRepositoryVM(
+            PhiladelphusRepositoryModel PhiladelphusRepositoryModel,
+            IPhiladelphusRepositoryService service)
         {
-            _model = treeRepositoryModel;
-            _storageVM = new DataStorageVM(treeRepositoryModel.OwnDataStorage);
-            foreach (var item in treeRepositoryModel.Childs)
+            _model = PhiladelphusRepositoryModel;
+            _storageVM = new DataStorageVM(PhiladelphusRepositoryModel.OwnDataStorage);
+            foreach (var item in PhiladelphusRepositoryModel.ContentShrub.ContentTrees.Select(x => x.ContentRoot))
             {
-                if (item.GetType() == typeof(TreeRootModel))
-                {
-                    Childs.Add(new TreeRootVM((TreeRootModel)item, service));
-                }
+                Childs.Add(new TreeRootVM(item, service));
             }
         }
 

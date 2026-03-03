@@ -4,14 +4,14 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
 {
-    public class MongoMainEntitуInfrastructure : ITreeRepositoriesMembersInfrastructureRepository
+    public class MongoMainEntitуInfrastructure : IPhiladelphusRepositoriesMembersInfrastructureRepository
     {
         MongoClient _client;
         IMongoDatabase _database;
@@ -28,7 +28,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         {
             try
             {
-                BsonClassMap.RegisterClassMap<TreeRepository>(c => {
+                BsonClassMap.RegisterClassMap<PhiladelphusRepository>(c => {
                     c.AutoMap();
                     c.MapIdProperty(s => s.Uuid).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
                 });
@@ -67,19 +67,10 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             {
             }
         }
-        public MainEntitiesCollection GetMainEntitiesCollection()
-        {
-            var result = new MainEntitiesCollection();
-            result.DbTreeRoots = SelectRoots();
-            result.DbTreeNodes = SelectNodes();
-            result.DbTreeLeaves = SelectLeaves();
-
-            return result;
-        }
         # region [ Select ]
-        public IEnumerable<TreeRepository> SelectRepositories(List<string> pathes)
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(List<string> pathes)
         {
-            var collection = _database.GetCollection<TreeRepository>("repositories");
+            var collection = _database.GetCollection<PhiladelphusRepository>("repositories");
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
@@ -103,7 +94,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         }
         #endregion
         #region [ Insert ]
-        public long InsertRepositories(IEnumerable<TreeRepository> repositories)
+        public long InsertRepositories(IEnumerable<PhiladelphusRepository> repositories)
         {
             long result = new long();
             return result;
@@ -134,34 +125,34 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         }
         #endregion
         #region [ Delete ]
-        public long DeleteRepositories(IEnumerable<TreeRepository> repositories)
+        public long DeleteRepositories(IEnumerable<PhiladelphusRepository> repositories)
         {
             long result = new long();
             return result;
         }
-        public long DeleteRoots(IEnumerable<TreeRoot> roots)
+        public long SoftDeleteRoots(IEnumerable<TreeRoot> roots)
         {
             long result = new long();
             return result;
         }
-        public long DeleteNodes(IEnumerable<TreeNode> nodes)
+        public long SoftDeleteNodes(IEnumerable<TreeNode> nodes)
         {
             long result = new long();
             return result;
         }
-        public long DeleteLeaves(IEnumerable<TreeLeave> leaves)
+        public long SoftDeleteLeaves(IEnumerable<TreeLeave> leaves)
         {
             long result = new long();
             return result;
         }
-        public long DeleteAttributes(IEnumerable<ElementAttribute> attributes)
+        public long SoftDeleteAttributes(IEnumerable<ElementAttribute> attributes)
         {
             long result = new long();
             return result;
         }
         #endregion
         #region [ Update ]
-        public long UpdateRepositories(IEnumerable<TreeRepository> repositories)
+        public long UpdateRepositories(IEnumerable<PhiladelphusRepository> repositories)
         {
             long result = new long();
             return result;
@@ -210,6 +201,31 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         }
 
         public IEnumerable<ElementAttribute> SelectAttributes()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<WorkingTree> SelectTrees()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long InsertTrees(IEnumerable<WorkingTree> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long UpdateTrees(IEnumerable<WorkingTree> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long SoftDeleteTrees(IEnumerable<WorkingTree> items)
         {
             throw new NotImplementedException();
         }

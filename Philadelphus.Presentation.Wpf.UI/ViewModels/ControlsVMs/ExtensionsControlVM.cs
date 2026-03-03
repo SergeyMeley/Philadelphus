@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
@@ -9,6 +10,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -24,9 +26,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private ExtensionInstanceVM _selectedExtension;
         private string _statusMessage;
         private bool _isExecuting;
-        private TreeRepositoryVM _repositoryVM;
+        private PhiladelphusRepositoryVM _repositoryVM;
 
-        public TreeRepositoryVM RepositoryVM
+        public PhiladelphusRepositoryVM RepositoryVM
         {
             get => _repositoryVM;
             set => SetProperty(ref _repositoryVM, value);
@@ -91,16 +93,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
         }
 
-        public async Task InitializeAsync(IEnumerable<string> pluginsFolderPaths)
+        public async Task InitializeAsync(IEnumerable<DirectoryInfo> pluginsFolderPaths)
         {
-            if (_extensionManager.GetExtensions()?.Count > 0)
+            if (Extensions.Count > 0
+                || _extensionManager.GetExtensions()?.Count > 0)
                 return;
             foreach (var path in pluginsFolderPaths)
             {
                 try
                 {
                     // Загружаем расширения из DLL
-                    await _extensionManager.LoadExtensionsAsync(path);
+                    await _extensionManager.LoadExtensionsAsync(path.FullName);
                     Debug.WriteLine($"Загружено расширений: {_extensionManager.GetExtensions().Count}");
                 }
                 catch (Exception ex)
@@ -208,7 +211,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 var originalExt = FindOriginalExtension(SelectedExtension);
                 if (originalExt != null)
                 {
-                    await _extensionManager.ExecuteExtensionAsync(originalExt, SelectedElement);
+                    await _extensionManager.ExecuteExtensionAsync(originalExt, _serviceProvider.GetRequiredService<IPhiladelphusRepositoryService>(), SelectedElement);
                     StatusMessage = $"Метод расширения '{SelectedExtension.Name}' успешно выполнен";
                 }
             }

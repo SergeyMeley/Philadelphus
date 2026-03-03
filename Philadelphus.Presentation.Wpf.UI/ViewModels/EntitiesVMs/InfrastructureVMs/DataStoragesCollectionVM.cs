@@ -41,11 +41,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 OnPropertyChanged(nameof(DataStorageVMs));
             }
         }
-        public IEnumerable<DataStorageVM>? TreeRepositoriesDataStorageVMs
+        public IEnumerable<DataStorageVM>? PhiladelphusRepositoriesDataStorageVMs
         {
             get
             {
-                return _dataStorageVMs.Where(x => x.HasTreeRepositoriesInfrastructureRepository);
+                return _dataStorageVMs.Where(x => x.HasPhiladelphusRepositoriesInfrastructureRepository);
             }
         }
 
@@ -84,7 +84,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
         private bool InitMainDataStorageVM(ApplicationSettingsConfig applicationSettings)
         {
-            var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.StoragesConfigFullPath, applicationSettings.RepositoryHeadersConfigFullPath);
+            if (applicationSettings.MainDataStorage == null)
+                throw new Exception(); 
+            var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.MainDataStorage);
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
             _dataStorageVMs.Add(_mainDataStorageVM);
             return true;
@@ -107,13 +109,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                     {
                         var model = entity.ToModel(connectionString);
 
-                        if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                        if (model != null)
                         {
-                            _dataStorageVMs.Add(new DataStorageVM(model));
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException();
+                            if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
+                            {
+                                _dataStorageVMs.Add(new DataStorageVM(model));
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException();
+                            }
                         }
                     }
                 }

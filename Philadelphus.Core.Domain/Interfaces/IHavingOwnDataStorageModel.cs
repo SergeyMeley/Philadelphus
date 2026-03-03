@@ -6,12 +6,12 @@ namespace Philadelphus.Core.Domain.Interfaces
     /// Владелец собственного хранилища. 
     /// Реализует возможность наличия независимой инфраструктуры (места и способа хранения данных)
     /// </summary>
-    internal interface IHavingOwnDataStorageModel
+    public interface IHavingOwnDataStorageModel
     {
         /// <summary>
         /// Собственное хранилище
         /// </summary>
-        internal IDataStorageModel OwnDataStorage { get; }
+        public IDataStorageModel OwnDataStorage { get; }
 
         /// <summary>
         /// Изменить собственное хранилище

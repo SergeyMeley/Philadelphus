@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
+using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
 
@@ -19,7 +20,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger<TreeRepositoryCollectionService> _logger;
+        private readonly ILogger<PhiladelphusRepositoryCollectionService> _logger;
         private readonly INotificationService _notificationService;
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
@@ -41,7 +42,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="dataStoragesCollection"></param>
         public DataStoragesService(
             IMapper mapper,
-            ILogger<TreeRepositoryCollectionService> logger,
+            ILogger<PhiladelphusRepositoryCollectionService> logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
@@ -93,28 +94,56 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="storagesConfigFullPath">Путь к настроечному файлу хранилищ данных</param>
         /// <param name="repositoryHeadersConfigFullPath">Путь к настроечному файлу запусков репозиториев</param>
         /// <returns></returns>
-        public IDataStorageModel CreateMainDataStorageModel(
-            FileInfo storagesConfigFullPath,
-            FileInfo repositoryHeadersConfigFullPath)
+        public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo basePath)
         {
-            if (storagesConfigFullPath == null || repositoryHeadersConfigFullPath == null)
-                return null;
+            if (basePath == null)
+                throw new ArgumentNullException($"{nameof(basePath)}");
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
                     name: "Основное хранилище",
                     description: "Основное хранилище",
-                    Guid.Empty,
-                    InfrastructureTypes.JsonDocument,
-                isDisabled: false)
-            .SetRepository(new JsonDataStoragesCollectionInfrastructureRepository(storagesConfigFullPath))
-            .SetRepository(new JsonTreeRepositoryHeadersCollectionInfrastructureRepository(repositoryHeadersConfigFullPath))
+                    uuid: Guid.Empty,
+                    infrastructureType: InfrastructureTypes.JsonDocument,
+                    isDisabled: false)
+            .SetRepository(new JsonMainEntitiesInfrastructureRepository(basePath))
+            .SetRepository(new JsonPhiladelphusRepositoriesInfrastructureRepository(basePath))
         ;
             var mainDataStorageModel = dataStorageBuilder.Build();
 
-            _logger.LogInformation("Хранилище конфигурационных файлов инициализировано.");
+            _logger.LogInformation("Базовое хранилище инициализировано.");
 
             return mainDataStorageModel;
+        }
+
+        /// <summary>
+        /// /// <summary>
+        /// Создать хранилище данных
+        /// <param name="name">Наименование</param>
+        /// <param name="desctiption">Описание</param>
+        /// <param name="connectionString">Строка подключенияя</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringContainer connectionString)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(desctiption) || connectionString == null)
+                throw new ArgumentNullException();
+
+            DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
+                .SetGeneralParameters(
+                    name: name,
+                    description: desctiption,
+                    uuid: connectionString.Uuid,
+                    infrastructureType: InfrastructureTypes.PostgreSqlEf,
+                    isDisabled: false)
+            .SetRepository(new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(connectionString.ConnectionString))
+            .SetRepository(new PostgreEfMainEntitiesInfrastructureRepository(connectionString.ConnectionString))
+        ;
+            var dataStorageModel = dataStorageBuilder.Build();
+
+            _logger.LogInformation("Хранилище инициализировано.");
+
+            return dataStorageModel;
         }
 
         #endregion

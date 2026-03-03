@@ -19,8 +19,6 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.CreatedBy = businessEntity.CreatedBy;
             result.UpdatedAt = businessEntity.UpdatedAt;
             result.UpdatedBy = businessEntity.UpdatedBy;
-            result.ContentUpdatedAt = businessEntity.ContentUpdatedAt;
-            result.ContentUpdatedBy = businessEntity.ContentUpdatedBy;
             result.IsDeleted = businessEntity.IsDeleted;
             result.DeletedAt = businessEntity.DeletedAt;
             result.DeletedBy = businessEntity.DeletedBy;
@@ -58,8 +56,6 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             result.CreatedBy = dbEntity.CreatedBy;
             result.UpdatedAt = dbEntity.UpdatedAt;
             result.UpdatedBy = dbEntity.UpdatedBy;
-            result.ContentUpdatedAt = dbEntity.ContentUpdatedAt;
-            result.ContentUpdatedBy = dbEntity.ContentUpdatedBy;
             result.IsDeleted = dbEntity.IsDeleted;
             result.DeletedAt = dbEntity.DeletedAt;
             result.DeletedBy = dbEntity.DeletedBy;

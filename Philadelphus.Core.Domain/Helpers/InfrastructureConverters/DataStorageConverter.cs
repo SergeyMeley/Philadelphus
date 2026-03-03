@@ -23,9 +23,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 Name = businessEntity.Name,
                 Description = businessEntity.Description,
                 Uuid = businessEntity.Uuid,
-                HasDataStorageInfrastructureRepositoryRepository = businessEntity.DataStoragesCollectionInfrastructureRepository != null,
-                HasTreeRepositoryHeadersInfrastructureRepository = businessEntity.TreeRepositoriesInfrastructureRepository != null,
-                HasMainEntitiesInfrastructureRepository = businessEntity.TreeRepositoryMembersInfrastructureRepository != null,
+                HasPhiladelphusRepositoryHeadersInfrastructureRepository = businessEntity.PhiladelphusRepositoriesInfrastructureRepository != null,
+                HasMainEntitiesInfrastructureRepository = businessEntity.PhiladelphusRepositoryMembersInfrastructureRepository != null,
                 InfrastructureType = businessEntity.InfrastructureType,
             };
             return result;
@@ -43,8 +42,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            ITreeRepositoriesInfrastructureRepository treeRepositoriesInfrastructureRepository = null;
-            ITreeRepositoriesMembersInfrastructureRepository mainEntitiesInfrastructureRepository = null;
+            IPhiladelphusRepositoriesInfrastructureRepository PhiladelphusRepositoriesInfrastructureRepository = null;
+            IPhiladelphusRepositoriesMembersInfrastructureRepository mainEntitiesInfrastructureRepository = null;
             switch (dbEntity.InfrastructureType)
             {
                 case InfrastructureTypes.WindowsDirectory:
@@ -52,7 +51,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 case InfrastructureTypes.PostgreSqlAdo:
                     break;
                 case InfrastructureTypes.PostgreSqlEf:
-                    treeRepositoriesInfrastructureRepository = new PostgreEfTreeRepositoriesInfrastructureRepository(connectionString);
+                    PhiladelphusRepositoriesInfrastructureRepository = new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(connectionString);
                     mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(connectionString);
                     break;
                 case InfrastructureTypes.MongoDbAdo:
@@ -72,7 +71,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             }
             var builder = new DataStorageBuilder()
                 .SetGeneralParameters(dbEntity.Name, dbEntity.Description, dbEntity.Uuid, dbEntity.InfrastructureType, dbEntity.IsDisabled)
-                .SetRepository(treeRepositoriesInfrastructureRepository)
+                .SetRepository(PhiladelphusRepositoriesInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();
         }

@@ -1,5 +1,7 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.TreeRepositoryMembers.TreeRootMembers;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -10,14 +12,18 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// </summary>
         /// <param name="businessEntity">Доменная модель</param>
         /// <returns></returns>
-        public static TreeLeave ToDbEntity(this TreeLeaveModel businessEntity/*, TreeRepositoryService service*/)   //TODO: Заменить на сервис кеширования
+        public static TreeLeave ToDbEntity(this TreeLeaveModel businessEntity)
         {
             if (businessEntity == null)
                 return null;
             var result = (TreeLeave)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
-            result.ParentUuid = businessEntity.Parent.Uuid;
-            result.ParentTreeRootUuid = businessEntity.ParentRoot.Uuid;
-            //result.ParentTreeRoot = (TreeRoot)service.GetEntityFromCollection(businessEntity.ParentRoot.Uuid);
+            result.ParentTreeNodeUuid = businessEntity.ParentNode.Uuid;
+            result.OwningWorkingTreeUuid = businessEntity.OwningWorkingTree.Uuid;
+            result.OwningWorkingTree = businessEntity.OwningWorkingTree.ToDbEntity();
+            if (businessEntity is SystemBaseTreeLeaveModel st)
+            {
+                result.SystemBaseTypeId = (int)st.SystemBaseType;
+            }
             return result;
         }
 
@@ -48,8 +54,28 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            var result = new TreeLeaveModel(dbEntity.Uuid, parent, dbEntity);
+            if (parent == null)
+                throw new ArgumentNullException();
+            var result = new TreeLeaveModel(dbEntity.Uuid, parent, parent.OwningWorkingTree, dbEntity);
             result = (TreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Конвертировать сущность БД в доменную модель
+        /// </summary>
+        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="parent">Родитель</param>
+        /// <returns></returns>
+        public static SystemBaseTreeLeaveModel ToModel(this TreeLeave dbEntity, SystemBaseTreeNodeModel parent)
+        {
+            if (dbEntity == null)
+                return null;
+            if (parent == null)
+                throw new ArgumentNullException();
+            var type = SystemBaseTreeNodeModel.GetTypeByUuid(parent.Uuid);
+            var result = new SystemBaseTreeLeaveModel(dbEntity.Uuid, parent, parent.OwningWorkingTree, type);
+            result = (SystemBaseTreeLeaveModel)dbEntity.ToModelGeneralProperties(result);
             return result;
         }
 
@@ -63,13 +89,24 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntityCollection == null)
                 return null;
+            if (dbEntityCollection.Count() == 0)
+                return new List<TreeLeaveModel>();
+            if (parents == null || parents.Count() == 0)
+                throw new ArgumentNullException();
             var result = new List<TreeLeaveModel>();
             foreach (var dbEntity in dbEntityCollection)
             {
-                var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentUuid);
+                var parent = parents.FirstOrDefault(x => x.Uuid == dbEntity.ParentTreeNodeUuid);
                 if (parent != null)
                 {
-                    result.Add(dbEntity.ToModel(parent));
+                    if (dbEntity.SystemBaseTypeId != 0)
+                    {
+                        result.Add(dbEntity.ToModel(parent as SystemBaseTreeNodeModel));
+                    }
+                    else
+                    {
+                        result.Add(dbEntity.ToModel(parent));
+                    }
                 }
             }
             return result;

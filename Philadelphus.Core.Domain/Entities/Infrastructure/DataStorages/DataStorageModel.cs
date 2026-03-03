@@ -57,54 +57,24 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         }
 
         /// <summary>
-        /// Репозиторий  БД работы с хранилищами данных Чубушника
-        /// </summary>
-        public IDataStoragesCollectionInfrastructureRepository DataStoragesCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_isDisabled)
-                    return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.DataStoragesCollection) == false)
-                    return null;
-                return (IDataStoragesCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.DataStoragesCollection];
-            }
-        }
-
-        /// <summary>
-        /// Репозиторий БД работы с заголовками репозиториев Чубушника
-        /// </summary>
-        public ITreeRepositoryHeadersCollectionInfrastructureRepository TreeRepositoryHeadersCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_isDisabled)
-                    return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.TreeRepositoryHeadersCollection) == false)
-                    return null;
-                return (ITreeRepositoryHeadersCollectionInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositoryHeadersCollection];
-            }
-        }
-
-        /// <summary>
         /// Репозиторий БД работы с репозиториями Чубушника
         /// </summary>
-        public ITreeRepositoriesInfrastructureRepository TreeRepositoriesInfrastructureRepository
+        public IPhiladelphusRepositoriesInfrastructureRepository PhiladelphusRepositoriesInfrastructureRepository
         {
             get
             {
                 if (_isDisabled)
                     return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.TreeRepositories) == false)
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.PhiladelphusRepositories) == false)
                     return null;
-                return (ITreeRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.TreeRepositories];
+                return (IPhiladelphusRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.PhiladelphusRepositories];
             }
         }
 
         /// <summary>
         /// Репозиторий БД работы с участниками репозитория Чубушника
         /// </summary>
-        public ITreeRepositoriesMembersInfrastructureRepository TreeRepositoryMembersInfrastructureRepository
+        public IPhiladelphusRepositoriesMembersInfrastructureRepository PhiladelphusRepositoryMembersInfrastructureRepository
         {
             get
             {
@@ -112,7 +82,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                     return null;
                 if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.MainEntities) == false)
                     return null;
-                return (ITreeRepositoriesMembersInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
+                return (IPhiladelphusRepositoriesMembersInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
             }
         }
 

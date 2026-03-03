@@ -62,29 +62,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 return true;
             }
         }
-        public bool HasDataStoragesCollectionInfrastructureRepository
+
+        public bool HasPhiladelphusRepositoriesInfrastructureRepository
         {
             get
             {
-                if (_model.DataStoragesCollectionInfrastructureRepository == null)
-                    return false;
-                return true;
-            }
-        }
-        public bool HasTreeRepositoryHeadersCollectionInfrastructureRepository
-        {
-            get
-            {
-                if (_model.TreeRepositoryHeadersCollectionInfrastructureRepository == null)
-                    return false;
-                return true;
-            }
-        }
-        public bool HasTreeRepositoriesInfrastructureRepository
-        {
-            get
-            {
-                if (_model.TreeRepositoriesInfrastructureRepository == null)
+                if (_model.PhiladelphusRepositoriesInfrastructureRepository == null)
                     return false;
                 return true;
             }
@@ -93,7 +76,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         {
             get
             {
-                if (_model.TreeRepositoryMembersInfrastructureRepository == null)
+                if (_model.PhiladelphusRepositoryMembersInfrastructureRepository == null)
                     return false;
                 return true;
             }
