@@ -96,8 +96,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 // Сохранение результата
                 var saveDialog = new SaveFileDialog
                 {
-                    Filter = "JSON Files|*.json",
-                    FileName = Path.GetFileNameWithoutExtension(_selectedFilePath) + ".json"
+                    Filter = "PHJSON Files|*.phjson",
+                    FileName = Path.GetFileNameWithoutExtension(_selectedFilePath) + ".phjson"
                 };
 
                 if (saveDialog.ShowDialog() == true)

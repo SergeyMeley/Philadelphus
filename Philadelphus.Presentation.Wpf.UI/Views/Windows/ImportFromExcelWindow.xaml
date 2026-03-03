@@ -50,7 +50,7 @@
         </GroupBox>
 
         <!-- Кнопка конвертации -->
-        <Button Grid.Row="3" Content="Конвертировать в JSON" Click="BtnConvert_Click" 
+        <Button Grid.Row="3" Content="Конвертировать в PHJSON" Click="BtnConvert_Click" 
                 Height="40" FontSize="14" Background="#007ACC" Foreground="White" Margin="0,20,0,0"/>
     </Grid>
 </Window>

@@ -159,11 +159,11 @@
                 </RibbonTab>-->
                 <RibbonTab Header="Данные">
                     <RibbonGroup Header="Экспорт / импорт">
-                        <RibbonButton Label="Экспорт .pjson" Command="{Binding RepositoryExplorerVM.ExportToPjsonCommand}" />
-                        <RibbonButton Label="Импорт из .pjson" Command="{Binding RepositoryExplorerVM.ImportFromPjsonCommand}" />
+                        <RibbonButton Label="Экспорт .phjson" Command="{Binding RepositoryExplorerVM.ExportToPhjsonCommand}" />
+                        <RibbonButton Label="Импорт из .phjson" Command="{Binding RepositoryExplorerVM.ImportFromPhjsonCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Конвертация">
-                        <RibbonButton Label="Конвертировать .xlsx в .pjson" Command="{Binding RepositoryExplorerVM.XlsxToPjsonCommand}" />
+                        <RibbonButton Label="Конвертировать .xlsx в .phjson" Command="{Binding RepositoryExplorerVM.ConvertXlsxToPhjsonCommand}" />
                     </RibbonGroup>
 
                 </RibbonTab>
