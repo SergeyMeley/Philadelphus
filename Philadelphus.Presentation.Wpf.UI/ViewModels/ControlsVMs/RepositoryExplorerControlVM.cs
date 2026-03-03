@@ -382,6 +382,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public RelayCommand XlsxToPjsonCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
+                    window.ShowDialog();
+                });
+            }
+        }
+
         #endregion
 
         #region [ Methods ]

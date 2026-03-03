@@ -14,9 +14,9 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
         public string Description { get; }
         public string DataTypeNodeName { get; set; } = "Не определён";
         public string ValueLeaveName { get; set; } = "Не задано";
-        public bool IsCollectionValue { get; }
-        public VisibilityScope Visibility { get; }
-        public OverrideType Override { get; }
+        public bool IsCollectionValue { get; } = false;
+        public VisibilityScope Visibility { get; } = VisibilityScope.Public;
+        public OverrideType Override { get; } = OverrideType.None;
 
         public AttributeExportDTO(ElementAttributeModel attr)
         {
@@ -27,6 +27,12 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
             IsCollectionValue = attr.IsCollectionValue;
             Visibility = attr.Visibility;
             Override = attr.Override;
+        }
+
+        public AttributeExportDTO(string name, string description)
+        {
+            Name = name;
+            Description = description;
         }
     }
 }

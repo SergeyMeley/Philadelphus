@@ -1,0 +1,56 @@
+﻿<Window x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.ImportFromExcelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
+        Title="Конвертер Excel -> JSON" Height="400" Width="500"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Выбор файла -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+            <Button Content="Выбрать Excel файл" Click="BtnSelectFile_Click" Padding="10,5"/>
+            <TextBlock x:Name="TxtFilePath" Text="Файл не выбран" Margin="15,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+        </StackPanel>
+
+        <!-- Настройки корня -->
+        <GroupBox Grid.Row="1" Header="Настройки TreeRoot" Padding="10">
+            <StackPanel>
+                <!-- Чек-бокс -->
+                <CheckBox x:Name="ChkCreateNewRoot" Content="Создать новый корень" Margin="0,0,0,10" 
+                          Checked="ChkCreateNewRoot_Checked" Unchecked="ChkCreateNewRoot_Unchecked"/>
+
+                <!-- Текстовое поле (активно только если чек-бокс включен) -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Наименование корня:" VerticalAlignment="Center"/>
+                    <TextBox x:Name="TxtRootName" Grid.Column="1" IsEnabled="False" Margin="5,0,0,0"/>
+                </Grid>
+
+                <!-- Выпадающий список (активен только если чек-бокс выключен) -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Существующие корни:" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="CmbExistingRoots" Grid.Column="1" Margin="5,0,0,0"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Кнопка конвертации -->
+        <Button Grid.Row="3" Content="Конвертировать в JSON" Click="BtnConvert_Click" 
+                Height="40" FontSize="14" Background="#007ACC" Foreground="White" Margin="0,20,0,0"/>
+    </Grid>
+</Window>

@@ -11,24 +11,15 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
     {
         public string Name { get; }
         public TreeRootExportDTO ContentRoot { get; }
-        public List<TreeNodeExportDTO> AllNodes { get; }
-        public List<TreeLeaveExportDTO> AllLeaves { get; }
-
-        public WorkingTreeExportDTO() 
-        { 
+        public WorkingTreeExportDTO(string name, TreeRootExportDTO root) 
+        {
+            Name = name;
+            ContentRoot = root;
         }
         public WorkingTreeExportDTO(WorkingTreeModel tree)
         {
             Name = tree.Name;
             ContentRoot = new TreeRootExportDTO(tree.ContentRoot);
-
-            AllNodes = tree.GetAllNodesRecursive()
-                .Select(node => new TreeNodeExportDTO(node))
-                .ToList();
-
-            AllLeaves = tree.GetAllLeavesRecursive()
-                .Select(leave => new TreeLeaveExportDTO(leave))
-                .ToList();
         }
     }
 }
