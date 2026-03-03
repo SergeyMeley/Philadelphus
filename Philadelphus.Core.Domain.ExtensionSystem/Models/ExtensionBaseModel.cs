@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.ExtensionSystem.Models
 {
@@ -13,7 +14,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         public virtual Task StopAsync() => Task.CompletedTask;
 
         public abstract Task<CanExecuteResultModel> CanExecuteAsync(MainEntityBaseModel element);
-        public abstract Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, CancellationToken cancellationToken = default);
+        public abstract Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default);
 
         public virtual object GetRepositoryExplorerWidget() => null;
         public virtual object GetRibbonWidget() => null;

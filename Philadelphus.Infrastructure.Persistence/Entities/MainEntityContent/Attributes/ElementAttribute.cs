@@ -9,6 +9,8 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Att
         public Guid DeclaringOwnerUuid { get; set; }
         public Guid? ValueTypeUuid { get; set; }
         public Guid? ValueUuid { get; set; }
+        public bool IsCollectionValue { get; set; }
+        public Guid[]? ValuesUuids { get; set; }
         public int VisibilityId { get; set; }
         public int OverrideId { get; set; }
 

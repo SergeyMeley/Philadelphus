@@ -27,7 +27,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeLeaveModel _value;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private VisibilityScope _visibility = VisibilityScope.Public;
-        private OverrideType _override = OverrideType.None;
+        private OverrideType _override = OverrideType.Virtual;
 
         #endregion
 
@@ -225,7 +225,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                     {
                         if (c.Parent is IAttributeOwnerModel ao)
                         {
-                            var originalAttribute = ao.Attributes.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
+                            var originalAttribute = ao.Attributes?.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
                             if (originalAttribute != null)
                             {
                                 depth = originalAttribute.InheritanceDepth + 1;
@@ -325,6 +325,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Добавить значение атрибута в коллекцию
         /// </summary>
+        /// <param name="value">Значение</param>
         /// <returns></returns>
         public bool TryAddValueToValuesCollection(TreeLeaveModel value)
         {
@@ -333,12 +334,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (_values != null && _values.Any(x => x.Uuid == value.Uuid))
                 return false;
             _values?.Add(value);
+            UpdateStateStateAfterChange();
             return true;
         }
 
         /// <summary>
         /// Исключить значение атрибута из коллекции
         /// </summary>
+        /// <param name="value">Значение</param>
         /// <returns></returns>
         public bool TryRemoveValueFromValuesCollection(TreeLeaveModel value)
         {
@@ -347,6 +350,22 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (_values != null && _values.Any(x => x == value) == false)
                 return false;
             _values?.Remove(value);
+            UpdateStateStateAfterChange(); 
+            return true;
+        }
+
+        /// <summary>
+        /// Очистить коллекцию значений атрибута
+        /// </summary>
+        /// <returns></returns>
+        public bool ClearValuesCollection()
+        {
+            if (_isCollectionValue == false)
+                return false;
+            if (_values != null)
+                return false;
+            _values?.Clear();
+            UpdateStateStateAfterChange(); 
             return true;
         }
 

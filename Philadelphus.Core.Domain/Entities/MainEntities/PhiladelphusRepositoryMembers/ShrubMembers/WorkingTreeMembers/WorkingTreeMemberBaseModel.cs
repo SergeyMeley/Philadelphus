@@ -152,9 +152,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 leaves.AddRange(node.ChildLeaves);
 
-                foreach (var leaveItem in node.ChildLeaves)
+                foreach (var nodeItem in node.ChildNodes)
                 {
-                    leaves.AddRange(leaveItem.GetAllLeavesRecursive());
+                    leaves.AddRange(nodeItem.GetAllLeavesRecursive());
                 }
             }
 

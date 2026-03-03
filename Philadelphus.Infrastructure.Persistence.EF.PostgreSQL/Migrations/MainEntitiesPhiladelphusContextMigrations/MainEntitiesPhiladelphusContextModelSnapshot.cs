@@ -267,6 +267,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<bool>("IsCollectionValue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_collection_value");
+
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -299,6 +305,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.Property<Guid?>("ValueUuid")
                         .HasColumnType("uuid")
                         .HasColumnName("value_uuid");
+
+                    b.PrimitiveCollection<Guid[]>("ValuesUuids")
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("values_uuids");
 
                     b.Property<int>("VisibilityId")
                         .ValueGeneratedOnAdd()

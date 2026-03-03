@@ -46,6 +46,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public string UserName { get => Environment.UserName; }
+
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
         public ViewModelBase SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория

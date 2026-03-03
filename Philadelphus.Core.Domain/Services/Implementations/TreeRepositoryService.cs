@@ -97,14 +97,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     var dbTrees = infrastructure.SelectTrees(treesUuids);
                     var trees = dbTrees.ToModelCollection(repository.DataStorages, repository);
 
-                    foreach (var tree in trees.Where(x => x.OwningRepository.Uuid == repository.Uuid))
+                    foreach (var tree in trees?.Where(x => x.OwningRepository.Uuid == repository.Uuid))
                     {
                         tree.UnavailableNames.Add(tree.Name);
 
                         repository.ContentShrub.ContentTrees.Add(tree);
 
-                        GetPersonalAttributes(tree);
                         GetWorkingTree(tree);
+                        GetPersonalAttributes(tree);
 
                         SetModelState(tree, State.SavedOrLoaded);
                     }
@@ -284,18 +284,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (attributeOwner is IShrubMemberModel me)
             {
                 var infrastructure = me.DataStorage.PhiladelphusRepositoryMembersInfrastructureRepository;
-                var dbEntities = infrastructure.SelectAttributes().Where(x => x.OwnerUuid == attributeOwner.Uuid);
-                var attributes = dbEntities?.ToModelCollection(new List<IAttributeOwnerModel>() { attributeOwner });
-
-                if (attributes != null)
+                var dbEntities = infrastructure.SelectAttributes()?.Where(x => x.OwnerUuid == attributeOwner.Uuid);
+                if (attributeOwner is IShrubMemberModel sm)
                 {
-                    foreach (var attribute in attributes)
+                    var valueTypes = sm.OwningShrub.ContentTrees.SelectMany(x => x.GetAllNodesRecursive() ?? new List<TreeNodeModel>())?.ToList();
+                    var values = sm.OwningShrub.ContentTrees.SelectMany(x => x.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>())?.ToList();
+                    var attributes = dbEntities?.ToModelCollection(new List<IAttributeOwnerModel>() { attributeOwner }, valueTypes, values);
+                    if (attributes != null)
                     {
-                        SetModelState(attribute, State.SavedOrLoaded);
-                        attributeOwner.AddAttribute(attribute);
-                    }
+                        foreach (var attribute in attributes)
+                        {
+                            SetModelState(attribute, State.SavedOrLoaded);
+                            attributeOwner.AddAttribute(attribute);
+                        }
 
-                    return attributes;
+                        return attributes;
+                    }
                 }
             }
             return null;
@@ -822,8 +826,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (existTree != null)
                 return false;
             var dbExistTree = shrub.DataStorage.PhiladelphusRepositoryMembersInfrastructureRepository
-                .SelectTrees(new Guid[] { WorkingTreeModel.SystemBaseGuid })
-                .ToModelCollection(new List<IDataStorageModel>() { shrub.DataStorage }, shrub.OwningRepository)
+                .SelectTrees(new Guid[] { WorkingTreeModel.SystemBaseGuid })?
+                .ToModelCollection(new List<IDataStorageModel>() { shrub.DataStorage }, shrub.OwningRepository)?
                 .SingleOrDefault();
             if (dbExistTree != null)
             {
