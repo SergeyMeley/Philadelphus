@@ -313,7 +313,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand ExportToPjsonCommand
+        public RelayCommand ExportToPhjsonCommand
         {
             get
             {
@@ -337,7 +337,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         path = dialog.FolderName;
                     }
 
-                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.NewGuid()}.pjson");
+                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.NewGuid()}.phjson");
                     File.WriteAllText(file, json, Encoding.UTF8);
 
                     Process.Start(new ProcessStartInfo
@@ -353,7 +353,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand ImportFromPjsonCommand
+        public RelayCommand ImportFromPhjsonCommand
         {
             get
             {
@@ -365,7 +365,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         Title = "Выберите файл",
                         Multiselect = false,
-                        Filter = "PJSON файлы (*.pjson)|*.pjson",
+                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
                         FilterIndex = 1,
                     };
 
@@ -382,7 +382,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand XlsxToPjsonCommand
+        public RelayCommand ConvertXlsxToPhjsonCommand
         {
             get
             {
