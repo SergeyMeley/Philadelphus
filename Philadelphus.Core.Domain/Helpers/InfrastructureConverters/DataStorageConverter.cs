@@ -1,8 +1,10 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
+using Serilog;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -38,6 +40,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         /// <returns></returns>
         public static IDataStorageModel ToModel(
             this DataStorage dbEntity,
+            ILogger logger,
             string connectionString)
         {
             if (dbEntity == null)
@@ -51,8 +54,8 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                 case InfrastructureTypes.PostgreSqlAdo:
                     break;
                 case InfrastructureTypes.PostgreSqlEf:
-                    PhiladelphusRepositoriesInfrastructureRepository = new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(connectionString);
-                    mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(connectionString);
+                    PhiladelphusRepositoriesInfrastructureRepository = new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(logger, connectionString);
+                    mainEntitiesInfrastructureRepository = new PostgreEfMainEntitiesInfrastructureRepository(logger, connectionString);
                     break;
                 case InfrastructureTypes.MongoDbAdo:
                     break;
@@ -70,7 +73,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
                     break;
             }
             var builder = new DataStorageBuilder()
-                .SetGeneralParameters(dbEntity.Name, dbEntity.Description, dbEntity.Uuid, dbEntity.InfrastructureType, dbEntity.IsDisabled)
+                .SetGeneralParameters(logger, dbEntity.Name, dbEntity.Description, dbEntity.Uuid, dbEntity.InfrastructureType, dbEntity.IsDisabled)
                 .SetRepository(PhiladelphusRepositoriesInfrastructureRepository)
                 .SetRepository(mainEntitiesInfrastructureRepository);
             return builder.Build();

@@ -5,19 +5,23 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public abstract class MainEntityBaseVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public abstract class MainEntityBaseVM<T> : ViewModelBase where T : MainEntityBaseModel  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         protected readonly IPhiladelphusRepositoryService _service;
+        protected readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
 
-        protected readonly MainEntityBaseModel _model;
-        public MainEntityBaseModel Model 
-        { get 
+        protected readonly T _model;
+        public T Model 
+        { 
+            get 
             { 
                 return _model; 
             } 
@@ -79,7 +83,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 {
                     foreach (var attribute in sm.Attributes)
                     {
-                        var attributeVM = new ElementAttributeVM(attribute, _service);
+                        var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service);
                         result.Add(attributeVM);
                     }
                 }
@@ -91,13 +95,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private DataStorageVM _storageVM;
         public DataStorageVM StorageVM { get => _storageVM; }
         public MainEntityBaseVM(
-            MainEntityBaseModel mainEntityBaseModel, 
+            T mainEntityBaseModel,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service)
         {
-            _service = service;
-
-            _model = mainEntityBaseModel;
-            _storageVM = new DataStorageVM(mainEntityBaseModel.DataStorage);
+            _service = service ?? throw new NullReferenceException();
+            _model = mainEntityBaseModel ?? throw new NullReferenceException();
+            _dataStoragesCollectionVM = dataStoragesCollectionVM ?? throw new NullReferenceException();
+            _storageVM = dataStoragesCollectionVM?.DataStoragesVMs?.SingleOrDefault(x => x.Uuid == _model.DataStorage.Uuid) ?? throw new NullReferenceException();
         }
         public ElementAttributeVM AddAttribute()
         {
@@ -106,7 +111,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 var attributeOwnerModel = (IAttributeOwnerModel)_model;
                 var attribute = _service.CreateElementAttribute(attributeOwnerModel);
                 attributeOwnerModel.AddAttribute(attribute);
-                var attributeVM = new ElementAttributeVM(attribute, _service);
+                var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service);
                 AttributesVMs.Add(attributeVM);
                 OnPropertyChanged(nameof(AttributesVMs));
                 return attributeVM;

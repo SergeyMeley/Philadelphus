@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
+using Serilog;
 
 namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
 {
@@ -30,11 +31,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="isDisabled">Состояние отключенности хранилища данных</param>
         /// <returns>Строитель хранилища данных</returns>
         /// <exception cref="ArgumentException"></exception>
-        public DataStorageBuilder SetGeneralParameters(string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
+        public DataStorageBuilder SetGeneralParameters(ILogger logger, string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description) /*|| uuid == Guid.Empty*/)  //TODO: Исправить костыль
                 throw new ArgumentException("Переданы некорректные параметры");
-            _storageModel = new DataStorageModel(uuid, name, description, infrastructureType, isDisabled);
+            _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled);
             return this;
         }
 

@@ -321,12 +321,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (repository == null)
                 return 0;
 
-            // Сохранение изменений
+            // Преобразование в сущность БД
             long result = 0;
             var infrastructure = repository.OwnDataStorage.PhiladelphusRepositoriesInfrastructureRepository;
             var entity = repository.ToDbEntity();
             var storage = repository.OwnDataStorage;
 
+            // Сохранение изменений
             switch (repository.State)
             {
                 case State.Initialized:
@@ -342,6 +343,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 default:
                     break;
             }
+
+            // Возвращение данных, генерируемых инфраструктурой
+            repository.AuditInfo = entity.AuditInfo.ToModel();
 
             // Актуализация статуса
             SetModelState(repository, State.SavedOrLoaded); // TODO: Удалить?
@@ -360,8 +364,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Возвращение обновленной информации
             // Не переносить, ломается логика
-            repository = infrastructure.SelectRepositories(new Guid[] { repository.Uuid }).First().ToModel(storage);  
-            repository = GetShrub(repository);      // Не переносить, ломается логика
+            //repository = infrastructure.SelectRepositories(new Guid[] { repository.Uuid }).First().ToModel(storage);  
+            //repository = GetShrub(repository);      // Не переносить, ломается логика
 
             return result;
         }

@@ -40,17 +40,17 @@ namespace Philadelphus.Core.Domain.Mapping
             CreateMap<AuditInfoModel, AuditInfo>()
                 .ReverseMap();
 
-            CreateMap<PhiladelphusRepositoryModel, PhiladelphusRepository>()
-            .ReverseMap()
-            .ConstructUsing((src, dst) =>
-            {
-                // Специальная логика создания
-                return new PhiladelphusRepositoryModel(
-                    uuid: src.Uuid,
-                    dataStorage: GetDataStorage(src.OwnDataStorageUuid), //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
-                    dbEntity: src
-                );
-            });
+            //CreateMap<PhiladelphusRepositoryModel, PhiladelphusRepository>()
+            //.ReverseMap()
+            //.ConstructUsing((src, dst) =>
+            //{
+            //    // Специальная логика создания
+            //    return new PhiladelphusRepositoryModel(
+            //        uuid: src.Uuid,
+            //        dataStorage: GetDataStorage(src.OwnDataStorageUuid), //TODO: ПЕРЕДЕЛАТЬ КОСТЫЛЬ
+            //        dbEntity: src
+            //    );
+            //});
 
             CreateMap<TreeRootModel, TreeRootExportDTO>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
@@ -120,12 +120,12 @@ namespace Philadelphus.Core.Domain.Mapping
                 .ForMember(dest => dest.DeclaringUuid, opt => opt.Ignore());
         }
 
-        private IDataStorageModel GetDataStorage(Guid uuid)
-        {
-            var builder = new DataStorageBuilder()
-                    .SetGeneralParameters("test", "test", uuid, InfrastructureTypes.PostgreSqlEf, isDisabled: false);
-            return builder.Build();
-        }
+        //private IDataStorageModel GetDataStorage(Guid uuid)
+        //{
+        //    var builder = new DataStorageBuilder()
+        //            .SetGeneralParameters("test", "test", uuid, InfrastructureTypes.PostgreSqlEf, isDisabled: false);
+        //    return builder.Build();
+        //}
 
         private static string GetOwningRootName(TreeNodeModel src) =>
         src.OwningWorkingTree?.ContentRoot?.Name ?? "Неизвестный корень";

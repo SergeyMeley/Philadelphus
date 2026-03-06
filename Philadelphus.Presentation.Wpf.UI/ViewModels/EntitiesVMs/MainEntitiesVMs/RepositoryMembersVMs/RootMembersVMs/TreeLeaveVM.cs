@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
-    public class TreeLeaveVM : MainEntityBaseVM //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public class TreeLeaveVM : MainEntityBaseVM<TreeLeaveModel> //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 
@@ -60,8 +61,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeLeaveVM(
             TreeLeaveModel treeLeave,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service) 
-            : base(treeLeave, service)
+            : base(treeLeave, dataStoragesCollectionVM, service)
         {
             _service = service;
         }

@@ -68,7 +68,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Запустить автоматическую проверку доступности
         /// </summary>
-        /// <param name="interval"></param>
+        /// <param name="interval">Интервал проверки (сек.). Не рекомендуется устанавливать период менее 60 сек.</param>
         /// <returns></returns>
         public bool StartAvailableAutoChecking(int interval);
 
