@@ -62,9 +62,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получить содержимое репозитория
         /// </summary>
-        /// <param name="repository">Репозиторий</param>
+        /// <param name="repository">Репозиторий</param> 
         /// <returns>Репозиторий с содержимым</returns>
-        public PhiladelphusRepositoryModel GetShrub(PhiladelphusRepositoryModel repository)
+        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository)
         {
             //var oldShrub = repository.ContentShrub;
             //repository.ContentShrub = new ShrubModel(oldShrub.Uuid, oldShrub.DbEntity as PhiladelphusRepository, repository);
@@ -72,7 +72,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // TODO: Добавить кэш
 
-            var result = GetShrubFromDb(repository);
+            var result = GetShrubContentFromDb(repository);
 
             InitSystemWorkingTree(repository.ContentShrub);
 
@@ -84,7 +84,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns>Репозиторий с элементами</returns>
-        public PhiladelphusRepositoryModel GetShrubFromDb(PhiladelphusRepositoryModel repository)
+        public PhiladelphusRepositoryModel GetShrubContentFromDb(PhiladelphusRepositoryModel repository)
         {
             repository.ContentShrub.ContentTrees.Clear();
 
@@ -103,8 +103,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                         repository.ContentShrub.ContentTrees.Add(tree);
 
-                        GetWorkingTree(tree);
-                        GetPersonalAttributes(tree);
+                        GetWorkingTreeContent(tree);
+                        DistributeAttributes(tree);
 
                         SetModelState(tree, State.SavedOrLoaded);
                     }
@@ -123,13 +123,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с содержимым</returns>
-        public WorkingTreeModel GetWorkingTree(WorkingTreeModel tree)
+        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree)
         {
             tree.ContentRoot = null;
 
             // TODO: Добавить кэш
 
-            return GetWorkingTreeFromDb(tree);
+            return GetWorkingTreeContentFromDb(tree);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeFromDb(WorkingTreeModel tree)
+        public WorkingTreeModel GetWorkingTreeContentFromDb(WorkingTreeModel tree)
         {
             tree.ContentRoot = null;
 
@@ -153,7 +153,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     tree.ContentRoot = root;
                     SetModelState(root, State.SavedOrLoaded);
-                    GetPersonalAttributes(root);
+                    DistributeAttributes(root);
 
                     tree.UnavailableNames.Add(root.Name);
 
@@ -177,7 +177,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         tree.UnavailableNames.Add(item.Name);
                     }
 
-                    GetTreeRootMembersAndContent(tree.ContentRoot, allNodes, allLeaves);
+                    DistributeTreeRootDescendants(tree.ContentRoot, allNodes, allLeaves);
                 }
             }
 
@@ -189,9 +189,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="root">Корень</param>
         /// <returns>Корень с содержимым</returns>
-        public TreeRootModel GetTreeRootMembersAndContent(TreeRootModel root, IEnumerable<TreeNodeModel> allNodes, IEnumerable<TreeLeaveModel> allLeaves)
+        private TreeRootModel DistributeTreeRootDescendants(TreeRootModel root, IEnumerable<TreeNodeModel> allNodes, IEnumerable<TreeLeaveModel> allLeaves)
         {
-            GetPersonalAttributes(root);
+            DistributeAttributes(root);
 
             root.ChildNodes.Clear();
 
@@ -207,7 +207,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childNodes)
                 {
-                    GetTreeNodeMembersAndContent(child, allNodes, allLeaves);
+                    DistributeTreeNodeDescendants(child, allNodes, allLeaves);
                 }
             }
 
@@ -219,9 +219,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="node">Узел</param>
         /// <returns>Узел с содержимым</returns>
-        public TreeNodeModel GetTreeNodeMembersAndContent(TreeNodeModel node, IEnumerable<TreeNodeModel> allNodes, IEnumerable<TreeLeaveModel> allLeaves)
+        private TreeNodeModel DistributeTreeNodeDescendants(TreeNodeModel node, IEnumerable<TreeNodeModel> allNodes, IEnumerable<TreeLeaveModel> allLeaves)
         {
-            GetPersonalAttributes(node);
+            DistributeAttributes(node);
 
             node.ChildNodes.Clear();
             node.ChildLeaves.Clear();
@@ -238,7 +238,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childNodes)
                 {
-                    GetTreeNodeMembersAndContent(child, allNodes, allLeaves);
+                    DistributeTreeNodeDescendants(child, allNodes, allLeaves);
                 }
             }
 
@@ -254,7 +254,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 foreach (var child in childLeaves)
                 {
-                    GetTreeLeaveContent(child);
+                    DistributeTreeLeaveContent(child);
                 }
             }
 
@@ -266,9 +266,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="leave">Лист</param>
         /// <returns>Лист с содержимым</returns>
-        public TreeLeaveModel GetTreeLeaveContent(TreeLeaveModel leave)
+        private TreeLeaveModel DistributeTreeLeaveContent(TreeLeaveModel leave)
         {
-            GetPersonalAttributes(leave);
+              (leave);
             return leave;
         }
 
@@ -277,7 +277,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="attributeOwner">Владелец атрибутов</param>
         /// <returns>Коллекция атрибутов</returns>
-        public IEnumerable<ElementAttributeModel> GetPersonalAttributes(IAttributeOwnerModel attributeOwner)
+        private IEnumerable<ElementAttributeModel> DistributeAttributes(IAttributeOwnerModel attributeOwner)
         {
             attributeOwner.ClearAttributes();
 

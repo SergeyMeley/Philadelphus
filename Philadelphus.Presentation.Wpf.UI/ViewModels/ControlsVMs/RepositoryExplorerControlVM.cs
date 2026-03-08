@@ -402,7 +402,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         internal bool LoadPhiladelphusRepository()
         {
-            var newRepo = _service.GetShrub(_philadelphusRepositoryVM.Model);
+            var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
             _philadelphusRepositoryVM.Childs.Clear();
             foreach (var item in newRepo.ContentShrub.ContentTrees)
             {
