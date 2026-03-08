@@ -4,12 +4,13 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs
 {
-    public class ElementAttributeVM : MainEntityBaseVM
+    public class ElementAttributeVM : MainEntityBaseVM<ElementAttributeModel>
     {
         #region [ Props ]
 
@@ -159,8 +160,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public ElementAttributeVM(
             ElementAttributeModel elementAttribute,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service) 
-            : base(elementAttribute, service)
+            : base(elementAttribute, dataStoragesCollectionVM, service)
         {
             _service = service;
 

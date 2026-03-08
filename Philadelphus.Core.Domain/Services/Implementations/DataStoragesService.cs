@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
@@ -9,6 +8,7 @@ using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
+using Serilog;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
@@ -20,7 +20,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger<PhiladelphusRepositoryCollectionService> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
@@ -42,7 +42,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="dataStoragesCollection"></param>
         public DataStoragesService(
             IMapper mapper,
-            ILogger<PhiladelphusRepositoryCollectionService> logger,
+            ILogger logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
@@ -55,7 +55,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             _connectionStringsCollection = connectionStringsCollection;
             _dataStoragesCollection = dataStoragesCollection;
 
-            _logger.LogInformation("DataStoragesService инициализирован.");
+            Log.Information("DataStoragesService инициализирован.");
         }
 
         #endregion
@@ -74,7 +74,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             foreach (var dbEntity in dbEntities)
             {
                 var cs = connectionStrings.SingleOrDefault(x => x.Uuid == dbEntity.Uuid);
-                var model = dbEntity.ToModel(cs.ConnectionString);
+                var model = dbEntity.ToModel(_logger, cs.ConnectionString);
                 models.Add(model);
             }
             return models;
@@ -101,6 +101,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
+                    logger: _logger,
                     name: "Основное хранилище",
                     description: "Основное хранилище",
                     uuid: Guid.Empty,
@@ -111,7 +112,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         ;
             var mainDataStorageModel = dataStorageBuilder.Build();
 
-            _logger.LogInformation("Базовое хранилище инициализировано.");
+            Log.Information("Базовое хранилище инициализировано.");
 
             return mainDataStorageModel;
         }
@@ -131,17 +132,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
+                    logger: _logger,
                     name: name,
                     description: desctiption,
                     uuid: connectionString.Uuid,
                     infrastructureType: InfrastructureTypes.PostgreSqlEf,
                     isDisabled: false)
-            .SetRepository(new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(connectionString.ConnectionString))
-            .SetRepository(new PostgreEfMainEntitiesInfrastructureRepository(connectionString.ConnectionString))
+            .SetRepository(new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString.ConnectionString))
+            .SetRepository(new PostgreEfMainEntitiesInfrastructureRepository(_logger, connectionString.ConnectionString))
         ;
             var dataStorageModel = dataStorageBuilder.Build();
 
-            _logger.LogInformation("Хранилище инициализировано.");
+            Log.Information("Хранилище инициализировано.");
 
             return dataStorageModel;
         }

@@ -131,7 +131,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return false;
             if (DataStoragesSettingsVM == null)
                 throw new NullReferenceException("Не инициализирована модель представления настроек хранилищ данных.");
-            if (DataStoragesSettingsVM.DataStorageVMs == null)
+            if (DataStoragesSettingsVM.DataStoragesVMs == null)
                 throw new NullReferenceException("Не инициализированы модели представлений хранилищ данных.");
 
             //var dataStorage = DataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model).FirstOrDefault(x => x.Uuid == header.OwnDataStorageUuid);

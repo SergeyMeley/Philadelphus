@@ -209,7 +209,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <param name="element">Текущий элемент репозитория</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns></returns>
-        public async Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default)
+        public async Task<IMainEntityModel> ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -231,7 +231,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
-        public async Task UpdateCanExecuteAsync(MainEntityBaseModel element)
+        public async Task UpdateCanExecuteAsync(IMainEntityModel element)
         {
             try
             {

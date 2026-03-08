@@ -8,18 +8,24 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.Philadelphus
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
+using Serilog;
+using System.Diagnostics;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
     public class PostgreEfMainEntitiesInfrastructureRepository : IPhiladelphusRepositoriesMembersInfrastructureRepository
     {
+        private readonly ILogger _logger;
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.MainEntities; }
 
         private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
 
-        private readonly MainEntitiesPhiladelphusContext _context;
-        public PostgreEfMainEntitiesInfrastructureRepository(string connectionString)
+        private MainEntitiesPhiladelphusContext _context;
+        public PostgreEfMainEntitiesInfrastructureRepository(
+            ILogger logger,
+            string connectionString)
         {
+            _logger = logger;
             _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой  
             _context = new MainEntitiesPhiladelphusContext(connectionString);
 
@@ -41,6 +47,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
         }
         public bool CheckAvailability()
         {
+            var sw = new Stopwatch();
+            sw.Start();
             using (var context = GetNewContext())
             {
                 if (context.Database.CanConnect() == false)
@@ -57,6 +65,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     return false;
                 }
+
+                sw.Stop();
+
+                _logger.Information($"Task '{Task.CurrentId}'. Репозиторий БД '{this.GetType().Name}'. t = {sw.ElapsedMilliseconds} мс.");
+
                 return true;
             }
         }

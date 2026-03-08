@@ -39,12 +39,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs
             await _extensionInstance.StopAsync();
         }
 
-        public async Task ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service)
+        public async Task ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service)
         {
             await _extensionInstance.ExecuteAsync(element, service);
         }
 
-        public async Task UpdateCanExecuteAsync(MainEntityBaseModel element)
+        public async Task UpdateCanExecuteAsync(IMainEntityModel element)
         {
             await _extensionInstance.UpdateCanExecuteAsync(element);
         }

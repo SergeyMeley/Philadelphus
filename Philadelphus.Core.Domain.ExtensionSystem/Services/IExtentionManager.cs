@@ -32,7 +32,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Выполнить основной метод расширения
         /// </summary>
-        Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, MainEntityBaseModel element);
+        Task<IMainEntityModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, IMainEntityModel element);
 
         /// <summary>
         /// Запустить все расширения с AutoStart = true
@@ -42,7 +42,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         /// <summary>
         /// Получить расширения, совместимые с элементом
         /// </summary>
-        Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(MainEntityBaseModel element);
+        Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(IMainEntityModel element);
 
         event EventHandler<ExtensionLoadedEventArgs> ExtensionLoaded;
         event EventHandler<ExtensionErrorEventArgs> ExtensionError;

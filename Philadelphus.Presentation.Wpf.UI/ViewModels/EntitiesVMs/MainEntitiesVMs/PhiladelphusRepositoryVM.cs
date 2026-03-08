@@ -10,23 +10,15 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
-    public class PhiladelphusRepositoryVM : ViewModelBase   
+    public class PhiladelphusRepositoryVM : MainEntityBaseVM<PhiladelphusRepositoryModel>
     {
-        private readonly PhiladelphusRepositoryModel _model;
-        public PhiladelphusRepositoryModel Model
+        public IDataStorageModel OwnDataStorage 
         {
             get
             {
-                return _model;
+                return _model.OwnDataStorage;
             }
         }
-
-        public Guid Uuid { get => _model.Uuid; }
-        public string Name { get => _model.Name; set => _model.Name = value; }
-        public string Description { get => _model.Description; set => _model.Description = value; }
-        public AuditInfoModel AuditInfo { get => _model.AuditInfo; }
-        public State State { get => _model.State; }
-        public IDataStorageModel OwnDataStorage { get => _model.OwnDataStorage; }
 
         private DataStorageVM _storageVM;
         public DataStorageVM StorageVM { get => _storageVM; }
@@ -79,16 +71,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
 
         public PhiladelphusRepositoryVM(
-            PhiladelphusRepositoryModel PhiladelphusRepositoryModel,
+            PhiladelphusRepositoryModel repositoryModel,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service)
+            : base(repositoryModel, dataStoragesCollectionVM, service)
         {
-            _model = PhiladelphusRepositoryModel;
-            _storageVM = new DataStorageVM(PhiladelphusRepositoryModel.OwnDataStorage);
-            foreach (var item in PhiladelphusRepositoryModel.ContentShrub.ContentTrees.Select(x => x.ContentRoot))
+            foreach (var item in repositoryModel.ContentShrub.ContentTrees.Select(x => x.ContentRoot))
             {
-                Childs.Add(new TreeRootVM(item, service));
+                Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service));
             }
         }
-
     }
 }

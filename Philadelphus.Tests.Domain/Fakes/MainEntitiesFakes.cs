@@ -34,7 +34,7 @@ namespace Philadelphus.Tests.Domain.Fakes
 
         public DateTime LastCheckTime => throw new NotImplementedException();
 
-        public bool CheckAvailable()
+        public Task<bool> CheckAvailableAsync()
         {
             throw new NotImplementedException();
         }
