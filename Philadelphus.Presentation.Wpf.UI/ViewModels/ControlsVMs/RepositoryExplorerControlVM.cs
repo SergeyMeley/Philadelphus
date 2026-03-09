@@ -159,7 +159,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     UpdateChildsCollection(this);   // TODO
                     var repo = _philadelphusRepositoryVM.Model;
                     _service.SaveChanges(ref repo, SaveMode.WithContentAndMembers);
-                    LoadPhiladelphusRepository();   // TODO: Тех. долг #60855129
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
                 });
