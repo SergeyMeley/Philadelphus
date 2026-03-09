@@ -104,14 +104,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
         private void StartCheckingStorage()
         {
-            _model.StartAvailableAutoChecking(interval: 20);
+            _model.StartAvailableAutoChecking(interval: 60);
             _timer = new System.Timers.Timer(5000);
             _timer.Elapsed += (s, e) => 
             {
                 OnPropertyChanged(nameof(IsAvailable));
                 OnPropertyChanged(nameof(LastCheckTime));
-            }
-            ;
+            };
             _timer.AutoReset = true;
             _timer.Enabled = true;
         }

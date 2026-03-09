@@ -1,5 +1,7 @@
-﻿using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +32,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer
 
         private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            ViewModel.SelectedRepositoryMember = (MainEntityBaseVM)MainTreeView.SelectedItem;
+            ViewModel.SelectedRepositoryMember = MainTreeView.SelectedItem as IMainEntityVM<IMainEntityModel>;
         }
     }
 }

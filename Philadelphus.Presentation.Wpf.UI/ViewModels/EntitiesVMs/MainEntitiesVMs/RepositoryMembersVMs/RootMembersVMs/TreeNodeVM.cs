@@ -1,12 +1,13 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
-    public class TreeNodeVM : MainEntityBaseVM  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public class TreeNodeVM : MainEntityBaseVM<TreeNodeModel>, INodeParent, ILeaveParent  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 
@@ -54,19 +55,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeNodeVM(
             TreeNodeModel treeNode,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service) 
-            : base(treeNode,  service)
+            : base(treeNode, dataStoragesCollectionVM, service)
         {
             _service = service;
 
             _model = treeNode;
             foreach (var item in treeNode.ChildNodes)
             {
-                _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
+                _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, dataStoragesCollectionVM, _service));
             }
             foreach (var item in treeNode.ChildLeaves)
             {
-                _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, _service));
+                _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, dataStoragesCollectionVM, _service));
             }
 
             Childs = new CompositeCollection()
@@ -90,7 +92,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             var resultModel = _service.CreateTreeNode(_model);
             if (resultModel == null)
                 return null;
-            var result = new TreeNodeVM(resultModel, _service);
+            var result = new TreeNodeVM(resultModel, _dataStoragesCollectionVM, _service);
             _childNodes.Add(result);
             OnPropertyChanged(nameof(ChildNodes));
             return result;
@@ -101,7 +103,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             var resultModel = _service.CreateTreeLeave(_model);
             if (resultModel == null)
                 return null;
-            var result = new TreeLeaveVM(resultModel, _service);
+            var result = new TreeLeaveVM(resultModel, _dataStoragesCollectionVM, _service);
             _childLeaves.Add(result);
             OnPropertyChanged(nameof(ChildLeaves));
             return result;

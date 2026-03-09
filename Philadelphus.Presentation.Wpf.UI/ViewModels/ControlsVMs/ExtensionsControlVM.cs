@@ -50,7 +50,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public MainEntityBaseModel SelectedElement
+        public IMainEntityModel SelectedElement
         {
             get => _repositoryExplorerControlVM.SelectedRepositoryMember?.Model;
         }

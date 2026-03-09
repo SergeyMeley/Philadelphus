@@ -178,7 +178,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public IEnumerable<TreeNodeModel> GetAllNodesRecursive()
         {
-            return ContentRoot?.GetAllNodesRecursive();
+            return ContentRoot?.GetAllNodesRecursive() ?? throw new NullReferenceException();
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public IEnumerable<TreeLeaveModel> GetAllLeavesRecursive()
         {
-            return ContentRoot?.GetAllLeavesRecursive();
+            return ContentRoot?.GetAllLeavesRecursive() ?? throw new NullReferenceException();
         }
 
         #endregion

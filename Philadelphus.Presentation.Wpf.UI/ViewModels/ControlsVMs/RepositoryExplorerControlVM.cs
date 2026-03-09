@@ -12,6 +12,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
@@ -32,6 +33,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private readonly IPhiladelphusRepositoryService _service;
         private PhiladelphusRepositoryVM _philadelphusRepositoryVM;     // TODO: Тех. долг. Вернуть readonly
+        private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
         public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
         { 
             get 
@@ -67,10 +69,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         public string CurentRepositoryName { get => _philadelphusRepositoryVM.Name; }
 
-        //public List<MainEntityBaseModel> ElementsCollection { get; internal set; } = new List<MainEntityBaseModel>();
+        //public List<IMainEntityModel> ElementsCollection { get; internal set; } = new List<IMainEntityModel>();
 
-        private MainEntityBaseVM? _selectedRepositoryMember;
-        public MainEntityBaseVM? SelectedRepositoryMember
+        private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
+        public IMainEntityVM<IMainEntityModel>? SelectedRepositoryMember
         {
             get
             {
@@ -118,12 +120,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IPhiladelphusRepositoryService service,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
-            PhiladelphusRepositoryVM PhiladelphusRepositoryVM)
+            PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
+            DataStoragesCollectionVM dataStoragesCollectionVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _service = service;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
+            _dataStoragesCollectionVM = dataStoragesCollectionVM;
 
             LoadPhiladelphusRepository();
 
@@ -168,7 +172,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     var result = _service.CreateTreeRoot(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _service));
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
                 });
@@ -182,13 +186,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     if (_selectedRepositoryMember == null)
                         return;
-                    if (_selectedRepositoryMember?.GetType() == typeof(TreeRootVM))
+                    if (_selectedRepositoryMember is INodeParent np)
                     {
-                        ((TreeRootVM)_selectedRepositoryMember).CreateTreeNode();
-                    }
-                    else if (_selectedRepositoryMember?.GetType() == typeof(TreeNodeVM))
-                    {
-                        ((TreeNodeVM)_selectedRepositoryMember).CreateTreeNode();
+                        np.CreateTreeNode();
                     }
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
@@ -203,9 +203,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     if (_selectedRepositoryMember == null)
                         return;
-                    if (_selectedRepositoryMember?.GetType() == typeof(TreeNodeVM))
+                    if (_selectedRepositoryMember is ILeaveParent lp)
                     {
-                        ((TreeNodeVM)_selectedRepositoryMember).CreateTreeLeave();
+                        lp.CreateTreeLeave();
                     }
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
@@ -376,7 +376,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                         JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model);
 
-                        PhiladelphusRepositoryVM.Childs.Add(new TreeRootVM(PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentTrees?.Last()?.ContentRoot, _service));
+                        var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentTrees?.Last()?.ContentRoot;
+                        var rootVM = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
+                        PhiladelphusRepositoryVM.Childs.Add(rootVM);
                     }
                 });
             }
@@ -400,13 +402,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         internal bool LoadPhiladelphusRepository()
         {
-            var newRepo = _service.GetShrub(_philadelphusRepositoryVM.Model);
+            var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
             _philadelphusRepositoryVM.Childs.Clear();
             foreach (var item in newRepo.ContentShrub.ContentTrees)
             {
                 if (item.ContentRoot != null)
                 {
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _service));
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service));
                 }
             }
             OnPropertyChanged(nameof(_philadelphusRepositoryVM));

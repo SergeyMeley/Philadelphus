@@ -1,5 +1,7 @@
-﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
+using Serilog;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -10,7 +12,10 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
     /// </summary>
     public class DataStorageModel : IDataStorageModel, IDisposable
     {
+        private readonly ILogger _logger;
         private System.Timers.Timer? _timer;
+
+        private bool _isAutoChecking;
 
         /// <summary>
         /// Уникальный идентификатор
@@ -125,8 +130,15 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="description">Описание</param>
         /// <param name="infrastructureType">Тип</param>
         /// <param name="isDisabled">Состояние отключенности</param>
-        internal DataStorageModel(Guid uuid, string name, string description, InfrastructureTypes infrastructureType, bool isDisabled)
+        internal DataStorageModel(
+            ILogger logger,
+            Guid uuid, 
+            string name, 
+            string description,
+            InfrastructureTypes infrastructureType, 
+            bool isDisabled)
         {
+            _logger = logger;
             Uuid = uuid;
             Name = name;
             Description = description;
@@ -136,28 +148,40 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             {
                 InfrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
             }
-            CheckAvailable();
+            Task.Run(() => CheckAvailableAsync());
         }
 
         /// <summary>
         /// Запустить автоматическую проверку доступности всех репозиториев
         /// </summary>
-        /// <param name="interval">Интервал проверки (сек.)</param>
+        /// <param name="interval">Интервал проверки (сек.). Не рекомендуется устанавливать период менее 60 сек.</param>
         /// <returns></returns>
-        public bool StartAvailableAutoChecking(int interval)
+        public bool StartAvailableAutoChecking(int interval = 60)
         {
-            if (_isDisabled)
+             if (_isDisabled)
                 return false;
+            if (_isAutoChecking)
+                return false;
+
             _timer = new Timer(interval * 1000);
-            _timer.Elapsed += OnAvailabilityCheckTimerElapsed;
+            _timer.Elapsed += (s, e) => _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await CheckAvailableAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"Ошибка проверки доступности хранилища {Name}");
+                }
+            });
             _timer.AutoReset = true;
             _timer.Enabled = true;
-            return true;
-        }
 
-        private void OnAvailabilityCheckTimerElapsed(object source, ElapsedEventArgs e)
-        {
-            _ = Task.Run(() => CheckAvailable());
+            _isAutoChecking = true;
+            _logger.Information($"Task '{Task.CurrentId}'. Хранилище '{Name}'. Начало автоматической проверки доступности каждые {interval} сек.");
+
+            return true;
         }
 
         /// <summary>
@@ -166,30 +190,44 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <returns></returns>
         public bool CheckAvailable()
         {
-            if (_isDisabled)
-                return false;
-            var result = true;
-            foreach (var item in InfrastructureRepositories)
-            {
-                if (item.Value.CheckAvailability() == false)
-                {
-                    result = false;
-                    break;
-                }
-            }
-            _lastCheckTime = DateTime.Now;
-            _isAvailable = result;
-            return _isAvailable;
+            return CheckAvailableAsync().Result;
         }
 
         /// <summary>
-        /// Проверить доступность всех репозиториев (обертка для таймера)
+        /// Проверить доступность всех репозиториев
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        private void CheckAvailable(Object source, ElapsedEventArgs e)
+        /// <returns></returns>
+        public Task<bool> CheckAvailableAsync()
         {
-            CheckAvailable();
+            var task = Task.Run(() =>
+            {
+                if (_isDisabled)
+                {
+                    _isAvailable = false;
+                }
+                else
+                {
+                    _logger.Information($"Task '{Task.CurrentId}'. Хранилище '{Name}'. Проверка доступности от {DateTime.Now}");
+
+                    var result = true;
+                    foreach (var item in InfrastructureRepositories)
+                    {
+                        if (item.Value.CheckAvailability() == false)
+                        {
+                            result = false;
+                            break;
+                        }
+                    }
+                    _isAvailable = result;
+
+                    _logger.Information($"Task '{Task.CurrentId}'. Хранилище '{Name}' - доступность {_isAvailable}.");
+                }
+
+                _lastCheckTime = DateTime.Now;
+
+                return _isAvailable;
+            });
+            return task;
         }
 
         /// <summary>
@@ -198,7 +236,14 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <returns></returns>
         public bool StopAvailableAutoChecking()
         {
+            if (_isAutoChecking == false)
+                return false;
+
             _timer?.Stop();
+
+            _isAutoChecking = false;
+            _logger.Information($"Task '{Task.CurrentId}'. Хранилище '{Name}'. Остановка автоматической проверки доступности.");
+
             return true;
         }
 

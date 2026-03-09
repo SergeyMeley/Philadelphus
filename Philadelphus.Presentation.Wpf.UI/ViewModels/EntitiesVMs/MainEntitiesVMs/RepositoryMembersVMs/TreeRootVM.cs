@@ -1,12 +1,13 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs
 {
-    public class TreeRootVM : MainEntityBaseVM  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
+    public class TreeRootVM : MainEntityBaseVM<TreeRootModel>, INodeParent  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 
@@ -43,8 +44,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         public TreeRootVM(
             TreeRootModel treeRoot,
+            DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service) 
-            : base(treeRoot, service)
+            : base(treeRoot, dataStoragesCollectionVM, service)
         {
             _service = service;
 
@@ -54,7 +56,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 {
                     if (item is TreeNodeModel)
                     {
-                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, _service));
+                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, dataStoragesCollectionVM, _service));
                     }
                 }
             }
@@ -77,7 +79,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             var resultModel = _service.CreateTreeNode(_model as TreeRootModel);
             if (resultModel == null)
                 return null;
-            var result = new TreeNodeVM(resultModel, _service);
+            var result = new TreeNodeVM(resultModel, _dataStoragesCollectionVM, _service);
             _childNodes.Add(result);
             OnPropertyChanged(nameof(ChildNodes));
             return result;

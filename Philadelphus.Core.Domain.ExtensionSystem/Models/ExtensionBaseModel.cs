@@ -13,8 +13,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         public virtual Task StartAsync() => Task.CompletedTask;
         public virtual Task StopAsync() => Task.CompletedTask;
 
-        public abstract Task<CanExecuteResultModel> CanExecuteAsync(MainEntityBaseModel element);
-        public abstract Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default);
+        public abstract Task<CanExecuteResultModel> CanExecuteAsync(IMainEntityModel element);
+        public abstract Task<IMainEntityModel> ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default);
 
         public virtual object GetRepositoryExplorerWidget() => null;
         public virtual object GetRibbonWidget() => null;

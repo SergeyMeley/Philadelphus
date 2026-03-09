@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
+using Serilog;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {
@@ -34,6 +36,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
                 optionsBuilder
                     .UseNpgsql(_connectionString)
                     .UseLazyLoadingProxies();
+                    //.LogTo(Log.Information, LogLevel.Information)
+                    //.EnableSensitiveDataLogging()
+                    //.EnableDetailedErrors();
             }
         }
 

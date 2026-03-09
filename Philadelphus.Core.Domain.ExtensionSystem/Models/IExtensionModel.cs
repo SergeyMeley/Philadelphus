@@ -26,13 +26,13 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Models
         /// <summary>
         /// Проверить возможность выполнения основного метода
         /// </summary>
-        Task<CanExecuteResultModel> CanExecuteAsync(MainEntityBaseModel element);
+        Task<CanExecuteResultModel> CanExecuteAsync(IMainEntityModel element);
 
         /// <summary>
         /// Основной метод расширения
         /// Принимает выбранный элемент и может возвращать измененный элемент
         /// </summary>
-        Task<MainEntityBaseModel> ExecuteAsync(MainEntityBaseModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default);
+        Task<IMainEntityModel> ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить виджет расширения для обозревателя репозитория (опционально)

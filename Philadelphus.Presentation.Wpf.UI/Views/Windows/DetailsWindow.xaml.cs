@@ -1,4 +1,6 @@
-﻿using Philadelphus.Presentation.Wpf.UI.ViewModels;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.ViewModels;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
@@ -8,7 +10,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
     /// </summary>
     public partial class DetailsWindow : Window
     {
-        public DetailsWindow(ViewModelBase vm)
+        public DetailsWindow(IMainEntityVM<IMainEntityModel> vm)
         {
             InitializeComponent();
             DataContext = vm;

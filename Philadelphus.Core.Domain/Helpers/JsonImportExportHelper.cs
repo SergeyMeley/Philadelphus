@@ -78,16 +78,16 @@ namespace Philadelphus.Core.Domain.Helpers
             CreateAttributesFromElement(service, treeRoot, contentRootElement, attributeLinkMap);
 
             // ✅ 4. Загружаем полную структуру (узлы + листы)
-            service.GetWorkingTree(treeRoot.OwningWorkingTree);
-            treeRoot.OwningWorkingTree.ContentRoot = treeRoot;
+            //service.GetWorkingTreeContent(treeRoot.OwningWorkingTree);
+            //treeRoot.OwningWorkingTree.ContentRoot = treeRoot;
 
             // ✅ 5. ПРИВЯЗЫВАЕМ типы данных и значения к атрибутам!
             LinkAttributesToRealEntities(service, treeRoot, attributeLinkMap);
 
             // 6. Загружаем атрибуты
-            service.GetPersonalAttributes(treeRoot);
+            //service.DistributeAttributes(treeRoot);
 
-                        return treeRoot.OwningWorkingTree;
+            return treeRoot.OwningWorkingTree;
         }
 
         private static void CreateNodeRecursive(IPhiladelphusRepositoryService service, IParentModel parent, JsonElement nodeElement, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)

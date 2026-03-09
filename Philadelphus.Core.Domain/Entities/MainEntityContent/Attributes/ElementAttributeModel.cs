@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
@@ -381,7 +382,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 localOwner: newOwner,
                 declaringUuid: this.DeclaringUuid,
                 declaringOwner: this.DeclaringOwner,
-                dbEntity: this.DbEntity
+                dbEntity: new ElementAttribute()
             )
             {
                 Name = this.Name,

@@ -39,6 +39,11 @@ namespace Philadelphus.Tests.Domain.Fakes
             throw new NotImplementedException();
         }
 
+        public Task<bool> CheckAvailableAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool StartAvailableAutoChecking(int interval)
         {
             throw new NotImplementedException();
