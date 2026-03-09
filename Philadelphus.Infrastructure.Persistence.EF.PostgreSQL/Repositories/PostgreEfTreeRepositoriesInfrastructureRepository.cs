@@ -6,19 +6,26 @@ using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
+using Serilog;
+using System.Diagnostics;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
     public class PostgreEfPhiladelphusRepositoriesInfrastructureRepository : IPhiladelphusRepositoriesInfrastructureRepository
     {
+        private readonly ILogger _logger;
         public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.PhiladelphusRepositories; }
 
         private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
 
         private PhiladelphusRepositoriesPhiladelphusContext _context;
-        public PostgreEfPhiladelphusRepositoriesInfrastructureRepository(string connectionString, bool needEnsureDeleted = false)
+        public PostgreEfPhiladelphusRepositoriesInfrastructureRepository(
+            ILogger logger,
+            string connectionString, 
+            bool needEnsureDeleted = false)
         {
-            _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой   
+            _logger = logger;
+            _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой  
             _context = new PhiladelphusRepositoriesPhiladelphusContext(connectionString);
 
             if (CheckAvailability())
@@ -39,10 +46,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
         }
         public bool CheckAvailability()
         {
+            var sw = new Stopwatch();
+            sw.Start();
             using (var context = GetNewContext())
             {
                 if (context.Database.CanConnect() == false)
-                     return false;
+                    return false;
                 try
                 {
                     if (context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
@@ -55,6 +64,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
                 {
                     return false;
                 }
+
+                sw.Stop();
+                var t = sw.ElapsedMilliseconds;
+
+                _logger.Information($"Task '{Task.CurrentId}'. Репозиторий БД '{this.GetType().Name}'. t = {sw.ElapsedMilliseconds} мс.");
+
                 return true;
             }
         }

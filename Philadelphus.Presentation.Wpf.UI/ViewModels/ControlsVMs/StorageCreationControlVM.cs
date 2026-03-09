@@ -77,7 +77,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     var entity = model.ToDbEntity();
                     _dataStoragesCollectionConfig.Value.DataStorages.Add(entity);
                     _configurationService.UpdateConfigFile<DataStoragesCollectionConfig>(_configFile, _dataStoragesCollectionConfig);
-                    _dataStoragesCollectionVM.DataStorageVMs.Add(vm);
+                    _dataStoragesCollectionVM.DataStoragesVMs.Add(vm);
                     _dataStoragesCollectionVM.SelectedDataStorageVM = vm;
                 });
             }

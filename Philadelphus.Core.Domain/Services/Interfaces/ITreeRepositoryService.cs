@@ -21,49 +21,28 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns>Репозиторий с участниками и содержимым</returns>
-        public PhiladelphusRepositoryModel GetShrubFromDb(PhiladelphusRepositoryModel repository);
+        public PhiladelphusRepositoryModel GetShrubContentFromDb(PhiladelphusRepositoryModel repository);
 
         /// <summary>
         /// Получить участников и содержимое репозитория
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns></returns>
-        public PhiladelphusRepositoryModel GetShrub(PhiladelphusRepositoryModel repository);
+        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository);
 
         /// <summary>
         /// Получить рабочее дерево
         /// </summary>
         /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с содержимым</returns>
-        public WorkingTreeModel GetWorkingTree(WorkingTreeModel tree);
+        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree);
 
         /// <summary>
         /// Получить участников и содержимое корня
         /// </summary>
         /// <param name="tree">Рабочее дерево</param>
         /// <returns>Корень с участниками и содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeFromDb(WorkingTreeModel tree);
-
-        /// <summary>
-        /// Получить участников и содержимое узла
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns>Узел с участниками и содержимым</returns>
-        public TreeNodeModel GetTreeNodeMembersAndContent(TreeNodeModel node, IEnumerable<TreeNodeModel> allNodes, IEnumerable<TreeLeaveModel> allLeaves);
-
-        /// <summary>
-        /// Получить содержимое листа
-        /// </summary>
-        /// <param name="leave"></param>
-        /// <returns>Лист с содержимым</returns>
-        public TreeLeaveModel GetTreeLeaveContent(TreeLeaveModel leave);
-
-        /// <summary>
-        /// Получить атрибуты элемента
-        /// </summary>
-        /// <param name="attributeOwner">Владелец</param>
-        /// <returns>Владелец с атрибутами</returns>
-        public IEnumerable<ElementAttributeModel> GetPersonalAttributes(IAttributeOwnerModel attributeOwner);
+        public WorkingTreeModel GetWorkingTreeContentFromDb(WorkingTreeModel tree);
 
         #endregion
 

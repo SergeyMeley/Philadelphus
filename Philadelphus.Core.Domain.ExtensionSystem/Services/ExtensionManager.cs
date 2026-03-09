@@ -102,7 +102,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             }
         }
 
-        public async Task<MainEntityBaseModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, MainEntityBaseModel element)
+        public async Task<IMainEntityModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, IMainEntityModel element)
         {
             if (extension == null)
                 throw new ArgumentNullException(nameof(extension));
@@ -143,7 +143,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             await Task.CompletedTask;
         }
 
-        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(MainEntityBaseModel element)
+        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(IMainEntityModel element)
         {
             var compatible = new List<ExtensionInstance>();
 

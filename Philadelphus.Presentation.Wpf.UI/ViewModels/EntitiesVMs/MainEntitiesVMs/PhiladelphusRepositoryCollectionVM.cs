@@ -127,7 +127,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 {
                     var builder = new DataStorageBuilder();
                     var repository = _collectionService.CreateNewPhiladelphusRepository(builder.Build());
-                    var repositorVM = new PhiladelphusRepositoryVM(repository, _service);
+                    var repositorVM = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service);
                     PhiladelphusRepositoriesVMs.Add(repositorVM);
                      
                 });
@@ -135,13 +135,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
         private bool InitRepositoriesVMsCollection()
         {
-            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
+            var storages = _dataStoragesSettingsVM.DataStoragesVMs.Select(x => x.Model);
             var repositories = _collectionService.GetPhiladelphusRepositoriesCollection(storages);
             if (repositories == null)
                 return false;
             foreach (var item in repositories)
             {
-                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _service));
+                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _dataStoragesSettingsVM, _service));
             }
             return true;
         }
@@ -157,14 +157,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
         private PhiladelphusRepositoryVM InitPhiladelphusRepositoryVM(Guid uuid)
         {
-            var storages = _dataStoragesSettingsVM.DataStorageVMs.Select(x => x.Model);
+            var storages = _dataStoragesSettingsVM.DataStoragesVMs.Select(x => x.Model);
             var repositories = _collectionService.GetPhiladelphusRepositoriesCollection(storages, new[] { uuid });
             if (repositories == null)
                 return null;
             var repository = repositories.FirstOrDefault(x => x.Uuid == uuid);
             if (repository == null)
                 return null;
-            var result = new PhiladelphusRepositoryVM(repository, _service);
+            var result = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service);
             _PhiladelphusRepositoriesVMs.Add(result);
             return result;
         }

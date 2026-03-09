@@ -103,6 +103,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IMainEntity dbEntity)
             : base(uuid, owner, dbEntity)
         {
+            owner.ContentRoot = this;
+
             ChildNodes = new List<TreeNodeModel>();
 
             if (uuid == SystemBaseGuid)

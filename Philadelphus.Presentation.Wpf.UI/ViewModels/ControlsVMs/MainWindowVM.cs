@@ -4,9 +4,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 
@@ -50,7 +52,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private NotificationsVM _notificationsVM;
         public NotificationsVM NotificationsVM { get => _notificationsVM; }
-        public ViewModelBase SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
+        public IMainEntityVM<IMainEntityModel> SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
 
         public MainWindowVM(
             IServiceProvider serviceProvider,

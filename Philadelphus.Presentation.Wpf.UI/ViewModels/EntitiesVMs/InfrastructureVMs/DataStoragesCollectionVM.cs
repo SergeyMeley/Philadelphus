@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -12,7 +12,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
 {
     public class DataStoragesCollectionVM : ViewModelBase, IDisposable
     {
-        private readonly ILogger<DataStoragesCollectionVM> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
         private readonly IDataStoragesService _dataStoragesService;
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
@@ -29,7 +29,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
 
         private ObservableCollection<DataStorageVM>? _dataStorageVMs = new ObservableCollection<DataStorageVM>();
-        public ObservableCollection<DataStorageVM>? DataStorageVMs 
+        public ObservableCollection<DataStorageVM>? DataStoragesVMs 
         { 
             get
             {
@@ -38,7 +38,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             set
             {
                 _dataStorageVMs = value;
-                OnPropertyChanged(nameof(DataStorageVMs));
+                OnPropertyChanged(nameof(DataStoragesVMs));
             }
         }
         public IEnumerable<DataStorageVM>? PhiladelphusRepositoriesDataStorageVMs
@@ -64,7 +64,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
 
         public DataStoragesCollectionVM(
-            ILogger<DataStoragesCollectionVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IDataStoragesService dataStoragesService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
@@ -102,12 +102,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
 
                     if (connectionString == null)
                     {
-                        _logger.LogError($"Не найдена строка подключения для хранилища {entity.Name}");
+                        _logger.Error($"Не найдена строка подключения для хранилища {entity.Name}");
                         MessageBox.Show($"Не найдена строка подключения для хранилища {entity.Name}");
                     }
                     else
                     {
-                        var model = entity.ToModel(connectionString);
+                        var model = entity.ToModel(_logger, connectionString);
 
                         if (model != null)
                         {
@@ -128,9 +128,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
 
         public void Dispose()
         {
-            foreach (var vm in DataStorageVMs)
+            foreach (var vm in DataStoragesVMs)
                 vm.Dispose();
-            DataStorageVMs.Clear();
+            DataStoragesVMs.Clear();
         }
     }
 }

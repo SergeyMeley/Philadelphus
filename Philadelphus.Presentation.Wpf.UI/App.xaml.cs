@@ -24,6 +24,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -63,10 +64,22 @@ namespace Philadelphus.Presentation.Wpf.UI
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(startupConfig)  // Читает "Serilog" секцию
+            var runtimeLogger = new LoggerConfiguration()
                 .MinimumLevel.Information()
+                .WriteTo.Console(
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+                )
+                .WriteTo.File("logs/philadelphus-.log",
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
+
+            Log.Logger = runtimeLogger;
+
+            //Log.Logger = new LoggerConfiguration()
+            //    .ReadFrom.Configuration(startupConfig)  // Читает "Serilog" секцию
+            //    .MinimumLevel.Information()
+            //    .CreateLogger();
 
             Log.Information("=== Philadelphus Startup: Console + File Logging ===");
 
@@ -80,7 +93,8 @@ namespace Philadelphus.Presentation.Wpf.UI
             _configuration = builder.Build();
 
             _host = Host.CreateDefaultBuilder()
-                .UseSerilog()
+                //.UseSerilog()
+                .UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration))
                 // Добавление конфигурационных файлов
                 .ConfigureAppConfiguration(async (hostingContext, config) =>
                 {
@@ -132,6 +146,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                 })
                 .ConfigureServices((context, services) =>
                 {
+                    services.AddLogging(builder => builder.AddSerilog());
+
                     // Регистрация конфигурации
                     services.Configure<ApplicationSettingsConfig>(
                         context.Configuration.GetSection(nameof(ApplicationSettingsConfig)));
