@@ -141,7 +141,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
 
             Uuid = uuid;
             Name = NamingHelper.GetNewName(new List<string>(), _defaultFixedPartOfName);
-            DbEntity = dbEntity;    // TODO: Исключить и применить автомаппер
         }
 
         #endregion
@@ -178,15 +177,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             }
             return false;
         }
-
-        #endregion
-
-        #region OLD     
-
-        /// <summary>
-        /// Сущность БД
-        /// </summary>
-        public IMainEntity DbEntity { get; set; }   // TODO: Исключить и применить автомаппер
 
         #endregion
     }

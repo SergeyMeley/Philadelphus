@@ -60,14 +60,5 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
 
 
         #endregion
-
-        #region OLD     
-
-        /// <summary>
-        /// Сущность БД
-        /// </summary>
-        public IMainEntity DbEntity { get; }    // TODO: Исключить и применить автомаппер
-
-        #endregion
     }
 }

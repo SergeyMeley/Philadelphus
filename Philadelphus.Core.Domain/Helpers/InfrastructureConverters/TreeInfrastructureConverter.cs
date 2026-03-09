@@ -22,7 +22,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (WorkingTree)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
+            var result = (WorkingTree)businessEntity.ToDbEntityGeneralProperties(new WorkingTree());
             result.OwnDataStorageUuid = businessEntity.DataStorage.Uuid;
             return result;
         }

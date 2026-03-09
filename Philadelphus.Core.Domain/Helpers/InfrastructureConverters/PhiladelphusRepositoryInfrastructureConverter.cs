@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
 {
@@ -16,10 +17,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = businessEntity.DbEntity as PhiladelphusRepository;
-            result.Uuid = businessEntity.Uuid;
-            result.Name = businessEntity.Name;
-            result.Description = businessEntity.Description;
+            var result = (PhiladelphusRepository)businessEntity.ToDbEntityGeneralProperties(new PhiladelphusRepository());
             result.AuditInfo = businessEntity.AuditInfo.ToDbEntity();
             result.ContentWorkingTreesUuids = businessEntity.ContentShrub.ContentTreesUuids.ToArray();
             result.OwnDataStorageUuid = businessEntity.OwnDataStorage.Uuid;
@@ -56,7 +54,6 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             if (dataStorage == null)
                 throw new ArgumentNullException();
             var result = new PhiladelphusRepositoryModel(dbEntity.Uuid, dataStorage, dbEntity);
-            result.DbEntity = dbEntity;
             result.Name = dbEntity.Name;
             result.Description = dbEntity.Description;
             result.AuditInfo = dbEntity.AuditInfo.ToModel();
