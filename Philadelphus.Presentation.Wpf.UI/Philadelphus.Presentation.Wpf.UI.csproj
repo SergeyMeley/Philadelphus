@@ -28,17 +28,32 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Icons\alarm_64.png" />
     <None Remove="Icons\approval_64.png" />
+    <None Remove="Icons\broom_64.png" />
     <None Remove="Icons\check_64.png" />
     <None Remove="Icons\edit_64.png" />
+    <None Remove="Icons\error_64_1.png" />
+    <None Remove="Icons\error_64_2.png" />
+    <None Remove="Icons\error_64_3.png" />
+    <None Remove="Icons\error_64_4.png" />
+    <None Remove="Icons\error_64_5.png" />
     <None Remove="Icons\getwork_64.png" />
+    <None Remove="Icons\hard_delete_64_1.png" />
+    <None Remove="Icons\hard_delete_64_2.png" />
+    <None Remove="Icons\info_64_1.png" />
+    <None Remove="Icons\info_64_2.png" />
+    <None Remove="Icons\info_64_3.png" />
     <None Remove="Icons\list_64.png" />
     <None Remove="Icons\new-tab_64.png" />
     <None Remove="Icons\open.png" />
     <None Remove="Icons\philadelphus_logo_64.png" />
     <None Remove="Icons\settings_64.png" />
+    <None Remove="Icons\soft_delete_64_1.png" />
+    <None Remove="Icons\soft_delete_64_2.png" />
     <None Remove="Icons\storage.png" />
     <None Remove="Icons\top_level_64.png" />
+    <None Remove="Icons\warning_64.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_add.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_back.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_copy.png" />
@@ -69,6 +84,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icons\alarm_64.png" />
+    <Resource Include="Icons\broom_64.png" />
+    <Resource Include="Icons\error_64_1.png" />
+    <Resource Include="Icons\error_64_2.png" />
+    <Resource Include="Icons\error_64_3.png" />
+    <Resource Include="Icons\error_64_4.png" />
+    <Resource Include="Icons\error_64_5.png" />
+    <Resource Include="Icons\hard_delete_64_1.png" />
+    <Resource Include="Icons\hard_delete_64_2.png" />
+    <Resource Include="Icons\info_64_1.png" />
+    <Resource Include="Icons\info_64_2.png" />
+    <Resource Include="Icons\info_64_3.png" />
     <Resource Include="Icons\list_64.png" />
     <Resource Include="Icons\philadelphus_logo_64.ico" />
   </ItemGroup>
@@ -114,10 +141,13 @@
     <Resource Include="Icons\open.png" />
     <Resource Include="Icons\philadelphus_logo_64.png" />
     <Resource Include="Icons\settings_64.png" />
+    <Resource Include="Icons\soft_delete_64_1.png" />
+    <Resource Include="Icons\soft_delete_64_2.png" />
     <Resource Include="Icons\storage.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Icons\top_level_64.png" />
+    <Resource Include="Icons\warning_64.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_add.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_back.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_copy.png" />
