@@ -17,7 +17,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (ElementAttribute)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
+            var result = (ElementAttribute)businessEntity.ToDbEntityGeneralProperties(new ElementAttribute());
             result.DeclaringUuid = businessEntity.DeclaringUuid;
             result.OwnerUuid = businessEntity.Owner.Uuid;
             result.DeclaringOwnerUuid = businessEntity.DeclaringOwner.Uuid;
