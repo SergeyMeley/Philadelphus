@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="Philadelphus.Presentation.Wpf.UI.Views.Controls.MessageLog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
+             mc:Ignorable="d">
+    <Grid>
+        <Expander Header="Журнал сообщений" ExpandDirection="Down" Margin="1" IsExpanded="True">
+            <Expander.HeaderTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Журнал сообщений" VerticalAlignment="Center" Margin="1,0"></TextBlock>
+                        <ToggleButton Grid.Column="1" IsChecked="{Binding IsInfoMessagesVisible}" ToolTip="Отобразить / скрыть информационные сообщения" Padding="0" Height="24" Margin="1,0">
+                            <ToggleButton.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ContentPresenter Grid.Column="0" Content="{StaticResource imageInfo64_2}"></ContentPresenter>
+                                        <TextBlock Grid.Column="1" Text="{Binding InfoMessagesCount, StringFormat={} Сообщения {0} шт.}"></TextBlock>      
+                                    </Grid>
+                                </DataTemplate>
+                            </ToggleButton.ContentTemplate>
+                        </ToggleButton>
+                        <ToggleButton Grid.Column="2" IsChecked="{Binding IsWarningMessagesVisible}" ToolTip="Отобразить / скрыть предупреждения" Padding="0" Height="24" Margin="1,0">
+                            <ToggleButton.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ContentPresenter Grid.Column="0" Content="{StaticResource imageWarning64}"></ContentPresenter>
+                                        <TextBlock Grid.Column="1" Text="{Binding WarningMessagesCount, StringFormat={} Предупреждения {0} шт.}"></TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ToggleButton.ContentTemplate>
+                        </ToggleButton>
+                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsErrorMessagesVisible}" ToolTip="Отобразить / скрыть сообщения об ошибках" Padding="0" Height="24" Margin="1,0">
+                            <ToggleButton.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ContentPresenter Grid.Column="0" Content="{StaticResource imageError64_3}"></ContentPresenter>
+                                        <TextBlock Grid.Column="1" Text="{Binding ErrorMessagesCount, StringFormat={} Ошибки {0} шт.}"></TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ToggleButton.ContentTemplate>
+                        </ToggleButton>
+                        <Button Grid.Column="4" Content="{StaticResource imageBroom64}" Command="{Binding ClearMessageLogCommand}" Padding="0" Height="24" Margin="1,0"></Button>
+                    </Grid>
+                </DataTemplate>
+            </Expander.HeaderTemplate>
+            <DataGrid ItemsSource="{Binding NotificationsVM.Notifications, Mode=OneWay}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Критичность" Binding="{Binding CriticalLevel}" Width="auto" MinWidth="35"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="150"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="*"></DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Expander>
+    </Grid>
+</UserControl>

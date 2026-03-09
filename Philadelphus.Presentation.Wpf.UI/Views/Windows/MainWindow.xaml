@@ -289,15 +289,7 @@
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                 </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="1" IsExpanded="True">
-                    <DataGrid ItemsSource="{Binding NotificationsVM.Notifications, Mode=OneWay}" AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Критичность" Binding="{Binding CriticalLevel}" Width="auto" MinWidth="35"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="*"></DataGridTextColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Expander>
+                <ctrls:MessageLog Grid.Row="2"></ctrls:MessageLog>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>

@@ -21,7 +21,7 @@
         <Image x:Key="imageDelete" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_delete.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDelete2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_delete2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDeleteSoft64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/soft_delete_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDeleteSoft64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/soft_delete_64_2" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDeleteSoft64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/soft_delete_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDeleteHard64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/hard_delete_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDeleteHard64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/hard_delete_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
         <Image x:Key="imageDuplicate" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_duplicate.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
