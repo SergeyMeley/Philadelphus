@@ -66,13 +66,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
             dbEntity.Name = businessEntity.Name;
             dbEntity.Description = businessEntity.Description;
             dbEntity.IsHidden = businessEntity.IsHidden;
-            dbEntity.AuditInfo.IsDeleted = businessEntity.AuditInfo.IsDeleted;
-            dbEntity.AuditInfo.CreatedAt = businessEntity.AuditInfo.CreatedAt;
-            dbEntity.AuditInfo.CreatedBy = businessEntity.AuditInfo.CreatedBy;
-            dbEntity.AuditInfo.UpdatedAt = businessEntity.AuditInfo.UpdatedAt;
-            dbEntity.AuditInfo.UpdatedBy = businessEntity.AuditInfo.UpdatedBy;
-            dbEntity.AuditInfo.DeletedAt = businessEntity.AuditInfo.DeletedAt;
-            dbEntity.AuditInfo.DeletedBy = businessEntity.AuditInfo.DeletedBy;
+            dbEntity.AuditInfo = businessEntity.AuditInfo.ToDbEntity();
             return dbEntity;
         }
 
@@ -132,17 +126,10 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (dbEntity == null)
                 return null;
-            businessEntity.DbEntity = dbEntity;
             businessEntity.Name = dbEntity.Name;
             businessEntity.Description = dbEntity.Description;
             businessEntity.IsHidden = dbEntity.IsHidden;
-            businessEntity.AuditInfo.IsDeleted = dbEntity.AuditInfo.IsDeleted;
-            businessEntity.AuditInfo.CreatedAt = dbEntity.AuditInfo.CreatedAt;
-            businessEntity.AuditInfo.CreatedBy = dbEntity.AuditInfo.CreatedBy;
-            businessEntity.AuditInfo.UpdatedAt = dbEntity.AuditInfo.UpdatedAt;
-            businessEntity.AuditInfo.UpdatedBy = dbEntity.AuditInfo.UpdatedBy;
-            businessEntity.AuditInfo.DeletedAt = dbEntity.AuditInfo.DeletedAt;
-            businessEntity.AuditInfo.DeletedBy = dbEntity.AuditInfo.DeletedBy;
+            businessEntity.AuditInfo = dbEntity.AuditInfo.ToModel();
             return businessEntity;
         }
     }

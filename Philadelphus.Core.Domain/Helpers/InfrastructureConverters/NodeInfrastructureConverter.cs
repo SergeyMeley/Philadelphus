@@ -18,7 +18,7 @@ namespace Philadelphus.Core.Domain.Helpers.InfrastructureConverters
         {
             if (businessEntity == null)
                 return null;
-            var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(businessEntity.DbEntity);
+            var result = (TreeNode)businessEntity.ToDbEntityGeneralProperties(new TreeNode());
             result.ParentTreeRootUuid = businessEntity.OwningWorkingTree.ContentRoot.Uuid;     //TODO: ВРЕМЕННО
             result.ParentTreeNodeUuid = businessEntity.ParentNode?.Uuid;
             result.OwningWorkingTreeUuid = businessEntity.OwningWorkingTree.Uuid;
