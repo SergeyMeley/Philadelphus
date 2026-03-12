@@ -21,9 +21,15 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Журнал сообщений" VerticalAlignment="Center" Margin="1,0"></TextBlock>
-                        <ToggleButton Grid.Column="1" IsChecked="{Binding IsInfoMessagesVisible}" ToolTip="Отобразить / скрыть информационные сообщения" Padding="0" Height="24" Margin="1,0">
+                        <ToggleButton Grid.Column="1" 
+                                      IsChecked="{Binding DataContext.IsInfoMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                      ToolTip="Отобразить / скрыть информационные сообщения" 
+                                      Padding="0" 
+                                      Height="24"
+                                      Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -32,12 +38,21 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <ContentPresenter Grid.Column="0" Content="{StaticResource imageInfo64_2}"></ContentPresenter>
-                                        <TextBlock Grid.Column="1" Text="{Binding InfoMessagesCount, StringFormat={} Сообщения {0} шт.}"></TextBlock>      
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding DataContext.InfoMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                   MinWidth="30"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"></TextBlock>      
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
                         </ToggleButton>
-                        <ToggleButton Grid.Column="2" IsChecked="{Binding IsWarningMessagesVisible}" ToolTip="Отобразить / скрыть предупреждения" Padding="0" Height="24" Margin="1,0">
+                        <ToggleButton Grid.Column="2" 
+                                      IsChecked="{Binding DataContext.IsWarningMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                      ToolTip="Отобразить / скрыть предупреждения" 
+                                      Padding="0" 
+                                      Height="24" 
+                                      Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -46,12 +61,21 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <ContentPresenter Grid.Column="0" Content="{StaticResource imageWarning64}"></ContentPresenter>
-                                        <TextBlock Grid.Column="1" Text="{Binding WarningMessagesCount, StringFormat={} Предупреждения {0} шт.}"></TextBlock>
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding DataContext.WarningMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                   MinWidth="30"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"></TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
                         </ToggleButton>
-                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsErrorMessagesVisible}" ToolTip="Отобразить / скрыть сообщения об ошибках" Padding="0" Height="24" Margin="1,0">
+                        <ToggleButton Grid.Column="3"
+                                      IsChecked="{Binding DataContext.IsErrorMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                      ToolTip="Отобразить / скрыть сообщения об ошибках" 
+                                      Padding="0"
+                                      Height="24" 
+                                      Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -60,16 +84,35 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <ContentPresenter Grid.Column="0" Content="{StaticResource imageError64_3}"></ContentPresenter>
-                                        <TextBlock Grid.Column="1" Text="{Binding ErrorMessagesCount, StringFormat={} Ошибки {0} шт.}"></TextBlock>
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding DataContext.ErrorMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                   MinWidth="30"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"></TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
                         </ToggleButton>
-                        <Button Grid.Column="4" Content="{StaticResource imageBroom64}" Command="{Binding ClearMessageLogCommand}" Padding="0" Height="24" Margin="1,0"></Button>
+                        <Button Grid.Column="4" 
+                                Content="{StaticResource imageBroom64}" 
+                                Command="{Binding DataContext.ClearMessageLogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                ToolTip="Очистить журнал сообщений" 
+                                Padding="0" 
+                                Height="24" 
+                                Margin="1,0"></Button>
+                        <Button Grid.Column="5" 
+                                Content="{StaticResource imageCheck64}" 
+                                Command="{Binding DataContext.SendTestNotificationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                ToolTip="Отправить тестовое уведомление всем пользователям" 
+                                Padding="0" 
+                                Height="24" 
+                                Margin="1,0"></Button>
                     </Grid>
                 </DataTemplate>
             </Expander.HeaderTemplate>
-            <DataGrid ItemsSource="{Binding Notifications, Mode=OneWay}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+            <DataGrid ItemsSource="{Binding CurrentMessageLogFilteredNotifications, Mode=OneWay}" 
+                      AutoGenerateColumns="False" 
+                      VerticalScrollBarVisibility="Visible">
                 <DataGrid.Resources>
                     <DataTemplate x:Key="IconColumnTemplate">
                         <Image Source="{Binding CriticalLevel, Converter={StaticResource criticalLevelToIconConverter}}" Height="15"></Image>

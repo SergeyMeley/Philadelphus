@@ -60,7 +60,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Коллекция сообщений
         /// </summary>
-        public ObservableCollection<NotificationModel> Notifications { get; private set;  } = new ObservableCollection<NotificationModel>();
+        public ObservableCollection<NotificationModel> Notifications { get; } = new ObservableCollection<NotificationModel>();
 
         public NotificationService(
             IMessageConsumer<ConsumerJoined> consumerJoinedMessageConsumer,
@@ -226,8 +226,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private bool StartAutoRegistrarion(IMessageProducer<ConsumerJoined> consumerJoinedMessageProducer)
         {
             var timer = new Timer(
-               callback: _ => _ = Task.Run(async () => {
-                   consumerJoinedMessageProducer.ProduceAsync(
+               callback: _ => _ =  Task.Run(async () => {
+                   return consumerJoinedMessageProducer.ProduceAsync(
                        new ConsumerJoined() 
                        { 
                            ProducerUuid = ReceiverUuid,
@@ -248,8 +248,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
              var task = consumerJoinedMessageConsumer.StartAsync(
                     async (mes, ct) =>
                     {
-                        ActiveConsumers.Add(mes);
-                        SendTextMessage($"{mes.ProducerName} ({mes.ProducerUuid}) теперь активен.");
+                        if (DateTime.Now - mes.JoinDateTime < TimeSpan.FromSeconds(_interval))
+                        {
+                            ActiveConsumers.Add(mes);
+                            SendTextMessage($"{mes.ProducerName} ({mes.ProducerUuid}) теперь активен.");
+                        }
                     });
 
             var timer = new Timer(

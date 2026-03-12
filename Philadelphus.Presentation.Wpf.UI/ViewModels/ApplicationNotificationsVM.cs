@@ -24,7 +24,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             }
         }
 
-        public ObservableCollection<NotificationModel> Notifications { get => _notificationService.Notifications; }
+        public ObservableCollection<NotificationModel> AllApplicationNotifications { get => _notificationService.Notifications; }
         public ApplicationNotificationsVM(
             PopUpNotificationsControlVM popupVM,
             ILogger<ApplicationNotificationsVM> logger,
