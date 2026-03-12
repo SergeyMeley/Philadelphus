@@ -69,12 +69,14 @@
     <None Remove="Icons\without_a_license\Flaticon_icon_modify.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_move.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_node.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_node.svg" />
     <None Remove="Icons\without_a_license\Flaticon_icon_node2.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_paste.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_protect.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_remove.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_return.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_root.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_root.svg" />
     <None Remove="Icons\without_a_license\Flaticon_icon_root2.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_save.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_select.png" />
@@ -121,6 +123,7 @@
     <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -163,18 +166,24 @@
     <Resource Include="Icons\without_a_license\Flaticon_icon_modify.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_move.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_node.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_node.svg" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_node2.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_paste.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_protect.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_remove.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_return.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_root.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_root.svg" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_root2.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_save.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_select.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_up.png" />
     <Resource Include="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
     <Resource Include="Icons\without_a_license\icons8_icon_repository.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModels\SupportiveVMs\" />
   </ItemGroup>
 
 </Project>

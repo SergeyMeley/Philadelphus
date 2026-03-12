@@ -10,22 +10,27 @@ namespace Philadelphus.Core.Domain.Entities.OtherEntities
         /// <summary>
         /// Уровень критичности уведомления
         /// </summary>
-        public NotificationCriticalLevelModel CriticalLevel { get; init; }
+        public NotificationCriticalLevelModel CriticalLevel { get; }
 
         /// <summary>
         /// Текст уведомления
         /// </summary>
-        public string Text { get; init; }
+        public string Code { get; }
+
+        /// <summary>
+        /// Текст уведомления
+        /// </summary>
+        public string Text { get; }
 
         /// <summary>
         /// Время уведомления
         /// </summary>
-        public DateTime DateTime { get; init; }
+        public DateTime DateTime { get; }
 
         /// <summary>
         /// Уведомление
         /// </summary>
-        /// <param name="text">Ткст уведомления</param>
+        /// <param name="text">Текст уведомления</param>
         /// <param name="criticalLevel">Уровень критичности уведомления</param>
         public NotificationModel(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
         {

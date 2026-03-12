@@ -1,8 +1,11 @@
-﻿using Philadelphus.Core.Domain.Entities.OtherEntities;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Core.Domain.Entities.OtherEntities;
+using Philadelphus.Core.Domain.Services.Interfaces;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
+namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
-    public class PopupVM : ViewModelBase
+    public class PopUpNotificationsControlVM : ControlBaseVM
     {
         private TimeSpan _periodicity = new TimeSpan(hours: 0, minutes: 0, seconds: 3);
         private TimeSpan _lifeTime = new TimeSpan(hours: 0, minutes: 0, seconds: 2);
@@ -33,6 +36,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
         }
 
         private NotificationModel _lastNotification = new NotificationModel("Hello!");
+
         public NotificationModel LastNotification 
         { 
             get => _lastNotification; 
@@ -88,6 +92,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
                 _lastUpdate = DateTime.Now;
                 Thread.Sleep((int)Math.Min(_periodicity.TotalSeconds, _lifeTime.TotalSeconds));
             }
+        }
+
+        public PopUpNotificationsControlVM(
+            IServiceProvider serviceProvider,
+            IMapper mapper,
+            ILogger<ControlBaseVM> logger,
+            INotificationService notificationService,
+            ApplicationCommandsVM applicationCommandsVM)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
+        {
         }
 
         private bool SendNotification(NotificationModel notification)

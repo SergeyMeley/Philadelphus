@@ -11,6 +11,10 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
     public interface INotificationService
     {
         /// <summary>
+        /// Уникальный идентификатор получателя
+        /// </summary>
+        public Guid ReceiverUuid { get; }
+        /// <summary>
         /// Обработчик текстовых сообщений
         /// </summary>
         public NotificationHandler TextMessageHandler { get; set; }

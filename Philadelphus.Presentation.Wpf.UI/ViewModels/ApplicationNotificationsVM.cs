@@ -2,34 +2,35 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.OtherEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using System.Collections.ObjectModel;
 using System.Windows;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
+namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
-    public class NotificationsVM
+    public class ApplicationNotificationsVM : ViewModelBase
     {
-        private readonly ILogger<NotificationsVM> _logger;
+        private readonly ILogger<ApplicationNotificationsVM> _logger;
         private readonly INotificationService _notificationService;
 
-        private PopupVM _popupVM;
-        public PopupVM PopupVM
+        private PopUpNotificationsControlVM _popupVM;
+
+        private Dictionary<Guid, MessageLogControlVM> MessageLogsVMs { get; } = new Dictionary<Guid, MessageLogControlVM>();
+        public PopUpNotificationsControlVM PopupVM
         {
             get
             {
-                if (_popupVM == null)
-                {
-                    _popupVM = new PopupVM();
-                }
                 return _popupVM;
             }
         }
 
         public ObservableCollection<NotificationModel> Notifications { get => _notificationService.Notifications; }
-        public NotificationsVM(
-            ILogger<NotificationsVM> logger,
+        public ApplicationNotificationsVM(
+            PopUpNotificationsControlVM popupVM,
+            ILogger<ApplicationNotificationsVM> logger,
             INotificationService notificationService)
         {
+            _popupVM = popupVM;
             _logger = logger;
             _notificationService = notificationService;
 
@@ -37,15 +38,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
         }
         private bool SetNotificationHandlers()
         {
-            _notificationService.TextMessageHandler = SendText;
-            bool SendText(NotificationModel notification)
+            _notificationService.TextMessageHandler = notification =>
             {
+                foreach (var vm in MessageLogsVMs)
+                {
+
+                }
                 return true;
-            }
+            };
             _notificationService.SendNotification("Обработчик текстовых сообщений назначен.", criticalLevel: NotificationCriticalLevelModel.Info, type: NotificationTypesModel.TextMessage);
 
-            _notificationService.ModalWindowHandler = SendModal;
-            bool SendModal(NotificationModel notification)
+            _notificationService.ModalWindowHandler = notification =>
             {
                 MessageBoxImage image;
                 switch (notification.CriticalLevel)
@@ -66,10 +69,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
                         image = MessageBoxImage.Error;
                         break;
                 }
-                MessageBox.Show(messageBoxText: notification.Text, caption: notification.CriticalLevel.ToString(), MessageBoxButton.OK, icon: image);
+                MessageBox.Show(
+                    messageBoxText: notification.Text,
+                    caption: notification.CriticalLevel.ToString(),
+                    MessageBoxButton.OK, icon: image);
                 return true;
-            }
-            _notificationService.SendNotification("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevelModel.Info, type: NotificationTypesModel.TextMessage);
+            };
+            _notificationService.SendTextMessage("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevelModel.Info);
 
             return true;
         }

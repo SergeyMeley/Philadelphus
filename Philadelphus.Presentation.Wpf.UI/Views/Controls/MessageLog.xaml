@@ -4,7 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
+             xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:CriticalLevelToIconConverter x:Key="criticalLevelToIconConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Expander Header="Журнал сообщений" ExpandDirection="Down" Margin="1" IsExpanded="True">
             <Expander.HeaderTemplate>
@@ -52,7 +56,7 @@
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <ContentPresenter Grid.Column="0" Content="{StaticResource imageError64_3}"></ContentPresenter>
@@ -65,11 +69,16 @@
                     </Grid>
                 </DataTemplate>
             </Expander.HeaderTemplate>
-            <DataGrid ItemsSource="{Binding NotificationsVM.Notifications, Mode=OneWay}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+            <DataGrid ItemsSource="{Binding Notifications, Mode=OneWay}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto">
+                <DataGrid.Resources>
+                    <DataTemplate x:Key="IconColumnTemplate">
+                        <Image Source="{Binding CriticalLevel, Converter={StaticResource criticalLevelToIconConverter}}" Height="15"></Image>
+                    </DataTemplate>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Критичность" Binding="{Binding CriticalLevel}" Width="auto" MinWidth="35"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="150"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="*"></DataGridTextColumn>
+                    <DataGridTemplateColumn Header="К." CellTemplate="{StaticResource IconColumnTemplate}" Width="auto" MaxWidth="30" IsReadOnly="True"></DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="150" IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="*" IsReadOnly="True"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Expander>

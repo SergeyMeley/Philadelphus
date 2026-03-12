@@ -33,8 +33,6 @@
                                     <TextBlock Foreground="Black" Height="70" Width="300" Padding="10" Text="{Binding Text}"></TextBlock>
                                 </StackPanel>
                             </Border>
-                           
-                            
                         </ItemContainerTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -289,7 +287,7 @@
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                 </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <ctrls:MessageLog Grid.Row="2"></ctrls:MessageLog>
+                <ctrls:MessageLog DataContext="{Binding NotificationsVM}" Grid.Row="2"></ctrls:MessageLog>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>

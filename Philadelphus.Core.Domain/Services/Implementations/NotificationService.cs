@@ -1,6 +1,8 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.OtherEntities;
 using Philadelphus.Core.Domain.Handlers;
+using Philadelphus.Core.Domain.Infrastructure.Messaging;
+using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Collections.ObjectModel;
 
@@ -11,6 +13,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
     /// </summary>
     public class NotificationService : INotificationService
     {
+        private readonly int _interval = 60;
+        private readonly IMessageConsumer<NotificationModel> _mainConsumer;
+        private readonly IMessageProducer<NotificationModel> _mainProducer;
+
+        /// <summary>
+        /// Активные получатели уведомлений
+        /// </summary>
+        public ObservableCollection<ConsumerJoined> ActiveConsumers { get; } = new ObservableCollection<ConsumerJoined>();
+
+        /// <summary>
+        /// Уникальный идентификатор получателя
+        /// </summary>
+        public Guid ReceiverUuid { get; }
+
         /// <summary>
         /// Обработчик текстовых сообщений
         /// </summary>
@@ -45,6 +61,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Коллекция сообщений
         /// </summary>
         public ObservableCollection<NotificationModel> Notifications { get; private set;  } = new ObservableCollection<NotificationModel>();
+
+        public NotificationService(
+            IMessageConsumer<ConsumerJoined> consumerJoinedMessageConsumer,
+            IMessageProducer<ConsumerJoined> consumerJoinedMessageProducer, 
+            IMessageConsumer<NotificationModel> mainConsumer,
+            IMessageProducer<NotificationModel> mainProducer)
+        {
+            _mainConsumer = mainConsumer;
+            _mainProducer = mainProducer;
+
+            ReceiverUuid = Guid.NewGuid();
+
+            StartAutoRegistrarion(consumerJoinedMessageProducer);
+            StartAutoCheckingActiveConsumers(consumerJoinedMessageConsumer);
+        }
 
         /// <summary>
         /// Направить уведомление
@@ -190,6 +221,53 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             //}
                 
             return false;
+        }
+
+        private bool StartAutoRegistrarion(IMessageProducer<ConsumerJoined> consumerJoinedMessageProducer)
+        {
+            var timer = new Timer(
+               callback: _ => _ = Task.Run(async () => {
+                   consumerJoinedMessageProducer.ProduceAsync(
+                       new ConsumerJoined() 
+                       { 
+                           ProducerUuid = ReceiverUuid,
+                           ProducerName = Environment.UserDomainName + "\\" + Environment.UserName, 
+                           JoinDateTime = DateTime.Now 
+                       }, 
+                       default);
+               }),
+               state: null,
+               dueTime: 0,
+               period: _interval * 1000);
+
+            return true;
+        }
+
+        private bool StartAutoCheckingActiveConsumers(IMessageConsumer<ConsumerJoined> consumerJoinedMessageConsumer)
+        {
+             var task = consumerJoinedMessageConsumer.StartAsync(
+                    async (mes, ct) =>
+                    {
+                        ActiveConsumers.Add(mes);
+                        SendTextMessage($"{mes.ProducerName} ({mes.ProducerUuid}) теперь активен.");
+                    });
+
+            var timer = new Timer(
+               callback: _ => _ = Task.Run(async () => {
+                   foreach (var item in ActiveConsumers)
+                   {
+                       if (DateTime.Now - item.JoinDateTime >= TimeSpan.FromSeconds(_interval))
+                       {
+                           ActiveConsumers.Remove(item);
+                           SendTextMessage($"{item.ProducerName} ({item.ProducerUuid}) теперь не активен.");
+                       }
+                   }
+               }),
+               state: null,
+               dueTime: 0,
+               period: _interval * 1000);
+
+            return true;
         }
     }
 }

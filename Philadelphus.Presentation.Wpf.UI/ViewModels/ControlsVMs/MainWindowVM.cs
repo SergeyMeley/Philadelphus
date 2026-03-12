@@ -9,7 +9,6 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -48,10 +47,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public string UserName { get => Environment.UserName; }
+        public string UserName { get => Environment.UserDomainName + "\\" + Environment.UserName; }
 
-        private NotificationsVM _notificationsVM;
-        public NotificationsVM NotificationsVM { get => _notificationsVM; }
+        private ApplicationNotificationsVM _notificationsVM;
+        public ApplicationNotificationsVM NotificationsVM { get => _notificationsVM; }
         public IMainEntityVM<IMainEntityModel> SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
 
         public MainWindowVM(
@@ -64,7 +63,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationSettingsControlVM applicationSettingsControlVM,
-            NotificationsVM notificationsVM)
+            ApplicationNotificationsVM notificationsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _repositoryExplorerControlVM = repositoryExplorerControlVM;

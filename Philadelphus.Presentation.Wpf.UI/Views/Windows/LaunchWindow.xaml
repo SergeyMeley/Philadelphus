@@ -16,7 +16,7 @@
     </Window.Visibility>
     <Window.Resources>
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
-        <converters:IconToImageConverter x:Key="iconToImageConverter"/>
+        <converters:KeyToImageConverter x:Key="keyToImageConverter"/>
 
         <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
         <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
@@ -129,7 +129,7 @@
                                     Height="75"
                                     Width="90"
                                     Margin="5,5">
-                            <Image Source="{Binding IconKey, Converter={StaticResource iconToImageConverter}}"
+                            <Image Source="{Binding IconKey, Converter={StaticResource keyToImageConverter}}"
                                    Width="45"
                                    Height="45"
                                    Margin="0,5,0,0"
