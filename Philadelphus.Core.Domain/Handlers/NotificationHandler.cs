@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.OtherEntities;
+﻿using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 
 namespace Philadelphus.Core.Domain.Handlers
 {
@@ -7,5 +7,5 @@ namespace Philadelphus.Core.Domain.Handlers
     /// </summary>
     /// <param name="notification"></param>
     /// <returns></returns>
-    public delegate bool NotificationHandler(NotificationModel notification);
+    public delegate bool NotificationHandler(Notification notification);
 }

@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.0" />
+    <PackageReference Include="Nanoid" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +51,7 @@
 
   <ItemGroup>
     <Folder Include="Aggregates\" />
+    <Folder Include="Entities\OtherEntities\" />
     <Folder Include="Events\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Specifications\" />

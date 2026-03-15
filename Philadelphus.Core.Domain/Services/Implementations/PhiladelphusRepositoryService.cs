@@ -619,7 +619,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания корня.", ex);
-                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -648,7 +648,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания узла.", ex);
-                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -663,7 +663,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 if (parentElement is IPhiladelphusRepositoryMemberModel == false || parentElement is TreeNodeModel == false)
                 {
-                    _notificationService.SendNotification("Лист можно добавить только в узел.", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>("Лист можно добавить только в узел.");
                     return null;
                 }
                 else
@@ -688,7 +688,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания листа.", ex);
-                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -719,7 +719,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания атрибута.", ex);
-                _notificationService.SendNotification($"Произошла непредвиденная ошибка, обратитесь к разработчику. Подробности: \r\n{ex.StackTrace}", NotificationCriticalLevelModel.Error, NotificationTypesModel.TextMessage);
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }

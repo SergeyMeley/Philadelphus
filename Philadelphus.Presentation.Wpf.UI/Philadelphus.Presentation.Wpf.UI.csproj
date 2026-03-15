@@ -28,17 +28,32 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Icons\alarm_64.png" />
     <None Remove="Icons\approval_64.png" />
+    <None Remove="Icons\broom_64.png" />
     <None Remove="Icons\check_64.png" />
     <None Remove="Icons\edit_64.png" />
+    <None Remove="Icons\error_64_1.png" />
+    <None Remove="Icons\error_64_2.png" />
+    <None Remove="Icons\error_64_3.png" />
+    <None Remove="Icons\error_64_4.png" />
+    <None Remove="Icons\error_64_5.png" />
     <None Remove="Icons\getwork_64.png" />
+    <None Remove="Icons\hard_delete_64_1.png" />
+    <None Remove="Icons\hard_delete_64_2.png" />
+    <None Remove="Icons\info_64_1.png" />
+    <None Remove="Icons\info_64_2.png" />
+    <None Remove="Icons\info_64_3.png" />
     <None Remove="Icons\list_64.png" />
     <None Remove="Icons\new-tab_64.png" />
     <None Remove="Icons\open.png" />
     <None Remove="Icons\philadelphus_logo_64.png" />
     <None Remove="Icons\settings_64.png" />
+    <None Remove="Icons\soft_delete_64_1.png" />
+    <None Remove="Icons\soft_delete_64_2.png" />
     <None Remove="Icons\storage.png" />
     <None Remove="Icons\top_level_64.png" />
+    <None Remove="Icons\warning_64.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_add.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_back.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_copy.png" />
@@ -54,12 +69,14 @@
     <None Remove="Icons\without_a_license\Flaticon_icon_modify.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_move.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_node.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_node.svg" />
     <None Remove="Icons\without_a_license\Flaticon_icon_node2.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_paste.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_protect.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_remove.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_return.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_root.png" />
+    <None Remove="Icons\without_a_license\Flaticon_icon_root.svg" />
     <None Remove="Icons\without_a_license\Flaticon_icon_root2.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_save.png" />
     <None Remove="Icons\without_a_license\Flaticon_icon_select.png" />
@@ -69,6 +86,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icons\alarm_64.png" />
+    <Resource Include="Icons\broom_64.png" />
+    <Resource Include="Icons\error_64_1.png" />
+    <Resource Include="Icons\error_64_2.png" />
+    <Resource Include="Icons\error_64_3.png" />
+    <Resource Include="Icons\error_64_4.png" />
+    <Resource Include="Icons\error_64_5.png" />
+    <Resource Include="Icons\hard_delete_64_1.png" />
+    <Resource Include="Icons\hard_delete_64_2.png" />
+    <Resource Include="Icons\info_64_1.png" />
+    <Resource Include="Icons\info_64_2.png" />
+    <Resource Include="Icons\info_64_3.png" />
     <Resource Include="Icons\list_64.png" />
     <Resource Include="Icons\philadelphus_logo_64.ico" />
   </ItemGroup>
@@ -94,6 +123,7 @@
     <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -114,10 +144,13 @@
     <Resource Include="Icons\open.png" />
     <Resource Include="Icons\philadelphus_logo_64.png" />
     <Resource Include="Icons\settings_64.png" />
+    <Resource Include="Icons\soft_delete_64_1.png" />
+    <Resource Include="Icons\soft_delete_64_2.png" />
     <Resource Include="Icons\storage.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Icons\top_level_64.png" />
+    <Resource Include="Icons\warning_64.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_add.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_back.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_copy.png" />
@@ -133,18 +166,24 @@
     <Resource Include="Icons\without_a_license\Flaticon_icon_modify.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_move.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_node.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_node.svg" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_node2.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_paste.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_protect.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_remove.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_return.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_root.png" />
+    <Resource Include="Icons\without_a_license\Flaticon_icon_root.svg" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_root2.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_save.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_select.png" />
     <Resource Include="Icons\without_a_license\Flaticon_icon_up.png" />
     <Resource Include="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
     <Resource Include="Icons\without_a_license\icons8_icon_repository.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModels\SupportiveVMs\" />
   </ItemGroup>
 
 </Project>

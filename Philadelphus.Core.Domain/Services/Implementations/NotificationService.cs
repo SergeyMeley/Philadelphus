@@ -1,8 +1,13 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.OtherEntities;
+﻿using Microsoft.Extensions.Options;
+using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Handlers;
+using Philadelphus.Core.Domain.Infrastructure.Messaging;
+using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Serilog;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
@@ -11,6 +16,29 @@ namespace Philadelphus.Core.Domain.Services.Implementations
     /// </summary>
     public class NotificationService : INotificationService
     {
+        private readonly ILogger _logger;
+        private readonly IMessageConsumer<Notification> _mainConsumer;
+        private readonly IMessageProducer<Notification> _mainProducer;
+        private readonly IMessageConsumer<MessagingUser> _consumerJoinedMessageConsumer;
+        private Timer _registrationTimer;
+        private Timer _cleanUsersTimer;
+        private readonly List<Notification> _notificationsHistory = new List<Notification>();
+
+        /// <summary>
+        /// История уведомлений дополнена
+        /// </summary>
+        public event Action<Notification>? HistoryUpdated;
+
+        /// <summary>
+        /// Текущий пользователь
+        /// </summary>
+        public MessagingUser CurrentUser { get; }
+
+        /// <summary>
+        /// Активные получатели уведомлений
+        /// </summary>
+        public ObservableCollection<MessagingUser> ActiveUsers { get; } = new ObservableCollection<MessagingUser>();
+
         /// <summary>
         /// Обработчик текстовых сообщений
         /// </summary>
@@ -42,9 +70,38 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public NotificationHandler CallHandler { get; set; }
 
         /// <summary>
-        /// Коллекция сообщений
+        /// История уведомлений
         /// </summary>
-        public ObservableCollection<NotificationModel> Notifications { get; private set;  } = new ObservableCollection<NotificationModel>();
+        public IReadOnlyList<Notification> NotificationsHistory => _notificationsHistory.AsReadOnly();
+
+        /// <summary>
+        /// Вместимость истории уведомлений
+        /// </summary>
+        public int HistoryCapacoty { get; set; } = int.MaxValue;
+
+        public NotificationService(
+            ILogger logger,
+            IMessageConsumer<MessagingUser> consumerJoinedMessageConsumer,
+            IMessageProducer<MessagingUser> consumerJoinedMessageProducer, 
+            IMessageConsumer<Notification> mainConsumer,
+            IMessageProducer<Notification> mainProducer,
+            IOptions<MessagingConfig> options)
+        {
+            _logger = logger;
+
+            CurrentUser = new MessagingUser(
+                Guid.NewGuid(), 
+                options?.Value?.MessagingUserName ?? $"{Environment.UserDomainName}\\{Environment.UserName}");
+
+            _consumerJoinedMessageConsumer = consumerJoinedMessageConsumer;
+            _mainConsumer = mainConsumer;
+            _mainProducer = mainProducer;
+
+            StartAutoRegistrarion(consumerJoinedMessageProducer);
+
+            StartAutoCheckingActiveConsumers(_consumerJoinedMessageConsumer);
+            StartAutoCheckingNotifications(_mainConsumer);
+        }
 
         /// <summary>
         /// Направить уведомление
@@ -53,11 +110,33 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <param name="type">Тип уведомления</param>
         /// <returns></returns>
-        public bool SendNotification(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error, NotificationTypesModel type = NotificationTypesModel.TextMessage)
+        public bool SendNotification<TCallerClass>(
+            string text, 
+            NotificationCriticalLevelModel criticalLevel,
+            NotificationTransmissionType transmissionType, 
+            NotificationTypesModel type = NotificationTypesModel.TextMessage,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            NotificationModel notification = new NotificationModel(text, criticalLevel);
-            Notifications.Add(notification);
-            return TryInvokeHandler(notification, type);
+            Notification notification = new Notification(
+                text: text, 
+                sendingUser: CurrentUser, 
+                source: $"{typeof(TCallerClass).Name}.{method}",
+                criticalLevel: criticalLevel,
+                notificationType: type);
+
+            switch (transmissionType)
+            {
+                case NotificationTransmissionType.Self:
+                    return ProcessNotification(notification);
+                case NotificationTransmissionType.Broadcast:
+                    _mainProducer.ProduceAsync(notification, default);
+                    return true;
+                default:
+                    break;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -66,9 +145,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendTextMessage(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
+        public bool SendTextMessage<TCallerClass>(
+            string text, 
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            return SendNotification(text , criticalLevel, NotificationTypesModel.TextMessage);
+            return SendNotification<TCallerClass>(
+                text: text,
+                criticalLevel: criticalLevel,
+                transmissionType: transmissionType,
+                type: NotificationTypesModel.TextMessage,
+                method: method,
+                file: file);
         }
 
         /// <summary>
@@ -77,9 +167,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendPopUpWindow(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
+        public bool SendPopUpWindow<TCallerClass>(
+            string text, 
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            return SendNotification(text, criticalLevel, NotificationTypesModel.PopUpWindow);
+            return SendNotification<TCallerClass>(
+                text: text,
+                criticalLevel: criticalLevel,
+                transmissionType: transmissionType,
+                type: NotificationTypesModel.PopUpWindow,
+                method: method,
+                file: file);
         }
 
         /// <summary>
@@ -88,11 +189,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendModalWindow(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
+        public bool SendModalWindow<TCallerClass>(
+            string text, 
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            return SendNotification(text, criticalLevel, NotificationTypesModel.ModalWindow);
+            return SendNotification<TCallerClass>(
+                text: text,
+                criticalLevel: criticalLevel,
+                transmissionType: transmissionType,
+                type: NotificationTypesModel.ModalWindow,
+                method: method,
+                file: file);
         }
-
 
         /// <summary>
         /// Направить электронное письмо
@@ -100,9 +211,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendEmail(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
+        public bool SendEmail<TCallerClass>(
+            string text, 
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            return SendNotification(text, criticalLevel, NotificationTypesModel.Email);
+            return SendNotification<TCallerClass>(
+                text: text,
+                criticalLevel: criticalLevel,
+                transmissionType: transmissionType,
+                type: NotificationTypesModel.Email,
+                method: method,
+                file: file);
         }
 
         /// <summary>
@@ -111,9 +233,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendSms(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
+        public bool SendSms<TCallerClass>(
+            string text, 
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            return SendNotification(text, criticalLevel, NotificationTypesModel.Sms);
+            return SendNotification<TCallerClass>(
+                text: text,
+                criticalLevel: criticalLevel,
+                transmissionType: transmissionType,
+                type: NotificationTypesModel.Sms,
+                method: method,
+                file: file);
         }
 
         /// <summary>
@@ -122,22 +255,34 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendCall(string text, NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error)
+        public bool SendCall<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null)
         {
-            return SendNotification(text, criticalLevel, NotificationTypesModel.Call);
+            return SendNotification<TCallerClass>(
+                text: text,
+                criticalLevel: criticalLevel,
+                transmissionType: transmissionType,
+                type: NotificationTypesModel.Call,
+                method: method,
+                file: file);
         }
 
         /// <summary>
-        /// Попробывать вызвать обработчик
+        /// Обработать (передать пользователю) полученное уведомление
         /// </summary>
         /// <param name="notification">Уведомление</param>
-        /// <param name="type">Тип обработчика</param>
-        /// <returns></returns>
-        private bool TryInvokeHandler(NotificationModel notification, NotificationTypesModel type)
+        private bool ProcessNotification(Notification notification)
         {
+            _notificationsHistory.Add(notification);
+            HistoryUpdated?.Invoke(notification);
+
             NotificationHandler handler = null;
 
-            switch (type)
+            switch (notification.NotificationType)
             {
                 case NotificationTypesModel.TextMessage:
                     handler = TextMessageHandler;
@@ -163,7 +308,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             if (handler == null)
             {
-                SendMissHandlerNotification();
+                SendMissHandlerNotification(notification.NotificationType.ToString(), $"{nameof(NotificationService)}.{nameof(ProcessNotification)}");
                 return false;
             }
             else
@@ -177,19 +322,87 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Уведомить об отсутствии обработчика
         /// </summary>
         /// <returns></returns>
-        private bool SendMissHandlerNotification()
+        private bool SendMissHandlerNotification(string handlerName, string source)
         {
-            NotificationModel error = new NotificationModel("Не задан требуемый обработчик уведомлений. Осуществляется попытка отправить с повышенным обработчиком", NotificationCriticalLevelModel.Error);
+            var notification = new Notification(
+                text: $"Не задан требуемый обработчик уведомлений '{handlerName}'. Осуществляется попытка отправить с повышенным обработчиком",
+                sendingUser: CurrentUser,
+                source: source,
+                criticalLevel: NotificationCriticalLevelModel.Warning);
 
-            Notifications.Add(error);
+            _notificationsHistory.Add(notification);
+            HistoryUpdated?.Invoke(notification);
 
             //for (int i = 0; i < Enum.GetValues(typeof(NotificationTypesModel)).Length; i++)
             //{
             //    if (error.TryInvokeHandler((NotificationTypesModel)i))
             //        return true;
             //}
-                
+
             return false;
+        }
+
+        private bool StartAutoRegistrarion(IMessageProducer<MessagingUser> consumerJoinedMessageProducer)
+        {
+            _registrationTimer = new Timer(
+               callback: _ => _ =  Task.Run(async () => {
+                   return consumerJoinedMessageProducer.ProduceAsync(
+                       CurrentUser, 
+                       default);
+               }),
+               state: null,
+               dueTime: 0,
+               period: MessagingUser.GetSessionDurability());
+
+            return true;
+        }
+
+        private bool StartAutoCheckingActiveConsumers(IMessageConsumer<MessagingUser> consumer)
+        {
+            consumer.MessageReceived += async (user, ct) =>
+            {
+                if (user?.IsActive ?? false)
+                {
+                    var au = ActiveUsers.SingleOrDefault(x => x.UserUuid == user.UserUuid);
+                    if (au != null)
+                    {
+                        au.UpdateSession();
+                        //SendTextMessage<NotificationService>($"{user.NameWithNanoid} [{user.UserUuid}] - сессия обновлена.", criticalLevel: NotificationCriticalLevelModel.Info);
+                    }
+                    else
+                    {
+                        ActiveUsers.Add(user);
+                        SendTextMessage<NotificationService>($"{user.NameWithNanoid} [{user.UserUuid}] - начало сессии.", criticalLevel: NotificationCriticalLevelModel.Info);
+                    }
+                }
+            };
+
+            _cleanUsersTimer = new Timer(
+               callback: _ => _ = Task.Run(async () => {
+                   foreach (var user in ActiveUsers)
+                   {
+                       if (user.IsActive == false)
+                       {
+                           ActiveUsers.Remove(user);
+                           SendTextMessage<NotificationService>($"{user.NameWithNanoid} [{user.UserUuid}] - конец сессии.", criticalLevel: NotificationCriticalLevelModel.Info);
+                       }
+                   }
+               }),
+               state: null,
+               dueTime: 0,
+               period: MessagingUser.GetSessionDurability());
+
+            return true;
+        }
+
+        private bool StartAutoCheckingNotifications(IMessageConsumer<Notification> consumer)
+        {
+            _mainConsumer.MessageReceived += async (notification, ct) =>
+            {
+                ProcessNotification(notification);
+            };
+
+            return true;
         }
     }
 }
