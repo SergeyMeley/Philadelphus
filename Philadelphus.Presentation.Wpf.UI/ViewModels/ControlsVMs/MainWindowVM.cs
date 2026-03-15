@@ -11,6 +11,7 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -42,14 +43,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             get
             {
-                var title = "Чубушник";
+                var title = $"Чубушник {AssemblyVersion}";
                 if (string.IsNullOrEmpty(RepositoryExplorerVM?.CurentRepositoryName) == false)
                 {
-                    title = $"{RepositoryExplorerVM?.CurentRepositoryName} - Чубушник";
+                    title = $"{RepositoryExplorerVM?.CurentRepositoryName} - Чубушник {AssemblyVersion}";
                 }
                 return title;
             }
         }
+        public string AssemblyVersion { get => $"v.{Assembly.GetExecutingAssembly().GetName().Version}"; }
         public string UserName { get => MessageLogControlVM.MessagingUserName; }
         public MainWindowNotificationsVM MainWindowNotificationsVM { get => _mainWindowNotificationsVM; }
         public MessageLogControlVM MessageLogControlVM { get => _messageLogControlVM; }

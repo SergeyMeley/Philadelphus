@@ -287,7 +287,25 @@
                     <StackPanel x:Name="popupTarget" Grid.Column="1"></StackPanel>
                 </Grid>
                 <StatusBar Grid.Row="3">
-                    <TextBlock Text="{Binding UserName}"></TextBlock>
+                    <StatusBar.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </ItemsPanelTemplate>
+                    </StatusBar.ItemsPanel>
+
+                    <StatusBarItem Grid.Column="0">
+                        <TextBlock Text="{Binding UserName}"/>
+                    </StatusBarItem>
+
+                    <StatusBarItem Grid.Column="2">
+                        <TextBlock Text="{Binding AssemblyVersion}" HorizontalAlignment="Right"/>
+                    </StatusBarItem>
                     <!--<TextBlock Text="Приложение запущено"></TextBlock>-->
                 </StatusBar>
                 <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
