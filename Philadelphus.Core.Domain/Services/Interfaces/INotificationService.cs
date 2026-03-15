@@ -1,7 +1,8 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.OtherEntities;
 using Philadelphus.Core.Domain.Handlers;
+using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
@@ -10,6 +11,16 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
     /// </summary>
     public interface INotificationService
     {
+        /// <summary>
+        /// История уведомлений дополнена
+        /// </summary>
+        public event Action<Notification>? HistoryUpdated;
+
+        /// <summary>
+        /// Текущий пользователь
+        /// </summary>
+        public MessagingUser CurrentUser { get; }
+
         /// <summary>
         /// Обработчик текстовых сообщений
         /// </summary>
@@ -41,9 +52,14 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         public NotificationHandler CallHandler { get; set; }
 
         /// <summary>
-        /// Коллекция сообщений
+        /// История уведомлений
         /// </summary>
-        public ObservableCollection<NotificationModel> Notifications { get; }
+        public IReadOnlyList<Notification> NotificationsHistory { get; }
+
+        /// <summary>
+        /// Вместимость истории уведомлений
+        /// </summary>
+        public int HistoryCapacoty { get; set; }
 
         /// <summary>
         /// Направить уведомление
@@ -52,7 +68,13 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <param name="type">Тип уведомления</param>
         /// <returns></returns>
-        public bool SendNotification(string text, NotificationCriticalLevelModel criticalLevel, NotificationTypesModel type);
+        public bool SendNotification<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel,
+            NotificationTransmissionType transmissionType,
+            NotificationTypesModel type = NotificationTypesModel.TextMessage,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
 
         /// <summary>
         /// Направить текстовое сообщение
@@ -60,7 +82,12 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendTextMessage(string text, NotificationCriticalLevelModel criticalLevel);
+        public bool SendTextMessage<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
 
         /// <summary>
         /// Вывести всплывающее попап-окно
@@ -68,7 +95,12 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendPopUpWindow(string text, NotificationCriticalLevelModel criticalLevel);
+        public bool SendPopUpWindow<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
 
         /// <summary>
         /// Вывести модальное (блокирующее) окно
@@ -76,7 +108,12 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendModalWindow(string text, NotificationCriticalLevelModel criticalLevel);
+        public bool SendModalWindow<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
 
         /// <summary>
         /// Направить электронное письмо
@@ -84,7 +121,12 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendEmail(string text, NotificationCriticalLevelModel criticalLevel);
+        public bool SendEmail<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
 
         /// <summary>
         /// Направить смс-уведомление
@@ -92,7 +134,12 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendSms(string text, NotificationCriticalLevelModel criticalLevel);
+        public bool SendSms<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
 
         /// <summary>
         /// Направить телефонный звонок
@@ -100,6 +147,11 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <returns></returns>
-        public bool SendCall(string text, NotificationCriticalLevelModel criticalLevel);
+        public bool SendCall<TCallerClass>(
+            string text,
+            NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
+            NotificationTransmissionType transmissionType = NotificationTransmissionType.Self,
+            [CallerMemberName] string method = null,
+            [CallerFilePath] string file = null);
     }
 }

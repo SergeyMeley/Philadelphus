@@ -1,8 +1,11 @@
-﻿using Philadelphus.Core.Domain.Entities.OtherEntities;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
+using Philadelphus.Core.Domain.Services.Interfaces;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
+namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
-    public class PopupVM : ViewModelBase
+    public class PopUpNotificationsControlVM : ControlBaseVM
     {
         private TimeSpan _periodicity = new TimeSpan(hours: 0, minutes: 0, seconds: 3);
         private TimeSpan _lifeTime = new TimeSpan(hours: 0, minutes: 0, seconds: 2);
@@ -11,8 +14,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
         private static bool _isOpen;
         public bool IsOpen { get => _isOpen; set => _isOpen = value; }
 
-        private static List<NotificationModel> _notificationList = new List<NotificationModel>();
-        public List<NotificationModel> NotificationList 
+        private static List<Notification> _notificationList = new List<Notification>();
+        public List<Notification> NotificationList 
         {
             get
             {
@@ -32,12 +35,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
             }
         }
 
-        private NotificationModel _lastNotification = new NotificationModel("Hello!");
-        public NotificationModel LastNotification 
-        { 
-            get => _lastNotification; 
-            set => _lastNotification = value; 
-        }
+        //private TextNotification _lastNotification = new TextNotification("Hello!");
+
+        //public TextNotification LastNotification 
+        //{ 
+        //    get => _lastNotification; 
+        //    set => _lastNotification = value; 
+        //}
 
         public bool StartReceivingNotifications()
         {
@@ -74,7 +78,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
         {
             while (true)
             {
-                var newList = new List<NotificationModel>(_notificationList);
+                var newList = new List<Notification>(_notificationList);
                 foreach (var notification in _notificationList)
                 {
                     var qwe = DateTime.Now - notification.DateTime;
@@ -90,9 +94,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs
             }
         }
 
-        private bool SendNotification(NotificationModel notification)
+        public PopUpNotificationsControlVM(
+            IServiceProvider serviceProvider,
+            IMapper mapper,
+            ILogger<ControlBaseVM> logger,
+            INotificationService notificationService,
+            ApplicationCommandsVM applicationCommandsVM)
+            : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
-            var newList = new List<NotificationModel>(_notificationList);
+        }
+
+        private bool SendNotification(Notification notification)
+        {
+            var newList = new List<Notification>(_notificationList);
             newList.Add(notification);
             _notificationList = newList;
             //_notificationList.Add(notification);

@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
@@ -17,15 +19,16 @@ using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.SupportiveVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -157,13 +160,21 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(DataStoragesCollectionConfig)));
                     services.Configure<PhiladelphusRepositoryHeadersCollectionConfig>(
                         context.Configuration.GetSection(nameof(PhiladelphusRepositoryHeadersCollectionConfig)));
+                    services.Configure<MessagingConfig>(
+                        context.Configuration.GetSection(nameof(MessagingConfig)));
 
                     // Регистрация AutoMapper
                     services.AddAutoMapper(
                         typeof(DomainMappingProfile),       // Model <-> Db Entity
                         typeof(ViewModelsMappingProfile)    // Model <-> ViewModel
                         );
-                    
+
+                    // Добавление отправителей и получателей сообщений
+                    services.AddKafkaProducer<MessagingUser>(context.Configuration.GetSection($"{nameof(KafkaOptions<MessagingUser>)}:{nameof(MessagingUser)}"));
+                    services.AddKafkaConsumer<MessagingUser>(context.Configuration.GetSection($"{nameof(KafkaOptions<MessagingUser>)}:{nameof(MessagingUser)}"));
+                    services.AddKafkaProducer<Notification>(context.Configuration.GetSection($"{nameof(KafkaOptions<Notification>)}:{nameof(Notification)}"));
+                    services.AddKafkaConsumer<Notification>(context.Configuration.GetSection($"{nameof(KafkaOptions<Notification>)}:{nameof(Notification)}"));
+
 
                     services.AddStackExchangeRedisCache(options =>
                     {
@@ -190,21 +201,27 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
 
                     // Регистрация ViewModel
+                    // Общие ViewModel
                     services.AddSingleton<ApplicationVM>();
-                    services.AddSingleton<ApplicationSettingsControlVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
+                    services.AddSingleton<MainWindowNotificationsVM>();
+                    // ViewModel окон
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
-                    //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
-                    services.AddSingleton<DataStoragesCollectionVM>();
-                    //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
-                    services.AddSingleton<PhiladelphusRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
-                    services.AddSingleton<PhiladelphusRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
+                    // ViewModel контролов
+                    services.AddTransient<MessageLogControlVM>();
+                    services.AddTransient<PopUpNotificationsControlVM>();
+                    services.AddSingleton<ApplicationSettingsControlVM>();
+                    services.AddTransient<ApplicationSettingsTabItemControlVM>();
+                    services.AddTransient<LaunchWindowTabItemControlVM>();
                     services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
-                    services.AddTransient<LaunchWindowTabItemControlVM>();
-                    services.AddTransient<ApplicationSettingsTabItemControlVM>();
-                    services.AddSingleton<NotificationsVM>();
+                    //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
+                    //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
+                    // ViewModel сущностей
+                    services.AddSingleton<DataStoragesCollectionVM>();
+                    services.AddSingleton<PhiladelphusRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
+                    services.AddSingleton<PhiladelphusRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();

@@ -33,8 +33,6 @@
                                     <TextBlock Foreground="Black" Height="70" Width="300" Padding="10" Text="{Binding Text}"></TextBlock>
                                 </StackPanel>
                             </Border>
-                           
-                            
                         </ItemContainerTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -211,22 +209,15 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto" MaxHeight="350"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="0"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="auto" MaxHeight="200"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MaxWidth="300"></ColumnDefinition>
-                            <ColumnDefinition Width="auto"></ColumnDefinition>
-                            <ColumnDefinition Width="5*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <!--<Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" MaxWidth="300"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <!--<Expander Grid.Row="2" Grid.Column="0" ExpandDirection="Left" Margin="1">
                             <Expander.Header>
                                 <TextBlock Text="Навигационная панель">
                                     <TextBlock.LayoutTransform>
@@ -266,12 +257,12 @@
                             </Grid>
                         </Expander>
                         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>-->
-                        <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="1" Background="White">
-                            <TabControl Margin="1">
-                                <TabItem Header="Репозиторий">
-                                    <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></re:RepositoryExplorer>
-                                </TabItem>
-                                <!--<TabItem Header="Отчеты">
+                    <GroupBox Grid.Row="0" Grid.Column="2" Header="Рабочая область" Margin="1" Background="White">
+                        <TabControl Margin="1">
+                            <TabItem Header="Репозиторий">
+                                <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></re:RepositoryExplorer>
+                            </TabItem>
+                            <!--<TabItem Header="Отчеты">
                                     <ctrls:ReportProcessor></ctrls:ReportProcessor>
                                 </TabItem>
                                 <TabItem Header="Настраиваемый отчет">
@@ -280,36 +271,26 @@
                                 <TabItem Header="Импорт / экспорт">
                                     <ctrls:DataExchange></ctrls:DataExchange>
                                 </TabItem>-->
-                                <TabItem Header="Настройки">
-                                    <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
-                                </TabItem>
-                            </TabControl>
-                        </GroupBox>
-                    </Grid>
-                    <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                            <TabItem Header="Настройки">
+                                <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
+                            </TabItem>
+                        </TabControl>
+                    </GroupBox>
                 </Grid>
-                <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                <Expander Grid.Row="2" Header="Сообщения" ExpandDirection="Down" Margin="1" IsExpanded="True">
-                    <DataGrid ItemsSource="{Binding NotificationsVM.Notifications, Mode=OneWay}" AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Критичность" Binding="{Binding CriticalLevel}" Width="auto" MinWidth="35"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="*"></DataGridTextColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Expander>
-                <Grid Grid.Row="3">
+
+                <ctrls:MessageLog Grid.Row="1" DataContext="{Binding MessageLogControlVM}"></ctrls:MessageLog>
+                <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition Width="320"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <StackPanel x:Name="popupTarget" Grid.Column="1"></StackPanel>
                 </Grid>
-                <StatusBar Grid.Row="4">
+                <StatusBar Grid.Row="3">
                     <TextBlock Text="{Binding UserName}"></TextBlock>
                     <!--<TextBlock Text="Приложение запущено"></TextBlock>-->
                 </StatusBar>
-                <ProgressBar Grid.Row="5" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
+                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3"></ProgressBar>
             </Grid>
         </DockPanel>
     </Grid>

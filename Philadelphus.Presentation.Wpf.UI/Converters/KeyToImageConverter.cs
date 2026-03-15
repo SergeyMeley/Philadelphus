@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
-    public class IconToImageConverter : IValueConverter
+    public class KeyToImageConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
