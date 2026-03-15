@@ -6,9 +6,11 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -48,6 +50,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private RepositoryCreationControlVM _repositoryCreationVM;
         public RepositoryCreationControlVM RepositoryCreationVM { get => _repositoryCreationVM; }
         public string UserName { get => Environment.UserName; }
+        public string Title { get => $"Чубушник {AssemblyVersion}"; }
+        public string AssemblyVersion { get => $"v.{Assembly.GetExecutingAssembly().GetName().Version}"; }
         public LaunchWindowVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
