@@ -104,7 +104,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Delete + Remove ]
 
-        public bool SoftDeleteRepositoryMember(IContentModel element);
+        public bool SoftDeleteShrubMember(IContentModel element);
 
         #endregion
     }

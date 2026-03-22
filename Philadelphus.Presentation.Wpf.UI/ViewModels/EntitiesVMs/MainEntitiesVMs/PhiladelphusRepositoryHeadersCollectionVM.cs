@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
@@ -16,11 +16,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     {
         private readonly ILogger<PhiladelphusRepositoryHeadersCollectionVM> _logger;
         private readonly INotificationService _notificationService;
+        private readonly IMapper _mapper;
         private readonly IPhiladelphusRepositoryCollectionService _service;
         private readonly DataStoragesCollectionVM _dataStoragesSettingsVM;
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-        private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _PhiladelphusRepositoryHeadersCollectionConfig;
+        private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _philadelphusRepositoryHeadersCollectionConfig;
 
         private ObservableCollection<PhiladelphusRepositoryHeaderVM> _PhiladelphusRepositoryHeadersVMs;
         public ObservableCollection<PhiladelphusRepositoryHeaderVM> PhiladelphusRepositoryHeadersVMs
@@ -77,6 +78,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         public PhiladelphusRepositoryHeadersCollectionVM(
             ILogger<PhiladelphusRepositoryHeadersCollectionVM> logger,
             INotificationService notificationService,
+            IMapper mapper,
             IPhiladelphusRepositoryCollectionService service,
             DataStoragesCollectionVM dataStoragesSettingsVM,
             IConfigurationService configurationService,
@@ -85,11 +87,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         {
             _logger = logger;
             _notificationService = notificationService;
+            _mapper = mapper;
             _service = service;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _configurationService = configurationService;
             _appConfig = appConfig;
-            _PhiladelphusRepositoryHeadersCollectionConfig = philadelphusRepositoryHeadersCollectionConfig;
+            _philadelphusRepositoryHeadersCollectionConfig = philadelphusRepositoryHeadersCollectionConfig;
 
             _PhiladelphusRepositoryHeadersVMs = new ObservableCollection<PhiladelphusRepositoryHeaderVM>();
             LoadPhiladelphusRepositoryHeadersVMs(philadelphusRepositoryHeadersCollectionConfig);
@@ -143,7 +146,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
             foreach (var header in headers)
             {
-                var vm = new PhiladelphusRepositoryHeaderVM(header.ToModel(), _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _PhiladelphusRepositoryHeadersCollectionConfig);
+                var vm = new PhiladelphusRepositoryHeaderVM(_mapper, _mapper.Map<PhiladelphusRepositoryHeaderModel>(header), _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _philadelphusRepositoryHeadersCollectionConfig);
                 CheckPhiladelphusRepositoryAvailable(vm);
                 _PhiladelphusRepositoryHeadersVMs.Add(vm);
             }
@@ -153,10 +156,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         {
             var header = _service.CreatePhiladelphusRepositoryHeaderFromPhiladelphusRepository(PhiladelphusRepositoryVM.Model);
 
-            _PhiladelphusRepositoryHeadersCollectionConfig.Value.PhiladelphusRepositoryHeaders.Add(header.ToDbEntity());
-            _configurationService.UpdateConfigFile(_appConfig.Value.RepositoryHeadersConfigFullPath, _PhiladelphusRepositoryHeadersCollectionConfig);
+            _philadelphusRepositoryHeadersCollectionConfig.Value.PhiladelphusRepositoryHeaders.Add(_mapper.Map<PhiladelphusRepositoryHeader>(header));
+            _configurationService.UpdateConfigFile(_appConfig.Value.RepositoryHeadersConfigFullPath, _philadelphusRepositoryHeadersCollectionConfig);
 
-            var result = new PhiladelphusRepositoryHeaderVM(header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _PhiladelphusRepositoryHeadersCollectionConfig);
+            var result = new PhiladelphusRepositoryHeaderVM(_mapper, header, _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _philadelphusRepositoryHeadersCollectionConfig);
             PhiladelphusRepositoryHeadersVMs.Add(result);
             return result;
         }

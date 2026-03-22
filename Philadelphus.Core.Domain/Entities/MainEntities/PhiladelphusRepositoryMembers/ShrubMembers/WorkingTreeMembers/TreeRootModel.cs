@@ -99,9 +99,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         internal TreeRootModel(
             Guid uuid,
-            WorkingTreeModel owner,
-            IMainEntity dbEntity)
-            : base(uuid, owner, dbEntity)
+            WorkingTreeModel owner)
+            : base(uuid, owner)
         {
             owner.ContentRoot = this;
 

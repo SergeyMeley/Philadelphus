@@ -233,7 +233,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     if (_selectedRepositoryMember.Model is IContentModel c)
                     {
-                        _service.SoftDeleteRepositoryMember(c);
+                        _service.SoftDeleteShrubMember(c);
                     }
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
@@ -252,7 +252,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     if (_selectedRepositoryMember.SelectedAttributeVM.Model is IContentModel c)
                     {
-                        _service.SoftDeleteRepositoryMember(c);
+                        _service.SoftDeleteShrubMember(c);
                     }
                     OnPropertyChanged(nameof(State));
                 });
@@ -375,7 +375,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                         JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model);
 
-                        var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentTrees?.Last()?.ContentRoot;
+                        var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.Last()?.ContentRoot;
                         var rootVM = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
                         PhiladelphusRepositoryVM.Childs.Add(rootVM);
                     }
@@ -403,7 +403,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
             _philadelphusRepositoryVM.Childs.Clear();
-            foreach (var item in newRepo.ContentShrub.ContentTrees)
+            foreach (var item in newRepo.ContentShrub.ContentWorkingTrees)
             {
                 if (item.ContentRoot != null)
                 {

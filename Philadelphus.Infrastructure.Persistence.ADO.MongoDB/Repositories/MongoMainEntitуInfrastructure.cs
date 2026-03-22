@@ -11,7 +11,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
 {
-    public class MongoMainEntitуInfrastructure : IPhiladelphusRepositoriesMembersInfrastructureRepository
+    public class MongoMainEntitуInfrastructure : IShrubMembersInfrastructureRepository
     {
         MongoClient _client;
         IMongoDatabase _database;
@@ -177,33 +177,6 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             long result = new long();
             return result;
         }
-        #endregion
-
-
-        public bool CheckAvailability()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<ElementAttribute> SelectAttributes()
-        {
-            throw new NotImplementedException();
-        }
 
         public IEnumerable<WorkingTree> SelectTrees()
         {
@@ -211,6 +184,26 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         }
 
         public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeRoot> SelectRoots(Guid[] owningTreesUuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeNode> SelectNodes(Guid[] owningTreesUuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TreeLeave> SelectLeaves(Guid[] owningTreesUuids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids)
         {
             throw new NotImplementedException();
         }
@@ -229,5 +222,13 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public bool CheckAvailability()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+
     }
 }

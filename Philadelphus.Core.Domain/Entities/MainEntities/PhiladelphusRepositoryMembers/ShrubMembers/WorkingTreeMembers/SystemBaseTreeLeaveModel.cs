@@ -26,7 +26,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             SystemBaseTreeNodeModel parent, 
             WorkingTreeModel owner,
             SystemBaseType type) 
-            : base(uuid, parent, owner, new TreeLeave())
+            : base(uuid, parent, owner)
         {
             SystemBaseType = type;
         }

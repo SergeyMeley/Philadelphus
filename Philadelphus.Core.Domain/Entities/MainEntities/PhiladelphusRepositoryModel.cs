@@ -189,16 +189,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="dbEntity">Сущность БД</param>
         internal PhiladelphusRepositoryModel(
             Guid uuid, 
-            IDataStorageModel dataStorage, 
-            PhiladelphusRepository dbEntity)
-            : base(uuid, dbEntity)
+            IDataStorageModel dataStorage)
+            : base(uuid)
         {
             if (dataStorage == null)
                 throw new ArgumentNullException(nameof(dataStorage));
 
             OwnDataStorage = dataStorage;
 
-            ContentShrub = new ShrubModel(uuid, dbEntity, this);
+            ContentShrub = new ShrubModel(uuid, this);
 
         }
 

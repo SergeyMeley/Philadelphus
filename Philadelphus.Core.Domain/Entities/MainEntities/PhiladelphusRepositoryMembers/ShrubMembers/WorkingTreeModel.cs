@@ -140,9 +140,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal WorkingTreeModel(
             Guid uuid,
             IDataStorageModel dataStorage,
-            WorkingTree dbEntity,
             ShrubModel owner)
-            : base(uuid, owner, dbEntity)
+            : base(uuid, owner)
         {
             if (dataStorage == null)
                 throw new ArgumentNullException(nameof(dataStorage));

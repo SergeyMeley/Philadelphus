@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
@@ -74,7 +73,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                     var model = _service.CreateDataStorageModel(Name, Description, SelectedConnectionStringContainer);
                     var vm = new DataStorageVM(model);
-                    var entity = model.ToDbEntity();
+                    var entity = _mapper.Map<DataStorage>(model);
                     _dataStoragesCollectionConfig.Value.DataStorages.Add(entity);
                     _configurationService.UpdateConfigFile<DataStoragesCollectionConfig>(_configFile, _dataStoragesCollectionConfig);
                     _dataStoragesCollectionVM.DataStoragesVMs.Add(vm);

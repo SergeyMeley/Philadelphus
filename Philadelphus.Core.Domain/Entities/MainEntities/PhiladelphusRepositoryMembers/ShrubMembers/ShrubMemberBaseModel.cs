@@ -23,8 +23,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         protected override string _defaultFixedPartOfName => "Новый участник кустарника";
 
+        private List<ElementAttributeModel> _attributes = new List<ElementAttributeModel>();
+        private IReadOnlyList<ElementAttributeModel> _cachedAttributes;
+
         private long _sequence;
-        private List<ElementAttributeModel> _attributes;
+
+        private object _lockObject = new();
+        private int _version = 0;
+        private int _cachedVersion = -1;
 
         #endregion
 
@@ -88,8 +94,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Атрибуты (собственные и унаследованные)
         /// </summary>
         public IReadOnlyList<ElementAttributeModel> Attributes 
-        { 
+        {
             get
+            {
+                if (_cachedVersion != _version)
+                {
+                    lock (_lockObject)
+                    {
+                        var result = GetActualAttributesList();
+                        _cachedAttributes = result;
+                        _cachedVersion = _version;
+                    }
+                }
+                return _cachedAttributes;
+            }
+        }
+
+        private IReadOnlyList<ElementAttributeModel> GetActualAttributesList()
+        {
+            lock (_lockObject)
             {
                 var attributes = _attributes?.Where(x => x.IsOwn).ToList();
 
@@ -124,8 +147,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
                 attributes.AddRange(newParentAttributes);
 
-                _attributes = attributes;
-                return attributes;
+                return attributes.AsReadOnly();
             }
         }
 
@@ -134,7 +156,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public IReadOnlyList<ElementAttributeModel> PersonalAttributes 
         { 
-            get => _attributes?.Where(x => x.IsOwn).ToList(); 
+            get => Attributes?.Where(x => x.IsOwn).ToList(); 
         }
 
         /// <summary>
@@ -142,7 +164,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public IReadOnlyList<ElementAttributeModel> ParentElementAttributes
         {
-            get => _attributes?.Where(x => x.IsOwn == false).ToList();
+            get => Attributes?.Where(x => x.IsOwn == false).ToList();
         }
 
         /// <summary>
@@ -152,13 +174,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             get
             {
-                if (Attributes.Count() > 0)
-                    return true;
-                if (PersonalAttributes.Count() > 0)
-                    return true;
-                if (ParentElementAttributes.Count() > 0)
-                    return true;
-                return false;
+                return _attributes.Any();
             }
         }
 
@@ -182,15 +198,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         internal ShrubMemberBaseModel(
             Guid uuid,
-            ShrubModel owner,
-            IMainEntity dbEntity)
-            : base(uuid, dbEntity, owner.OwningRepository)
+            ShrubModel owner)
+            : base(uuid, owner.OwningRepository)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
 
             OwningShrub = owner;
-            _attributes = new List<ElementAttributeModel>();
         }
 
         #endregion
@@ -201,26 +215,47 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
-        public void AddAttribute(ElementAttributeModel attribute)
+        public bool AddAttribute(ElementAttributeModel attribute)
         {
-            _attributes.Add(attribute);
+            lock (_lockObject)
+            {
+                if (_attributes.Any(x => x.Uuid == attribute.Uuid))
+                    return false;
+
+                _attributes.Add(attribute);
+                _version++;
+                return true;
+            }
          }
 
         /// <summary>
         /// Удалить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
-        public void RemoveAttribute(ElementAttributeModel attribute)
+        public bool RemoveAttribute(ElementAttributeModel attribute)
         {
-            _attributes.Remove(attribute);
+            lock (_lockObject)
+            {
+                if (_attributes.Any(x => x.Uuid == attribute.Uuid))
+                    return false;
+
+                _attributes.Remove(attribute);
+                _version++;
+                return true;
+            }
         }
 
         /// <summary>
         /// Очистить атрибуты
         /// </summary>
-        public void ClearAttributes()
+        public bool ClearAttributes()
         {
-            _attributes.Clear();
+            lock (_lockObject)
+            {
+                _attributes.Clear();
+                _version++;
+                return true;
+            }
         }
 
         /// <summary>
@@ -232,7 +267,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             if (viewer == null) yield break;
 
-            foreach (var attr in Attributes)
+            var allAttributes = Attributes; // Получаем один раз
+            foreach (var attr in allAttributes)
             {
                 var res = attr.Visibility switch
                 {

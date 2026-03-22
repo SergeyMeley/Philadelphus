@@ -94,9 +94,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         internal PhiladelphusRepositoryMemberBaseModel(
             Guid uuid,
-            IMainEntity dbEntity,
             PhiladelphusRepositoryModel owner)
-            : base(uuid, dbEntity)
+            : base(uuid)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));

@@ -92,9 +92,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         public WorkingTreeMemberBaseModel(
             Guid uuid,
-            WorkingTreeModel owner,
-            IMainEntity dbEntity)
-             : base(uuid, owner.OwningShrub, dbEntity)
+            WorkingTreeModel owner)
+             : base(uuid, owner.OwningShrub)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));

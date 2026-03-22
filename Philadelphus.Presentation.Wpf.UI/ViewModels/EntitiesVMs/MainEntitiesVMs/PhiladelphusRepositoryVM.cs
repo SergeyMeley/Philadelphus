@@ -43,7 +43,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
         public ObservableCollection<TreeRootVM> Childs { get => _childs; }
 
-        public string ChildsCount { get => $"Детей: {Childs?.Count()}, Корней: {_model?.ContentShrub?.ContentTrees?.Count()}, Uuids: NOT IMPLEMENTED"; }
+        public string ChildsCount { get => $"Детей: {Childs?.Count()}, Корней: {_model?.ContentShrub?.ContentWorkingTrees?.Count()}, Uuids: NOT IMPLEMENTED"; }
 
         public bool IsFavorite
         {
@@ -76,7 +76,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IPhiladelphusRepositoryService service)
             : base(repositoryModel, dataStoragesCollectionVM, service)
         {
-            foreach (var item in repositoryModel.ContentShrub.ContentTrees.Select(x => x.ContentRoot))
+            foreach (var item in repositoryModel.ContentShrub.ContentWorkingTrees.Select(x => x.ContentRoot))
             {
                 Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service));
             }

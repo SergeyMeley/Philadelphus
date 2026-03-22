@@ -2,12 +2,13 @@
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
+using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Serilog;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
@@ -66,18 +67,37 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Получить коллекцию хранилищ данных
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IDataStorageModel> GetStoragesModels()
+        public IEnumerable<IDataStorageModel> GetStoragesModels(
+            Func<ConnectionStringContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
             var connectionStrings = _connectionStringsCollection.Value.ConnectionStringContainers;
             var dbEntities = _dataStoragesCollection.Value.DataStorages;
             var models = new List<IDataStorageModel>();
-            foreach (var dbEntity in dbEntities)
+
+            foreach (var entity in dbEntities)
             {
-                var cs = connectionStrings.SingleOrDefault(x => x.Uuid == dbEntity.Uuid);
-                var model = dbEntity.ToModel(_logger, cs.ConnectionString);
-                models.Add(model);
+                var connectionString = connectionStrings.SingleOrDefault(x => x.Uuid == entity.Uuid);
+
+                if (connectionString == null)
+                {
+                    _logger.Error($"Не найдена строка подключения для хранилища {entity.Name}");
+                    _notificationService.SendTextMessage<DataStoragesService>($"Не найдена строка подключения для хранилища {entity.Name}");
+                }
+                else
+                {
+                    var infrastructureRepositories = new List<IInfrastructureRepository>();
+                    if (entity.IsHidden == false)
+                    {
+                        if (entity.HasPhiladelphusRepositoriesInfrastructureRepository)
+                            infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories));
+                        if (entity.HasShrubMembersInfrastructureRepository)
+                            infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
+                    }
+
+                    var model = _mapper.MapDataStorage(entity, infrastructureRepositories, _logger);
+                    yield return model;
+                }
             }
-            return models;
         }
 
         #endregion
@@ -139,7 +159,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     infrastructureType: InfrastructureTypes.PostgreSqlEf,
                     isDisabled: false)
             .SetRepository(new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString.ConnectionString))
-            .SetRepository(new PostgreEfMainEntitiesInfrastructureRepository(_logger, connectionString.ConnectionString))
+            .SetRepository(new PostgreEfShrubMembersInfrastructureRepository(_logger, connectionString.ConnectionString))
         ;
             var dataStorageModel = dataStorageBuilder.Build();
 

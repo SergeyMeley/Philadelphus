@@ -49,7 +49,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             if (repository == null)
                 return this;
-            if (_storageModel.IsDisabled)
+            if (_storageModel.IsHidden)
                 return this;
             if (_storageModel == null)
                 throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
@@ -78,6 +78,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 return null;
             if (_storageModel.InfrastructureRepositories == null || _storageModel.InfrastructureRepositories.Count == 0)
                 return null;
+            _storageModel.CheckAvailableAsync();
             return _storageModel;
         }
     }

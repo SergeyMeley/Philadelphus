@@ -26,7 +26,7 @@
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <lbs:DataStorageHeadersListBox DataStorageHeadersItemsSource="{Binding DataStoragesSettingsVM.DataStorageVMs}" DataStorageHeadersSelectedItem="{Binding DataStoragesSettingsVM.SelectedDataStorageVM, Mode=TwoWay}" Grid.Row="0" Grid.Column="0"></lbs:DataStorageHeadersListBox>
+                <lbs:DataStorageHeadersListBox DataStorageHeadersItemsSource="{Binding DataStoragesSettingsVM.DataStoragesVMs}" DataStorageHeadersSelectedItem="{Binding DataStoragesSettingsVM.SelectedDataStorageVM, Mode=TwoWay}" Grid.Row="0" Grid.Column="0"></lbs:DataStorageHeadersListBox>
                 <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="1" IsExpanded="False" ExpandDirection="Right">
                     <Expander.Header>
                         <TextBlock Text="Детальная информация">

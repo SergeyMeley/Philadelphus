@@ -76,7 +76,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         {
             get
             {
-                if (_model.PhiladelphusRepositoryMembersInfrastructureRepository == null)
+                if (_model.ShrubMembersInfrastructureRepository == null)
                     return false;
                 return true;
             }

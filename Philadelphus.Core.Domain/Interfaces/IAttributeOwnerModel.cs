@@ -33,18 +33,18 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Добавить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
-        public void AddAttribute(ElementAttributeModel attribute);
+        public bool AddAttribute(ElementAttributeModel attribute);
 
         /// <summary>
         /// Удалить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
-        public void RemoveAttribute(ElementAttributeModel attribute);
+        public bool RemoveAttribute(ElementAttributeModel attribute);
 
         /// <summary>
         /// Очистить атрибуты
         /// </summary>
-        public void ClearAttributes();
+        public bool ClearAttributes();
 
         /// <summary>
         /// Получить видимые атрибуты родителей

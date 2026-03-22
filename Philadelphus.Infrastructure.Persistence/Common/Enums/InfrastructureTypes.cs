@@ -3,14 +3,14 @@
     public enum InfrastructureTypes
     {
         Empty,
-        WindowsDirectory,
-        PostgreSqlAdo,
+        //WindowsDirectory,
+        //PostgreSqlAdo,
         PostgreSqlEf,
-        MongoDbAdo,
-        MongoDbEf,
-        MsSqlServerEf,
-        SQLite,
+        //MongoDbAdo,
+        //MongoDbEf,
+        //MsSqlServerEf,
+        //SQLite,
         JsonDocument,
-        XmlDocument
+        //XmlDocument
     }
 }

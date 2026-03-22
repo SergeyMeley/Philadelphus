@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -164,10 +165,13 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(MessagingConfig)));
 
                     // Регистрация AutoMapper
-                    services.AddAutoMapper(
-                        typeof(DomainMappingProfile),       // Model <-> Db Entity
-                        typeof(ViewModelsMappingProfile)    // Model <-> ViewModel
-                        );
+                    var profileAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                        .Where(a => a.GetTypes()
+                            .Any(t => typeof(Profile).IsAssignableFrom(t) &&
+                                     t.Namespace?.StartsWith("Philadelphus.") == true))
+                        .ToArray();
+
+                    services.AddAutoMapper(cfg => { }, profileAssemblies);
 
                     // Добавление отправителей и получателей сообщений
                     services.AddKafkaProducer<MessagingUser>(context.Configuration.GetSection($"{nameof(KafkaOptions<MessagingUser>)}:{nameof(MessagingUser)}"));
@@ -234,6 +238,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
                     services.AddTransient<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
                     services.AddTransient<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
+                    services.AddTransient<IInfrastructureRepositoryFactory, InfrastructureRepositoryFactory>();
                 })
                 .Build();
         }

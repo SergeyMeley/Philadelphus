@@ -6,10 +6,9 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
+using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
@@ -71,58 +70,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Get + Load ]
 
         /// <summary>
-        /// Получение репозитория по его уникальному идентификатору
-        /// </summary>
-        /// <param name="uuid">Уникальный идентификатор</param>
-        /// <returns>Репозиторий</returns>
-        public PhiladelphusRepository GetPhiladelphusRepositoryFromCollection(Guid uuid)
-        {
-            return GetPhiladelphusRepositoryModelFromCollection(uuid).ToDbEntity();
-        }
-        /// <summary>
-        /// Получение коллекции репозиториев по их уникальным идентификаторам
-        /// </summary>
-        /// <param name="uuids">Уникальные идентификаторы</param>
-        /// <returns>Коллекция репозиториев</returns>
-        public List<PhiladelphusRepository> GetPhiladelphusRepositoryFromCollection(IEnumerable<Guid> uuids)
-        {
-            return GetPhiladelphusRepositoryModelFromCollection(uuids).ToDbEntityCollection();
-        }
-        /// <summary>
-        /// Получение репозитория (модель) по его уникальному идентификатору
-        /// </summary>
-        /// <param name="uuid">Уникальный идентификатор</param>
-        /// <returns>Репозиторий (модель)</returns>
-        public PhiladelphusRepositoryModel GetPhiladelphusRepositoryModelFromCollection(Guid uuid)
-        {
-            return _dataPhiladelphusRepositories[uuid];
-        }
-        /// <summary>
-        /// Получение коллекции репозиториев (модели) по их UUID
-        /// </summary>
-        /// <param name="uuids">Уникальные идентификаторы</param>
-        /// <returns>Коллекция репозиториев (модели)</returns>
-        public List<PhiladelphusRepositoryModel> GetPhiladelphusRepositoryModelFromCollection(IEnumerable<Guid> uuids)
-        {
-            var result = new List<PhiladelphusRepositoryModel>();
-            foreach (var uuid in uuids)
-            {
-                if (_dataPhiladelphusRepositories.TryGetValue(uuid, out var model))
-                {
-                    result.Add(model);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Загрузка коллекции заголовков репозиториев (избранные или последние запускаемые) из настроечного файла
         /// </summary>
         /// <returns>Коллекция заголовков репозиториев (модели)</returns>
         public IEnumerable<PhiladelphusRepositoryHeaderModel> GetPhiladelphusRepositoryHeadersCollection()
         {
             var dbEntities = _PhiladelphusRepositoryHeadersCollection.Value.PhiladelphusRepositoryHeaders;
-            var result = dbEntities.ToModelCollection();
+            var result = _mapper.Map<List<PhiladelphusRepositoryHeaderModel>>(dbEntities);
             return result;
         }
         /// <summary>
@@ -163,7 +117,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     else
                         dbRepositories = infrastructure.SelectRepositories(uuids);
                     //var repositories = _mapper.Map<List<PhiladelphusRepositoryModel>>(dbRepositories);
-                    var repositories = dbRepositories?.ToModelCollection(dataStorages);
+                    var repositories = _mapper.MapPhiladelphusRepositories(dbRepositories, dataStorages).ToList();
                     if (repositories != null)
                     {
                         for (int i = 0; i < repositories.Count; i++)
@@ -204,8 +158,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий</returns>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage)
         {
-            var result = new PhiladelphusRepositoryModel(Guid.NewGuid(), dataStorage, new PhiladelphusRepository());
-            result.ContentShrub.ContentTreesUuids.Add(WorkingTreeModel.SystemBaseGuid);
+            var result = new PhiladelphusRepositoryModel(Guid.NewGuid(), dataStorage);
+            result.ContentShrub.ContentWorkingTreesUuids.Add(WorkingTreeModel.SystemBaseGuid);
             return result;
         }
 

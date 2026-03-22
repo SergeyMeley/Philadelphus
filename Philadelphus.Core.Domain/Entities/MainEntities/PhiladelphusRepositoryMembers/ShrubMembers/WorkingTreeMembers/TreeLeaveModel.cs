@@ -78,9 +78,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal TreeLeaveModel(
             Guid uuid,
             TreeNodeModel parent,
-            WorkingTreeModel owner,
-            IMainEntity dbEntity)
-            : base(uuid, owner, dbEntity)
+            WorkingTreeModel owner)
+            : base(uuid, owner)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));

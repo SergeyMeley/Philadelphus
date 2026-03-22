@@ -8,17 +8,17 @@ using Serilog;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {
-    public partial class MainEntitiesPhiladelphusContext : DbContext
+    public partial class ShrubMembersContext : DbContext
     {
         private readonly string _connectionString;
-        public MainEntitiesPhiladelphusContext()
+        public ShrubMembersContext()
         {
         }
-        public MainEntitiesPhiladelphusContext(string connectionString)
+        public ShrubMembersContext(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public MainEntitiesPhiladelphusContext(DbContextOptions<MainEntitiesPhiladelphusContext> options)
+        public ShrubMembersContext(DbContextOptions<ShrubMembersContext> options)
             : base(options)
         {
         }
@@ -35,7 +35,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
             {
                 optionsBuilder
                     .UseNpgsql(_connectionString)
-                    .UseLazyLoadingProxies();
+                    .UseLazyLoadingProxies()
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                     //.LogTo(Log.Information, LogLevel.Information)
                     //.EnableSensitiveDataLogging()
                     //.EnableDetailedErrors();

@@ -179,8 +179,8 @@ namespace Philadelphus.Core.Domain.Helpers
         private static void LinkAttributesToRealEntities(IPhiladelphusRepositoryService service, TreeRootModel treeRoot, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
         {
             // Получаем ВСЕ узлы и листы дерева
-            var allNodes = treeRoot.OwningShrub.ContentTrees.SelectMany(x => x.ContentRoot.GetAllNodesRecursive())?.ToList();
-            var allLeaves = treeRoot.OwningShrub.ContentTrees.SelectMany(x => x.ContentRoot.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>())?.ToList();
+            var allNodes = treeRoot.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentRoot.GetAllNodesRecursive())?.ToList();
+            var allLeaves = treeRoot.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentRoot.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>())?.ToList();
 
             foreach (var kvp in attributeLinkMap)
             {
