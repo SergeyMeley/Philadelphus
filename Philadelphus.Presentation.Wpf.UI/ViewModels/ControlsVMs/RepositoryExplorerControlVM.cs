@@ -170,7 +170,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    var result = _service.CreateTreeRoot(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
+                    var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
+                    var result = _service.CreateTreeRoot(tree);
                     _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));

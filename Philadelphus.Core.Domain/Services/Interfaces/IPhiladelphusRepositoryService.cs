@@ -91,7 +91,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Create + Add ]
 
-        public TreeRootModel CreateTreeRoot(PhiladelphusRepositoryModel parentElement, IDataStorageModel dataStorage);
+        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel parentElement, IDataStorageModel dataStorage);
+        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner);
         public TreeNodeModel CreateTreeNode(IParentModel parentElement);
         public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement);
         public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner);

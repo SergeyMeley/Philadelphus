@@ -730,23 +730,61 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Создать корень и добавить родителю
         /// </summary>
-        /// <param name="parentElement">Родитель</param>
+        /// <param name="owner">Родитель</param>
         /// <param name="dataStorage">Хранилище</param>
         /// <returns>Корень</returns>
-        public TreeRootModel CreateTreeRoot(PhiladelphusRepositoryModel parentElement, IDataStorageModel dataStorage)
+        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel owner, IDataStorageModel dataStorage)
         {
             try
             {
-                // TODO: Вынести в отдельный метод
-                var tree = new WorkingTreeModel(Guid.NewGuid(), dataStorage, parentElement.ContentShrub);
-                var root = new TreeRootModel(tree.Uuid, tree);
-                tree.ContentRoot = root;
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Начало создания рабочего дерева. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}]",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
 
-                var result = tree.ContentRoot;
+                var result = new WorkingTreeModel(Guid.NewGuid(), dataStorage, owner.ContentShrub);
 
-                parentElement.ContentShrub.ContentWorkingTrees.Add(tree);
-                parentElement.ContentShrub.ContentWorkingTreesUuids.Add(tree.Uuid);
-                SetModelState(parentElement, State.Changed);
+                owner.ContentShrub.ContentWorkingTrees.Add(result);
+                owner.ContentShrub.ContentWorkingTreesUuids.Add(result.Uuid);
+
+                SetModelState(result, State.Initialized);
+                SetModelState(owner, State.Changed);
+
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Завершение создания рабочего дерева.",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Ошибка создания рабочего дерева.", ex);
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Ошибка создания рабочего дерева. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Создать корень и добавить родителю
+        /// </summary>
+        /// <param name="parentElement">Родитель</param>
+        /// <param name="dataStorage">Хранилище</param>
+        /// <returns>Корень</returns>
+        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner)
+        {
+            try
+            {
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Начало создания корня. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}]",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+                
+                var result = new TreeRootModel(Guid.NewGuid(), owner);
+                
+                SetModelState(result, State.Initialized);
+
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Завершение создания корня.",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
 
                 return result;
             }
@@ -754,79 +792,86 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 _logger.LogError("Ошибка создания корня.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                    $"Ошибка создания корня. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
+
         /// <summary>
         /// Создать узел и добавить родителю
         /// </summary>
-        /// <param name="parentElement">Родитель</param>
+        /// <param name="parent">Родитель</param>
         /// <returns>Узел</returns>
-        public TreeNodeModel CreateTreeNode(IParentModel parentElement)
+        public TreeNodeModel CreateTreeNode(IParentModel parent)
         {
             try
             {
-                var result = new TreeNodeModel(Guid.NewGuid(), parentElement, (parentElement as IWorkingTreeMemberModel)?.OwningWorkingTree);
-                // Переработал на pull-модель
-                //if (parentElement is IAttributeOwnerModel)
-                //    result.ParentElementAttributes = ((IAttributeOwnerModel)parentElement).Attributes;
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}]",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
 
-                if (parentElement is TreeNodeModel node)
+                var result = new TreeNodeModel(Guid.NewGuid(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree);
+
+                if (parent is TreeNodeModel node)
                     node.ChildNodes.Add(result);
-                if (parentElement is TreeRootModel root)
+                if (parent is TreeRootModel root)
                     root.ChildNodes.Add(result);
 
                 SetModelState(result, State.Initialized);
+
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Завершение создания узла.",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+
                 return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания узла.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                    $"Ошибка создания узла. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
+
         /// <summary>
         /// Создать лист и добавить родителю
         /// </summary>
-        /// <param name="parentElement">Родитель</param>
+        /// <param name="parent">Родитель</param>
         /// <returns>Лист</returns>
-        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement)
+        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parent)
         {
             try
             {
-                if (parentElement is TreeNodeModel == false)
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}]",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+
+                TreeLeaveModel result = null;
+                if (parent is SystemBaseTreeNodeModel sbn)
                 {
-                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        "Лист можно добавить только в узел.");
-                    return null;
+                    result = new SystemBaseTreeLeaveModel(Guid.NewGuid(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType);
                 }
                 else
                 {
-                    TreeLeaveModel result = null;
-                    if (parentElement is SystemBaseTreeNodeModel sbn)
-                    {
-                        result = new SystemBaseTreeLeaveModel(Guid.NewGuid(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType);
-                    }
-                    else
-                    {
-                        result = new TreeLeaveModel(Guid.NewGuid(), parentElement, parentElement.OwningWorkingTree);
-                    }
-                    // Переработал на pull-модель
-                    //result.ParentElementAttributes = parentElement.Attributes;
-                    parentElement.ChildLeaves.Add(result);
-                    //parentElement.State = State.Changed;
-                    SetModelState(result, State.Initialized);
-                    return result;
+                    result = new TreeLeaveModel(Guid.NewGuid(), parent, parent.OwningWorkingTree);
                 }
+
+                parent.ChildLeaves.Add(result);
+
+                SetModelState(result, State.Initialized);
+
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Завершение создания листа.",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания листа.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                    $"Ошибка создания листа. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -840,6 +885,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             try
             {
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}]",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+
                 var uuid = Guid.NewGuid();
 
                 if (owner is WorkingTreeMemberBaseModel wtm)
@@ -850,22 +899,27 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         Override = OverrideType.Virtual
                     };
 
+                    owner.AddAttribute(result);
+
                     SetModelState(result, State.Initialized);
 
-                    owner.AddAttribute(result);
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Завершение создания атрибута.",
+                        criticalLevel: NotificationCriticalLevelModel.Info);
 
                     return result;
                 }
                 _logger.LogWarning("Попытка добавления атрибута элементу, НЕ являющумяся участником рабочего дерева.");
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Атрибут можно добавить только участнику рабочего дерева.");
+                    $"Ошибка создания атрибута. Атрибут можно добавить только участнику рабочего дерева.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
                 return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания атрибута.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                    $"Ошибка создания атрибута. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
