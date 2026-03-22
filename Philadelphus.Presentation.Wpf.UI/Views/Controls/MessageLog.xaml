@@ -116,7 +116,8 @@
                       HorizontalScrollBarVisibility="Auto"
                       ColumnWidth="*"
                       Height="200"
-                      MinHeight="200">
+                      MinHeight="200"
+                      CanUserResizeRows="True">
                 <DataGrid.Resources>
                     <DataTemplate x:Key="IconColumnTemplate">
                         <Image Source="{Binding CriticalLevel, Converter={StaticResource criticalLevelToIconConverter}}" Height="15"></Image>
@@ -124,9 +125,15 @@
                 </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="К." CellTemplate="{StaticResource IconColumnTemplate}" Width="auto" MaxWidth="30" IsReadOnly="True"></DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="120" IsReadOnly="True"></DataGridTextColumn>
                     <DataGridTextColumn Header="Отправитель" Binding="{Binding SenderDisplayName}" Width="auto" MinWidth="150" IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Сообщение" Binding="{Binding Text}" Width="7*" MinWidth="900" IsReadOnly="True" ></DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Сообщение" Width="7*" MinWidth="900" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Height="auto" MaxHeight="50"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Источник" Binding="{Binding Source}" Width="*" MinWidth="350" IsReadOnly="True"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
