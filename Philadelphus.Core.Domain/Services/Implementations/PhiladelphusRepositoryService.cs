@@ -313,6 +313,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             // Проверка исходных данных
             if (repository == null)
                 return 0;
+            
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Начало сохранения репозитория. Репозиторий: '{repository.Name}'",
+                criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Преобразование в сущность БД
             long result = 0;
@@ -320,7 +325,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             var entity = _mapper.Map<PhiladelphusRepository>(repository);
             var storage = repository.OwnDataStorage;
 
-             // Сохранение изменений
+            // Сохранение изменений
             switch (repository.State)
             {
                 case State.Initialized:
@@ -354,10 +359,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += SaveChanges(repository.ContentShrub.ContentWorkingTrees, saveMode);
             }
 
-            // Возвращение обновленной информации
-            // Не переносить, ломается логика
-            //repository = infrastructure.SelectRepositories(new Guid[] { repository.Uuid }).First().ToModel(storage);  
-            //repository = GetShrub(repository);      // Не переносить, ломается логика
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Завершение сохранения репозитория. Сохранено {result} элементов.",
+                criticalLevel: NotificationCriticalLevelModel.Info);
 
             return result;
         }
@@ -374,8 +379,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (workingTrees == null || workingTrees.Count() == 0)
                 return 0;
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Начало сохранения рабочих деревьев. Рабочие деревья: {string.Join(", ", workingTrees.Select(x => $"'{x.Name}' [{x.Uuid}]").Distinct())}",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+            
             // Сохранение изменений
             long result = 0;
+            long initCount = 0;
+            long changedCount = 0;
+            long deletedCount = 0;
             foreach (var infrastructure in workingTrees.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
                 var fullCollection = workingTrees.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
@@ -383,20 +396,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SaveAndReturnAuditInfo<WorkingTreeModel, WorkingTree>(
                     fullCollection, 
                     State.Initialized,
-                    dbCollection => result += infrastructure.InsertTrees(dbCollection),
+                    dbCollection => initCount = infrastructure.InsertTrees(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<WorkingTreeModel, WorkingTree>(
                     fullCollection,
                     State.Changed,
-                    dbCollection => result += infrastructure.UpdateTrees(dbCollection),
+                    dbCollection => changedCount = infrastructure.UpdateTrees(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<WorkingTreeModel, WorkingTree>(
                     fullCollection,
                     State.ForSoftDelete,
-                    dbCollection => result += infrastructure.SoftDeleteTrees(dbCollection),
+                    dbCollection => deletedCount = infrastructure.SoftDeleteTrees(dbCollection),
                     ref result);
+
+                result += initCount + changedCount + deletedCount;
             }
 
             // Актуализация статуса
@@ -418,6 +433,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += SaveChanges(workingTrees.Select(x => x.ContentRoot), saveMode);
             }
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Завершение сохранения рабочих деревьев. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             return result;
         }
 
@@ -433,8 +453,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (treeRoots == null || treeRoots.Count() == 0)
                 return 0;
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Начало сохранения корней. Рабочие деревья: {string.Join(", ", treeRoots.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             // Сохранение изменений
             long result = 0;
+            long initCount = 0;
+            long changedCount = 0;
+            long deletedCount = 0;
             foreach (var infrastructure in treeRoots.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
                 var fullCollection = treeRoots.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
@@ -442,20 +470,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SaveAndReturnAuditInfo<TreeRootModel, TreeRoot>(
                     fullCollection,
                     State.Initialized,
-                    dbCollection => result += infrastructure.InsertRoots(dbCollection),
+                    dbCollection => initCount = infrastructure.InsertRoots(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<TreeRootModel, TreeRoot>(
                     fullCollection,
                     State.Changed,
-                    dbCollection => result += infrastructure.UpdateRoots(dbCollection),
+                    dbCollection => changedCount = infrastructure.UpdateRoots(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<TreeRootModel, TreeRoot>(
                     fullCollection,
                     State.ForSoftDelete,
-                    dbCollection => result += infrastructure.SoftDeleteRoots(dbCollection),
+                    dbCollection => deletedCount = infrastructure.SoftDeleteRoots(dbCollection),
                     ref result);
+
+                result += initCount + changedCount + deletedCount;
             }
 
             // Актуализация статуса
@@ -477,6 +507,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += SaveChanges(treeRoots.SelectMany(x => x.ChildNodes), saveMode);
             }
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Завершение сохранения корней. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             return result;
         }
 
@@ -492,8 +527,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (treeNodes == null || treeNodes.Count() == 0)
                 return 0;
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Начало сохранения узлов. Рабочие деревья: {string.Join(", ", treeNodes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             // Сохранение изменений
             long result = 0;
+            long initCount = 0;
+            long changedCount = 0;
+            long deletedCount = 0;
             foreach (var infrastructure in treeNodes.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
                 var fullCollection = treeNodes.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
@@ -501,20 +544,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SaveAndReturnAuditInfo<TreeNodeModel, TreeNode>(
                     fullCollection,
                     State.Initialized,
-                    dbCollection => result += infrastructure.InsertNodes(dbCollection),
+                    dbCollection => initCount = infrastructure.InsertNodes(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<TreeNodeModel, TreeNode>(
                     fullCollection,
                     State.Changed,
-                    dbCollection => result += infrastructure.UpdateNodes(dbCollection),
+                    dbCollection => changedCount = infrastructure.UpdateNodes(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<TreeNodeModel, TreeNode>(
                     fullCollection,
                     State.ForSoftDelete,
-                    dbCollection => result += infrastructure.SoftDeleteNodes(dbCollection),
+                    dbCollection => deletedCount = infrastructure.SoftDeleteNodes(dbCollection),
                     ref result);
+
+                result += initCount + changedCount + deletedCount;
             }
 
             // Актуализация статуса
@@ -537,6 +582,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += SaveChanges(treeNodes.SelectMany(x => x.ChildLeaves), saveMode);
             }
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Завершение сохранения узлов. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             return result;
         }
 
@@ -552,8 +602,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (treeLeaves == null || treeLeaves.Count() == 0)
                 return 0;
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Начало сохранения листов. Рабочие деревья: {string.Join(", ", treeLeaves.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             // Сохранение изменений
             long result = 0;
+            long initCount = 0;
+            long changedCount = 0;
+            long deletedCount = 0;
             foreach (var infrastructure in treeLeaves.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
                 var fullCollection = treeLeaves.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
@@ -561,20 +619,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SaveAndReturnAuditInfo<TreeLeaveModel, TreeLeave>(
                     fullCollection,
                     State.Initialized,
-                    dbCollection => result += infrastructure.InsertLeaves(dbCollection),
+                    dbCollection => initCount = infrastructure.InsertLeaves(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<TreeLeaveModel, TreeLeave>(
                     fullCollection,
                     State.Changed,
-                    dbCollection => result += infrastructure.UpdateLeaves(dbCollection),
+                    dbCollection => changedCount = infrastructure.UpdateLeaves(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<TreeLeaveModel, TreeLeave>(
                     fullCollection,
                     State.ForSoftDelete,
-                    dbCollection => result += infrastructure.SoftDeleteLeaves(dbCollection),
+                    dbCollection => deletedCount = infrastructure.SoftDeleteLeaves(dbCollection),
                     ref result);
+
+                result += initCount + changedCount + deletedCount;
             }
 
             // Актуализация статуса
@@ -595,6 +655,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
             }
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Завершение сохранения листов. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             return result;
         }
 
@@ -609,8 +674,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (elementAttributes == null || elementAttributes.Count() == 0)
                 return 0;
 
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Начало сохранения атрибутов. Рабочие деревья: {string.Join(", ", elementAttributes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                criticalLevel: NotificationCriticalLevelModel.Info);
+
             // Сохранение изменений
             long result = 0;
+            long initCount = 0;
+            long changedCount = 0;
+            long deletedCount = 0;
             foreach (var infrastructure in elementAttributes.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
                 var fullCollection = elementAttributes.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
@@ -618,20 +691,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SaveAndReturnAuditInfo<ElementAttributeModel, ElementAttribute>(
                     fullCollection,
                     State.Initialized,
-                    dbCollection => result += infrastructure.InsertAttributes(dbCollection),
+                    dbCollection => initCount = infrastructure.InsertAttributes(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<ElementAttributeModel, ElementAttribute>(
                     fullCollection,
                     State.Changed,
-                    dbCollection => result += infrastructure.UpdateAttributes(dbCollection),
+                    dbCollection => changedCount = infrastructure.UpdateAttributes(dbCollection),
                     ref result);
 
                 SaveAndReturnAuditInfo<ElementAttributeModel, ElementAttribute>(
                     fullCollection,
                     State.ForSoftDelete,
-                    dbCollection => result += infrastructure.SoftDeleteAttributes(dbCollection),
+                    dbCollection => deletedCount = infrastructure.SoftDeleteAttributes(dbCollection),
                     ref result);
+
+                result += initCount + changedCount + deletedCount;
             }
 
             // Актуализация статуса
@@ -639,6 +714,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 SetModelState(elementAttribute, State.SavedOrLoaded);
             }
+
+            // Уведомление
+            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                $"Завершение сохранения атрибутов. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Info);
 
             return result;
         }
@@ -673,7 +753,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания корня.", ex);
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -702,7 +783,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания узла.", ex);
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -715,9 +797,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             try
             {
-                if (parentElement is IPhiladelphusRepositoryMemberModel == false || parentElement is TreeNodeModel == false)
+                if (parentElement is TreeNodeModel == false)
                 {
-                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>("Лист можно добавить только в узел.");
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        "Лист можно добавить только в узел.");
                     return null;
                 }
                 else
@@ -742,7 +825,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания листа.", ex);
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -773,13 +857,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     return result;
                 }
                 _logger.LogWarning("Попытка добавления атрибута элементу, НЕ являющумяся участником рабочего дерева.");
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Атрибут можно добавить только участнику рабочего дерева.");
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Атрибут можно добавить только участнику рабочего дерева.");
                 return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Ошибка создания атрибута.", ex);
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>($"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
             }
         }
@@ -877,7 +963,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             var tree = new WorkingTreeModel(
                 uuid: WorkingTreeModel.SystemBaseGuid,
                 dataStorage: shrub.DataStorage,
-                owner: shrub);
+                owner: shrub)
+            { 
+                Name = "Системное рабочее дерево" 
+            };
 
             var root = new TreeRootModel(
                 uuid: TreeRootModel.SystemBaseGuid,
