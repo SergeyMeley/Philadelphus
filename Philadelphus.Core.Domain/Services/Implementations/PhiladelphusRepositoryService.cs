@@ -381,7 +381,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения рабочих деревьев. Рабочие деревья: {string.Join(", ", workingTrees.Select(x => $"'{x.Name}' [{x.Uuid}]").Distinct())}",
+                $"Начало сохранения рабочих деревьев. Рабочие деревья: {string.Join(", ", workingTrees.Select(x => $"'{x.Name}' [{x.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
             
             // Сохранение изменений
@@ -455,7 +455,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения корней. Рабочие деревья: {string.Join(", ", treeRoots.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                $"Начало сохранения корней. Рабочие деревья: {string.Join(", ", treeRoots.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Сохранение изменений
@@ -529,7 +529,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения узлов. Рабочие деревья: {string.Join(", ", treeNodes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                $"Начало сохранения узлов. Рабочие деревья: {string.Join(", ", treeNodes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Сохранение изменений
@@ -604,7 +604,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения листов. Рабочие деревья: {string.Join(", ", treeLeaves.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                $"Начало сохранения листов. Рабочие деревья: {string.Join(", ", treeLeaves.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Сохранение изменений
@@ -676,7 +676,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения атрибутов. Рабочие деревья: {string.Join(", ", elementAttributes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}]").Distinct())}",
+                $"Начало сохранения атрибутов. Рабочие деревья: {string.Join(", ", elementAttributes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Сохранение изменений
@@ -738,7 +738,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания рабочего дерева. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}]",
+                    $"Начало создания рабочего дерева. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
                 var result = new WorkingTreeModel(Guid.NewGuid(), dataStorage, owner.ContentShrub);
@@ -775,7 +775,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания корня. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}]",
+                    $"Начало создания корня. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
                 
                 var result = new TreeRootModel(Guid.NewGuid(), owner);
@@ -807,7 +807,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}]",
+                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
                 var result = new TreeNodeModel(Guid.NewGuid(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree);
@@ -844,7 +844,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}]",
+                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
                 TreeLeaveModel result = null;
@@ -886,7 +886,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}]",
+                    $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
                 var uuid = Guid.NewGuid();
@@ -941,8 +941,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             try
             {
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Начало удаления элемента. Элемент - '{(element as IMainEntityModel).Name}' [{(element as IMainEntityModel).Uuid}].",
+                    criticalLevel: NotificationCriticalLevelModel.Info);
+
                 if (element == null)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление элемента невозможно, элемент не выбран, операция не выполнена. Выберите элемент для удаления и повторите попытку.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
                     return false;
+                }    
+
                 long result = 0;
                 if (element is IMainEntityWritableModel me)
                 {
@@ -961,11 +971,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     SetModelState(r.OwningShrub, State.Changed);
                 }
 
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Удаление элемента выполнено корректно. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
+
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                _logger.LogError("Ошибка удаления элемента.", ex);
+                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                    $"Ошибка удаления элемента. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                throw;
             }
         }
 
