@@ -23,7 +23,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IParentModel parent, 
             WorkingTreeModel owner, 
             SystemBaseType type) 
-            : base(GetUuidByType(type), parent, owner, new TreeNode())
+            : base(GetUuidByType(type), parent, owner)
         {
             SystemBaseType = type;
             InitProperties(type);
@@ -33,7 +33,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             Guid uuid,
             IParentModel parent,
             WorkingTreeModel owner)
-            : base(uuid, parent, owner, new TreeNode())
+            : base(uuid, parent, owner)
         {
             SystemBaseType = GetTypeByUuid(uuid);
             InitProperties(SystemBaseType);

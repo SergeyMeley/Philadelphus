@@ -4,19 +4,15 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attribu
 
 namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
 {
-    public interface IPhiladelphusRepositoriesMembersInfrastructureRepository : IInfrastructureRepository
+    public interface IShrubMembersInfrastructureRepository : IInfrastructureRepository
     {
         # region [ Select ]
 
-        public IEnumerable<WorkingTree> SelectTrees();
-        public IEnumerable<TreeRoot> SelectRoots();
-        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids);
+        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids = null);
         public IEnumerable<TreeRoot> SelectRoots(Guid[] owningTreesUuids);
-        public IEnumerable<TreeNode> SelectNodes();
         public IEnumerable<TreeNode> SelectNodes(Guid[] owningTreesUuids);
-        public IEnumerable<TreeLeave> SelectLeaves();
         public IEnumerable<TreeLeave> SelectLeaves(Guid[] owningTreesUuids);
-        public IEnumerable<ElementAttribute> SelectAttributes();
+        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids);
 
         #endregion
 

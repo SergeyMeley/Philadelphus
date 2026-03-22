@@ -1,8 +1,9 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes
 {
-    public class ElementAttribute : MainEntityBase
+    public class ElementAttribute : WorkingTreeMemberBase
     {
         public Guid DeclaringUuid { get; set; }
         public Guid OwnerUuid { get; set; }

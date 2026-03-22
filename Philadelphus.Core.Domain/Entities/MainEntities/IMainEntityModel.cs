@@ -30,7 +30,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Информация для аудита
         /// </summary>
-        public AuditInfoModel AuditInfo { get; }
+        public AuditInfoModel AuditInfo { get; set; }
 
         /// <summary>
         /// Скрыт от нового использования (устаревший для бизнеса)

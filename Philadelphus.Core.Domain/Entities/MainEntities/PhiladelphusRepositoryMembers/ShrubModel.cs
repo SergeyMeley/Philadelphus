@@ -58,7 +58,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Содержащиеся рабочие деревья
         /// </summary>
-        public List<WorkingTreeModel> ContentTrees { get; }
+        public List<WorkingTreeModel> ContentWorkingTrees { get; }
 
         /// <summary>
         /// Содержимое
@@ -69,7 +69,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 var result = new Dictionary<Guid, IContentModel>();
 
-                foreach (var item in ContentTrees)
+                foreach (var item in ContentWorkingTrees)
                 {
                     result.Add(item.Uuid, item);
                 }
@@ -90,7 +90,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Уникальные идентификаторы содержащихся деревьев
         /// </summary>
-        public List<Guid> ContentTreesUuids 
+        public List<Guid> ContentWorkingTreesUuids 
         { 
             get
             {
@@ -132,16 +132,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="owner">Владелец</param>
         internal ShrubModel(
             Guid uuid,
-            PhiladelphusRepository dbEntity,
             PhiladelphusRepositoryModel owner)
-            : base(uuid, dbEntity, owner)
+            : base(uuid, owner)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
 
             OwningRepository = owner;
 
-            ContentTrees = new List<WorkingTreeModel>();
+            ContentWorkingTrees = new List<WorkingTreeModel>();
         }
 
         #endregion

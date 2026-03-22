@@ -14,7 +14,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
     /// <summary>
     /// Атрибут элемента Чубушника
     /// </summary>
-    public class ElementAttributeModel : MainEntityBaseModel, IContentModel
+    public class ElementAttributeModel : WorkingTreeMemberBaseModel, IContentModel
     {
         #region [ Fields ]
 
@@ -23,6 +23,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         protected override string _defaultFixedPartOfName => "Новый атрибут";
 
+        private readonly IAttributeOwnerModel _attributeOwner;
+        private readonly IAttributeOwnerModel _declaringAttributeOwner;
         private bool _isCollectionValue = false;
         private TreeNodeModel _valueType;
         private TreeLeaveModel _value;
@@ -64,7 +66,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             {
                 if (Owner is ShrubMemberBaseModel sm)
                 {
-                    return sm.OwningShrub.ContentTrees
+                    return sm.OwningShrub.ContentWorkingTrees
                         .SelectMany(x => x.GetAllNodesRecursive());
                 }
                 throw new Exception("Владелец атрибута не является элементом репозитория. Непредвиденная ситуация, обратитесь к разработчику.");
@@ -191,12 +193,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Владелец
         /// </summary>
-        public IOwnerModel Owner { get; }
+        public IOwnerModel Owner { get => _attributeOwner; }
 
         /// <summary>
         /// Объявивший владелец, с которого унаследован атрибут
         /// </summary>
-        public IOwnerModel DeclaringOwner { get; }
+        public IOwnerModel DeclaringOwner { get => _declaringAttributeOwner; }
 
         /// <summary>
         /// Уникальный идентификатор в рамках текущего владельца
@@ -288,11 +290,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <param name="dbEntity">Сущность БД</param>
         public ElementAttributeModel(
             Guid localUuid, 
-            IOwnerModel localOwner, 
+            IAttributeOwnerModel localOwner, 
             Guid declaringUuid,
-            IOwnerModel declaringOwner,
-            IMainEntity dbEntity) 
-            : base(localUuid, dbEntity)
+            IAttributeOwnerModel declaringOwner,
+            WorkingTreeModel owningWorkingTree) 
+            : base(localUuid, owningWorkingTree)
         {
             ArgumentNullException.ThrowIfNull(localOwner, nameof(localOwner));
             ArgumentNullException.ThrowIfNull(declaringOwner, nameof(declaringOwner));
@@ -300,9 +302,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (declaringUuid == Guid.Empty)
                 throw new ArgumentException(nameof(declaringUuid));
 
-            Owner = localOwner;
+            _attributeOwner = localOwner;
             DeclaringUuid = declaringUuid;
-            DeclaringOwner = declaringOwner;
+            _declaringAttributeOwner = declaringOwner;
 
             if (Owner is IWorkingTreeMemberModel wtm)
             {
@@ -375,15 +377,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         /// <param name="newOwner"></param>
         /// <returns></returns>
-        public ElementAttributeModel CloneForChild(IOwnerModel newOwner)
+        public ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
         {
-            return new ElementAttributeModel(
+            var result = new ElementAttributeModel(
                 localUuid: Guid.NewGuid(),
                 localOwner: newOwner,
                 declaringUuid: this.DeclaringUuid,
-                declaringOwner: this.DeclaringOwner,
-                dbEntity: new ElementAttribute()
-            )
+                declaringOwner: this._declaringAttributeOwner,
+                owningWorkingTree: this.OwningWorkingTree)
             {
                 Name = this.Name,
                 Description = this.Description,
@@ -394,6 +395,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 Visibility = this.Visibility,
                 Override = this.Override
             };
+
+            newOwner.AddAttribute(result);
+
+            return result;
         }
 
         #endregion

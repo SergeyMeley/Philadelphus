@@ -45,17 +45,17 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Репозитории БД
         /// </summary>
-        public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories 
-        { 
+        public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories
+        {
             get
             {
-                if (_isDisabled)
+                if (_isHidden)
                     return null;
                 return _infrastructureRepositories;
             }
             internal set
             {
-                if (_isDisabled)
+                if (_isHidden)
                     return;
                 _infrastructureRepositories = value;
             }
@@ -68,7 +68,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             get
             {
-                if (_isDisabled)
+                if (_isHidden)
                     return null;
                 if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.PhiladelphusRepositories) == false)
                     return null;
@@ -77,19 +77,29 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         }
 
         /// <summary>
-        /// Репозиторий БД работы с участниками репозитория Чубушника
+        /// Репозиторий БД работы с участниками кустарника репозитория Чубушника
         /// </summary>
-        public IPhiladelphusRepositoriesMembersInfrastructureRepository PhiladelphusRepositoryMembersInfrastructureRepository
+        public IShrubMembersInfrastructureRepository ShrubMembersInfrastructureRepository
         {
             get
             {
-                if (_isDisabled)
+                if (_isHidden)
                     return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.MainEntities) == false)
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.ShrubMembers) == false)
                     return null;
-                return (IPhiladelphusRepositoriesMembersInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.MainEntities];
+                return (IShrubMembersInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.ShrubMembers];
             }
         }
+
+        /// <summary>
+        /// Имеет репозиторий БД работы с репозиториями Чубушника 
+        /// </summary>
+        public bool HasPhiladelphusRepositoriesInfrastructureRepository { get => PhiladelphusRepositoriesInfrastructureRepository != null; }
+
+        /// <summary>
+        /// Имеет репозиторий БД работы с участниками кустарника репозитория Чубушника
+        /// </summary>
+        public bool HasShrubMembersInfrastructureRepository { get => ShrubMembersInfrastructureRepository != null; }
 
         /// <summary>
         /// Доступность хранилища (доступность всех репозиториев БД)
@@ -104,12 +114,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Состояние отключенности
         /// </summary>
-        private bool _isDisabled;
+        private bool _isHidden;
 
         /// <summary>
         /// Состояние отключенности
         /// </summary>
-        public bool IsDisabled { get => _isDisabled; set => _isDisabled = value; }
+        public bool IsHidden { get => _isHidden; set => _isHidden = value; }
 
 
         /// <summary>
@@ -129,26 +139,22 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="name">Наименование</param>
         /// <param name="description">Описание</param>
         /// <param name="infrastructureType">Тип</param>
-        /// <param name="isDisabled">Состояние отключенности</param>
+        /// <param name="isHidden">Состояние отключенности</param>
         internal DataStorageModel(
             ILogger logger,
             Guid uuid, 
             string name, 
             string description,
             InfrastructureTypes infrastructureType, 
-            bool isDisabled)
+            bool isHidden)
         {
             _logger = logger;
             Uuid = uuid;
             Name = name;
             Description = description;
             InfrastructureType = infrastructureType;
-            IsDisabled = isDisabled;
-            if (IsDisabled == false)
-            {
-                InfrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
-            }
-            Task.Run(() => CheckAvailableAsync());
+            IsHidden = isHidden;
+            InfrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
         }
 
         /// <summary>
@@ -158,7 +164,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <returns></returns>
         public bool StartAvailableAutoChecking(int interval = 60)
         {
-             if (_isDisabled)
+            if (_isHidden)
                 return false;
             if (_isAutoChecking)
                 return false;
@@ -201,7 +207,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             var task = Task.Run(() =>
             {
-                if (_isDisabled)
+                if (_isHidden)
                 {
                     _isAvailable = false;
                 }

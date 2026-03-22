@@ -26,12 +26,12 @@ set PROJECT_DIR=D:\MelSV_Projects\Philadelphus.General\Philadelphus.Infrastructu
 cd /d "%PROJECT_DIR%"
 echo Текущая директория: %CD%
 
-echo Создание миграции для PhiladelphusRepositoriesPhiladelphusContext...
-dotnet ef migrations add %MIGRATION_NAME% -c PhiladelphusRepositoriesPhiladelphusContext -o "Migrations\TreeRepositoriesPhiladelphusContextMigrations"
+echo Создание миграции для PhiladelphusRepositoriesContext...
+dotnet ef migrations add %MIGRATION_NAME% -c PhiladelphusRepositoriesContext -o "Migrations\TreeRepositoriesPhiladelphusContextMigrations"
 
 
-echo Создание миграции для MainEntitiesPhiladelphusContext...
-dotnet ef migrations add %MIGRATION_NAME% -c MainEntitiesPhiladelphusContext -o "Migrations\MainEntitiesPhiladelphusContextMigrations"
+echo Создание миграции для ShrubMembersContext...
+dotnet ef migrations add %MIGRATION_NAME% -c ShrubMembersContext -o "Migrations\MainEntitiesPhiladelphusContextMigrations"
 
 
 ::echo Создание миграции для DataStoragesPhiladelphusContext...

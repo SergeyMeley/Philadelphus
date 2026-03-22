@@ -131,13 +131,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="dbEntity">Сущность БД</param>
         internal MainEntityBaseModel(
-            Guid uuid, 
-            IMainEntity dbEntity)
+            Guid uuid)
         {
             if (uuid == Guid.Empty)
                 throw new ArgumentNullException(nameof(uuid));
-            if (dbEntity == null)
-                throw new ArgumentNullException(nameof(dbEntity));
 
             Uuid = uuid;
             Name = NamingHelper.GetNewName(new List<string>(), _defaultFixedPartOfName);

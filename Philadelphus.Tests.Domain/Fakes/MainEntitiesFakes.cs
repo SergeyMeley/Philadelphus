@@ -26,13 +26,17 @@ namespace Philadelphus.Tests.Domain.Fakes
 
         public IPhiladelphusRepositoriesInfrastructureRepository PhiladelphusRepositoriesInfrastructureRepository => throw new NotImplementedException();
 
-        public IPhiladelphusRepositoriesMembersInfrastructureRepository PhiladelphusRepositoryMembersInfrastructureRepository => throw new NotImplementedException();
+        public IShrubMembersInfrastructureRepository ShrubMembersInfrastructureRepository => throw new NotImplementedException();
 
         public bool IsAvailable => throw new NotImplementedException();
 
-        public bool IsDisabled { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsHidden { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public DateTime LastCheckTime => throw new NotImplementedException();
+
+        public bool HasPhiladelphusRepositoriesInfrastructureRepository => throw new NotImplementedException();
+
+        public bool HasShrubMembersInfrastructureRepository => throw new NotImplementedException();
 
         public bool CheckAvailable()
         {
@@ -68,7 +72,7 @@ namespace Philadelphus.Tests.Domain.Fakes
             var dbEntity = new FakePhiladelphusRepository();
 
             // Act
-            var sut = new PhiladelphusRepositoryModelTestingFixture(uuid, dataStorage, dbEntity);
+            var sut = new PhiladelphusRepositoryModelTestingFixture(uuid, dataStorage);
 
             // Assert
             sut.Uuid.Should().Be(uuid);
@@ -85,7 +89,7 @@ namespace Philadelphus.Tests.Domain.Fakes
         public void Constructor_NullDataStorage_ThrowsArgumentNullException()
         {
             // Arrange
-            var act = () => new PhiladelphusRepositoryModelTestingFixture(Guid.NewGuid(), null!, new FakePhiladelphusRepository());
+            var act = () => new PhiladelphusRepositoryModelTestingFixture(Guid.NewGuid(), null!);
 
             act.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dataStorage");
         }
@@ -95,8 +99,8 @@ namespace Philadelphus.Tests.Domain.Fakes
 
     internal class PhiladelphusRepositoryModelTestingFixture : PhiladelphusRepositoryModel
     {
-        public PhiladelphusRepositoryModelTestingFixture(Guid uuid, IDataStorageModel dataStorage, Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepository dbEntity)
-            : base(uuid, dataStorage, dbEntity) { }
+        public PhiladelphusRepositoryModelTestingFixture(Guid uuid, IDataStorageModel dataStorage)
+            : base(uuid, dataStorage) { }
 
         // Переопределяем абстрактный DataStorage
         public override Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages.IDataStorageModel DataStorage => OwnDataStorage;

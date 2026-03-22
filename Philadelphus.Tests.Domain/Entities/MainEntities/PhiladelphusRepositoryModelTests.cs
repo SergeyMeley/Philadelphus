@@ -21,7 +21,7 @@ public class PhiladelphusRepositoryModelTests
         var dbEntity = new Mock<PhiladelphusRepository>().Object;
 
         // Act
-        var sut = CreateSut(uuid, dataStorage, dbEntity);
+        var sut = CreateSut(uuid, dataStorage);
 
         // Assert
         sut.Uuid.Should().Be(uuid);
@@ -38,7 +38,7 @@ public class PhiladelphusRepositoryModelTests
     [Fact]
     public void Constructor_NullDataStorage_ThrowsArgumentNullException()
     {
-        var act = () => CreateSut(Guid.NewGuid(), null!, new Mock<PhiladelphusRepository>().Object);
+        var act = () => CreateSut(Guid.NewGuid(), null!);
 
         act.Should().Throw<ArgumentNullException>()
             .And.ParamName.Should().Be("dataStorage");
@@ -50,7 +50,7 @@ public class PhiladelphusRepositoryModelTests
     public void IsFavorite_SetDifferentValue_UpdatesStateToChanged(bool newValue)
     {
         // Arrange
-        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage(), new Mock<PhiladelphusRepository>().Object);
+        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage());
 
         // Act
         sut.IsFavorite = newValue;
@@ -64,7 +64,7 @@ public class PhiladelphusRepositoryModelTests
     public void OwnDataStorageName_SetNewValue_UpdatesStorageNameAndState()
     {
         // Arrange
-        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage(), new Mock<PhiladelphusRepository>().Object);
+        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage());
         const string newName = "Новое хранилище";
 
         // Act
@@ -79,7 +79,7 @@ public class PhiladelphusRepositoryModelTests
     public void ChangeDataStorage_Always_ThrowsNotImplementedException()
     {
         // Arrange
-        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage(), new Mock<PhiladelphusRepository>().Object);
+        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage());
         var newStorage = CreateFakeDataStorage();
 
         // Act & Assert
@@ -87,8 +87,8 @@ public class PhiladelphusRepositoryModelTests
             .Should().ThrowExactly<NotImplementedException>();
     }
 
-    private static PhiladelphusRepositoryModelTestingFixture CreateSut(Guid uuid, IDataStorageModel dataStorage, PhiladelphusRepository dbEntity) =>
-        new(uuid, dataStorage, dbEntity);
+    private static PhiladelphusRepositoryModelTestingFixture CreateSut(Guid uuid, IDataStorageModel dataStorage) =>
+        new(uuid, dataStorage);
 
     private static IDataStorageModel CreateFakeDataStorage()
     {
@@ -103,8 +103,8 @@ public class PhiladelphusRepositoryModelTests
 // FIXTURE для обхода internal конструктора
 internal class PhiladelphusRepositoryModelTestingFixture : PhiladelphusRepositoryModel
 {
-    public PhiladelphusRepositoryModelTestingFixture(Guid uuid, IDataStorageModel dataStorage, PhiladelphusRepository dbEntity)
-        : base(uuid, dataStorage, dbEntity) { }
+    public PhiladelphusRepositoryModelTestingFixture(Guid uuid, IDataStorageModel dataStorage)
+        : base(uuid, dataStorage) { }
 
     public override IDataStorageModel DataStorage => OwnDataStorage;
 }

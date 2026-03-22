@@ -5,160 +5,53 @@ using Npgsql;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Serilog;
 using System.Diagnostics;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
-    public class PostgreEfPhiladelphusRepositoriesInfrastructureRepository : IPhiladelphusRepositoriesInfrastructureRepository
+    public class PostgreEfPhiladelphusRepositoriesInfrastructureRepository : PostgreEfInfrastructureRepositoryBase<PhiladelphusRepositoriesContext>, IPhiladelphusRepositoriesInfrastructureRepository
     {
-        private readonly ILogger _logger;
-        public InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.PhiladelphusRepositories; }
-
-        private string _connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
-
-        private PhiladelphusRepositoriesPhiladelphusContext _context;
+        public override InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.PhiladelphusRepositories; }
         public PostgreEfPhiladelphusRepositoriesInfrastructureRepository(
             ILogger logger,
-            string connectionString, 
+            string connectionString,
             bool needEnsureDeleted = false)
+            : base(logger, connectionString)
         {
-            _logger = logger;
-            _connectionString = connectionString;   //TODO: Заменить на использование контекста на сессию с ленивой загрузкой  
-            _context = new PhiladelphusRepositoriesPhiladelphusContext(connectionString);
-
-            if (CheckAvailability())
+        }
+        protected override PhiladelphusRepositoriesContext GetNewContext() => new PhiladelphusRepositoriesContext(_connectionString);
+        protected override DbSet<TEntity> GetDbSet<TEntity>(PhiladelphusRepositoriesContext context) where TEntity : class
+        {
+            return typeof(TEntity).Name switch
             {
-                //_context.Database.EnsureDeleted();
-                _context.Database.EnsureCreated();
-
-                if (_context.Database.GetPendingMigrations().ToList().Any())
-                {
-                    try
-                    {
-                        _context.Database.Migrate();
-                    }
-                    catch (PostgresException ex) when (ex.SqlState == "42P07") { }
-                    catch (Exception ex) { throw; }
-                }
+                nameof(PhiladelphusRepository) => context.Repositories as DbSet<TEntity>,
+                _ => throw new NotSupportedException($"Тип {typeof(TEntity).Name} не поддерживается.")
+            };
+        }
+        protected override void SetNavigationProperties<TEntity, TNav>(TEntity item, Dictionary<Guid, TNav> navigationEntities)
+        {
+            switch (item)
+            {
+                case PhiladelphusRepository repository:
+                    break;
             }
         }
-        public bool CheckAvailability()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            using (var context = GetNewContext())
-            {
-                if (context.Database.CanConnect() == false)
-                    return false;
-                try
-                {
-                    if (context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
-                        return false;
-                    context.Database.ExecuteSqlRaw($"SELECT {0}", 1);
-                    context.Database.OpenConnection();
-                    context.Database.CloseConnection();
-                }
-                catch (Exception ex)
-                {
-                    return false;
-                }
 
-                sw.Stop();
-                var t = sw.ElapsedMilliseconds;
-
-                _logger.Information($"Task '{Task.CurrentId}'. Репозиторий БД '{this.GetType().Name}'. t = {sw.ElapsedMilliseconds} мс.");
-
-                return true;
-            }
-        }
-        private PhiladelphusRepositoriesPhiladelphusContext GetNewContext() => new PhiladelphusRepositoriesPhiladelphusContext(_connectionString);
-        public IEnumerable<PhiladelphusRepository> SelectRepositories()
-        {
-            if (CheckAvailability() == false)
-                return null;
-
-            List<PhiladelphusRepository> result = null;
-
-            using (var context = GetNewContext())
-            {
-                result = context.Repositories.Where(x => x.AuditInfo.IsDeleted == false).ToList();
-            }
-
-            return result;
-        }
-        public IEnumerable<PhiladelphusRepository> SelectRepositories(Guid[] uuids)
-        {
-            if (CheckAvailability() == false)
-                return null;
-
-            List<PhiladelphusRepository> result = null;
-
-            using (var context = GetNewContext())
-            {
-                result = context.Repositories.Where(x =>
-                x.AuditInfo.IsDeleted == false
-                && uuids.Contains(x.Uuid)
-                ).ToList();
-            }
-
-            return result;
-        }
+        public IEnumerable<PhiladelphusRepository> SelectRepositories(Guid[] uuids = null)
+            => Select<PhiladelphusRepository>(ownUuids: uuids);
 
         public long InsertRepository(PhiladelphusRepository item)
-        {
-            if (CheckAvailability() == false)
-                return -1;
+            => Insert(new List<PhiladelphusRepository>() { item });
 
-            long result = 0;
-
-            using (var context = GetNewContext())
-            {
-                item.AuditInfo.CreatedAt = DateTime.UtcNow;
-                item.AuditInfo.CreatedBy = Environment.UserName;
-                context.Repositories.Add(item);
-                result = context.SaveChanges();
-            }
-
-            return result;
-        }
         public long UpdateRepository(PhiladelphusRepository item)
-        {
-            if (CheckAvailability() == false)
-                return -1;
+            => Update(new List<PhiladelphusRepository>() { item });
 
-            long result = 0;
-
-            using (var context = GetNewContext())
-            {
-                item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-                item.AuditInfo.UpdatedBy = Environment.UserName;
-                context.Update(item);
-                result = context.SaveChanges();
-            }
-
-            return result;
-        }
-        public long DeleteRepository(PhiladelphusRepository item)
-        {
-            if (CheckAvailability() == false)
-                return -1;
-
-            long result = 0;
-
-            using (var context = GetNewContext())
-            {
-                item.AuditInfo.IsDeleted = true;
-                item.AuditInfo.DeletedAt = DateTime.UtcNow;
-                item.AuditInfo.DeletedBy = Environment.UserName;
-                context.Update(item);
-                result = context.SaveChanges();
-            }
-
-            return result;
-        }
-
-
+        public long SoftDeleteRepository(PhiladelphusRepository item)
+            => SoftDelete(new List<PhiladelphusRepository>() { item });
     }
 }

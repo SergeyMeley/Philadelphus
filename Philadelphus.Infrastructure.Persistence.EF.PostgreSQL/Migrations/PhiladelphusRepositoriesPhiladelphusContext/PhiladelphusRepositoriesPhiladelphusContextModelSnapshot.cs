@@ -10,7 +10,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeRepositoriesPhiladelphusContextMigrations
 {
-    [DbContext(typeof(PhiladelphusRepositoriesPhiladelphusContext))]
+    [DbContext(typeof(PhiladelphusRepositoriesContext))]
     partial class PhiladelphusRepositoriesPhiladelphusContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

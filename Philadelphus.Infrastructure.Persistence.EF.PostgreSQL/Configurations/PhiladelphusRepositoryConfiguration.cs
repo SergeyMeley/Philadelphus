@@ -45,11 +45,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 
             builder.OwnsOne(x => x.AuditInfo, audit =>
             {
-                audit.Property(a => a.IsDeleted)
-                    .HasColumnName("is_deleted")
-                    .IsRequired()
-                    .HasDefaultValue(false);
-
                 audit.Property(a => a.CreatedAt)
                     .HasColumnName("created_at")
                     .IsRequired();
@@ -63,6 +58,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
 
                 audit.Property(a => a.UpdatedBy)
                     .HasColumnName("updated_by");
+
+                audit.Property(a => a.IsDeleted)
+                    .HasColumnName("is_deleted")
+                    .IsRequired()
+                    .HasDefaultValue(false);
 
                 audit.Property(a => a.DeletedAt)
                     .HasColumnName("deleted_at");

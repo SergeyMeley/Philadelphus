@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
 {
-    public class JsonMainEntitiesInfrastructureRepository : IPhiladelphusRepositoriesMembersInfrastructureRepository
+    public class JsonMainEntitiesInfrastructureRepository : IShrubMembersInfrastructureRepository
     {
         private DirectoryInfo _baseDirectory;
         public JsonMainEntitiesInfrastructureRepository(DirectoryInfo baseDirectory)
         {
             _baseDirectory = baseDirectory;
         }
-        public InfrastructureEntityGroups EntityGroup => InfrastructureEntityGroups.MainEntities;
+        public InfrastructureEntityGroups EntityGroup => InfrastructureEntityGroups.ShrubMembers;
 
         public bool CheckAvailability()
         {
@@ -141,6 +141,11 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
         }
 
         public long UpdateTrees(IEnumerable<WorkingTree> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids)
         {
             throw new NotImplementedException();
         }

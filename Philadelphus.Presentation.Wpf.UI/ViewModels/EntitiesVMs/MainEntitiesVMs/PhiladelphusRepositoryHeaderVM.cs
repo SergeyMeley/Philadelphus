@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Options;
+﻿using AutoMapper;
+using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
@@ -14,6 +14,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     {
         #region [ Props ]
 
+        private readonly IMapper _mapper;
         private readonly IPhiladelphusRepositoryCollectionService _service;
         private readonly DataStorageVM _dataStoragesVM;
         private readonly IConfigurationService _configurationService;
@@ -149,7 +150,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         #region [ Construct ]
 
         public PhiladelphusRepositoryHeaderVM(
-            PhiladelphusRepositoryHeaderModel PhiladelphusRepositoryHeader,
+            IMapper mapper,
+            PhiladelphusRepositoryHeaderModel philadelphusRepositoryHeader,
             IPhiladelphusRepositoryCollectionService service,
             DataStorageVM dataStoragesVM, 
             Action updatePhiladelphusRepositoryHeaders,
@@ -157,7 +159,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollectionConfig)
         {
-            _model = PhiladelphusRepositoryHeader;
+            _mapper = mapper;
+            _model = philadelphusRepositoryHeader;
             _service = service;
             _dataStoragesVM = dataStoragesVM;
             _configurationService = configurationService;
@@ -184,7 +187,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
             if (headers.Any(x => x.Uuid == _model.Uuid) == false)
             {
-                headers.Add(_model.ToDbEntity());
+                headers.Add(_mapper.Map<PhiladelphusRepositoryHeader>(_model));
             }
             else
             {
@@ -192,7 +195,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 {
                     if (headers[i].Uuid == _model.Uuid)
                     {
-                        headers[i] = _model.ToDbEntity();
+                        headers[i] = _mapper.Map<PhiladelphusRepositoryHeader>(_model);
                         break;
                     }
                 }

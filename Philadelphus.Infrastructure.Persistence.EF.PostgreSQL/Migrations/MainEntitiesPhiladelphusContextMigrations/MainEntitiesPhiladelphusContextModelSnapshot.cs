@@ -10,7 +10,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
-    [DbContext(typeof(MainEntitiesPhiladelphusContext))]
+    [DbContext(typeof(ShrubMembersContext))]
     partial class MainEntitiesPhiladelphusContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -294,6 +294,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .HasColumnType("uuid")
                         .HasColumnName("owner_uuid");
 
+                    b.Property<Guid>("OwningWorkingTreeUuid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owning_working_tree_uuid");
+
                     b.Property<long?>("Sequence")
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
@@ -318,6 +322,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
                     b.HasKey("Uuid")
                         .HasName("element_attributes_pkey");
+
+                    b.HasIndex("OwningWorkingTreeUuid");
 
                     b.ToTable("element_attributes", "shrub_members_content");
                 });
@@ -392,16 +398,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnType("uuid");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at")
-                                .HasDefaultValueSql("NOW()");
+                                .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("text")
-                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
@@ -522,16 +524,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                                 .HasColumnType("uuid");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at")
-                                .HasDefaultValueSql("NOW()");
+                                .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("text")
-                                .HasDefaultValue("session_user")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
@@ -572,6 +570,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
+                        .WithMany()
+                        .HasForeignKey("OwningWorkingTreeUuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
                         {
                             b1.Property<Guid>("ElementAttributeUuid")
@@ -619,6 +623,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
+
+                    b.Navigation("OwningWorkingTree");
                 });
 #pragma warning restore 612, 618
         }

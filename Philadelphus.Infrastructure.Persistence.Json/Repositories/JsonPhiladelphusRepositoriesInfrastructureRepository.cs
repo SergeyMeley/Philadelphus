@@ -23,7 +23,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             throw new NotImplementedException();
         }
 
-        public long DeleteRepository(PhiladelphusRepository item)
+        public long SoftDeleteRepository(PhiladelphusRepository item)
         {
             throw new NotImplementedException();
         }

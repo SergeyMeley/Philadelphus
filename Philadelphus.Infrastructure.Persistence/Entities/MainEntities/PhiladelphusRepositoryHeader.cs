@@ -9,5 +9,6 @@
         public Guid OwnDataStorageUuid { get; set; }
         public DateTime? LastOpening { get; set; }
         public bool IsFavorite { get; set; }
+        public bool IsHidden { get; set; }
     }
 }

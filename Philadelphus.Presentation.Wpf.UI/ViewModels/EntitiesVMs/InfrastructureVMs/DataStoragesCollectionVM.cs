@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
-using Philadelphus.Core.Domain.Helpers.InfrastructureConverters;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Serilog;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
@@ -18,6 +16,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
+        private readonly IInfrastructureRepositoryFactory _infrastructureRepositoryFactory;
 
         private DataStorageVM _mainDataStorageVM;
         public DataStorageVM MainDataStorageVM
@@ -28,16 +27,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             }
         }
 
-        private ObservableCollection<DataStorageVM>? _dataStorageVMs = new ObservableCollection<DataStorageVM>();
+        private ObservableCollection<DataStorageVM>? _dataStoragesVMs = new ObservableCollection<DataStorageVM>();
         public ObservableCollection<DataStorageVM>? DataStoragesVMs 
         { 
             get
             {
-                return _dataStorageVMs;
+                return _dataStoragesVMs;
             }
             set
             {
-                _dataStorageVMs = value;
+                _dataStoragesVMs = value;
                 OnPropertyChanged(nameof(DataStoragesVMs));
             }
         }
@@ -45,7 +44,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         {
             get
             {
-                return _dataStorageVMs.Where(x => x.HasPhiladelphusRepositoriesInfrastructureRepository);
+                return _dataStoragesVMs.Where(x => x.HasPhiladelphusRepositoriesInfrastructureRepository);
             }
         }
 
@@ -69,7 +68,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             IDataStoragesService dataStoragesService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
-            IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
+            IOptions<DataStoragesCollectionConfig> dataStoragesCollection,
+            IInfrastructureRepositoryFactory infrastructureRepositoryFactory)
         {
             _logger = logger;
             _notificationService = notificationService;
@@ -77,10 +77,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             _applicationSettings = applicationSettings;
             _connectionStringsCollection = connectionStringsCollection;
             _dataStoragesCollection = dataStoragesCollection;
+            _infrastructureRepositoryFactory = infrastructureRepositoryFactory;
 
             InitMainDataStorageVM(applicationSettings.Value);
-            //InitDataStorages(connectionStringsCollection.Value);
-            InitDataStorages(dataStoragesCollection.Value, connectionStringsCollection.Value);
+            InitDataStorages();
         }
         private bool InitMainDataStorageVM(ApplicationSettingsConfig applicationSettings)
         {
@@ -88,39 +88,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 throw new Exception(); 
             var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.MainDataStorage);
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
-            _dataStorageVMs.Add(_mainDataStorageVM);
+            _dataStoragesVMs.Add(_mainDataStorageVM);
             return true;
         }
 
-        private bool InitDataStorages(DataStoragesCollectionConfig dataStoragesCollection, ConnectionStringsCollectionConfig connectionStrings)
+        private bool InitDataStorages()
         {
-            foreach (var entity in dataStoragesCollection.DataStorages)
+            var models = _dataStoragesService.GetStoragesModels((cs, type, group) => _infrastructureRepositoryFactory.Create(type, group, cs.ConnectionString));
+
+            foreach (var model in models)
             {
-                if (entity != null)
+                if (_dataStoragesVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
                 {
-                    var connectionString = connectionStrings.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == entity.Uuid)?.ConnectionString;
-
-                    if (connectionString == null)
-                    {
-                        _logger.Error($"Не найдена строка подключения для хранилища {entity.Name}");
-                        MessageBox.Show($"Не найдена строка подключения для хранилища {entity.Name}");
-                    }
-                    else
-                    {
-                        var model = entity.ToModel(_logger, connectionString);
-
-                        if (model != null)
-                        {
-                            if (_dataStorageVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
-                            {
-                                _dataStorageVMs.Add(new DataStorageVM(model));
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException();
-                            }
-                        }
-                    }
+                    _dataStoragesVMs.Add(new DataStorageVM(model));
+                }
+                else
+                {
+                    throw new InvalidOperationException();
                 }
             }
             return true;

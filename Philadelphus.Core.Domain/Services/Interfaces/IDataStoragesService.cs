@@ -1,5 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
+using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
@@ -18,7 +20,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// Получить коллекцию хранилищ данных
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IDataStorageModel> GetStoragesModels();
+        public IEnumerable<IDataStorageModel> GetStoragesModels(
+            Func<ConnectionStringContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository);
 
         #endregion
 
