@@ -207,6 +207,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         lp.CreateTreeLeave();
                     }
+                    else if (_selectedRepositoryMember is TreeLeaveVM leave)
+                    {
+                        leave.Parent.CreateTreeLeave();
+                    }
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
                 });
