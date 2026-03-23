@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
@@ -96,7 +98,33 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public bool ChangeParent(IParentModel newParent)
         {
-            throw new NotImplementedException();
+            return false;
+        }
+
+        /// <summary>
+        /// Добавить атрибут
+        /// </summary>
+        /// <param name="attribute">Атрибут</param>
+        public override sealed bool AddAttribute(ElementAttributeModel attribute)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Удалить атрибут
+        /// </summary>
+        /// <param name="attribute">Атрибут</param>
+        public override sealed bool RemoveAttribute(ElementAttributeModel attribute)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Очистить атрибуты
+        /// </summary>
+        public override sealed bool ClearAttributes()
+        {
+            return false;
         }
 
         #endregion

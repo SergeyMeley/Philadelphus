@@ -889,6 +889,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
+                if (owner is TreeLeaveModel)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Ошибка создания атрибута. Изменение перечня атрибутов листов не допускается.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return null;
+                }
+
                 var uuid = Guid.NewGuid();
 
                 if (owner is WorkingTreeMemberBaseModel wtm)
@@ -899,13 +907,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         Override = OverrideType.Virtual
                     };
 
-                    owner.AddAttribute(result);
+                    if (owner.AddAttribute(result))
+                    {
+                        SetModelState(result, State.Initialized);
 
-                    SetModelState(result, State.Initialized);
-
-                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        $"Создание атрибута выполнено успешно.",
-                        criticalLevel: NotificationCriticalLevelModel.Ok);
+                        _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                            $"Создание атрибута выполнено успешно.",
+                            criticalLevel: NotificationCriticalLevelModel.Ok);
+                    }
+                    else
+                    {
+                        _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                                $"Ошибка создания атрибута.",
+                                criticalLevel: NotificationCriticalLevelModel.Error);
+                    }
 
                     return result;
                 }
@@ -951,7 +966,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         $"Удаление элемента невозможно, элемент не выбран, операция не выполнена. Выберите элемент для удаления и повторите попытку.",
                         criticalLevel: NotificationCriticalLevelModel.Warning);
                     return false;
-                }    
+                }
+
+                if (element is ElementAttributeModel ea && ea.Owner is TreeLeaveModel)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление элемента невозможно. Изменение перечня атрибутов листов не допускается.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
 
                 long result = 0;
                 if (element is IMainEntityWritableModel me)
