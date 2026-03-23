@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
              xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters"
+             xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d">
     <UserControl.Resources>
         <converters:CriticalLevelToIconConverter x:Key="criticalLevelToIconConverter"/>
@@ -142,23 +144,26 @@
                       Height="200"
                       MinHeight="200"
                       CanUserResizeRows="True">
+                <i:Interaction.Behaviors>
+                    <behaviors:DataGridAutoScrollBehavior HighlightColor="#abd0db"/>
+                </i:Interaction.Behaviors>
                 <DataGrid.Resources>
                     <DataTemplate x:Key="IconColumnTemplate">
                         <Image Source="{Binding CriticalLevel, Converter={StaticResource criticalLevelToIconConverter}}" Height="15"></Image>
                     </DataTemplate>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="К." CellTemplate="{StaticResource IconColumnTemplate}" Width="auto" MaxWidth="30" IsReadOnly="True"></DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="К." CellTemplate="{StaticResource IconColumnTemplate}" Width="auto" MaxWidth="30" IsReadOnly="True" CanUserSort="False"></DataGridTemplateColumn>
                     <DataGridTextColumn Header="Время" Binding="{Binding DateTime,ConverterCulture=ru-RY}" Width="auto" MinWidth="120" IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Отправитель" Binding="{Binding SenderDisplayName}" Width="auto" MinWidth="150" IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTemplateColumn Header="Сообщение" Width="7*" MinWidth="900" IsReadOnly="True">
+                    <DataGridTextColumn Header="Отправитель" Binding="{Binding SenderDisplayName}" Width="auto" MinWidth="150" IsReadOnly="True" CanUserSort="False"></DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Сообщение" Width="7*" MinWidth="900" IsReadOnly="True" CanUserSort="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Height="auto" MaxHeight="50"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Источник" Binding="{Binding Source}" Width="*" MinWidth="350" IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Источник" Binding="{Binding Source}" Width="*" MinWidth="350" IsReadOnly="True" CanUserSort="False"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Expander>

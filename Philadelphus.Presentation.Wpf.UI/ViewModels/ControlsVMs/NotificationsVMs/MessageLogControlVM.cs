@@ -208,14 +208,38 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
 
         private void FilterVisibleNotifications()
         {
-            _currentMessageLogFilteredNotifications.Clear();
-            foreach (var item in _currentMessageLogAllNotifications)
+            var remItems = new List<NotificationVM>();
+            foreach (var item in _currentMessageLogFilteredNotifications)
             {
-                if (IsVisible(item))
+                if (_currentMessageLogAllNotifications.Contains(item) == false)
                 {
-                    _currentMessageLogFilteredNotifications.Add(item);
+                    remItems.Add(item);
+                }
+                else if (IsVisible(item) == false)
+                {
+                    remItems.Add(item);
                 }
             }
+            foreach (var item in remItems)
+            {
+                _currentMessageLogFilteredNotifications.Remove(item);
+            }
+            foreach (var item in _currentMessageLogAllNotifications)
+            {
+                if (IsVisible(item) && _currentMessageLogFilteredNotifications.Contains(item) == false)
+                {
+                    var next = _currentMessageLogFilteredNotifications?.OrderBy(x => x.DateTime)?.FirstOrDefault(x => x.DateTime > item.DateTime);
+                    if (next != null)
+                    {
+                        _currentMessageLogFilteredNotifications.Insert(_currentMessageLogFilteredNotifications.IndexOf(next), item);
+                    }
+                    else
+                    {
+                        _currentMessageLogFilteredNotifications.Add(item);
+                    }
+                }
+            }
+
             OnPropertyChanged(nameof(OkMessagesCount));
             OnPropertyChanged(nameof(InfoMessagesCount));
             OnPropertyChanged(nameof(WarningMessagesCount));
