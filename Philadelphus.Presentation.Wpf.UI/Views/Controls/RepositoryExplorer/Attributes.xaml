@@ -7,75 +7,81 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <GroupBox>
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
-                        <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
-                        <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
-                    </StackPanel>
-                    <DataGrid Height="auto" DataContext="{Binding SelectedRepositoryMember}" ItemsSource="{Binding AttributesVMs}" SelectedItem="{Binding SelectedAttributeVM}" AutoGenerateColumns="false">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Uuid" Binding="{Binding Uuid, Mode=OneWay}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Состояние" Binding="{Binding State, Mode=OneWay}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
-                            <DataGridComboBoxColumn Header="Тип данных" DisplayMemberPath="Name" SelectedItemBinding="{Binding SelectedValueType}" SelectedValuePath="Name">
-                                <DataGridComboBoxColumn.ElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding ValueTypesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.ElementStyle>
-                                <DataGridComboBoxColumn.EditingElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding ValueTypesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.EditingElementStyle>
-                            </DataGridComboBoxColumn>
-                            <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}"></DataGridCheckBoxColumn>
-                            <DataGridComboBoxColumn Header="Значение" DisplayMemberPath="Name" SelectedItemBinding="{Binding AssignedValue}" SelectedValuePath="Name" IsReadOnly="{Binding IsSingleValue}">
-                                <DataGridComboBoxColumn.ElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.ElementStyle>
-                                <DataGridComboBoxColumn.EditingElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.EditingElementStyle>
-                            </DataGridComboBoxColumn>
-                            <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}"></DataGridTextColumn>
-                            <DataGridComboBoxColumn Header="Область видимости" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Visibility}" SelectedValuePath="Value">
-                                <DataGridComboBoxColumn.ElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding VisibilityScopesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.ElementStyle>
-                                <DataGridComboBoxColumn.EditingElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding VisibilityScopesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.EditingElementStyle>
-                            </DataGridComboBoxColumn>
-                            <DataGridComboBoxColumn Header="Переопределение" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Override}" SelectedValuePath="Value">
-                                <DataGridComboBoxColumn.ElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding OverrideTypesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.ElementStyle>
-                                <DataGridComboBoxColumn.EditingElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding OverrideTypesList}" />
-                                    </Style>
-                                </DataGridComboBoxColumn.EditingElementStyle>
-                            </DataGridComboBoxColumn>
-                            <DataGridTextColumn Header="Глубина наследования" Binding="{Binding InheritanceDepth}" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Владелец" Binding="{Binding DeclaringOwner.Name}" IsReadOnly="True"></DataGridTextColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </StackPanel>
-            </GroupBox>
-        </ScrollViewer>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
+            <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
+            <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
+        </StackPanel>
+        <DataGrid Grid.Row="1"
+                  Height="auto"
+                  ColumnWidth="*"
+                  DataContext="{Binding SelectedRepositoryMember}"
+                  ItemsSource="{Binding AttributesVMs}"
+                  SelectedItem="{Binding SelectedAttributeVM}"
+                  AutoGenerateColumns="false"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Uuid" Binding="{Binding Uuid, Mode=OneWay}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Состояние" Binding="{Binding State, Mode=OneWay}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
+                <DataGridComboBoxColumn Header="Тип данных" DisplayMemberPath="Name" SelectedItemBinding="{Binding SelectedValueType}" SelectedValuePath="Name">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding ValueTypesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding ValueTypesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}"></DataGridCheckBoxColumn>
+                <DataGridComboBoxColumn Header="Значение" DisplayMemberPath="Name" SelectedItemBinding="{Binding AssignedValue}" SelectedValuePath="Name" IsReadOnly="{Binding IsSingleValue}">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}"></DataGridTextColumn>
+                <DataGridComboBoxColumn Header="Область видимости" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Visibility}" SelectedValuePath="Value">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding VisibilityScopesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding VisibilityScopesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridComboBoxColumn Header="Переопределение" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Override}" SelectedValuePath="Value">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding OverrideTypesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding OverrideTypesList}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridTextColumn Header="Глубина наследования" Binding="{Binding InheritanceDepth}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="Владелец" Binding="{Binding DeclaringOwner.Name}" IsReadOnly="True"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>
