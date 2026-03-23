@@ -215,7 +215,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
-        public bool AddAttribute(ElementAttributeModel attribute)
+        public virtual bool AddAttribute(ElementAttributeModel attribute)
         {
             lock (_lockObject)
             {
@@ -232,7 +232,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
-        public bool RemoveAttribute(ElementAttributeModel attribute)
+        public virtual bool RemoveAttribute(ElementAttributeModel attribute)
         {
             lock (_lockObject)
             {
@@ -248,7 +248,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить атрибуты
         /// </summary>
-        public bool ClearAttributes()
+        public virtual bool ClearAttributes()
         {
             lock (_lockObject)
             {

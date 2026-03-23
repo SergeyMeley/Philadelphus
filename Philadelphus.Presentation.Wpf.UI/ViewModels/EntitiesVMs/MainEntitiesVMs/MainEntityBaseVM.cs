@@ -115,11 +115,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 var attributeOwnerModel = (IAttributeOwnerModel)_model;
                 var attribute = _service.CreateElementAttribute(attributeOwnerModel);
-                attributeOwnerModel.AddAttribute(attribute);
-                var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service);
-                AttributesVMs.Add(attributeVM);
-                OnPropertyChanged(nameof(AttributesVMs));
-                return attributeVM;
+                if (attribute != null)
+                {
+                    attributeOwnerModel.AddAttribute(attribute);
+                    var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service);
+                    AttributesVMs.Add(attributeVM);
+                    OnPropertyChanged(nameof(AttributesVMs));
+                    return attributeVM;
+                }
             }
             return null;
         }

@@ -361,7 +361,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Сохранение репозитория выполнено успешно. Сохранено {result} элементов.",
+                $"Сохранение репозитория успешно выполнено. Сохранено {result} элементов.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
@@ -435,7 +435,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Сохранение рабочих деревьев выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                $"Сохранение рабочих деревьев успешно выполнено. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
@@ -509,7 +509,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Сохранение корней выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                $"Сохранение корней успешно выполнено. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
@@ -584,7 +584,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Сохранение узлов выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                $"Сохранение узлов успешно выполнено. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
@@ -657,7 +657,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Сохранение листов выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                $"Сохранение листов успешно выполнено. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
@@ -717,7 +717,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Сохранение атрибутов выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                $"Сохранение атрибутов успешно выполнено. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
@@ -750,7 +750,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(owner, State.Changed);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание рабочего дерева выполнено успешно.",
+                    $"Создание рабочего дерева успешно выполнено.",
                     criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
@@ -783,7 +783,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание корня выполнено успешно.",
+                    $"Создание корня успешно выполнено.",
                     criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
@@ -820,7 +820,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание узла выполнено успешно.",
+                    $"Создание узла успешно выполнено.",
                     criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
@@ -862,7 +862,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание листа выполнено успешно.",
+                    $"Создание листа успешно выполнено.",
                     criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
@@ -889,6 +889,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
+                if (owner is TreeLeaveModel)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Ошибка создания атрибута. Изменение перечня атрибутов листов не допускается.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return null;
+                }
+
                 var uuid = Guid.NewGuid();
 
                 if (owner is WorkingTreeMemberBaseModel wtm)
@@ -899,13 +907,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         Override = OverrideType.Virtual
                     };
 
-                    owner.AddAttribute(result);
+                    if (owner.AddAttribute(result))
+                    {
+                        SetModelState(result, State.Initialized);
 
-                    SetModelState(result, State.Initialized);
-
-                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        $"Создание атрибута выполнено успешно.",
-                        criticalLevel: NotificationCriticalLevelModel.Ok);
+                        _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                            $"Создание атрибута успешно выполнено.",
+                            criticalLevel: NotificationCriticalLevelModel.Ok);
+                    }
+                    else
+                    {
+                        _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                                $"Ошибка создания атрибута.",
+                                criticalLevel: NotificationCriticalLevelModel.Error);
+                    }
 
                     return result;
                 }
@@ -951,7 +966,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         $"Удаление элемента невозможно, элемент не выбран, операция не выполнена. Выберите элемент для удаления и повторите попытку.",
                         criticalLevel: NotificationCriticalLevelModel.Warning);
                     return false;
-                }    
+                }
+
+                if (element is ElementAttributeModel ea && ea.Owner is TreeLeaveModel)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление элемента невозможно. Изменение перечня атрибутов листов не допускается.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
 
                 long result = 0;
                 if (element is IMainEntityWritableModel me)
@@ -972,7 +995,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Удаление элемента выполнено успешно. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
+                    $"Удаление элемента успешно выполнено. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
                     criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return true;

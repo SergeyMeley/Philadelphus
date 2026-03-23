@@ -255,11 +255,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    if (_selectedRepositoryMember.SelectedAttributeVM.Model is IContentModel c)
+                    if (_selectedRepositoryMember?.SelectedAttributeVM?.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
+                        OnPropertyChanged(nameof(_selectedRepositoryMember.SelectedAttributeVM.State));
                     }
-                    OnPropertyChanged(nameof(State));
                 });
             }
         }
