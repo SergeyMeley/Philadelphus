@@ -77,7 +77,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Вместимость истории уведомлений
         /// </summary>
-        public int HistoryCapacoty { get; set; } = int.MaxValue;
+        public int HistoryCapacity { get; set; } = int.MaxValue;
 
         public NotificationService(
             ILogger logger,
@@ -128,14 +128,17 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             switch (transmissionType)
             {
                 case NotificationTransmissionType.Self:
+                    _logger.Information($"Отправлено уведомление себе. Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'.");
                     return ProcessNotification(notification);
                 case NotificationTransmissionType.Broadcast:
                     _mainProducer.ProduceAsync(notification, default);
+                    _logger.Information($"Отправлено уведомление всем. Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'.");
                     return true;
                 default:
                     break;
             }
 
+            _logger.Information($"Уведомление не отправлено. Неизвестный тип передачи данных. Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'. Текст: '{notification.Text}'");
             return false;
         }
 
@@ -277,6 +280,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="notification">Уведомление</param>
         private bool ProcessNotification(Notification notification)
         {
+            _logger.Information($"Начало обработки полученного уведомления.");
+
             _notificationsHistory.Add(notification);
             HistoryUpdated?.Invoke(notification);
 
@@ -309,11 +314,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (handler == null)
             {
                 SendMissHandlerNotification(notification.NotificationType.ToString(), $"{nameof(NotificationService)}.{nameof(ProcessNotification)}");
+                _logger.Error($"Ошибка отправки - не назначен обработчик.");
                 return false;
             }
             else
             {
+                _logger.Information($"Обработка уведомления.  Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'. Текст: '{notification.Text}'");
                 handler.Invoke(notification);
+                _logger.Information($"Обработка уведомления завершена корректно.");
                 return true;
             }
         }
@@ -354,6 +362,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                dueTime: 0,
                period: MessagingUser.GetSessionDurability());
 
+            _logger.Information("Запущена автоматическая регистрация получателя уведомлений.");
             return true;
         }
 
@@ -392,6 +401,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                dueTime: 0,
                period: MessagingUser.GetSessionDurability());
 
+            _logger.Information("Запущена автоматическая проверка активных получателей уведомлений.");
             return true;
         }
 
@@ -402,6 +412,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 ProcessNotification(notification);
             };
 
+            _logger.Information("Запущени автоматическое получение уведомлений.");
             return true;
         }
     }

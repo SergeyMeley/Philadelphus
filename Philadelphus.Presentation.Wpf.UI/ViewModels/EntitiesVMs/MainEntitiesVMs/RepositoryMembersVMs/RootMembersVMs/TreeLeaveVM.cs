@@ -11,24 +11,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         private readonly IPhiladelphusRepositoryService _service;
 
+        public TreeNodeVM Parent { get; }
+
         public string Alias
         {
             get
             {
-                if (_model is TreeLeaveModel m)
-                {
-                    return m.Alias;
-                }
-                return string.Empty;
+                return _model.Alias;
             }
             set
             {
-                if (_model is TreeLeaveModel m)
-                {
-                    m.Alias = value;
-                    OnPropertyChanged(nameof(Alias));
-                    OnPropertyChanged(nameof(State));
-                }
+                _model.Alias = value;
+                OnPropertyChanged(nameof(Alias));
+                OnPropertyChanged(nameof(State));
             }
         }
 
@@ -60,12 +55,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         #region [ Construct ]
 
         public TreeLeaveVM(
+            TreeNodeVM parent,
             TreeLeaveModel treeLeave,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service) 
             : base(treeLeave, dataStoragesCollectionVM, service)
         {
             _service = service;
+
+            Parent = parent;
         }
 
         #endregion

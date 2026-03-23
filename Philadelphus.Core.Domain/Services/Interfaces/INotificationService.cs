@@ -59,7 +59,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Вместимость истории уведомлений
         /// </summary>
-        public int HistoryCapacoty { get; set; }
+        public int HistoryCapacity { get; set; }
 
         /// <summary>
         /// Направить уведомление

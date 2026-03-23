@@ -64,11 +64,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _model = treeNode;
             foreach (var item in treeNode.ChildNodes)
             {
-                _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, dataStoragesCollectionVM, _service));
+                _childNodes.Add(new TreeNodeVM(item, dataStoragesCollectionVM, _service));
             }
             foreach (var item in treeNode.ChildLeaves)
             {
-                _childLeaves.Add(new TreeLeaveVM((TreeLeaveModel)item, dataStoragesCollectionVM, _service));
+                _childLeaves.Add(new TreeLeaveVM(this, item, dataStoragesCollectionVM, _service));
             }
 
             Childs = new CompositeCollection()
@@ -103,7 +103,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             var resultModel = _service.CreateTreeLeave(_model);
             if (resultModel == null)
                 return null;
-            var result = new TreeLeaveVM(resultModel, _dataStoragesCollectionVM, _service);
+            var result = new TreeLeaveVM(this, resultModel, _dataStoragesCollectionVM, _service);
             _childLeaves.Add(result);
             OnPropertyChanged(nameof(ChildLeaves));
             return result;

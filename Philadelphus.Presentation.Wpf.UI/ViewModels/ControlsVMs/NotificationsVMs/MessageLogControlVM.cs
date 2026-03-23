@@ -19,18 +19,32 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
     {
         private readonly ObservableCollection<NotificationVM> _currentMessageLogAllNotifications = new ObservableCollection<NotificationVM>();
         private readonly ObservableCollection<NotificationVM> _currentMessageLogFilteredNotifications = new ObservableCollection<NotificationVM>();
-        private bool _IsInfoMessagesVisible = true;
-        private bool _IsWarningMessagesVisible = true;
-        private bool _IsErrorMessagesVisible = true;
+        private bool _isOkMessagesVisible = true;
+        private bool _isInfoMessagesVisible = true;
+        private bool _isWarningMessagesVisible = true;
+        private bool _isErrorMessagesVisible = true;
+        public bool IsOkMessagesVisible
+        {
+            get
+            {
+                return _isOkMessagesVisible;
+            }
+            set
+            {
+                _isOkMessagesVisible = value;
+                FilterVisibleNotifications();
+                OnPropertyChanged(nameof(IsOkMessagesVisible));
+            }
+        }
         public bool IsInfoMessagesVisible 
         { 
             get
             {
-                return _IsInfoMessagesVisible;
+                return _isInfoMessagesVisible;
             }
             set
             {
-                _IsInfoMessagesVisible = value;
+                _isInfoMessagesVisible = value;
                 FilterVisibleNotifications();
                 OnPropertyChanged(nameof(IsInfoMessagesVisible));
             }
@@ -39,11 +53,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         {
             get
             {
-                return _IsWarningMessagesVisible;
+                return _isWarningMessagesVisible;
             }
             set
             {
-                _IsWarningMessagesVisible = value;
+                _isWarningMessagesVisible = value;
                 FilterVisibleNotifications();
                 OnPropertyChanged(nameof(IsWarningMessagesVisible));
             }
@@ -52,13 +66,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         {
             get
             {
-                return _IsErrorMessagesVisible;
+                return _isErrorMessagesVisible;
             }
             set
             {
-                _IsErrorMessagesVisible = value;
+                _isErrorMessagesVisible = value;
                 FilterVisibleNotifications();
                 OnPropertyChanged(nameof(IsErrorMessagesVisible));
+            }
+        }
+        public string OkMessagesCount
+        {
+            get
+            {
+                var visible = _currentMessageLogFilteredNotifications.Where(x =>
+                    x.CriticalLevel == NotificationCriticalLevelModel.Ok)
+                    .Count();
+                var inTotal = _currentMessageLogAllNotifications.Where(x =>
+                    x.CriticalLevel == NotificationCriticalLevelModel.Ok)
+                    .Count();
+                return $"{visible}/{inTotal}";
             }
         }
         public string InfoMessagesCount 
@@ -189,6 +216,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
                     _currentMessageLogFilteredNotifications.Add(item);
                 }
             }
+            OnPropertyChanged(nameof(OkMessagesCount));
             OnPropertyChanged(nameof(InfoMessagesCount));
             OnPropertyChanged(nameof(WarningMessagesCount));
             OnPropertyChanged(nameof(ErrorMessagesCount));
@@ -198,7 +226,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         {
             return (IsErrorMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Error || notification.CriticalLevel == NotificationCriticalLevelModel.Alarm))
                 || (IsWarningMessagesVisible && notification.CriticalLevel == NotificationCriticalLevelModel.Warning)
-                || (IsInfoMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Info || notification.CriticalLevel == NotificationCriticalLevelModel.None));
+                || (IsInfoMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Info || notification.CriticalLevel == NotificationCriticalLevelModel.None)) 
+                || (IsOkMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Ok));
         }
     }
 }

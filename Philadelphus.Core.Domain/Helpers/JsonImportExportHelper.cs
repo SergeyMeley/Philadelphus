@@ -59,7 +59,8 @@ namespace Philadelphus.Core.Domain.Helpers
 
             // 1. Создаём дерево
             var dataStorage = repository.DataStorages.First();
-            var treeRoot = service.CreateTreeRoot(repository, dataStorage);
+            var tree = service.CreateWorkingTree(repository, dataStorage);
+            var treeRoot = service.CreateTreeRoot(tree);
             treeRoot.Name = rootName;
 
             var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
