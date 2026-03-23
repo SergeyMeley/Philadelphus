@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Models.Entities.Enums;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.IO;
 
@@ -14,7 +14,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
     public class PhiladelphusRepositoryCollectionVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<PhiladelphusRepositoryCollectionVM> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
         private readonly IPhiladelphusRepositoryCollectionService _collectionService;
         private readonly IPhiladelphusRepositoryService _service;
@@ -23,7 +23,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
         public PhiladelphusRepositoryCollectionVM(
             IServiceProvider serviceProvider,
-            ILogger<PhiladelphusRepositoryCollectionVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IPhiladelphusRepositoryCollectionService collectionService, 
             IPhiladelphusRepositoryService service,

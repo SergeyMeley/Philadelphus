@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs
         public object Content { get; set; }
         public TabItemControlBaseVM(IServiceProvider serviceProvider, 
             IMapper mapper, 
-            ILogger<ControlBaseVM> logger, 
+            ILogger logger, 
             INotificationService notificationService, 
             ApplicationCommandsVM applicationCommandsVM) 
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)

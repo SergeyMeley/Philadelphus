@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -15,6 +14,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
+using Serilog;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
@@ -26,7 +26,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger<PhiladelphusRepositoryService> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
 
         #endregion
@@ -41,7 +41,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="notificationService">Сервис уведомлений</param>
         public PhiladelphusRepositoryService(
             IMapper mapper,
-            ILogger<PhiladelphusRepositoryService> logger,
+            ILogger logger,
             INotificationService notificationService)
         {
             _mapper = mapper;
@@ -757,7 +757,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка создания рабочего дерева.", ex);
+                _logger.Error("Ошибка создания рабочего дерева.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка создания рабочего дерева. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
@@ -790,7 +790,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка создания корня.", ex);
+                _logger.Error("Ошибка создания корня.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка создания корня. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
@@ -827,7 +827,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка создания узла.", ex);
+                _logger.Error("Ошибка создания узла.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка создания узла. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
@@ -869,7 +869,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка создания листа.", ex);
+                _logger.Error("Ошибка создания листа.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка создания листа. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
@@ -924,7 +924,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                     return result;
                 }
-                _logger.LogWarning("Попытка добавления атрибута элементу, НЕ являющумяся участником рабочего дерева.");
+                _logger.Warning("Попытка добавления атрибута элементу, НЕ являющумяся участником рабочего дерева.");
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка создания атрибута. Атрибут можно добавить только участнику рабочего дерева.",
                     criticalLevel: NotificationCriticalLevelModel.Warning);
@@ -932,7 +932,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка создания атрибута.", ex);
+                _logger.Error("Ошибка создания атрибута.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка создания атрибута. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;
@@ -1002,7 +1002,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка удаления элемента.", ex);
+                _logger.Error("Ошибка удаления элемента.", ex);
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Ошибка удаления элемента. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
                 throw;

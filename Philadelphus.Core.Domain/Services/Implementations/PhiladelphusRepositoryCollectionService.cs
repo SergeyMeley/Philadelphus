@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
@@ -10,6 +9,7 @@ using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
+using Serilog;
 
 namespace Philadelphus.Core.Domain.Services.Implementations
 {
@@ -21,7 +21,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #region [ Props ]
 
         private readonly IMapper _mapper;
-        private readonly ILogger<PhiladelphusRepositoryCollectionService> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
         private readonly IPhiladelphusRepositoryService _philadelphusRepositoryService;
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
@@ -49,7 +49,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="PhiladelphusRepositoryHeadersCollection"></param>
         public PhiladelphusRepositoryCollectionService(
             IMapper mapper,
-            ILogger<PhiladelphusRepositoryCollectionService> logger,
+            ILogger logger,
             INotificationService notificationService,
             IPhiladelphusRepositoryService PhiladelphusRepositoryService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
@@ -62,7 +62,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             _applicationSettings = applicationSettings;
             _PhiladelphusRepositoryHeadersCollection = PhiladelphusRepositoryHeadersCollection;
 
-            _logger.LogInformation("PhiladelphusRepositoryCollectionService инициализирован.");
+            _logger.Information("PhiladelphusRepositoryCollectionService инициализирован.");
         }
 
         #endregion

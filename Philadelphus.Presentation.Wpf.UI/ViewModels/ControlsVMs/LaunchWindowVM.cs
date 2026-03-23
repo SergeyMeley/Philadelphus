@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
@@ -10,6 +9,7 @@ using Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using Serilog;
 using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -55,7 +55,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public LaunchWindowVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<RepositoryCreationControlVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             PhiladelphusRepositoryCollectionVM repositoryCollectionVM,

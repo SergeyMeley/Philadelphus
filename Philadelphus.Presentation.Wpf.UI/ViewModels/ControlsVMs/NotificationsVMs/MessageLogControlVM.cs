@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesVMs;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -145,7 +145,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         public MessageLogControlVM(
             IServiceProvider serviceProvider, 
             IMapper mapper, 
-            ILogger<ControlBaseVM> logger, 
+            ILogger logger, 
             INotificationService notificationService,
             ApplicationCommandsVM applicationCommandsVM) 
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
@@ -11,6 +10,7 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using Serilog;
 using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -60,7 +60,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public MainWindowVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<RepositoryCreationControlVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,

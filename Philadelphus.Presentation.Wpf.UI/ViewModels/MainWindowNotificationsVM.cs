@@ -1,10 +1,10 @@
 ﻿using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -12,7 +12,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
     public class MainWindowNotificationsVM : ViewModelBase
     {
-        private readonly ILogger<MainWindowNotificationsVM> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
 
         private PopUpNotificationsControlVM _popupVM;
@@ -29,7 +29,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         public ObservableCollection<Notification> AllMainWindowNotifications { get; } = new ObservableCollection<Notification>();
         public MainWindowNotificationsVM(
             PopUpNotificationsControlVM popupVM,
-            ILogger<MainWindowNotificationsVM> logger,
+            ILogger logger,
             INotificationService notificationService)
         {
             _popupVM = popupVM;
