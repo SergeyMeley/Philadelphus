@@ -10,6 +10,10 @@
         /// </summary>
         None = 0,
         /// <summary>
+        /// Успех
+        /// </summary>
+        Ok,
+        /// <summary>
         /// Информационное уведомление
         /// </summary>
         Info,

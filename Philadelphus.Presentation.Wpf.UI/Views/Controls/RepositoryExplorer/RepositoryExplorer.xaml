@@ -35,9 +35,9 @@
                         <Button Content="{StaticResource imageGetWork}" Command="{Binding GetWorkCommand}" ToolTip="Обновить из хранилища" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageSave}" Command="{Binding SaveCommand}" ToolTip="Сохранить изменения" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageEdit64}" ToolTip="Режим редактирования" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageRoot}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageNode}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
-                        <Button Content="{StaticResource imageLeave}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageRoot64_1}" Command="{Binding CreateRootCommand}" ToolTip="Добавить корень" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageNode64_3}" Command="{Binding CreateNodeCommand}"  ToolTip="Добавить узел" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
+                        <Button Content="{StaticResource imageLeave64_3}" Command="{Binding CreateLeaveCommand}" ToolTip="Добавить лист" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageDelete}" Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip="Удалить выбранный элемент репозитория" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                         <Button Content="{StaticResource imageProtect}" Command="{Binding ProtectCommand}" ToolTip="Защитить" Margin="1" Height="25" Width="25" Background="Transparent"></Button>
                     </StackPanel>

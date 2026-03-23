@@ -19,10 +19,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
         {
             string iconPath = value switch
             {
-                PhiladelphusRepositoryVM => "without_a_license/icons8_icon_repository.png",
-                TreeRootVM => "without_a_license/Flaticon_icon_root.png",
-                TreeNodeVM => "without_a_license/Flaticon_icon_node.png",
-                TreeLeaveVM => "without_a_license/Flaticon_icon_leave.png",
+                PhiladelphusRepositoryVM => "philadelphus_logo_64.png",
+                TreeRootVM => "root_64_1.png",
+                TreeNodeVM => "node_64_3.png",
+                TreeLeaveVM => "leave_64_3.png",
                 _ => "Flaticon_icon_empty.png"
             };
 

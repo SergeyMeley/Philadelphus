@@ -361,8 +361,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Завершение сохранения репозитория. Сохранено {result} элементов.",
-                criticalLevel: NotificationCriticalLevelModel.Info);
+                $"Сохранение репозитория выполнено успешно. Сохранено {result} элементов.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
         }
@@ -435,8 +435,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Завершение сохранения рабочих деревьев. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
-                criticalLevel: NotificationCriticalLevelModel.Info);
+                $"Сохранение рабочих деревьев выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
         }
@@ -509,8 +509,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Завершение сохранения корней. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
-                criticalLevel: NotificationCriticalLevelModel.Info);
+                $"Сохранение корней выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
         }
@@ -584,8 +584,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Завершение сохранения узлов. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
-                criticalLevel: NotificationCriticalLevelModel.Info);
+                $"Сохранение узлов выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
         }
@@ -657,8 +657,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Завершение сохранения листов. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
-                criticalLevel: NotificationCriticalLevelModel.Info);
+                $"Сохранение листов выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
         }
@@ -717,8 +717,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Завершение сохранения атрибутов. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
-                criticalLevel: NotificationCriticalLevelModel.Info);
+                $"Сохранение атрибутов выполнено успешно. Сохранено {initCount + changedCount + deletedCount} шт. - новых {initCount} шт., измененных {changedCount} шт., удаленных {deletedCount} шт.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return result;
         }
@@ -750,8 +750,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(owner, State.Changed);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Завершение создания рабочего дерева.",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                    $"Создание рабочего дерева выполнено успешно.",
+                    criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
             }
@@ -783,8 +783,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Завершение создания корня.",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                    $"Создание корня выполнено успешно.",
+                    criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
             }
@@ -820,8 +820,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Завершение создания узла.",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                    $"Создание узла выполнено успешно.",
+                    criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
             }
@@ -862,8 +862,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Завершение создания листа.",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                    $"Создание листа выполнено успешно.",
+                    criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return result;
             }
@@ -904,8 +904,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     SetModelState(result, State.Initialized);
 
                     _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        $"Завершение создания атрибута.",
-                        criticalLevel: NotificationCriticalLevelModel.Info);
+                        $"Создание атрибута выполнено успешно.",
+                        criticalLevel: NotificationCriticalLevelModel.Ok);
 
                     return result;
                 }
@@ -943,7 +943,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                     $"Начало удаления элемента. Элемент - '{(element as IMainEntityModel).Name}' [{(element as IMainEntityModel).Uuid}].",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
 
                 if (element == null)
                 {
@@ -972,8 +972,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Удаление элемента выполнено корректно. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
-                    criticalLevel: NotificationCriticalLevelModel.Warning);
+                    $"Удаление элемента выполнено успешно. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
+                    criticalLevel: NotificationCriticalLevelModel.Ok);
 
                 return true;
             }

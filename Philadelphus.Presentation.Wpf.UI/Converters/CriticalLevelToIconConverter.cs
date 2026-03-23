@@ -23,6 +23,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
                     case NotificationCriticalLevelModel.None:
                         key = "imageEmpty";
                         break;
+                    case NotificationCriticalLevelModel.Ok:
+                        key = "imageOk64_1";
+                        break;
                     case NotificationCriticalLevelModel.Info:
                         key = "imageInfo64_2";
                         break;

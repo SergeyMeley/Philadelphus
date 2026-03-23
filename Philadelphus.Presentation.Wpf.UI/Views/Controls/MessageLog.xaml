@@ -22,9 +22,33 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Журнал сообщений" VerticalAlignment="Center" Margin="1,0"></TextBlock>
                         <ToggleButton Grid.Column="1" 
+                                      IsChecked="{Binding DataContext.IsOkMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                      ToolTip="Отобразить / скрыть уведомления об успешном выполнении" 
+                                      Padding="0" 
+                                      Height="24"
+                                      Margin="1,0">
+                            <ToggleButton.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ContentPresenter Grid.Column="0" Content="{StaticResource imageOk64_1}"></ContentPresenter>
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding DataContext.OkMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                   MinWidth="30"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"></TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ToggleButton.ContentTemplate>
+                        </ToggleButton>
+                        <ToggleButton Grid.Column="2" 
                                       IsChecked="{Binding DataContext.IsInfoMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                       ToolTip="Отобразить / скрыть информационные сообщения" 
                                       Padding="0" 
@@ -47,7 +71,7 @@
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
                         </ToggleButton>
-                        <ToggleButton Grid.Column="2" 
+                        <ToggleButton Grid.Column="3" 
                                       IsChecked="{Binding DataContext.IsWarningMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                       ToolTip="Отобразить / скрыть предупреждения" 
                                       Padding="0" 
@@ -70,7 +94,7 @@
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
                         </ToggleButton>
-                        <ToggleButton Grid.Column="3"
+                        <ToggleButton Grid.Column="4"
                                       IsChecked="{Binding DataContext.IsErrorMessagesVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                       ToolTip="Отобразить / скрыть сообщения об ошибках" 
                                       Padding="0"
@@ -93,14 +117,14 @@
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
                         </ToggleButton>
-                        <Button Grid.Column="4" 
+                        <Button Grid.Column="5" 
                                 Content="{StaticResource imageBroom64}" 
                                 Command="{Binding DataContext.ClearMessageLogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                 ToolTip="Очистить журнал сообщений" 
                                 Padding="0" 
                                 Height="24" 
                                 Margin="1,0"></Button>
-                        <Button Grid.Column="5" 
+                        <Button Grid.Column="6" 
                                 Content="{StaticResource imageCheck64}" 
                                 Command="{Binding DataContext.SendTestNotificationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                 ToolTip="Отправить тестовое уведомление всем пользователям" 
