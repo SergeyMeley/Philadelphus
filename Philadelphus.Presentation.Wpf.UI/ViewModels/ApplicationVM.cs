@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
@@ -13,7 +13,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IMapper _mapper;
-        private readonly ILogger<ApplicationVM> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
 
         private ApplicationCommandsVM _applicationCommandsVM;
@@ -34,7 +34,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         public ApplicationVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<ApplicationVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,

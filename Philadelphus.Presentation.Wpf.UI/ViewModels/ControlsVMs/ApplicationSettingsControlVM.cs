@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
@@ -15,6 +14,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -72,7 +72,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<RepositoryCreationControlVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IConfigurationService configurationService,
             ApplicationCommandsVM applicationCommandsVM,
@@ -290,7 +290,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     else
                     {
                         var message = "Путь к конфигурационному файлу 'ConnectionStringsCollectionConfig' не найден, изменения не сохранены";
-                        _logger.LogError(message);
+                        _logger.Error(message);
                         MessageBox.Show(message);
                     }
                 });

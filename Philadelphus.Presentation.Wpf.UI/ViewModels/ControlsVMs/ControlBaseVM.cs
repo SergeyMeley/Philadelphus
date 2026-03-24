@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -8,13 +8,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly IMapper _mapper;
-        protected readonly ILogger<ControlBaseVM> _logger;
+        protected readonly ILogger _logger;
         protected readonly INotificationService _notificationService;
         protected readonly ApplicationCommandsVM _applicationCommandsVM;
         public ControlBaseVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<ControlBaseVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             ApplicationCommandsVM applicationCommandsVM)
         {

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
@@ -8,6 +7,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -75,7 +75,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public ExtensionsControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<ExtensionsControlVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IExtensionManager extensionManager,
             RepositoryExplorerControlVM repositoryExplorerControlVM,

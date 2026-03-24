@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
@@ -97,7 +97,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         public PopUpNotificationsControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<ControlBaseVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)

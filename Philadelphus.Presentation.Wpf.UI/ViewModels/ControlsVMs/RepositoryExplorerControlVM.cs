@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
@@ -18,6 +17,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using PropertyTools.Wpf;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -114,7 +114,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public RepositoryExplorerControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
-            ILogger<RepositoryCreationControlVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             IPhiladelphusRepositoryService service,

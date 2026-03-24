@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -7,6 +6,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 
@@ -14,7 +14,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 {
     public class PhiladelphusRepositoryHeadersCollectionVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
-        private readonly ILogger<PhiladelphusRepositoryHeadersCollectionVM> _logger;
+        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
         private readonly IPhiladelphusRepositoryCollectionService _service;
@@ -76,7 +76,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
         public PhiladelphusRepositoryHeadersCollectionVM(
-            ILogger<PhiladelphusRepositoryHeadersCollectionVM> logger,
+            ILogger logger,
             INotificationService notificationService,
             IMapper mapper,
             IPhiladelphusRepositoryCollectionService service,
