@@ -333,7 +333,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private bool SendMissHandlerNotification(string handlerName, string source)
         {
             var notification = new Notification(
-                text: $"Не задан требуемый обработчик уведомлений '{handlerName}'. Осуществляется попытка отправить с повышенным обработчиком",
+                text: $"Не задан требуемый обработчик уведомлений '{handlerName}'. Осуществляется попытка отправить с повышенным обработчиком.",
                 sendingUser: CurrentUser,
                 source: source,
                 criticalLevel: NotificationCriticalLevelModel.Warning);

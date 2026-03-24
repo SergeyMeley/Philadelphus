@@ -73,9 +73,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
 
-            _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
+            _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
-            _notificationService.SendTextMessage<MainWindowVM>($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Ok);
+            _notificationService.SendTextMessage<MainWindowVM>($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт.).", NotificationCriticalLevelModel.Ok);
         }
 
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
