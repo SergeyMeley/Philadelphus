@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF\Philadelphus.Infrastructure.Persistence.EF.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
   </ItemGroup>
 
