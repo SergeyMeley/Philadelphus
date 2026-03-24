@@ -207,13 +207,13 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Общие ViewModel
                     services.AddSingleton<ApplicationVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
-                    services.AddSingleton<MainWindowNotificationsVM>();
+                    services.AddTransient<MainWindowNotificationsVM>();
+                    services.AddTransient<MessageLogControlVM>();
+                    services.AddTransient<PopUpNotificationsControlVM>();
                     // ViewModel окон
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
                     // ViewModel контролов
-                    services.AddTransient<MessageLogControlVM>();
-                    services.AddTransient<PopUpNotificationsControlVM>();
                     services.AddSingleton<ApplicationSettingsControlVM>();
                     services.AddTransient<ApplicationSettingsTabItemControlVM>();
                     services.AddTransient<LaunchWindowTabItemControlVM>();
