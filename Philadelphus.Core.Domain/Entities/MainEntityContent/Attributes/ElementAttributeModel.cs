@@ -191,11 +191,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         #region [ Ownership Properties ]
 
         /// <summary>
-        /// Владелец
-        /// </summary>
-        public IOwnerModel Owner { get => _attributeOwner; }
-
-        /// <summary>
         /// Объявивший владелец, с которого унаследован атрибут
         /// </summary>
         public IOwnerModel DeclaringOwner { get => _declaringAttributeOwner; }
@@ -399,6 +394,21 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             newOwner.AddAttribute(result);
 
             return result;
+        }
+
+        protected override bool AddContentDetailed(IContentModel content)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool RemoveContentDetailed(IContentModel content)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool ClearContentDetailed()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
@@ -34,7 +35,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Уникальный идентификатор системного рабочего дерева
         /// </summary>
-        internal static Guid SystemBaseGuid { get => Guid.Parse("00000000-0000-0000-0000-0000002018ee"); }
+        internal static Guid SystemBaseUuid { get => Guid.Parse("00000000-0000-0000-0000-0000002018ee"); }
 
         /// <summary>
         /// Недоступные (занятые) имена
@@ -151,7 +152,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             Name = NamingHelper.GetNewName(UnavailableNames, _defaultFixedPartOfName);
             UnavailableNames.Add(Name);
 
-            if (uuid == SystemBaseGuid)
+            if (uuid == SystemBaseUuid)
             {
                 IsSystemBase = true;
             }
@@ -186,6 +187,49 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public IEnumerable<TreeLeaveModel> GetAllLeavesRecursive()
         {
             return ContentRoot?.GetAllLeavesRecursive() ?? throw new NullReferenceException();
+        }
+
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool AddContentDetailed(IContentModel content)
+        {
+            if (content is TreeRootModel)
+            {
+                return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool RemoveContentDetailed(IContentModel content)
+        {
+            if (content is TreeRootModel r
+                && ContentRoot.Uuid == content.Uuid)
+            {
+                ContentRoot = null;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        protected override bool ClearContentDetailed()
+        {
+            ContentRoot = null;
+            return true;
         }
 
         #endregion

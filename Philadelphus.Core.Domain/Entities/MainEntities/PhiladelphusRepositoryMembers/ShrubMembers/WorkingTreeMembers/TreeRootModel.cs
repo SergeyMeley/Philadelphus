@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
@@ -36,7 +37,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Уникальный идентификатор системного корня
         /// </summary>
-        internal static Guid SystemBaseGuid { get => Guid.Parse("00000000-0000-0000-0000-000018151520"); }
+        internal static Guid SystemBaseUuid { get => Guid.Parse("00000000-0000-0000-0000-000018151520"); }
 
         #endregion
 
@@ -106,7 +107,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             ChildNodes = new List<TreeNodeModel>();
 
-            if (uuid == SystemBaseGuid)
+            if (uuid == SystemBaseUuid)
             {
                 IsSystemBase = true;
             }
@@ -116,7 +117,78 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ Methods ]
 
+        /// <summary>
+        /// Добавить наследника
+        /// </summary>
+        /// <param name="child">Наследник</param>
+        public bool AddChild(IChildrenModel child)
+        {
+            if (child is TreeNodeModel n
+                && ChildNodes.Any(x => x.Uuid == child.Uuid) == false)
+            {
+                ChildNodes.Add(n);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
+        /// <summary>
+        /// Удалить наследника
+        /// </summary>
+        /// <param name="child">Наследник</param>
+        public bool RemoveChild(IChildrenModel child)
+        {
+            if (child is TreeNodeModel n
+                && ChildNodes.Any(x => x.Uuid == child.Uuid))
+            {
+                var remItem = ChildNodes.First(x => x.Uuid == child.Uuid);
+                ChildNodes.Remove(remItem);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        /// <summary>
+        /// Очистить список наследников
+        /// </summary>
+        public bool ClearChilds()
+        {
+            ChildNodes.Clear();
+            return true;
+        }
+
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool AddContentDetailed(IContentModel content)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool RemoveContentDetailed(IContentModel content)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        protected override bool ClearContentDetailed()
+        {
+            return true;
+        }
 
         #endregion
     }

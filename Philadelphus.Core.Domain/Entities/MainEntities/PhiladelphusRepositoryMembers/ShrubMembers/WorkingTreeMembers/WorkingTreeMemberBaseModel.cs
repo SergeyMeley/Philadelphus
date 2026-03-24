@@ -92,13 +92,24 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         public WorkingTreeMemberBaseModel(
             Guid uuid,
-            WorkingTreeModel owner)
-             : base(uuid, owner.OwningShrub)
+            IOwnerModel owner)
+             : base(uuid, owner)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
 
-            OwningWorkingTree = owner;
+            if (owner is WorkingTreeModel t)
+            {
+                OwningWorkingTree = t;
+            }
+            else if (owner is WorkingTreeMemberBaseModel wtm)
+            {
+                OwningWorkingTree = wtm.OwningWorkingTree;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
 
             Name = NamingHelper.GetNewName(OwningWorkingTree.UnavailableNames, _defaultFixedPartOfName);
             OwningWorkingTree.UnavailableNames.Add(Name);

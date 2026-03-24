@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.Reflection.Metadata;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
@@ -147,6 +148,93 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool ChangeParent(IParentModel newParent)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Добавить наследника
+        /// </summary>
+        /// <param name="child">Наследник</param>
+        public bool AddChild(IChildrenModel child)
+        {
+            if (child is TreeNodeModel n
+                && ChildNodes.Any(x => x.Uuid == child.Uuid) == false)
+            {
+                ChildNodes.Add(n);
+                return true;
+            }
+            else if (child is TreeLeaveModel l
+                && ChildNodes.Any(x => x.Uuid == child.Uuid) == false)
+            {
+                ChildLeaves.Add(l);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Удалить наследника
+        /// </summary>
+        /// <param name="child">Наследник</param>
+        public bool RemoveChild(IChildrenModel child)
+        {
+            if (child is TreeNodeModel n
+                && ChildNodes.Any(x => x.Uuid == child.Uuid))
+            {
+                var remItem = ChildNodes.First(x => x.Uuid == child.Uuid);
+                ChildNodes.Remove(remItem);
+                return true;
+            }
+            else if (child is TreeLeaveModel l
+                && ChildNodes.Any(x => x.Uuid == child.Uuid))
+            {
+                var remItem = ChildLeaves.First(x => x.Uuid == child.Uuid);
+                ChildLeaves.Remove(remItem);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        /// <summary>
+        /// Очистить список наследников
+        /// </summary>
+        public bool ClearChilds()
+        {
+            ChildNodes.Clear();
+            ChildLeaves.Clear();
+            return true;
+        }
+
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool AddContentDetailed(IContentModel content)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool RemoveContentDetailed(IContentModel content)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        protected override bool ClearContentDetailed()
+        {
+            return true;
         }
 
         #endregion

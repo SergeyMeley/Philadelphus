@@ -57,8 +57,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ Ownership Properties ]
 
-
-
         #endregion
 
         #region [ Infrastructure Properties ]
@@ -125,6 +123,32 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public override sealed bool ClearAttributes()
         {
             return false;
+        }
+
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool AddContentDetailed(IContentModel content)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected override bool RemoveContentDetailed(IContentModel content)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        protected override bool ClearContentDetailed()
+        {
+            return true;
         }
 
         #endregion
