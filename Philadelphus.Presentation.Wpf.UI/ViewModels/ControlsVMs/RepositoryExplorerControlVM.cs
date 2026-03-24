@@ -156,9 +156,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    UpdateChildsCollection(this);   // TODO
                     var repo = _philadelphusRepositoryVM.Model;
                     _service.SaveChanges(ref repo, SaveMode.WithContentAndMembers);
+                    UpdateChildsCollection(_philadelphusRepositoryVM);   // TODO
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
                 });
@@ -239,9 +239,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
+                        OnPropertyChanged(nameof(_selectedRepositoryMember.State));
+                        NotifyChildsPropertyChangedRecursive();
                     }
-                    OnPropertyChanged(nameof(State));
-                    NotifyChildsPropertyChangedRecursive();
                 },
                 ce =>
                 {
@@ -440,9 +440,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private bool UpdateChildsCollection(ViewModelBase parent)    //TODO: Переделать временный костыль
         {
-            if (parent is PhiladelphusRepositoryVM)
+            if (parent is PhiladelphusRepositoryVM repository)
             {
-                var repository = (PhiladelphusRepositoryVM)parent;
                 for (int i = repository.Childs.Count - 1; i >= 0; i--)
                 {
                     if (repository.Childs[i].State == State.ForHardDelete
@@ -455,9 +454,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         UpdateChildsCollection(repository.Childs[i]);
                 }
             }
-            if (parent is TreeRootVM)
+            if (parent is TreeRootVM root)
             {
-                var root = (TreeRootVM)parent;
                 for (int i = root.ChildNodes.Count - 1; i >= 0; i--)
                 {
                     if (root.ChildNodes[i].State == State.ForHardDelete
@@ -470,9 +468,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         UpdateChildsCollection(root.ChildNodes[i]);
                 }
             }
-            if (parent is TreeNodeVM)
+            if (parent is TreeNodeVM node)
             {
-                var node = (TreeNodeVM)parent;
                 for (int i = node.ChildNodes.Count - 1; i >= 0; i--)
                 {
                     if (node.ChildNodes[i].State == State.ForHardDelete

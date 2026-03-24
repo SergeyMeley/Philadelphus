@@ -159,7 +159,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage)
         {
             var result = new PhiladelphusRepositoryModel(Guid.NewGuid(), dataStorage);
-            result.ContentShrub.ContentWorkingTreesUuids.Add(WorkingTreeModel.SystemBaseGuid);
+            result.ContentShrub.ContentWorkingTreesUuids.Add(WorkingTreeModel.SystemBaseUuid);
             return result;
         }
 
@@ -212,10 +212,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             model.SetState(newState);
         }
-
-        #endregion
-
-        #region [ Temp ]
 
         #endregion
     }

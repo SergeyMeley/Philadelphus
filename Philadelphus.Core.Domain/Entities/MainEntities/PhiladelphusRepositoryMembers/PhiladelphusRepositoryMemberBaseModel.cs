@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
@@ -67,10 +68,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Владелец
         /// </summary>
-        public virtual IOwnerModel Owner 
-        { 
-            get => OwningRepository; 
-        }
+        public IOwnerModel Owner { get; }
 
         /// <summary>
         /// Все владельцы (рекурсивно)
@@ -94,13 +92,26 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         internal PhiladelphusRepositoryMemberBaseModel(
             Guid uuid,
-            PhiladelphusRepositoryModel owner)
+            IOwnerModel owner)
             : base(uuid)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
 
-            OwningRepository = owner;
+            Owner = owner;
+
+            if (owner is PhiladelphusRepositoryModel r)
+            {
+                OwningRepository = r;
+            }
+            else if (owner is PhiladelphusRepositoryMemberBaseModel rm)
+            {
+                OwningRepository = rm.OwningRepository;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         #endregion

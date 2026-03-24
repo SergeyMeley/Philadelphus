@@ -216,6 +216,32 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        public bool AddContent(IContentModel content)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        public bool RemoveContent(IContentModel content)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        public bool ClearContent()
+        {
+            return false;
+        }
+
         #endregion
     }
 }

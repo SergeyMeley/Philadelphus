@@ -51,11 +51,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public PhiladelphusRepositoryModel OwningRepository { get; }
 
         /// <summary>
-        /// Владелец
-        /// </summary>
-        public override IOwnerModel Owner { get => OwningRepository; }
-
-        /// <summary>
         /// Содержащиеся рабочие деревья
         /// </summary>
         public List<WorkingTreeModel> ContentWorkingTrees { get; }
@@ -147,7 +142,54 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ Methods ]
 
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        public bool AddContent(IContentModel content)
+        {
+            if (content is WorkingTreeModel wt 
+                && ContentWorkingTrees.Any(x => x.Uuid == content.Uuid) == false)
+            {
+                ContentWorkingTrees.Add(wt);
+                ContentWorkingTreesUuids.Add(wt.Uuid);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        public bool RemoveContent(IContentModel content)
+        {
+            if (content is WorkingTreeModel wt
+                && ContentWorkingTrees.Any(x => x.Uuid == content.Uuid))
+            {
+                var remItem = ContentWorkingTrees.First(x => x.Uuid == content.Uuid);
+                ContentWorkingTrees.Remove(remItem);
+                ContentWorkingTreesUuids.Remove(remItem.Uuid);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        public bool ClearContent()
+        {
+            ContentWorkingTrees.Clear();
+            ContentWorkingTreesUuids.Clear();
+            return true;
+        }
 
         #endregion
     }

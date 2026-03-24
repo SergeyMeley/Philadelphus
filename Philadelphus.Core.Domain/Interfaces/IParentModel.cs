@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
@@ -16,5 +17,22 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Все наследники (рекурсивно)
         /// </summary>
         public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive { get; }
+
+        /// <summary>
+        /// Добавить наследника
+        /// </summary>
+        /// <param name="child">Наследник</param>
+        public bool AddChild(IChildrenModel child);
+
+        /// <summary>
+        /// Удалить наследника
+        /// </summary>
+        /// <param name="child">Наследник</param>
+        public bool RemoveChild(IChildrenModel child);
+
+        /// <summary>
+        /// Очистить список наследников
+        /// </summary>
+        public bool ClearChilds();
     }
 }

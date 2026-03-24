@@ -73,11 +73,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public ShrubModel OwningShrub { get; }
 
         /// <summary>
-        /// Владелец
-        /// </summary>
-        public IOwnerModel Owner { get => OwningShrub; }
-
-        /// <summary>
         /// Содержимое
         /// </summary>
         public abstract ReadOnlyDictionary<Guid, IContentModel> Content { get; }
@@ -198,13 +193,24 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         internal ShrubMemberBaseModel(
             Guid uuid,
-            ShrubModel owner)
-            : base(uuid, owner.OwningRepository)
+            IOwnerModel owner)
+            : base(uuid, owner)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
 
-            OwningShrub = owner;
+            if (owner is ShrubModel sh)
+            {
+                OwningShrub = sh;
+            }
+            else if (owner is ShrubMemberBaseModel shm)
+            {
+                OwningShrub = shm.OwningShrub;
+            }
+            else 
+            {
+                throw new ArgumentException();
+            }
         }
 
         #endregion
@@ -334,6 +340,59 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             }
             return IsSameNodeOrLeaf(viewer);
         }
+
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        public bool AddContent(IContentModel content)
+        {
+            if (content is ElementAttributeModel a)
+            {
+                return AddAttribute(a);
+            }
+            return AddContentDetailed(content);
+        }
+
+        /// <summary>
+        /// Добавить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected abstract bool AddContentDetailed(IContentModel content);
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        public bool RemoveContent(IContentModel content)
+        {
+            if (content is ElementAttributeModel a)
+            {
+                return RemoveAttribute(a);
+            }
+            return RemoveContentDetailed(content);
+        }
+
+        /// <summary>
+        /// Удалить содержимое
+        /// </summary>
+        /// <param name="content">Содержимое</param>
+        protected abstract bool RemoveContentDetailed(IContentModel content);
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        public bool ClearContent()
+        {
+            ClearAttributes();
+            ClearContentDetailed();
+            return true;
+        }
+
+        /// <summary>
+        /// Очистить содержимое
+        /// </summary>
+        protected abstract bool ClearContentDetailed();
 
         #endregion
     }

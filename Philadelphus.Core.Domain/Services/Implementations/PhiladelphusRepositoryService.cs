@@ -345,7 +345,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             repository.AuditInfo = _mapper.Map<AuditInfoModel>(entity.AuditInfo);
 
             // Актуализация статуса
-            SetModelState(repository, State.SavedOrLoaded); // TODO: Удалить?
+            SetModelState(repository, State.SavedOrLoaded);     // TODO: Удалить?
 
             // Сохранение содержимого
             if (saveMode == SaveMode.WithContent || 
@@ -414,11 +414,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += initCount + changedCount + deletedCount;
             }
 
-            // Актуализация статуса
-            foreach (var workingTree in workingTrees)
-            {
-                SetModelState(workingTree, State.SavedOrLoaded);
-            }
+            // Постобработка сохраненных элементов
+            PostProcessSavedEntities(workingTrees);
 
             // Сохранение содержимого
             if (saveMode == SaveMode.WithContent ||
@@ -488,12 +485,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += initCount + changedCount + deletedCount;
             }
 
-            // Актуализация статуса
-            foreach (var treeRoot in treeRoots)
-            {
-                SetModelState(treeRoot, State.SavedOrLoaded);
-            }
-
+            // Постобработка сохраненных элементов
+            PostProcessSavedEntities(treeRoots);
+            
             // Сохранение содержимого
             if (saveMode == SaveMode.WithContent || 
                 saveMode == SaveMode.WithContentAndMembers)
@@ -562,11 +556,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += initCount + changedCount + deletedCount;
             }
 
-            // Актуализация статуса
-            foreach (var treeNode in treeNodes)
-            {
-                SetModelState(treeNode, State.SavedOrLoaded);
-            }
+            // Постобработка сохраненных элементов
+            PostProcessSavedEntities(treeNodes);
 
             // Сохранение содержимого
             if (saveMode == SaveMode.WithContent ||
@@ -637,11 +628,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += initCount + changedCount + deletedCount;
             }
 
-            // Актуализация статуса
-            foreach (var treeLeave in treeLeaves)
-            {
-                SetModelState(treeLeave, State.SavedOrLoaded);
-            }
+            // Постобработка сохраненных элементов
+            PostProcessSavedEntities(treeLeaves);
 
             // Сохранение содержимого
             if (saveMode == SaveMode.WithContent || 
@@ -709,11 +697,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 result += initCount + changedCount + deletedCount;
             }
 
-            // Актуализация статуса
-            foreach (var elementAttribute in elementAttributes)
-            {
-                SetModelState(elementAttribute, State.SavedOrLoaded);
-            }
+            // Постобработка сохраненных элементов
+            PostProcessSavedEntities(elementAttributes);
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
@@ -1037,12 +1022,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns></returns>
         private bool InitSystemWorkingTree(ShrubModel shrub)
         {
-            var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseGuid);
+            var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid);
             if (existTree != null)
                 return false;
 
             var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
-                .SelectTrees(new Guid[] { WorkingTreeModel.SystemBaseGuid });
+                .SelectTrees(new Guid[] { WorkingTreeModel.SystemBaseUuid });
             existTree = _mapper.MapWorkingTrees(dbExistTrees, shrub.OwningRepository.DataStorages, shrub).SingleOrDefault();
 
             if (existTree != null)
@@ -1055,7 +1040,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             // TODO: ех. долг #61187115
 
             var tree = new WorkingTreeModel(
-                uuid: WorkingTreeModel.SystemBaseGuid,
+                uuid: WorkingTreeModel.SystemBaseUuid,
                 dataStorage: shrub.DataStorage,
                 owner: shrub)
             { 
@@ -1063,7 +1048,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             };
 
             var root = new TreeRootModel(
-                uuid: TreeRootModel.SystemBaseGuid,
+                uuid: TreeRootModel.SystemBaseUuid,
                 owner: tree)
             {
                 Name = "Базовые типы данных"
@@ -1096,22 +1081,66 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             State state,
             Func<IEnumerable<TMainEntity>, long> persister,
             ref long result)
-            where TMainEntityModel : IMainEntityModel
+            where TMainEntityModel : IMainEntityWritableModel
             where TMainEntity : IMainEntity
         {
+            // Проверки
+            if (state == State.SavedOrLoaded)
+                throw new ArgumentException();
+
+            // Подготовка
             var collection = fullCollection.Where(x => x.State == state);
             var dbCollection = _mapper.Map<List<TMainEntity>>(collection);
 
+            // Сохранение в хранилище
             result += persister(dbCollection);
 
+            // Возвращение полей аудита их хранилища
             foreach (var (src, dest) in collection.Zip(dbCollection, (src, dest) => (src, dest)))
             {
                 src.AuditInfo = _mapper.Map<AuditInfoModel>(dest.AuditInfo);
             }
         }
 
+        private void PostProcessSavedEntities(IEnumerable<IMainEntityWritableModel> collection)
+        {
+            // Постобработка удаленных элементов
+            var remItems = new List<IMainEntityWritableModel>();
+            foreach (var item in collection.Where(x => 
+            x.State == State.ForSoftDelete 
+            || x.State == State.ForHardDelete
+            || x.State == State.SoftDeleted))
+            {
+                if (item is IContentModel c)
+                {
+                    remItems.Add(item);
+                }
+                if (item is IChildrenModel ch)
+                {
+                    remItems.Add(item);
+                }
+            }
+            foreach (var item in remItems)
+            {
+                if (item is IContentModel c)
+                {
+                    c.Owner.RemoveContent(c);
+                }
+                if (item is IChildrenModel ch)
+                {
+                    ch.Parent.RemoveChild(ch);
+                }
+            }
+
+            // Актуализация статуса остальных
+            foreach (var item in collection.Where(x => 
+            x.State == State.Initialized 
+            || x.State == State.Changed))
+            {
+                SetModelState(item, State.SavedOrLoaded);
+            }
+        }
 
         #endregion
-
     }
 }
