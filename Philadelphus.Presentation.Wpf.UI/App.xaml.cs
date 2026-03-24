@@ -210,6 +210,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<MainWindowNotificationsVM>();
                     services.AddTransient<MessageLogControlVM>();
                     services.AddTransient<PopUpNotificationsControlVM>();
+                    services.AddTransient<ModalWindowNotificationsControlVM>();
                     // ViewModel окон
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();

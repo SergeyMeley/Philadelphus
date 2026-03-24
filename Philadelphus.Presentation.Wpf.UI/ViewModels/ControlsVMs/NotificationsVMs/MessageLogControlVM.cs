@@ -25,7 +25,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         private bool _isErrorMessagesVisible = true;
 
         private bool _isSubscribedNotificationsHistoryUpdate;
-        private bool _isSetedTextMessageHandler;
+        private bool _isSetedHandler;
 
         public bool IsOkMessagesVisible
         {
@@ -179,23 +179,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             _notificationService.HistoryUpdated += (n) => AddNewMessage(n);
             _isSubscribedNotificationsHistoryUpdate = true;
 
-            _notificationService.SendTextMessage<MainWindowNotificationsVM>(
+            _notificationService.SendTextMessage<MessageLogControlVM>(
                 "Журнал сообщений подписан на все необработанные уведомления.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
             return true;
         }
 
-        internal bool SetTextMessageHandler()
+        internal bool SetHandler()
         {
-            if (_isSetedTextMessageHandler)
+            if (_isSetedHandler)
                 return false;
 
             _notificationService.TextMessageHandler += mes => AddNewMessage(mes);
+            _isSetedHandler = true;
 
-            _isSetedTextMessageHandler = true;
-
-            _notificationService.SendTextMessage<MainWindowNotificationsVM>(
+            _notificationService.SendTextMessage<MessageLogControlVM>(
                 "Обработчик текстовых сообщений назначен.",
                 criticalLevel: NotificationCriticalLevelModel.Ok);
 
@@ -296,10 +295,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
                 _notificationService.HistoryUpdated -= (n) => AddNewMessage(n);
                 _isSubscribedNotificationsHistoryUpdate = false;
             }
-            if (_isSetedTextMessageHandler)
+            if (_isSetedHandler)
             {
                 _notificationService.TextMessageHandler -= mes => AddNewMessage(mes);
-                _isSetedTextMessageHandler = false;
+                _isSetedHandler = false;
             }
         }
     }

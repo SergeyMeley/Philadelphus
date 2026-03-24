@@ -15,6 +15,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         private readonly INotificationService _notificationService;
         private readonly MessageLogControlVM _messageLogControlVM;
         private readonly PopUpNotificationsControlVM _popupControlVM;
+        private readonly ModalWindowNotificationsControlVM _modalControlVM;
 
         public MessageLogControlVM MessageLogControlVM
         {
@@ -23,61 +24,39 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                 return _messageLogControlVM;
             }
         }
-        public PopUpNotificationsControlVM PopupVM
+        public PopUpNotificationsControlVM PopupControlVM
         {
             get
             {
                 return _popupControlVM;
             }
         }
+        public ModalWindowNotificationsControlVM ModalControlVM
+        {
+            get
+            {
+                return _modalControlVM;
+            }
+        }
         public MainWindowNotificationsVM(
             MessageLogControlVM messageLogControlVM,
             PopUpNotificationsControlVM popupControlVM,
+            ModalWindowNotificationsControlVM modalControlVM,
             INotificationService notificationService)
         {
              _notificationService = notificationService;
 
             _messageLogControlVM = messageLogControlVM;
             _popupControlVM = popupControlVM;
+            _modalControlVM = modalControlVM;
 
             SetNotificationHandlers();
         }
 
         private bool SetNotificationHandlers()
         {
-            MessageLogControlVM.SetTextMessageHandler();
-
-            _notificationService.ModalWindowHandler = notification =>
-            {
-                MessageBoxImage image;
-                switch (notification.CriticalLevel)
-                {
-                    case NotificationCriticalLevelModel.Ok:
-                        image = MessageBoxImage.None;
-                        break;
-                    case NotificationCriticalLevelModel.Info:
-                        image = MessageBoxImage.Information;
-                        break;
-                    case NotificationCriticalLevelModel.Warning:
-                        image = MessageBoxImage.Warning;
-                        break;
-                    case NotificationCriticalLevelModel.Error:
-                        image = MessageBoxImage.Error;
-                        break;
-                    case NotificationCriticalLevelModel.Alarm:
-                        image = MessageBoxImage.Error;
-                        break;
-                    default:
-                        image = MessageBoxImage.Error;
-                        break;
-                }
-                MessageBox.Show(
-                    messageBoxText: notification.Text,
-                    caption: notification.CriticalLevel.ToString(),
-                    MessageBoxButton.OK, icon: image);
-                return true;
-            };
-            _notificationService.SendTextMessage<MainWindowNotificationsVM>("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevelModel.Info);
+            MessageLogControlVM.SetHandler();
+            ModalControlVM.SetHandler();
 
             MessageLogControlVM.SubscribeNotificationsHistoryUpdate();
 
