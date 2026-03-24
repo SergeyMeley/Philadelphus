@@ -12,79 +12,49 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
     public class MainWindowNotificationsVM : ViewModelBase
     {
-        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
+        private readonly MessageLogControlVM _messageLogControlVM;
+        private readonly PopUpNotificationsControlVM _popupControlVM;
 
-        private PopUpNotificationsControlVM _popupVM;
-
-        private Dictionary<Guid, MessageLogControlVM> MessageLogsVMs { get; } = new Dictionary<Guid, MessageLogControlVM>();
+        public MessageLogControlVM MessageLogControlVM
+        {
+            get
+            {
+                return _messageLogControlVM;
+            }
+        }
         public PopUpNotificationsControlVM PopupVM
         {
             get
             {
-                return _popupVM;
+                return _popupControlVM;
             }
         }
-
-        public ObservableCollection<Notification> AllMainWindowNotifications { get; } = new ObservableCollection<Notification>();
         public MainWindowNotificationsVM(
-            PopUpNotificationsControlVM popupVM,
-            ILogger logger,
+            MessageLogControlVM messageLogControlVM,
+            PopUpNotificationsControlVM popupControlVM,
             INotificationService notificationService)
         {
-            _popupVM = popupVM;
-            _logger = logger;
-            _notificationService = notificationService;
+             _notificationService = notificationService;
+
+            _messageLogControlVM = messageLogControlVM;
+            _popupControlVM = popupControlVM;
 
             SetNotificationHandlers();
-
-            CopyNotifications();
-            SubscribeNotifications();
-        }
-
-        private void CopyNotifications()
-        {
-            foreach (var item in _notificationService.NotificationsHistory.ToList())
-            {
-                Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    AllMainWindowNotifications.Add(item);
-                });
-            }
-        }
-        private void SubscribeNotifications()
-        {
-            _notificationService.HistoryUpdated += (n) =>
-            {
-                Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    _notificationService.HistoryUpdated += (n) =>
-                    {
-                        AllMainWindowNotifications.Add(n);
-                    };
-                });
-            };
         }
 
         private bool SetNotificationHandlers()
         {
-            _notificationService.TextMessageHandler = notification =>
-            {
-                foreach (var vm in MessageLogsVMs)
-                {
-
-                }
-                return true;
-            };
-            _notificationService.SendTextMessage<MainWindowNotificationsVM>(
-                "Обработчик текстовых сообщений назначен.", 
-                criticalLevel: NotificationCriticalLevelModel.Info);
+            MessageLogControlVM.SetTextMessageHandler();
 
             _notificationService.ModalWindowHandler = notification =>
             {
                 MessageBoxImage image;
                 switch (notification.CriticalLevel)
                 {
+                    case NotificationCriticalLevelModel.Ok:
+                        image = MessageBoxImage.None;
+                        break;
                     case NotificationCriticalLevelModel.Info:
                         image = MessageBoxImage.Information;
                         break;
@@ -108,6 +78,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                 return true;
             };
             _notificationService.SendTextMessage<MainWindowNotificationsVM>("Обработчик модальных окон назначен.", criticalLevel: NotificationCriticalLevelModel.Info);
+
+            MessageLogControlVM.SubscribeNotificationsHistoryUpdate();
 
             return true;
         }

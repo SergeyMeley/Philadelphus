@@ -21,7 +21,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
-        private readonly MessageLogControlVM _messageLogControlVM;
 
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
@@ -52,9 +51,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
         public string AssemblyVersion { get => $"v.{Assembly.GetExecutingAssembly().GetName().Version}"; }
-        public string UserName { get => MessageLogControlVM.MessagingUserName; }
+        public string UserName { get => _mainWindowNotificationsVM.MessageLogControlVM.MessagingUserName; }
         public MainWindowNotificationsVM MainWindowNotificationsVM { get => _mainWindowNotificationsVM; }
-        public MessageLogControlVM MessageLogControlVM { get => _messageLogControlVM; }
         public IMainEntityVM<IMainEntityModel> SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
 
         public MainWindowVM(
@@ -67,19 +65,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationSettingsControlVM applicationSettingsControlVM,
-            MainWindowNotificationsVM mainWindowNotificationsVM,
-            MessageLogControlVM messageLogControlVM)
+            MainWindowNotificationsVM mainWindowNotificationsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
-            _messageLogControlVM = messageLogControlVM;
 
             _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
-            _notificationService.SendTextMessage<MainWindowVM>($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Info);
+            _notificationService.SendTextMessage<MainWindowVM>($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт)", NotificationCriticalLevelModel.Ok);
         }
 
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;

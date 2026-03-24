@@ -278,7 +278,7 @@
                     </GroupBox>
                 </Grid>
 
-                <ctrls:MessageLog Grid.Row="1" DataContext="{Binding MessageLogControlVM}"></ctrls:MessageLog>
+                <ctrls:MessageLog Grid.Row="1" DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}"></ctrls:MessageLog>
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>

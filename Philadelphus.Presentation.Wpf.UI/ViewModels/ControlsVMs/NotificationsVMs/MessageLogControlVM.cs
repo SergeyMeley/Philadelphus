@@ -15,7 +15,7 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
-    public class MessageLogControlVM : ControlBaseVM
+    public class MessageLogControlVM : ControlBaseVM, IDisposable
     {
         private readonly ObservableCollection<NotificationVM> _currentMessageLogAllNotifications = new ObservableCollection<NotificationVM>();
         private readonly ObservableCollection<NotificationVM> _currentMessageLogFilteredNotifications = new ObservableCollection<NotificationVM>();
@@ -23,6 +23,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         private bool _isInfoMessagesVisible = true;
         private bool _isWarningMessagesVisible = true;
         private bool _isErrorMessagesVisible = true;
+
+        private bool _isSubscribedNotificationsHistoryUpdate;
+        private bool _isSetedTextMessageHandler;
+
         public bool IsOkMessagesVisible
         {
             get
@@ -150,36 +154,67 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             ApplicationCommandsVM applicationCommandsVM) 
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
-            CopyNotifications();
-            FilterVisibleNotifications();
-            SubscribeNotifications();
+            CopyNotificationsHistory();
         }
 
-        private void CopyNotifications()
+        internal bool CopyNotificationsHistory()
         {
             foreach (var item in _notificationService.NotificationsHistory.ToList())
             {
-                Application.Current.Dispatcher.InvokeAsync(() =>
+                Application.Current.Dispatcher.Invoke(() =>
                 {
                     _currentMessageLogAllNotifications.Add(new NotificationVM(item, _notificationService));
-                    FilterVisibleNotifications();
                 });
             }
+            FilterVisibleNotifications();
+
+            return true;
         }
-        private void SubscribeNotifications()
+
+        internal bool SubscribeNotificationsHistoryUpdate()
         {
-            _notificationService.HistoryUpdated += (n) =>
+            if (_isSubscribedNotificationsHistoryUpdate)
+                return false;
+
+            _notificationService.HistoryUpdated += (n) => AddNewMessage(n);
+            _isSubscribedNotificationsHistoryUpdate = true;
+
+            _notificationService.SendTextMessage<MainWindowNotificationsVM>(
+                "Журнал сообщений подписан на все необработанные уведомления.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
+
+            return true;
+        }
+
+        internal bool SetTextMessageHandler()
+        {
+            if (_isSetedTextMessageHandler)
+                return false;
+
+            _notificationService.TextMessageHandler += mes => AddNewMessage(mes);
+
+            _isSetedTextMessageHandler = true;
+
+            _notificationService.SendTextMessage<MainWindowNotificationsVM>(
+                "Обработчик текстовых сообщений назначен.",
+                criticalLevel: NotificationCriticalLevelModel.Ok);
+
+            return true;
+        }
+
+        private bool AddNewMessage(Notification notification)
+        {
+            if (_currentMessageLogAllNotifications.Any(x => x.Model == notification))
+                return false;
+
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    var vm = new NotificationVM(n, _notificationService);
-                    if (IsVisible(vm))
-                    {
-                        _currentMessageLogAllNotifications.Add(vm);
-                        FilterVisibleNotifications();
-                    }
-                });
-            };
+                var vm = new NotificationVM(notification, _notificationService);
+                _currentMessageLogAllNotifications.Add(vm);
+                FilterVisibleNotifications();
+            }); 
+            
+            return true;
         }
 
         public RelayCommand ClearMessageLogCommand
@@ -252,6 +287,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
                 || (IsWarningMessagesVisible && notification.CriticalLevel == NotificationCriticalLevelModel.Warning)
                 || (IsInfoMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Info || notification.CriticalLevel == NotificationCriticalLevelModel.None)) 
                 || (IsOkMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Ok));
+        }
+
+        public void Dispose()
+        {
+            if (_isSubscribedNotificationsHistoryUpdate)
+            {
+                _notificationService.HistoryUpdated -= (n) => AddNewMessage(n);
+                _isSubscribedNotificationsHistoryUpdate = false;
+            }
+            if (_isSetedTextMessageHandler)
+            {
+                _notificationService.TextMessageHandler -= mes => AddNewMessage(mes);
+                _isSetedTextMessageHandler = false;
+            }
         }
     }
 }
