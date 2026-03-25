@@ -13,7 +13,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Mapping
     {
         public ViewModelsMappingProfile()
         {
-            CreateMap<ConnectionStringContainer, ConnectionStringContainerVM>().ReverseMap();
+            CreateMap<ConnectionStringsContainer, ConnectionStringsContainerVM>().ReverseMap();
         }
     }
 }

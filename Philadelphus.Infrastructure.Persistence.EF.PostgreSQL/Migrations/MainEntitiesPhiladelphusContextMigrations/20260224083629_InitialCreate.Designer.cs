@@ -11,7 +11,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
-    [DbContext(typeof(ShrubMembersContext))]
+    [DbContext(typeof(PostgreEfShrubMembersContext))]
     [Migration("20260224083629_InitialCreate")]
     partial class InitialCreate
     {

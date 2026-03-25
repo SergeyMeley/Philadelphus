@@ -1,5 +1,4 @@
-﻿using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
-using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Text.Json.Serialization;
 

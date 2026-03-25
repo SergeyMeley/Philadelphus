@@ -9,18 +9,18 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 #nullable disable
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
+namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.ShrubMembersContextMigrations
 {
     [DbContext(typeof(PostgreEfShrubMembersContext))]
-    [Migration("20260319220702_audit")]
-    partial class audit
+    [Migration("20260325122512_sqlite")]
+    partial class sqlite
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.14")
                 .HasAnnotation("Proxies:ChangeTracking", false)
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true)

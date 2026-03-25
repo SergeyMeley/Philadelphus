@@ -44,7 +44,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
                 try
                 {
                     if (context.Database.GetService<IRelationalDatabaseCreator>().Exists() == false)
-                    return false;
+                        return false;
                     context.Database.ExecuteSqlRaw($"SELECT {0}", 1);
                     context.Database.OpenConnection();
                     context.Database.CloseConnection();

@@ -1,21 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
+using Philadelphus.Infrastructure.Persistence.EF.Configurations;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Serilog;
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
+namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts
 {
-    public partial class PhiladelphusRepositoriesContext : DbContext
+    public partial class SqliteEfPhiladelphusRepositoriesContext : DbContext
     {
         private readonly string _connectionString;
-        public PhiladelphusRepositoriesContext()
+        public SqliteEfPhiladelphusRepositoriesContext()
         {
         }
-        public PhiladelphusRepositoriesContext(string connectionString)
+        public SqliteEfPhiladelphusRepositoriesContext(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public PhiladelphusRepositoriesContext(DbContextOptions<PhiladelphusRepositoriesContext> options)
+        public SqliteEfPhiladelphusRepositoriesContext(DbContextOptions<SqliteEfPhiladelphusRepositoriesContext> options)
             : base(options)
         {
         }
@@ -27,12 +26,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder
-                    .UseNpgsql(_connectionString)
-                    .UseLazyLoadingProxies()
+                    .UseSqlite(_connectionString)
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                    //.LogTo(Log.Information, LogLevel.Information)
-                    //.EnableSensitiveDataLogging()
-                    //.EnableDetailedErrors();
             }
         }
 

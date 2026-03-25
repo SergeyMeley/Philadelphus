@@ -33,7 +33,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <exception cref="ArgumentException"></exception>
         public DataStorageBuilder SetGeneralParameters(ILogger logger, string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description) /*|| uuid == Guid.Empty*/)  //TODO: Исправить костыль
+            if (string.IsNullOrEmpty(name) /*|| uuid == Guid.Empty*/)  //TODO: Исправить костыль
                 throw new ArgumentException("Переданы некорректные параметры");
             _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled);
             return this;
@@ -72,8 +72,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             if (_storageModel == null)
                 return null;
-            if (string.IsNullOrEmpty(_storageModel.Name) 
-                || string.IsNullOrEmpty(_storageModel.Description)
+            if (string.IsNullOrEmpty(_storageModel.Name)
                 /*|| _storageModel.Uuid == Guid.Empty*/)    //TODO: Исправить костыль
                 return null;
             if (_storageModel.InfrastructureRepositories == null || _storageModel.InfrastructureRepositories.Count == 0)

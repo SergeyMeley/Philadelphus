@@ -1,28 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
+using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Serilog;
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
+namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 {
-    public class PostgreEfShrubMembersInfrastructureRepository : PostgreEfInfrastructureRepositoryBase<PostgreEfShrubMembersContext>, IShrubMembersInfrastructureRepository
+    public class SqliteEfShrubMembersInfrastructureRepository : SqliteEfInfrastructureRepositoryBase<SqliteEfShrubMembersContext>, IShrubMembersInfrastructureRepository
     {
         public override InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.ShrubMembers; }
 
-        public PostgreEfShrubMembersInfrastructureRepository(
+        public SqliteEfShrubMembersInfrastructureRepository(
             ILogger logger,
             string connectionString)
             : base(logger, connectionString)
         {
         }
 
-        protected override PostgreEfShrubMembersContext GetNewContext() => new PostgreEfShrubMembersContext(_connectionString);
+        protected override SqliteEfShrubMembersContext GetNewContext() => new SqliteEfShrubMembersContext(_connectionString);
 
-        protected override DbSet<TEntity> GetDbSet<TEntity>(PostgreEfShrubMembersContext context) where TEntity : class
+        protected override DbSet<TEntity> GetDbSet<TEntity>(SqliteEfShrubMembersContext context) where TEntity : class
         {
             return typeof(TEntity).Name switch
             {

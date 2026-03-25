@@ -1,23 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations;
+using Philadelphus.Infrastructure.Persistence.EF.Configurations;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
-using Serilog;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {
-    public partial class ShrubMembersContext : DbContext
+    public partial class PostgreEfShrubMembersContext : DbContext
     {
         private readonly string _connectionString;
-        public ShrubMembersContext()
+        public PostgreEfShrubMembersContext()
         {
         }
-        public ShrubMembersContext(string connectionString)
+        public PostgreEfShrubMembersContext(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public ShrubMembersContext(DbContextOptions<ShrubMembersContext> options)
+        public PostgreEfShrubMembersContext(DbContextOptions<PostgreEfShrubMembersContext> options)
             : base(options)
         {
         }

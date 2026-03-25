@@ -94,7 +94,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
 
         private bool InitDataStorages()
         {
-            var models = _dataStoragesService.GetStoragesModels((cs, type, group) => _infrastructureRepositoryFactory.Create(type, group, cs.ConnectionString));
+            var models = _dataStoragesService.GetStoragesModels((csc, type, group) =>
+                        {
+                            csc.ConnectionStrings.TryGetValue(group, out var cs);
+                            return _infrastructureRepositoryFactory.Create(type, group, cs);
+                        });
 
             foreach (var model in models)
             {

@@ -11,6 +11,6 @@ namespace Philadelphus.Core.Domain.Configurations
         /// <summary>
         /// Коллекция контейнеров строк подключения
         /// </summary>
-        public List<ConnectionStringContainer> ConnectionStringContainers { get; set; } = new List<ConnectionStringContainer>();
+        public List<ConnectionStringsContainer> ConnectionStringsContainers { get; set; } = new List<ConnectionStringsContainer>();
     }
 }

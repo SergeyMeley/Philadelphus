@@ -153,6 +153,8 @@
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.SQLite\Philadelphus.Infrastructure.Persistence.EF.SQLite.csproj" />
   </ItemGroup>
 
   <ItemGroup>

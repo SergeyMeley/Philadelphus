@@ -11,7 +11,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
 {
-    [DbContext(typeof(ShrubMembersContext))]
+    [DbContext(typeof(PostgreEfShrubMembersContext))]
     [Migration("20260319215057_change_audit_info")]
     partial class change_audit_info
     {

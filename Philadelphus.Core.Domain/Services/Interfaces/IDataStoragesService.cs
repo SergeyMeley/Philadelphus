@@ -21,7 +21,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IDataStorageModel> GetStoragesModels(
-            Func<ConnectionStringContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository);
+            Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository);
 
         #endregion
 
@@ -47,7 +47,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="connectionString">Строка подключенияя</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringContainer connectionString);
+        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringsContainer connectionString,
+            Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository);
 
         #endregion
 
