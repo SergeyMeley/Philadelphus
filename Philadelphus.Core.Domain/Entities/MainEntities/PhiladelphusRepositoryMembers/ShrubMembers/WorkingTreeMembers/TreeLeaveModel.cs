@@ -100,32 +100,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         }
 
         /// <summary>
-        /// Добавить атрибут
-        /// </summary>
-        /// <param name="attribute">Атрибут</param>
-        public override sealed bool AddAttribute(ElementAttributeModel attribute)
-        {
-            return false;
-        }
-
-        /// <summary>
-        /// Удалить атрибут
-        /// </summary>
-        /// <param name="attribute">Атрибут</param>
-        public override sealed bool RemoveAttribute(ElementAttributeModel attribute)
-        {
-            return false;
-        }
-
-        /// <summary>
-        /// Очистить атрибуты
-        /// </summary>
-        public override sealed bool ClearAttributes()
-        {
-            return false;
-        }
-
-        /// <summary>
         /// Добавить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>

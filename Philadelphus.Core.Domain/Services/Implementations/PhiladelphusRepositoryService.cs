@@ -291,8 +291,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             foreach (var attribute in allAttributes.Where(x => x.Owner.Uuid == attributeOwner.Uuid))
             {
-                SetModelState(attribute, State.SavedOrLoaded);
                 attributeOwner.AddAttribute(attribute);
+                SetModelState(attribute, State.SavedOrLoaded);
             }
 
             return attributeOwner.Attributes;
