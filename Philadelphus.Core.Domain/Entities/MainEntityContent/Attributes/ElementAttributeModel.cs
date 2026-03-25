@@ -289,7 +289,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             Guid declaringUuid,
             IAttributeOwnerModel declaringOwner,
             WorkingTreeModel owningWorkingTree) 
-            : base(localUuid, owningWorkingTree)
+            : base(localUuid, localOwner)
         {
             ArgumentNullException.ThrowIfNull(localOwner, nameof(localOwner));
             ArgumentNullException.ThrowIfNull(declaringOwner, nameof(declaringOwner));

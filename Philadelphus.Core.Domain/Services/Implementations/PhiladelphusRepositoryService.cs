@@ -829,7 +829,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
+                    $"Начало создания листа. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
                 TreeLeaveModel result = null;
@@ -903,8 +903,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     else
                     {
                         _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                                $"Ошибка создания атрибута.",
-                                criticalLevel: NotificationCriticalLevelModel.Error);
+                            $"Ошибка добавления атрибута владельцу '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
+                            criticalLevel: NotificationCriticalLevelModel.Error);
                     }
 
                     return result;
