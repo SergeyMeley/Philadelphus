@@ -26,17 +26,22 @@ set PROJECT_DIR=D:\MelSV_Projects\Philadelphus.General\Philadelphus.Infrastructu
 cd /d "%PROJECT_DIR%"
 echo Текущая директория: %CD%
 
-echo Создание миграции для PhiladelphusRepositoriesContext...
-dotnet ef migrations add %MIGRATION_NAME% -c PhiladelphusRepositoriesContext -o "Migrations\TreeRepositoriesPhiladelphusContextMigrations"
+echo Создание миграции для PostgreEfPhiladelphusRepositoriesContext...
+dotnet ef migrations add %MIGRATION_NAME% -c PostgreEfPhiladelphusRepositoriesContext -o "Migrations\PhiladelphusRepositoriesContextMigrations"
 
+echo Создание миграции для PostgreEfShrubMembersContext...
+dotnet ef migrations add %MIGRATION_NAME% -c PostgreEfShrubMembersContext -o "Migrations\ShrubMembersContextMigrations"
 
-echo Создание миграции для ShrubMembersContext...
-dotnet ef migrations add %MIGRATION_NAME% -c ShrubMembersContext -o "Migrations\MainEntitiesPhiladelphusContextMigrations"
+set PROJECT_DIR=D:\MelSV_Projects\Philadelphus.General\Philadelphus.Infrastructure.Persistence.EF.SQLite
 
+cd /d "%PROJECT_DIR%"
+echo Текущая директория: %CD%
 
-::echo Создание миграции для DataStoragesPhiladelphusContext...
-::dotnet ef migrations add %MIGRATION_NAME% -c DataStoragesPhiladelphusContext -o "Migrations\DataStoragesPhiladelphusContextPhiladelphusContextMigrations"
+echo Создание миграции для SqliteEfPhiladelphusRepositoriesContext...
+dotnet ef migrations add %MIGRATION_NAME% -c SqliteEfPhiladelphusRepositoriesContext -o "Migrations\PhiladelphusRepositoriesContextMigrations"
 
+echo Создание миграции для SqliteEfShrubMembersContext...
+dotnet ef migrations add %MIGRATION_NAME% -c SqliteEfShrubMembersContext -o "Migrations\ShrubMembersContextMigrations"
 
 echo.
 echo ========================================

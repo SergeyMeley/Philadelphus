@@ -5,6 +5,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Serilog;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
@@ -79,22 +80,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             _dataStoragesCollection = dataStoragesCollection;
             _infrastructureRepositoryFactory = infrastructureRepositoryFactory;
 
-            InitMainDataStorageVM(applicationSettings.Value);
+            InitMainDataStorageVM();
             InitDataStorages();
         }
-        private bool InitMainDataStorageVM(ApplicationSettingsConfig applicationSettings)
+        private bool InitMainDataStorageVM()
         {
-            if (applicationSettings.MainDataStorage == null)
-                throw new Exception(); 
-            var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(applicationSettings.MainDataStorage);
+            var path = _applicationSettings.Value.MainDataStorage;
+
+            if (path == null)
+                throw new Exception();
+
+            if (path.Exists == false)
+            {
+                path.Create();
+            }
+
+            var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(path);
+            
             _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
             _dataStoragesVMs.Add(_mainDataStorageVM);
+            
             return true;
         }
 
         private bool InitDataStorages()
         {
-            var models = _dataStoragesService.GetStoragesModels((cs, type, group) => _infrastructureRepositoryFactory.Create(type, group, cs.ConnectionString));
+            var models = _dataStoragesService.GetStoragesModels((csc, type, group) =>
+                        {
+                            csc.ConnectionStrings.TryGetValue(group, out var cs);
+                             return _infrastructureRepositoryFactory.Create(type, group, cs);
+                        });
 
             foreach (var model in models)
             {

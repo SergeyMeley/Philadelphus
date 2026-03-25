@@ -26,10 +26,10 @@
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Строка подключения" Margin="1"></TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewConnectionStringContainerConnectionString}" Margin="1"></TextBox>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewConnectionStringsContainerConnectionString}" Margin="1"></TextBox>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Провайдер" Margin="1"></TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ProvidersNames}" SelectedValue="{Binding NewConnectionStringContainerSelectedProvider}" Margin="1"></ComboBox>
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="10" Content="Создать и сохранить" Command="{Binding CreateAndSaveNewConnectionStringContainerCommand}" Margin="1"></Button>
+                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ProvidersNames}" SelectedValue="{Binding NewConnectionStringsContainerSelectedProvider}" Margin="1"></ComboBox>
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="10" Content="Создать и сохранить" Command="{Binding CreateAndSaveNewConnectionStringsContainerCommand}" Margin="1"></Button>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Изменить">
@@ -40,7 +40,7 @@
                         <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <DataGrid Grid.Row="0" ItemsSource="{Binding ConnectionStringContainersVMs}" SelectedItem="{Binding SelectedConnectionStringContainerVM}" AutoGenerateColumns="False" ColumnWidth="*" Margin="1">
+                    <DataGrid Grid.Row="0" ItemsSource="{Binding ConnectionStringsContainersVMs}" SelectedItem="{Binding SelectedConnectionStringsContainerVM}" AutoGenerateColumns="False" ColumnWidth="*" Margin="1">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="UUID" IsReadOnly="True" Binding="{Binding Uuid}" Width="auto"></DataGridTextColumn>
                             <DataGridComboBoxColumn Header="Провайдер" ItemsSource="{Binding Source={StaticResource ProvidersNames}}" SelectedValueBinding="{Binding ProviderName}" Width="auto"></DataGridComboBoxColumn>
@@ -48,8 +48,8 @@
                             <DataGridCheckBoxColumn Header="Для удаления" Binding="{Binding ForDelete}" Width="auto"></DataGridCheckBoxColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="1" Content="Удалить" Command="{Binding DeleteConnectionStringContainersCommand}" Height="30" Margin="1"></Button>
-                    <Button Grid.Row="2" Content="Сохранить изменения" Command="{Binding SaveConnectionStringContainersCommand}" Height="30" Margin="1"></Button>
+                    <Button Grid.Row="1" Content="Удалить" Command="{Binding DeleteConnectionStringsContainersCommand}" Height="30" Margin="1"></Button>
+                    <Button Grid.Row="2" Content="Сохранить изменения" Command="{Binding SaveConnectionStringsContainersCommand}" Height="30" Margin="1"></Button>
                 </Grid>
             </ScrollViewer>
         </GroupBox>

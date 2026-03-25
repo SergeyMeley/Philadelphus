@@ -53,8 +53,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
         public HashSet<ConfigurationFileVM> ConfigFiles { get; } = new HashSet<ConfigurationFileVM>();
         public ConfigurationFileVM SelectedConfigFile { get; set; }
-        public ObservableCollection<ConnectionStringContainerVM> ConnectionStringContainersVMs { get; } = new ObservableCollection<ConnectionStringContainerVM>();
-        public ConnectionStringContainerVM SelectedConnectionStringContainerVM {  get; set; } 
+        public ObservableCollection<ConnectionStringsContainerVM> ConnectionStringsContainersVMs { get; } = new ObservableCollection<ConnectionStringsContainerVM>();
+        public ConnectionStringsContainerVM SelectedConnectionStringsContainerVM {  get; set; } 
         public string[] ProvidersNames
         { 
             get
@@ -66,8 +66,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public string NewConnectionStringContainerSelectedProvider { get; set; }
-        public string NewConnectionStringContainerConnectionString { get; set; }
+        public string NewConnectionStringsContainerSelectedProvider { get; set; }
+        public string NewConnectionStringsContainerConnectionString { get; set; }
 
 
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
@@ -116,9 +116,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 ConfigFiles.Add(new ConfigurationFileVM(displayName, configFile.Value));
             }
 
-            foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringContainers) 
+            foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringsContainers) 
             {
-                ConnectionStringContainersVMs.Add(_mapper.Map<ConnectionStringContainerVM>(cs));
+                ConnectionStringsContainersVMs.Add(_mapper.Map<ConnectionStringsContainerVM>(cs));
             }
 
             InitializeTabs();
@@ -218,67 +218,67 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
-        public RelayCommand CreateAndSaveNewConnectionStringContainerCommand
+        public RelayCommand CreateAndSaveNewConnectionStringsContainerCommand
         {
             get
             {
                 return new RelayCommand(
                     obj =>
                     {
-                        var vm = new ConnectionStringContainerVM()
+                        var vm = new ConnectionStringsContainerVM()
                         {
                             Uuid = Guid.NewGuid(),
-                            ProviderName = NewConnectionStringContainerSelectedProvider,
-                            ConnectionString = NewConnectionStringContainerConnectionString
+                            ProviderName = NewConnectionStringsContainerSelectedProvider,
+                            ConnectionString = NewConnectionStringsContainerConnectionString
                         };
-                        ConnectionStringContainersVMs.Add(vm);
-                        SaveConnectionStringContainersCommand.Execute(obj);
+                        ConnectionStringsContainersVMs.Add(vm);
+                        SaveConnectionStringsContainersCommand.Execute(obj);
                     },
                     ce =>
                     {
-                        if (string.IsNullOrEmpty(NewConnectionStringContainerSelectedProvider))
+                        if (string.IsNullOrEmpty(NewConnectionStringsContainerSelectedProvider))
                             return false;
-                        if (string.IsNullOrEmpty(NewConnectionStringContainerConnectionString))
+                        if (string.IsNullOrEmpty(NewConnectionStringsContainerConnectionString))
                             return false;
                         return true;
                     });
             }
         }
-        public RelayCommand SaveConnectionStringContainersCommand
+        public RelayCommand SaveConnectionStringsContainersCommand
         {
             get
             {
                 return new RelayCommand(obj =>
                 {
                     // Изменение существующих строк подключения
-                    for (int i = 0; i < _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Count; i++)
+                    for (int i = 0; i < _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Count; i++)
                     {
-                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers[i];
-                        var vm = ConnectionStringContainersVMs.SingleOrDefault(x => x.Uuid == cs.Uuid);
+                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringsContainers[i];
+                        var vm = ConnectionStringsContainersVMs.SingleOrDefault(x => x.Uuid == cs.StorageUuid);
                         if (vm != null)
                         {
-                            _connectionStringsCollectionConfig.Value.ConnectionStringContainers[i] = _mapper.Map<ConnectionStringContainer>(vm);
+                            _connectionStringsCollectionConfig.Value.ConnectionStringsContainers[i] = _mapper.Map<ConnectionStringsContainer>(vm);
                         }
                     }
 
                     // Добавление новых строк подключения
-                    var newVms = ConnectionStringContainersVMs.Where(x => _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Any(c => c.Uuid == x.Uuid) == false);
+                    var newVms = ConnectionStringsContainersVMs.Where(x => _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Any(c => c.StorageUuid == x.Uuid) == false);
                     foreach (var newVm in newVms)
                     {
-                        _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Add(_mapper.Map<ConnectionStringContainer>(newVm));
+                        _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Add(_mapper.Map<ConnectionStringsContainer>(newVm));
                     }
 
                     // Исключение удаленных строк подключения
-                    foreach (var vm in ConnectionStringContainersVMs.Where(x => x.ForDelete == true))
+                    foreach (var vm in ConnectionStringsContainersVMs.Where(x => x.ForDelete == true))
                     {
-                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringContainers.SingleOrDefault(x => x.Uuid == vm.Uuid);
-                        _connectionStringsCollectionConfig.Value.ConnectionStringContainers.Remove(cs);
+                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.SingleOrDefault(x => x.StorageUuid == vm.Uuid);
+                        _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Remove(cs);
                     }
-                    for (int i = ConnectionStringContainersVMs.Count - 1; i >= 0; i--)
+                    for (int i = ConnectionStringsContainersVMs.Count - 1; i >= 0; i--)
     {
-                        if (ConnectionStringContainersVMs[i].ForDelete == true)
+                        if (ConnectionStringsContainersVMs[i].ForDelete == true)
         {
-                            ConnectionStringContainersVMs.RemoveAt(i);
+                            ConnectionStringsContainersVMs.RemoveAt(i);
                         }
                     }
 
@@ -297,13 +297,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand DeleteConnectionStringContainersCommand
+        public RelayCommand DeleteConnectionStringsContainersCommand
         {
             get
             {
                 return new RelayCommand(obj =>
         {
-                    SelectedConnectionStringContainerVM.ForDelete = true;
+                    SelectedConnectionStringsContainerVM.ForDelete = true;
                 });
             }
         }
@@ -313,9 +313,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             tab1.Header = "Настроечные файлы";
             tab1.Content = new ConfigFilesPathesTabControl() { DataContext = this };
 
-            var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
-            tab2.Header = "Строки подключения";
-            tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
+            //var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab2.Header = "Строки подключения";
+            //tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
 
             //var tab3 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
             //tab3.Header = "Конфиденциальная информация";
@@ -329,7 +329,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             //tab5.Header = "Сочетания клавиш";
             //tab5.Content = new HotKeysSettingsTabControl() { DataContext = this };
 
-            ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1, tab2 };
+            ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1 };
 
             SelectedApplicationSettingsTabItemVM = ApplicationSettingsTabItemsVMs.FirstOrDefault(t => t.Content is ConfigFilesPathesTabControl);
         }

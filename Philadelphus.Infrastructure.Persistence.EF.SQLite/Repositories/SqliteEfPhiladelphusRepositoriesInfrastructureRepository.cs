@@ -1,26 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
+using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Serilog;
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
+namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 {
-    public class PostgreEfPhiladelphusRepositoriesInfrastructureRepository : PostgreEfInfrastructureRepositoryBase<PostgreEfPhiladelphusRepositoriesContext>, IPhiladelphusRepositoriesInfrastructureRepository
+    public class SqliteEfPhiladelphusRepositoriesInfrastructureRepository : SqliteEfInfrastructureRepositoryBase<SqliteEfPhiladelphusRepositoriesContext>, IPhiladelphusRepositoriesInfrastructureRepository
     {
         public override InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.PhiladelphusRepositories; }
 
-        public PostgreEfPhiladelphusRepositoriesInfrastructureRepository(
+        public SqliteEfPhiladelphusRepositoriesInfrastructureRepository(
             ILogger logger,
             string connectionString)
             : base(logger, connectionString)
         {
         }
 
-        protected override PostgreEfPhiladelphusRepositoriesContext GetNewContext() => new PostgreEfPhiladelphusRepositoriesContext(_connectionString);
+        protected override SqliteEfPhiladelphusRepositoriesContext GetNewContext() => new SqliteEfPhiladelphusRepositoriesContext(_connectionString);
 
-        protected override DbSet<TEntity> GetDbSet<TEntity>(PostgreEfPhiladelphusRepositoriesContext context) where TEntity : class
+        protected override DbSet<TEntity> GetDbSet<TEntity>(SqliteEfPhiladelphusRepositoriesContext context) where TEntity : class
         {
             return typeof(TEntity).Name switch
             {

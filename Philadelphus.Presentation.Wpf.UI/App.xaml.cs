@@ -116,7 +116,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     {
                         [Environment.ExpandEnvironmentVariables(
                             _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(ConnectionStringsCollectionConfig)}"])]
-                            = new ConnectionStringsCollectionConfig { ConnectionStringContainers = new() },
+                            = new ConnectionStringsCollectionConfig { ConnectionStringsContainers = new() },
                          [Environment.ExpandEnvironmentVariables(
                             _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(DataStoragesCollectionConfig)}"])]
                             = new DataStoragesCollectionConfig { DataStorages = new() },

@@ -1,16 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
+namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
 {
-    internal class TreeRootConfiguration : IEntityTypeConfiguration<TreeRoot>
+    public class WorkingTreeConfiguration : IEntityTypeConfiguration<WorkingTree>
     {
-        public void Configure(EntityTypeBuilder<TreeRoot> builder)
+        public void Configure(EntityTypeBuilder<WorkingTree> builder)
         {
-            builder.ToTable("tree_roots", "shrub_members");
+            builder.ToTable("working_trees", "shrub_members");
 
-            builder.HasKey(x => x.Uuid).HasName("tree_roots_pkey");
+            builder.HasKey(x => x.Uuid).HasName("working_trees_pkey");
 
             builder.Property(x => x.Uuid)
                 .HasColumnName("uuid")
@@ -39,6 +45,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                 .IsRequired()
                 .HasDefaultValue(false);
 
+            builder.Property(x => x.OwnDataStorageUuid)
+                .HasColumnName("data_storage_uuid")
+                  .IsRequired();
+
             builder.OwnsOne(x => x.AuditInfo, audit =>
             {
                 audit.Property(a => a.CreatedAt)
@@ -66,14 +76,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Configurations
                 audit.Property(a => a.DeletedBy)
                     .HasColumnName("deleted_by");
             });
-
-            builder.Property(x => x.OwningWorkingTreeUuid)
-                .HasColumnName("owning_working_tree_uuid")
-                .IsRequired();
-
-            builder.HasOne(x => x.OwningWorkingTree)
-              .WithMany()
-              .HasForeignKey(x => x.OwningWorkingTreeUuid);
         }
     }
 }

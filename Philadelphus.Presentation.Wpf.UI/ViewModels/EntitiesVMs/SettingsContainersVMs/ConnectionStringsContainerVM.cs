@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs
 {
-    public class ConnectionStringContainerVM : ViewModelBase
+    public class ConnectionStringsContainerVM : ViewModelBase
     {
-        private ConnectionStringContainer _connectionStringContainer;
+        private ConnectionStringsContainer _connectionStringsContainer;
         private string _providerName;
         private string _connectionString;
         private bool _forDelete;
@@ -56,13 +56,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
                 }
             }
         }
-        public ConnectionStringContainerVM()
+        public ConnectionStringsContainerVM()
         {
-            _connectionStringContainer = new ConnectionStringContainer()
+            _connectionStringsContainer = new ConnectionStringsContainer()
             {
-                Uuid = Guid.NewGuid(),
+                StorageUuid = Guid.NewGuid(),
                 ProviderName = string.Empty,
-                ConnectionString = string.Empty
+                ConnectionStrings = new()
             };
             OnPropertyChanged();
         }

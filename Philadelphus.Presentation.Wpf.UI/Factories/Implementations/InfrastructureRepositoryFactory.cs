@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
+using Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
@@ -30,10 +31,19 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
                     {
                         case InfrastructureEntityGroups.PhiladelphusRepositories:
                             return new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString);
-                            break;
                         case InfrastructureEntityGroups.ShrubMembers:
                             return new PostgreEfShrubMembersInfrastructureRepository(_logger, connectionString);
+                        default:
                             break;
+                    }
+                    break;
+                case InfrastructureTypes.SQLiteEf:
+                    switch (entityGroup)
+                    {
+                        case InfrastructureEntityGroups.PhiladelphusRepositories:
+                            return new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString);
+                        case InfrastructureEntityGroups.ShrubMembers:
+                            return new SqliteEfShrubMembersInfrastructureRepository(_logger, connectionString);
                         default:
                             break;
                     }

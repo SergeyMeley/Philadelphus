@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
+using Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Json.Repositories;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
@@ -68,15 +69,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IDataStorageModel> GetStoragesModels(
-            Func<ConnectionStringContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
+            Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
-            var connectionStrings = _connectionStringsCollection.Value.ConnectionStringContainers;
+            var connectionStrings = _connectionStringsCollection.Value.ConnectionStringsContainers;
             var dbEntities = _dataStoragesCollection.Value.DataStorages;
             var models = new List<IDataStorageModel>();
 
             foreach (var entity in dbEntities)
             {
-                var connectionString = connectionStrings.SingleOrDefault(x => x.Uuid == entity.Uuid);
+                var connectionString = connectionStrings.SingleOrDefault(x => x.StorageUuid == entity.Uuid);
 
                 if (connectionString == null)
                 {
@@ -119,17 +120,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (basePath == null)
                 throw new ArgumentNullException($"{nameof(basePath)}");
 
+            var path = _applicationSettings.Value.MainDataStorage.FullName;
+
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
                     logger: _logger,
                     name: "Основное хранилище",
                     description: "Основное хранилище",
-                    uuid: Guid.Empty,
-                    infrastructureType: InfrastructureTypes.JsonDocument,
+                    uuid: Guid.Parse("00000000-0000-0000-0000-19201518a07e"),
+                    infrastructureType: InfrastructureTypes.SQLiteEf,
                     isDisabled: false)
-            .SetRepository(new JsonMainEntitiesInfrastructureRepository(basePath))
-            .SetRepository(new JsonPhiladelphusRepositoriesInfrastructureRepository(basePath))
-        ;
+            .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}"))
+            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}"));
+
             var mainDataStorageModel = dataStorageBuilder.Build();
 
             Log.Information("Базовое хранилище инициализировано.");
@@ -145,9 +148,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="connectionString">Строка подключенияя</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringContainer connectionString)
+        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringsContainer connectionString,
+            Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(desctiption) || connectionString == null)
+            if (string.IsNullOrEmpty(name) || getInfrastructureRepository == null)
                 throw new ArgumentNullException();
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
@@ -155,12 +159,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     logger: _logger,
                     name: name,
                     description: desctiption,
-                    uuid: connectionString.Uuid,
-                    infrastructureType: InfrastructureTypes.PostgreSqlEf,
+                    uuid: connectionString.StorageUuid,
+                    infrastructureType: connectionString.InfrastructureType,
                     isDisabled: false)
-            .SetRepository(new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString.ConnectionString))
-            .SetRepository(new PostgreEfShrubMembersInfrastructureRepository(_logger, connectionString.ConnectionString))
-        ;
+                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories))
+                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
+
             var dataStorageModel = dataStorageBuilder.Build();
 
             Log.Information("Хранилище инициализировано.");

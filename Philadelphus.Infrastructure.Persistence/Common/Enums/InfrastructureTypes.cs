@@ -9,7 +9,7 @@
         //MongoDbAdo,
         //MongoDbEf,
         //MsSqlServerEf,
-        //SQLite,
+        SQLiteEf,
         JsonDocument,
         //XmlDocument
     }
