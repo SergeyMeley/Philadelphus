@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
@@ -24,12 +25,40 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
         private readonly PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
 
-
         private string _name;
-        public string Name { get => _name; set => _name = value; }
-
         private string _description;
-        public string Description { get => _description; set => _description = value; }
+        
+        public string Name 
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged(nameof(Name));
+                }
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                if (_description != value)
+                {
+                    _description = value;
+                    OnPropertyChanged(nameof(Description));
+                }
+            }
+        }
 
         public DataStoragesCollectionVM DataStoragesCollectionVM { get => _dataStoragesCollectionVM; }
 
@@ -59,6 +88,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
 
             _configFile = options.Value.RepositoryHeadersConfigFullPath;
+
+            if (_dataStoragesCollectionVM.DataStoragesVMs?.Contains(_dataStoragesCollectionVM?.MainDataStorageVM) ?? false)
+            {
+                _dataStoragesCollectionVM.SelectedDataStorageVM = _dataStoragesCollectionVM.MainDataStorageVM;
+            }
+            Name = "Новый репозиторий";
         }
         public RelayCommand CreateAndSaveRepositoryCommand
         {
