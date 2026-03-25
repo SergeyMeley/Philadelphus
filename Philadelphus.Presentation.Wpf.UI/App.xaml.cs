@@ -275,7 +275,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                 //window.Topmost = false;
 
                 var window = _host.Services.GetRequiredService<SplashWindow>();
+                window.Topmost = true;
                 window.Show();
+                window.Activate();
+                window.Topmost = false;
 
                 base.OnStartup(e);
             }

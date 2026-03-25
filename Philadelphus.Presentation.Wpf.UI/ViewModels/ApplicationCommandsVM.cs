@@ -3,6 +3,7 @@ using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
+using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
@@ -36,10 +37,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                     var repositoryExplorerControlVM = _serviceProvider.GetRequiredService<IRepositoryExplorerControlVMFactory>().Create(currentRepositoryVM);
                     var mainWindowVM = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(repositoryExplorerControlVM);
                     var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-                    //context.RepositoryExplorerVM = _serviceProvider.GetRequiredService<RepositoryExplorerControlVM>();
-                    //context.RepositoryExplorerVM.PhiladelphusRepositoryVM = appVM.RepositoryCollectionVM.CurrentRepositoryVM;
                     mainWindow.DataContext = mainWindowVM;
+                    mainWindow.Topmost = true;
                     mainWindow.Show();
+                    mainWindow.Activate();
+                    mainWindow.Topmost = false;
                     var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
                     launchWindow.Hide();
                 });
