@@ -313,9 +313,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             tab1.Header = "Настроечные файлы";
             tab1.Content = new ConfigFilesPathesTabControl() { DataContext = this };
 
-            var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
-            tab2.Header = "Строки подключения";
-            tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
+            //var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
+            //tab2.Header = "Строки подключения";
+            //tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
 
             //var tab3 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
             //tab3.Header = "Конфиденциальная информация";
@@ -329,7 +329,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             //tab5.Header = "Сочетания клавиш";
             //tab5.Content = new HotKeysSettingsTabControl() { DataContext = this };
 
-            ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1, tab2 };
+            ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1 };
 
             SelectedApplicationSettingsTabItemVM = ApplicationSettingsTabItemsVMs.FirstOrDefault(t => t.Content is ConfigFilesPathesTabControl);
         }
