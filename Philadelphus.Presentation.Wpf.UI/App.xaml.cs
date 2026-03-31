@@ -25,6 +25,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using System;
@@ -67,22 +68,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var runtimeLogger = new LoggerConfiguration()
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(startupConfig)
                 .MinimumLevel.Information()
-                .WriteTo.Console(
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-                )
-                .WriteTo.File("logs/philadelphus-.log",
-                    rollingInterval: RollingInterval.Day,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
-
-            Log.Logger = runtimeLogger;
-
-            //Log.Logger = new LoggerConfiguration()
-            //    .ReadFrom.Configuration(startupConfig)  // Читает "Serilog" секцию
-            //    .MinimumLevel.Information()
-            //    .CreateLogger();
 
             Log.Information("=== Philadelphus Startup: Console + File Logging ===");
 
@@ -93,7 +82,7 @@ namespace Philadelphus.Presentation.Wpf.UI
 
             Log.Information($"Загружаю конфиг из: {Directory.GetCurrentDirectory()}");
 
-            _configuration = builder.Build();
+             _configuration = builder.Build();
 
             _host = Host.CreateDefaultBuilder()
                 //.UseSerilog()
@@ -170,7 +159,11 @@ namespace Philadelphus.Presentation.Wpf.UI
                                      t.Namespace?.StartsWith("Philadelphus.") == true))
                         .ToArray();
 
-                    services.AddAutoMapper(cfg => { }, profileAssemblies);
+                    services.AddAutoMapper(cfg => 
+                    {
+                        cfg.LicenseKey = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4OGNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxODA2NDUxMjAwIiwiaWF0IjoiMTc3NDk5NzAxMyIsImFjY291bnRfaWQiOiIwMTlkNDYxMDhjYzI3YThhOGRlZmM3M2E1MWM4MzEwYSIsImN1c3RvbWVyX2lkIjoiY3RtXzAxa24zMTIwdzl0Zm1kNGFldDdoMWZka3lkIiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.0nAJKYuxbe-byA9zSIMj65s1RDEQNkbqI3s3ypLkF11PRA8DZqR1gIgPAg4xE6LbqB5F0AEHXA6OBaUFxNyfS-prwCEB2LMRV9IbFPQEHkmZojcb_ygjldo1BtPQwBwVpjRsxnHOGQqJ1CGVCvF7F8TvnMjANRJVhEjsDh0OLyar3sz-Hun0GPRC6bIABmQh3fjOrD2WLJyIx2uW8dypdXnFpctOhTRMV8d3p8VfvOdkx70UxPoLMwQFPtdF_CaYkvSt_7pXMbVCxswrxD4BmXmmzza_6cUUCqa1aOHu5sHj5z0sHEnQxblAWF4ioZTB99XmncVZ-x4aTh-mhcIBHg";
+                    }, 
+                    profileAssemblies);
 
                     // Добавление отправителей и получателей сообщений
                     services.AddKafkaProducer<MessagingUser>(context.Configuration.GetSection($"{nameof(KafkaOptions<MessagingUser>)}:{nameof(MessagingUser)}"));
@@ -251,11 +244,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                 await _host.StartAsync();
 
                 // 2. Переконфигурация: только File (закрыть Console)
+                Log.Information("Искусственная задержка запуска 2 сек.");
                 Log.Information("Startup завершён. Переключение на File-only logging...");
 
-                Log.Information("Искусственная задержка запуска 2 сек.");
                 await Task.Delay(2000);
-
 
                 var runtimeLogger = new LoggerConfiguration()
                     .ReadFrom.Configuration(_configuration)
@@ -267,12 +259,6 @@ namespace Philadelphus.Presentation.Wpf.UI
                 FreeConsole();  // Закрыть консольное окно
 
                 Log.Information("UI запущен. Логи → только файл logs/philadelphus-.log");
-
-                //var window = _host.Services.GetRequiredService<LaunchWindow>();
-                //window.Topmost = true;
-                //window.Show();
-                //window.Activate();
-                //window.Topmost = false;
 
                 var window = _host.Services.GetRequiredService<SplashWindow>();
                 window.Topmost = true;

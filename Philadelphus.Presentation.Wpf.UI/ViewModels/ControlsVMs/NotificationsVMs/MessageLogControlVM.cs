@@ -204,7 +204,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         private bool AddNewMessage(Notification notification)
         {
             if (_currentMessageLogAllNotifications.Any(x => x.Model == notification))
-                return false;
+                return true;
 
             Application.Current.Dispatcher.Invoke(() =>
             {

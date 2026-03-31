@@ -8,6 +8,11 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
     public class Notification
     {
         /// <summary>
+        /// Короткий идентификатор
+        /// </summary>
+        public object Nanoid { get; } = NanoidDotNet.Nanoid.Generate(size: 5);
+
+        /// <summary>
         /// Тип уведомления
         /// </summary>
         public NotificationTypesModel NotificationType { get; }
@@ -59,6 +64,17 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
             Source = source;
             CriticalLevel = criticalLevel;
             NotificationType = notificationType;
+        }
+
+        public override string ToString()
+        {
+            return $"" +
+                $"nanoid - '{Nanoid}'; " +
+                $"код - '{Code}'; " +
+                $"источник - '{Source}'; " +
+                $"тип - '{NotificationType}'; " +
+                $"критичность - '{CriticalLevel}'; " +
+                $"текст: '{Text}'";
         }
     }
 }
