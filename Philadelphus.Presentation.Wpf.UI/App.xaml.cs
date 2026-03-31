@@ -25,6 +25,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using System;
@@ -67,22 +68,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var runtimeLogger = new LoggerConfiguration()
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(startupConfig)
                 .MinimumLevel.Information()
-                .WriteTo.Console(
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-                )
-                .WriteTo.File("logs/philadelphus-.log",
-                    rollingInterval: RollingInterval.Day,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
-
-            Log.Logger = runtimeLogger;
-
-            //Log.Logger = new LoggerConfiguration()
-            //    .ReadFrom.Configuration(startupConfig)  // Читает "Serilog" секцию
-            //    .MinimumLevel.Information()
-            //    .CreateLogger();
 
             Log.Information("=== Philadelphus Startup: Console + File Logging ===");
 
@@ -93,7 +82,7 @@ namespace Philadelphus.Presentation.Wpf.UI
 
             Log.Information($"Загружаю конфиг из: {Directory.GetCurrentDirectory()}");
 
-            _configuration = builder.Build();
+             _configuration = builder.Build();
 
             _host = Host.CreateDefaultBuilder()
                 //.UseSerilog()
@@ -255,11 +244,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                 await _host.StartAsync();
 
                 // 2. Переконфигурация: только File (закрыть Console)
+                Log.Information("Искусственная задержка запуска 2 сек.");
                 Log.Information("Startup завершён. Переключение на File-only logging...");
 
-                Log.Information("Искусственная задержка запуска 2 сек.");
                 await Task.Delay(2000);
-
 
                 var runtimeLogger = new LoggerConfiguration()
                     .ReadFrom.Configuration(_configuration)
@@ -271,12 +259,6 @@ namespace Philadelphus.Presentation.Wpf.UI
                 FreeConsole();  // Закрыть консольное окно
 
                 Log.Information("UI запущен. Логи → только файл logs/philadelphus-.log");
-
-                //var window = _host.Services.GetRequiredService<LaunchWindow>();
-                //window.Topmost = true;
-                //window.Show();
-                //window.Activate();
-                //window.Topmost = false;
 
                 var window = _host.Services.GetRequiredService<SplashWindow>();
                 window.Topmost = true;

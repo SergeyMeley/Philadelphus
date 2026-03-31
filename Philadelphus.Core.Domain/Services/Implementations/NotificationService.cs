@@ -87,7 +87,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IMessageProducer<Notification> mainProducer,
             IOptions<MessagingConfig> options)
         {
-            _logger = logger;
+            _logger = logger.ForContext("SourceContext", "NotificationService");
 
             CurrentUser = new MessagingUser(
                 Guid.NewGuid(), 
@@ -128,17 +128,17 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             switch (transmissionType)
             {
                 case NotificationTransmissionType.Self:
-                    _logger.Information($"Отправлено уведомление себе. Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'.");
+                    _logger.Information($"Уведомление '{notification.Nanoid}' отправлено себе. Уведомление: {notification.ToString()}");
                     return ProcessNotification(notification);
                 case NotificationTransmissionType.Broadcast:
                     _mainProducer.ProduceAsync(notification, default);
-                    _logger.Information($"Отправлено уведомление всем. Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'.");
+                    _logger.Information($"Уведомление '{notification.Nanoid}' отправлено всем. Уведомление: {notification.ToString()}");
                     return true;
                 default:
                     break;
             }
 
-            _logger.Information($"Уведомление не отправлено. Неизвестный тип передачи данных. Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'. Текст: '{notification.Text}'");
+            _logger.Error($"Уведомление '{notification.Nanoid}' не отправлено. Неизвестный тип передачи данных.");
             return false;
         }
 
@@ -280,7 +280,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="notification">Уведомление</param>
         private bool ProcessNotification(Notification notification)
         {
-            _logger.Information($"Начало обработки полученного уведомления.");
+            _logger.Information($"Начало обработки полученного уведомления '{notification.Nanoid}'. Уведомление: {notification.ToString()}");
 
             _notificationsHistory.Add(notification);
             HistoryUpdated?.Invoke(notification);
@@ -313,15 +313,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             if (handler == null)
             {
+                _logger.Error($"Обработка уведомления '{notification.Nanoid}' завершена с ошибкой. Не назначен обработчик.");
                 SendMissHandlerNotification(notification.NotificationType.ToString(), $"{nameof(NotificationService)}.{nameof(ProcessNotification)}");
-                _logger.Error($"Ошибка отправки - не назначен обработчик.");
                 return false;
             }
             else
             {
-                _logger.Information($"Обработка уведомления.  Источник - '{notification.Source}', тип - '{notification.NotificationType}', критичность - '{notification.CriticalLevel}'. Текст: '{notification.Text}'");
-                handler.Invoke(notification);
-                _logger.Information($"Обработка уведомления завершена корректно.");
+                if (handler.Invoke(notification))
+                {
+                    _logger.Information($"Обработка уведомления '{notification.Nanoid}' завершена корректно.");
+                }
+                else
+                {
+                    _logger.Error($"Обработка уведомления '{notification.Nanoid}' завершена с ошибкой.");
+                }
                 return true;
             }
         }
