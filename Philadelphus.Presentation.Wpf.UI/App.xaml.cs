@@ -170,7 +170,11 @@ namespace Philadelphus.Presentation.Wpf.UI
                                      t.Namespace?.StartsWith("Philadelphus.") == true))
                         .ToArray();
 
-                    services.AddAutoMapper(cfg => { }, profileAssemblies);
+                    services.AddAutoMapper(cfg => 
+                    {
+                        cfg.LicenseKey = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4OGNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxODA2NDUxMjAwIiwiaWF0IjoiMTc3NDk5NzAxMyIsImFjY291bnRfaWQiOiIwMTlkNDYxMDhjYzI3YThhOGRlZmM3M2E1MWM4MzEwYSIsImN1c3RvbWVyX2lkIjoiY3RtXzAxa24zMTIwdzl0Zm1kNGFldDdoMWZka3lkIiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.0nAJKYuxbe-byA9zSIMj65s1RDEQNkbqI3s3ypLkF11PRA8DZqR1gIgPAg4xE6LbqB5F0AEHXA6OBaUFxNyfS-prwCEB2LMRV9IbFPQEHkmZojcb_ygjldo1BtPQwBwVpjRsxnHOGQqJ1CGVCvF7F8TvnMjANRJVhEjsDh0OLyar3sz-Hun0GPRC6bIABmQh3fjOrD2WLJyIx2uW8dypdXnFpctOhTRMV8d3p8VfvOdkx70UxPoLMwQFPtdF_CaYkvSt_7pXMbVCxswrxD4BmXmmzza_6cUUCqa1aOHu5sHj5z0sHEnQxblAWF4ioZTB99XmncVZ-x4aTh-mhcIBHg";
+                    }, 
+                    profileAssemblies);
 
                     // Добавление отправителей и получателей сообщений
                     services.AddKafkaProducer<MessagingUser>(context.Configuration.GetSection($"{nameof(KafkaOptions<MessagingUser>)}:{nameof(MessagingUser)}"));
