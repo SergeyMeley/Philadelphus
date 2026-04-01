@@ -888,8 +888,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     var result = new ElementAttributeModel(uuid, owner, uuid, owner, wtm.OwningWorkingTree)
                     {
-                        Visibility = /*visibility*/ VisibilityScope.Public,
-                        Override = OverrideType.Virtual
+                        Visibility = VisibilityScope.Public,
+                        Override = OverrideType.Virtual,
+                        ValueType = wtm.OwningShrub.SystemBaseWorkingTree.GetAllNodesRecursive().SingleOrDefault(x => x is SystemBaseTreeNodeModel sbn && sbn.SystemBaseType == SystemBaseType.STRING)
                     };
 
                     if (owner.AddAttribute(result))
