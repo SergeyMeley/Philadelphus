@@ -91,11 +91,11 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Create + Add ]
 
-        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel parentElement, IDataStorageModel dataStorage);
-        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner);
-        public TreeNodeModel CreateTreeNode(IParentModel parentElement);
-        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement);
-        public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner);
+        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel parentElement, IDataStorageModel dataStorage, bool needAutoName = true);
+        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner, bool needAutoName = true);
+        public TreeNodeModel CreateTreeNode(IParentModel parentElement, bool needAutoName = true);
+        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement, bool needAutoName = true);
+        public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner, bool needAutoName = true);
 
         #endregion
 

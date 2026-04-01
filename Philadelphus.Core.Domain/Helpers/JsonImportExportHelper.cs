@@ -46,22 +46,25 @@ namespace Philadelphus.Core.Domain.Helpers
             using var document = JsonDocument.Parse(json);
             var root = document.RootElement;
 
-            var treeName = root.TryGetProperty("name", out var nameProp)
-                ? nameProp.GetString() ?? "Импортированное дерево"
-                : "Импортированное дерево";
-
             if (!root.TryGetProperty("contentRoot", out var contentRootElement))
                 throw new InvalidOperationException("Нет contentRoot");
 
-            var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp)
-                ? rootNameProp.GetString() ?? "Корень"
-                : "Корень";
-
             // 1. Создаём дерево
-            var dataStorage = repository.DataStorages.First();
-            var tree = service.CreateWorkingTree(repository, dataStorage);
-            var treeRoot = service.CreateTreeRoot(tree);
-            treeRoot.Name = rootName;
+            var dataStorage = repository.DataStorages.Where(x => x.HasShrubMembersInfrastructureRepository).First();
+
+            var treeName = root.TryGetProperty("name", out var nameProp)
+                ? nameProp.GetString() ?? "Импортированное дерево"
+                : "Импортированное дерево";
+            var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false);
+            tree.Name = treeName;
+
+            var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp) ? rootNameProp.GetString() : string.Empty;
+            var needRootName = string.IsNullOrEmpty(rootName);
+            var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName);
+            if (needRootName == false)
+            {
+                treeRoot.Name = rootName;
+            }
 
             var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
 
@@ -93,10 +96,14 @@ namespace Philadelphus.Core.Domain.Helpers
 
         private static void CreateNodeRecursive(IPhiladelphusRepositoryService service, IParentModel parent, JsonElement nodeElement, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
         {
-            if (!nodeElement.TryGetProperty("name", out var nodeNameProp)) return;
+            var name = nodeElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
+            var needName = string.IsNullOrEmpty(name);
 
-            var node = service.CreateTreeNode(parent);
-            node.Name = nodeNameProp.GetString() ?? "Узел";
+            var node = service.CreateTreeNode(parent, needAutoName: needName);
+            if (needName == false)
+            {
+                node.Name = name;
+            }
 
             CreateAttributesFromElement(service, node, nodeElement, attributeLinkMap);
 
@@ -116,13 +123,16 @@ namespace Philadelphus.Core.Domain.Helpers
 
             foreach (var leafElement in leavesElement.EnumerateArray())
             {
-                if (leafElement.TryGetProperty("name", out var leafNameProp))
-                {
-                    var leaf = service.CreateTreeLeave(node);
-                    leaf.Name = leafNameProp.GetString() ?? "Лист";
+                var name = leafElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
+                var needName = string.IsNullOrEmpty(name);
 
-                    CreateAttributesFromElement(service, leaf, leafElement, attributeLinkMap);
+                var leaf = service.CreateTreeLeave(node, needAutoName: needName);
+                if (needName == false)
+                {
+                    leaf.Name = name;
                 }
+
+                CreateAttributesFromElement(service, leaf, leafElement, attributeLinkMap);
             }
         }
 
@@ -134,13 +144,17 @@ namespace Philadelphus.Core.Domain.Helpers
             foreach (var attrElement in attributesElement.EnumerateArray())
             {
                 // Заполняем свойства
-                var name = attrElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() ?? "Атрибут" : "Атрибут";
+                var name = attrElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
+                var needName = string.IsNullOrEmpty(name);
 
                 var attr = element.Attributes.ToList().FirstOrDefault(x => x.Name == name);
                 if (attr == null)
                 {
-                    attr = service.CreateElementAttribute(element);
-                    attr.Name = name;
+                    attr = service.CreateElementAttribute(element, needAutoName: needName);
+                    if (needName == false)
+                    {
+                        attr.Name = name;
+                    }
                 }
 
                 if (attrElement.TryGetProperty("isCollectionValue", out var isCollProp)) attr.IsCollectionValue = isCollProp.GetBoolean();
@@ -199,7 +213,7 @@ namespace Philadelphus.Core.Domain.Helpers
                     {
                         if (ownAtt.Value == null)
                         {
-                            var newValue = service.CreateTreeLeave(ownAtt.ValueType);
+                            var newValue = service.CreateTreeLeave(ownAtt.ValueType, needAutoName: false);
                             newValue.Name = valueLeafName;
                             ownAtt.Value = newValue;
                         }
