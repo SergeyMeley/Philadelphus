@@ -16,7 +16,7 @@ namespace Philadelphus.Tests.Domain.Fakes
     // 2. Фейковая IDataStorageModel
     public class FakeDataStorage : IDataStorageModel
     {
-        public Guid Uuid { get; set; } = Guid.NewGuid();
+        public Guid Uuid { get; set; } = Guid.CreateVersion7();
         public string Name { get; set; } = "TestStorage";
         public string Description { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -67,7 +67,7 @@ namespace Philadelphus.Tests.Domain.Fakes
         public void Constructor_ValidArgs_SetsOwnDataStorageAndContentShrub()
         {
             // Arrange
-            var uuid = Guid.NewGuid();
+            var uuid = Guid.CreateVersion7();
             var dataStorage = new FakeDataStorage();
             var dbEntity = new FakePhiladelphusRepository();
 
@@ -89,7 +89,7 @@ namespace Philadelphus.Tests.Domain.Fakes
         public void Constructor_NullDataStorage_ThrowsArgumentNullException()
         {
             // Arrange
-            var act = () => new PhiladelphusRepositoryModelTestingFixture(Guid.NewGuid(), null!);
+            var act = () => new PhiladelphusRepositoryModelTestingFixture(Guid.CreateVersion7(), null!);
 
             act.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dataStorage");
         }

@@ -375,7 +375,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         public ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
         {
             var result = new ElementAttributeModel(
-                localUuid: Guid.NewGuid(),
+                localUuid: Guid.CreateVersion7(),
                 localOwner: newOwner,
                 declaringUuid: this.DeclaringUuid,
                 declaringOwner: this._declaringAttributeOwner,

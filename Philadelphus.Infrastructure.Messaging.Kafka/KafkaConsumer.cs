@@ -21,7 +21,7 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
             var config = new ConsumerConfig()
             {
                 BootstrapServers = options.Value.BootstrapServers,
-                GroupId = $"consumer-{Guid.NewGuid()}",
+                GroupId = $"consumer-{Guid.CreateVersion7()}",
                 AutoOffsetReset = options.Value.AutoOffsetReset
             };
 

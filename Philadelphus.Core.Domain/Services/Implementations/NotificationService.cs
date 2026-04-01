@@ -90,7 +90,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             _logger = logger.ForContext("SourceContext", "NotificationService");
 
             CurrentUser = new MessagingUser(
-                Guid.NewGuid(), 
+                Guid.CreateVersion7(), 
                 options?.Value?.MessagingUserName ?? $"{Environment.UserDomainName}\\{Environment.UserName}");
 
             _consumerJoinedMessageConsumer = consumerJoinedMessageConsumer;

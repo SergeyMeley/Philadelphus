@@ -158,7 +158,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий</returns>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage)
         {
-            var result = new PhiladelphusRepositoryModel(Guid.NewGuid(), dataStorage);
+            var result = new PhiladelphusRepositoryModel(Guid.CreateVersion7(), dataStorage);
             result.ContentShrub.ContentWorkingTreesUuids.Add(WorkingTreeModel.SystemBaseUuid);
             return result;
         }

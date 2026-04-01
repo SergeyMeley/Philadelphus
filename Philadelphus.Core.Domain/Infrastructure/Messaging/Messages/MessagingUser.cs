@@ -31,7 +31,7 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
         }
         internal void UpdateSession()
         {
-            SessionUuid = Guid.NewGuid();
+            SessionUuid = Guid.CreateVersion7();
             StartSessionDateTime = DateTime.UtcNow;
         }
         internal static int GetSessionDurability() => (int)_sessionDurability.TotalMilliseconds;

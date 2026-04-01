@@ -726,7 +726,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     $"Начало создания рабочего дерева. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
-                var result = new WorkingTreeModel(Guid.NewGuid(), dataStorage, owner.ContentShrub);
+                var result = new WorkingTreeModel(Guid.CreateVersion7(), dataStorage, owner.ContentShrub);
 
                 owner.ContentShrub.ContentWorkingTrees.Add(result);
                 owner.ContentShrub.ContentWorkingTreesUuids.Add(result.Uuid);
@@ -763,7 +763,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     $"Начало создания корня. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
                 
-                var result = new TreeRootModel(Guid.NewGuid(), owner);
+                var result = new TreeRootModel(Guid.CreateVersion7(), owner);
                 
                 SetModelState(result, State.Initialized);
 
@@ -795,7 +795,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Info);
 
-                var result = new TreeNodeModel(Guid.NewGuid(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree);
+                var result = new TreeNodeModel(Guid.CreateVersion7(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree);
 
                 if (parent is TreeNodeModel node)
                     node.ChildNodes.Add(result);
@@ -835,11 +835,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 TreeLeaveModel result = null;
                 if (parent is SystemBaseTreeNodeModel sbn)
                 {
-                    result = new SystemBaseTreeLeaveModel(Guid.NewGuid(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType);
+                    result = new SystemBaseTreeLeaveModel(Guid.CreateVersion7(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType);
                 }
                 else
                 {
-                    result = new TreeLeaveModel(Guid.NewGuid(), parent, parent.OwningWorkingTree);
+                    result = new TreeLeaveModel(Guid.CreateVersion7(), parent, parent.OwningWorkingTree);
                 }
 
                 parent.ChildLeaves.Add(result);
@@ -882,7 +882,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     return null;
                 }
 
-                var uuid = Guid.NewGuid();
+                var uuid = Guid.CreateVersion7();
 
                 if (owner is WorkingTreeMemberBaseModel wtm)
                 {

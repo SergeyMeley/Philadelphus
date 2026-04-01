@@ -17,7 +17,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         public void Constructor_ValidArgs_SetsUuidAndDefaultNameAndStateInitialized()
         {
             // Arrange
-            var uuid = Guid.NewGuid();
+            var uuid = Guid.CreateVersion7();
             var mockDbEntity = new Mock<IMainEntity>();
 
             // Act
@@ -47,7 +47,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         public void Constructor_NullDbEntity_ThrowsArgumentNullException()
         {
             // Arrange
-            var act = () => CreateSut(Guid.NewGuid(), null!);
+            var act = () => CreateSut(Guid.CreateVersion7(), null!);
 
             // Act & Assert
             act.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dbEntity");
@@ -59,7 +59,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         public void Name_SetDifferentValue_UpdatesStateToChanged(string oldValue, string newValue)
         {
             // Arrange
-            var uuid = Guid.NewGuid();
+            var uuid = Guid.CreateVersion7();
             var mockDbEntity = new Mock<IMainEntity>();
             var sut = CreateSut(uuid, mockDbEntity.Object);
             sut.Name = oldValue ?? "";
@@ -76,7 +76,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         public void IsHidden_SetTrue_UpdatesStateToChanged()
         {
             // Arrange
-            var sut = CreateSut(Guid.NewGuid(), new Mock<IMainEntity>().Object);
+            var sut = CreateSut(Guid.CreateVersion7(), new Mock<IMainEntity>().Object);
 
             // Act
             sut.IsHidden = true;

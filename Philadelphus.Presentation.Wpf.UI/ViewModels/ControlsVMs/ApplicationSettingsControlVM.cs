@@ -227,7 +227,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         var vm = new ConnectionStringsContainerVM()
                         {
-                            Uuid = Guid.NewGuid(),
+                            Uuid = Guid.CreateVersion7(),
                             ProviderName = NewConnectionStringsContainerSelectedProvider,
                             ConnectionString = NewConnectionStringsContainerConnectionString
                         };
