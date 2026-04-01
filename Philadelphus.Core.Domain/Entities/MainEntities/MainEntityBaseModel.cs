@@ -137,7 +137,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 throw new ArgumentNullException(nameof(uuid));
 
             Uuid = uuid;
-            Name = NamingHelper.GetNewName(new List<string>(), _defaultFixedPartOfName);
+            Name = NamingHelper.GetNewName(fixedPartOfName: _defaultFixedPartOfName);
         }
 
         #endregion
