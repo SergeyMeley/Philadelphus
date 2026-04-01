@@ -55,12 +55,12 @@ namespace Philadelphus.Core.Domain.Helpers
             var treeName = root.TryGetProperty("name", out var nameProp)
                 ? nameProp.GetString() ?? "Импортированное дерево"
                 : "Импортированное дерево";
-            var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false);
+            var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false, withoutInfoNotifications: true);
             tree.Name = treeName;
 
             var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp) ? rootNameProp.GetString() : string.Empty;
             var needRootName = string.IsNullOrEmpty(rootName);
-            var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName);
+            var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName, withoutInfoNotifications: true);
             if (needRootName == false)
             {
                 treeRoot.Name = rootName;
@@ -99,7 +99,7 @@ namespace Philadelphus.Core.Domain.Helpers
             var name = nodeElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
             var needName = string.IsNullOrEmpty(name);
 
-            var node = service.CreateTreeNode(parent, needAutoName: needName);
+            var node = service.CreateTreeNode(parent, needAutoName: needName, withoutInfoNotifications: true);
             if (needName == false)
             {
                 node.Name = name;
@@ -126,7 +126,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 var name = leafElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
                 var needName = string.IsNullOrEmpty(name);
 
-                var leaf = service.CreateTreeLeave(node, needAutoName: needName);
+                var leaf = service.CreateTreeLeave(node, needAutoName: needName, withoutInfoNotifications: true);
                 if (needName == false)
                 {
                     leaf.Name = name;
@@ -150,7 +150,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 var attr = element.Attributes.ToList().FirstOrDefault(x => x.Name == name);
                 if (attr == null)
                 {
-                    attr = service.CreateElementAttribute(element, needAutoName: needName);
+                    attr = service.CreateElementAttribute(element, needAutoName: needName, withoutInfoNotifications: true);
                     if (needName == false)
                     {
                         attr.Name = name;
@@ -213,7 +213,7 @@ namespace Philadelphus.Core.Domain.Helpers
                     {
                         if (ownAtt.Value == null)
                         {
-                            var newValue = service.CreateTreeLeave(ownAtt.ValueType, needAutoName: false);
+                            var newValue = service.CreateTreeLeave(ownAtt.ValueType, needAutoName: false, withoutInfoNotifications: true);
                             newValue.Name = valueLeafName;
                             ownAtt.Value = newValue;
                         }

@@ -718,13 +718,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="owner">Родитель</param>
         /// <param name="dataStorage">Хранилище</param>
         /// <returns>Корень</returns>
-        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel owner, IDataStorageModel dataStorage, bool needAutoName = true)
+        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel owner, IDataStorageModel dataStorage, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             try
             {
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания рабочего дерева. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Начало создания рабочего дерева. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
+                        criticalLevel: NotificationCriticalLevelModel.Info);
+                }
 
                 var result = new WorkingTreeModel(Guid.CreateVersion7(), dataStorage, owner.ContentShrub);
 
@@ -739,9 +742,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(result, State.Initialized);
                 SetModelState(owner, State.Changed);
 
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание рабочего дерева успешно выполнено.",
-                    criticalLevel: NotificationCriticalLevelModel.Ok);
+
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Создание рабочего дерева '{result.Name}' успешно выполнено.",
+                        criticalLevel: NotificationCriticalLevelModel.Ok);
+                }
 
                 return result;
             }
@@ -760,14 +767,17 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="parentElement">Родитель</param>
         /// <param name="dataStorage">Хранилище</param>
         /// <returns>Корень</returns>
-        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner, bool needAutoName = true)
+        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             try
             {
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания корня. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
-                
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Начало создания корня. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
+                        criticalLevel: NotificationCriticalLevelModel.Info);
+                }
+
                 var result = new TreeRootModel(Guid.CreateVersion7(), owner);
 
                 if (needAutoName)
@@ -777,9 +787,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 SetModelState(result, State.Initialized);
 
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание корня успешно выполнено.",
-                    criticalLevel: NotificationCriticalLevelModel.Ok);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Создание корня '{result.Name}' успешно выполнено.",
+                        criticalLevel: NotificationCriticalLevelModel.Ok);
+                }
 
                 return result;
             }
@@ -797,13 +810,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="parent">Родитель</param>
         /// <returns>Узел</returns>
-        public TreeNodeModel CreateTreeNode(IParentModel parent, bool needAutoName = true)
+        public TreeNodeModel CreateTreeNode(IParentModel parent, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             try
             {
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Начало создания узла. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
+                        criticalLevel: NotificationCriticalLevelModel.Info);
+                }
 
                 var result = new TreeNodeModel(Guid.CreateVersion7(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree);
 
@@ -819,9 +835,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 SetModelState(result, State.Initialized);
 
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание узла успешно выполнено.",
-                    criticalLevel: NotificationCriticalLevelModel.Ok);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Создание узла '{result.Name}' успешно выполнено.",
+                        criticalLevel: NotificationCriticalLevelModel.Ok);
+                }
 
                 return result;
             }
@@ -839,13 +858,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="parent">Родитель</param>
         /// <returns>Лист</returns>
-        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parent, bool needAutoName = true)
+        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parent, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             try
             {
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания листа. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Начало создания листа. Родитель - '{(parent as IMainEntityModel).Name}' [{(parent as IMainEntityModel).Uuid}].",
+                        criticalLevel: NotificationCriticalLevelModel.Info);
+                }
 
                 TreeLeaveModel result = null;
                 if (parent is SystemBaseTreeNodeModel sbn)
@@ -866,9 +888,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 SetModelState(result, State.Initialized);
 
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Создание листа успешно выполнено.",
-                    criticalLevel: NotificationCriticalLevelModel.Ok);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                       $"Создание листа '{result.Name}' успешно выполнено.",
+                       criticalLevel: NotificationCriticalLevelModel.Ok);
+                }
 
                 return result;
             }
@@ -886,13 +911,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="owner">Владелец</param>
         /// <returns>Атрибут</returns>
-        public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner, bool needAutoName = true)
+        public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             try
             {
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
-                    criticalLevel: NotificationCriticalLevelModel.Info);
+                if (withoutInfoNotifications == false)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Начало создания атрибута. Владелец - '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
+                        criticalLevel: NotificationCriticalLevelModel.Info);
+                }
 
                 if (owner is TreeLeaveModel)
                 {
@@ -922,9 +950,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     {
                         SetModelState(result, State.Initialized);
 
-                        _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                            $"Создание атрибута успешно выполнено.",
-                            criticalLevel: NotificationCriticalLevelModel.Ok);
+                        if (withoutInfoNotifications == false)
+                        {
+                            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                                $"Создание атрибута '{result.Name}' успешно выполнено.",
+                                criticalLevel: NotificationCriticalLevelModel.Ok);
+                        }
                     }
                     else
                     {
