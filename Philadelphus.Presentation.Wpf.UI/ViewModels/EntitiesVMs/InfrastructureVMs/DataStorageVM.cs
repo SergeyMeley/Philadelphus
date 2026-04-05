@@ -81,6 +81,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 return true;
             }
         }
+        public bool HasReportsInfrastructureRepository
+        {
+            get
+            {
+                if (_model.HasReportsInfrastructureRepository == null)
+                    return false;
+                return true;
+            }
+        }
         public bool? IsAvailable 
         {
             get

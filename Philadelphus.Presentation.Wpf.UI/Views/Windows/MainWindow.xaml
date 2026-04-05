@@ -262,15 +262,15 @@
                             <TabItem Header="Репозиторий">
                                 <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}"></re:RepositoryExplorer>
                             </TabItem>
-                            <!--<TabItem Header="Отчеты">
-                                    <ctrls:ReportProcessor></ctrls:ReportProcessor>
-                                </TabItem>
-                                <TabItem Header="Настраиваемый отчет">
-                                    <ctrls:CustomizableReport></ctrls:CustomizableReport>
-                                </TabItem>
-                                <TabItem Header="Импорт / экспорт">
-                                    <ctrls:DataExchange></ctrls:DataExchange>
-                                </TabItem>-->
+                            <TabItem Header="Отчеты">
+                                <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}"></ctrls:ReportProcessor>
+                            </TabItem>
+                            <!--<TabItem Header="Настраиваемый отчет">
+                                <ctrls:CustomizableReport></ctrls:CustomizableReport>
+                            </TabItem>
+                            <TabItem Header="Импорт / экспорт">
+                                <ctrls:DataExchange></ctrls:DataExchange>
+                            </TabItem>-->
                             <TabItem Header="Настройки">
                                 <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>
                             </TabItem>

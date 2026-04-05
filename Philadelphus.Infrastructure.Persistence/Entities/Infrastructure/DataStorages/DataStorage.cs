@@ -10,6 +10,7 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataSt
         public InfrastructureTypes InfrastructureType { get; set; }
         public bool HasPhiladelphusRepositoriesInfrastructureRepository { get; set; }
         public bool HasShrubMembersInfrastructureRepository { get; set; }
+        public bool HasReportsInfrastructureRepository { get; set; }
         public bool IsHidden { get; set; }
     }
 }

@@ -92,6 +92,21 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         }
 
         /// <summary>
+        /// Репозиторий БД работы с отчетами
+        /// </summary>
+        public IReportsInfrastructureRepository ReportsInfrastructureRepository
+        {
+            get
+            {
+                if (_isHidden)
+                    return null;
+                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.Reports) == false)
+                    return null;
+                return (IReportsInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.Reports];
+            }
+        }
+
+        /// <summary>
         /// Имеет репозиторий БД работы с репозиториями Чубушника 
         /// </summary>
         public bool HasPhiladelphusRepositoriesInfrastructureRepository { get => PhiladelphusRepositoriesInfrastructureRepository != null; }
@@ -100,6 +115,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// Имеет репозиторий БД работы с участниками кустарника репозитория Чубушника
         /// </summary>
         public bool HasShrubMembersInfrastructureRepository { get => ShrubMembersInfrastructureRepository != null; }
+
+        /// <summary>
+        /// Имеет репозиторий БД работы с отчетами
+        /// </summary>
+        public bool HasReportsInfrastructureRepository { get => ReportsInfrastructureRepository != null; }
 
         /// <summary>
         /// Доступность хранилища (доступность всех репозиториев БД)

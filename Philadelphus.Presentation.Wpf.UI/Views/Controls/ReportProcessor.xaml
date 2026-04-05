@@ -36,10 +36,10 @@
                                 <RowDefinition Height="20"></RowDefinition>
                                 <RowDefinition Height="20"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Группа отчетов" Margin="1"></TextBlock>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Хранилище" Margin="1"></TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Отчет" Margin="1"></TextBlock>
-                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="1"></ComboBox>
-                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="1"></ComboBox>
+                            <ComboBox  Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DataStoragesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedDataStorageVM}" Margin="1"></ComboBox>
+                            <ComboBox  Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ReportInfos}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedReport}" Margin="1"></ComboBox>
                         </Grid>
                     </GroupBox>
                     <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
