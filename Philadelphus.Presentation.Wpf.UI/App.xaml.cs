@@ -195,6 +195,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
+                    services.AddSingleton<IThemeService, ThemeService>();
 
                     // Регистрация ViewModel
                     // Общие ViewModel

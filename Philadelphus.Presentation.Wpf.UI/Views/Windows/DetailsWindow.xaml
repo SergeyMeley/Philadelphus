@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
         xmlns:detail="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids"
         mc:Ignorable="d"
-        Title="DetailsWindow">
+        Title="DetailsWindow"
+        Background="{DynamicResource BackgroundBrush}"
+        Foreground="{DynamicResource ForegroundBrush}">
     <Grid>
         <detail:UniversalDetails></detail:UniversalDetails>
     </Grid>

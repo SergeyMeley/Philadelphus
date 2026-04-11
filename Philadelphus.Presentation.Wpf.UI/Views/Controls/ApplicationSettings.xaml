@@ -32,7 +32,6 @@
                                     x:Name="ContentPanel" 
                                     BorderBrush="{TemplateBinding BorderBrush}" 
                                     BorderThickness="{TemplateBinding BorderThickness}" 
-                                    Background="{TemplateBinding Background}" 
                                     KeyboardNavigation.DirectionalNavigation="Contained" 
                                     KeyboardNavigation.TabIndex="2" 
                                     KeyboardNavigation.TabNavigation="Local">
@@ -46,36 +45,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--<Style x:Key="LeftVerticalTabItemStyle" TargetType="TabItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Border Name="Border" BorderThickness="1,1,0,1" BorderBrush="LightSlateGray" Margin="1">
-                                <StackPanel Orientation="Vertical" 
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Height="75"
-                                            Width="90"
-                                            Margin="5,5">
-                                    <TextBlock Text="{TemplateBinding Header}" 
-                                               HorizontalAlignment="Center"
-                                               Margin="0,5,0,5"
-                                               FontSize="14"
-                                               TextWrapping="Wrap"
-                                               TextAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
     </UserControl.Resources>
     <Grid>
         <TabControl Style="{StaticResource LeftVerticalTabControlStyle}"

@@ -35,7 +35,7 @@
                                       Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Background="Transparent">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -45,7 +45,8 @@
                                                    Text="{Binding DataContext.OkMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                    MinWidth="30"
                                                    HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"></TextBlock>
+                                                   VerticalAlignment="Center">
+                                        </TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
@@ -58,7 +59,7 @@
                                       Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Background="Transparent">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -68,7 +69,8 @@
                                                    Text="{Binding DataContext.InfoMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                    MinWidth="30"
                                                    HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"></TextBlock>      
+                                                   VerticalAlignment="Center">
+                                        </TextBlock>      
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
@@ -81,7 +83,7 @@
                                       Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Background="Transparent">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -91,7 +93,8 @@
                                                    Text="{Binding DataContext.WarningMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                    MinWidth="30"
                                                    HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"></TextBlock>
+                                                   VerticalAlignment="Center">
+                                        </TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>
@@ -104,17 +107,18 @@
                                       Margin="1,0">
                             <ToggleButton.ContentTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Background="Transparent">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <ContentPresenter Grid.Column="0" Content="{StaticResource imageError64_3}"></ContentPresenter>
                                         <TextBlock Grid.Column="1" 
-                                                   Text="{Binding DataContext.ErrorMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                   Text="{Binding DataContext.ErrorMessagesCount, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                    MinWidth="30"
                                                    HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"></TextBlock>
+                                                   VerticalAlignment="Center">
+                                        </TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </ToggleButton.ContentTemplate>

@@ -2,10 +2,18 @@
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.Wpf.UI.Models.Entities.Enums;
+using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
+using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
@@ -15,12 +23,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
+        private readonly IThemeService _themeService;
 
         private ApplicationCommandsVM _applicationCommandsVM;
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
-
-        private LaunchWindowVM _launchVM;
-        public LaunchWindowVM LaunchVM { get { return _launchVM; } }
 
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
@@ -36,48 +42,40 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
+            IThemeService themeService,
             IOptions<ApplicationSettingsConfig> options,
             ApplicationCommandsVM applicationCommandsVM,
             DataStoragesCollectionVM dataStoragesSettingsVM,
             PhiladelphusRepositoryCollectionVM PhiladelphusRepositoryCollectionVM,
             PhiladelphusRepositoryHeadersCollectionVM PhiladelphusRepositoryHeadersCollectionVM,
-            RepositoryCreationControlVM RepositoryCreationVM,
-            LaunchWindowVM launchVM)
+            RepositoryCreationControlVM RepositoryCreationVM)
         {
-            //var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
-            //if (configPath == null)
-            //    throw new Exception("Не найден путь к настроечным файлам. Проверьте параметр \'ConfigsDirectory\' в \'App.config\'.");
-            //var configDirectory = new DirectoryInfo(configPath);
-            //options.Value.ConfigsDirectory = configDirectory;
-
             _serviceProvider = serviceProvider;
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
-            _applicationCommandsVM = applicationCommandsVM;    // Зависает приложение
+            _themeService = themeService;
+            _applicationCommandsVM = applicationCommandsVM;
             _dataStoragesSettingsVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = PhiladelphusRepositoryCollectionVM;
             _repositoryHeadersCollectionVM = PhiladelphusRepositoryHeadersCollectionVM;
-            //_repositoryCreationVM = RepositoryCreationVM;
-            _launchVM = launchVM;
-
-            //CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
-
-
-            //var PhiladelphusRepositoryCollectionService = new PhiladelphusRepositoryCollectionService(configDirectory);
-
-            //_applicationWindowsVM = new ApplicationWindowsVM();
-            //_applicationCommandsVM = new ApplicationCommandsVM(this, _applicationWindowsVM);
-            //_dataStoragesSettingsVM = new DataStoragesSettingsVM();
-            //_repositoryCollectionVM = new PhiladelphusRepositoryCollectionVM(PhiladelphusRepositoryCollectionService, _dataStoragesSettingsVM);
-            //_repositoryHeadersCollectionVM = new PhiladelphusRepositoryHeadersCollectionVM(PhiladelphusRepositoryCollectionService);
-            //_repositoryCreationVM = new RepositoryCreationVM(PhiladelphusRepositoryCollectionService, _repositoryCollectionVM, _dataStoragesSettingsVM);
-            //_launchVM = new LaunchVM(_dataStoragesSettingsVM, _repositoryCollectionVM, _repositoryHeadersCollectionVM, _applicationCommandsVM.OpenMainWindowCommand);
-            //_applicationWindowsVM.LaunchWindow = new LaunchWindow(_launchVM);
-            //_applicationWindowsVM.LaunchWindow.Show();
-            //_applicationWindowsVM.LaunchWindow.Focus();
-            //_applicationWindowsVM.LaunchWindow.Activate();
         }
 
+        public Array ThemeModes => Enum.GetValues(typeof(ControlsThemeMode));
+
+        private ControlsThemeMode _selectedTheme;
+        public ControlsThemeMode SelectedTheme
+        {
+            get => _selectedTheme;
+            set
+            {
+                if (_selectedTheme != value)
+                {
+                    _selectedTheme = value;
+                    OnPropertyChanged();
+                    _themeService.ApplyTheme(value);
+                }
+            }
+        }
     }
 }

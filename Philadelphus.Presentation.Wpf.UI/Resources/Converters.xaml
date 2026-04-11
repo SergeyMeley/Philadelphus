@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters">
+    <converters:MainEntityToIconConverter x:Key="mainEntityToIconConverter" />
+    <converters:SelectedIndexConverter x:Key="selectedIndexConverter" />
+    <converters:RepresentationToDataGridVisibilityConverter x:Key="representationToDataGridVisibilityConverter" />
+    <converters:RepresentationToStandardGridVisibilityConverter x:Key="representationToStandardGridVisibilityConverter" />
+    <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
+</ResourceDictionary>

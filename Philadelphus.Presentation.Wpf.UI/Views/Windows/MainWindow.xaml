@@ -13,7 +13,9 @@
         Title="{Binding Title}"
         MinHeight="500" MinWidth="1000"
         WindowState="Maximized"
-        Icon="{StaticResource imagePhiladelphusLogo}">
+        Icon="{StaticResource imagePhiladelphusLogo}"
+        Background="{DynamicResource BackgroundBrush}"
+        Foreground="{DynamicResource ForegroundBrush}">
     <Window.CommandBindings>
         <!--<CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
         <CommandBinding Command="Open" CanExecute="CommonCommandBinding_CanExecute" />
@@ -30,7 +32,7 @@
                         <ItemContainerTemplate>
                             <Border BorderThickness="3" CornerRadius="5" BorderBrush="SlateGray" Background="LightGray">
                                 <StackPanel>
-                                    <TextBlock Foreground="Black" Height="70" Width="300" Padding="10" Text="{Binding Text}"></TextBlock>
+                                    <TextBlock Height="70" Width="300" Padding="10" Text="{Binding Text}"></TextBlock>
                                 </StackPanel>
                             </Border>
                         </ItemContainerTemplate>
@@ -40,16 +42,16 @@
         </Popup>
         <DockPanel>
             <Ribbon DockPanel.Dock="Top" Background="Transparent" Margin="0,-20,0,0">
-                <!--<Ribbon.HelpPaneContent>
+                <Ribbon.HelpPaneContent>
                     <RibbonButton  />
                 </Ribbon.HelpPaneContent>
                 <Ribbon.QuickAccessToolBar>
                     <RibbonQuickAccessToolBar >
                         
                     </RibbonQuickAccessToolBar>
-                </Ribbon.QuickAccessToolBar>-->
+                </Ribbon.QuickAccessToolBar>
                 <Ribbon.ApplicationMenu>
-                    <RibbonApplicationMenu>
+                    <RibbonApplicationMenu Visibility="Collapsed">
                         <!--<RibbonApplicationMenu.SmallImageSource>
                             <BitmapImage UriSource="C:\Users\MeleychukSV\Downloads\icons8-квадратный-корень-2-64.png" />
                         </RibbonApplicationMenu.SmallImageSource>-->

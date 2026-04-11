@@ -11,7 +11,7 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ScrollViewer>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
             <DataGrid Grid.Row="0" AutoGenerateColumns="False" ItemsSource="{Binding ConfigFiles}" SelectedItem="{Binding SelectedConfigFile}" Margin="1" ColumnWidth="*">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Настроечный файл" Binding="{Binding ConfigName, Mode=OneWay}" Width="auto"></DataGridTextColumn>

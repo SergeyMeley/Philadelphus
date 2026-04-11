@@ -12,9 +12,9 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
-            <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
-            <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
+            <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="1" Height="25" Width="25" />
+            <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" />
+            <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" />
         </StackPanel>
         <DataGrid Grid.Row="1"
                   Height="auto"

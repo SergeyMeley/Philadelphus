@@ -62,6 +62,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             PhiladelphusRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
             StorageCreationControlVM storageCreationControlVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
+            ApplicationVM applicationVM,
             ApplicationCommandsVM applicationCommandsVM,
             ApplicationSettingsControlVM applicationSettingsControlVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)

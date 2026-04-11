@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- БАЗА -->
+    <Color x:Key="BackgroundColor">#1E1E1E</Color>
+    <Color x:Key="ForegroundColor">#FFFFFF</Color>
+
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{DynamicResource BackgroundColor}" />
+    <SolidColorBrush x:Key="ForegroundBrush" Color="{DynamicResource ForegroundColor}" />
+
+    <!-- КОНТРОЛЫ -->
+    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="#3C3C3C"/>
+    <SolidColorBrush x:Key="ControlForegroundBrush" Color="#FFFFFF"/>
+
+    <!-- ГРАНИЦЫ -->
+    <SolidColorBrush x:Key="BorderBrush" Color="#6A6A6A"/>
+    
+    <!-- HOVER -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#505050"/>
+
+    <!-- SELECTED -->
+    <SolidColorBrush x:Key="SelectedBrush" Color="#7FA9B3"/>
+
+    <!-- SCROLL -->
+    <SolidColorBrush x:Key="ScrollBarBrush" Color="#3E3E42"/>
+    <SolidColorBrush x:Key="ThumbBrush" Color="#6B6B6B"/>
+    <SolidColorBrush x:Key="ThumbHoverBrush" Color="#9E9E9E"/>
+
+    <!-- SPLITTER -->
+    <SolidColorBrush x:Key="SplitterBrush" Color="#444444"/>
+
+    <!-- TAB -->
+    <SolidColorBrush x:Key="TabBackgroundBrush" Color="#2D2D30"/>
+    <SolidColorBrush x:Key="TabSelectedBrush" Color="#1E1E1E"/>
+
+</ResourceDictionary>
