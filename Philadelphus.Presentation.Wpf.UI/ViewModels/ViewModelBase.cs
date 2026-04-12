@@ -6,10 +6,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        protected internal virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
