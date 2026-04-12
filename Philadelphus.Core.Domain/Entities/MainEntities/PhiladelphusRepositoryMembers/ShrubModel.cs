@@ -15,7 +15,7 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers
 {
-    public class ShrubModel : PhiladelphusRepositoryMemberBaseModel, IOwnerModel, IContentModel
+    public class ShrubModel : PhiladelphusRepositoryMemberBaseModel<ShrubModel>, IOwnerModel, IContentModel
     {
         #region [ Fields ]
 

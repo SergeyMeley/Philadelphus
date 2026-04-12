@@ -16,7 +16,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
     /// <summary>
     /// Репозиторий Чубушника (агрегатор корней, аналог решения в .NET)
     /// </summary>
-    public class PhiladelphusRepositoryModel : MainEntityBaseModel, IPhiladelphusRepositoryHeaderModel, IOwnerModel, IHavingOwnDataStorageModel
+    public class PhiladelphusRepositoryModel : MainEntityBaseModel<PhiladelphusRepositoryModel>, IPhiladelphusRepositoryHeaderModel, IOwnerModel, IHavingOwnDataStorageModel
     {
         #region [ Fields ]
 

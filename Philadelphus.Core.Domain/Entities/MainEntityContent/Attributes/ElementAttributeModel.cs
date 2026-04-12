@@ -5,17 +5,19 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 {
     /// <summary>
     /// Атрибут элемента Чубушника
     /// </summary>
-    public class ElementAttributeModel : WorkingTreeMemberBaseModel, IContentModel
+    public class ElementAttributeModel : WorkingTreeMemberBaseModel<ElementAttributeModel>, IContentModel
     {
         #region [ Fields ]
 
@@ -65,7 +67,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         { 
             get
             {
-                if (Owner is ShrubMemberBaseModel sm)
+                if (Owner is IShrubMemberModel sm)
                 {
                     return sm.OwningShrub.ContentWorkingTrees
                         .SelectMany(x => x.GetAllNodesRecursive());

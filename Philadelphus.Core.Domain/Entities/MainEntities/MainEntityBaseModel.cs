@@ -3,8 +3,10 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
 
@@ -13,7 +15,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
     /// <summary>
     /// Основная сущность Чубушника
     /// </summary>
-    public abstract class MainEntityBaseModel : IMainEntityWritableModel
+    public abstract class MainEntityBaseModel<T> : IMainEntityWritableModel
+        where T : MainEntityBaseModel<T>
     {
         #region [ Fields ]
 

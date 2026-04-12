@@ -15,7 +15,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Корень дерева участников репозитория Чубушника (аналог проекта / библиотеки в .NET)
     /// </summary>
-    public class  TreeRootModel : WorkingTreeMemberBaseModel, IParentModel, IOwnerModel
+    public class  TreeRootModel : WorkingTreeMemberBaseModel<TreeRootModel>, IParentModel, IOwnerModel
     {
         #region [ Fields ]
 

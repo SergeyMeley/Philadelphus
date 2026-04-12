@@ -13,7 +13,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Узел дерева участников репозитория Чубушника (аналог классов и интерфейсов в ООП)
     /// </summary>
-    public class TreeNodeModel : WorkingTreeMemberBaseModel, IWorkingTreeMemberModel, IParentModel, IChildrenModel, IOwnerModel
+    public class TreeNodeModel : WorkingTreeMemberBaseModel<TreeNodeModel>, IWorkingTreeMemberModel, IParentModel, IChildrenModel, IOwnerModel
     {
         #region [ Fields ]
 

@@ -15,7 +15,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Лист дерева участников репозитория Чубушника (аналог объекта в ООП)
     /// </summary>
-    public class  TreeLeaveModel : WorkingTreeMemberBaseModel, IWorkingTreeMemberModel, IChildrenModel, IOwnerModel
+    public class  TreeLeaveModel : WorkingTreeMemberBaseModel<TreeLeaveModel>, IWorkingTreeMemberModel, IChildrenModel, IOwnerModel
     {
         #region [ Fields ]
 

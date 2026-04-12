@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
 {
-    public class WorkingTreeModel : ShrubMemberBaseModel, IPhiladelphusRepositoryMemberModel, IHavingOwnDataStorageModel, IOwnerModel, IContentModel
+    public class WorkingTreeModel : ShrubMemberBaseModel<WorkingTreeModel>, IPhiladelphusRepositoryMemberModel, IHavingOwnDataStorageModel, IOwnerModel, IContentModel
     {
         #region [ Fields ]
 

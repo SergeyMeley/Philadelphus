@@ -13,7 +13,8 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers
 {
-    public abstract class PhiladelphusRepositoryMemberBaseModel : MainEntityBaseModel, IPhiladelphusRepositoryMemberModel, IContentModel
+    public abstract class PhiladelphusRepositoryMemberBaseModel<T> : MainEntityBaseModel<T>, IPhiladelphusRepositoryMemberModel, IContentModel
+        where T : PhiladelphusRepositoryMemberBaseModel<T>
     {
         #region [ Fields ]
 
@@ -106,7 +107,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 OwningRepository = r;
             }
-            else if (owner is PhiladelphusRepositoryMemberBaseModel rm)
+            else if (owner is IPhiladelphusRepositoryMemberModel rm)
             {
                 OwningRepository = rm.OwningRepository;
             }

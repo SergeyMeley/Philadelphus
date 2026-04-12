@@ -932,7 +932,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 var uuid = Guid.CreateVersion7();
 
-                if (owner is WorkingTreeMemberBaseModel wtm)
+                if (owner is IWorkingTreeMemberModel wtm)
                 {
                     var result = new ElementAttributeModel(uuid, owner, uuid, owner, wtm.OwningWorkingTree, _notificationService)
                     {

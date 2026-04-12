@@ -10,7 +10,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Участник корня репозитория Чубушника
     /// </summary>
-    public abstract class WorkingTreeMemberBaseModel : ShrubMemberBaseModel, IWorkingTreeMemberModel, IOwnerModel, IContentModel
+    public abstract class WorkingTreeMemberBaseModel<T> : ShrubMemberBaseModel<T>, IWorkingTreeMemberModel, IOwnerModel, IContentModel
+        where T : WorkingTreeMemberBaseModel<T>
     {
         #region [ Fields ]
 
@@ -104,7 +105,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 OwningWorkingTree = t;
             }
-            else if (owner is WorkingTreeMemberBaseModel wtm)
+            else if (owner is IWorkingTreeMemberModel wtm)
             {
                 OwningWorkingTree = wtm.OwningWorkingTree;
             }

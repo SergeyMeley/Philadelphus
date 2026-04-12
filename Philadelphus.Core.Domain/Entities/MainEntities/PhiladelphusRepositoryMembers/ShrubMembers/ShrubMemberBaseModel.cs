@@ -15,7 +15,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Участник репозитория Чубушника
     /// </summary>
-    public abstract class ShrubMemberBaseModel : PhiladelphusRepositoryMemberBaseModel, IShrubMemberModel, IPhiladelphusRepositoryMemberModel, IAttributeOwnerModel, IOwnerModel, IContentModel, ISequencableModel
+    public abstract class ShrubMemberBaseModel<T> : PhiladelphusRepositoryMemberBaseModel<T>, IShrubMemberModel, IPhiladelphusRepositoryMemberModel, IAttributeOwnerModel, IOwnerModel, IContentModel, ISequencableModel
+        where T : ShrubMemberBaseModel<T>
     {
         #region [ Fields ]
 
@@ -205,7 +206,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 OwningShrub = sh;
             }
-            else if (owner is ShrubMemberBaseModel shm)
+            else if (owner is IShrubMemberModel shm)
             {
                 OwningShrub = shm.OwningShrub;
             }
@@ -231,21 +232,21 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                     return false;
 
                 _attributes.Add(attribute);
-                IncrementVersionRecursive();
+                ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
                 return true;
             }
-         }
+        }
 
-        private void IncrementVersionRecursive()
+        void IAttributeOwnerModel.MarkAsNeedRecalculateAttributesList()
         {
             _version++;
             if (this is IParentModel p)
             {
                 foreach (var c in p.Childs)
                 {
-                    if (c.Value is ShrubMemberBaseModel sm)
+                    if (c.Value is IAttributeOwnerModel ao)
                     {
-                        sm.IncrementVersionRecursive();
+                        ao.MarkAsNeedRecalculateAttributesList();
                     }
                 }
             }
