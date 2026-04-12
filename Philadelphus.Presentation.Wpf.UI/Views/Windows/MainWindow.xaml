@@ -1,9 +1,10 @@
-﻿<Window x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.MainWindow"
+﻿<fluent:RibbonWindow x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
+        xmlns:fluent="urn:fluent-ribbon"
         xmlns:viewmodels="clr-namespace:Philadelphus.Presentation.Wpf.UI.ViewModels"
         xmlns:i="Microsoft.Xaml.Behaviors;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
@@ -16,11 +17,11 @@
         Icon="{StaticResource imagePhiladelphusLogo}"
         Background="{DynamicResource BackgroundBrush}"
         Foreground="{DynamicResource ForegroundBrush}">
-    <Window.CommandBindings>
+    <fluent:RibbonWindow.CommandBindings>
         <!--<CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
         <CommandBinding Command="Open" CanExecute="CommonCommandBinding_CanExecute" />
         <CommandBinding Command="Save" CanExecute="CommonCommandBinding_CanExecute" />-->
-    </Window.CommandBindings>
+    </fluent:RibbonWindow.CommandBindings>
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="#FFF1F1F1"/>
@@ -40,172 +41,145 @@
                 </ListBox>
             </StackPanel>
         </Popup>
-        <DockPanel>
-            <Ribbon DockPanel.Dock="Top" Background="Transparent" Margin="0,-20,0,0">
-                <Ribbon.HelpPaneContent>
-                    <RibbonButton  />
-                </Ribbon.HelpPaneContent>
-                <Ribbon.QuickAccessToolBar>
-                    <RibbonQuickAccessToolBar >
-                        
-                    </RibbonQuickAccessToolBar>
-                </Ribbon.QuickAccessToolBar>
-                <Ribbon.ApplicationMenu>
-                    <RibbonApplicationMenu Visibility="Collapsed">
+        <DockPanel LastChildFill="True">
+            <fluent:Ribbon DockPanel.Dock="Top" Background="Transparent"
+               xmlns:fluent="urn:fluent-ribbon">
+
+                <fluent:Ribbon.QuickAccessItems>
+                </fluent:Ribbon.QuickAccessItems>
+
+                <fluent:Ribbon.Menu>
+                    <fluent:ApplicationMenu Visibility="Collapsed">
+
                         <!--<RibbonApplicationMenu.SmallImageSource>
                             <BitmapImage UriSource="C:\Users\MeleychukSV\Downloads\icons8-квадратный-корень-2-64.png" />
                         </RibbonApplicationMenu.SmallImageSource>-->
-                        <RibbonApplicationMenu.SmallImageSource>
-                            <DrawingImage>
-                                <DrawingImage.Drawing>
-                                    <GlyphRunDrawing ForegroundBrush="White">
-                                        <GlyphRunDrawing.GlyphRun>
-                                            <GlyphRun
-                                                CaretStops="{x:Null}" 
-                                                ClusterMap="{x:Null}" 
-                                                IsSideways="False" 
-                                                GlyphOffsets="{x:Null}" 
-                                                GlyphIndices="41 76 79 72" 
-                                                FontRenderingEmSize="12" 
-                                                DeviceFontName="{x:Null}" 
-                                                AdvanceWidths="5.859375 2.90625 2.90625 6.275390625">
-                                                <GlyphRun.GlyphTypeface>
-                                                    <GlyphTypeface FontUri="C:\WINDOWS\Fonts\SEGOEUI.TTF"/>
-                                                </GlyphRun.GlyphTypeface>
-                                            </GlyphRun>
-                                        </GlyphRunDrawing.GlyphRun>
-                                    </GlyphRunDrawing>
-                                </DrawingImage.Drawing>
-                            </DrawingImage>
-                        </RibbonApplicationMenu.SmallImageSource>
-                        <RibbonApplicationMenuItem Header="Hello _Ribbon" />
-                        <RibbonButton Label="Открыть локальный репозиторий"/>
-                        <RibbonButton Label="Открыть удаленный репозиторий"/>
-                        <RibbonButton Label="Создать пустой репозиторий"/>
-                        <RibbonButton Label="Создать из шаблона"/>
-                    </RibbonApplicationMenu>
-                </Ribbon.ApplicationMenu>
-                <RibbonTab Header="Главная">
-                    <RibbonGroup Header="Общее">
-                        <RibbonButton Label="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" />
-                    </RibbonGroup> 
+
+
+                        <fluent:MenuItem Header="Hello _Ribbon" />
+                        <fluent:Button Content="Открыть локальный репозиторий"/>
+                        <fluent:Button Content="Открыть удаленный репозиторий"/>
+                        <fluent:Button Content="Создать пустой репозиторий"/>
+                        <fluent:Button Content="Создать из шаблона"/>
+                    </fluent:ApplicationMenu>
+                </fluent:Ribbon.Menu>
+
+                <fluent:RibbonTabItem Header="Главная">
+                    <fluent:RibbonGroupBox Header="Общее">
+                        <fluent:Button Content="Открыть стартовое окно"
+                           Command="{Binding OpenLaunchWindowCommand}" />
+                    </fluent:RibbonGroupBox>
+
                     <!--<RibbonGroup Header="Буфер обмена">
-                        <RibbonButton Label="Копировать" />
-                        <RibbonButton Label="Вырезать" />
-                        <RibbonButton Label="Вставить" />
-                        <RibbonButton Label="Дублировать" />
-                        <RibbonButton Label="Переместить" />
-                    </RibbonGroup>-->
-                </RibbonTab>
-                <RibbonTab Header="Репозиторий">
-                    <RibbonGroup Header="Текущий репозиторий">
-                        <!--<RibbonComboBox ItemsSource="{Binding PhiladelphusRepositories}" DisplayMemberPath="Name">
-                            <RibbonComboBox.Style>
-                                <Style TargetType="RibbonComboBox" BasedOn="{StaticResource SyncfusionRibbonComboBoxStyle}">
-                                    <Style.Triggers>
-                                        <Trigger Property="LayoutTransform"  Value="True">
-                                            <Setter Property="Height" Value="25"/>
-                                            <Setter Property="Width" Value="100"/>
-                                            <Setter Property="Margin" Value="2"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </RibbonComboBox.Style>
-                        </RibbonComboBox>-->
-                        <!--<ComboBox ItemsSource="{Binding RepositoryCollectionVM.PhiladelphusRepositoriesVMs}" DisplayMemberPath="Name" SelectedItem="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"  IsEditable="True" IsReadOnly="True" Width="auto" MinWidth="200" IsEnabled="False"></ComboBox>-->
-                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}"></TextBlock>
+            <RibbonButton Label="Копировать" />
+            <RibbonButton Label="Вырезать" />
+            <RibbonButton Label="Вставить" />
+            <RibbonButton Label="Дублировать" />
+            <RibbonButton Label="Переместить" />
+        </RibbonGroup>-->
+                </fluent:RibbonTabItem>
+
+                <fluent:RibbonTabItem Header="Репозиторий">
+
+                    <fluent:RibbonGroupBox Header="Текущий репозиторий">
+
+                        <!--<RibbonComboBox ... />-->
+
+                        <!--<ComboBox ... />-->
+
+                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}"/>
+
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Состояние: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.State}"></TextBlock>
+                            <TextBlock Text="Состояние: "/>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.State}"/>
                         </StackPanel>
-                        <RibbonButton Label="Открыть стартовое окно" Command="{Binding ApplicationCommandsVM.OpenLaunchWindowCommand}" />
-                    </RibbonGroup>
-                    <RibbonGroup Header="Информация">
+
+                        <fluent:Button Content="Открыть стартовое окно"
+                           Command="{Binding ApplicationCommandsVM.OpenLaunchWindowCommand}" />
+                    </fluent:RibbonGroupBox>
+
+                    <fluent:RibbonGroupBox Header="Информация">
+
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Количество корней: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.ChildsCount}"></TextBlock>
+                            <TextBlock Text="Количество корней: "/>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.ChildsCount}"/>
                         </StackPanel>
+
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Текущий участник репозитория: "></TextBlock>
-                            <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}"></TextBlock>
+                            <TextBlock Text="Текущий участник репозитория: "/>
+                            <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}"/>
                         </StackPanel>
-                        <RibbonButton Label="Подробнее" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
-                    </RibbonGroup>
-                    <!--<RibbonGroup Header="Иерархия репозитория">
-                        <RibbonButton Label="Добавить собственный корень" />
-                        <RibbonButton Label="Добавить внешний корень" />
-                        <RibbonButton Label="Добавить узел" />
-                        <RibbonButton Label="Добавить лист" />
-                        <RibbonButton Label="Удалить элемент" />
-                    </RibbonGroup>
-                    <RibbonGroup Header="Вхождения атрибутов">
-                        <RibbonButton Label="Добавить вхождение" />
-                        <RibbonButton Label="Удалить вхождение" />
-                    </RibbonGroup>
-                    <RibbonGroup Header="Атрибуты">
-                        <RibbonButton Label="Добавить атрибут" />
-                        <RibbonButton Label="Удалить атрибут" />
-                    </RibbonGroup>
-                    <RibbonGroup Header="Пресеты">
-                        <RibbonButton Label="Добавить пресет" />
-                        <RibbonButton Label="Удалить пресет" />
-                    </RibbonGroup>-->
-                </RibbonTab>
-                <!--<RibbonTab Header="Вставка">
 
-                </RibbonTab>
-                <RibbonTab Header="Рассылки">
+                        <fluent:Button Content="Подробнее"
+                           Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
+                    </fluent:RibbonGroupBox>
 
-                </RibbonTab>-->
-                <RibbonTab Header="Данные">
-                    <RibbonGroup Header="Импорт">
-                        <RibbonButton Label="Импорт дерева из .phjson" Command="{Binding RepositoryExplorerVM.ImportFromPhjsonCommand}" />
-                    </RibbonGroup>
-                    <RibbonGroup Header="Экспорт">
-                        <RibbonButton Label="Экспорт дерева в .phjson" Command="{Binding RepositoryExplorerVM.ExportToPhjsonCommand}" />
-                    </RibbonGroup>
-                    <RibbonGroup Header="Конвертация">
-                        <RibbonButton Label="Конвертировать .xlsx в .phjson" Command="{Binding RepositoryExplorerVM.ConvertXlsxToPhjsonCommand}" />
-                    </RibbonGroup>
-                </RibbonTab>
-                <!--<RibbonTab Header="Вид">
+                    <!--<RibbonGroup Header="Иерархия репозитория">...</RibbonGroup>-->
+                    <!--<RibbonGroup Header="Вхождения атрибутов">...</RibbonGroup>-->
+                    <!--<RibbonGroup Header="Атрибуты">...</RibbonGroup>-->
+                    <!--<RibbonGroup Header="Пресеты">...</RibbonGroup>-->
 
-                </RibbonTab>-->
-                <RibbonTab Header="Расширения" DataContext="{Binding ExtensionsControlVM}">
-                    <RibbonGroup Header="Текущее расширение">
-                        <ComboBox ItemsSource="{Binding Extensions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedExtension}" IsEditable="True" IsReadOnly="True" Width="200"></ComboBox>
+                </fluent:RibbonTabItem>
+
+                <fluent:RibbonTabItem Header="Данные">
+
+                    <fluent:RibbonGroupBox Header="Импорт">
+                        <fluent:Button Content="Импорт дерева из .phjson"
+                           Command="{Binding RepositoryExplorerVM.ImportFromPhjsonCommand}" />
+                    </fluent:RibbonGroupBox>
+
+                    <fluent:RibbonGroupBox Header="Экспорт">
+                        <fluent:Button Content="Экспорт дерева в .phjson"
+                           Command="{Binding RepositoryExplorerVM.ExportToPhjsonCommand}" />
+                    </fluent:RibbonGroupBox>
+
+                    <fluent:RibbonGroupBox Header="Конвертация">
+                        <fluent:Button Content="Конвертировать .xlsx в .phjson"
+                           Command="{Binding RepositoryExplorerVM.ConvertXlsxToPhjsonCommand}" />
+                    </fluent:RibbonGroupBox>
+
+                </fluent:RibbonTabItem>
+
+                <fluent:RibbonTabItem Header="Расширения"
+                          DataContext="{Binding ExtensionsControlVM}">
+
+                    <fluent:RibbonGroupBox Header="Текущее расширение">
+
+                        <ComboBox ItemsSource="{Binding Extensions}"
+                      DisplayMemberPath="Name"
+                      SelectedItem="{Binding SelectedExtension}"
+                      IsEditable="True"
+                      IsReadOnly="True"
+                      Width="200"/>
+
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Состояние: "></TextBlock>
-                            <TextBlock Text="{Binding SelectedExtension.State}"></TextBlock>
+                            <TextBlock Text="Состояние: "/>
+                            <TextBlock Text="{Binding SelectedExtension.State}"/>
                         </StackPanel>
+
                         <StackPanel Orientation="Horizontal">
-                            <RibbonButton Label="Запустить" Command="{Binding StartExtensionCommand}"></RibbonButton>
-                            <RibbonButton Label="Остановить" Command="{Binding StopExtensionCommand}"></RibbonButton>
+                            <fluent:Button Content="Запустить"
+                               Command="{Binding StartExtensionCommand}"/>
+                            <fluent:Button Content="Остановить"
+                               Command="{Binding StopExtensionCommand}"/>
                         </StackPanel>
-                        <RibbonButton Label="Выполнить" Command="{Binding ExecuteExtensionCommand}"></RibbonButton>
-                        <RibbonToggleButton Label="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}"></RibbonToggleButton>
-                    </RibbonGroup>
-                    <RibbonGroup Header="Виджеты расширений">
-                        <ContentControl Content="{Binding SelectedExtension.RibbonWidget}"></ContentControl>
-                    </RibbonGroup>
-                    <!--<RibbonGroup Header="Окна расширений">
 
-                    </RibbonGroup>-->
-                </RibbonTab>
-                <!--<RibbonTab Header="Администрирование">
+                        <fluent:Button Content="Выполнить"
+                           Command="{Binding ExecuteExtensionCommand}"/>
 
-                </RibbonTab>
-                <RibbonTab Header="Настройки">
-                    
-                </RibbonTab>
-                <RibbonTab Header="Справка">
-                    <RibbonGroup>
-                        <RibbonButton Label="О нас"></RibbonButton>
-                    </RibbonGroup>
+                        <fluent:ToggleButton Content="Окно"
+                                 Command="{Binding OpenMainWindowCommand}"
+                                 IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}"/>
+                    </fluent:RibbonGroupBox>
 
-                </RibbonTab>-->
-            </Ribbon>
-            <Grid DockPanel.Dock="Top">
+                    <fluent:RibbonGroupBox Header="Виджеты расширений">
+                        <ContentControl Content="{Binding SelectedExtension.RibbonWidget}"/>
+                    </fluent:RibbonGroupBox>
+
+                </fluent:RibbonTabItem>
+
+            </fluent:Ribbon>
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="4*"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -314,4 +288,4 @@
             </Grid>
         </DockPanel>
     </Grid>
-</Window>
+</fluent:RibbonWindow>

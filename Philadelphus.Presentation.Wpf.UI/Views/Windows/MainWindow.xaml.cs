@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using Fluent;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : RibbonWindow
     {
         public MainWindow()
         {
