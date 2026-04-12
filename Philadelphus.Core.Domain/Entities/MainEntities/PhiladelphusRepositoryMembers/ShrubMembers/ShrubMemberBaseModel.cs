@@ -229,10 +229,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                     return false;
 
                 _attributes.Add(attribute);
-                _version++;
+                IncrementVersionRecursive();
                 return true;
             }
          }
+
+        private void IncrementVersionRecursive()
+        {
+            _version++;
+            if (this is IParentModel p)
+            {
+                foreach (var c in p.Childs)
+                {
+                    if (c.Value is ShrubMemberBaseModel sm)
+                    {
+                        sm.IncrementVersionRecursive();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Удалить атрибут
