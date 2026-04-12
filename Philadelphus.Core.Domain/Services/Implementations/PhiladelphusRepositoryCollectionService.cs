@@ -117,7 +117,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     else
                         dbRepositories = infrastructure.SelectRepositories(uuids);
                     //var repositories = _mapper.Map<List<PhiladelphusRepositoryModel>>(dbRepositories);
-                    var repositories = _mapper.MapPhiladelphusRepositories(dbRepositories, dataStorages).ToList();
+                    var repositories = _mapper.MapPhiladelphusRepositories(dbRepositories, dataStorages, _notificationService).ToList();
                     if (repositories != null)
                     {
                         for (int i = 0; i < repositories.Count; i++)
@@ -158,7 +158,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий</returns>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true)
         {
-            var result = new PhiladelphusRepositoryModel(Guid.CreateVersion7(), dataStorage);
+            var result = new PhiladelphusRepositoryModel(Guid.CreateVersion7(), dataStorage, _notificationService);
 
             if (needAutoName)
             {

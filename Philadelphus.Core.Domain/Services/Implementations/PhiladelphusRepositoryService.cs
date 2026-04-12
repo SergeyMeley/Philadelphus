@@ -89,7 +89,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     var infrastructure = dataStorage.ShrubMembersInfrastructureRepository;
                     var treesUuids = repository.ContentShrub.ContentWorkingTreesUuids?.ToArray();
                     var dbTrees = infrastructure.SelectTrees(treesUuids);
-                    var trees = _mapper.MapWorkingTrees(dbTrees, repository.DataStorages, repository.ContentShrub);
+                    var trees = _mapper.MapWorkingTrees(dbTrees, repository.DataStorages, repository.ContentShrub, _notificationService);
 
                     foreach (var tree in trees?.Where(x => x.OwningRepository.Uuid == repository.Uuid))
                     {
@@ -155,7 +155,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Получение атрибутов всех элементов дерева из БД
             var dbAttributes = tree.OwnDataStorage.ShrubMembersInfrastructureRepository.SelectAttributes(new[] { tree.Uuid });
-            var allAttributes = _mapper.MapAttributes(dbAttributes, owners, allShrubNodes, allShrubLeaves, tree);
+            var allAttributes = _mapper.MapAttributes(dbAttributes, owners, allShrubNodes, allShrubLeaves, tree, _notificationService);
 
             // Распределение атрибутов по владельцам
             foreach (var item in owners)
@@ -175,7 +175,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 var infrastructure = tree.DataStorage.ShrubMembersInfrastructureRepository;
 
                 var dbRoot = infrastructure.SelectRoots(new Guid[] { tree.Uuid }).First();
-                var root = _mapper.MapTreeRoot(dbRoot, tree);
+                var root = _mapper.MapTreeRoot(dbRoot, tree, _notificationService);
 
                 if (root != null)
                 {
@@ -184,15 +184,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                     // Получение из БД всех элементов дерева
                     var dbNodes = infrastructure.SelectNodes(new[] { tree.Uuid });
-                    var nodes = _mapper.MapTreeNodes(dbNodes, new[] { tree.ContentRoot }, tree.ContentRoot.OwningWorkingTree);
+                    var nodes = _mapper.MapTreeNodes(dbNodes, new[] { tree.ContentRoot }, tree.ContentRoot.OwningWorkingTree, _notificationService);
                     var allNodes = new List<TreeNodeModel>();
                     while (nodes.Count() > 0)
                     {
                         allNodes.AddRange(nodes);
-                        nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree);;
+                        nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree, _notificationService);
                     }
                     var dbLeaves = infrastructure.SelectLeaves(new[] { tree.Uuid });
-                    var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree);
+                    var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree, _notificationService);
 
                     // Регистрация имен
                     tree.UnavailableNames.Add(root.Name);
@@ -729,7 +729,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         criticalLevel: NotificationCriticalLevelModel.Info);
                 }
 
-                var result = new WorkingTreeModel(Guid.CreateVersion7(), dataStorage, owner.ContentShrub);
+                var result = new WorkingTreeModel(Guid.CreateVersion7(), dataStorage, owner.ContentShrub, _notificationService);
 
                 if (needAutoName)
                 {
@@ -778,7 +778,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         criticalLevel: NotificationCriticalLevelModel.Info);
                 }
 
-                var result = new TreeRootModel(Guid.CreateVersion7(), owner);
+                var result = new TreeRootModel(Guid.CreateVersion7(), owner, _notificationService);
 
                 if (needAutoName)
                 {
@@ -821,7 +821,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         criticalLevel: NotificationCriticalLevelModel.Info);
                 }
 
-                var result = new TreeNodeModel(Guid.CreateVersion7(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree);
+                var result = new TreeNodeModel(Guid.CreateVersion7(), parent, (parent as IWorkingTreeMemberModel)?.OwningWorkingTree, _notificationService);
 
                 if (needAutoName)
                 {
@@ -872,11 +872,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 TreeLeaveModel result = null;
                 if (parent is SystemBaseTreeNodeModel sbn)
                 {
-                    result = new SystemBaseTreeLeaveModel(Guid.CreateVersion7(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType);
+                    result = new SystemBaseTreeLeaveModel(Guid.CreateVersion7(), sbn, sbn.OwningWorkingTree, sbn.SystemBaseType, _notificationService);
                 }
                 else
                 {
-                    result = new TreeLeaveModel(Guid.CreateVersion7(), parent, parent.OwningWorkingTree);
+                    result = new TreeLeaveModel(Guid.CreateVersion7(), parent, parent.OwningWorkingTree, _notificationService);
                 }
 
                 if (needAutoName)
@@ -934,7 +934,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 if (owner is WorkingTreeMemberBaseModel wtm)
                 {
-                    var result = new ElementAttributeModel(uuid, owner, uuid, owner, wtm.OwningWorkingTree)
+                    var result = new ElementAttributeModel(uuid, owner, uuid, owner, wtm.OwningWorkingTree, _notificationService)
                     {
                         Visibility = VisibilityScope.Public,
                         Override = OverrideType.Virtual,
@@ -1085,7 +1085,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
                 .SelectTrees(new Guid[] { WorkingTreeModel.SystemBaseUuid });
-            existTree = _mapper.MapWorkingTrees(dbExistTrees, shrub.OwningRepository.DataStorages, shrub).SingleOrDefault();
+            existTree = _mapper.MapWorkingTrees(dbExistTrees, shrub.OwningRepository.DataStorages, shrub, _notificationService).SingleOrDefault();
 
             if (existTree != null)
             {
@@ -1099,33 +1099,35 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             var tree = new WorkingTreeModel(
                 uuid: WorkingTreeModel.SystemBaseUuid,
                 dataStorage: shrub.DataStorage,
-                owner: shrub)
+                owner: shrub,
+                notificationService: _notificationService)
             { 
                 Name = "Системное рабочее дерево" 
             };
 
             var root = new TreeRootModel(
                 uuid: TreeRootModel.SystemBaseUuid,
-                owner: tree)
+                owner: tree,
+                notificationService: _notificationService)
             {
                 Name = "Базовые типы данных"
             };
 
             tree.ContentRoot = root;
 
-            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT);
+            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT, _notificationService);
             root.ChildNodes.Add(obj);
 
-            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING);
+            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING, _notificationService);
             obj.ChildNodes.Add(str);
 
-            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC);
+            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC, _notificationService);
             obj.ChildNodes.Add(num);
 
-            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER);
+            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER, _notificationService);
             num.ChildNodes.Add(integer);
 
-            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT);
+            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT, _notificationService);
             num.ChildNodes.Add(flt);
 
             shrub.ContentWorkingTrees.Add(tree);

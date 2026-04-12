@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
 using System;
@@ -40,11 +41,13 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 {
                     var storage = (ctx.Items["DataStorages"] as IEnumerable<IDataStorageModel>).Single(x => x.Uuid == src.OwnDataStorageUuid);
                     var owner = ctx.Items["Owner"] as ShrubModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
 
                     return new WorkingTreeModel(
                         src.Uuid,
                         storage,
-                        owner);
+                        owner,
+                        notificationService);
                 })
 
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))

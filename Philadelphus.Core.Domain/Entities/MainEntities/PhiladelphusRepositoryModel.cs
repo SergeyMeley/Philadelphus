@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.ObjectModel;
@@ -189,15 +190,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="dbEntity">Сущность БД</param>
         internal PhiladelphusRepositoryModel(
             Guid uuid, 
-            IDataStorageModel dataStorage)
-            : base(uuid)
+            IDataStorageModel dataStorage,
+            INotificationService notificationService)
+            : base(uuid, notificationService)
         {
             if (dataStorage == null)
                 throw new ArgumentNullException(nameof(dataStorage));
 
             OwnDataStorage = dataStorage;
 
-            ContentShrub = new ShrubModel(uuid, this);
+            ContentShrub = new ShrubModel(uuid, this, notificationService);
 
         }
 

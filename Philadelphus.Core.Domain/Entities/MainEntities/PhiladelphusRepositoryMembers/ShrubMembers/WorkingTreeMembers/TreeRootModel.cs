@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
 
@@ -100,8 +101,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         internal TreeRootModel(
             Guid uuid,
-            WorkingTreeModel owner)
-            : base(uuid, owner)
+            WorkingTreeModel owner,
+            INotificationService notificationService)
+            : base(uuid, owner, notificationService)
         {
             owner.ContentRoot = this;
 

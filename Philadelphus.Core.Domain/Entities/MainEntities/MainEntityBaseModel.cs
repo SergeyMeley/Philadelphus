@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Text;
 using System.Xml.Linq;
@@ -15,6 +16,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
     public abstract class MainEntityBaseModel : IMainEntityWritableModel
     {
         #region [ Fields ]
+
+        protected readonly INotificationService _notificationService;
 
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
@@ -131,8 +134,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="dbEntity">Сущность БД</param>
         internal MainEntityBaseModel(
-            Guid uuid)
+            Guid uuid,
+            INotificationService notificationService)
         {
+            _notificationService = notificationService;
+
             if (uuid == Guid.Empty)
                 throw new ArgumentNullException(nameof(uuid));
 

@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using System.Collections.ObjectModel;
@@ -288,8 +289,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             IAttributeOwnerModel localOwner, 
             Guid declaringUuid,
             IAttributeOwnerModel declaringOwner,
-            WorkingTreeModel owningWorkingTree) 
-            : base(localUuid, localOwner)
+            WorkingTreeModel owningWorkingTree,
+            INotificationService notificationService) 
+            : base(localUuid, localOwner, notificationService)
         {
             ArgumentNullException.ThrowIfNull(localOwner, nameof(localOwner));
             ArgumentNullException.ThrowIfNull(declaringOwner, nameof(declaringOwner));
@@ -373,7 +375,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 localOwner: newOwner,
                 declaringUuid: this.DeclaringUuid,
                 declaringOwner: this._declaringAttributeOwner,
-                owningWorkingTree: this.OwningWorkingTree)
+                owningWorkingTree: this.OwningWorkingTree,
+                notificationService: _notificationService)
             {
                 Name = this.Name,
                 Description = this.Description,
