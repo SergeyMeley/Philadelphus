@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -53,9 +54,10 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                 .ConstructUsing((src, ctx) =>
                 {
-                var parent = (ctx.Items["Parents"] as IEnumerable<IParentModel>).Single(x => x.Uuid == (src.ParentTreeNodeUuid ?? src.ParentTreeRootUuid));
-                var owner = ctx.Items["Owner"] as WorkingTreeModel;
-                var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var parent = (ctx.Items["Parents"] as IEnumerable<IParentModel>).Single(x => x.Uuid == (src.ParentTreeNodeUuid ?? src.ParentTreeRootUuid));
+                    var owner = ctx.Items["Owner"] as WorkingTreeModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<TreeNodeModel>)] as IPropertiesPolicy<TreeNodeModel>;
 
                     if (src.SystemBaseTypeId == 0)
                     {
@@ -63,7 +65,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             src.Uuid,
                             parent,
                             owner,
-                            notificationService);
+                            notificationService,
+                            propertiesPolicy);
                     }
                     else
                     {
@@ -71,7 +74,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             src.Uuid,
                             parent,
                             owner,
-                            notificationService);
+                            notificationService,
+                            propertiesPolicy);
                     }
                 })
 

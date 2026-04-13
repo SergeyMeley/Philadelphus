@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
@@ -134,8 +135,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal ShrubModel(
             Guid uuid,
             PhiladelphusRepositoryModel owner,
-            INotificationService notificationService)
-            : base(uuid, owner, notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<ShrubModel> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));

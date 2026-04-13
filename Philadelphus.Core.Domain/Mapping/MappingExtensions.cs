@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
@@ -92,7 +93,8 @@ namespace Philadelphus.Core.Domain.Mapping
             this IMapper mapper,
             IEnumerable<PhiladelphusRepository> philadelphusRepositories,
             IEnumerable<IDataStorageModel> dataStorages,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<PhiladelphusRepositoryModel> propertiesPolicy)
         {
             foreach (var philadelphusRepository in philadelphusRepositories)
             {
@@ -102,6 +104,7 @@ namespace Philadelphus.Core.Domain.Mapping
                     {
                         opt.Items.Add("DataStorages", dataStorages);
                         opt.Items.Add(nameof(INotificationService), notificationService);
+                        opt.Items.Add(nameof(IPropertiesPolicy<PhiladelphusRepositoryModel>), propertiesPolicy);
                     });
             }
         }
@@ -119,7 +122,8 @@ namespace Philadelphus.Core.Domain.Mapping
             IEnumerable<WorkingTree> workingTrees,
             IEnumerable<IDataStorageModel> dataStorages,
             ShrubModel owner,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<WorkingTreeModel> propertiesPolicy)
         {
             return mapper.Map<List<WorkingTreeModel>>(
                 workingTrees,
@@ -128,6 +132,7 @@ namespace Philadelphus.Core.Domain.Mapping
                     opt.Items.Add("DataStorages", dataStorages);
                     opt.Items.Add("Owner", owner);
                     opt.Items.Add(nameof(INotificationService), notificationService);
+                    opt.Items.Add(nameof(IPropertiesPolicy<WorkingTreeModel>), propertiesPolicy);
                 });
         }
 
@@ -142,7 +147,8 @@ namespace Philadelphus.Core.Domain.Mapping
             this IMapper mapper,
             TreeRoot treeRoot,
             WorkingTreeModel owner,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeRootModel> propertiesPolicy)
         {
             return mapper.Map<TreeRootModel>(
                 treeRoot,
@@ -150,6 +156,7 @@ namespace Philadelphus.Core.Domain.Mapping
                 {
                     opt.Items.Add("Owner", owner);
                     opt.Items.Add(nameof(INotificationService), notificationService);
+                    opt.Items.Add(nameof(IPropertiesPolicy<TreeRootModel>), propertiesPolicy);
                 });
         }
 
@@ -166,7 +173,8 @@ namespace Philadelphus.Core.Domain.Mapping
             IEnumerable<TreeNode> treeNodes,
             IEnumerable<IParentModel> parents,
             WorkingTreeModel owner,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeNodeModel> propertiesPolicy)
         {
             var correctNodes = treeNodes.Where(x => parents.Any(o => o.Uuid == (x.ParentTreeNodeUuid ?? x.ParentTreeRootUuid)));
 
@@ -177,6 +185,7 @@ namespace Philadelphus.Core.Domain.Mapping
                     opt.Items.Add("Parents", parents);
                     opt.Items.Add("Owner", owner);
                     opt.Items.Add(nameof(INotificationService), notificationService);
+                    opt.Items.Add(nameof(IPropertiesPolicy<TreeNodeModel>), propertiesPolicy);
                 });
         }
 
@@ -193,7 +202,8 @@ namespace Philadelphus.Core.Domain.Mapping
             IEnumerable<TreeLeave> treeLeaves,
             IEnumerable<TreeNodeModel> parents,
             WorkingTreeModel owner,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy)
         {
             var correctLeaves = treeLeaves.Where(x => parents.Any(o => o.Uuid == x.ParentTreeNodeUuid));
 
@@ -204,6 +214,7 @@ namespace Philadelphus.Core.Domain.Mapping
                     opt.Items.Add("Parents", parents);
                     opt.Items.Add("Owner", owner);
                     opt.Items.Add(nameof(INotificationService), notificationService);
+                    opt.Items.Add(nameof(IPropertiesPolicy<TreeLeaveModel>), propertiesPolicy);
                 });
         }
 
@@ -224,7 +235,8 @@ namespace Philadelphus.Core.Domain.Mapping
             IEnumerable<TreeNodeModel> valueTypes,
             IEnumerable<TreeLeaveModel> values,
             WorkingTreeModel owningWorkingTree,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<ElementAttributeModel> propertiesPolicy)
         {
             var correctAttributes = attributes.Where(x => owners.Any(o => o.Uuid == x.OwnerUuid));
 
@@ -237,6 +249,7 @@ namespace Philadelphus.Core.Domain.Mapping
                     opt.Items.Add("Values", values);
                     opt.Items.Add("OwningWorkingTree", owningWorkingTree);
                     opt.Items.Add(nameof(INotificationService), notificationService);
+                    opt.Items.Add(nameof(IPropertiesPolicy<ElementAttributeModel>), propertiesPolicy);
                 });
         }
     }

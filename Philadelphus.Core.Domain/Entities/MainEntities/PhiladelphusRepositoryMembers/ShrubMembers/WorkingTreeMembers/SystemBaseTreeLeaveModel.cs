@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
@@ -27,8 +28,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             SystemBaseTreeNodeModel parent, 
             WorkingTreeModel owner,
             SystemBaseType type,
-            INotificationService notificationService) 
-            : base(uuid, parent, owner, notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy) 
+            : base(uuid, parent, owner, notificationService, propertiesPolicy)
         {
             SystemBaseType = type;
         }

@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
@@ -95,8 +96,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal PhiladelphusRepositoryMemberBaseModel(
             Guid uuid,
             IOwnerModel owner,
-            INotificationService notificationService)
-            : base(uuid, notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<T> propertiesPolicy)
+            : base(uuid, notificationService, propertiesPolicy)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));

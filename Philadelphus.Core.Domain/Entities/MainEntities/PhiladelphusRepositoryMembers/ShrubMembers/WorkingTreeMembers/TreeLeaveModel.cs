@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
@@ -80,8 +81,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             Guid uuid,
             TreeNodeModel parent,
             WorkingTreeModel owner,
-            INotificationService notificationService)
-            : base(uuid, owner, notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));

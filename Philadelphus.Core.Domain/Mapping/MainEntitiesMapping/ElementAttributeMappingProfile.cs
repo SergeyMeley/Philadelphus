@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
@@ -89,7 +90,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         src.DeclaringUuid,
                         declaringOwner,
                         owningTree,
-                        notificationService);
+                        notificationService,
+                        AttributePolicyBuilder.CreateDefault());
 
                     return result;
                 })

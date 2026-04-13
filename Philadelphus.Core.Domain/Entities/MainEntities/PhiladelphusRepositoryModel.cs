@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
@@ -191,15 +192,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         internal PhiladelphusRepositoryModel(
             Guid uuid, 
             IDataStorageModel dataStorage,
-            INotificationService notificationService)
-            : base(uuid, notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<PhiladelphusRepositoryModel> propertiesPolicy,
+            IPropertiesPolicy<ShrubModel> shrubPropertiesPolicy)
+            : base(uuid, notificationService, propertiesPolicy)
         {
             if (dataStorage == null)
                 throw new ArgumentNullException(nameof(dataStorage));
 
             OwnDataStorage = dataStorage;
 
-            ContentShrub = new ShrubModel(uuid, this, notificationService);
+            ContentShrub = new ShrubModel(uuid, this, notificationService, shrubPropertiesPolicy);
 
         }
 

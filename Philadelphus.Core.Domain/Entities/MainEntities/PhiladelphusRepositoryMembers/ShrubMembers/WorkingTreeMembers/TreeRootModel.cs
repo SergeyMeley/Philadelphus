@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
@@ -102,8 +103,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal TreeRootModel(
             Guid uuid,
             WorkingTreeModel owner,
-            INotificationService notificationService)
-            : base(uuid, owner, notificationService)
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeRootModel> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             owner.ContentRoot = this;
 
