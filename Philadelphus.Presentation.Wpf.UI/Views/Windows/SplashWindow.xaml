@@ -12,7 +12,8 @@
     <Border x:Name="MainBorder" Background="#E0F7FA" CornerRadius="20" 
             Width="380" Height="280" Margin="10"
             BorderBrush="#00BCD4" BorderThickness="2"
-            Opacity="0">
+            Opacity="0"
+            RenderTransformOrigin="0.5,0.5">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -32,36 +33,41 @@
 
             <!-- Спиннер (три элемента) -->
             <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20">
-                <Ellipse x:Name="SpinnerOuter" Width="80" Height="80" 
-                         Fill="#26C6DA" Opacity="0.6">
-                    <Ellipse.RenderTransform>
-                        <RotateTransform x:Name="RotateOuter" CenterX="40" CenterY="40"/>
-                    </Ellipse.RenderTransform>
-                    <Ellipse.Effect>
-                        <DropShadowEffect Color="#00ACC1" ShadowDepth="0" BlurRadius="15" Opacity="0.7"/>
-                    </Ellipse.Effect>
-                </Ellipse>
+                <Grid Width="80" Height="80">
+                    <Ellipse x:Name="SpinnerOuter" Width="80" Height="80" 
+                             Fill="#26C6DA" Opacity="0.6">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform x:Name="RotateOuter" CenterX="40" CenterY="40"/>
+                        </Ellipse.RenderTransform>
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#00ACC1" ShadowDepth="0" BlurRadius="15" Opacity="0.7"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
 
-                <Ellipse x:Name="SpinnerInner" Width="60" Height="60" 
-                         Fill="#E0F7FA" Margin="10">
-                    <Ellipse.RenderTransform>
-                        <RotateTransform x:Name="RotateInner" CenterX="30" CenterY="30"/>
-                    </Ellipse.RenderTransform>
-                </Ellipse>
+                    <Ellipse x:Name="SpinnerInner" Width="60" Height="60" 
+                             Fill="#E0F7FA" Margin="10">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform x:Name="RotateInner" CenterX="30" CenterY="30"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
 
-                <Ellipse x:Name="SpinnerDot" Width="16" Height="16" 
-                         Fill="#00695C" HorizontalAlignment="Center" 
-                         VerticalAlignment="Top" Margin="0,0,0,0">
-                    <Ellipse.RenderTransform>
-                        <RotateTransform x:Name="RotateDot" CenterX="40" CenterY="40"/>
-                    </Ellipse.RenderTransform>
-                </Ellipse>
+                    <Grid Width="80" Height="80" IsHitTestVisible="False">
+                        <Grid.RenderTransform>
+                            <RotateTransform x:Name="RotateDot" CenterX="40" CenterY="40"/>
+                        </Grid.RenderTransform>
+
+                        <Ellipse x:Name="SpinnerDot" Width="16" Height="16" 
+                                 Fill="#00695C"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Top"/>
+                    </Grid>
+                </Grid>
             </Grid>
 
             <!-- Текст прогресса -->
-            <TextBlock x:Name="LoadingText" Grid.Row="2" Text="Загрузка" 
+            <TextBlock x:Name="LoadingText" Grid.Row="3" Text="Загрузка" 
                        FontSize="20" HorizontalAlignment="Center" 
-                       VerticalAlignment="Bottom" Margin="0,0,0,20" 
+                       VerticalAlignment="Top" Margin="0,0,0,0" 
                        Foreground="#00695C"/>
         </Grid>
     </Border>
