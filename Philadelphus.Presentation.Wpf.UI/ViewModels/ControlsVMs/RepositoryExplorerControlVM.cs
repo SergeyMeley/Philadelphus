@@ -388,6 +388,34 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public RelayCommand ImportTreeFromXlsxCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
+                    window.InitializeForImport(
+                        PhiladelphusRepositoryVM.Model.ContentShrub,
+                        PhiladelphusRepositoryVM.Model,
+                        _service,
+                        () =>
+                        {
+                            var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.LastOrDefault()?.ContentRoot;
+                            if (root != null)
+                            {
+                                var rootVm = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
+                                PhiladelphusRepositoryVM.Childs.Add(rootVm);
+                                OnPropertyChanged(nameof(PhiladelphusRepositoryVM));
+                                OnPropertyChanged(nameof(PhiladelphusRepositoryVM.Childs));
+                                OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
+                            }
+                        });
+                    window.ShowDialog();
+                });
+            }
+        }
+
         public RelayCommand ConvertXlsxToPhjsonCommand
         {
             get
@@ -395,6 +423,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
+                    window.InitializeForConvert(PhiladelphusRepositoryVM.Model.ContentShrub);
                     window.ShowDialog();
                 });
             }

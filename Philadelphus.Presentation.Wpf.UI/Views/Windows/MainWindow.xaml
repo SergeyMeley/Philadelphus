@@ -158,6 +158,7 @@
                 <RibbonTab Header="Данные">
                     <RibbonGroup Header="Импорт">
                         <RibbonButton Label="Импорт дерева из .phjson" Command="{Binding RepositoryExplorerVM.ImportFromPhjsonCommand}" />
+                        <RibbonButton Label="Импорт дерева из .xlsx" Command="{Binding RepositoryExplorerVM.ImportTreeFromXlsxCommand}" />
                     </RibbonGroup>
                     <RibbonGroup Header="Экспорт">
                         <RibbonButton Label="Экспорт дерева в .phjson" Command="{Binding RepositoryExplorerVM.ExportToPhjsonCommand}" />

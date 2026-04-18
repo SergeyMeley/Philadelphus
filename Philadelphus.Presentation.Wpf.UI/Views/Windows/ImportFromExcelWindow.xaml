@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Выбор файла -->
@@ -49,8 +50,14 @@
             </StackPanel>
         </GroupBox>
 
-        <!-- Кнопка конвертации -->
-        <Button Grid.Row="3" Content="Конвертировать в PHJSON" Click="BtnConvert_Click" 
+        <ProgressBar x:Name="ProgressOperation"
+                     Grid.Row="3"
+                     Height="10"
+                     Margin="0,20,0,0"
+                     IsIndeterminate="True"
+                     Visibility="Collapsed"/>
+
+        <Button x:Name="BtnMainAction" Grid.Row="4" Content="Конвертировать в PHJSON" Click="BtnConvert_Click" 
                 Height="40" FontSize="14" Background="#007ACC" Foreground="White" Margin="0,20,0,0"/>
     </Grid>
 </Window>

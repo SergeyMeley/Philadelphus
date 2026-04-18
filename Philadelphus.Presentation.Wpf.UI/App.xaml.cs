@@ -226,6 +226,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<AttributeValuesCollectionWindow>();
                     services.AddSingleton<SplashWindow>();
                     services.AddTransient<ImportFromExcelWindow>();
+                    services.AddTransient<ImportProgressWindow>();
 
                     // Регистрация фабрик
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();

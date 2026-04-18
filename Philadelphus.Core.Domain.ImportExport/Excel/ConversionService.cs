@@ -1,6 +1,8 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +23,14 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         {
             // В реальном приложении здесь будет вызов API или БД
             return new List<string> { "Склад", "Сотрудники", "Клиенты", "Архив" };
+        }
+
+        public List<TreeRootModel> GetExistingRootsFromStorage(ShrubModel shrub)
+        {
+            return shrub.ContentWorkingTrees
+                .Select(x => x.ContentRoot)
+                .Where(x => x != null && x.IsSystemBase == false)
+                .ToList();
         }
 
         public string ProcessFile(string filePath, bool createNewRoot, string rootNameInput)
@@ -137,15 +147,25 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         private string DetermineDataType(IXLWorksheet sheet, int colNumber)
         {
-            // Простая эвристика: смотрим на тип первой заполненной ячейки в колонке (после заголовка)
-            var firstDataCell = sheet.Column(colNumber).FirstCellUsed();
-            if (firstDataCell == null) return "Строка";
+            // Смотрим первую непустую ячейку данных под заголовком, а не сам заголовок.
+            var firstDataCell = sheet
+                .Column(colNumber)
+                .CellsUsed()
+                .FirstOrDefault(cell => cell.Address.RowNumber > 1 && !cell.IsEmpty());
 
-            if (firstDataCell.DataType == XLDataType.Number) return "Число";
-            if (firstDataCell.DataType == XLDataType.DateTime) return "Дата";
-            if (firstDataCell.DataType == XLDataType.Boolean) return "Булево";
+            if (firstDataCell == null)
+                return "Текст";
 
-            return "Строка";
+            if (firstDataCell.DataType == XLDataType.Number)
+                return "Число";
+
+            if (firstDataCell.DataType == XLDataType.DateTime)
+                return "Текст";
+
+            if (firstDataCell.DataType == XLDataType.Boolean)
+                return "Текст";
+
+            return "Текст";
         }
     }
 }
