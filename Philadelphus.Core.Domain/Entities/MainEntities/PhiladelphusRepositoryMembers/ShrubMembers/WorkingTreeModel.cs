@@ -30,7 +30,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Системное рабочее дерево
         /// </summary>
-        public bool IsSystemBase { get; } = false;
+        public bool IsSystemBase { get => Uuid == SystemBaseUuid; }
 
         /// <summary>
         /// Уникальный идентификатор системного рабочего дерева
@@ -151,11 +151,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             Name = NamingHelper.GetNewName(UnavailableNames, _defaultFixedPartOfName);
             UnavailableNames.Add(Name);
-
-            if (uuid == SystemBaseUuid)
-            {
-                IsSystemBase = true;
-            }
         }
 
         #endregion

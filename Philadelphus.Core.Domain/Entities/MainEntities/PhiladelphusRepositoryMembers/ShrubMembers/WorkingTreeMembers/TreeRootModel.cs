@@ -32,7 +32,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Системный корень
         /// </summary>
-        public bool IsSystemBase { get; } = false;
+        public bool IsSystemBase { get => Uuid == SystemBaseUuid; }
 
         /// <summary>
         /// Уникальный идентификатор системного корня
@@ -106,11 +106,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             owner.ContentRoot = this;
 
             ChildNodes = new List<TreeNodeModel>();
-
-            if (uuid == SystemBaseUuid)
-            {
-                IsSystemBase = true;
-            }
         }
 
         #endregion
