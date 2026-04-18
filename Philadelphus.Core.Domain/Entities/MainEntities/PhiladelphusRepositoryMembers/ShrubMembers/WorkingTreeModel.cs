@@ -149,7 +149,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             _ownDataStorage = dataStorage;
 
-            Name = NamingHelper.GetNewName(UnavailableNames, _defaultFixedPartOfName);
+            Name = NamingHelper.GetNewName(_defaultFixedPartOfName);
             UnavailableNames.Add(Name);
         }
 

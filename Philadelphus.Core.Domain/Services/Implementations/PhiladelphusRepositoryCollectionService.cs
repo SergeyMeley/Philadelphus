@@ -156,9 +156,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="dataStorage">Хранилище данных</param>
         /// <returns>Репозиторий</returns>
-        public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage)
+        public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true)
         {
             var result = new PhiladelphusRepositoryModel(Guid.CreateVersion7(), dataStorage);
+
+            if (needAutoName)
+            {
+                result.AssignAutoName();
+            }
+
             result.ContentShrub.ContentWorkingTreesUuids.Add(WorkingTreeModel.SystemBaseUuid);
             return result;
         }

@@ -56,6 +56,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public List<WorkingTreeModel> ContentWorkingTrees { get; }
 
         /// <summary>
+        /// Системное рабочее дерево
+        /// </summary>
+        public WorkingTreeModel SystemBaseWorkingTree { get => ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid); }
+
+        /// <summary>
         /// Содержимое
         /// </summary>
         public ReadOnlyDictionary<Guid, IContentModel> Content 

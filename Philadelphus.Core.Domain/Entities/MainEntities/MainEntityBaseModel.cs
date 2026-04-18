@@ -137,7 +137,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 throw new ArgumentNullException(nameof(uuid));
 
             Uuid = uuid;
-            Name = NamingHelper.GetNewName(new List<string>(), _defaultFixedPartOfName);
         }
 
         #endregion
@@ -173,6 +172,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Присвоить автоматически сгенерированное наименование
+        /// </summary>
+        /// <returns></returns>
+        public string AssignAutoName()
+        {
+            Name = NamingHelper.GetNewName(fixedPartOfName: _defaultFixedPartOfName);
+            return Name;
         }
 
         #endregion
