@@ -6,48 +6,75 @@
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="White">
+    <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto" MinWidth="400" MaxWidth="700"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <GroupBox Grid.Row="0" Grid.Column="0" Header="Настройки отчета" Margin="1">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
                         <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Grid.Column="0" Header="Выбор отчета" Margin="1">
                         <Grid Grid.Row="0" Grid.Column="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="20"></RowDefinition>
-                                <RowDefinition Height="20"></RowDefinition>
-                                <RowDefinition Height="20"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Группа отчетов" Margin="1"></TextBlock>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Хранилище" Margin="1"></TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Отчет" Margin="1"></TextBlock>
-                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="1"></ComboBox>
-                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="1"></ComboBox>
+                            <ComboBox Grid.Row="0" 
+                                      Grid.Column="1" 
+                                      ItemsSource="{Binding DisplayedDataStoragesVMs}" 
+                                      DisplayMemberPath="Name" 
+                                      SelectedItem="{Binding SelectedDataStorageVM}" 
+                                      Margin="1"></ComboBox>
+                            <ComboBox Grid.Row="1" 
+                                      Grid.Column="1" 
+                                      ItemsSource="{Binding ReportInfos}" 
+                                      DisplayMemberPath="Name" 
+                                      SelectedItem="{Binding SelectedReportInfo}" 
+                                      Margin="1"></ComboBox>
+                            <CheckBox Grid.Row="2" Grid.ColumnSpan="100" IsChecked="{Binding PreliminaryRefresh}" Content="Актуальные данные (?)" ToolTip="Принудительно обновить данные из базы данных перед формированием отчета (может занять длительное время)"></CheckBox>
                         </Grid>
                     </GroupBox>
-                    <GridSplitter Grid.Row="1" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
-                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Шаблон" Margin="1">
+                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Параметры" Margin="1">
+                        <DataGrid AutoGenerateColumns="False" 
+                                  ItemsSource="{Binding SelectedReportInfo.Parameters}"
+                                  ColumnWidth="*"
+                                  CanUserAddRows="False"
+                                  VerticalScrollBarVisibility="Auto" 
+                                  HorizontalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" MinWidth="100" IsReadOnly="True" Width="auto"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Описание" Binding="{Binding Description}" MinWidth="100" IsReadOnly="True" Width="auto"></DataGridTextColumn>
+                                <DataGridCheckBoxColumn Header="Обязательный" Binding="{Binding IsRequired}" MinWidth="90" IsReadOnly="True" Width="auto"></DataGridCheckBoxColumn>
+                                <DataGridTextColumn Header="Значение" Binding="{Binding Value}" MinWidth="100" Width="*"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <!--<GroupBox Grid.Row="2" Grid.Column="0" Header="Шаблон" Margin="1">
                         <StackPanel>
                             <Grid Grid.Row="0" Grid.Column="0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="auto"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Шаблон" Margin="1"></TextBlock>
@@ -56,9 +83,7 @@
                             <Button Content="Сохранить шаблон" Margin="1"></Button>
                             <Button Content="Сохранить новый" Margin="1"></Button>
                         </StackPanel>
-
                     </GroupBox>
-                    <GridSplitter Grid.Row="3" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                     <GroupBox Grid.Row="4" Grid.Column="0" Header="Набор полей" Margin="1">
                         <StackPanel>
                             <DataGrid Margin="1">
@@ -79,7 +104,6 @@
                             <Button Content="Сбросить" Margin="1"></Button>
                         </StackPanel>
                     </GroupBox>
-                    <GridSplitter Grid.Row="5" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
                     <GroupBox Grid.Row="6" Grid.Column="0" Header="Фильтрация результатов" Margin="1">
                         <StackPanel>
                             <DataGrid Margin="1">
@@ -99,19 +123,21 @@
                             </Grid>
                             <Button Content="Сбросить" Margin="1"></Button>
                         </StackPanel>
-                    </GroupBox>
-                    <GridSplitter Grid.Row="7" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+                    </GroupBox>-->
                     <GroupBox Grid.Row="8" Grid.Column="0" Header="Результат" Margin="1">
                         <StackPanel Grid.Row="6" Grid.Column="0">
-                            <Button Content="Сформировать отчет" Margin="1"></Button>
-                            <Button Content="Экспорт отчета" Margin="1"></Button>
+                            <Button Content="Отобразить отчет" Command="{Binding ExecuteReportCommand}" Margin="1"></Button>
+                            <Button Content="Экспорт отчета .xlsx" Command="{Binding ExportToExcelCommand}" Margin="1"></Button>
                         </StackPanel>
                     </GroupBox>
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Row="0" Grid.Column="1" Header="Отчет" Margin="1">
-                <DataGrid AutoGenerateColumns="True">
-
+            <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
+            <GroupBox Grid.Row="0" Grid.Column="2" Header="Отчет" Margin="1">
+                <DataGrid AutoGenerateColumns="True"
+                          ItemsSource="{Binding ReportResult}" 
+                          CanUserAddRows="False"
+                          IsReadOnly="True">
                 </DataGrid>
             </GroupBox>
         </Grid>

@@ -33,6 +33,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
                             return new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString);
                         case InfrastructureEntityGroups.ShrubMembers:
                             return new PostgreEfShrubMembersInfrastructureRepository(_logger, connectionString);
+                        case InfrastructureEntityGroups.Reports:
+                            return new PostgreEfReportsInfrastructureRepository(_logger, connectionString);
                         default:
                             break;
                     }
@@ -44,6 +46,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
                             return new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString);
                         case InfrastructureEntityGroups.ShrubMembers:
                             return new SqliteEfShrubMembersInfrastructureRepository(_logger, connectionString);
+                        case InfrastructureEntityGroups.Reports:
+                            throw new NotImplementedException();
                         default:
                             break;
                     }

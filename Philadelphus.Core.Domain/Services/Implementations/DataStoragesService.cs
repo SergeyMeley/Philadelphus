@@ -93,6 +93,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                             infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories));
                         if (entity.HasShrubMembersInfrastructureRepository)
                             infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
+                        if (entity.HasReportsInfrastructureRepository)
+                            infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.Reports));
                     }
 
                     var model = _mapper.MapDataStorage(entity, infrastructureRepositories, _logger);

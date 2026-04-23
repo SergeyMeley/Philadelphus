@@ -38,6 +38,10 @@ namespace Philadelphus.Tests.Domain.Fakes
 
         public bool HasShrubMembersInfrastructureRepository => throw new NotImplementedException();
 
+        public IReportsInfrastructureRepository ReportsInfrastructureRepository => throw new NotImplementedException();
+
+        public bool HasReportsInfrastructureRepository => throw new NotImplementedException();
+
         public bool CheckAvailable()
         {
             throw new NotImplementedException();
