@@ -114,8 +114,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             _reportService = reportService;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
-
-            _reportService = reportService;
         }
 
         public RelayCommand ExecuteReportCommand

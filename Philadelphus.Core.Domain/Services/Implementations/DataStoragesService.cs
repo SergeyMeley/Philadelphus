@@ -133,7 +133,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     infrastructureType: InfrastructureTypes.SQLiteEf,
                     isDisabled: false)
             .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}"))
-            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}"));
+            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}"))
+            .SetRepository(new SqliteEfReportsInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-reports-data-storage.db")}"));
 
             var mainDataStorageModel = dataStorageBuilder.Build();
 
@@ -165,7 +166,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     infrastructureType: connectionString.InfrastructureType,
                     isDisabled: false)
                 .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories))
-                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
+                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.ShrubMembers))
+                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.Reports));
 
             var dataStorageModel = dataStorageBuilder.Build();
 

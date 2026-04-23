@@ -47,7 +47,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
                         case InfrastructureEntityGroups.ShrubMembers:
                             return new SqliteEfShrubMembersInfrastructureRepository(_logger, connectionString);
                         case InfrastructureEntityGroups.Reports:
-                            throw new NotImplementedException();
+                            return new SqliteEfReportsInfrastructureRepository(_logger, connectionString);
                         default:
                             break;
                     }
