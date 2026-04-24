@@ -113,7 +113,7 @@ namespace Philadelphus.Core.Domain.Reports.Services
                 catch (Exception ex)
                 {
                     _notificationService.SendTextMessage<ReportService>(
-                        $"Ошибка обновления материализованного представления '{report.Name}'. Неизвестная ошибка, обратитесь к разработчкику. \r\nПодробнее:\r\n{ex.Message}\r\n{ex.StackTrace}",
+                        $"Ошибка обновления материализованного представления '{report.Name}'. Неизвестная ошибка, обратитесь к разработчику. \r\nПодробнее:\r\n{ex.Message}\r\n{ex.StackTrace}",
                         criticalLevel: NotificationCriticalLevelModel.Error);
 
                 }
@@ -130,7 +130,7 @@ namespace Philadelphus.Core.Domain.Reports.Services
             catch (Exception ex)
             {
                 _notificationService.SendTextMessage<ReportService>(
-                    $"Ошибка получения отчета '{report.Name}'. Неизвестная ошибка, обратитесь к разработчкику. \r\nПодробнее:\r\n{ex.Message}\r\n{ex.StackTrace}",
+                    $"Ошибка получения отчета '{report.Name}'. Неизвестная ошибка, обратитесь к разработчику. \r\nПодробнее:\r\n{ex.Message}\r\n{ex.StackTrace}",
                     criticalLevel: NotificationCriticalLevelModel.Error);
             }
 
