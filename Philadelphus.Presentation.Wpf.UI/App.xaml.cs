@@ -7,11 +7,14 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Mapping;
+using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Messaging.Kafka;
+using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Mapping;
@@ -193,6 +196,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();
                     services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
+                    services.AddSingleton<IReportService, ReportService>();
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
 
@@ -213,6 +217,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<LaunchWindowTabItemControlVM>();
                     services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
+                    services.AddTransient<ReportsControlVM>();
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
                     // ViewModel сущностей
