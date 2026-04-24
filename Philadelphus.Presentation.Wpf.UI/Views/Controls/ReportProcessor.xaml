@@ -133,7 +133,9 @@
                     <GroupBox Grid.Row="8" Grid.Column="0" Header="Результат" Margin="1">
                         <StackPanel Grid.Row="6" Grid.Column="0">
                             <Button Content="Отобразить отчет" Command="{Binding ExecuteReportCommand}" Margin="1"></Button>
-                            <Button Visibility="Collapsed" Content="Экспорт отчета .xlsx" Command="{Binding ExportToExcelCommand}" Margin="1"></Button>
+                            <Button Content="Экспорт отчета .xlsx" Command="{Binding ExportToXlsxCommand}" Margin="1"></Button>
+                            <Button Content="Экспорт отчета .json" Command="{Binding ExportToJsonCommand}" Margin="1"></Button>
+                            <Button Content="Экспорт отчета .xml" Command="{Binding ExportToXmlCommand}" Margin="1"></Button>
                         </StackPanel>
                     </GroupBox>
                 </Grid>

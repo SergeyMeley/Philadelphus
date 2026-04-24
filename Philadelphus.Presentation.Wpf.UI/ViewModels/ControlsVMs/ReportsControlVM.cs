@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
 using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.EntityFrameworkCore;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Reports.Models;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.TablesExport.Enums;
+using Philadelphus.Core.Domain.TablesExport.Factories;
+using Philadelphus.Core.Domain.TablesExport.Models;
+using Philadelphus.Core.Domain.TablesExport.Services;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -12,6 +17,7 @@ using Serilog;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -21,6 +27,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     public class ReportsControlVM : ControlBaseVM
     {
         private readonly IReportService _reportService;
+        private readonly ITablesExportService _xlsxExportService;
+        private readonly ITablesExportService _jsonExportService;
+        private readonly ITablesExportService _xmlExportService;
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
 
         private DataStorageVM _selectedDataStorageVM;
@@ -108,11 +117,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ILogger logger, 
             INotificationService notificationService,
             IReportService reportService,
+            ITablesExportServiceFactory tablesExportServiceFactory,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             ApplicationCommandsVM applicationCommandsVM) 
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _reportService = reportService;
+            _xlsxExportService = tablesExportServiceFactory.Create(TablesExportFormat.Xlsx);
+            _jsonExportService = tablesExportServiceFactory.Create(TablesExportFormat.Json);
+            _xmlExportService = tablesExportServiceFactory.Create(TablesExportFormat.Xml);
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
         }
 
@@ -131,23 +144,106 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     });
             }
         }
-        public RelayCommand ExportToExcelCommand
+        public RelayCommand ExportToXlsxCommand
         {
             get
             {
                 return new RelayCommand(
                     async obj =>
                     {
-                        _notificationService.SendTextMessage<ReportsControlVM>(
-                            $"Экспорт отчета в Excel не реализован.",
-                            criticalLevel: NotificationCriticalLevelModel.Warning);
+                        ExportTableAsync(_xlsxExportService);
                     },
                     ce =>
                     {
-                        return SelectedReportInfo != null;
+                        return ReportResult != null;
                     });
             }
         }
+
+        public RelayCommand ExportToJsonCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    async obj =>
+                    {
+                        ExportTableAsync(_jsonExportService);
+                    },
+                    ce =>
+                    {
+                        return ReportResult != null;
+                    });
+            }
+        }
+
+        public RelayCommand ExportToXmlCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    async obj =>
+                    {
+                        ExportTableAsync(_xmlExportService);
+                    },
+                    ce =>
+                    {
+                        return ReportResult != null;
+                    });
+            }
+        }
+
+        private async Task ExportTableAsync(ITablesExportService tablesExportService)
+        {
+            if (ReportResult == null || ReportResult.Rows.Count == 0)
+                return;
+
+            // колонки
+            var columns = ReportResult.Columns
+                .Cast<DataColumn>()
+                .Select(c => new TableExportColumn<DataRow>
+                {
+                    Header = c.ColumnName,
+                    ValueSelector = row => row[c],
+                    Width = 20
+                })
+                .ToList();
+
+            // локальная функция → превращаем DataTable в IAsyncEnumerable
+            async IAsyncEnumerable<DataRow> GetData(
+                [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default)
+            {
+                foreach (DataRow row in ReportResult.Rows)
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    yield return row;
+
+                    // даём возможность не блокировать поток
+                    await Task.Yield();
+                }
+            }
+
+            var path = await tablesExportService.ExportAsync(
+                GetData(),
+                columns,
+                SelectedReportInfo?.Name ?? "report");
+
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _notificationService.SendTextMessage<ReportsControlVM>(
+                    $"Файл сохранён, но не удалось открыть: {ex.Message}",
+                    NotificationCriticalLevelModel.Warning);
+            }
+        }
+
         private async void UpdateReportInfos()
         {
             if (SelectedDataStorageVM != null)

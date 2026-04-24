@@ -10,6 +10,7 @@ using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.TablesExport.Factories;
 using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
@@ -197,6 +198,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
+                    services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
 
