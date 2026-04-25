@@ -20,6 +20,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
+        private readonly ReportsControlVM _reportsControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
 
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
@@ -36,6 +37,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             get
             {
                 return _applicationSettingsControlVM;
+            }
+        }
+        public ReportsControlVM ReportsControlVM
+        {
+            get
+            {
+                return _reportsControlVM;
             }
         }
         public string Title
@@ -65,12 +73,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationSettingsControlVM applicationSettingsControlVM,
+            ReportsControlVM reportsControlVM,
             MainWindowNotificationsVM mainWindowNotificationsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
+            _reportsControlVM = reportsControlVM;
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
 
             _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);

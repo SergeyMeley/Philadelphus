@@ -6,8 +6,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 {
     public class SystemBaseTreeNodeModel : TreeNodeModel
     {
-        private Guid _uuid = Guid.NewGuid();
-
         private static Dictionary<Guid, SystemBaseType> _baseUuids = new Dictionary<Guid, SystemBaseType>()
         {
             { Guid.Parse("00000000-0000-0000-0000-00015b10ec20"), SystemBaseType.OBJECT },

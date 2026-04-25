@@ -110,9 +110,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 throw new ArgumentException();
             }
-
-            Name = NamingHelper.GetNewName(OwningWorkingTree.UnavailableNames, _defaultFixedPartOfName);
-            OwningWorkingTree.UnavailableNames.Add(Name);
         }
 
         #endregion

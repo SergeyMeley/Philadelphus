@@ -21,7 +21,7 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
             var config = new ConsumerConfig()
             {
                 BootstrapServers = options.Value.BootstrapServers,
-                GroupId = $"consumer-{Guid.NewGuid()}",
+                GroupId = $"consumer-{Guid.CreateVersion7()}",
                 AutoOffsetReset = options.Value.AutoOffsetReset
             };
 
@@ -45,28 +45,51 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
         {
             _consumer.Subscribe(_topic);
 
-            while (ct.IsCancellationRequested == false)
+            try
             {
-                var result = _consumer.Consume(ct);
 
-                if (result?.Message != null)
+                while (ct.IsCancellationRequested == false)
                 {
-                    _ = Task.Run(async () =>
+                    ConsumeResult<string, TMessage> result = null;
+                    try
                     {
-                        try
+                        result = _consumer.Consume(ct);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.Information("Отмена получения сообщений Kafka.");
+                        break;
+                    }
+
+                    if (result?.Message != null)
+                    {
+                        _ = Task.Run(async () =>
                         {
-                            if (MessageReceived != null)
+                            try
                             {
-                                await MessageReceived.Invoke(result.Message.Value, ct);
+                                if (MessageReceived != null)
+                                {
+                                    await MessageReceived.Invoke(result.Message.Value, CancellationToken.None);
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "Ошибка обработчика события");
-                        }
-                    });
-                    _consumer.Commit(result);
+                            catch (Exception ex)
+                            {
+                                _logger.Error(ex, "Ошибка обработчика события.");
+                            }
+                        });
+                        _consumer.Commit(result);
+                    }
                 }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger.Error(ex, "Неизвестная ошибка Kafka.");
+                throw;
+            }
+            finally
+            {
+                _consumer.Close();
+                _logger.Information("Остановка получения сообщения.");
             }
         }
     }

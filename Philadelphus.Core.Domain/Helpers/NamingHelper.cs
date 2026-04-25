@@ -1,31 +1,81 @@
-﻿namespace Philadelphus.Core.Domain.Helpers
+﻿using System.Buffers;
+using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
+
+namespace Philadelphus.Core.Domain.Helpers
 {
     /// <summary>
     /// Помощник наименования
     /// </summary>
     public static class NamingHelper
     {
+        private static HashSet<string> _existNames = new HashSet<string>();
+        private static Dictionary<string, int> _indexesByFixedParts = new Dictionary<string, int>();
+
+        /// <summary>
+        /// Использованные (занятые) наименования
+        /// </summary>
+        public static ReadOnlySet<string> ExistNames { get => _existNames.AsReadOnly(); }
+
         /// <summary>
         /// Получить новое наименование
         /// </summary>
+        /// <param name="fixedPartOfName">Фиксированная часть наименования</param>
         /// <param name="existNames">Коллекция занятых наименований</param>
-        /// <param name="fixPart">Фиксированная часть наименования</param>
         /// <returns></returns>
-        public static string GetNewName(IEnumerable<string> existNames, string fixPart)
+        public static string GetNewName(string fixedPartOfName = "Новое наименование")
         {
-            bool IsIndexExist = true;
-            int index = 1;
-            string newName = string.Empty;
-            do
+            if (_indexesByFixedParts.ContainsKey(fixedPartOfName) == false)
             {
-                newName = $"{fixPart.Trim()} {index}";
-                if (existNames == null || existNames.Contains(newName) == false)
+                _indexesByFixedParts.Add(fixedPartOfName, 1);
+            }
+
+            int index = _indexesByFixedParts[fixedPartOfName];
+            string newName = string.Empty;
+
+            while (true)
+            {
+                newName = $"{fixedPartOfName} {index}";
+
+                if (CheckName(newName))
                 {
-                    IsIndexExist = false;
+                    _existNames.Add(newName);
+                    _indexesByFixedParts[fixedPartOfName] = index;
+                    return newName;
                 }
+
+                if (index == int.MaxValue)
+                {
+                    throw new Exception();
+                }
+
                 index++;
-            } while (IsIndexExist == true);
-            return newName;
+            }
+        }
+
+        /// <summary>
+        /// Проверить доступность наименования
+        /// </summary>
+        /// <param name="name">Наименование для проверки</param>
+        /// <returns></returns>
+        public static bool CheckName(string name)
+        {
+            return ExistNames.Any(x => x == name) == false;
+        }
+
+        /// <summary>
+        /// Добавить занятые наименования
+        /// </summary>
+        /// <param name="existNames">Наименования</param>
+        /// <returns></returns>
+        public static bool AddExistNames(IEnumerable<string> existNames)
+        {
+            foreach (string name in existNames?.Where(x => ExistNames.Contains(x) == false))
+            {
+                _existNames.Add(name);
+            }
+            return true;
         }
     }
 }

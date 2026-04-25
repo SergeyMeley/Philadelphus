@@ -341,7 +341,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         path = dialog.FolderName;
                     }
 
-                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.NewGuid()}.phjson");
+                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.CreateVersion7()}.phjson");
                     File.WriteAllText(file, json, Encoding.UTF8);
 
                     Process.Start(new ProcessStartInfo

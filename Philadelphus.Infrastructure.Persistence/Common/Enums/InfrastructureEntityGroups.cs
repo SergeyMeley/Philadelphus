@@ -4,5 +4,6 @@
     {
         PhiladelphusRepositories,
         ShrubMembers,
+        Reports,
     }
 }

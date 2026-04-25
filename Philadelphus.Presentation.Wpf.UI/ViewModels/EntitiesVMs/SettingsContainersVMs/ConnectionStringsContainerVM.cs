@@ -13,7 +13,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
         private string _providerName;
         private string _connectionString;
         private bool _forDelete;
-        public Guid Uuid { get; internal set; } = Guid.NewGuid();
+        public Guid Uuid { get; internal set; } = Guid.CreateVersion7();
         public string ProviderName 
         { 
             get
@@ -60,7 +60,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
         {
             _connectionStringsContainer = new ConnectionStringsContainer()
             {
-                StorageUuid = Guid.NewGuid(),
+                StorageUuid = Guid.CreateVersion7(),
                 ProviderName = string.Empty,
                 ConnectionStrings = new()
             };

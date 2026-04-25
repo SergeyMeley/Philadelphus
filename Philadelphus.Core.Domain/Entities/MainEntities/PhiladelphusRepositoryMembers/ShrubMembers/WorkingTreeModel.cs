@@ -149,9 +149,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             _ownDataStorage = dataStorage;
 
-            Name = NamingHelper.GetNewName(UnavailableNames, _defaultFixedPartOfName);
-            UnavailableNames.Add(Name);
-
             if (uuid == SystemBaseUuid)
             {
                 IsSystemBase = true;

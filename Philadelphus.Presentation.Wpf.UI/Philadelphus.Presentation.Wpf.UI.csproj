@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UserSecretsId>9d9f6ea9-cd34-412e-b854-8fc4186804fc</UserSecretsId>
     <ApplicationIcon>Icons\philadelphus_logo_64.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
 	  
 	<SignManifests>true</SignManifests>
 
-	  <FileVersion>1.0.2.0</FileVersion>
+	  <FileVersion>1.0.3.0</FileVersion>
 	  <Product>Philadelphus</Product>
 	  <Company>Sergey Meley</Company>
 	  <Copyright>© 2026 Sergey Meley</Copyright>
@@ -150,6 +150,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.Reports\Philadelphus.Core.Domain.Reports.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.TablesExport\Philadelphus.Core.Domain.TablesExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj" />
