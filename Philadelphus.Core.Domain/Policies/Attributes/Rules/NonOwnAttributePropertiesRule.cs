@@ -1,7 +1,11 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +17,8 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
     /// </summary>
     public class NonOwnAttributePropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
+        private readonly INotificationService _notificationService;
+
         private static readonly HashSet<string> _mustBeInherited =
         [
             nameof(ElementAttributeModel.Name),
@@ -33,45 +39,55 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             nameof(ElementAttributeModel.Visibility)
         ];
 
-        public bool CanRead(ElementAttributeModel attr, string prop)
+        public NonOwnAttributePropertiesRule(
+            INotificationService notificationService)
+        {
+            _notificationService = notificationService;
+        }
+
+        public bool CanRead(ElementAttributeModel model, string prop)
         {
             return true;
         }
 
-        public bool CanWrite(ElementAttributeModel attr, string prop, object value)
+        public bool CanWrite(ElementAttributeModel model, string prop, object value)
         {
-            if (prop == nameof(attr.IsOwn))
-                return true; 
-            
-            return attr.IsOwn || (_mustBeInherited.Contains(prop) == false);
+            if (prop == nameof(model.IsOwn))
+                return true;
+
+            var result = model.IsOwn || (_mustBeInherited.Contains(prop) == false);
+
+            if (result == false)
+            {
+                _notificationService.SendTextMessage<CompositeAttributePropertiesPolicy>(
+                    $"Для атрибута '{model.Name}' [{model.Uuid}] элемента '{(model.Owner as IMainEntityModel)?.Name}' [{(model.Owner as IMainEntityModel)?.Uuid}] " +
+                    $"изменение значения свойства '{prop}' ограничено, т.к. атрибут не является собственным.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
+            }
+
+            return result;
         }
 
-        public object OnRead(ElementAttributeModel attr, string prop, object value)
+        public object OnRead(ElementAttributeModel model, string prop, object value)
         {
-            if (prop == nameof(attr.IsOwn))
+            if (prop == nameof(model.IsOwn))
                 return value;
 
             // Если атрибут НЕ собственный и значение может или обязано быть унаследовано
-            if (attr.IsOwn == false && (_canBeInherited.Contains(prop) || _mustBeInherited.Contains(prop)))
+            if (model.IsOwn == false && (_canBeInherited.Contains(prop) || _mustBeInherited.Contains(prop)))
             {
 
                 // Если значение свойства обязано быть унаследовано ИЛИ еще не заполнено у текущего атрибута, берем с родителя
                 if (_mustBeInherited.Contains(prop) || value == default)
                 {
-                    var parentAttribute = attr.GetInheritedAttributeFromParent();
-
-                    var q1 = parentAttribute?.GetType().GetProperty(prop);
-                    var q2 = q1?.GetValue(parentAttribute);
-                    var q3 = parentAttribute.Name;
-
-                    return parentAttribute?.GetType().GetProperty(prop)?.GetValue(parentAttribute);
+                    return model?.InheritedAttributeFromParent?.GetType().GetProperty(prop)?.GetValue(model?.InheritedAttributeFromParent);
                 }
             }
 
             return value;
         }
 
-        public void OnWrite(ElementAttributeModel attr, string prop, object oldValue, object newValue) 
+        public void OnWrite(ElementAttributeModel model, string prop, object oldValue, object newValue) 
         { 
         }
     }

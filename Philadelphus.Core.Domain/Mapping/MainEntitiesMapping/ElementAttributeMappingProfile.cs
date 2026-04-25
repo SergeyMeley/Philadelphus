@@ -91,7 +91,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         declaringOwner,
                         owningTree,
                         notificationService,
-                        AttributePolicyBuilder.CreateDefault());
+                        AttributePolicyBuilder.CreateDefault(notificationService));
 
                     return result;
                 })

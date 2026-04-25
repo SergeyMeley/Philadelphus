@@ -157,7 +157,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Получение атрибутов всех элементов дерева из БД
             var dbAttributes = tree.OwnDataStorage.ShrubMembersInfrastructureRepository.SelectAttributes(new[] { tree.Uuid });
-            var allAttributes = _mapper.MapAttributes(dbAttributes, owners, allShrubNodes, allShrubLeaves, tree, _notificationService, AttributePolicyBuilder.CreateDefault());
+            var allAttributes = _mapper.MapAttributes(dbAttributes, owners, allShrubNodes, allShrubLeaves, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
 
             // Распределение атрибутов по владельцам
             foreach (var item in owners)
@@ -968,7 +968,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         owner, 
                         wtm.OwningWorkingTree,
                         _notificationService,
-                        AttributePolicyBuilder.CreateDefault())
+                        AttributePolicyBuilder.CreateDefault(_notificationService))
                     {
                         Visibility = VisibilityScope.Public,
                         Override = OverrideType.Virtual,

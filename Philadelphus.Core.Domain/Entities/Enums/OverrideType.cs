@@ -11,7 +11,7 @@ namespace Philadelphus.Core.Domain.Entities.Enums
     public enum OverrideType
     {
         [Display(Name = "Запрещено")]
-        None,
+        Sealed,
         [Display(Name = "Возможно")] 
         Virtual,
         [Display(Name = "Требуется")] 

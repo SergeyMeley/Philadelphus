@@ -215,7 +215,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
 
             if (_propertiesPolicy?.CanWrite((T)this, prop, value) == false)
             {
-                _notificationService.SendTextMessage<MainEntityBaseModel<T>>($"Ошибка присвоения значения свойству '{prop}' - нарушены ограничения системы.");
+                _notificationService.SendTextMessage<MainEntityBaseModel<T>>(
+                    $"Ошибка присвоения значения свойству '{prop}' - нарушены ограничения системы.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
                 return false;
             }
                 

@@ -38,6 +38,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private VisibilityScope _visibility = VisibilityScope.Public;
         private OverrideType _override = OverrideType.Virtual;
+        private ElementAttributeModel _inheritedAttributeFromParent;
 
         #endregion
 
@@ -139,7 +140,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 
         #region [ Hierarchy Properties ]
 
-
+        /// <summary>
+        /// Унаследованный атрибут родителя
+        /// </summary>
+        public ElementAttributeModel InheritedAttributeFromParent 
+        {
+            get => GetValue(_inheritedAttributeFromParent); 
+        }
 
         #endregion
 
@@ -262,6 +269,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 
             _isOwn = localUuid == _declaringUuid
                 && _attributeOwner.Uuid == _declaringAttributeOwner.Uuid;
+
+            _inheritedAttributeFromParent = GetInheritedAttributeFromParent();
         }
 
         #endregion
@@ -380,6 +389,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             if (elevationLevel == 0 || IsOwn)
                 return this;
+
+            if (elevationLevel == 1 && _inheritedAttributeFromParent != null)
+                return _inheritedAttributeFromParent;
 
             if (Owner is IChildrenModel c)
             {

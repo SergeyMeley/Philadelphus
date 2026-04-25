@@ -3,10 +3,14 @@ using Moq;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Tests.Domain.Fakes.Services;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Philadelphus.Tests.Domain.Entities.MainEntities;
 
@@ -104,7 +108,7 @@ public class PhiladelphusRepositoryModelTests
 internal class PhiladelphusRepositoryModelTestingFixture : PhiladelphusRepositoryModel
 {
     public PhiladelphusRepositoryModelTestingFixture(Guid uuid, IDataStorageModel dataStorage)
-        : base(uuid, dataStorage) { }
+        : base(uuid, dataStorage, new FakeNotificationService(), new EmptyPropertiesPolicy<PhiladelphusRepositoryModel>(), new EmptyPropertiesPolicy<ShrubModel>()) { }
 
     public override IDataStorageModel DataStorage => OwnDataStorage;
 }

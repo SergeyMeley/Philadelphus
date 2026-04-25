@@ -11,7 +11,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
 {
     public abstract class MainEntityBaseModelTests
     {
-        protected abstract MainEntityBaseModel<IMainEntity> CreateSut(Guid uuid, IMainEntity dbEntity);
+        protected abstract MainEntityBaseModel<PhiladelphusRepositoryModel> CreateSut(Guid uuid, IMainEntity dbEntity);
 
         [Fact]
         public void Constructor_ValidArgs_SetsUuidAndDefaultNameAndStateInitialized()
