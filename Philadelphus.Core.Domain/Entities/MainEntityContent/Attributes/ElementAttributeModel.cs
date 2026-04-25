@@ -300,12 +300,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             _attributeOwner = localOwner;
             DeclaringUuid = declaringUuid;
             _declaringAttributeOwner = declaringOwner;
-
-            if (Owner is IWorkingTreeMemberModel wtm)
-            {
-                Name = NamingHelper.GetNewName(wtm.OwningWorkingTree.UnavailableNames, _defaultFixedPartOfName);
-                wtm.OwningWorkingTree.UnavailableNames.Add(Name);
-            }
         }
 
         #endregion
@@ -375,7 +369,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         public ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
         {
             var result = new ElementAttributeModel(
-                localUuid: Guid.NewGuid(),
+                localUuid: Guid.CreateVersion7(),
                 localOwner: newOwner,
                 declaringUuid: this.DeclaringUuid,
                 declaringOwner: this._declaringAttributeOwner,

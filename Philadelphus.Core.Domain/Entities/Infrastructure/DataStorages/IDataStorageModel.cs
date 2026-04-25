@@ -44,6 +44,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public IShrubMembersInfrastructureRepository ShrubMembersInfrastructureRepository { get; }
 
         /// <summary>
+        /// Репозиторий БД работы с отчетами
+        /// </summary>
+        public IReportsInfrastructureRepository ReportsInfrastructureRepository { get; }
+
+        /// <summary>
         /// Имеет репозиторий БД работы с репозиториями Чубушника 
         /// </summary>
         public bool HasPhiladelphusRepositoriesInfrastructureRepository { get; }
@@ -52,6 +57,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// Имеет репозиторий БД работы с участниками кустарника репозитория Чубушника
         /// </summary>
         public bool HasShrubMembersInfrastructureRepository { get; }
+
+        /// <summary>
+        /// Имеет репозиторий БД работы с отчетами
+        /// </summary>
+        public bool HasReportsInfrastructureRepository { get; }
 
         /// <summary>
         /// Доступность хранилища данных

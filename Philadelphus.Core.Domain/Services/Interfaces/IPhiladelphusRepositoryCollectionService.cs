@@ -56,7 +56,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="dataStorage"></param>
         /// <returns>Репозиторий</returns>
-        public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage);
+        public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true);
 
         /// <summary>
         /// Создать заголовок репозитория из репозитория

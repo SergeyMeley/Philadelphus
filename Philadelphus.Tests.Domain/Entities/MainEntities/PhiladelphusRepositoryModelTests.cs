@@ -16,7 +16,7 @@ public class PhiladelphusRepositoryModelTests
     public void Constructor_ValidArguments_SetsCorrectInitialState()
     {
         // Arrange
-        var uuid = Guid.NewGuid();
+        var uuid = Guid.CreateVersion7();
         var dataStorage = CreateFakeDataStorage();
         var dbEntity = new Mock<PhiladelphusRepository>().Object;
 
@@ -38,7 +38,7 @@ public class PhiladelphusRepositoryModelTests
     [Fact]
     public void Constructor_NullDataStorage_ThrowsArgumentNullException()
     {
-        var act = () => CreateSut(Guid.NewGuid(), null!);
+        var act = () => CreateSut(Guid.CreateVersion7(), null!);
 
         act.Should().Throw<ArgumentNullException>()
             .And.ParamName.Should().Be("dataStorage");
@@ -50,7 +50,7 @@ public class PhiladelphusRepositoryModelTests
     public void IsFavorite_SetDifferentValue_UpdatesStateToChanged(bool newValue)
     {
         // Arrange
-        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage());
+        var sut = CreateSut(Guid.CreateVersion7(), CreateFakeDataStorage());
 
         // Act
         sut.IsFavorite = newValue;
@@ -64,7 +64,7 @@ public class PhiladelphusRepositoryModelTests
     public void OwnDataStorageName_SetNewValue_UpdatesStorageNameAndState()
     {
         // Arrange
-        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage());
+        var sut = CreateSut(Guid.CreateVersion7(), CreateFakeDataStorage());
         const string newName = "Новое хранилище";
 
         // Act
@@ -79,7 +79,7 @@ public class PhiladelphusRepositoryModelTests
     public void ChangeDataStorage_Always_ThrowsNotImplementedException()
     {
         // Arrange
-        var sut = CreateSut(Guid.NewGuid(), CreateFakeDataStorage());
+        var sut = CreateSut(Guid.CreateVersion7(), CreateFakeDataStorage());
         var newStorage = CreateFakeDataStorage();
 
         // Act & Assert
@@ -93,7 +93,7 @@ public class PhiladelphusRepositoryModelTests
     private static IDataStorageModel CreateFakeDataStorage()
     {
         var mock = new Mock<IDataStorageModel>();
-        mock.Setup(x => x.Uuid).Returns(Guid.NewGuid());
+        mock.Setup(x => x.Uuid).Returns(Guid.CreateVersion7());
         mock.Setup(x => x.Name).Returns("TestStorage");
         mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
         return mock.Object;

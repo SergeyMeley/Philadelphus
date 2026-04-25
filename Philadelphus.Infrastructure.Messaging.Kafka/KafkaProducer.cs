@@ -35,7 +35,7 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
         {
             var mes = new Message<string, TMessage>()
             {
-                Key = key ?? Guid.NewGuid().ToString(),
+                Key = key ?? Guid.CreateVersion7().ToString(),
                 Value = message
             };
             return _producer.ProduceAsync(_topic, mes, cancellationToken);
