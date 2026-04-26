@@ -39,6 +39,8 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             nameof(ElementAttributeModel.Visibility)
         ];
 
+        private static readonly Dictionary<(Type, string), Func<object, object>> _propertyGetters = new();
+
         public NonOwnAttributePropertiesRule(
             INotificationService notificationService)
         {
@@ -55,7 +57,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             if (prop == nameof(model.IsOwn))
                 return true;
 
-            var result = model.IsOwn || (_mustBeInherited.Contains(prop) == false);
+            var result = (_mustBeInherited.Contains(prop) == false) || model.IsOwn;
 
             if (result == false)
             {
@@ -74,13 +76,15 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
                 return value;
 
             // Если атрибут НЕ собственный и значение может или обязано быть унаследовано
-            if (model.IsOwn == false && (_canBeInherited.Contains(prop) || _mustBeInherited.Contains(prop)))
+            if ((_canBeInherited.Contains(prop) || _mustBeInherited.Contains(prop))
+                && model.IsOwn == false)
             {
 
                 // Если значение свойства обязано быть унаследовано ИЛИ еще не заполнено у текущего атрибута, берем с родителя
-                if (_mustBeInherited.Contains(prop) || value == default)
+                if (_mustBeInherited.Contains(prop)
+                    || value == default)
                 {
-                    return model?.InheritedAttributeFromParent?.GetType().GetProperty(prop)?.GetValue(model?.InheritedAttributeFromParent);
+                    return GetInheritedValue(model, prop);
                 }
             }
 
@@ -89,6 +93,23 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
 
         public void OnWrite(ElementAttributeModel model, string prop, object oldValue, object newValue) 
         { 
+        }
+
+        private object GetInheritedValue(ElementAttributeModel model, string prop)
+        {
+            if (model?.InheritedAttributeFromParent == null) return null;
+
+            var key = (model.InheritedAttributeFromParent.GetType(), prop);
+            if (!_propertyGetters.TryGetValue(key, out var getter))
+            {
+                var pi = key.Item1.GetProperty(prop);
+                getter = pi != null
+                    ? obj => pi.GetValue(obj)
+                    : obj => null;
+                _propertyGetters[key] = getter;
+            }
+
+            return getter(model.InheritedAttributeFromParent);
         }
     }
 }

@@ -970,8 +970,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         _notificationService,
                         AttributePolicyBuilder.CreateDefault(_notificationService))
                     {
-                        Visibility = VisibilityScope.Public,
-                        Override = OverrideType.Virtual,
                         ValueType = wtm.OwningShrub.SystemBaseWorkingTree.GetAllNodesRecursive().SingleOrDefault(x => x is SystemBaseTreeNodeModel sbn && sbn.SystemBaseType == SystemBaseType.STRING)
                     };
 
