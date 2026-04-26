@@ -13,6 +13,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 {
@@ -36,8 +37,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeNodeModel _valueType;
         private TreeLeaveModel _value;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
-        private VisibilityScope _visibility = VisibilityScope.Public;
-        private OverrideType _override = OverrideType.Sealed;
+        private VisibilityScope _visibility;
+        private OverrideType _override;
         private ElementAttributeModel _inheritedAttributeFromParent;
 
         #endregion
@@ -271,6 +272,21 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 && _attributeOwner.Uuid == _declaringAttributeOwner.Uuid;
 
             _inheritedAttributeFromParent = GetInheritedAttributeFromParent();
+
+            _visibility = VisibilityScope.Public;
+
+            if (_attributeOwner is TreeRootModel)
+            {
+                _override = OverrideType.Abstract;
+            }
+            else if (_attributeOwner is TreeNodeModel)
+            {
+                _override = OverrideType.Virtual;
+            }
+            else if (_attributeOwner is TreeLeaveModel)
+            {
+                _override = OverrideType.NotApplicable;
+            }
         }
 
         #endregion
@@ -352,11 +368,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _description = this._description,
                 _valueType = this._valueType,
                 _isCollectionValue = this._isCollectionValue,
-                _value = this._value, 
+                _value = this._value,
                 _values = new List<TreeLeaveModel>(this._values),
                 _visibility = this._visibility,
-                Override = this._override
             };
+
+            if (newOwner is not TreeLeaveModel)
+            {
+                result._override = this._override;
+            }
 
             newOwner.AddAttribute(result);
 
