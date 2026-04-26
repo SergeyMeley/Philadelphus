@@ -155,6 +155,18 @@ namespace Philadelphus.Core.Domain.Helpers
                     {
                         attr.Name = name;
                     }
+                    if (element is TreeRootModel)
+                    {
+                        attr.Override = OverrideType.Abstract;
+                    }
+                    else if (element is TreeNodeModel)
+                    {
+                        attr.Override = OverrideType.Virtual;
+                    }
+                    else if (element is TreeLeaveModel)
+                    {
+                        attr.Override = OverrideType.NotApplicable;
+                    }
                 }
 
                 if (attrElement.TryGetProperty("isCollectionValue", out var isCollProp)) attr.IsCollectionValue = isCollProp.GetBoolean();

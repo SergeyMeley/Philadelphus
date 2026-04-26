@@ -10,6 +10,8 @@ namespace Philadelphus.Core.Domain.Entities.Enums
 {
     public enum OverrideType
     {
+        [Display(Name = "Не применимо")]
+        NotApplicable,
         [Display(Name = "Запрещено")]
         Sealed,
         [Display(Name = "Возможно")] 

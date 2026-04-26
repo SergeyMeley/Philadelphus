@@ -37,7 +37,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeLeaveModel _value;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private VisibilityScope _visibility = VisibilityScope.Public;
-        private OverrideType _override = OverrideType.Virtual;
+        private OverrideType _override = OverrideType.Sealed;
         private ElementAttributeModel _inheritedAttributeFromParent;
 
         #endregion
