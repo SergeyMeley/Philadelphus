@@ -10,6 +10,8 @@ namespace Philadelphus.Core.Domain.Entities.Enums
 {
     public enum VisibilityScope
     {
+        [Display(Name = "Ошибка системы")]
+        SystemError, 
         [Display(Name = "Всем")]
         Public,             
         [Display(Name = "Текущему узлу и листам")]
