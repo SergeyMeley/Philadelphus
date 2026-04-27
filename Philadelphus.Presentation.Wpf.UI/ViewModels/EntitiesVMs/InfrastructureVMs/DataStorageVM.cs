@@ -67,18 +67,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         {
             get
             {
-                if (_model.PhiladelphusRepositoriesInfrastructureRepository == null)
-                    return false;
-                return true;
+                return _model.HasPhiladelphusRepositoriesInfrastructureRepository;
             }
         }
         public bool HasMainEntitiesInfrastructureRepository
         {
             get
             {
-                if (_model.ShrubMembersInfrastructureRepository == null)
-                    return false;
-                return true;
+                return _model.HasShrubMembersInfrastructureRepository;
+            }
+        }
+        public bool HasReportsInfrastructureRepository
+        {
+            get
+            {
+                return _model.HasReportsInfrastructureRepository;
             }
         }
         public bool? IsAvailable 
