@@ -15,6 +15,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using PropertyTools.Wpf;
 using Serilog;
@@ -106,6 +107,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private ExtensionsControlVM _extensionsControlVM;
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
+
+        public string CurrentProcess { get; private set; }
+        public string CurrentProgress { get; private set; }
 
         #endregion
 
@@ -363,27 +367,33 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    var path = string.Empty;
+                    Task.Run(() => {
+                        var path = string.Empty;
 
-                    var dialog = new OpenFileDialog
-                    {
-                        Title = "Выберите файл",
-                        Multiselect = false,
-                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
-                        FilterIndex = 1,
-                    };
+                        var dialog = new OpenFileDialog
+                        {
+                            Title = "Выберите файл",
+                            Multiselect = false,
+                            Filter = "PHJSON файлы (*.phjson)|*.phjson",
+                            FilterIndex = 1,
+                        };
 
-                    if (dialog.ShowDialog() == true)
-                    {
-                        string file = dialog.FileName;
-                        var json = File.ReadAllText(file);
+                        if (dialog.ShowDialog() == true)
+                        {
+                            string file = dialog.FileName;
+                            var json = File.ReadAllText(file);
 
-                        JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model);
+                            JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model, OnProcessChanged, OnProgressChanged);
 
-                        var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.Last()?.ContentRoot;
-                        var rootVM = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
-                        PhiladelphusRepositoryVM.Childs.Add(rootVM);
-                    }
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.Last()?.ContentRoot;
+                                var rootVM = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
+
+                                PhiladelphusRepositoryVM.Childs.Add(rootVM);
+                            });
+                        }
+                    });
                 });
             }
         }
@@ -494,6 +504,24 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
             }
             return true;
+        }
+
+        private void OnProcessChanged(string currentProcess)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentProcess = currentProcess;
+                OnPropertyChanged(nameof(CurrentProcess));
+            });
+        }
+
+        private void OnProgressChanged(int currentNumber, int totalCount)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round(((double)currentNumber / (double)totalCount * 100), 1)} %)";
+                OnPropertyChanged(nameof(CurrentProgress));
+            });
         }
 
         #endregion
