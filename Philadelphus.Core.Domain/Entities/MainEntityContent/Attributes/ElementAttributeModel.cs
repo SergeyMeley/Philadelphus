@@ -5,16 +5,22 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Policies.Attributes.Builders;
+using Philadelphus.Core.Domain.Policies.Attributes.Rules;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 {
     /// <summary>
     /// Атрибут элемента Чубушника
     /// </summary>
-    public class ElementAttributeModel : WorkingTreeMemberBaseModel, IContentModel
+    public class ElementAttributeModel : WorkingTreeMemberBaseModel<ElementAttributeModel>, IContentModel
     {
         #region [ Fields ]
 
@@ -24,13 +30,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         protected override string _defaultFixedPartOfName => "Новый атрибут";
 
         private readonly IAttributeOwnerModel _attributeOwner;
+        private readonly Guid _declaringUuid;
         private readonly IAttributeOwnerModel _declaringAttributeOwner;
+        private readonly bool _isOwn;
         private bool _isCollectionValue = false;
         private TreeNodeModel _valueType;
         private TreeLeaveModel _value;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
-        private VisibilityScope _visibility = VisibilityScope.Public;
-        private OverrideType _override = OverrideType.Virtual;
+        private VisibilityScope _visibility;
+        private OverrideType _override;
+        private ElementAttributeModel _inheritedAttributeFromParent;
 
         #endregion
 
@@ -43,18 +52,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public TreeNodeModel ValueType
         {
-            get
-            {
-                return _valueType;
-            }
-            set
-            {
-                if (_valueType != value)
-                {
-                    _valueType = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_valueType);
+            set => SetValue(ref _valueType, value);
         }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         { 
             get
             {
-                if (Owner is ShrubMemberBaseModel sm)
+                if (Owner is IShrubMemberModel sm)
                 {
                     return sm.OwningShrub.ContentWorkingTrees
                         .SelectMany(x => x.GetAllNodesRecursive());
@@ -76,20 +75,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Допускается коллекция значений
         /// </summary>
-        public bool IsCollectionValue 
-        { 
-            get
-            {
-                return _isCollectionValue; 
-            }
-            set
-            {
-                if (_isCollectionValue != value)
-                {
-                    _isCollectionValue = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+        public bool IsCollectionValue
+        {
+            get => GetValue(_isCollectionValue);
+            set => SetValue(ref _isCollectionValue, value);
         }
 
         /// <summary>
@@ -97,29 +86,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public TreeLeaveModel Value
         {
-            get
-            {
-                return _value;
-            }
-            set
-            {
-                if (_value != value)
-                {
-                    _value = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_value);
+            set => SetValue(ref _value, value);
         }
 
         /// <summary>
         /// Значения (листы выбранного узла дерева репозитория Чубушника)
         /// </summary>
-        public IReadOnlyList<TreeLeaveModel> Values 
-        { 
-            get
-            {
-                return _values.AsReadOnly();
-            }
+        public IReadOnlyList<TreeLeaveModel> Values
+        {
+            get => GetValue(_values.AsReadOnly());
         }
 
         /// <summary>
@@ -130,8 +106,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             get
             {
                 return ValueType?.ChildLeaves;
-                
+
                 // TODO: Подумать про использование листов наследников
+
                 //if (Owner is ShrubMemberBaseModel sm)
                 //{
                 //    return sm.OwningShrub.ContentTrees
@@ -147,18 +124,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public VisibilityScope Visibility
         {
-            get
-            {
-                return _visibility;
-            }
-            set
-            {
-                if (_visibility != value)
-                {
-                    _visibility = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_visibility);
+            set => SetValue(ref _visibility, value);
         }
 
         /// <summary>
@@ -166,25 +133,21 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public OverrideType Override
         {
-            get
-            {
-                return _override;
-            }
-            set
-            {
-                if (_override != value)
-                {
-                    _override = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_override);
+            set => SetValue(ref _override, value);
         }
 
         #endregion
 
         #region [ Hierarchy Properties ]
 
-
+        /// <summary>
+        /// Унаследованный атрибут родителя
+        /// </summary>
+        public ElementAttributeModel InheritedAttributeFromParent 
+        {
+            get => GetValue(_inheritedAttributeFromParent); 
+        }
 
         #endregion
 
@@ -203,7 +166,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Уникальный идентификатор в рамках объяввшего владельца
         /// </summary>
-        public Guid DeclaringUuid { get; }
+        public Guid DeclaringUuid
+        {
+            get => GetValue(_declaringUuid);
+        }
 
         /// <summary>
         /// Глубина наследования
@@ -239,9 +205,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// Персональный атрибут, созданный в рамках текущего владельца, а не унаследованный
         /// </summary>
         public bool IsOwn 
-        { 
-            get => LocalUuid == DeclaringUuid
-                && Owner.Uuid == DeclaringOwner.Uuid;
+        {
+            get => GetValue(_isOwn);
         }
 
         /// <summary>
@@ -288,8 +253,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             IAttributeOwnerModel localOwner, 
             Guid declaringUuid,
             IAttributeOwnerModel declaringOwner,
-            WorkingTreeModel owningWorkingTree) 
-            : base(localUuid, localOwner)
+            WorkingTreeModel owningWorkingTree,
+            INotificationService notificationService,
+            IPropertiesPolicy<ElementAttributeModel> propertiesPolicy) 
+            : base(localUuid, localOwner, notificationService, propertiesPolicy)
         {
             ArgumentNullException.ThrowIfNull(localOwner, nameof(localOwner));
             ArgumentNullException.ThrowIfNull(declaringOwner, nameof(declaringOwner));
@@ -298,8 +265,28 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 throw new ArgumentException(nameof(declaringUuid));
 
             _attributeOwner = localOwner;
-            DeclaringUuid = declaringUuid;
+            _declaringUuid = declaringUuid;
             _declaringAttributeOwner = declaringOwner;
+
+            _isOwn = localUuid == _declaringUuid
+                && _attributeOwner.Uuid == _declaringAttributeOwner.Uuid;
+
+            _inheritedAttributeFromParent = GetInheritedAttributeFromParent();
+
+            _visibility = VisibilityScope.Public;
+
+            if (_attributeOwner is TreeRootModel)
+            {
+                _override = OverrideType.Abstract;
+            }
+            else if (_attributeOwner is TreeNodeModel)
+            {
+                _override = OverrideType.Virtual;
+            }
+            else if (_attributeOwner is TreeLeaveModel)
+            {
+                _override = OverrideType.NotApplicable;
+            }
         }
 
         #endregion
@@ -373,17 +360,23 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 localOwner: newOwner,
                 declaringUuid: this.DeclaringUuid,
                 declaringOwner: this._declaringAttributeOwner,
-                owningWorkingTree: this.OwningWorkingTree)
+                owningWorkingTree: this.OwningWorkingTree,
+                notificationService: _notificationService,
+                propertiesPolicy: _propertiesPolicy)
             {
-                Name = this.Name,
-                Description = this.Description,
-                ValueType = this.ValueType,
-                IsCollectionValue = this.IsCollectionValue, 
-                Value = this.Value, 
-                _values = new List<TreeLeaveModel>(this._values), 
-                Visibility = this.Visibility,
-                Override = this.Override
+                _name = this._name,
+                _description = this._description,
+                _valueType = this._valueType,
+                _isCollectionValue = this._isCollectionValue,
+                _value = this._value,
+                _values = new List<TreeLeaveModel>(this._values),
+                _visibility = this._visibility,
             };
+
+            if (newOwner is not TreeLeaveModel)
+            {
+                result._override = this._override;
+            }
 
             newOwner.AddAttribute(result);
 
@@ -403,6 +396,42 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         protected override bool ClearContentDetailed()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Получить унаследованный атрибут с родителя
+        /// </summary>
+        /// <param name="elevationLevel">Уровень поднятия. Величина обратная к глубине наследования. 
+        ///     elevationLevel = this.InheritanceDepth - targetParent.InheritanceDepth 
+        ///     (0 - текущий владелец, 1 - ближайший родитель, int.Max - изначальный владелец)</param>
+        /// <returns></returns>
+        public ElementAttributeModel GetInheritedAttributeFromParent(int elevationLevel = 1)
+        {
+            if (elevationLevel == 0 || IsOwn)
+                return this;
+
+            if (elevationLevel == 1 && _inheritedAttributeFromParent != null)
+                return _inheritedAttributeFromParent;
+
+            if (Owner is IChildrenModel c)
+            {
+                if (c.Parent is IAttributeOwnerModel nextParent)
+                {
+                    var inheritedAttribute = nextParent.Attributes.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
+                     
+                    if (inheritedAttribute != null)
+                        return inheritedAttribute.GetInheritedAttributeFromParent(elevationLevel - 1); ;
+
+                    _notificationService.SendTextMessage<ElementAttributeModel>($"Ошибка поиска унаследованного атрибута '{Name}' - родитель владельца '{(c.Parent as IMainEntity)?.Name}' не содержит такого атрибута. Обратитесь к разработчику.");
+                    throw new Exception();
+                }
+
+                _notificationService.SendTextMessage<ElementAttributeModel>($"Ошибка поиска унаследованного атрибута '{Name}' - родитель владельца '{(c.Parent as IMainEntity)?.Name}' не содержит атрибутов. Обратитесь к разработчику.");
+                throw new Exception();
+            }
+
+            _notificationService.SendTextMessage<ElementAttributeModel>($"Ошибка поиска унаследованного атрибута '{Name}' - владелец атрибута '{(Owner as IMainEntity)?.Name}' не имеет родителей. Обратитесь к разработчику.");
+            throw new Exception();
         }
 
         #endregion

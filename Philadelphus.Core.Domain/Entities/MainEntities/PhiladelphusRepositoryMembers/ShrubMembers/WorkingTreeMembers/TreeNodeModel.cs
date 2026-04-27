@@ -3,6 +3,8 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
 using System.Reflection.Metadata;
@@ -12,7 +14,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Узел дерева участников репозитория Чубушника (аналог классов и интерфейсов в ООП)
     /// </summary>
-    public class TreeNodeModel : WorkingTreeMemberBaseModel, IWorkingTreeMemberModel, IParentModel, IChildrenModel, IOwnerModel
+    public class TreeNodeModel : WorkingTreeMemberBaseModel<TreeNodeModel>, IWorkingTreeMemberModel, IParentModel, IChildrenModel, IOwnerModel
     {
         #region [ Fields ]
 
@@ -125,8 +127,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal TreeNodeModel(
             Guid uuid,
             IParentModel parent,
-            WorkingTreeModel owner)
-            : base(uuid, owner)
+            WorkingTreeModel owner,
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeNodeModel> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));

@@ -52,5 +52,10 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// <param name="viewer">Текущий элемент</param>
         /// <returns></returns>
         public IEnumerable<ElementAttributeModel> GetVisibleAttributesRecursive(IWorkingTreeMemberModel? viewer);
+
+        /// <summary>
+        /// Пометить как требующий пересчета списка атрибутов
+        /// </summary>
+        internal void MarkAsNeedRecalculateAttributesList();
     }
 }

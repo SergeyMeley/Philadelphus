@@ -4,6 +4,8 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System;
@@ -54,20 +56,26 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 {
                     var parent = (ctx.Items["Parents"] as IEnumerable<IParentModel>).Single(x => x.Uuid == (src.ParentTreeNodeUuid ?? src.ParentTreeRootUuid));
                     var owner = ctx.Items["Owner"] as WorkingTreeModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<TreeNodeModel>)] as IPropertiesPolicy<TreeNodeModel>;
 
                     if (src.SystemBaseTypeId == 0)
                     {
                         return new TreeNodeModel(
                             src.Uuid,
                             parent,
-                            owner);
+                            owner,
+                            notificationService,
+                            propertiesPolicy);
                     }
                     else
                     {
                         return new SystemBaseTreeNodeModel(
                             src.Uuid,
                             parent,
-                            owner);
+                            owner,
+                            notificationService,
+                            propertiesPolicy);
                     }
                 })
 

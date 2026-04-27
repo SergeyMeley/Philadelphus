@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System;
@@ -52,13 +55,17 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 {
                     var parent = (ctx.Items["Parents"] as IEnumerable<TreeNodeModel>).Single(x => x.Uuid == src.ParentTreeNodeUuid);
                     var owner = ctx.Items["Owner"] as WorkingTreeModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<TreeLeaveModel>)] as IPropertiesPolicy<TreeLeaveModel>;
 
                     if (src.SystemBaseTypeId == 0)
                     {
                         return new TreeLeaveModel(
                             src.Uuid,
                             parent,
-                            owner);
+                            owner,
+                            notificationService,
+                            propertiesPolicy);
                     }
                     else
                     {
@@ -68,7 +75,9 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             src.Uuid,
                             parent as SystemBaseTreeNodeModel,
                             owner,
-                            type);
+                            type,
+                            notificationService,
+                            propertiesPolicy);
                     }
                 })
 

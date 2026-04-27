@@ -64,7 +64,7 @@
         </GroupBox>
         <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
         <GroupBox Grid.Row="0" Grid.Column="2" Header="Текущий элемент">
-            <TabControl>
+            <TabControl SelectedIndex="0">
                 <TabItem Header="Значение" Visibility="{Binding SystemBaseLeaveControlVisibility}">
                     <Grid>
                         <Grid.ColumnDefinitions>

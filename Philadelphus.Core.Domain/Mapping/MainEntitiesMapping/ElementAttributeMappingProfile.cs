@@ -5,6 +5,8 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies.Attributes.Builders;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
@@ -80,13 +82,16 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                     var owner = (ctx.Items["Owners"] as IEnumerable<IAttributeOwnerModel>)?.FirstOrDefault(x => x.Uuid == src.OwnerUuid);
                     var declaringOwner = (ctx.Items["Owners"] as IEnumerable<IAttributeOwnerModel>)?.FirstOrDefault(x => x.Uuid == src.DeclaringOwnerUuid);
                     var owningTree = ctx.Items["OwningWorkingTree"] as WorkingTreeModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
 
                     var result = new ElementAttributeModel(
                         src.Uuid,
                         owner,
                         src.DeclaringUuid,
                         declaringOwner,
-                        owningTree);
+                        owningTree,
+                        notificationService,
+                        AttributePolicyBuilder.CreateDefault(notificationService));
 
                     return result;
                 })

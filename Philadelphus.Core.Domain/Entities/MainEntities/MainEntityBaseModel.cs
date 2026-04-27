@@ -3,7 +3,10 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
 
@@ -12,17 +15,24 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
     /// <summary>
     /// Основная сущность Чубушника
     /// </summary>
-    public abstract class MainEntityBaseModel : IMainEntityWritableModel
+    public abstract class MainEntityBaseModel<T> : IMainEntityWritableModel
+        where T : MainEntityBaseModel<T>
     {
         #region [ Fields ]
+
+        protected readonly INotificationService _notificationService;
 
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
         /// </summary>
         protected virtual string _defaultFixedPartOfName => "Новая основная сущность";
 
-        private string _name;
-        private string? _description;
+        protected readonly IPropertiesPolicy<T> _propertiesPolicy;
+        private static readonly AsyncLocal<PropertiesPolicyContext> _context = new();
+
+        private Guid _uuid;
+        protected string _name;
+        protected string? _description;
         private bool _isHidden = false;
         private State _state = State.Initialized;
 
@@ -35,25 +45,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Уникальный идентификатор
         /// </summary>
-        public Guid Uuid { get; }
+        public Guid Uuid
+        {
+            get => GetValue(_uuid);
+            private init => SetValue(ref _uuid, value);
+        }
 
         /// <summary>
         /// Наименование
         /// </summary>
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                if (_name != value)
-                {
-                    _name = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_name);
+            set => SetValue(ref _name, value);
         }
 
         /// <summary>
@@ -61,18 +65,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         public string? Description
         {
-            get
-            {
-                return _description;
-            }
-            set
-            {
-                if (_description != value)
-                {
-                    _description = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_description);
+            set => SetValue(ref _description, value);
         }
 
         /// <summary>
@@ -85,18 +79,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         public bool IsHidden
         {
-            get
-            {
-                return _isHidden;
-            }
-            set
-            {
-                if (_isHidden != value)
-                {
-                    _isHidden = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_isHidden);
+            set => SetValue(ref _isHidden, value);
         }
 
         #endregion
@@ -106,12 +90,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Состояние
         /// </summary>
-        public State State 
-        { 
-            get
-            {
-                return _state; 
-            }
+        public State State
+        {
+            get => GetValue(_state);
         }
 
         /// <summary>
@@ -131,12 +112,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="dbEntity">Сущность БД</param>
         internal MainEntityBaseModel(
-            Guid uuid)
+            Guid uuid,
+            INotificationService notificationService,
+            IPropertiesPolicy<T> propertiesPolicy)
         {
+            _notificationService = notificationService;
+            _propertiesPolicy = propertiesPolicy;
+
             if (uuid == Guid.Empty)
                 throw new ArgumentNullException(nameof(uuid));
 
-            Uuid = uuid;
+            _uuid = uuid;
         }
 
         #endregion
@@ -182,6 +168,69 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         {
             Name = NamingHelper.GetNewName(fixedPartOfName: _defaultFixedPartOfName);
             return Name;
+        }
+
+        protected TValue GetValue<TValue>(
+            TValue field,
+            [CallerMemberName] string prop = null)
+        {
+            var ctx = _context.Value ??= new PropertiesPolicyContext();
+
+            // Защита от зацикливания
+            if (ctx.IsInProgress(this, field, prop))
+                return field;
+
+            try
+            {
+                ctx.Enter(this, field, prop);
+
+                if (_propertiesPolicy?.CanRead((T)this, prop) == false)
+                {
+                    _notificationService.SendTextMessage<MainEntityBaseModel<T>>($"Ошибка получения значения свойства '{prop}' - нарушены ограничения системы.");
+                    return default;
+                }
+
+                return (TValue)_propertiesPolicy?.OnRead((T)this, prop, field);
+            }
+            finally
+            {
+                ctx.Exit(this, field, prop);
+            }
+        }
+
+        /// <summary>
+        /// Получить значение свойства
+        /// Проверяется на соответствие политикам
+        /// </summary>
+        /// <param name="field">Поле</param>
+        /// <param name="prop">Свойство</param>
+        /// <returns></returns>
+        protected bool SetValue<TValue>(
+            ref TValue field,
+            TValue value,
+            [CallerMemberName] string prop = null)
+        {
+            if (EqualityComparer<TValue>.Default.Equals(field, value))
+                return false;
+
+            if (_propertiesPolicy?.CanWrite((T)this, prop, value) == false)
+            {
+                _notificationService.SendTextMessage<MainEntityBaseModel<T>>(
+                    $"Ошибка присвоения значения свойству '{prop}' - нарушены ограничения системы.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
+                return false;
+            }
+                
+
+            var oldValue = field;
+
+            field = value;
+
+            _propertiesPolicy?.OnWrite((T)this, prop, oldValue, value);
+
+            UpdateStateStateAfterChange();
+
+            return true;
         }
 
         #endregion

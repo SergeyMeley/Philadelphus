@@ -4,6 +4,8 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.ObjectModel;
@@ -15,7 +17,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
     /// <summary>
     /// Репозиторий Чубушника (агрегатор корней, аналог решения в .NET)
     /// </summary>
-    public class PhiladelphusRepositoryModel : MainEntityBaseModel, IPhiladelphusRepositoryHeaderModel, IOwnerModel, IHavingOwnDataStorageModel
+    public class PhiladelphusRepositoryModel : MainEntityBaseModel<PhiladelphusRepositoryModel>, IPhiladelphusRepositoryHeaderModel, IOwnerModel, IHavingOwnDataStorageModel
     {
         #region [ Fields ]
 
@@ -189,15 +191,18 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="dbEntity">Сущность БД</param>
         internal PhiladelphusRepositoryModel(
             Guid uuid, 
-            IDataStorageModel dataStorage)
-            : base(uuid)
+            IDataStorageModel dataStorage,
+            INotificationService notificationService,
+            IPropertiesPolicy<PhiladelphusRepositoryModel> propertiesPolicy,
+            IPropertiesPolicy<ShrubModel> shrubPropertiesPolicy)
+            : base(uuid, notificationService, propertiesPolicy)
         {
             if (dataStorage == null)
                 throw new ArgumentNullException(nameof(dataStorage));
 
             OwnDataStorage = dataStorage;
 
-            ContentShrub = new ShrubModel(uuid, this);
+            ContentShrub = new ShrubModel(uuid, this, notificationService, shrubPropertiesPolicy);
 
         }
 

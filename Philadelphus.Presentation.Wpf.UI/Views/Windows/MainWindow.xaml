@@ -165,6 +165,10 @@
                     <RibbonGroup Header="Конвертация">
                         <RibbonButton Label="Конвертировать .xlsx в .phjson" Command="{Binding RepositoryExplorerVM.ConvertXlsxToPhjsonCommand}" />
                     </RibbonGroup>
+                    <RibbonGroup Header="Прогресс">
+                        <TextBlock Text="{Binding RepositoryExplorerVM.CurrentProcess}"></TextBlock>
+                        <TextBlock Text="{Binding RepositoryExplorerVM.CurrentProgress}"></TextBlock>
+                    </RibbonGroup>
                 </RibbonTab>
                 <!--<RibbonTab Header="Вид">
 

@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
 using System;
@@ -40,11 +43,15 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 {
                     var storage = (ctx.Items["DataStorages"] as IEnumerable<IDataStorageModel>).Single(x => x.Uuid == src.OwnDataStorageUuid);
                     var owner = ctx.Items["Owner"] as ShrubModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<WorkingTreeModel>)] as IPropertiesPolicy<WorkingTreeModel>;
 
                     return new WorkingTreeModel(
                         src.Uuid,
                         storage,
-                        owner);
+                        owner,
+                        notificationService,
+                        propertiesPolicy);
                 })
 
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))

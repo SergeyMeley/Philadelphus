@@ -6,6 +6,8 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
 
@@ -14,7 +16,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Корень дерева участников репозитория Чубушника (аналог проекта / библиотеки в .NET)
     /// </summary>
-    public class  TreeRootModel : WorkingTreeMemberBaseModel, IParentModel, IOwnerModel
+    public class  TreeRootModel : WorkingTreeMemberBaseModel<TreeRootModel>, IParentModel, IOwnerModel
     {
         #region [ Fields ]
 
@@ -100,8 +102,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         internal TreeRootModel(
             Guid uuid,
-            WorkingTreeModel owner)
-            : base(uuid, owner)
+            WorkingTreeModel owner,
+            INotificationService notificationService,
+            IPropertiesPolicy<TreeRootModel> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             owner.ContentRoot = this;
 

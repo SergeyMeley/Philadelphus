@@ -84,7 +84,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             get
             {
                 var result = new ObservableCollection<ElementAttributeVM>();
-                if (_model is ShrubMemberBaseModel sm)
+                if (_model is IShrubMemberModel sm)
                 {
                     foreach (var attribute in sm.Attributes)
                     {

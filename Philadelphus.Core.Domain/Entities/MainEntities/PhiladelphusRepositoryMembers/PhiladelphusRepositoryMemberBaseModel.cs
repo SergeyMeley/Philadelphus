@@ -1,6 +1,8 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,8 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers
 {
-    public abstract class PhiladelphusRepositoryMemberBaseModel : MainEntityBaseModel, IPhiladelphusRepositoryMemberModel, IContentModel
+    public abstract class PhiladelphusRepositoryMemberBaseModel<T> : MainEntityBaseModel<T>, IPhiladelphusRepositoryMemberModel, IContentModel
+        where T : PhiladelphusRepositoryMemberBaseModel<T>
     {
         #region [ Fields ]
 
@@ -92,8 +95,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         internal PhiladelphusRepositoryMemberBaseModel(
             Guid uuid,
-            IOwnerModel owner)
-            : base(uuid)
+            IOwnerModel owner,
+            INotificationService notificationService,
+            IPropertiesPolicy<T> propertiesPolicy)
+            : base(uuid, notificationService, propertiesPolicy)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
@@ -104,7 +109,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 OwningRepository = r;
             }
-            else if (owner is PhiladelphusRepositoryMemberBaseModel rm)
+            else if (owner is IPhiladelphusRepositoryMemberModel rm)
             {
                 OwningRepository = rm.OwningRepository;
             }

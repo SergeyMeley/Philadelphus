@@ -1,6 +1,8 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
 
@@ -9,7 +11,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Участник корня репозитория Чубушника
     /// </summary>
-    public abstract class WorkingTreeMemberBaseModel : ShrubMemberBaseModel, IWorkingTreeMemberModel, IOwnerModel, IContentModel
+    public abstract class WorkingTreeMemberBaseModel<T> : ShrubMemberBaseModel<T>, IWorkingTreeMemberModel, IOwnerModel, IContentModel
+        where T : WorkingTreeMemberBaseModel<T>
     {
         #region [ Fields ]
 
@@ -92,8 +95,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         public WorkingTreeMemberBaseModel(
             Guid uuid,
-            IOwnerModel owner)
-             : base(uuid, owner)
+            IOwnerModel owner,
+            INotificationService notificationService,
+            IPropertiesPolicy<T> propertiesPolicy)
+             : base(uuid, owner, notificationService, propertiesPolicy)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
@@ -102,7 +107,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 OwningWorkingTree = t;
             }
-            else if (owner is WorkingTreeMemberBaseModel wtm)
+            else if (owner is IWorkingTreeMemberModel wtm)
             {
                 OwningWorkingTree = wtm.OwningWorkingTree;
             }

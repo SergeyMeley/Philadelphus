@@ -16,7 +16,7 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
         public string ValueLeaveName { get; set; } = "Не задано";
         public bool IsCollectionValue { get; } = false;
         public VisibilityScope Visibility { get; } = VisibilityScope.Public;
-        public OverrideType Override { get; } = OverrideType.None;
+        public OverrideType Override { get; } = OverrideType.Sealed;
 
         public AttributeExportDTO(ElementAttributeModel attr)
         {

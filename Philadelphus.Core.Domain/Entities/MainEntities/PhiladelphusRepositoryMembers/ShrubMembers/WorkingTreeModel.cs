@@ -3,13 +3,15 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
 {
-    public class WorkingTreeModel : ShrubMemberBaseModel, IPhiladelphusRepositoryMemberModel, IHavingOwnDataStorageModel, IOwnerModel, IContentModel
+    public class WorkingTreeModel : ShrubMemberBaseModel<WorkingTreeModel>, IPhiladelphusRepositoryMemberModel, IHavingOwnDataStorageModel, IOwnerModel, IContentModel
     {
         #region [ Fields ]
 
@@ -141,8 +143,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal WorkingTreeModel(
             Guid uuid,
             IDataStorageModel dataStorage,
-            ShrubModel owner)
-            : base(uuid, owner)
+            ShrubModel owner,
+            INotificationService notificationService,
+            IPropertiesPolicy<WorkingTreeModel> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             if (dataStorage == null)
                 throw new ArgumentNullException(nameof(dataStorage));

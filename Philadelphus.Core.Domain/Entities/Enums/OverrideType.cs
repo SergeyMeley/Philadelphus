@@ -10,8 +10,12 @@ namespace Philadelphus.Core.Domain.Entities.Enums
 {
     public enum OverrideType
     {
+        [Display(Name = "Ошибка системы")]
+        SystemError,
+        [Display(Name = "Не применимо")]
+        NotApplicable,
         [Display(Name = "Запрещено")]
-        None,
+        Sealed,
         [Display(Name = "Возможно")] 
         Virtual,
         [Display(Name = "Требуется")] 

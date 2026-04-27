@@ -4,8 +4,11 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Mapping;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
@@ -117,7 +120,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     else
                         dbRepositories = infrastructure.SelectRepositories(uuids);
                     //var repositories = _mapper.Map<List<PhiladelphusRepositoryModel>>(dbRepositories);
-                    var repositories = _mapper.MapPhiladelphusRepositories(dbRepositories, dataStorages).ToList();
+                    var repositories = _mapper.MapPhiladelphusRepositories(dbRepositories, dataStorages, _notificationService, new EmptyPropertiesPolicy<PhiladelphusRepositoryModel>()).ToList();
                     if (repositories != null)
                     {
                         for (int i = 0; i < repositories.Count; i++)
@@ -158,7 +161,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий</returns>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true)
         {
-            var result = new PhiladelphusRepositoryModel(Guid.CreateVersion7(), dataStorage);
+            var result = new PhiladelphusRepositoryModel(
+                Guid.CreateVersion7(), 
+                dataStorage, 
+                _notificationService, 
+                new EmptyPropertiesPolicy<PhiladelphusRepositoryModel>(),
+                new EmptyPropertiesPolicy<ShrubModel>());
 
             if (needAutoName)
             {

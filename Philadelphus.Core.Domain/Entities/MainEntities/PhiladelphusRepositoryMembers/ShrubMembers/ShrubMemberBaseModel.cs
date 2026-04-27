@@ -4,6 +4,8 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
@@ -14,7 +16,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// <summary>
     /// Участник репозитория Чубушника
     /// </summary>
-    public abstract class ShrubMemberBaseModel : PhiladelphusRepositoryMemberBaseModel, IShrubMemberModel, IPhiladelphusRepositoryMemberModel, IAttributeOwnerModel, IOwnerModel, IContentModel, ISequencableModel
+    public abstract class ShrubMemberBaseModel<T> : PhiladelphusRepositoryMemberBaseModel<T>, IShrubMemberModel, IPhiladelphusRepositoryMemberModel, IAttributeOwnerModel, IOwnerModel, IContentModel, ISequencableModel
+        where T : ShrubMemberBaseModel<T>
     {
         #region [ Fields ]
 
@@ -193,8 +196,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="dbEntity">Сущность БД</param>
         internal ShrubMemberBaseModel(
             Guid uuid,
-            IOwnerModel owner)
-            : base(uuid, owner)
+            IOwnerModel owner,
+            INotificationService notificationService,
+            IPropertiesPolicy<T> propertiesPolicy)
+            : base(uuid, owner, notificationService, propertiesPolicy)
         {
             if (owner == null)
                 throw new ArgumentNullException(nameof(owner));
@@ -203,7 +208,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 OwningShrub = sh;
             }
-            else if (owner is ShrubMemberBaseModel shm)
+            else if (owner is IShrubMemberModel shm)
             {
                 OwningShrub = shm.OwningShrub;
             }
@@ -229,21 +234,21 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                     return false;
 
                 _attributes.Add(attribute);
-                IncrementVersionRecursive();
+                ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
                 return true;
             }
-         }
+        }
 
-        private void IncrementVersionRecursive()
+        void IAttributeOwnerModel.MarkAsNeedRecalculateAttributesList()
         {
             _version++;
             if (this is IParentModel p)
             {
                 foreach (var c in p.Childs)
                 {
-                    if (c.Value is ShrubMemberBaseModel sm)
+                    if (c.Value is IAttributeOwnerModel ao)
                     {
-                        sm.IncrementVersionRecursive();
+                        ao.MarkAsNeedRecalculateAttributesList();
                     }
                 }
             }

@@ -3,6 +3,8 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System;
@@ -38,10 +40,14 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ConstructUsing((src, ctx) =>
                 {
                     var owner = ctx.Items["Owner"] as WorkingTreeModel;
+                    var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<TreeRootModel>)] as IPropertiesPolicy<TreeRootModel>;
 
                     return new TreeRootModel(
                         src.Uuid,
-                        owner);
+                        owner,
+                        notificationService,
+                        propertiesPolicy);
                 })
 
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
