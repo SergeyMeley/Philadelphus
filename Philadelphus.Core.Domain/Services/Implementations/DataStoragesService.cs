@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
@@ -50,6 +50,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
             IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
         {
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(applicationSettings);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollection);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollection);
+
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
@@ -71,9 +78,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public IEnumerable<IDataStorageModel> GetStoragesModels(
             Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
-            var connectionStrings = _connectionStringsCollection.Value.ConnectionStringsContainers;
-            var dbEntities = _dataStoragesCollection.Value.DataStorages;
-            var models = new List<IDataStorageModel>();
+            ArgumentNullException.ThrowIfNull(getInfrastructureRepository);
+
+            // Валидация конфигурации
+            var connectionStrings = _connectionStringsCollection.Value?.ConnectionStringsContainers
+                ?? throw new InvalidOperationException(
+                    "ConnectionStrings не инициализированы. Проверьте конфиг ConnectionStringsCollectionConfig");
+
+            var dbEntities = _dataStoragesCollection.Value?.DataStorages
+                ?? throw new InvalidOperationException(
+                    "DataStorages не инициализированы. Проверьте конфиг DataStoragesCollectionConfig");
 
             foreach (var entity in dbEntities)
             {
@@ -83,23 +97,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     _logger.Error($"Не найдена строка подключения для хранилища {entity.Name}");
                     _notificationService.SendTextMessage<DataStoragesService>($"Не найдена строка подключения для хранилища {entity.Name}");
+                    continue;
                 }
-                else
-                {
-                    var infrastructureRepositories = new List<IInfrastructureRepository>();
-                    if (entity.IsHidden == false)
-                    {
-                        if (entity.HasPhiladelphusRepositoriesInfrastructureRepository)
-                            infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories));
-                        if (entity.HasShrubMembersInfrastructureRepository)
-                            infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
-                        if (entity.HasReportsInfrastructureRepository)
-                            infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.Reports));
-                    }
 
-                    var model = _mapper.MapDataStorage(entity, infrastructureRepositories, _logger);
-                    yield return model;
+                var infrastructureRepositories = new List<IInfrastructureRepository>();
+                if (entity.IsHidden == false)
+                {
+                    if (entity.HasPhiladelphusRepositoriesInfrastructureRepository)
+                        infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories));
+                    if (entity.HasShrubMembersInfrastructureRepository)
+                        infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
+                    if (entity.HasReportsInfrastructureRepository)
+                        infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.Reports));
                 }
+
+                var model = _mapper.MapDataStorage(entity, infrastructureRepositories, _logger);
+                yield return model;
             }
         }
 
@@ -119,10 +132,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns></returns>
         public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo basePath)
         {
-            if (basePath == null)
-                throw new ArgumentNullException($"{nameof(basePath)}");
+            ArgumentNullException.ThrowIfNull(basePath);
 
-            var path = _applicationSettings.Value.MainDataStorage.FullName;
+            var settings = _applicationSettings.Value
+                ?? throw new InvalidOperationException("ApplicationSettings не инициализированы");
+            var mainDataStorage = settings.MainDataStorage
+                ?? throw new InvalidOperationException("MainDataStorage не инициализирован");
+
+            var path = mainDataStorage.FullName;
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
@@ -154,8 +171,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringsContainer connectionString,
             Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
-            if (string.IsNullOrEmpty(name) || getInfrastructureRepository == null)
-                throw new ArgumentNullException();
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentNullException.ThrowIfNull(connectionString);
+            ArgumentNullException.ThrowIfNull(getInfrastructureRepository);
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(

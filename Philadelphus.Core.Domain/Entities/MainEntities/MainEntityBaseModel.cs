@@ -119,8 +119,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             _notificationService = notificationService;
             _propertiesPolicy = propertiesPolicy;
 
-            if (uuid == Guid.Empty)
-                throw new ArgumentNullException(nameof(uuid));
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
             _uuid = uuid;
         }

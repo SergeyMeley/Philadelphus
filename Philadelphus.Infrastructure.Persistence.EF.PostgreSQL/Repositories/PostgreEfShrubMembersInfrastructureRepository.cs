@@ -41,7 +41,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             {
                 if (navigationEntities.TryGetValue(workingTreeMember.OwningWorkingTreeUuid, out var owningTree))
                 {
-                    workingTreeMember.OwningWorkingTree = owningTree as WorkingTree ?? throw new ArgumentNullException();
+                    workingTreeMember.OwningWorkingTree = owningTree as WorkingTree
+                        ?? throw new ArgumentNullException();
                 }
                 else
                 {

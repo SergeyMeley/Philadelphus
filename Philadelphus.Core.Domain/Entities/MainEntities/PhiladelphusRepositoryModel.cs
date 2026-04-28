@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
@@ -197,8 +197,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             IPropertiesPolicy<ShrubModel> shrubPropertiesPolicy)
             : base(uuid, notificationService, propertiesPolicy)
         {
-            if (dataStorage == null)
-                throw new ArgumentNullException(nameof(dataStorage));
+            ArgumentNullException.ThrowIfNull(dataStorage);
 
             OwnDataStorage = dataStorage;
 

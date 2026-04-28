@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 
@@ -13,8 +13,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         }
         public MainWindowVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
-            if (repositoryExplorerControlVM == null)
-                throw new ArgumentNullException();
+            ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
+
             return ActivatorUtilities.CreateInstance<MainWindowVM>(_serviceProvider, repositoryExplorerControlVM);
         }
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -14,8 +14,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         }
         public RepositoryExplorerControlVM Create(PhiladelphusRepositoryVM repositoryVM)
         {
-            if (repositoryVM == null)
-                throw new ArgumentNullException();
+            ArgumentNullException.ThrowIfNull(repositoryVM);
+
             return ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(_serviceProvider, repositoryVM);
         }
     }

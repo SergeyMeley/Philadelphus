@@ -143,14 +143,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         #endregion
 
         #region [Commands]
-        public RelayCommand GetWorkCommand
+        public AsyncRelayCommand GetWorkCommand
         {
             get
             {
-                return new RelayCommand(obj =>
-                {
-                    LoadPhiladelphusRepository();
-                });
+                return new AsyncRelayCommand(ExecuteGetWorkAsync); ;
             }
         }
 
@@ -417,6 +414,34 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         internal bool LoadPhiladelphusRepository()
         {
             var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
+            UpdateLoadedPhiladelphusRepository(newRepo);
+            return _philadelphusRepositoryVM.Childs != null;
+        }
+
+        internal async Task<bool> LoadPhiladelphusRepositoryAsync()
+        {
+            var newRepo = await _service.GetShrubContentAsync(_philadelphusRepositoryVM.Model);
+            UpdateLoadedPhiladelphusRepository(newRepo);
+            return _philadelphusRepositoryVM.Childs != null;
+        }
+
+        private async Task ExecuteGetWorkAsync(object obj)
+        {
+            try
+            {
+                await LoadPhiladelphusRepositoryAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Ошибка обновления содержимого репозитория.");
+                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                    $"Ошибка обновления содержимого репозитория. Подробности: {ex.Message}",
+                    criticalLevel: NotificationCriticalLevelModel.Error);
+            }
+        }
+
+        private void UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryModel newRepo)
+        {
             _philadelphusRepositoryVM.Childs.Clear();
             foreach (var item in newRepo.ContentShrub.ContentWorkingTrees)
             {
@@ -428,8 +453,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             OnPropertyChanged(nameof(_philadelphusRepositoryVM));
             OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
             OnPropertyChanged(nameof(_philadelphusRepositoryVM.ChildsCount));
-            return _philadelphusRepositoryVM.Childs != null;
         }
+
         public bool CheckPhiladelphusRepositoryAvailability()
         {
             if (_philadelphusRepositoryVM.Model == null)

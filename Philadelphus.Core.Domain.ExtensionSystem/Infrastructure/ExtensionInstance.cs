@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Collections.ObjectModel;
@@ -147,7 +147,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
 
         public ExtensionInstance(IExtensionModel extension)
         {
-            Extension = extension ?? throw new ArgumentNullException(nameof(extension));
+            ArgumentNullException.ThrowIfNull(extension);
+
+            Extension = extension;
             State = ExtensionState.Created;
             OperationHistory = new ObservableCollection<OperationLog>();
 

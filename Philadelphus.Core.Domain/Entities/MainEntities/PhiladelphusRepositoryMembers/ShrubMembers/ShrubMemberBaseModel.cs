@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
@@ -201,8 +201,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IPropertiesPolicy<T> propertiesPolicy)
             : base(uuid, owner, notificationService, propertiesPolicy)
         {
-            if (owner == null)
-                throw new ArgumentNullException(nameof(owner));
+            ArgumentNullException.ThrowIfNull(owner);
 
             if (owner is ShrubModel sh)
             {

@@ -34,6 +34,8 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
         public XmlTablesExportService(
             INotificationService notificationService)
         {
+            ArgumentNullException.ThrowIfNull(notificationService);
+
             _notificationService = notificationService;
         }
 
@@ -51,6 +53,9 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
             string reportName,
             CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentNullException.ThrowIfNull(columns);
+
             var path = TablesExportPathBuilder.BuildExportPath(reportName, FileExtension);
 
             var settings = new XmlWriterSettings

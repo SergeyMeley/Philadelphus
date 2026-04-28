@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
@@ -100,8 +100,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IPropertiesPolicy<T> propertiesPolicy)
             : base(uuid, notificationService, propertiesPolicy)
         {
-            if (owner == null)
-                throw new ArgumentNullException(nameof(owner));
+            ArgumentNullException.ThrowIfNull(owner);
 
             Owner = owner;
 

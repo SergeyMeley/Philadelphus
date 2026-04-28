@@ -36,6 +36,8 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
         public OpenXmlExcelTablesExportService(
             INotificationService notificationService)
         {
+            ArgumentNullException.ThrowIfNull(notificationService);
+
             _notificationService = notificationService;
         }
 
@@ -53,6 +55,9 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
             string reportName,
             CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentNullException.ThrowIfNull(columns);
+
             if (columns.Count == 0)
                 throw new ArgumentException("Не задан список колонок для экспорта.", nameof(columns));
 

@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
 {
@@ -10,7 +10,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
 
         public AsyncRelayCommand(Func<object, System.Threading.Tasks.Task> execute, Predicate<object> canExecute = null)
         {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            ArgumentNullException.ThrowIfNull(execute);
+
+            _execute = execute;
             _canExecute = canExecute;
         }
 

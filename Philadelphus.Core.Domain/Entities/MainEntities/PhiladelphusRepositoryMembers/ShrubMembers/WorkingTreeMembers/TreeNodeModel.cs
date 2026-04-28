@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
@@ -132,8 +132,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IPropertiesPolicy<TreeNodeModel> propertiesPolicy)
             : base(uuid, owner, notificationService, propertiesPolicy)
         {
-            if (parent == null)
-                throw new ArgumentNullException(nameof(parent));
+            ArgumentNullException.ThrowIfNull(parent);
 
             if (parent is TreeNodeModel node)
                 ParentNode = node;

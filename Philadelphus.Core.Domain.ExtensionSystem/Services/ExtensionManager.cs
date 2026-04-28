@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Models;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -64,8 +64,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public async Task StartExtensionAsync(ExtensionInstance extension)
         {
-            if (extension == null)
-                throw new ArgumentNullException(nameof(extension));
+            ArgumentNullException.ThrowIfNull(extension);
 
             try
             {
@@ -84,8 +83,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public async Task StopExtensionAsync(ExtensionInstance extension)
         {
-            if (extension == null)
-                throw new ArgumentNullException(nameof(extension));
+            ArgumentNullException.ThrowIfNull(extension);
 
             try
             {
@@ -104,10 +102,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public async Task<IMainEntityModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, IMainEntityModel element)
         {
-            if (extension == null)
-                throw new ArgumentNullException(nameof(extension));
-            if (element == null)
-                throw new ArgumentNullException(nameof(element));
+            ArgumentNullException.ThrowIfNull(extension);
+            ArgumentNullException.ThrowIfNull(element);
 
             try
             {
@@ -161,8 +157,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public void RegisterExtension(ExtensionInstance extensionInstance)
         {
-            if (extensionInstance == null)
-                throw new ArgumentNullException(nameof(extensionInstance));
+            ArgumentNullException.ThrowIfNull(extensionInstance);
 
             _extensions.Add(extensionInstance);
             ExtensionLoaded?.Invoke(this, new ExtensionLoadedEventArgs { Extension = extensionInstance });

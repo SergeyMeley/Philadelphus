@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Philadelphus.Core.Domain.Configurations
 {
     /// <summary>
-    /// Основные настройки приложения
+    /// Основные настройки приложения.
     /// </summary>
     public class ApplicationSettingsConfig    //TODO: Подумать о переносе в Application
     {
@@ -52,7 +52,7 @@ namespace Philadelphus.Core.Domain.Configurations
         /// Пути к конфигурационным файлам
         /// </summary>
         [JsonIgnore]
-        public Dictionary<string, FileInfo> ConfigurationFilesPathes 
+        public Dictionary<string, FileInfo> ConfigurationFilesPathes
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Philadelphus.Core.Domain.Configurations
                     result.Add(path.Key, GetFileInfo(path.Value));
                 }
                 return result;
-            } 
+            }
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Philadelphus.Core.Domain.Configurations
 
                 for (int i = 0; i < PluginsDirectoriesStrings.Count(); i++)
                 {
-                    result[i] = GetDirectoryInfo(PluginsDirectoriesStrings[i]); 
+                    result[i] = GetDirectoryInfo(PluginsDirectoriesStrings[i]);
                 }
 
                 return result;

@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
@@ -62,6 +62,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             get
             {
                 var result = new Dictionary<Guid, IContentModel>();
+
+                if (ContentRoot == null)
+                {
+                    return result.AsReadOnly();
+                }
 
                 result.Add(ContentRoot.Uuid, ContentRoot);
 
@@ -138,7 +143,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="uuid"></param>
         /// <param name="dataStorage"></param>
-        /// <param name="dbEntity"></param>
         /// <param name="owner"></param>
         internal WorkingTreeModel(
             Guid uuid,
@@ -148,8 +152,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IPropertiesPolicy<WorkingTreeModel> propertiesPolicy)
             : base(uuid, owner, notificationService, propertiesPolicy)
         {
-            if (dataStorage == null)
-                throw new ArgumentNullException(nameof(dataStorage));
+            ArgumentNullException.ThrowIfNull(dataStorage);
 
             _ownDataStorage = dataStorage;
 
@@ -179,7 +182,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public IEnumerable<TreeNodeModel> GetAllNodesRecursive()
         {
-            return ContentRoot?.GetAllNodesRecursive() ?? throw new NullReferenceException();
+            return ContentRoot?.GetAllNodesRecursive() ?? Enumerable.Empty<TreeNodeModel>();
         }
 
         /// <summary>
@@ -187,7 +190,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public IEnumerable<TreeLeaveModel> GetAllLeavesRecursive()
         {
-            return ContentRoot?.GetAllLeavesRecursive() ?? throw new NullReferenceException();
+            return ContentRoot?.GetAllLeavesRecursive() ?? Enumerable.Empty<TreeLeaveModel>();
         }
 
         /// <summary>

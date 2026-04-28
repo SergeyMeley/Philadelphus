@@ -17,32 +17,44 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         #region [ Get + Load ]
 
         /// <summary>
-        /// Принудительная загрузка из хранилища участников и содержимого репозитория
-        /// </summary>
-        /// <param name="repository">Репозиторий</param>
-        /// <returns>Репозиторий с участниками и содержимым</returns>
-        public PhiladelphusRepositoryModel GetShrubContentFromDb(PhiladelphusRepositoryModel repository);
-
-        /// <summary>
         /// Получить участников и содержимое репозитория
         /// </summary>
         /// <param name="repository">Репозиторий</param>
+        /// <param name="force">Признак принудительного чтения из хранилища</param>
         /// <returns></returns>
-        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository);
+        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository, bool force = false);
+
+        /// <summary>
+        /// Получить участников и содержимое репозитория (асинхронно)
+        /// </summary>
+        /// <param name="repository">Репозиторий</param>
+        /// <param name="force">Признак принудительного чтения из хранилища</param>
+        /// <param name="cancellationToken">Токен отмены операции</param>
+        /// <returns>Репозиторий с участниками и содержимым</returns>
+        public Task<PhiladelphusRepositoryModel> GetShrubContentAsync(
+            PhiladelphusRepositoryModel repository,
+            bool force = false,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить рабочее дерево
         /// </summary>
         /// <param name="tree">Рабочее дерево</param>
+        /// <param name="force">Признак принудительного чтения из хранилища</param>
         /// <returns>Корень с содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree);
+        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree, bool force = false);
 
         /// <summary>
-        /// Получить участников и содержимое корня
+        /// Получить рабочее дерево (асинхронно)
         /// </summary>
         /// <param name="tree">Рабочее дерево</param>
-        /// <returns>Корень с участниками и содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeContentFromDb(WorkingTreeModel tree);
+        /// <param name="force">Признак принудительного чтения из хранилища</param>
+        /// <param name="cancellationToken">Токен отмены операции</param>
+        /// <returns>Корень с содержимым</returns>
+        public Task<WorkingTreeModel> GetWorkingTreeContentAsync(
+            WorkingTreeModel tree,
+            bool force = false,
+            CancellationToken cancellationToken = default);
 
         #endregion
 
@@ -55,6 +67,18 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(ref PhiladelphusRepositoryModel PhiladelphusRepository, SaveMode saveMode);
+
+        /// <summary>
+        /// Сохранить изменения (репозиторий, асинхронно)
+        /// </summary>
+        /// <param name="PhiladelphusRepository">Репозиторий</param>
+        /// <param name="saveMode">Параметры сохранения</param>
+        /// <param name="cancellationToken">Токен отмены операции</param>
+        /// <returns>Количество сохраненных изменений</returns>
+        public Task<long> SaveChangesAsync(
+            PhiladelphusRepositoryModel PhiladelphusRepository,
+            SaveMode saveMode,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Сохранить изменения (корни)

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Handlers;
@@ -14,7 +14,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
     /// <summary>
     /// Сервис управления уведомлениями
     /// </summary>
-    public class NotificationService : INotificationService
+    public class NotificationService : INotificationService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IMessageConsumer<Notification> _mainConsumer;
@@ -23,6 +23,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private Timer _registrationTimer;
         private Timer _cleanUsersTimer;
         private readonly List<Notification> _notificationsHistory = new List<Notification>();
+        private bool _disposed = false;
 
         /// <summary>
         /// История уведомлений дополнена
@@ -87,7 +88,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IMessageProducer<Notification> mainProducer,
             IOptions<MessagingConfig> options)
         {
-            _logger = logger.ForContext("SourceContext", "NotificationService");
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(consumerJoinedMessageConsumer);
+            ArgumentNullException.ThrowIfNull(mainConsumer);
+            ArgumentNullException.ThrowIfNull(mainProducer);
+            ArgumentNullException.ThrowIfNull(consumerJoinedMessageProducer);
+
+            _logger = logger
+                .ForContext("SourceContext", "NotificationService");
 
             CurrentUser = new MessagingUser(
                 Guid.CreateVersion7(), 
@@ -118,6 +127,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             [CallerMemberName] string method = null,
             [CallerFilePath] string file = null)
         {
+            ThrowIfDisposed();
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(text);
+
             Notification notification = new Notification(
                 text: text, 
                 sendingUser: CurrentUser, 
@@ -280,6 +293,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="notification">Уведомление</param>
         private bool ProcessNotification(Notification notification)
         {
+            ThrowIfDisposed();
+
+            ArgumentNullException.ThrowIfNull(notification);
+
             _logger.Information($"Начало обработки полученного уведомления '{notification.Nanoid}'. Уведомление: {notification.ToString()}");
 
             _notificationsHistory.Add(notification);
@@ -357,11 +374,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
         private bool StartAutoRegistrarion(IMessageProducer<MessagingUser> consumerJoinedMessageProducer)
         {
+            ArgumentNullException.ThrowIfNull(consumerJoinedMessageProducer);
+
             _registrationTimer = new Timer(
-               callback: _ => _ =  Task.Run(async () => {
-                   return consumerJoinedMessageProducer.ProduceAsync(
-                       CurrentUser, 
-                       default);
+               callback: _ => _ = Task.Run(async () =>
+               {
+                   try
+                   {
+                       await consumerJoinedMessageProducer.ProduceAsync(CurrentUser, default);
+                   }
+                   catch (Exception ex)
+                   {
+                       _logger.Error(ex, "Ошибка автоматической регистрации получателя уведомлений.");
+                   }
                }),
                state: null,
                dueTime: 0,
@@ -373,6 +398,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
         private bool StartAutoCheckingActiveConsumers(IMessageConsumer<MessagingUser> consumer)
         {
+            ArgumentNullException.ThrowIfNull(consumer);
+
             consumer.MessageReceived += async (user, ct) =>
             {
                 if (user?.IsActive ?? false)
@@ -392,14 +419,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             };
 
             _cleanUsersTimer = new Timer(
-               callback: _ => _ = Task.Run(async () => {
-                   foreach (var user in ActiveUsers)
+               callback: _ => _ = Task.Run(() =>
+               {
+                   try
                    {
-                       if (user.IsActive == false)
+                       foreach (var user in ActiveUsers.ToList())
                        {
-                           ActiveUsers.Remove(user);
-                           SendTextMessage<NotificationService>($"{user.NameWithNanoid} [{user.UserUuid}] - конец сессии.", criticalLevel: NotificationCriticalLevelModel.Info);
+                           if (user.IsActive == false)
+                           {
+                               ActiveUsers.Remove(user);
+                               SendTextMessage<NotificationService>($"{user.NameWithNanoid} [{user.UserUuid}] - конец сессии.", criticalLevel: NotificationCriticalLevelModel.Info);
+                           }
                        }
+                   }
+                   catch (Exception ex)
+                   {
+                       _logger.Error(ex, "Ошибка автоматической проверки активных получателей уведомлений.");
                    }
                }),
                state: null,
@@ -412,6 +447,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
         private bool StartAutoCheckingNotifications(IMessageConsumer<Notification> consumer)
         {
+            ArgumentNullException.ThrowIfNull(consumer);
+
             _mainConsumer.MessageReceived += async (notification, ct) =>
             {
                 ProcessNotification(notification);
@@ -419,6 +456,53 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             _logger.Information("Запущени автоматическое получение уведомлений.");
             return true;
+        }
+
+        /// <summary>
+        /// Освобождение управляемых ресурсов
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Внутренний метод освобождения ресурсов
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                try
+                {
+                    _registrationTimer?.Dispose();
+                    _cleanUsersTimer?.Dispose();
+                    _logger.Information("NotificationService: Таймеры успешно освобождены");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "NotificationService: Ошибка при освобождении таймеров");
+                }
+            }
+
+            _disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+        }
+
+        /// <summary>
+        /// Финализатор для гарантированного освобождения ресурсов
+        /// </summary>
+        ~NotificationService()
+        {
+            Dispose(false);
         }
     }
 }

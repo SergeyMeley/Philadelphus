@@ -16,9 +16,11 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="Nanoid" Version="3.1.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Cache\Philadelphus.Infrastructure.Cache.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.SQLite\Philadelphus.Infrastructure.Persistence.EF.SQLite.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.Json\Philadelphus.Infrastructure.Persistence.Json.csproj" />

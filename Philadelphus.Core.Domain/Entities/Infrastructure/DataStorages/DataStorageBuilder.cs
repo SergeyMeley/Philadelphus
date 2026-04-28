@@ -17,7 +17,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Строитель хранилища данных
         /// </summary>
-        public DataStorageBuilder() 
+        public DataStorageBuilder()
         {
         }
 
@@ -30,11 +30,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="infrastructureType">Тип хранилища данных</param>
         /// <param name="isDisabled">Состояние отключенности хранилища данных</param>
         /// <returns>Строитель хранилища данных</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Выбрасывается, если наименование пусто или некорректно</exception>
         public DataStorageBuilder SetGeneralParameters(ILogger logger, string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
         {
-            if (string.IsNullOrEmpty(name) /*|| uuid == Guid.Empty*/)  //TODO: Исправить костыль
-                throw new ArgumentException("Переданы некорректные параметры");
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentException.ThrowIfNullOrEmpty(name);
+
             _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled);
             return this;
         }
@@ -49,10 +50,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             if (repository == null)
                 return this;
+            if (_storageModel == null)
+                throw new InvalidOperationException("Сначала необходимо назначить основные параметры");
             if (_storageModel.IsHidden)
                 return this;
-            if (_storageModel == null)
-                throw new ArgumentNullException("Сначала необходимо назначить основные параметры");
+
             if (_storageModel.InfrastructureRepositories.ContainsKey(repository.EntityGroup))
             {
                 _storageModel.InfrastructureRepositories[repository.EntityGroup] = repository;
@@ -67,16 +69,20 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Получить хранилище данных
         /// </summary>
-        /// <returns>Готовое хранилище данных</returns>
+        /// <returns>Готовое хранилище данных. Возвращает null, если валидация не прошла.</returns>
         public IDataStorageModel Build()
         {
             if (_storageModel == null)
                 return null;
-            if (string.IsNullOrEmpty(_storageModel.Name)
-                /*|| _storageModel.Uuid == Guid.Empty*/)    //TODO: Исправить костыль
+
+            if (string.IsNullOrEmpty(_storageModel.Name))
+            {
                 return null;
+            }
+
             if (_storageModel.InfrastructureRepositories == null || _storageModel.InfrastructureRepositories.Count == 0)
                 return null;
+
             _storageModel.CheckAvailableAsync();
             return _storageModel;
         }

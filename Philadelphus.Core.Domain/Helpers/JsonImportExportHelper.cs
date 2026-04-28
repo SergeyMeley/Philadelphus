@@ -1,4 +1,4 @@
-﻿using Npgsql.Internal.Postgres;
+using Npgsql.Internal.Postgres;
 using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System.Globalization;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -22,6 +23,16 @@ namespace Philadelphus.Core.Domain.Helpers
     /// </summary>
     public static class JsonImportExportHelper
     {
+        /// <summary>
+        /// Максимальный размер JSON файла (500 МБ)
+        /// </summary>
+        private const int MaxJsonSize = 500 * 1024 * 1024;
+
+        /// <summary>
+        /// Максимальная глубина JSON структуры
+        /// </summary>
+        private const int MaxJsonDepth = 100;
+
         private static readonly JsonSerializerOptions _options = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -33,6 +44,13 @@ namespace Philadelphus.Core.Domain.Helpers
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        private static readonly JsonDocumentOptions _documentOptions = new()
+        {
+            MaxDepth = MaxJsonDepth,
+            AllowTrailingCommas = false,
+            CommentHandling = JsonCommentHandling.Disallow
         };
 
         public static string GetJson(WorkingTreeModel tree)
@@ -48,87 +66,117 @@ namespace Philadelphus.Core.Domain.Helpers
             Action<string> refreshProcess,
             Action<int, int> refreshProgress)
         {
-            refreshProcess.Invoke("Читаем json");
-            refreshProgress.Invoke(0, 1);
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(repository);
 
-            using var document = JsonDocument.Parse(json);
-            var root = document.RootElement;
+            // Валидация входных данных
+            ArgumentException.ThrowIfNullOrWhiteSpace(json);
 
-            if (!root.TryGetProperty("contentRoot", out var contentRootElement))
-                throw new InvalidOperationException("Нет contentRoot");
+            var jsonSize = Encoding.UTF8.GetByteCount(json);
+            if (jsonSize > MaxJsonSize)
+                throw new InvalidOperationException(
+                    $"JSON слишком большой: {jsonSize} байт (максимум {MaxJsonSize} байт)");
 
-            refreshProgress.Invoke(1, 1);
+            refreshProcess?.Invoke("Читаем json");
+            refreshProgress?.Invoke(0, 1);
 
-            // 1. Создаём дерево
-            refreshProcess.Invoke("Создаём дерево");
-            refreshProgress.Invoke(0, 1);
-
-            var dataStorage = repository.DataStorages.Where(x => x.HasShrubMembersInfrastructureRepository).First();
-
-            var treeName = root.TryGetProperty("name", out var nameProp)
-                ? nameProp.GetString() ?? "Импортированное дерево"
-                : "Импортированное дерево";
-            var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false, withoutInfoNotifications: true);
-            tree.Name = treeName;
-
-            var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp) ? rootNameProp.GetString() : string.Empty;
-            var needRootName = string.IsNullOrEmpty(rootName);
-            var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName, withoutInfoNotifications: true);
-            if (needRootName == false)
+            try
             {
-                treeRoot.Name = rootName;
-            }
+                using var document = JsonDocument.Parse(json, _documentOptions);
+                var root = document.RootElement;
 
-            var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
+                if (!root.TryGetProperty("contentRoot", out var contentRootElement))
+                    throw new InvalidOperationException("Нет contentRoot в JSON");
 
-            refreshProgress.Invoke(1, 1);
+                refreshProgress?.Invoke(1, 1);
 
-            // 2. Создаём структуру + сохраняем атрибуты для привязки
-            refreshProcess.Invoke("Создаём структуру");
-            refreshProgress.Invoke(0, 1);
+                // 1. Создаём дерево
+                refreshProcess?.Invoke("Создаём дерево");
+                refreshProgress?.Invoke(0, 1);
 
-            if (contentRootElement.TryGetProperty("childNodes", out var childNodesElement) &&
-                childNodesElement.ValueKind == JsonValueKind.Array)
-            {
-                var nodeElements = childNodesElement.EnumerateArray();
-                var count = nodeElements.Count();
-                int i = 0;
+                var dataStorage = repository.DataStorages?.Where(x => x.HasShrubMembersInfrastructureRepository).FirstOrDefault()
+                    ?? throw new InvalidOperationException("Не найдено хранилище с ShrubMembers");
 
-                foreach (var nodeElement in nodeElements)
+                var treeName = root.TryGetProperty("name", out var nameProp)
+                    ? nameProp.GetString() ?? "Импортированное дерево"
+                    : "Импортированное дерево";
+                var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false, withoutInfoNotifications: true);
+                tree.Name = treeName;
+
+                var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp) ? rootNameProp.GetString() : string.Empty;
+                var needRootName = string.IsNullOrEmpty(rootName);
+                var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName, withoutInfoNotifications: true);
+                if (needRootName == false)
                 {
-                    CreateNodeRecursive(service, treeRoot, nodeElement, attributeLinkMap);
-
-                    refreshProgress.Invoke(i++, count);
+                    treeRoot.Name = rootName;
                 }
-            }
 
-            // 3. Атрибуты корня
-            refreshProcess.Invoke("Атрибуты корня");
-            refreshProgress.Invoke(0, 1);
+                var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
 
-            CreateAttributesFromElement(service, treeRoot, contentRootElement, attributeLinkMap);
+                refreshProgress?.Invoke(1, 1);
 
-            refreshProgress.Invoke(1, 1);
+                // 2. Создаём структуру + сохраняем атрибуты для привязки
+                refreshProcess?.Invoke("Создаём структуру");
+                refreshProgress?.Invoke(0, 1);
 
-            // ✅ 4. Загружаем полную структуру (узлы + листы)
-            //service.GetWorkingTreeContent(treeRoot.OwningWorkingTree);
-            //treeRoot.OwningWorkingTree.ContentRoot = treeRoot;
+                if (contentRootElement.TryGetProperty("childNodes", out var childNodesElement) &&
+                    childNodesElement.ValueKind == JsonValueKind.Array)
+                {
+                    var nodeElements = childNodesElement.EnumerateArray();
+                    var count = nodeElements.Count();
+                    int i = 0;
 
-            // ✅ 5. ПРИВЯЗЫВАЕМ типы данных и значения к атрибутам!
-            refreshProcess.Invoke("Привязываем значения к атрибутам");
-            refreshProgress.Invoke(0, attributeLinkMap.Count());
+                    foreach (var nodeElement in nodeElements)
+                    {
+                        CreateNodeRecursive(service, treeRoot, nodeElement, attributeLinkMap);
 
-            LinkAttributesToRealEntities(service, treeRoot, attributeLinkMap, refreshProgress);
+                        refreshProgress?.Invoke(i++, count);
+                    }
+                }
+
+                // 3. Атрибуты корня
+                refreshProcess?.Invoke("Атрибуты корня");
+                refreshProgress?.Invoke(0, 1);
+
+                CreateAttributesFromElement(service, treeRoot, contentRootElement, attributeLinkMap);
+
+                refreshProgress?.Invoke(1, 1);
+
+                // ✅ 4. Загружаем полную структуру (узлы + листы)
+                //service.GetWorkingTreeContent(treeRoot.OwningWorkingTree);
+                //treeRoot.OwningWorkingTree.ContentRoot = treeRoot;
+
+                // ✅ 5. ПРИВЯЗЫВАЕМ типы данных и значения к атрибутам!
+                refreshProcess?.Invoke("Привязываем значения к атрибутам");
+                refreshProgress?.Invoke(0, attributeLinkMap.Count());
+
+                LinkAttributesToRealEntities(service, treeRoot, attributeLinkMap, refreshProgress);
             
-            refreshProgress.Invoke(attributeLinkMap.Count(), attributeLinkMap.Count());
+                refreshProgress?.Invoke(attributeLinkMap.Count(), attributeLinkMap.Count());
 
-            // 6. Загружаем атрибуты
-            //service.DistributeAttributes(treeRoot);
+                // 6. Загружаем атрибуты
+                //service.DistributeAttributes(treeRoot);
 
-            refreshProcess.Invoke("Готово!");
-            refreshProgress.Invoke(1, 1);
+                refreshProcess?.Invoke("Готово!");
+                refreshProgress?.Invoke(1, 1);
 
-            return treeRoot.OwningWorkingTree;
+                return treeRoot.OwningWorkingTree;
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Ошибка парсинга JSON: {ex.Message}", ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Ошибка обработки JSON данных: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Неожиданная ошибка при импорте JSON: {ex.Message}", ex);
+            }
         }
 
         private static void CreateNodeRecursive(
@@ -299,6 +347,9 @@ namespace Philadelphus.Core.Domain.Helpers
                 {
                     if (!string.IsNullOrEmpty(valueLeafName))
                     {
+                        if (valueType == null)
+                            throw new InvalidOperationException($"Не найден тип данных '{dataTypeName}' для атрибута '{attr.Name}'");
+
                         var newValue = service.CreateTreeLeave(
                             valueType,
                             needAutoName: false,
@@ -314,7 +365,7 @@ namespace Philadelphus.Core.Domain.Helpers
                     }
                 }
 
-                refreshProgress.Invoke(i++, count);
+                refreshProgress?.Invoke(i++, count);
             }
         }
     }

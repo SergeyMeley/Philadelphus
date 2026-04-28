@@ -11,6 +11,8 @@ using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.TablesExport.Factories;
+using Philadelphus.Infrastructure.Cache.Redis.Implementations;
+using Philadelphus.Infrastructure.Cache.RepositoryInterfaces;
 using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
@@ -41,6 +43,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
+using StackExchange.Redis;
 using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI
@@ -175,19 +178,28 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddKafkaProducer<Notification>(context.Configuration.GetSection($"{nameof(KafkaOptions<Notification>)}:{nameof(Notification)}"));
                     services.AddKafkaConsumer<Notification>(context.Configuration.GetSection($"{nameof(KafkaOptions<Notification>)}:{nameof(Notification)}"));
 
-
                     services.AddStackExchangeRedisCache(options =>
                     {
-                        var settings = services.BuildServiceProvider()
-                            .GetRequiredService<IOptions<ApplicationSettingsConfig>>().Value;
+                        var settings = context.Configuration
+                            .GetSection(nameof(ApplicationSettingsConfig))
+                            .Get<ApplicationSettingsConfig>()
+                            ?? throw new InvalidOperationException("ApplicationSettingsConfig не инициализирован");
 
-                        options.Configuration = settings.RedisOptions.Socket +
-                            (string.IsNullOrEmpty(settings.RedisOptions.Password)
-                                ? "" : $",password={settings.RedisOptions.Password}");
+                        options.ConfigurationOptions = new ConfigurationOptions
+                        {
+                            EndPoints = { settings.RedisOptions.Socket },
+                            Password = string.IsNullOrEmpty(settings.RedisOptions.Password)
+                                ? null
+                                : settings.RedisOptions.Password,
+                            AbortOnConnectFail = false,
+                            ConnectRetry = 1,
+                            ConnectTimeout = 1000,
+                            SyncTimeout = 1000,
+                            AsyncTimeout = 1000
+                        };
                         options.InstanceName = "Philadelphus:";
-
-                        options.Configuration = "localhost:6379,password=philapass";
                     });
+                    services.AddSingleton<IPhiladelphusRepositoryContentCache, DistributedPhiladelphusRepositoryContentCache>();
 
                     // Регистрация сервисов
                     // Слой Core

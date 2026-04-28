@@ -261,8 +261,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             ArgumentNullException.ThrowIfNull(localOwner, nameof(localOwner));
             ArgumentNullException.ThrowIfNull(declaringOwner, nameof(declaringOwner));
 
-            if (declaringUuid == Guid.Empty)
-                throw new ArgumentException(nameof(declaringUuid));
+            ArgumentOutOfRangeException.ThrowIfEqual(declaringUuid, Guid.Empty);
 
             _attributeOwner = localOwner;
             _declaringUuid = declaringUuid;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Primitives;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
@@ -85,8 +85,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             IPropertiesPolicy<TreeLeaveModel> propertiesPolicy)
             : base(uuid, owner, notificationService, propertiesPolicy)
         {
-            if (parent == null)
-                throw new ArgumentNullException(nameof(parent));
+            ArgumentNullException.ThrowIfNull(parent);
 
             ParentNode = parent;
         }

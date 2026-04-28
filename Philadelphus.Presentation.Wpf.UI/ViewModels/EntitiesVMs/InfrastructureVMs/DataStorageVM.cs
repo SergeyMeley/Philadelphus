@@ -1,4 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using System.Timers;
 
@@ -100,8 +100,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
         }
         public DataStorageVM(IDataStorageModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException();
+            ArgumentNullException.ThrowIfNull(model);
+
             _model = model;
             StartCheckingStorage();
         }

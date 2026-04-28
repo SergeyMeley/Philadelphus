@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
@@ -82,7 +82,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
-            _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
+            ArgumentNullException.ThrowIfNull(extensionManager);
+
+            _extensionManager = extensionManager;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
 
             RecentOperations = new ObservableCollection<OperationLog>();
