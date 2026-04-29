@@ -267,21 +267,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             Guid[]? uuids,
             InfrastructureCacheReadContext cacheReadContext)
         {
-            var cachedItems = _contentCache.SelectTreesCache(
-                dataStorage.Uuid,
-                uuids,
-                cacheReadContext);
-
-            if (cachedItems != null)
-            {
-                return cachedItems;
-            }
-
             cacheReadContext.MarkStorageRead();
-            var items = SelectTreesForce(dataStorage, uuids);
-            RefreshTreesCache(dataStorage.Uuid, uuids, items);
-
-            return items;
+            return SelectTreesForce(dataStorage, uuids);
         }
 
         /// <summary>

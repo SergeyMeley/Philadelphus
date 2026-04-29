@@ -27,6 +27,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         private readonly Dictionary<DataGridRow, RowHighlightState> _highlightedRows = new Dictionary<DataGridRow, RowHighlightState>();
         private DispatcherTimer _flushTimer;
         private bool _flushScheduled;
+        private bool _isDetached = true;
 
         public static readonly DependencyProperty HighlightColorProperty =
             DependencyProperty.Register(
@@ -70,6 +71,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
+            _isDetached = false;
             AssociatedObject.Loaded += OnLoaded;
 
             var descriptor = DependencyPropertyDescriptor.FromProperty(
@@ -90,6 +92,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         protected override void OnDetaching()
         {
+            _isDetached = true;
             base.OnDetaching();
             AssociatedObject.Loaded -= OnLoaded;
 
@@ -113,11 +116,21 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (_isDetached)
+            {
+                return;
+            }
+
             SubscribeToCollection();
         }
 
         private void OnItemsSourceChanged(object sender, EventArgs e)
         {
+            if (_isDetached)
+            {
+                return;
+            }
+
             SubscribeToCollection();
         }
 
@@ -145,6 +158,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_isDetached)
+            {
+                return;
+            }
+
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 _pendingItems.Clear();
@@ -177,6 +195,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private void FlushTimerOnTick(object sender, EventArgs e)
         {
+            if (_isDetached)
+            {
+                _flushTimer.Stop();
+                _flushScheduled = false;
+                _pendingItems.Clear();
+                return;
+            }
+
             _flushTimer.Stop();
             _flushScheduled = false;
 
@@ -218,13 +244,26 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private void HighlightSingleRow(object item, int attemptsLeft)
         {
+            if (_isDetached)
+            {
+                return;
+            }
+
             var row = AssociatedObject.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
             if (row == null)
             {
                 if (attemptsLeft > 0)
                 {
                     AssociatedObject.Dispatcher.BeginInvoke(
-                        new Action(() => HighlightSingleRow(item, attemptsLeft - 1)),
+                        new Action(() =>
+                        {
+                            if (_isDetached)
+                            {
+                                return;
+                            }
+
+                            HighlightSingleRow(item, attemptsLeft - 1);
+                        }),
                         DispatcherPriority.Render);
                 }
 

@@ -5,7 +5,6 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.Philadelphus
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using Serilog;
-using System.Collections.Concurrent;
 using System.Text.Json;
 using PersistenceAuditInfo = Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo;
 
@@ -23,7 +22,6 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
 
         private readonly IDistributedCache _distributedCache;
         private readonly ILogger _logger;
-        private readonly ConcurrentDictionary<string, long> _localCacheVersions = new();
         private DateTime _distributedCacheUnavailableUntilUtc = DateTime.MinValue;
 
         /// <summary>
@@ -357,21 +355,18 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <param name="cacheBaseKey">Базовый ключ кэша</param>
         private void RemoveCache(string cacheBaseKey)
         {
-            var staleCacheKey = GetVersionedCacheKey(cacheBaseKey);
-            AdvanceLocalCacheVersion(cacheBaseKey);
-
             for (var attempt = 1; attempt <= CacheRemoveRetryCount; attempt++)
             {
                 try
                 {
-                    _distributedCache.Remove(staleCacheKey);
+                    _distributedCache.Remove(cacheBaseKey);
                     return;
                 }
                 catch (Exception ex)
                 {
                     if (attempt == CacheRemoveRetryCount)
                     {
-                        MarkDistributedCacheUnavailable(ex, "удаления", staleCacheKey);
+                        MarkDistributedCacheUnavailable(ex, "удаления", cacheBaseKey);
                         return;
                     }
 
@@ -388,7 +383,7 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <returns>Ключ кэша</returns>
         private string GetTreesCacheKey(Guid dataStorageUuid, Guid[]? uuids)
         {
-            return GetVersionedCacheKey(GetTreesCacheBaseKey(dataStorageUuid, uuids));
+            return GetTreesCacheBaseKey(dataStorageUuid, uuids);
         }
 
         /// <summary>
@@ -399,7 +394,7 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <returns>Ключ кэша</returns>
         private string GetRootsCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
         {
-            return GetVersionedCacheKey(GetRootsCacheBaseKey(dataStorageUuid, owningTreesUuids));
+            return GetRootsCacheBaseKey(dataStorageUuid, owningTreesUuids);
         }
 
         /// <summary>
@@ -410,7 +405,7 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <returns>Ключ кэша</returns>
         private string GetNodesCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
         {
-            return GetVersionedCacheKey(GetNodesCacheBaseKey(dataStorageUuid, owningTreesUuids));
+            return GetNodesCacheBaseKey(dataStorageUuid, owningTreesUuids);
         }
 
         /// <summary>
@@ -421,7 +416,7 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <returns>Ключ кэша</returns>
         private string GetLeavesCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
         {
-            return GetVersionedCacheKey(GetLeavesCacheBaseKey(dataStorageUuid, owningTreesUuids));
+            return GetLeavesCacheBaseKey(dataStorageUuid, owningTreesUuids);
         }
 
         /// <summary>
@@ -432,7 +427,7 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <returns>Ключ кэша</returns>
         private string GetAttributesCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
         {
-            return GetVersionedCacheKey(GetAttributesCacheBaseKey(dataStorageUuid, owningTreesUuids));
+            return GetAttributesCacheBaseKey(dataStorageUuid, owningTreesUuids);
         }
 
         /// <summary>
@@ -488,26 +483,6 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         private static string GetAttributesCacheBaseKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
         {
             return GetCacheBaseKey(dataStorageUuid, "attributes", owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить ключ кэша с локальной версией
-        /// </summary>
-        /// <param name="cacheBaseKey">Базовый ключ кэша</param>
-        /// <returns>Версионированный ключ кэша</returns>
-        private string GetVersionedCacheKey(string cacheBaseKey)
-        {
-            var version = _localCacheVersions.GetOrAdd(cacheBaseKey, 0);
-            return $"{cacheBaseKey}:v{version}";
-        }
-
-        /// <summary>
-        /// Увеличить локальную версию ключа кэша
-        /// </summary>
-        /// <param name="cacheBaseKey">Базовый ключ кэша</param>
-        private void AdvanceLocalCacheVersion(string cacheBaseKey)
-        {
-            _localCacheVersions.AddOrUpdate(cacheBaseKey, 1, (_, version) => version + 1);
         }
 
         /// <summary>
