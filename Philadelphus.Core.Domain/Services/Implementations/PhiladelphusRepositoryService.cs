@@ -196,7 +196,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IReadOnlyCollection<TreeNode> dbNodes,
             IReadOnlyCollection<TreeLeave> dbLeaves)
         {
-            var dbRoot = dbRoots.First();
+            if (dbRoots.Count != 1)
+            {
+                throw new InvalidOperationException(
+                    $"Рабочее дерево '{tree.Name}' [{tree.Uuid}] должно иметь ровно один корень. Получено: {dbRoots.Count}.");
+            }
+
+            var dbRoot = dbRoots.Single();
             var root = _mapper.MapTreeRoot(dbRoot, tree, _notificationService, new EmptyPropertiesPolicy<TreeRootModel>());
 
             if (root == null)

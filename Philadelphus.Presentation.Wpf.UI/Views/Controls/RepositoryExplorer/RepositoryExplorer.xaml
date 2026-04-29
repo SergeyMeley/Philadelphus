@@ -10,12 +10,10 @@
              xmlns:detail="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="White">
-        <Grid.Resources>
-
-        </Grid.Resources>
+    <Grid IsEnabled="{Binding IsRepositoryContentEnabled}">
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -139,5 +137,12 @@
                 </TabItem>
             </TabControl>
         </GroupBox>
+        <ProgressBar Grid.Row="1"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="3"
+                     Height="4"
+                     Margin="1,0,1,1"
+                     IsIndeterminate="True"
+                     Visibility="{Binding RepositoryLoadingVisibility}" />
     </Grid>
 </UserControl>

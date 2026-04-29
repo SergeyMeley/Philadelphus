@@ -302,14 +302,39 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             if (cachedItems != null)
             {
-                return cachedItems;
+                if (IsRootsSetValid(cachedItems, owningTreesUuids))
+                {
+                    return cachedItems;
+                }
+
+                foreach (var treeUuid in owningTreesUuids.Distinct())
+                {
+                    _contentCache.InvalidateTreeContent(dataStorage.Uuid, treeUuid);
+                }
             }
 
             cacheReadContext?.MarkStorageRead();
             var items = SelectRootsForce(dataStorage, owningTreesUuids);
-            RefreshRootsCache(dataStorage.Uuid, owningTreesUuids, items);
+            if (IsRootsSetValid(items, owningTreesUuids))
+            {
+                RefreshRootsCache(dataStorage.Uuid, owningTreesUuids, items);
+            }
 
             return items;
+        }
+
+        /// <summary>
+        /// Проверить инвариант корней рабочих деревьев
+        /// </summary>
+        /// <param name="items">Коллекция корней</param>
+        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
+        /// <returns>Признак корректного набора корней</returns>
+        private static bool IsRootsSetValid(IReadOnlyCollection<TreeRoot> items, Guid[] owningTreesUuids)
+        {
+            var expectedTreeUuids = owningTreesUuids.Distinct().ToArray();
+
+            return items.Count == expectedTreeUuids.Length
+                && expectedTreeUuids.All(treeUuid => items.Count(root => root.OwningWorkingTreeUuid == treeUuid) == 1);
         }
 
         /// <summary>

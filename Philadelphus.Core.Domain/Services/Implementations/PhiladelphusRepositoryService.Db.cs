@@ -129,7 +129,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 var dbRoots = SelectRootsForce(tree.DataStorage, treeUuids);
                 var dbNodes = SelectNodesForce(tree.DataStorage, treeUuids);
                 var dbLeaves = SelectLeavesForce(tree.DataStorage, treeUuids);
-                RefreshRootsCache(tree.DataStorage.Uuid, treeUuids, dbRoots);
+                if (IsRootsSetValid(dbRoots, treeUuids))
+                {
+                    RefreshRootsCache(tree.DataStorage.Uuid, treeUuids, dbRoots);
+                }
                 RefreshNodesCache(tree.DataStorage.Uuid, treeUuids, dbNodes);
                 RefreshLeavesCache(tree.DataStorage.Uuid, treeUuids, dbLeaves);
 
