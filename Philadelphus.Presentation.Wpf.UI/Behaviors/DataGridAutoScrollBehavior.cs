@@ -1,4 +1,5 @@
-﻿using Microsoft.Xaml.Behaviors;
+using Microsoft.Xaml.Behaviors;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -12,19 +13,21 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 {
     public class DataGridAutoScrollBehavior : Behavior<DataGrid>
     {
-        private INotifyCollectionChanged _currentCollection;
+        private const int MaxHighlightedRowsPerBatch = 20;
 
-        // Храним информацию о каждой анимируемой строке
-        private class RowAnimationInfo
+        private sealed class RowHighlightState
         {
-            public DataGridRow Row { get; set; }
-            public Brush OriginalBackground { get; set; }
-            public DispatcherTimer Timer { get; set; }
+            public object OriginalBackgroundLocalValue { get; set; } = DependencyProperty.UnsetValue;
+            public SolidColorBrush HighlightBrush { get; set; } = null!;
+            public RoutedEventHandler UnloadedHandler { get; set; } = null!;
         }
 
-        private Dictionary<DataGridRow, RowAnimationInfo> _animatedRows = new Dictionary<DataGridRow, RowAnimationInfo>();
+        private INotifyCollectionChanged _currentCollection;
+        private readonly Queue<object> _pendingItems = new Queue<object>();
+        private readonly Dictionary<DataGridRow, RowHighlightState> _highlightedRows = new Dictionary<DataGridRow, RowHighlightState>();
+        private DispatcherTimer _flushTimer;
+        private bool _flushScheduled;
 
-        // Свойства для настройки анимации
         public static readonly DependencyProperty HighlightColorProperty =
             DependencyProperty.Register(
                 nameof(HighlightColor),
@@ -37,7 +40,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 nameof(AnimationDuration),
                 typeof(Duration),
                 typeof(DataGridAutoScrollBehavior),
-                new PropertyMetadata(new Duration(TimeSpan.FromMilliseconds(1500))));
+                new PropertyMetadata(new Duration(TimeSpan.FromMilliseconds(700))));
+
+        public static readonly DependencyProperty HighlightRetryCountProperty =
+            DependencyProperty.Register(
+                nameof(HighlightRetryCount),
+                typeof(int),
+                typeof(DataGridAutoScrollBehavior),
+                new PropertyMetadata(3));
 
         public Color HighlightColor
         {
@@ -51,6 +61,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             set => SetValue(AnimationDurationProperty, value);
         }
 
+        public int HighlightRetryCount
+        {
+            get => (int)GetValue(HighlightRetryCountProperty);
+            set => SetValue(HighlightRetryCountProperty, value);
+        }
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -59,6 +75,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             var descriptor = DependencyPropertyDescriptor.FromProperty(
                 ItemsControl.ItemsSourceProperty, typeof(DataGrid));
             descriptor.AddValueChanged(AssociatedObject, OnItemsSourceChanged);
+
+            _flushTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMilliseconds(150)
+            };
+            _flushTimer.Tick += FlushTimerOnTick;
 
             if (AssociatedObject.IsLoaded)
             {
@@ -77,6 +99,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             UnsubscribeFromCollection();
             ClearAllHighlights();
+
+            if (_flushTimer != null)
+            {
+                _flushTimer.Stop();
+                _flushTimer.Tick -= FlushTimerOnTick;
+                _flushTimer = null;
+            }
+
+            _pendingItems.Clear();
+            _flushScheduled = false;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -102,142 +134,170 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private void UnsubscribeFromCollection()
         {
-            if (_currentCollection != null)
+            if (_currentCollection == null)
             {
-                _currentCollection.CollectionChanged -= OnCollectionChanged;
-                _currentCollection = null;
+                return;
             }
+
+            _currentCollection.CollectionChanged -= OnCollectionChanged;
+            _currentCollection = null;
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine($"Collection changed: {e.Action}, NewItems count: {e.NewItems?.Count ?? 0}");
-
-            // Анимация только для добавленных элементов
-            if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+            if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                foreach (var newItem in e.NewItems)
-                {
-                    var item = newItem;
-                    AssociatedObject.Dispatcher.BeginInvoke(new System.Action(() =>
-                    {
-                        if (AssociatedObject.Items.Count > 0)
-                        {
-                            AssociatedObject.ScrollIntoView(item);
+                _pendingItems.Clear();
+                _flushScheduled = false;
+                ClearAllHighlights();
+                return;
+            }
 
-                            AssociatedObject.Dispatcher.BeginInvoke(new System.Action(() =>
-                            {
-                                HighlightNewRowWithAnimation(item);
-                            }), DispatcherPriority.Render);
-                        }
-                    }), DispatcherPriority.Render);
+            if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems == null || e.NewItems.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var item in e.NewItems)
+            {
+                if (item != null)
+                {
+                    _pendingItems.Enqueue(item);
                 }
             }
-            // При очистке коллекции убираем все выделения
-            else if (e.Action == NotifyCollectionChangedAction.Reset)
+
+            if (_flushScheduled || _flushTimer == null)
             {
-                ClearAllHighlights();
+                return;
+            }
+
+            _flushScheduled = true;
+            _flushTimer.Start();
+        }
+
+        private void FlushTimerOnTick(object sender, EventArgs e)
+        {
+            _flushTimer.Stop();
+            _flushScheduled = false;
+
+            if (_pendingItems.Count == 0 || AssociatedObject.Items.Count == 0)
+            {
+                return;
+            }
+
+            var batchItems = new List<object>();
+            while (_pendingItems.Count > 0)
+            {
+                batchItems.Add(_pendingItems.Dequeue());
+            }
+
+            if (batchItems.Count == 0)
+            {
+                return;
+            }
+
+            var lastItem = batchItems[batchItems.Count - 1];
+            if (lastItem == null)
+            {
+                return;
+            }
+
+            AssociatedObject.ScrollIntoView(lastItem);
+            HighlightBatchRows(batchItems);
+        }
+
+        private void HighlightBatchRows(List<object> batchItems)
+        {
+            var startIndex = Math.Max(0, batchItems.Count - MaxHighlightedRowsPerBatch);
+            var retryCount = Math.Max(0, HighlightRetryCount);
+            for (var i = startIndex; i < batchItems.Count; i++)
+            {
+                HighlightSingleRow(batchItems[i], retryCount);
             }
         }
 
-        private void HighlightNewRowWithAnimation(object item)
+        private void HighlightSingleRow(object item, int attemptsLeft)
         {
             var row = AssociatedObject.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
-
-            if (row != null)
+            if (row == null)
             {
-                // Проверяем, нет ли уже анимации на этой строке
-                if (_animatedRows.ContainsKey(row))
+                if (attemptsLeft > 0)
                 {
-                    return;
+                    AssociatedObject.Dispatcher.BeginInvoke(
+                        new Action(() => HighlightSingleRow(item, attemptsLeft - 1)),
+                        DispatcherPriority.Render);
                 }
 
-                // Сохраняем оригинальный фон
-                var originalBackground = row.Background;
-
-                // Создаем новый SolidColorBrush для анимации
-                var highlightBrush = new SolidColorBrush(HighlightColor);
-                row.Background = highlightBrush;
-
-                // Создаем анимацию цвета
-                var colorAnimation = new ColorAnimation
-                {
-                    From = HighlightColor,
-                    To = Colors.Transparent,
-                    Duration = AnimationDuration,
-                    FillBehavior = FillBehavior.Stop
-                };
-
-                // Применяем анимацию
-                highlightBrush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnimation);
-
-                // Создаем информацию о строке
-                var animationInfo = new RowAnimationInfo
-                {
-                    Row = row,
-                    OriginalBackground = originalBackground
-                };
-
-                // Добавляем в словарь
-                _animatedRows[row] = animationInfo;
-
-                // Запускаем таймер для восстановления фона
-                var timer = new DispatcherTimer
-                {
-                    Interval = AnimationDuration.TimeSpan
-                };
-
-                timer.Tick += (s, e) =>
-                {
-                    timer.Stop();
-                    if (_animatedRows.TryGetValue(row, out var info))
-                    {
-                        if (row != null)
-                        {
-                            // Останавливаем анимацию
-                            if (row.Background is SolidColorBrush brush)
-                            {
-                                brush.BeginAnimation(SolidColorBrush.ColorProperty, null);
-                            }
-                            // Восстанавливаем оригинальный фон
-                            row.Background = info.OriginalBackground;
-                        }
-                        _animatedRows.Remove(row);
-                    }
-                };
-
-                timer.Start();
-                animationInfo.Timer = timer;
+                return;
             }
-            else
+
+            ClearRowHighlight(row, restoreOriginalBackground: true);
+
+            var originalBackgroundLocalValue = row.ReadLocalValue(Control.BackgroundProperty);
+            var highlightBrush = new SolidColorBrush(HighlightColor);
+            RoutedEventHandler unloadedHandler = (_, _) => ClearRowHighlight(row, restoreOriginalBackground: true);
+            row.Unloaded += unloadedHandler;
+
+            _highlightedRows[row] = new RowHighlightState
             {
-                // Если строка еще не создана, ждем
-                EventHandler handler = null;
-                handler = (s, e) =>
-                {
-                    AssociatedObject.ItemContainerGenerator.StatusChanged -= handler;
-                    HighlightNewRowWithAnimation(item);
-                };
+                OriginalBackgroundLocalValue = originalBackgroundLocalValue,
+                HighlightBrush = highlightBrush,
+                UnloadedHandler = unloadedHandler
+            };
 
-                AssociatedObject.ItemContainerGenerator.StatusChanged += handler;
-            }
+            row.Background = highlightBrush;
+
+            var colorAnimation = new ColorAnimation
+            {
+                From = HighlightColor,
+                To = Colors.Transparent,
+                Duration = AnimationDuration,
+                FillBehavior = FillBehavior.Stop
+            };
+
+            colorAnimation.Completed += (_, _) =>
+            {
+                ClearRowHighlight(row, restoreOriginalBackground: true);
+            };
+
+            highlightBrush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnimation, HandoffBehavior.SnapshotAndReplace);
         }
 
         private void ClearAllHighlights()
         {
-            foreach (var kvp in _animatedRows)
+            foreach (var row in new List<DataGridRow>(_highlightedRows.Keys))
             {
-                if (kvp.Key != null && kvp.Value.OriginalBackground != null)
-                {
-                    if (kvp.Key.Background is SolidColorBrush brush)
-                    {
-                        brush.BeginAnimation(SolidColorBrush.ColorProperty, null);
-                    }
-                    kvp.Key.Background = kvp.Value.OriginalBackground;
-                }
-                kvp.Value.Timer?.Stop();
+                ClearRowHighlight(row, restoreOriginalBackground: true);
             }
-            _animatedRows.Clear();
+        }
+
+        private void ClearRowHighlight(DataGridRow row, bool restoreOriginalBackground)
+        {
+            if (row == null || !_highlightedRows.TryGetValue(row, out var state))
+            {
+                return;
+            }
+
+            if (state.UnloadedHandler != null)
+            {
+                row.Unloaded -= state.UnloadedHandler;
+            }
+
+            state.HighlightBrush?.BeginAnimation(SolidColorBrush.ColorProperty, null);
+            _highlightedRows.Remove(row);
+
+            if (!restoreOriginalBackground || !ReferenceEquals(row.Background, state.HighlightBrush))
+            {
+                return;
+            }
+
+            if (state.OriginalBackgroundLocalValue == DependencyProperty.UnsetValue)
+            {
+                row.ClearValue(Control.BackgroundProperty);
+                return;
+            }
+
+            row.SetValue(Control.BackgroundProperty, state.OriginalBackgroundLocalValue);
         }
     }
 }

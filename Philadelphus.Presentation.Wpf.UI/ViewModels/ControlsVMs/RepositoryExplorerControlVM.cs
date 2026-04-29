@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shapes;
@@ -112,6 +113,29 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public string CurrentProcess { get; private set; }
         public string CurrentProgress { get; private set; }
 
+        private bool _isRepositoryLoading;
+        public bool IsRepositoryLoading
+        {
+            get => _isRepositoryLoading;
+            private set
+            {
+                if (_isRepositoryLoading == value)
+                    return;
+
+                _isRepositoryLoading = value;
+                OnPropertyChanged(nameof(IsRepositoryLoading));
+                OnPropertyChanged(nameof(IsRepositoryContentEnabled));
+                OnPropertyChanged(nameof(RepositoryLoadingVisibility));
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        public bool IsRepositoryContentEnabled => IsRepositoryLoading == false;
+
+        public Visibility RepositoryLoadingVisibility => IsRepositoryLoading
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
         #endregion
 
         #region [ Construct ]
@@ -134,7 +158,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
 
-            LoadPhiladelphusRepository();
+            _ = LoadPhiladelphusRepositoryOnStartupAsync();
 
             _notificationService.SendTextMessage<RepositoryExplorerControlVM>("Обозреватель репозитория. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
@@ -148,7 +172,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             get
             {
-                return new AsyncRelayCommand(ExecuteGetWorkAsync); ;
+                return new AsyncRelayCommand(ExecuteGetWorkAsync, _ => IsRepositoryLoading == false); ;
             }
         }
 
@@ -163,6 +187,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     UpdateChildsCollection(_philadelphusRepositoryVM);   // TODO
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -177,6 +205,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -194,6 +226,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -215,6 +251,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -229,6 +269,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     _selectedRepositoryMember.AddAttribute();
                     
                     OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -247,7 +291,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 },
                 ce =>
                 {
-                    return _selectedRepositoryMember?.Model is IContentModel;
+                    return CanModifyRepository()
+                        && _selectedRepositoryMember?.Model is IContentModel;
                 });
             }
         }
@@ -262,6 +307,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         _service.SoftDeleteShrubMember(c);
                         OnPropertyChanged(nameof(_selectedRepositoryMember.SelectedAttributeVM.State));
                     }
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -278,7 +327,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 },
                 ce =>
                 {
-                    return _selectedRepositoryMember?.SelectedAttributeVM?.IsCollectionValue ?? false;
+                    return CanModifyRepository()
+                        && (_selectedRepositoryMember?.SelectedAttributeVM?.IsCollectionValue ?? false);
                 });
             }
         }
@@ -290,6 +340,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -301,6 +355,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -354,7 +412,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 },
                 ce =>
                 {
-                    return SelectedRepositoryMember is TreeRootVM;
+                    return CanModifyRepository() && SelectedRepositoryMember is TreeRootVM;
                 });
             }
         }
@@ -392,6 +450,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                             });
                         }
                     });
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -404,6 +466,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
                     window.ShowDialog();
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
                 });
             }
         }
@@ -419,11 +485,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return _philadelphusRepositoryVM.Childs != null;
         }
 
+        private async Task LoadPhiladelphusRepositoryOnStartupAsync()
+        {
+            await Task.Yield();
+
+            try
+            {
+                await LoadPhiladelphusRepositoryAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Ошибка первичной загрузки содержимого репозитория.");
+                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                    $"Ошибка первичной загрузки содержимого репозитория. Подробности: {ex.Message}",
+                    criticalLevel: NotificationCriticalLevelModel.Error);
+            }
+        }
+
         internal async Task<bool> LoadPhiladelphusRepositoryAsync()
         {
-            var newRepo = await _service.GetShrubContentAsync(_philadelphusRepositoryVM.Model);
-            UpdateLoadedPhiladelphusRepository(newRepo);
-            return _philadelphusRepositoryVM.Childs != null;
+            IsRepositoryLoading = true;
+            try
+            {
+                var newRepo = await _service.GetShrubContentAsync(_philadelphusRepositoryVM.Model);
+                UpdateLoadedPhiladelphusRepository(newRepo);
+                return _philadelphusRepositoryVM.Childs != null;
+            }
+            finally
+            {
+                IsRepositoryLoading = false;
+            }
         }
 
         private async Task ExecuteGetWorkAsync(object obj)
@@ -454,6 +545,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             OnPropertyChanged(nameof(_philadelphusRepositoryVM));
             OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
             OnPropertyChanged(nameof(_philadelphusRepositoryVM.ChildsCount));
+        }
+
+        private bool CanModifyRepository()
+        {
+            return IsRepositoryLoading == false;
         }
 
         public bool CheckPhiladelphusRepositoryAvailability()
