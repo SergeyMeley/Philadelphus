@@ -246,6 +246,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             {
                 return new RelayCommand(_ =>
                 {
+                    DrainPendingNotifications();
                     _currentMessageLogAllNotifications.Clear();
                     FilterVisibleNotifications();
                 });
@@ -269,49 +270,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
 
         private void FilterVisibleNotifications()
         {
-            var remItems = new List<NotificationVM>();
-            foreach (var item in _currentMessageLogFilteredNotifications)
-            {
-                if (_currentMessageLogAllNotifications.Contains(item) == false)
-                {
-                    remItems.Add(item);
-                }
-                else if (IsVisible(item) == false)
-                {
-                    remItems.Add(item);
-                }
-            }
+            _currentMessageLogFilteredNotifications.Clear();
 
-            foreach (var item in remItems)
+            foreach (var item in _currentMessageLogAllNotifications
+                .Where(IsVisible)
+                .OrderBy(x => x.DateTime))
             {
-                _currentMessageLogFilteredNotifications.Remove(item);
-            }
-
-            foreach (var item in _currentMessageLogAllNotifications)
-            {
-                if (IsVisible(item) && _currentMessageLogFilteredNotifications.Contains(item) == false)
-                {
-                    var next = _currentMessageLogFilteredNotifications
-                        .OrderBy(x => x.DateTime)
-                        .FirstOrDefault(x => x.DateTime > item.DateTime);
-
-                    if (next != null)
-                    {
-                        _currentMessageLogFilteredNotifications.Insert(
-                            _currentMessageLogFilteredNotifications.IndexOf(next),
-                            item);
-                    }
-                    else
-                    {
-                        _currentMessageLogFilteredNotifications.Add(item);
-                    }
-                }
+                _currentMessageLogFilteredNotifications.Add(item);
             }
 
             OnPropertyChanged(nameof(OkMessagesCount));
             OnPropertyChanged(nameof(InfoMessagesCount));
             OnPropertyChanged(nameof(WarningMessagesCount));
             OnPropertyChanged(nameof(ErrorMessagesCount));
+        }
+
+        private void DrainPendingNotifications()
+        {
+            while (_pendingNotifications.TryDequeue(out _))
+            {
+            }
         }
 
         private bool IsVisible(NotificationVM notification)
