@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
+using Philadelphus.Core.Domain.ImportExport.Excel;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -225,8 +226,13 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<LaunchWindow>();      // Не менять. Требуется для автоматического закрытия окна при открытии основного
                     services.AddTransient<AttributeValuesCollectionWindow>();
                     services.AddSingleton<SplashWindow>();
+                    services.AddSingleton<IExcelDataTypeDetector, ExcelDataTypeDetector>();
+                    services.AddTransient<ConversionService>();
+                    services.AddTransient<ExcelPreviewService>();
+                    services.AddTransient<ExcelImportPreviewService>();
                     services.AddTransient<ImportFromExcelWindow>();
                     services.AddTransient<ImportProgressWindow>();
+                    services.AddTransient<ImportTreePreviewWindow>();
 
                     // Регистрация фабрик
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();

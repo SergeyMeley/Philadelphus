@@ -41,7 +41,7 @@ namespace Philadelphus.Core.Domain.Helpers
             return JsonSerializer.Serialize(exportDto, _options);
         }
 
-        public static WorkingTreeModel ParseJson(string json, IPhiladelphusRepositoryService service, PhiladelphusRepositoryModel repository)
+        public static WorkingTreeModel ParseJson(string json, IPhiladelphusRepositoryService service, PhiladelphusRepositoryModel repository, TreeRootModel? targetRoot = null)
         {
             using var document = JsonDocument.Parse(json);
             var root = document.RootElement;
@@ -49,21 +49,35 @@ namespace Philadelphus.Core.Domain.Helpers
             if (!root.TryGetProperty("contentRoot", out var contentRootElement))
                 throw new InvalidOperationException("Нет contentRoot");
 
-            // 1. Создаём дерево
-            var dataStorage = repository.DataStorages.Where(x => x.HasShrubMembersInfrastructureRepository).First();
+            WorkingTreeModel tree;
+            TreeRootModel treeRoot;
 
-            var treeName = root.TryGetProperty("name", out var nameProp)
-                ? nameProp.GetString() ?? "Импортированное дерево"
-                : "Импортированное дерево";
-            var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false, withoutInfoNotifications: true);
-            tree.Name = treeName;
-
-            var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp) ? rootNameProp.GetString() : string.Empty;
-            var needRootName = string.IsNullOrEmpty(rootName);
-            var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName, withoutInfoNotifications: true);
-            if (needRootName == false)
+            if (targetRoot == null)
             {
-                treeRoot.Name = rootName;
+                var dataStorage = repository.DataStorages.First(x => x.HasShrubMembersInfrastructureRepository);
+
+                var treeName = root.TryGetProperty("name", out var nameProp)
+                    ? nameProp.GetString() ?? "Импортированное дерево"
+                    : "Импортированное дерево";
+                tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false, withoutInfoNotifications: true);
+                tree.Name = treeName;
+
+                var rootName = contentRootElement.TryGetProperty("name", out var rootNameProp) ? rootNameProp.GetString() : string.Empty;
+                var needRootName = string.IsNullOrEmpty(rootName);
+                treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName, withoutInfoNotifications: true);
+                if (needRootName == false)
+                {
+                    treeRoot.Name = rootName;
+                }
+                if (contentRootElement.TryGetProperty("description", out var rootDescriptionProp))
+                {
+                    treeRoot.Description = rootDescriptionProp.GetString();
+                }
+            }
+            else
+            {
+                treeRoot = targetRoot;
+                tree = treeRoot.OwningWorkingTree;
             }
 
             var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
@@ -91,7 +105,7 @@ namespace Philadelphus.Core.Domain.Helpers
             // 6. Загружаем атрибуты
             //service.DistributeAttributes(treeRoot);
 
-            return treeRoot.OwningWorkingTree;
+            return tree;
         }
 
         private static void CreateNodeRecursive(IPhiladelphusRepositoryService service, IParentModel parent, JsonElement nodeElement, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
@@ -103,6 +117,10 @@ namespace Philadelphus.Core.Domain.Helpers
             if (needName == false)
             {
                 node.Name = name;
+            }
+            if (nodeElement.TryGetProperty("description", out var nodeDescriptionProp))
+            {
+                node.Description = nodeDescriptionProp.GetString();
             }
 
             CreateAttributesFromElement(service, node, nodeElement, attributeLinkMap);
@@ -131,6 +149,14 @@ namespace Philadelphus.Core.Domain.Helpers
                 {
                     leaf.Name = name;
                 }
+                if (leafElement.TryGetProperty("description", out var leafDescriptionProp))
+                {
+                    leaf.Description = leafDescriptionProp.GetString();
+                }
+                if (leafElement.TryGetProperty("sequence", out var leafSequenceProp) && leafSequenceProp.TryGetInt64(out var leafSequence))
+                {
+                    leaf.Sequence = leafSequence;
+                }
 
                 CreateAttributesFromElement(service, leaf, leafElement, attributeLinkMap);
             }
@@ -151,10 +177,15 @@ namespace Philadelphus.Core.Domain.Helpers
                 if (attr == null)
                 {
                     attr = service.CreateElementAttribute(element, needAutoName: needName, withoutInfoNotifications: true);
-                    if (needName == false)
+                    if (attr != null && needName == false)
                     {
                         attr.Name = name;
                     }
+                }
+
+                if (attr == null)
+                {
+                    continue;
                 }
 
                 if (attrElement.TryGetProperty("isCollectionValue", out var isCollProp)) attr.IsCollectionValue = isCollProp.GetBoolean();
@@ -181,7 +212,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 dataTypeName = dataTypeName == "Строка" ? "Текст" : dataTypeName;
                 var valueLeafName = attrElement.TryGetProperty("valueLeaveName", out var vlProp)
                     && vlProp.ValueKind != JsonValueKind.Null
-                    ? vlProp.ToString()  // Работает для всех типов!
+                    ? vlProp.ToString()
                     : null;
 
                 attributeLinkMap[attr.LocalUuid] = (dataTypeName, valueLeafName, attr);
@@ -193,21 +224,31 @@ namespace Philadelphus.Core.Domain.Helpers
         /// </summary>
         private static void LinkAttributesToRealEntities(IPhiladelphusRepositoryService service, TreeRootModel treeRoot, Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap)
         {
-            // Получаем ВСЕ узлы и листы дерева
-            var allNodes = treeRoot.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentRoot.GetAllNodesRecursive())?.ToList();
-            var allLeaves = treeRoot.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentRoot.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>())?.ToList();
+            var systemBaseWorkingTree = treeRoot.OwningShrub.SystemBaseWorkingTree
+                ?? throw new InvalidOperationException("Не удалось получить системное рабочее дерево базовых типов.");
+            var systemBaseNodes = systemBaseWorkingTree
+                .GetAllNodesRecursive()
+                .OfType<SystemBaseTreeNodeModel>()
+                .ToList();
 
             foreach (var kvp in attributeLinkMap)
             {
                 var attr = kvp.Value.attribute;
-                var (dataTypeName, valueLeafName, attribute) = kvp.Value;
+                var (dataTypeName, valueLeafName, _) = kvp.Value;
 
                 if (attr.Owner is IShrubMemberModel sm)
                 {
-                    var ownAtt = sm.Attributes.SingleOrDefault(x => x.Name == attr.Name) ?? throw new Exception();
+                    var ownAtt = sm.Attributes.SingleOrDefault(x => x.Name == attr.Name)
+                        ?? throw new InvalidOperationException($"Не удалось найти созданный атрибут '{attr.Name}'.");
 
-                    ownAtt.ValueType = allNodes.SingleOrDefault(x => x.Name == dataTypeName);
-                    ownAtt.Value = allLeaves.Where(x => x.ParentNode.Uuid == ownAtt.ValueType.Uuid).FirstOrDefault(x => x.Name == valueLeafName);
+                    ownAtt.ValueType = ResolveSystemDataTypeNode(systemBaseNodes, dataTypeName);
+                    if (ownAtt.ValueType == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Не удалось определить системный тип данных '{dataTypeName}' для атрибута '{attr.Name}'.");
+                    }
+
+                    ownAtt.Value = ownAtt.ValueType.ChildLeaves.FirstOrDefault(x => x.Name == valueLeafName);
 
                     if (string.IsNullOrEmpty(valueLeafName) == false)
                     {
@@ -221,10 +262,24 @@ namespace Philadelphus.Core.Domain.Helpers
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new InvalidOperationException("Владелец атрибута не является участником кустарника.");
                 }
-                
             }
+        }
+
+        private static TreeNodeModel? ResolveSystemDataTypeNode(IEnumerable<SystemBaseTreeNodeModel> systemBaseNodes, string dataTypeName)
+        {
+            var normalizedTypeName = (dataTypeName ?? string.Empty).Trim();
+
+            return normalizedTypeName switch
+            {
+                "Строка" => systemBaseNodes.SingleOrDefault(x => x.SystemBaseType == SystemBaseType.STRING),
+                "Текст" => systemBaseNodes.SingleOrDefault(x => x.SystemBaseType == SystemBaseType.STRING),
+                "Число" => systemBaseNodes.SingleOrDefault(x => x.SystemBaseType == SystemBaseType.NUMERIC),
+                "Целое число" => systemBaseNodes.SingleOrDefault(x => x.SystemBaseType == SystemBaseType.INTEGER),
+                "Дробное число" => systemBaseNodes.SingleOrDefault(x => x.SystemBaseType == SystemBaseType.FLOAT),
+                _ => systemBaseNodes.SingleOrDefault(x => string.Equals(x.Name, normalizedTypeName, StringComparison.OrdinalIgnoreCase))
+            };
         }
     }
 }

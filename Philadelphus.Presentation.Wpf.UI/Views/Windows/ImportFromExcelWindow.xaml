@@ -3,11 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
-        Title="Конвертер Excel -> JSON" Height="400" Width="500"
+        Title="Конвертер Excel -> JSON" Height="980" Width="1180"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <x:Array x:Key="AvailableDataTypesResource" Type="{x:Type sys:String}">
+            <sys:String>Текст</sys:String>
+            <sys:String>Число</sys:String>
+            <sys:String>Целое число</sys:String>
+            <sys:String>Дробное число</sys:String>
+        </x:Array>
+    </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -15,21 +25,24 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Выбор файла -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+        <TextBlock x:Name="TxtWizardIntro"
+                   Grid.Row="0"
+                   Text="Импорт из Excel."
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,16"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
             <Button Content="Выбрать Excel файл" Click="BtnSelectFile_Click" Padding="10,5"/>
             <TextBlock x:Name="TxtFilePath" Text="Файл не выбран" Margin="15,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
         </StackPanel>
 
-        <!-- Настройки корня -->
-        <GroupBox Grid.Row="1" Header="Настройки TreeRoot" Padding="10">
+        <GroupBox x:Name="GroupRootSettings" Grid.Row="2" Header="Настройки TreeRoot" Padding="10" Margin="0,0,0,20">
             <StackPanel>
-                <!-- Чек-бокс -->
-                <CheckBox x:Name="ChkCreateNewRoot" Content="Создать новый корень" Margin="0,0,0,10" 
+                <CheckBox x:Name="ChkCreateNewRoot" Content="Создать новый корень" Margin="0,0,0,10"
                           Checked="ChkCreateNewRoot_Checked" Unchecked="ChkCreateNewRoot_Unchecked"/>
 
-                <!-- Текстовое поле (активно только если чек-бокс включен) -->
-                <Grid Margin="0,0,0,10">
+                <Grid x:Name="GridRootName" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
@@ -38,8 +51,7 @@
                     <TextBox x:Name="TxtRootName" Grid.Column="1" IsEnabled="False" Margin="5,0,0,0"/>
                 </Grid>
 
-                <!-- Выпадающий список (активен только если чек-бокс выключен) -->
-                <Grid>
+                <Grid x:Name="GridExistingRoots">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
@@ -50,14 +62,201 @@
             </StackPanel>
         </GroupBox>
 
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="340"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="260"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox x:Name="GroupSourceSelection" Grid.Row="0" Header="Предпросмотр Excel" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+                        <CheckBox x:Name="ChkUseAllWorksheets"
+                                  Content="Импортировать все листы книги"
+                                  IsChecked="True"
+                                  Checked="ChkUseAllWorksheets_Changed"
+                                  Unchecked="ChkUseAllWorksheets_Changed"
+                                  Margin="0,0,0,10"/>
+                        <Border BorderBrush="#D0D0D0" BorderThickness="1">
+                            <ListBox x:Name="LstPreviewSources"
+                                     Height="250"
+                                     SelectionMode="Extended"
+                                     SelectionChanged="LstPreviewSources_SelectionChanged"
+                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ScrollViewer.CanContentScroll="True">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2,0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="DimGray"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding TotalRowCount}"
+                                                       Foreground="SlateGray"
+                                                       VerticalAlignment="Center"
+                                                       Margin="12,0,0,0"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock x:Name="TxtPreviewInfo"
+                               Grid.Row="0"
+                               Grid.Column="2"
+                               Text="Файл не выбран."
+                               Margin="0,0,0,10"
+                               Foreground="DimGray"/>
+                    <DataGrid x:Name="DgPreview"
+                              Grid.Row="1"
+                              Grid.Column="2"
+                              AutoGenerateColumns="True"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              HeadersVisibility="Column"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox x:Name="GroupColumnSettings" Grid.Row="2" Header="Настройка колонок" Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Для активного выбранного листа можно задать роль колонки, тип данных и параметры наследования импортируемых атрибутов."
+                               Margin="0,0,0,10"
+                               Foreground="DimGray"/>
+
+                    <DataGrid x:Name="DgColumnSettings"
+                              Grid.Row="1"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              HeadersVisibility="Column"
+                              BeginningEdit="DgColumnSettings_BeginningEdit"
+                              CellEditEnding="DgColumnSettings_CellEditEnding"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Колонка" Binding="{Binding HeaderName}" IsReadOnly="True" Width="2*"/>
+                            <DataGridTextColumn Header="Пример" Binding="{Binding SampleValue}" IsReadOnly="True" Width="2*"/>
+                            <DataGridTemplateColumn Header="Роль" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Role}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableColumnRoles, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  SelectedItem="{Binding Role, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Тип данных" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DataTypeNodeName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{StaticResource AvailableDataTypesResource}"
+                                                  SelectedItem="{Binding DataTypeNodeName, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" Width="*"/>
+                            <DataGridTemplateColumn Header="Область видимости" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding VisibilityDisplayName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableVisibilityScopes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  SelectedValuePath="Value"
+                                                  SelectedValue="{Binding Visibility, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Переопределение" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding OverrideDisplayName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableOverrideTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  SelectedValuePath="Value"
+                                                  SelectedValue="{Binding Override, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
         <ProgressBar x:Name="ProgressOperation"
-                     Grid.Row="3"
+                     Grid.Row="4"
                      Height="10"
                      Margin="0,20,0,0"
                      IsIndeterminate="True"
                      Visibility="Collapsed"/>
 
-        <Button x:Name="BtnMainAction" Grid.Row="4" Content="Конвертировать в PHJSON" Click="BtnConvert_Click" 
-                Height="40" FontSize="14" Background="#007ACC" Foreground="White" Margin="0,20,0,0"/>
+        <Grid Grid.Row="5" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BtnPreviewResult"
+                    Grid.Column="1"
+                    Content="Предпросмотр результата"
+                    Click="BtnPreviewResult_Click"
+                    Height="40"
+                    Padding="18,0"
+                    Visibility="Collapsed"/>
+
+            <Button x:Name="BtnMainAction"
+                    Grid.Column="3"
+                    Content="Конвертировать в PHJSON"
+                    Click="BtnConvert_Click"
+                    Height="40"
+                    FontSize="14"
+                    Background="#007ACC"
+                    Foreground="White"
+                    Padding="20,0"/>
+        </Grid>
     </Grid>
 </Window>

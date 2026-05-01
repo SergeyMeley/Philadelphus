@@ -10,13 +10,13 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 {
     public class AttributeExportDTO
     {
-        public string Name { get; }
-        public string Description { get; }
+        public string Name { get; set; }
+        public string Description { get; set; }
         public string DataTypeNodeName { get; set; } = "Не определён";
         public string ValueLeaveName { get; set; } = "Не задано";
-        public bool IsCollectionValue { get; } = false;
-        public VisibilityScope Visibility { get; } = VisibilityScope.Public;
-        public OverrideType Override { get; } = OverrideType.None;
+        public bool IsCollectionValue { get; set; } = false;
+        public VisibilityScope Visibility { get; set; } = VisibilityScope.Public;
+        public OverrideType Override { get; set; } = OverrideType.None;
 
         public AttributeExportDTO(ElementAttributeModel attr)
         {

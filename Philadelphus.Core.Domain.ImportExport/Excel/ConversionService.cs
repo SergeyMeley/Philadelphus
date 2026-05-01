@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using Microsoft.EntityFrameworkCore;
 using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -7,10 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
@@ -18,6 +15,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 {
     public class ConversionService
     {
+        private readonly IExcelDataTypeDetector _dataTypeDetector;
+
+        public ConversionService(IExcelDataTypeDetector dataTypeDetector)
+        {
+            _dataTypeDetector = dataTypeDetector;
+        }
+
         // Эмуляция получения корней из хранилища "Чубушник"
         public List<string> GetExistingRootsFromStorage()
         {
@@ -35,7 +39,37 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         public string ProcessFile(string filePath, bool createNewRoot, string rootNameInput)
         {
+            return ProcessFile(filePath, createNewRoot, rootNameInput, (ExcelImportProfile?)null);
+        }
 
+        public string ProcessFile(string filePath, bool createNewRoot, string rootNameInput, ExcelImportSourceSelection? sourceSelection)
+        {
+            return ProcessFile(
+                filePath,
+                createNewRoot,
+                rootNameInput,
+                sourceSelection == null
+                    ? null
+                    : new List<ExcelImportProfile>
+                    {
+                        new()
+                        {
+                            SourceSelection = sourceSelection
+                        }
+                    });
+        }
+
+        public string ProcessFile(string filePath, bool createNewRoot, string rootNameInput, ExcelImportProfile? importProfile)
+        {
+            return ProcessFile(
+                filePath,
+                createNewRoot,
+                rootNameInput,
+                importProfile == null ? null : new List<ExcelImportProfile> { importProfile });
+        }
+
+        public string ProcessFile(string filePath, bool createNewRoot, string rootNameInput, IReadOnlyCollection<ExcelImportProfile>? importProfiles)
+        {
             string excelFileName = Path.GetFileNameWithoutExtension(filePath);
 
             // Логика определения имени корня
@@ -50,72 +84,40 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             {
                 var allNodes = new List<TreeNodeExportDTO>();
 
-                foreach (var worksheet in workbook.Worksheets)
+                if (importProfiles == null || importProfiles.Count == 0)
                 {
-                    // 1. Создаем Узел (TreeNode) для каждого Листа Excel
-                    var node = new TreeNodeExportDTO
+                    foreach (var worksheet in workbook.Worksheets)
                     {
-                        Name = worksheet.Name,
-                        Description = $"Импортировано с листа «{worksheet.Name}»",
-                        OwningRootName = finalRootName,
-                        Attributes = new List<AttributeExportDTO>()
-                    };
+                        var worksheetRange = worksheet.RangeUsed();
+                        if (worksheetRange == null)
+                            continue;
 
-                    // Читаем заголовки (первая строка) для создания Атрибутов узла
-                    var firstRow = worksheet.FirstRowUsed();
-                    if (firstRow != null)
-                    {
-                        foreach (var cell in firstRow.CellsUsed())
-                        {
-                            string headerName = cell.GetString();
-                            // Определяем тип данных эвристически (по первой ячейке с данными)
-                            string dataType = DetermineDataType(worksheet, cell.Address.ColumnNumber);
-
-                            node.Attributes.Add(new AttributeExportDTO(headerName, $"Импортировано из колонки «{headerName}»")
-                            {
-                                DataTypeNodeName = dataType,
-                                ValueLeaveName = null
-                            });
-                        }
-                    }
-                    allNodes.Add(node);
-
-                    // 2. Создаем Листья (TreeLeaves) для каждой строки данных
-                    var dataRows = worksheet.RowsUsed().Skip(1); // Пропускаем заголовок
-                    int rowIndex = 2; // Нумерация строк Excel (1-based)
-
-                    var allLeaves = new List<TreeLeaveExportDTO>();
-
-                    foreach (var row in dataRows)
-                    {
-                        var leaf = new TreeLeaveExportDTO(rowIndex.ToString(), $"Импортировано из строки «{rowIndex}»", worksheet.Name);
-
-                        int colIndex = 1;
-                        foreach (var cell in row.CellsUsed())
-                        {
-                            // Находим описание атрибута, созданное выше
-                            if (colIndex <= node.Attributes.Count)
-                            {
-                                var attrDef = node.Attributes[colIndex - 1];
-                                string cellValue = cell.GetString();
-
-                                leaf.Attributes.Add(new AttributeExportDTO(attrDef.Name, attrDef.Description)
-                                {
-                                    DataTypeNodeName = attrDef.DataTypeNodeName,
-                                    ValueLeaveName = cellValue // Значение ячейки
-                                });
-                            }
-                            colIndex++;
-                        }
-                        allLeaves.Add(leaf);
-                        rowIndex++;
-                    }
-
-                    foreach (var nodeItem in allNodes)
-                    {
-                        nodeItem.ChildLeaves.AddRange(allLeaves.Where(x => x.OwningNodeName == nodeItem.Name));
+                        allNodes.Add(CreateNodeFromRange(
+                            worksheet.Name,
+                            $"Импортировано с листа «{worksheet.Name}»",
+                            finalRootName,
+                            worksheetRange));
                     }
                 }
+                else
+                {
+                    foreach (var importProfile in importProfiles)
+                    {
+                        var selectedRange = ResolveRange(workbook, importProfile.SourceSelection);
+                        if (selectedRange == null)
+                        {
+                            throw new InvalidOperationException($"Не удалось найти лист «{importProfile.SourceSelection.SourceName}» в Excel-файле.");
+                        }
+
+                        allNodes.Add(CreateNodeFromRange(
+                            importProfile.SourceSelection.SourceName,
+                            $"Импортировано с листа «{importProfile.SourceSelection.SourceName}»",
+                            finalRootName,
+                            selectedRange,
+                            importProfile));
+                    }
+                }
+
                 root.ChildNodes.AddRange(allNodes);
             }
 
@@ -145,27 +147,175 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             return jsonResult;
         }
 
-        private string DetermineDataType(IXLWorksheet sheet, int colNumber)
+        private TreeNodeExportDTO CreateNodeFromRange(string nodeName, string description, string owningRootName, IXLRange range, ExcelImportProfile? importProfile = null)
         {
-            // Смотрим первую непустую ячейку данных под заголовком, а не сам заголовок.
-            var firstDataCell = sheet
-                .Column(colNumber)
-                .CellsUsed()
-                .FirstOrDefault(cell => cell.Address.RowNumber > 1 && !cell.IsEmpty());
+            var node = new TreeNodeExportDTO
+            {
+                Name = nodeName,
+                Description = description,
+                OwningRootName = owningRootName,
+                Attributes = new List<AttributeExportDTO>()
+            };
 
-            if (firstDataCell == null)
-                return "Текст";
+            var firstRow = range.FirstRowUsed();
+            if (firstRow == null)
+                return node;
 
-            if (firstDataCell.DataType == XLDataType.Number)
-                return "Число";
+            var columnProfiles = BuildColumnProfiles(range, importProfile);
 
-            if (firstDataCell.DataType == XLDataType.DateTime)
-                return "Текст";
+            foreach (var profile in columnProfiles.Where(x => x.Role == ExcelImportColumnRole.Attribute))
+            {
+                node.Attributes.Add(new AttributeExportDTO(profile.HeaderName, $"Импортировано из колонки «{profile.HeaderName}»")
+                {
+                    DataTypeNodeName = profile.DataTypeNodeName,
+                    ValueLeaveName = null,
+                    IsCollectionValue = profile.IsCollectionValue,
+                    Visibility = profile.Visibility,
+                    Override = profile.Override
+                });
+            }
 
-            if (firstDataCell.DataType == XLDataType.Boolean)
-                return "Текст";
+            var allRows = range.RowsUsed().ToList();
+            var allLeaves = new List<TreeLeaveExportDTO>();
+            var usedLeafNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (var rowIndex = 1; rowIndex < allRows.Count; rowIndex++)
+            {
+                var row = allRows[rowIndex];
+                var excelRowNumber = row.RowNumber();
+                var leafName = ResolveLeafName(columnProfiles, row, excelRowNumber, usedLeafNames);
+                var leafDescription = ResolveLeafDescription(columnProfiles, row, excelRowNumber);
+                var leaf = new TreeLeaveExportDTO(leafName, leafDescription, nodeName)
+                {
+                    Sequence = ResolveLeafSequence(columnProfiles, row)
+                };
 
-            return "Текст";
+                var attributeProfiles = columnProfiles.Where(x => x.Role == ExcelImportColumnRole.Attribute).ToList();
+                for (var attrIndex = 0; attrIndex < attributeProfiles.Count; attrIndex++)
+                {
+                    var attributeProfile = attributeProfiles[attrIndex];
+                    var columnNumber = attributeProfile.ColumnIndex;
+                    var cellValue = row.Cell(columnNumber).GetString();
+                    var attrDef = node.Attributes[attrIndex];
+
+                    leaf.Attributes.Add(new AttributeExportDTO(attrDef.Name, attrDef.Description)
+                    {
+                        DataTypeNodeName = attrDef.DataTypeNodeName,
+                        ValueLeaveName = cellValue,
+                        IsCollectionValue = attrDef.IsCollectionValue,
+                        Visibility = attrDef.Visibility,
+                        Override = attrDef.Override
+                    });
+                }
+
+                allLeaves.Add(leaf);
+            }
+
+            node.ChildLeaves.AddRange(allLeaves);
+            return node;
+        }
+
+        private List<ExcelImportColumnProfile> BuildColumnProfiles(IXLRange range, ExcelImportProfile? importProfile)
+        {
+            if (importProfile?.Columns?.Count > 0)
+                return importProfile.Columns.OrderBy(x => x.ColumnIndex).ToList();
+
+            var firstRow = range.FirstRowUsed();
+            var firstColumn = range.FirstColumnUsed();
+            var lastColumn = range.LastColumnUsed();
+
+            if (firstRow == null || firstColumn == null || lastColumn == null)
+                return new List<ExcelImportColumnProfile>();
+
+            var headerRowNumber = firstRow.RowNumber();
+            var firstColumnNumber = firstColumn.ColumnNumber();
+            var lastColumnNumber = lastColumn.ColumnNumber();
+            var result = new List<ExcelImportColumnProfile>();
+
+            for (var absoluteColumnNumber = firstColumnNumber; absoluteColumnNumber <= lastColumnNumber; absoluteColumnNumber++)
+            {
+                var relativeColumnIndex = absoluteColumnNumber - firstColumnNumber + 1;
+                var headerValue = range.Worksheet.Cell(headerRowNumber, absoluteColumnNumber).GetFormattedString();
+
+                result.Add(new ExcelImportColumnProfile
+                {
+                    ColumnIndex = relativeColumnIndex,
+                    HeaderName = string.IsNullOrWhiteSpace(headerValue) ? $"Колонка {relativeColumnIndex}" : headerValue,
+                    Role = ExcelImportColumnRole.Attribute,
+                    DataTypeNodeName = DetermineDataType(range, relativeColumnIndex)
+                });
+            }
+
+            return result;
+        }
+
+        private static string ResolveLeafName(List<ExcelImportColumnProfile> columnProfiles, IXLRangeRow row, int excelRowNumber, HashSet<string> usedLeafNames)
+        {
+            var nameColumn = columnProfiles.FirstOrDefault(x => x.Role == ExcelImportColumnRole.SystemName);
+            var baseName = nameColumn == null
+                ? excelRowNumber.ToString()
+                : row.Cell(nameColumn.ColumnIndex).GetString().Trim();
+
+            if (string.IsNullOrWhiteSpace(baseName))
+                baseName = excelRowNumber.ToString();
+
+            var uniqueName = baseName;
+            var counter = 2;
+
+            while (usedLeafNames.Contains(uniqueName))
+            {
+                uniqueName = $"{baseName} ({counter})";
+                counter++;
+            }
+
+            usedLeafNames.Add(uniqueName);
+            return uniqueName;
+        }
+
+        private static string ResolveLeafDescription(List<ExcelImportColumnProfile> columnProfiles, IXLRangeRow row, int excelRowNumber)
+        {
+            var descriptionColumn = columnProfiles.FirstOrDefault(x => x.Role == ExcelImportColumnRole.SystemDescription);
+            var description = descriptionColumn == null
+                ? string.Empty
+                : row.Cell(descriptionColumn.ColumnIndex).GetString().Trim();
+
+            return string.IsNullOrWhiteSpace(description)
+                ? $"Импортировано из строки «{excelRowNumber}»"
+                : description;
+        }
+
+        private static long? ResolveLeafSequence(List<ExcelImportColumnProfile> columnProfiles, IXLRangeRow row)
+        {
+            var sequenceColumn = columnProfiles.FirstOrDefault(x => x.Role == ExcelImportColumnRole.SystemSequence);
+            if (sequenceColumn == null)
+                return null;
+
+            var sequenceValue = row.Cell(sequenceColumn.ColumnIndex).GetString().Trim();
+            return long.TryParse(sequenceValue, out var parsed) ? parsed : null;
+        }
+
+        private IXLRange? ResolveRange(XLWorkbook workbook, ExcelImportSourceSelection sourceSelection)
+        {
+            if (sourceSelection.SourceType == ExcelPreviewSourceType.Worksheet)
+            {
+                var worksheet = workbook.Worksheets.FirstOrDefault(x => string.Equals(x.Name, sourceSelection.SourceName, StringComparison.OrdinalIgnoreCase));
+                return worksheet?.RangeUsed();
+            }
+
+            var namedRange = workbook.DefinedNames
+                .Concat(workbook.Worksheets.SelectMany(x => x.DefinedNames))
+                .FirstOrDefault(x => string.Equals(x.Name, sourceSelection.SourceName, StringComparison.OrdinalIgnoreCase));
+
+            return namedRange?.Ranges.FirstOrDefault()?.RangeAddress.AsRange();
+        }
+
+        private string DetermineDataType(IXLRange range, int colNumber)
+        {
+            var values = range.RowsUsed()
+                .Skip(1)
+                .Select(row => row.Cell(colNumber).GetString())
+                .ToList();
+
+            return _dataTypeDetector.DetermineBestDataType(values);
         }
     }
 }

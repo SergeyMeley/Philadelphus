@@ -12,6 +12,7 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
         public string Name { get; }
         public string Description { get; }
         public string OwningNodeName { get; }
+        public long? Sequence { get; set; }
         public List<AttributeExportDTO> Attributes { get; } = new();
 
         public TreeLeaveExportDTO(TreeLeaveModel leave)
@@ -19,6 +20,7 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
             Name = leave.Name;
             Description = leave.Description;
             OwningNodeName = leave.ParentNode?.Name ?? "Неизвестный";
+            Sequence = leave.Sequence;
             Attributes = leave.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
         }
 
