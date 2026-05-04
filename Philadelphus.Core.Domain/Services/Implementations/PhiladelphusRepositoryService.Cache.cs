@@ -171,7 +171,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="workingTrees">Коллекция рабочих деревьев</param>
         private void InvalidateCachedContent(IEnumerable<WorkingTreeModel> workingTrees)
         {
-            foreach (var tree in workingTrees)
+            foreach (var tree in workingTrees
+                .Where(x => x != null)
+                .GroupBy(x => x.Uuid)
+                .Select(x => x.First()))
             {
                 InvalidateCachedContent(tree);
             }
@@ -183,9 +186,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="workingTreeMembers">Коллекция элементов рабочих деревьев</param>
         private void InvalidateCachedContent(IEnumerable<IWorkingTreeMemberModel> workingTreeMembers)
         {
-            foreach (var member in workingTreeMembers)
+            foreach (var tree in workingTreeMembers
+                .Where(x => x?.OwningWorkingTree != null)
+                .Select(x => x.OwningWorkingTree)
+                .GroupBy(x => x.Uuid)
+                .Select(x => x.First()))
             {
-                InvalidateCachedContent(member.OwningWorkingTree);
+                InvalidateCachedContent(tree);
             }
         }
 
@@ -195,9 +202,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="elementAttributes">Коллекция атрибутов</param>
         private void InvalidateCachedContent(IEnumerable<ElementAttributeModel> elementAttributes)
         {
-            foreach (var attribute in elementAttributes)
+            foreach (var tree in elementAttributes
+                .Where(x => x?.OwningWorkingTree != null)
+                .Select(x => x.OwningWorkingTree)
+                .GroupBy(x => x.Uuid)
+                .Select(x => x.First()))
             {
-                InvalidateCachedContent(attribute.OwningWorkingTree);
+                InvalidateCachedContent(tree);
             }
         }
 

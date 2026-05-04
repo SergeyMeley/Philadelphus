@@ -17,8 +17,8 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
     {
         private static readonly JsonSerializerOptions CacheJsonSerializerOptions = new(JsonSerializerDefaults.Web);
         private static readonly TimeSpan DistributedCacheFailurePause = TimeSpan.FromMinutes(1);
-        private static readonly TimeSpan CacheRemoveRetryDelay = TimeSpan.FromMilliseconds(50);
-        private const int CacheRemoveRetryCount = 3;
+        private static readonly TimeSpan CacheRemoveRetryDelay = TimeSpan.Zero;
+        private const int CacheRemoveRetryCount = 1;
 
         private readonly IDistributedCache _distributedCache;
         private readonly ILogger _logger;
@@ -355,6 +355,11 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// <param name="cacheBaseKey">Базовый ключ кэша</param>
         private void RemoveCache(string cacheBaseKey)
         {
+            if (IsDistributedCacheTemporarilyUnavailable())
+            {
+                return;
+            }
+
             for (var attempt = 1; attempt <= CacheRemoveRetryCount; attempt++)
             {
                 try
