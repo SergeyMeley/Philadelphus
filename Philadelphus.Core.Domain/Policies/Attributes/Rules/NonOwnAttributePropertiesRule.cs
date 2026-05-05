@@ -61,10 +61,21 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
 
             if (result == false)
             {
-                _notificationService.SendTextMessage<CompositeAttributePropertiesPolicy>(
-                    $"Для атрибута '{model.Name}' [{model.Uuid}] элемента '{(model.Owner as IMainEntityModel)?.Name}' [{(model.Owner as IMainEntityModel)?.Uuid}] " +
-                    $"изменение значения свойства '{prop}' ограничено, т.к. атрибут не является собственным.",
-                    criticalLevel: NotificationCriticalLevelModel.Warning);
+                var inheritedValue = GetInheritedValue(model, prop);
+
+                if (Equals(inheritedValue, value))
+                {
+                    return true;
+                }
+                else
+                {
+                    _notificationService.SendTextMessage<CompositeAttributePropertiesPolicy>(
+                        $"Для атрибута '{model.Name}' [{model.Uuid}] элемента '{(model.Owner as IMainEntityModel)?.Name}' [{(model.Owner as IMainEntityModel)?.Uuid}] " +
+                        $"изменение значения свойства '{prop}' ограничено, т.к. атрибут не является собственным.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+
+                    return false;
+                }
             }
 
             return result;
