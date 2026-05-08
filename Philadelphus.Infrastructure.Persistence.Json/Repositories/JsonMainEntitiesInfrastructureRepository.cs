@@ -75,47 +75,7 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<ElementAttribute> SelectAttributes()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeLeave> SelectLeaves()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] parentRootUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeNode> SelectNodes()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeNode> SelectNodes(Guid[] parentRootUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeRoot> SelectRoots()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] uuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<WorkingTree> SelectTrees()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids)
+        public IEnumerable<WorkingTree> SelectTreeAggregates(Guid[]? uuids = null)
         {
             throw new NotImplementedException();
         }
@@ -145,9 +105,5 @@ namespace Philadelphus.Infrastructure.Persistence.Json.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

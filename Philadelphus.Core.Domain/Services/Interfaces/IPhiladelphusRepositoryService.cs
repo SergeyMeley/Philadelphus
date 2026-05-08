@@ -22,7 +22,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="repository">Репозиторий</param>
         /// <param name="force">Признак принудительного чтения из хранилища</param>
         /// <returns></returns>
-        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository, bool force = false);
+        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository);
 
         /// <summary>
         /// Получить участников и содержимое репозитория (асинхронно)
@@ -33,7 +33,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <returns>Репозиторий с участниками и содержимым</returns>
         public Task<PhiladelphusRepositoryModel> GetShrubContentAsync(
             PhiladelphusRepositoryModel repository,
-            bool force = false,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="tree">Рабочее дерево</param>
         /// <param name="force">Признак принудительного чтения из хранилища</param>
         /// <returns>Корень с содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree, bool force = false);
+        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree);
 
         /// <summary>
         /// Получить рабочее дерево (асинхронно)
@@ -53,7 +52,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <returns>Корень с содержимым</returns>
         public Task<WorkingTreeModel> GetWorkingTreeContentAsync(
             WorkingTreeModel tree,
-            bool force = false,
             CancellationToken cancellationToken = default);
 
         #endregion

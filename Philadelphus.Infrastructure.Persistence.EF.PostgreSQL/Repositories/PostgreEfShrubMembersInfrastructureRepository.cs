@@ -35,38 +35,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             };
         }
 
-        protected override void SetNavigationProperties<TEntity, TNav>(TEntity item, Dictionary<Guid, TNav> navigationEntities)
-        {
-            if (item is WorkingTreeMemberBase workingTreeMember)
-            {
-                if (navigationEntities.TryGetValue(workingTreeMember.OwningWorkingTreeUuid, out var owningTree))
-                {
-                    workingTreeMember.OwningWorkingTree = owningTree as WorkingTree
-                        ?? throw new ArgumentNullException();
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Родительский WorkingTree с Uuid='{workingTreeMember.OwningWorkingTreeUuid}' не найден в БД");
-                }
-            }
-        }
-
         #region [ Select ]
 
-        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids = null)
-                => Select<WorkingTree>(ownUuids: uuids);
-
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] owningTreesUuids)
-            => Select<TreeRoot>(owningTreesUuids: owningTreesUuids);
-
-        public IEnumerable<TreeNode> SelectNodes(Guid[] owningTreesUuids)
-            => Select<TreeNode>(owningTreesUuids: owningTreesUuids);
-
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] owningTreesUuids)
-            => Select<TreeLeave>(owningTreesUuids: owningTreesUuids);
-
-        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids)
-            => Select<ElementAttribute>(owningTreesUuids: owningTreesUuids);
+        public IEnumerable<WorkingTree> SelectTreeAggregates(Guid[]? uuids = null)
+            => SelectWorkingTreeAggregates(uuids);
 
         #endregion
 

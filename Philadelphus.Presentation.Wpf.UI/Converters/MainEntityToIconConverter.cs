@@ -13,7 +13,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
     public class MainEntityToIconConverter : IValueConverter
     {
-        private static readonly string BaseUri = "pack://application:,,,/Philadelphus.Presentation.Wpf.UI;component/Icons/";
+        private static readonly string BaseUri = "pack://application:,,,/Icons/";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -23,7 +23,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
                 TreeRootVM => "root_64_1.png",
                 TreeNodeVM => "node_64_3.png",
                 TreeLeaveVM => "leave_64_3.png",
-                _ => "Flaticon_icon_empty.png"
+                _ => "without_a_license/Flaticon_icon_empty.png"
             };
 
             var uri = new Uri(BaseUri + iconPath, UriKind.Absolute);

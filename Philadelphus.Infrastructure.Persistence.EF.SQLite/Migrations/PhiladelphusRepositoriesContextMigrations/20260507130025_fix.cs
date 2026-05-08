@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.TreeRepositoriesPhiladelphusContextMigrations
+namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.PhiladelphusRepositoriesContextMigrations
 {
     /// <inheritdoc />
-    public partial class change_audit_info : Migration
+    public partial class RepositoryContextSnapshotSync : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

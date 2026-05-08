@@ -37,6 +37,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.ParentTreeRootUuid, opt => opt.Ignore())    // Сложная логика
                 .ForMember(dest => dest.ParentTreeNodeUuid, opt => opt.Ignore())    // Сложная логика
                 .ForMember(dest => dest.SystemBaseTypeId, opt => opt.Ignore())      // Сложная логика
+                .ForMember(dest => dest.ChildNodes, opt => opt.Ignore())
+                .ForMember(dest => dest.ChildLeaves, opt => opt.Ignore())
 
                 .AfterMap((src, dest, ctx) =>
                 {

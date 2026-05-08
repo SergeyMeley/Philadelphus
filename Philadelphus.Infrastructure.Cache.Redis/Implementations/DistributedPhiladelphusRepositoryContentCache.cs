@@ -11,7 +11,7 @@ using PersistenceAuditInfo = Philadelphus.Infrastructure.Persistence.Entities.Ma
 namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
 {
     /// <summary>
-    /// Кэш содержимого репозитория Philadelphus на базе распределенного кэша
+    /// Кэш содержимого репозитория Philadelphus на базе распределенного кэша.
     /// </summary>
     public class DistributedPhiladelphusRepositoryContentCache : IPhiladelphusRepositoryContentCache
     {
@@ -25,10 +25,10 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         private DateTime _distributedCacheUnavailableUntilUtc = DateTime.MinValue;
 
         /// <summary>
-        /// Кэш содержимого репозитория Philadelphus на базе распределенного кэша
+        /// Кэш содержимого репозитория Philadelphus на базе распределенного кэша.
         /// </summary>
-        /// <param name="distributedCache">Распределенный кэш</param>
-        /// <param name="logger">Сервис логгирования</param>
+        /// <param name="distributedCache">Распределенный кэш.</param>
+        /// <param name="logger">Сервис логгирования.</param>
         public DistributedPhiladelphusRepositoryContentCache(
             IDistributedCache distributedCache,
             ILogger logger)
@@ -41,206 +41,66 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Прочитать рабочие деревья из кэша Redis
+        /// Прочитать агрегаты рабочих деревьев из кэша Redis.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="uuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <returns>Коллекция сущностей рабочих деревьев или null, если кэш пуст или недоступен</returns>
-        public IReadOnlyCollection<WorkingTree>? SelectTreesCache(
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="uuids">Идентификаторы рабочих деревьев.</param>
+        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных.</param>
+        /// <returns>Коллекция агрегатов рабочих деревьев или null, если кэш пуст или недоступен.</returns>
+        public IReadOnlyCollection<WorkingTree>? SelectTreeAggregatesCache(
             Guid dataStorageUuid,
             Guid[]? uuids,
             InfrastructureCacheReadContext? cacheReadContext)
         {
             return GetCache<WorkingTree>(
-                GetTreesCacheKey(dataStorageUuid, uuids),
+                GetTreeAggregatesCacheKey(dataStorageUuid, uuids),
                 cacheReadContext);
         }
 
         /// <summary>
-        /// Записать рабочие деревья в кэш Redis
+        /// Записать агрегаты рабочих деревьев в кэш Redis.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="uuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="items">Коллекция сущностей рабочих деревьев</param>
-        public void SetTreesCache(
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="uuids">Идентификаторы рабочих деревьев.</param>
+        /// <param name="items">Коллекция агрегатов рабочих деревьев.</param>
+        public void SetTreeAggregatesCache(
             Guid dataStorageUuid,
             Guid[]? uuids,
             IEnumerable<WorkingTree> items)
         {
             SetCache(
-                GetTreesCacheKey(dataStorageUuid, uuids),
+                GetTreeAggregatesCacheKey(dataStorageUuid, uuids),
                 items,
-                CloneForCache);
+                CloneTreeAggregateForCache);
         }
 
         /// <summary>
-        /// Прочитать корни деревьев из кэша Redis
+        /// Удалить кэш рабочих деревьев из Redis.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <returns>Коллекция сущностей корней или null, если кэш пуст или недоступен</returns>
-        public IReadOnlyCollection<TreeRoot>? SelectRootsCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            InfrastructureCacheReadContext? cacheReadContext)
-        {
-            return GetCache<TreeRoot>(
-                GetRootsCacheKey(dataStorageUuid, owningTreesUuids),
-                cacheReadContext);
-        }
-
-        /// <summary>
-        /// Записать корни деревьев в кэш Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="items">Коллекция сущностей корней</param>
-        public void SetRootsCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            IEnumerable<TreeRoot> items)
-        {
-            SetCache(
-                GetRootsCacheKey(dataStorageUuid, owningTreesUuids),
-                items,
-                CloneForCache);
-        }
-
-        /// <summary>
-        /// Прочитать узлы деревьев из кэша Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <returns>Коллекция сущностей узлов или null, если кэш пуст или недоступен</returns>
-        public IReadOnlyCollection<TreeNode>? SelectNodesCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            InfrastructureCacheReadContext? cacheReadContext)
-        {
-            return GetCache<TreeNode>(
-                GetNodesCacheKey(dataStorageUuid, owningTreesUuids),
-                cacheReadContext);
-        }
-
-        /// <summary>
-        /// Записать узлы деревьев в кэш Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="items">Коллекция сущностей узлов</param>
-        public void SetNodesCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            IEnumerable<TreeNode> items)
-        {
-            SetCache(
-                GetNodesCacheKey(dataStorageUuid, owningTreesUuids),
-                items,
-                CloneForCache);
-        }
-
-        /// <summary>
-        /// Прочитать листья деревьев из кэша Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <returns>Коллекция сущностей листьев или null, если кэш пуст или недоступен</returns>
-        public IReadOnlyCollection<TreeLeave>? SelectLeavesCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            InfrastructureCacheReadContext? cacheReadContext)
-        {
-            return GetCache<TreeLeave>(
-                GetLeavesCacheKey(dataStorageUuid, owningTreesUuids),
-                cacheReadContext);
-        }
-
-        /// <summary>
-        /// Записать листья деревьев в кэш Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="items">Коллекция сущностей листьев</param>
-        public void SetLeavesCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            IEnumerable<TreeLeave> items)
-        {
-            SetCache(
-                GetLeavesCacheKey(dataStorageUuid, owningTreesUuids),
-                items,
-                CloneForCache);
-        }
-
-        /// <summary>
-        /// Прочитать атрибуты деревьев из кэша Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <returns>Коллекция сущностей атрибутов или null, если кэш пуст или недоступен</returns>
-        public IReadOnlyCollection<ElementAttribute>? SelectAttributesCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            InfrastructureCacheReadContext? cacheReadContext)
-        {
-            return GetCache<ElementAttribute>(
-                GetAttributesCacheKey(dataStorageUuid, owningTreesUuids),
-                cacheReadContext);
-        }
-
-        /// <summary>
-        /// Записать атрибуты деревьев в кэш Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <param name="items">Коллекция сущностей атрибутов</param>
-        public void SetAttributesCache(
-            Guid dataStorageUuid,
-            Guid[] owningTreesUuids,
-            IEnumerable<ElementAttribute> items)
-        {
-            SetCache(
-                GetAttributesCacheKey(dataStorageUuid, owningTreesUuids),
-                items,
-                CloneForCache);
-        }
-
-        /// <summary>
-        /// Удалить кэш рабочих деревьев из Redis
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="uuids">Идентификаторы рабочих деревьев</param>
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="uuids">Идентификаторы рабочих деревьев.</param>
         public void InvalidateTrees(Guid dataStorageUuid, Guid[]? uuids)
         {
-            RemoveCache(GetTreesCacheBaseKey(dataStorageUuid, uuids));
+            RemoveCache(GetTreeAggregatesCacheBaseKey(dataStorageUuid, uuids));
         }
 
         /// <summary>
-        /// Удалить кэш содержимого рабочего дерева из Redis
+        /// Удалить кэш содержимого рабочего дерева из Redis.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="treeUuid">Идентификатор рабочего дерева</param>
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="treeUuid">Идентификатор рабочего дерева.</param>
         public void InvalidateTreeContent(Guid dataStorageUuid, Guid treeUuid)
         {
-            var treeUuids = new[] { treeUuid };
-            RemoveCache(GetRootsCacheBaseKey(dataStorageUuid, treeUuids));
-            RemoveCache(GetNodesCacheBaseKey(dataStorageUuid, treeUuids));
-            RemoveCache(GetLeavesCacheBaseKey(dataStorageUuid, treeUuids));
-            RemoveCache(GetAttributesCacheBaseKey(dataStorageUuid, treeUuids));
+            InvalidateTrees(dataStorageUuid, new[] { treeUuid });
         }
 
         /// <summary>
-        /// Получить коллекцию из кэша
+        /// Получить коллекцию из кэша.
         /// </summary>
-        /// <typeparam name="T">Тип сущности инфраструктуры</typeparam>
-        /// <param name="cacheKey">Ключ кэша</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <returns>Коллекция сущностей инфраструктуры или null, если кэш пуст или недоступен</returns>
+        /// <typeparam name="T">Тип сущности инфраструктуры.</typeparam>
+        /// <param name="cacheKey">Ключ кэша.</param>
+        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных.</param>
+        /// <returns>Коллекция сущностей инфраструктуры или null, если кэш пуст или недоступен.</returns>
         private IReadOnlyCollection<T>? GetCache<T>(
             string cacheKey,
             InfrastructureCacheReadContext? cacheReadContext)
@@ -268,12 +128,12 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Записать коллекцию в кэш
+        /// Записать коллекцию в кэш.
         /// </summary>
-        /// <typeparam name="T">Тип сущности инфраструктуры</typeparam>
-        /// <param name="cacheKey">Ключ кэша</param>
-        /// <param name="items">Коллекция сущностей инфраструктуры</param>
-        /// <param name="clone">Функция подготовки сущности к кэшированию</param>
+        /// <typeparam name="T">Тип сущности инфраструктуры.</typeparam>
+        /// <param name="cacheKey">Ключ кэша.</param>
+        /// <param name="items">Коллекция сущностей инфраструктуры.</param>
+        /// <param name="clone">Функция подготовки сущности к кэшированию.</param>
         private void SetCache<T>(
             string cacheKey,
             IEnumerable<T> items,
@@ -297,50 +157,55 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
             {
                 MarkDistributedCacheUnavailable(ex, "обновления", cacheKey);
             }
-
         }
 
         /// <summary>
-        /// Попробовать прочитать строку из распределенного кэша
+        /// Попробовать прочитать строку из распределенного кэша.
         /// </summary>
-        /// <param name="cacheKey">Ключ кэша</param>
-        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных</param>
-        /// <param name="cachedJson">Содержимое кэша</param>
-        /// <returns>Признак успешного обращения к кэшу</returns>
+        /// <param name="cacheKey">Ключ кэша.</param>
+        /// <param name="cacheReadContext">Контекст чтения кэшируемых данных.</param>
+        /// <param name="cachedJson">Содержимое кэша.</param>
+        /// <returns>Признак успешного обращения к кэшу.</returns>
         private bool TryGetCacheString(
             string cacheKey,
             InfrastructureCacheReadContext? cacheReadContext,
             out string? cachedJson)
         {
+            cachedJson = null;
+
             try
             {
                 cachedJson = _distributedCache.GetString(cacheKey);
+                if (cachedJson == null)
+                {
+                    return false;
+                }
+
                 return true;
             }
             catch (Exception ex)
             {
-                cachedJson = null;
-                cacheReadContext?.MarkDistributedCacheUnavailable();
                 MarkDistributedCacheUnavailable(ex, "чтения", cacheKey);
+                cacheReadContext?.MarkDistributedCacheUnavailable();
                 return false;
             }
         }
 
         /// <summary>
-        /// Проверить временную недоступность распределенного кэша
+        /// Проверить временную недоступность распределенного кэша.
         /// </summary>
-        /// <returns>Признак временной недоступности распределенного кэша</returns>
+        /// <returns>Признак временной недоступности распределенного кэша.</returns>
         private bool IsDistributedCacheTemporarilyUnavailable()
         {
             return DateTime.UtcNow < _distributedCacheUnavailableUntilUtc;
         }
 
         /// <summary>
-        /// Отметить распределенный кэш временно недоступным
+        /// Отметить распределенный кэш временно недоступным.
         /// </summary>
-        /// <param name="ex">Исключение операции кэша</param>
-        /// <param name="operationName">Название операции</param>
-        /// <param name="cacheKey">Ключ кэша</param>
+        /// <param name="ex">Исключение операции кэша.</param>
+        /// <param name="operationName">Название операции.</param>
+        /// <param name="cacheKey">Ключ кэша.</param>
         private void MarkDistributedCacheUnavailable(Exception ex, string operationName, string cacheKey)
         {
             _distributedCacheUnavailableUntilUtc = DateTime.UtcNow.Add(DistributedCacheFailurePause);
@@ -350,9 +215,9 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Удалить запись кэша
+        /// Удалить запись кэша.
         /// </summary>
-        /// <param name="cacheBaseKey">Базовый ключ кэша</param>
+        /// <param name="cacheBaseKey">Базовый ключ кэша.</param>
         private void RemoveCache(string cacheBaseKey)
         {
             if (IsDistributedCacheTemporarilyUnavailable())
@@ -381,135 +246,47 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Получить ключ кэша рабочих деревьев
+        /// Получить ключ кэша агрегатов рабочих деревьев.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="uuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Ключ кэша</returns>
-        private string GetTreesCacheKey(Guid dataStorageUuid, Guid[]? uuids)
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="uuids">Идентификаторы рабочих деревьев.</param>
+        /// <returns>Ключ кэша.</returns>
+        private string GetTreeAggregatesCacheKey(Guid dataStorageUuid, Guid[]? uuids)
         {
-            return GetTreesCacheBaseKey(dataStorageUuid, uuids);
+            return GetTreeAggregatesCacheBaseKey(dataStorageUuid, uuids);
         }
 
         /// <summary>
-        /// Получить ключ кэша корней рабочих деревьев
+        /// Получить базовый ключ кэша агрегатов рабочих деревьев.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Ключ кэша</returns>
-        private string GetRootsCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="uuids">Идентификаторы рабочих деревьев.</param>
+        /// <returns>Базовый ключ кэша.</returns>
+        private static string GetTreeAggregatesCacheBaseKey(Guid dataStorageUuid, Guid[]? uuids)
         {
-            return GetRootsCacheBaseKey(dataStorageUuid, owningTreesUuids);
+            return GetCacheBaseKey(dataStorageUuid, "tree-aggregates", uuids);
         }
 
         /// <summary>
-        /// Получить ключ кэша узлов рабочих деревьев
+        /// Получить ключ кэша.
         /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Ключ кэша</returns>
-        private string GetNodesCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetNodesCacheBaseKey(dataStorageUuid, owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить ключ кэша листьев рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Ключ кэша</returns>
-        private string GetLeavesCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetLeavesCacheBaseKey(dataStorageUuid, owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить ключ кэша атрибутов рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Ключ кэша</returns>
-        private string GetAttributesCacheKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetAttributesCacheBaseKey(dataStorageUuid, owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить базовый ключ кэша рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="uuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Базовый ключ кэша</returns>
-        private static string GetTreesCacheBaseKey(Guid dataStorageUuid, Guid[]? uuids)
-        {
-            return GetCacheBaseKey(dataStorageUuid, "trees", uuids);
-        }
-
-        /// <summary>
-        /// Получить базовый ключ кэша корней рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Базовый ключ кэша</returns>
-        private static string GetRootsCacheBaseKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetCacheBaseKey(dataStorageUuid, "roots", owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить базовый ключ кэша узлов рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Базовый ключ кэша</returns>
-        private static string GetNodesCacheBaseKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetCacheBaseKey(dataStorageUuid, "nodes", owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить базовый ключ кэша листьев рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Базовый ключ кэша</returns>
-        private static string GetLeavesCacheBaseKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetCacheBaseKey(dataStorageUuid, "leaves", owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить базовый ключ кэша атрибутов рабочих деревьев
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="owningTreesUuids">Идентификаторы рабочих деревьев</param>
-        /// <returns>Базовый ключ кэша</returns>
-        private static string GetAttributesCacheBaseKey(Guid dataStorageUuid, Guid[]? owningTreesUuids)
-        {
-            return GetCacheBaseKey(dataStorageUuid, "attributes", owningTreesUuids);
-        }
-
-        /// <summary>
-        /// Получить ключ кэша
-        /// </summary>
-        /// <param name="dataStorageUuid">Идентификатор хранилища данных</param>
-        /// <param name="entityGroup">Группа сущностей</param>
-        /// <param name="uuids">Идентификаторы сущностей или владельцев</param>
-        /// <returns>Ключ кэша</returns>
+        /// <param name="dataStorageUuid">Идентификатор хранилища данных.</param>
+        /// <param name="entityGroup">Группа сущностей.</param>
+        /// <param name="uuids">Идентификаторы сущностей или владельцев.</param>
+        /// <returns>Ключ кэша.</returns>
         private static string GetCacheBaseKey(Guid dataStorageUuid, string entityGroup, Guid[]? uuids)
         {
             var normalizedUuids = uuids == null || uuids.Length == 0
                 ? "all"
                 : string.Join("-", uuids.OrderBy(x => x).Select(x => x.ToString("N")));
 
-            return $"Philadelphus:CoreDomain:v1:storage:{dataStorageUuid:N}:{entityGroup}:{normalizedUuids}";
+            return $"Philadelphus:CoreDomain:v2:storage:{dataStorageUuid:N}:{entityGroup}:{normalizedUuids}";
         }
 
         /// <summary>
-        /// Создать параметры записи распределенного кэша
+        /// Создать параметры записи распределенного кэша.
         /// </summary>
-        /// <returns>Параметры записи кэша</returns>
+        /// <returns>Параметры записи кэша.</returns>
         private static DistributedCacheEntryOptions CreateDistributedCacheEntryOptions()
         {
             return new DistributedCacheEntryOptions
@@ -520,11 +297,11 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Подготовить сущность рабочего дерева к кэшированию
+        /// Подготовить агрегат рабочего дерева к кэшированию.
         /// </summary>
-        /// <param name="item">Сущность рабочего дерева</param>
-        /// <returns>Сущность без навигационных свойств</returns>
-        private static WorkingTree CloneForCache(WorkingTree item)
+        /// <param name="item">Агрегат рабочего дерева.</param>
+        /// <returns>Агрегат без обратных навигационных свойств.</returns>
+        private static WorkingTree CloneTreeAggregateForCache(WorkingTree item)
         {
             return new WorkingTree
             {
@@ -536,15 +313,19 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
                 CustomCode = item.CustomCode,
                 IsHidden = item.IsHidden,
                 AuditInfo = CloneAuditInfo(item.AuditInfo),
-                OwnDataStorageUuid = item.OwnDataStorageUuid
+                OwnDataStorageUuid = item.OwnDataStorageUuid,
+                ContentRoot = item.ContentRoot == null ? null! : CloneForCache(item.ContentRoot),
+                ContentNodes = item.ContentNodes.Select(CloneForCache).ToList(),
+                ContentLeaves = item.ContentLeaves.Select(CloneForCache).ToList(),
+                ContentAttributes = item.ContentAttributes.Select(CloneForCache).ToList()
             };
         }
 
         /// <summary>
-        /// Подготовить сущность корня к кэшированию
+        /// Подготовить сущность корня к кэшированию.
         /// </summary>
-        /// <param name="item">Сущность корня</param>
-        /// <returns>Сущность без навигационных свойств</returns>
+        /// <param name="item">Сущность корня.</param>
+        /// <returns>Сущность без навигационных свойств.</returns>
         private static TreeRoot CloneForCache(TreeRoot item)
         {
             return new TreeRoot
@@ -562,10 +343,10 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Подготовить сущность узла к кэшированию
+        /// Подготовить сущность узла к кэшированию.
         /// </summary>
-        /// <param name="item">Сущность узла</param>
-        /// <returns>Сущность без навигационных свойств</returns>
+        /// <param name="item">Сущность узла.</param>
+        /// <returns>Сущность без навигационных свойств.</returns>
         private static TreeNode CloneForCache(TreeNode item)
         {
             return new TreeNode
@@ -586,10 +367,10 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Подготовить сущность листа к кэшированию
+        /// Подготовить сущность листа к кэшированию.
         /// </summary>
-        /// <param name="item">Сущность листа</param>
-        /// <returns>Сущность без навигационных свойств</returns>
+        /// <param name="item">Сущность листа.</param>
+        /// <returns>Сущность без навигационных свойств.</returns>
         private static TreeLeave CloneForCache(TreeLeave item)
         {
             return new TreeLeave
@@ -609,10 +390,10 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Подготовить сущность атрибута к кэшированию
+        /// Подготовить сущность атрибута к кэшированию.
         /// </summary>
-        /// <param name="item">Сущность атрибута</param>
-        /// <returns>Сущность без навигационных свойств</returns>
+        /// <param name="item">Сущность атрибута.</param>
+        /// <returns>Сущность без навигационных свойств.</returns>
         private static ElementAttribute CloneForCache(ElementAttribute item)
         {
             return new ElementAttribute
@@ -639,10 +420,10 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         }
 
         /// <summary>
-        /// Клонировать информацию аудита
+        /// Клонировать информацию аудита.
         /// </summary>
-        /// <param name="auditInfo">Информация аудита</param>
-        /// <returns>Копия информации аудита</returns>
+        /// <param name="auditInfo">Информация аудита.</param>
+        /// <returns>Копия информации аудита.</returns>
         private static PersistenceAuditInfo CloneAuditInfo(PersistenceAuditInfo? auditInfo)
         {
             if (auditInfo == null)

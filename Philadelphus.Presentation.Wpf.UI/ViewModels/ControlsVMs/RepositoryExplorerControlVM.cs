@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -30,13 +31,16 @@ using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
-    public  class RepositoryExplorerControlVM : ControlBaseVM
+    public  class RepositoryExplorerControlVM : ControlBaseVM, IDisposable
     {
         #region [ Props ]
 
         private readonly IPhiladelphusRepositoryService _service;
+        private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private PhiladelphusRepositoryVM _philadelphusRepositoryVM;     // TODO: Тех. долг. Вернуть readonly
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
+        private int _repositoryLoadVersion;
+        private bool _isDisposed;
         public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
         { 
             get 
@@ -203,8 +207,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
                     var result = _service.CreateTreeRoot(tree);
                     _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service));
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                    NotifyRepositoryTreeChanged();
                 },
                 ce =>
                 {
@@ -224,8 +227,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         np.CreateTreeNode();
                     }
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                    _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
                 },
                 ce =>
                 {
@@ -249,8 +251,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         leave.Parent.CreateTreeLeave();
                     }
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                    _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
                 },
                 ce =>
                 {
@@ -268,7 +269,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         return;
                     _selectedRepositoryMember.AddAttribute();
                     
-                    OnPropertyChanged(nameof(_philadelphusRepositoryVM.State));
+                    _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
                 },
                 ce =>
                 {
@@ -285,7 +286,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
-                        OnPropertyChanged(nameof(_selectedRepositoryMember.State));
+                        (_selectedRepositoryMember as ViewModelBase)?.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.State));
                         NotifyChildsPropertyChangedRecursive();
                     }
                 },
@@ -305,7 +306,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember?.SelectedAttributeVM?.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
-                        OnPropertyChanged(nameof(_selectedRepositoryMember.SelectedAttributeVM.State));
+                        _selectedRepositoryMember.SelectedAttributeVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.State));
                     }
                 },
                 ce =>
@@ -480,9 +481,39 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         internal bool LoadPhiladelphusRepository()
         {
-            var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
-            UpdateLoadedPhiladelphusRepository(newRepo);
-            return _philadelphusRepositoryVM.Childs != null;
+            if (_isDisposed)
+            {
+                return false;
+            }
+
+            if (_repositoryLoadSemaphore.Wait(0) == false)
+            {
+                return false;
+            }
+
+            var loadVersion = BeginRepositoryLoad();
+
+            try
+            {
+                if (CanApplyRepositoryLoad(loadVersion) == false)
+                {
+                    return false;
+                }
+
+                var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
+                if (CanApplyRepositoryLoad(loadVersion) == false)
+                {
+                    return false;
+                }
+
+                UpdateLoadedPhiladelphusRepository(newRepo);
+                return _philadelphusRepositoryVM.Childs != null;
+            }
+            finally
+            {
+                _repositoryLoadSemaphore.Release();
+                CompleteRepositoryLoad(loadVersion);
+            }
         }
 
         private async Task LoadPhiladelphusRepositoryOnStartupAsync()
@@ -504,16 +535,41 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         internal async Task<bool> LoadPhiladelphusRepositoryAsync()
         {
-            IsRepositoryLoading = true;
+            if (_isDisposed)
+            {
+                return false;
+            }
+
+            var loadVersion = BeginRepositoryLoad();
+            var lockTaken = false;
+
             try
             {
+                await _repositoryLoadSemaphore.WaitAsync();
+                lockTaken = true;
+
+                if (CanApplyRepositoryLoad(loadVersion) == false)
+                {
+                    return false;
+                }
+
                 var newRepo = await _service.GetShrubContentAsync(_philadelphusRepositoryVM.Model);
+                if (CanApplyRepositoryLoad(loadVersion) == false)
+                {
+                    return false;
+                }
+
                 UpdateLoadedPhiladelphusRepository(newRepo);
                 return _philadelphusRepositoryVM.Childs != null;
             }
             finally
             {
-                IsRepositoryLoading = false;
+                if (lockTaken)
+                {
+                    _repositoryLoadSemaphore.Release();
+                }
+
+                CompleteRepositoryLoad(loadVersion);
             }
         }
 
@@ -534,6 +590,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private void UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryModel newRepo)
         {
+            var selectedUuid = SelectedRepositoryMember?.Uuid;
+
+            SelectedRepositoryMember = null;
             _philadelphusRepositoryVM.Childs.Clear();
             foreach (var item in newRepo.ContentShrub.ContentWorkingTrees)
             {
@@ -542,9 +601,101 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service));
                 }
             }
-            OnPropertyChanged(nameof(_philadelphusRepositoryVM));
-            OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
-            OnPropertyChanged(nameof(_philadelphusRepositoryVM.ChildsCount));
+
+            if (selectedUuid.HasValue)
+            {
+                SelectedRepositoryMember = FindRepositoryMemberByUuid(selectedUuid.Value);
+            }
+
+            NotifyRepositoryTreeChanged();
+        }
+
+        private int BeginRepositoryLoad()
+        {
+            IsRepositoryLoading = true;
+            return Interlocked.Increment(ref _repositoryLoadVersion);
+        }
+
+        private bool CanApplyRepositoryLoad(int loadVersion)
+        {
+            return _isDisposed == false
+                && loadVersion == Volatile.Read(ref _repositoryLoadVersion);
+        }
+
+        private void CompleteRepositoryLoad(int loadVersion)
+        {
+            if (loadVersion == Volatile.Read(ref _repositoryLoadVersion))
+            {
+                IsRepositoryLoading = false;
+            }
+        }
+
+        private void NotifyRepositoryTreeChanged()
+        {
+            OnPropertyChanged(nameof(PhiladelphusRepositoryVM));
+            _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.Childs));
+            _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
+            _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+        }
+
+        private IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(Guid uuid)
+        {
+            foreach (var root in _philadelphusRepositoryVM.Childs)
+            {
+                var found = FindRepositoryMemberByUuid(root, uuid);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        private static IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(TreeRootVM root, Guid uuid)
+        {
+            if (root.Uuid == uuid)
+            {
+                return root;
+            }
+
+            foreach (var node in root.ChildNodes)
+            {
+                var found = FindRepositoryMemberByUuid(node, uuid);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        private static IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(TreeNodeVM node, Guid uuid)
+        {
+            if (node.Uuid == uuid)
+            {
+                return node;
+            }
+
+            foreach (var childNode in node.ChildNodes)
+            {
+                var found = FindRepositoryMemberByUuid(childNode, uuid);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            foreach (var leave in node.ChildLeaves)
+            {
+                if (leave.Uuid == uuid)
+                {
+                    return leave;
+                }
+            }
+
+            return null;
         }
 
         private bool CanModifyRepository()
@@ -644,6 +795,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round(((double)currentNumber / (double)totalCount * 100), 1)} %)";
                 OnPropertyChanged(nameof(CurrentProgress));
             });
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _isDisposed = true;
+            Interlocked.Increment(ref _repositoryLoadVersion);
         }
 
         #endregion

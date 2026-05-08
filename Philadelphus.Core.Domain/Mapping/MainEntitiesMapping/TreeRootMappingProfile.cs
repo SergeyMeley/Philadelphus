@@ -31,7 +31,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.CustomCode, opt => opt.MapFrom(src => src.CustomCode))
                 .ForMember(dest => dest.IsHidden, opt => opt.MapFrom(src => src.IsHidden))
 
-                .ForMember(dest => dest.OwningWorkingTreeUuid, opt => opt.MapFrom(src => src.OwningWorkingTree != null ? src.OwningWorkingTree.Uuid : Guid.Empty));
+                .ForMember(dest => dest.OwningWorkingTreeUuid, opt => opt.MapFrom(src => src.OwningWorkingTree != null ? src.OwningWorkingTree.Uuid : Guid.Empty))
+                .ForMember(dest => dest.ChildNodes, opt => opt.Ignore());
 
             // Сущность инфраструктуры => Модель бизнес-слоя
             CreateMap<TreeRoot, TreeRootModel>()

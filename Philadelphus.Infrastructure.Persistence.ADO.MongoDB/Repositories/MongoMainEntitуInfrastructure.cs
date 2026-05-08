@@ -74,24 +74,6 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             var documents = collection.Find(new BsonDocument()).ToList();
             return documents;
         }
-        public IEnumerable<TreeRoot> SelectRoots()
-        {
-            var collection = _database.GetCollection<TreeRoot>("roots");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
-        public IEnumerable<TreeNode> SelectNodes()
-        {
-            var collection = _database.GetCollection<TreeNode>("nodes");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
-        public IEnumerable<TreeLeave> SelectLeaves()
-        {
-            var collection = _database.GetCollection<TreeLeave>("leaves");
-            var documents = collection.Find(new BsonDocument()).ToList();
-            return documents;
-        }
         #endregion
         #region [ Insert ]
         public long InsertRepositories(IEnumerable<PhiladelphusRepository> repositories)
@@ -178,32 +160,7 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
             return result;
         }
 
-        public IEnumerable<WorkingTree> SelectTrees()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] owningTreesUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeNode> SelectNodes(Guid[] owningTreesUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] owningTreesUuids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids)
+        public IEnumerable<WorkingTree> SelectTreeAggregates(Guid[]? uuids = null)
         {
             throw new NotImplementedException();
         }

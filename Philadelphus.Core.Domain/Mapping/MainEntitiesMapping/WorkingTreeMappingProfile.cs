@@ -33,7 +33,11 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(src => src.Alias))
                 .ForMember(dest => dest.IsHidden, opt => opt.MapFrom(src => src.IsHidden))
 
-                .ForMember(dest => dest.OwnDataStorageUuid, opt => opt.MapFrom(src => src.OwnDataStorage != null ? src.OwnDataStorage.Uuid : Guid.Empty));
+                .ForMember(dest => dest.OwnDataStorageUuid, opt => opt.MapFrom(src => src.OwnDataStorage != null ? src.OwnDataStorage.Uuid : Guid.Empty))
+                .ForMember(dest => dest.ContentRoot, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentNodes, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentLeaves, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentAttributes, opt => opt.Ignore());
 
             // Сущность инфраструктуры => Модель бизнес-слоя
             CreateMap<WorkingTree, WorkingTreeModel>()
@@ -58,7 +62,12 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.Sequence, opt => opt.MapFrom(src => src.Sequence))
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(src => src.Alias))
-                .ForMember(dest => dest.IsHidden, opt => opt.MapFrom(src => src.IsHidden));
+                .ForMember(dest => dest.IsHidden, opt => opt.MapFrom(src => src.IsHidden))
+
+                .ForMember(dest => dest.ContentRoot, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentNodes, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentLeaves, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentAttributes, opt => opt.Ignore());
         }
     }
 }

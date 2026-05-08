@@ -134,6 +134,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ArgumentNullException.ThrowIfNull(parent);
 
+            OwningWorkingTree.ContentNodes.Add(this);
+
             if (parent is TreeNodeModel node)
                 ParentNode = node;
 

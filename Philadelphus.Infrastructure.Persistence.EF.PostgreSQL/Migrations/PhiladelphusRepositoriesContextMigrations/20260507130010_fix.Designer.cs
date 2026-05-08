@@ -4,64 +4,72 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 #nullable disable
 
-namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.PhiladelphusRepositoriesContextMigrations
+namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.PhiladelphusRepositoriesContextMigrations
 {
-    [DbContext(typeof(SqliteEfPhiladelphusRepositoriesContext))]
-    [Migration("20260325122518_sqlite")]
-    partial class sqlite
+    [DbContext(typeof(PostgreEfPhiladelphusRepositoriesContext))]
+    [Migration("20260507130010_fix")]
+    partial class RepositoryContextSnapshotSync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.14");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.14")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepository", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Alias")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("alias");
 
-                    b.PrimitiveCollection<string>("ContentWorkingTreesUuids")
+                    b.PrimitiveCollection<Guid[]>("ContentWorkingTreesUuids")
                         .IsRequired()
                         .HasColumnType("uuid[]")
                         .HasColumnName("content_working_trees_uuids");
 
                     b.Property<string>("CustomCode")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("custom_code");
 
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<Guid>("OwnDataStorageUuid")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("data_storage_uuid");
 
                     b.Property<long?>("Sequence")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
                     b.HasKey("Uuid")
@@ -76,37 +84,37 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.Philadelp
                         {
                             b1.Property<Guid>("PhiladelphusRepositoryUuid")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("TEXT");
+                                .HasColumnType("uuid");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("TEXT")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasColumnType("TEXT")
+                                .HasColumnType("text")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
-                                .HasColumnType("TEXT")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasColumnType("TEXT")
+                                .HasColumnType("text")
                                 .HasColumnName("deleted_by");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER")
+                                .HasColumnType("boolean")
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("TEXT")
+                                .HasColumnType("timestamp with time zone")
                                 .HasColumnName("updated_at");
 
                             b1.Property<string>("UpdatedBy")
-                                .HasColumnType("TEXT")
+                                .HasColumnType("text")
                                 .HasColumnName("updated_by");
 
                             b1.HasKey("PhiladelphusRepositoryUuid");

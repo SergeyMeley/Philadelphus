@@ -8,11 +8,7 @@ namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
     {
         # region [ Select ]
 
-        public IEnumerable<WorkingTree> SelectTrees(Guid[] uuids = null);
-        public IEnumerable<TreeRoot> SelectRoots(Guid[] owningTreesUuids);
-        public IEnumerable<TreeNode> SelectNodes(Guid[] owningTreesUuids);
-        public IEnumerable<TreeLeave> SelectLeaves(Guid[] owningTreesUuids);
-        public IEnumerable<ElementAttribute> SelectAttributes(Guid[] owningTreesUuids);
+        public IEnumerable<WorkingTree> SelectTreeAggregates(Guid[]? uuids = null);
 
         #endregion
 

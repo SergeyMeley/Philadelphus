@@ -4,67 +4,59 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
+using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
 
 #nullable disable
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
+namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMembersContextMigrations
 {
-    [DbContext(typeof(PostgreEfShrubMembersContext))]
-    [Migration("20260319220702_audit")]
-    partial class audit
+    [DbContext(typeof(SqliteEfShrubMembersContext))]
+    [Migration("20260505230114_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.14");
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", b =>
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Alias")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("alias");
 
                     b.Property<string>("CustomCode")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("custom_code");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<Guid>("OwnDataStorageUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_storage_uuid");
 
                     b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
                     b.HasKey("Uuid")
@@ -77,48 +69,48 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Alias")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("alias");
 
                     b.Property<string>("CustomCode")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("custom_code");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<Guid>("OwningWorkingTreeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("owning_working_tree_uuid");
 
                     b.Property<Guid?>("ParentTreeNodeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("parent_tree_node_uuid");
 
                     b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
                     b.Property<int>("SystemBaseTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(0)
                         .HasColumnName("data_type_id");
 
@@ -136,52 +128,52 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Alias")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("alias");
 
                     b.Property<string>("CustomCode")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("custom_code");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<Guid>("OwningWorkingTreeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("owning_working_tree_uuid");
 
                     b.Property<Guid?>("ParentTreeNodeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("parent_tree_node_uuid");
 
                     b.Property<Guid?>("ParentTreeRootUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("parent_tree_root_uuid");
 
                     b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
                     b.Property<int>("SystemBaseTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(0)
                         .HasColumnName("data_type_id");
 
@@ -199,45 +191,46 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Alias")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("alias");
 
                     b.Property<string>("CustomCode")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("custom_code");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<Guid>("OwningWorkingTreeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("owning_working_tree_uuid");
 
                     b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
                     b.HasKey("Uuid")
                         .HasName("tree_roots_pkey");
 
-                    b.HasIndex("OwningWorkingTreeUuid");
+                    b.HasIndex("OwningWorkingTreeUuid")
+                        .IsUnique();
 
                     b.ToTable("tree_roots", "shrub_members");
                 });
@@ -246,80 +239,80 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                 {
                     b.Property<Guid>("Uuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Alias")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("alias");
 
                     b.Property<string>("CustomCode")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("custom_code");
 
                     b.Property<Guid>("DeclaringOwnerUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("declaring_owner_uuid");
 
                     b.Property<Guid>("DeclaringUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("declaring_uuid");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsCollectionValue")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("is_collection_value");
 
                     b.Property<bool>("IsHidden")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<int>("OverrideId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(0)
                         .HasColumnName("override_id");
 
                     b.Property<Guid>("OwnerUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("owner_uuid");
 
                     b.Property<Guid>("OwningWorkingTreeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("owning_working_tree_uuid");
 
                     b.Property<long?>("Sequence")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
                     b.Property<Guid?>("ValueTypeUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("value_type_uuid");
 
                     b.Property<Guid?>("ValueUuid")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("value_uuid");
 
-                    b.PrimitiveCollection<Guid[]>("ValuesUuids")
-                        .HasColumnType("uuid[]")
+                    b.PrimitiveCollection<string>("ValuesUuids")
+                        .HasColumnType("TEXT")
                         .HasColumnName("values_uuids");
 
                     b.Property<int>("VisibilityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(0)
                         .HasColumnName("visibility_id");
 
@@ -337,37 +330,37 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         {
                             b1.Property<Guid>("WorkingTreeUuid")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_by");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("boolean")
+                                .HasColumnType("INTEGER")
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_at");
 
                             b1.Property<string>("UpdatedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_by");
 
                             b1.HasKey("WorkingTreeUuid");
@@ -385,7 +378,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeave", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                        .WithMany("TreeLeaves")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -398,37 +391,37 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         {
                             b1.Property<Guid>("TreeLeaveUuid")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_by");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("boolean")
+                                .HasColumnType("INTEGER")
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_at");
 
                             b1.Property<string>("UpdatedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_by");
 
                             b1.HasKey("TreeLeaveUuid");
@@ -450,7 +443,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                        .WithMany("TreeNodes")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -463,37 +456,37 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         {
                             b1.Property<Guid>("TreeNodeUuid")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_by");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("boolean")
+                                .HasColumnType("INTEGER")
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_at");
 
                             b1.Property<string>("UpdatedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_by");
 
                             b1.HasKey("TreeNodeUuid");
@@ -515,8 +508,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
-                        .HasForeignKey("OwningWorkingTreeUuid")
+                        .WithOne("TreeRoot")
+                        .HasForeignKey("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", "OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -524,37 +517,37 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         {
                             b1.Property<Guid>("TreeRootUuid")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_by");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("boolean")
+                                .HasColumnType("INTEGER")
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_at");
 
                             b1.Property<string>("UpdatedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_by");
 
                             b1.HasKey("TreeRootUuid");
@@ -574,7 +567,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                        .WithMany("ElementAttributes")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -583,37 +576,37 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         {
                             b1.Property<Guid>("ElementAttributeUuid")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_at");
 
                             b1.Property<string>("CreatedBy")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("created_by");
 
                             b1.Property<DateTime?>("DeletedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_at");
 
                             b1.Property<string>("DeletedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("deleted_by");
 
                             b1.Property<bool>("IsDeleted")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("boolean")
+                                .HasColumnType("INTEGER")
                                 .HasDefaultValue(false)
                                 .HasColumnName("is_deleted");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_at");
 
                             b1.Property<string>("UpdatedBy")
-                                .HasColumnType("text")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("updated_by");
 
                             b1.HasKey("ElementAttributeUuid");
@@ -628,6 +621,18 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .IsRequired();
 
                     b.Navigation("OwningWorkingTree");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", b =>
+                {
+                    b.Navigation("ElementAttributes");
+
+                    b.Navigation("TreeLeaves");
+
+                    b.Navigation("TreeNodes");
+
+                    b.Navigation("TreeRoot")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

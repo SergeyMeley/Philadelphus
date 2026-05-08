@@ -29,15 +29,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             };
         }
 
-        protected override void SetNavigationProperties<TEntity, TNav>(TEntity item, Dictionary<Guid, TNav> navigationEntities)
-        {
-            switch (item)
-            {
-                case PhiladelphusRepository repository:
-                    break;
-            }
-        }
-
         public IEnumerable<PhiladelphusRepository> SelectRepositories(Guid[] uuids = null)
             => Select<PhiladelphusRepository>(ownUuids: uuids);
 

@@ -22,6 +22,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         private IDataStorageModel _ownDataStorage;
         private TreeRootModel _contentRoot;
+        private ICollection<TreeNodeModel> _contentNodes = new List<TreeNodeModel>();
+        private ICollection<TreeLeaveModel> _contentLeaves = new List<TreeLeaveModel>();
+        private ICollection<ElementAttributeModel> _contentAttributes = new List<ElementAttributeModel>();
 
         #endregion
 
@@ -107,6 +110,63 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (_contentRoot != value)
                 {
                     _contentRoot = value;
+                    UpdateStateStateAfterChange();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Узлы рабочего дерева
+        /// </summary>
+        public ICollection<TreeNodeModel> ContentNodes
+        {
+            get
+            {
+                return _contentNodes;
+            }
+            set
+            {
+                if (_contentNodes != value)
+                {
+                    _contentNodes = value;
+                    UpdateStateStateAfterChange();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Листы рабочего дерева
+        /// </summary>
+        public ICollection<TreeLeaveModel> ContentLeaves 
+        {
+            get
+            {
+                return _contentLeaves;
+            }
+            set
+            {
+                if (_contentLeaves != value)
+                {
+                    _contentLeaves = value;
+                    UpdateStateStateAfterChange();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Атрибуты элементов рабочего дерева
+        /// </summary>
+        public ICollection<ElementAttributeModel> ContentAttributes
+        {
+            get
+            {
+                return _contentAttributes;
+            }
+            set
+            {
+                if (_contentAttributes != value)
+                {
+                    _contentAttributes = value;
                     UpdateStateStateAfterChange();
                 }
             }

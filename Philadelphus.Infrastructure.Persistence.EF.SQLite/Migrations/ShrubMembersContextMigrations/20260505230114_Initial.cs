@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMembersContextMigrations
 {
     /// <inheritdoc />
-    public partial class sqlite : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -235,7 +235,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
                 name: "IX_tree_roots_owning_working_tree_uuid",
                 schema: "shrub_members",
                 table: "tree_roots",
-                column: "owning_working_tree_uuid");
+                column: "owning_working_tree_uuid",
+                unique: true);
         }
 
         /// <inheritdoc />

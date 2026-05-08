@@ -31,10 +31,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             };
         }
 
-        protected override void SetNavigationProperties<TEntity, TNav>(TEntity item, Dictionary<Guid, TNav> navigationEntities)
-        {
-        }
-
         public async Task<List<ReportInfo>> GetAvailableReportsAsync(string schemaName)
         {
             var reports = new List<ReportInfo>();

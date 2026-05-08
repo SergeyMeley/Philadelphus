@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
@@ -71,14 +72,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
                     .HasColumnName("deleted_by");
             });
 
-            builder.Property(x => x.OwningWorkingTreeUuid)
-                .HasColumnName("owning_working_tree_uuid")
-                .IsRequired();
-
-            builder.HasOne(x => x.OwningWorkingTree)
-              .WithMany()
-              .HasForeignKey(x => x.OwningWorkingTreeUuid);
-
             builder.Property(x => x.OwnerUuid)
                 .HasColumnName("owner_uuid")
                 .IsRequired();
@@ -108,6 +101,14 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
             builder.Property(x => x.OverrideId)
                 .HasColumnName("override_id")
                 .HasDefaultValue(0);
+
+            builder.Property(x => x.OwningWorkingTreeUuid)
+                .HasColumnName("owning_working_tree_uuid")
+                .IsRequired();
+
+            builder.HasOne<WorkingTree>()
+               .WithMany(x => x.ContentAttributes)
+               .HasForeignKey(x => x.OwningWorkingTreeUuid);
         }
     }
 }

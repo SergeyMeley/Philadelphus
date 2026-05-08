@@ -263,6 +263,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 
             ArgumentOutOfRangeException.ThrowIfEqual(declaringUuid, Guid.Empty);
 
+            OwningWorkingTree.ContentAttributes.Add(this);
+
             _attributeOwner = localOwner;
             _declaringUuid = declaringUuid;
             _declaringAttributeOwner = declaringOwner;

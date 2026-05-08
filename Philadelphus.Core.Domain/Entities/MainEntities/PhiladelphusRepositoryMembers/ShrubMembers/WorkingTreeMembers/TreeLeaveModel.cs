@@ -87,6 +87,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ArgumentNullException.ThrowIfNull(parent);
 
+            OwningWorkingTree.ContentLeaves.Add(this);
+
             ParentNode = parent;
         }
 

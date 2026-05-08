@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
@@ -82,15 +83,17 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
             builder.Property(x => x.ParentTreeNodeUuid)
                 .HasColumnName("parent_tree_node_uuid");
 
-            builder.HasOne(x => x.OwningWorkingTree)
-              .WithMany()
+            builder.HasOne<WorkingTree>()
+              .WithMany(x => x.ContentNodes)
               .HasForeignKey(x => x.OwningWorkingTreeUuid);
 
-            builder.HasOne(x => x.ParentTreeRoot)
-              .WithMany()
+            builder.HasOne<TreeRoot>()
+              .WithMany(x => x.ChildNodes)
               .HasForeignKey(x => x.ParentTreeRootUuid);
 
-            builder.Ignore(x => x.ParentTreeNode);
+            builder.HasOne<TreeNode>()
+              .WithMany(x => x.ChildNodes)
+              .HasForeignKey(x => x.ParentTreeNodeUuid);
         }
     }
 }

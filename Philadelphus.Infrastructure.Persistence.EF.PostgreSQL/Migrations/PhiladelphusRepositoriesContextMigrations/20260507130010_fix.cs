@@ -5,7 +5,7 @@
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.PhiladelphusRepositoriesContextMigrations
 {
     /// <inheritdoc />
-    public partial class sqlite : Migration
+    public partial class RepositoryContextSnapshotSync : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

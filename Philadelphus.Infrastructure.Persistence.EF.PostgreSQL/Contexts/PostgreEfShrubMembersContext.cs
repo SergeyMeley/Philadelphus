@@ -33,8 +33,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
             {
                 optionsBuilder
                     .UseNpgsql(_connectionString)
-                    .UseLazyLoadingProxies()
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                    .UseLazyLoadingProxies();
+                    //.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                     //.LogTo(Log.Information, LogLevel.Information)
                     //.EnableSensitiveDataLogging()
                     //.EnableDetailedErrors();

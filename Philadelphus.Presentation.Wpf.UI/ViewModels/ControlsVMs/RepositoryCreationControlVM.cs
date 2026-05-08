@@ -107,9 +107,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         MessageBox.Show($"Некорректно заполнены параметры, операция не выполнена.");
                         return;
                     }
-                    if (_repositoryCollectionVM.PhiladelphusRepositoriesVMs.Any(x => x.Name == _name))
+
+                    var existsRepository = _repositoryCollectionVM.PhiladelphusRepositoriesVMs.FirstOrDefault(x => x.Name == _name);
+                    if (existsRepository != null)
                     {
-                        MessageBox.Show($"Репозиторий '{_name}' уже существует, операция не выполнена.");
+                        MessageBox.Show($"Репозиторий '{existsRepository?.Name}' [{existsRepository?.Uuid}] уже существует в хранилище '{existsRepository?.OwnDataStorageName}' [{existsRepository?.OwnDataStorageUuid}], операция не выполнена. Откройте репозиторий из списка доступных.");
                         return;
                     }
 

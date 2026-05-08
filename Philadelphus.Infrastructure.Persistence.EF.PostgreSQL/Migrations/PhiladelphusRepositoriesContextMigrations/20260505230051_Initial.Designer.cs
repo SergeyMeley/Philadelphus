@@ -12,8 +12,8 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.PhiladelphusRepositoriesContextMigrations
 {
     [DbContext(typeof(PostgreEfPhiladelphusRepositoriesContext))]
-    [Migration("20260325122505_sqlite")]
-    partial class sqlite
+    [Migration("20260505230051_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

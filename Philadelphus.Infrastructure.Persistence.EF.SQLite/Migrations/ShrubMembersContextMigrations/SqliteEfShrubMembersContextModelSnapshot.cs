@@ -179,6 +179,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
 
                     b.HasIndex("OwningWorkingTreeUuid");
 
+                    b.HasIndex("ParentTreeNodeUuid");
+
                     b.HasIndex("ParentTreeRootUuid");
 
                     b.ToTable("tree_nodes", "shrub_members");
@@ -226,7 +228,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
                     b.HasKey("Uuid")
                         .HasName("tree_roots_pkey");
 
-                    b.HasIndex("OwningWorkingTreeUuid");
+                    b.HasIndex("OwningWorkingTreeUuid")
+                        .IsUnique();
 
                     b.ToTable("tree_roots", "shrub_members");
                 });
@@ -373,14 +376,14 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeave", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", null)
+                        .WithMany("ContentLeaves")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", "ParentTreeNode")
-                        .WithMany()
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", null)
+                        .WithMany("ChildLeaves")
                         .HasForeignKey("ParentTreeNodeUuid");
 
                     b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
@@ -430,22 +433,22 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
-
-                    b.Navigation("OwningWorkingTree");
-
-                    b.Navigation("ParentTreeNode");
                 });
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", null)
+                        .WithMany("ContentNodes")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", "ParentTreeRoot")
-                        .WithMany()
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", null)
+                        .WithMany("ChildNodes")
+                        .HasForeignKey("ParentTreeNodeUuid");
+
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", null)
+                        .WithMany("ChildNodes")
                         .HasForeignKey("ParentTreeRootUuid");
 
                     b.OwnsOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties.AuditInfo", "AuditInfo", b1 =>
@@ -495,17 +498,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
-
-                    b.Navigation("OwningWorkingTree");
-
-                    b.Navigation("ParentTreeRoot");
                 });
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
-                        .HasForeignKey("OwningWorkingTreeUuid")
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", null)
+                        .WithOne("ContentRoot")
+                        .HasForeignKey("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", "OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -556,14 +555,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
-
-                    b.Navigation("OwningWorkingTree");
                 });
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
-                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                    b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", null)
+                        .WithMany("ContentAttributes")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -615,8 +612,30 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
 
                     b.Navigation("AuditInfo")
                         .IsRequired();
+                });
 
-                    b.Navigation("OwningWorkingTree");
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", b =>
+                {
+                    b.Navigation("ContentAttributes");
+
+                    b.Navigation("ContentLeaves");
+
+                    b.Navigation("ContentNodes");
+
+                    b.Navigation("ContentRoot")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", b =>
+                {
+                    b.Navigation("ChildLeaves");
+
+                    b.Navigation("ChildNodes");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", b =>
+                {
+                    b.Navigation("ChildNodes");
                 });
 #pragma warning restore 612, 618
         }

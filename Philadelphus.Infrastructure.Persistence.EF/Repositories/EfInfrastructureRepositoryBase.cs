@@ -18,6 +18,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
     public abstract class EfInfrastructureRepositoryBase<TContext> : IInfrastructureRepository
         where TContext : DbContext
     {
+        private enum AuditOperation
+        {
+            Insert,
+            Update,
+            SoftDelete
+        }
+
         protected readonly ILogger _logger;
         public abstract InfrastructureEntityGroups EntityGroup { get; }
         protected string _connectionString { get; }     //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
@@ -49,7 +56,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
                     context.Database.OpenConnection();
                     context.Database.CloseConnection();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -78,7 +85,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
                     {
                         // Пропускаем ошибку дублирования таблицы
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         throw;
                     }
@@ -93,7 +100,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
             where TEntity : class, IMainEntity
         {
             if (CheckAvailability() == false)
-                return default;
+                return default!;
 
             using (var context = GetNewContext())
             {
@@ -102,7 +109,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
             }
         }
 
-        protected IEnumerable<TEntity> Select<TEntity>(Guid[] ownUuids = null, Guid[] owningTreesUuids = null) where TEntity : class, IMainEntity
+        protected IEnumerable<TEntity> Select<TEntity>(Guid[]? ownUuids = null, Guid[]? owningTreesUuids = null) where TEntity : class, IMainEntity
         {
             return ExecuteWithContext<TEntity, IEnumerable<TEntity>>((context, dbSet) =>
             {
@@ -113,9 +120,52 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
 
                 if (typeof(TEntity).IsAssignableTo(typeof(WorkingTreeMemberBase))
                 && (owningTreesUuids?.Any() ?? false))
-                    query = query.Where(x => owningTreesUuids.Contains((x as WorkingTreeMemberBase).OwningWorkingTreeUuid));
+                    query = query.Where(x => owningTreesUuids.Contains((x as WorkingTreeMemberBase)!.OwningWorkingTreeUuid));
 
                 return query.ToList();
+            });
+        }
+
+        protected IEnumerable<WorkingTree> SelectWorkingTreeAggregates(Guid[]? uuids = null)
+        {
+            return ExecuteWithContext<WorkingTree, IEnumerable<WorkingTree>>((context, dbSet) =>
+            {
+                var query = dbSet
+                    .AsNoTracking()
+                    .AsSplitQuery()
+                    .Where(x => x.AuditInfo.IsDeleted == false);
+
+                if (uuids?.Any() ?? false)
+                    query = query.Where(x => uuids.Contains(x.Uuid));
+
+                var trees = query
+                    .Include(x => x.ContentRoot)
+                    .Include(x => x.ContentNodes.Where(n => n.AuditInfo.IsDeleted == false))
+                    .Include(x => x.ContentLeaves.Where(l => l.AuditInfo.IsDeleted == false))
+                    .Include(x => x.ContentAttributes.Where(a => a.AuditInfo.IsDeleted == false))
+                    .ToList();
+
+                foreach (var tree in trees)
+                {
+                    if (tree.ContentRoot?.AuditInfo.IsDeleted == true)
+                    {
+                        tree.ContentRoot = null!;
+                    }
+
+                    tree.ContentNodes = tree.ContentNodes
+                        .Where(x => x.AuditInfo.IsDeleted == false)
+                        .ToList();
+
+                    tree.ContentLeaves = tree.ContentLeaves
+                        .Where(x => x.AuditInfo.IsDeleted == false)
+                        .ToList();
+
+                    tree.ContentAttributes = tree.ContentAttributes
+                        .Where(x => x.AuditInfo.IsDeleted == false)
+                        .ToList();
+                }
+
+                return trees;
             });
         }
 
@@ -123,32 +173,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         {
             return ExecuteWithContext<TEntity, long>((context, dbSet) =>
             {
-                // Предварительная обработка перед сохранением в БД
-                var treesDictionary = GetNavigationEntitiesByUuid<WorkingTree>(
-                    context,
-                    items.Cast<IMainEntity>(),
-                    item =>
-                    {
-                        if (item is WorkingTreeMemberBase wtm)
-                        {
-                            return wtm.OwningWorkingTreeUuid;
-                        }
-                        return null;
-                    });
-
-                foreach (var item in items)
-                {
-                    // Поля аудита
-                    item.AuditInfo.CreatedBy = Environment.UserName;
-                    item.AuditInfo.CreatedAt = DateTime.UtcNow;
-
-                    // Навигационные свойства
-                    SetNavigationProperties(item, treesDictionary);
-                }
-
-                // Сохранение
                 dbSet.AddRange(items);
-                MakeNavigationEntitiesUnchanged(context, items, typeof(AuditInfo));
+                AssignAuditInfoToTrackedGraph(context, AuditOperation.Insert);
                 return context.SaveChanges();
             });
         }
@@ -157,32 +183,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         {
             return ExecuteWithContext<TEntity, long>((context, dbSet) =>
             {
-                // Предварительная обработка перед сохранением в БД
-                var treesDictionary = GetNavigationEntitiesByUuid<WorkingTree>(
-                    context,
-                    items.Cast<IMainEntity>(),
-                    item =>
-                    {
-                        if (item is WorkingTreeMemberBase wtm)
-                        {
-                            return wtm.OwningWorkingTreeUuid;
-                        }
-                        return null;
-                    });
-
-                foreach (var item in items)
-                {
-                    // Поля аудита
-                    item.AuditInfo.UpdatedBy = Environment.UserName;
-                    item.AuditInfo.UpdatedAt = DateTime.UtcNow;
-
-                    // Навигационные свойства
-                    SetNavigationProperties(item, treesDictionary);
-                }
-
-                // Сохранение
                 dbSet.UpdateRange(items);
-                MakeNavigationEntitiesUnchanged(context, items, typeof(AuditInfo));
+                AssignAuditInfoToTrackedGraph(context, AuditOperation.Update);
                 return context.SaveChanges();
             });
         }
@@ -191,115 +193,67 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         {
             return ExecuteWithContext<TEntity, long>((context, dbSet) =>
             {
-                // Предварительная обработка перед сохранением в БД
-                var treesDictionary = GetNavigationEntitiesByUuid<WorkingTree>(
-                    context,
-                    items.Cast<IMainEntity>(),
-                    item =>
-                    {
-                        if (item is WorkingTreeMemberBase wtm)
-                        {
-                            return wtm.OwningWorkingTreeUuid;
-                        }
-                        return null;
-                    });
-
-                foreach (var item in items)
-                {
-                    // Поля аудита
-                    item.AuditInfo.IsDeleted = true;
-                    item.AuditInfo.DeletedBy = Environment.UserName;
-                    item.AuditInfo.DeletedAt = DateTime.UtcNow;
-
-                    // Навигационные свойства
-                    SetNavigationProperties(item, treesDictionary);
-                }
-
-                // Сохранение
                 dbSet.UpdateRange(items);
-                MakeNavigationEntitiesUnchanged(context, items, typeof(AuditInfo));
+                AssignAuditInfoToTrackedGraph(context, AuditOperation.SoftDelete);
                 return context.SaveChanges();
             });
         }
 
-        internal static void MakeNavigationEntitiesUnchanged<TEntity>(DbContext context, IEnumerable<TEntity> entities, params Type[] skipTypes)
-            where TEntity : class, IMainEntity
+        private static void AssignAuditInfoToTrackedGraph(DbContext context, AuditOperation operation)
         {
-            foreach (var entry in context.ChangeTracker.Entries<TEntity>().Where(x => entities.Any(e => e.Uuid == x.Entity.Uuid)))
+            var now = DateTime.UtcNow;
+            var userName = Environment.UserName;
+
+            foreach (var entry in context.ChangeTracker.Entries<IMainEntity>())
             {
-                foreach (var navEntry in entry.Navigations)
+                if (entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                    continue;
+
+                var auditInfo = entry.Entity.AuditInfo ??= new AuditInfo();
+                EnsureCreatedAuditInfo(auditInfo, userName, now);
+
+                switch (operation)
                 {
-                    if (navEntry.Metadata.IsCollection)
-                    {
-                        var collection = navEntry.CurrentValue as IEnumerable<object>;
-                        if (collection != null)
+                    case AuditOperation.Insert:
+                        if (entry.State == EntityState.Added)
                         {
-                            foreach (var navEntity in collection)
-                            {
-                                ProcessNavigationEntity(context, navEntity, skipTypes);
-                            }
+                            EnsureCreatedAuditInfo(auditInfo, userName, now);
                         }
-                    }
-                    else
-                    {
-                        var navEntity = navEntry.CurrentValue as object;
-                        if (navEntity != null)
+                        break;
+
+                    case AuditOperation.Update:
+                        if (entry.State == EntityState.Added)
                         {
-                            ProcessNavigationEntity(context, navEntity, skipTypes);
+                            EnsureCreatedAuditInfo(auditInfo, userName, now);
                         }
-                    }
+                        else if (entry.State == EntityState.Modified)
+                        {
+                            auditInfo.UpdatedBy = userName;
+                            auditInfo.UpdatedAt = now;
+                        }
+                        break;
+
+                    case AuditOperation.SoftDelete:
+                        auditInfo.IsDeleted = true;
+                        auditInfo.DeletedBy = userName;
+                        auditInfo.DeletedAt = now;
+                        break;
                 }
             }
         }
 
-        private static void ProcessNavigationEntity(DbContext context, object entity, params Type[] skipTypes)
+        private static void EnsureCreatedAuditInfo(AuditInfo auditInfo, string userName, DateTime now)
         {
-            if (skipTypes?.Contains(entity.GetType()) == true)
-                return;
+            if (string.IsNullOrWhiteSpace(auditInfo.CreatedBy))
+                auditInfo.CreatedBy = userName;
 
-            var navEntryInternal = context.Entry(entity);
-            if (navEntryInternal is { State: EntityState.Added })
-            {
-                navEntryInternal.State = EntityState.Unchanged;
-            }
-        }
-
-        /// <summary>
-        /// Возвращает словарь Guid → TNav для всех навигационных свойств TNav, встречающихся в items.
-        /// TNav - тип навигационной сущности (например, WorkingTree, TreeNode, TreeRoot и т.п.)
-        /// </summary>
-        public static Dictionary<Guid, TNav> GetNavigationEntitiesByUuid<TNav>(
-            DbContext context,
-            IEnumerable<IMainEntity> items,
-            Func<IMainEntity, Guid?> getEntityUuid)
-            where TNav : class, IMainEntity
-        {
-            // Собираем все Uuid, которые участвуют как навигация
-            var uuids = items
-                .Select(getEntityUuid)
-                .Where(uuid => uuid != null && uuid != Guid.Empty)
-                .Distinct()
-                .ToList();
-
-            if (uuids.Count == 0)
-            {
-                return new Dictionary<Guid, TNav>();
-            }
-
-            return context
-                .Set<TNav>()
-                .AsNoTracking()
-                .Where(n => uuids.Contains(n.Uuid))
-                .ToDictionary(n => n.Uuid, n => n);
+            if (auditInfo.CreatedAt == default)
+                auditInfo.CreatedAt = now;
         }
 
         protected abstract TContext GetNewContext();
 
         protected abstract DbSet<TEntity> GetDbSet<TEntity>(TContext context)
             where TEntity : class, IMainEntity;
-
-        protected abstract void SetNavigationProperties<TEntity, TNav>(TEntity item, Dictionary<Guid, TNav> navigationEntities)
-            where TEntity : IMainEntity
-            where TNav : IMainEntity;
     }
 }

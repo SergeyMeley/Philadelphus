@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 
 #nullable disable
 
-namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainEntitiesPhiladelphusContextMigrations
+namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.ShrubMembersContextMigrations
 {
     [DbContext(typeof(PostgreEfShrubMembersContext))]
-    partial class MainEntitiesPhiladelphusContextModelSnapshot : ModelSnapshot
+    [Migration("20260505230059_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,7 +237,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                     b.HasKey("Uuid")
                         .HasName("tree_roots_pkey");
 
-                    b.HasIndex("OwningWorkingTreeUuid");
+                    b.HasIndex("OwningWorkingTreeUuid")
+                        .IsUnique();
 
                     b.ToTable("tree_roots", "shrub_members");
                 });
@@ -382,7 +386,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeave", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                        .WithMany("TreeLeaves")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -447,7 +451,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeNode", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                        .WithMany("TreeNodes")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -512,8 +516,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
-                        .HasForeignKey("OwningWorkingTreeUuid")
+                        .WithOne("TreeRoot")
+                        .HasForeignKey("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRoot", "OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -571,7 +575,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes.ElementAttribute", b =>
                 {
                     b.HasOne("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", "OwningWorkingTree")
-                        .WithMany()
+                        .WithMany("ElementAttributes")
                         .HasForeignKey("OwningWorkingTreeUuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -625,6 +629,18 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.MainE
                         .IsRequired();
 
                     b.Navigation("OwningWorkingTree");
+                });
+
+            modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTree", b =>
+                {
+                    b.Navigation("ElementAttributes");
+
+                    b.Navigation("TreeLeaves");
+
+                    b.Navigation("TreeNodes");
+
+                    b.Navigation("TreeRoot")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
