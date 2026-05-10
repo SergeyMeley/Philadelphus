@@ -380,8 +380,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 result._override = this._override;
             }
 
-            newOwner.AddAttribute(result);
-
             return result;
         }
 

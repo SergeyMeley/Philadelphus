@@ -785,22 +785,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         result.AssignAutoName();
                     }
 
-                    if (owner.AddAttribute(result))
-                    {
-                        SetModelState(result, State.Initialized);
+                    SetModelState(result, State.Initialized);
 
-                        if (withoutInfoNotifications == false)
-                        {
-                            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                                $"Создание атрибута '{result.Name}' успешно выполнено.",
-                                criticalLevel: NotificationCriticalLevelModel.Ok);
-                        }
-                    }
-                    else
+                    if (withoutInfoNotifications == false)
                     {
                         _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                            $"Ошибка добавления атрибута владельцу '{(owner as IMainEntityModel).Name}' [{(owner as IMainEntityModel).Uuid}].",
-                            criticalLevel: NotificationCriticalLevelModel.Error);
+                            $"Создание атрибута '{result.Name}' успешно выполнено.",
+                            criticalLevel: NotificationCriticalLevelModel.Ok);
                     }
 
                     return result;
