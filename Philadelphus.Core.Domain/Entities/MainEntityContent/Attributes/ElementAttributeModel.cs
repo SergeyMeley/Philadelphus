@@ -273,7 +273,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             _isOwn = localUuid == _declaringUuid
                 && _attributeOwner.Uuid == _declaringAttributeOwner.Uuid;
 
-            _inheritedAttributeFromParent = GetInheritedAttributeFromParent();
+            _inheritedAttributeFromParent = TryGetInheritedAttributeFromParent();
 
             _visibility = VisibilityScope.Public;
 
@@ -434,6 +434,24 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 
             _notificationService.SendTextMessage<ElementAttributeModel>($"Ошибка поиска унаследованного атрибута '{Name}' - владелец атрибута '{(Owner as IMainEntity)?.Name}' не имеет родителей. Обратитесь к разработчику.");
             throw new Exception();
+        }
+
+        /// <summary>
+        /// Попробовать получить унаследованный атрибут с родителя в процессе формирования дерева, пока у владельца еще нет родителя (без выбрасывания исключений)
+        /// </summary>
+        /// <returns></returns>
+        private ElementAttributeModel? TryGetInheritedAttributeFromParent()
+        {
+            if (IsOwn)
+                return this;
+
+            if (Owner is IChildrenModel c
+                && c.Parent is IAttributeOwnerModel nextParent)
+            {
+                return nextParent.Attributes.SingleOrDefault(x => x.DeclaringUuid == DeclaringUuid);
+            }
+
+            return null;
         }
 
         #endregion
