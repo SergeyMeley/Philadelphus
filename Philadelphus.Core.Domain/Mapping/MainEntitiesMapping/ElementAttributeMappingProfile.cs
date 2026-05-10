@@ -79,8 +79,12 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                 .ConstructUsing((src, ctx) =>
                 {
-                    var owner = (ctx.Items["Owners"] as IEnumerable<IAttributeOwnerModel>)?.FirstOrDefault(x => x.Uuid == src.OwnerUuid);
-                    var declaringOwner = (ctx.Items["Owners"] as IEnumerable<IAttributeOwnerModel>)?.FirstOrDefault(x => x.Uuid == src.DeclaringOwnerUuid);
+                    var ownersByUuid = ctx.Items["OwnersByUuid"] as IReadOnlyDictionary<Guid, IAttributeOwnerModel>;
+                    IAttributeOwnerModel? owner = null;
+                    IAttributeOwnerModel? declaringOwner = null;
+                    ownersByUuid?.TryGetValue(src.OwnerUuid, out owner);
+                    ownersByUuid?.TryGetValue(src.DeclaringOwnerUuid, out declaringOwner);
+
                     var owningTree = ctx.Items["OwningWorkingTree"] as WorkingTreeModel;
                     var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
 
@@ -112,12 +116,16 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                 .AfterMap((src, dest, ctx) =>
                 {
-                    var valueTypes = ctx.Items["ValueTypes"] as IEnumerable<TreeNodeModel>;
-                    var values = ctx.Items["Values"] as IEnumerable<TreeLeaveModel>;
+                    var valueTypesByUuid = ctx.Items["ValueTypesByUuid"] as IReadOnlyDictionary<Guid, TreeNodeModel>;
+                    var valuesByUuid = ctx.Items["ValuesByUuid"] as IReadOnlyDictionary<Guid, TreeLeaveModel>;
 
                     // ValueType
                     if (src.ValueTypeUuid != null)
-                        dest.ValueType = valueTypes?.SingleOrDefault(x => x.Uuid == src.ValueTypeUuid);
+                    {
+                        TreeNodeModel? valueType = null;
+                        valueTypesByUuid?.TryGetValue(src.ValueTypeUuid.Value, out valueType);
+                        dest.ValueType = valueType;
+                    }
 
                     // Value или Values
                     if (src.IsCollectionValue == false)
@@ -126,7 +134,9 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                         if (src.ValueUuid != null)
                         {
-                            dest.Value = values?.SingleOrDefault(x => x.Uuid == src.ValueUuid);
+                            TreeLeaveModel? value = null;
+                            valuesByUuid?.TryGetValue(src.ValueUuid.Value, out value);
+                            dest.Value = value;
                         }
                     }
                     else
@@ -136,9 +146,12 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         dest.ClearValuesCollection();
                         if (src.ValuesUuids != null)
                         {
-                            foreach (var item in values?.Where(x => src.ValuesUuids.Contains(x.Uuid)))
+                            foreach (var valueUuid in src.ValuesUuids)
                             {
-                                dest.TryAddValueToValuesCollection(item);
+                                if (valuesByUuid != null && valuesByUuid.TryGetValue(valueUuid, out var value))
+                                {
+                                    dest.TryAddValueToValuesCollection(value);
+                                }
                             }
                         }
                     }

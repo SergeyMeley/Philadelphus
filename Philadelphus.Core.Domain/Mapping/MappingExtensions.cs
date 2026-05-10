@@ -238,15 +238,19 @@ namespace Philadelphus.Core.Domain.Mapping
             INotificationService notificationService,
             IPropertiesPolicy<ElementAttributeModel> propertiesPolicy)
         {
-            var correctAttributes = attributes.Where(x => owners.Any(o => o.Uuid == x.OwnerUuid));
+            var ownersByUuid = owners.ToDictionary(x => x.Uuid);
+            var valueTypesByUuid = valueTypes.ToDictionary(x => x.Uuid);
+            var valuesByUuid = values.ToDictionary(x => x.Uuid);
+
+            var correctAttributes = attributes.Where(x => ownersByUuid.ContainsKey(x.OwnerUuid));
 
             return mapper.Map<List<ElementAttributeModel>>(
                 correctAttributes,
                 opt =>
                 {
-                    opt.Items.Add("Owners", owners);
-                    opt.Items.Add("ValueTypes", valueTypes);
-                    opt.Items.Add("Values", values);
+                    opt.Items.Add("OwnersByUuid", ownersByUuid);
+                    opt.Items.Add("ValueTypesByUuid", valueTypesByUuid);
+                    opt.Items.Add("ValuesByUuid", valuesByUuid);
                     opt.Items.Add("OwningWorkingTree", owningWorkingTree);
                     opt.Items.Add(nameof(INotificationService), notificationService);
                     opt.Items.Add(nameof(IPropertiesPolicy<ElementAttributeModel>), propertiesPolicy);
