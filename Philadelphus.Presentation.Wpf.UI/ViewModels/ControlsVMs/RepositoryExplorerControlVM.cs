@@ -424,20 +424,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    Task.Run(() => {
-                        var path = string.Empty;
+                    var dialog = new OpenFileDialog
+                    {
+                        Title = "Выберите файл",
+                        Multiselect = false,
+                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
+                        FilterIndex = 1,
+                    };
 
-                        var dialog = new OpenFileDialog
-                        {
-                            Title = "Выберите файл",
-                            Multiselect = false,
-                            Filter = "PHJSON файлы (*.phjson)|*.phjson",
-                            FilterIndex = 1,
-                        };
+                    if (dialog.ShowDialog() == true)
+                    {
+                        var file = dialog.FileName;
 
-                        if (dialog.ShowDialog() == true)
+                        _ = Task.Run(() =>
                         {
-                            string file = dialog.FileName;
                             var json = File.ReadAllText(file);
 
                             JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model, OnProcessChanged, OnProgressChanged);
@@ -449,8 +449,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                                 PhiladelphusRepositoryVM.Childs.Add(rootVM);
                             });
-                        }
-                    });
+                        });
+                    }
                 },
                 ce =>
                 {

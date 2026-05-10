@@ -295,16 +295,12 @@ namespace Philadelphus.Core.Domain.Helpers
             Action<int, int> refreshProgress)
         {
             var allNodes = treeRoot.OwningShrub.ContentWorkingTrees
-                .SelectMany(x => x.ContentRoot.GetAllNodesRecursive())
+                .SelectMany(x => x.ContentNodes ?? Enumerable.Empty<TreeNodeModel>())
                 .ToList();
 
             var allLeaves = treeRoot.OwningShrub.ContentWorkingTrees
-                .SelectMany(x => x.ContentRoot.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>())
+                .SelectMany(x => x.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>())
                 .ToList();
-
-            var nodesByName = allNodes
-                .GroupBy(x => x.Name)
-                .ToDictionary(x => x.Key, x => x.Single());
 
             var leavesByParentUuidAndName = allLeaves
                 .GroupBy(x => (ParentUuid: x.ParentNode.Uuid, LeafName: x.Name))
@@ -324,9 +320,7 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 if (!attributesByOwner.TryGetValue(sm, out var attributesByName))
                 {
-                    attributesByName = sm.Attributes
-                        .GroupBy(x => x.Name)
-                        .ToDictionary(x => x.Key, x => x.Single());
+                    attributesByName = BuildAttributesByName(sm);
 
                     attributesByOwner[sm] = attributesByName;
                 }
@@ -334,7 +328,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 if (!attributesByName.TryGetValue(attr.Name, out var ownAtt))
                     throw new Exception();
 
-                nodesByName.TryGetValue(dataTypeName, out var valueType);
+                var valueType = ResolveNodeByName(dataTypeName, allNodes, treeRoot.OwningWorkingTree);
 
                 ownAtt.ValueType = valueType;
 
@@ -367,6 +361,67 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 refreshProgress?.Invoke(i++, count);
             }
+        }
+
+        private static Dictionary<string, ElementAttributeModel> BuildAttributesByName(IShrubMemberModel owner)
+        {
+            var duplicateNames = owner.Attributes
+                .GroupBy(x => x.Name)
+                .Where(x => x.Count() > 1)
+                .Select(x => x.Key)
+                .ToList();
+
+            if (duplicateNames.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    $"У элемента '{owner.Name}' [{owner.Uuid}] найдено несколько атрибутов с одинаковыми именами: {string.Join(", ", duplicateNames.Select(x => $"'{x}'"))}.");
+            }
+
+            return owner.Attributes.ToDictionary(x => x.Name);
+        }
+
+        private static TreeNodeModel? ResolveNodeByName(
+            string nodeName,
+            IReadOnlyCollection<TreeNodeModel> allNodes,
+            WorkingTreeModel preferredTree)
+        {
+            if (string.IsNullOrWhiteSpace(nodeName))
+            {
+                return null;
+            }
+
+            var candidates = allNodes
+                .Where(x => x.Name == nodeName)
+                .ToList();
+
+            if (candidates.Count <= 1)
+            {
+                return candidates.SingleOrDefault();
+            }
+
+            var preferredTreeCandidates = candidates
+                .Where(x => x.OwningWorkingTree?.Uuid == preferredTree.Uuid)
+                .ToList();
+
+            if (preferredTreeCandidates.Count == 1)
+            {
+                return preferredTreeCandidates[0];
+            }
+
+            var systemTreeCandidates = candidates
+                .Where(x => x.OwningWorkingTree?.Uuid == WorkingTreeModel.SystemBaseUuid)
+                .ToList();
+
+            if (systemTreeCandidates.Count == 1)
+            {
+                return systemTreeCandidates[0];
+            }
+
+            var candidateDescriptions = string.Join(", ", candidates.Select(x =>
+                $"'{x.Name}' [{x.Uuid}] в дереве '{x.OwningWorkingTree?.Name}' [{x.OwningWorkingTree?.Uuid}]"));
+
+            throw new InvalidOperationException(
+                $"Найдено несколько типов данных с именем '{nodeName}', невозможно однозначно привязать атрибут. Кандидаты: {candidateDescriptions}.");
         }
     }
 }

@@ -18,6 +18,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     {
         #region [ Fields ]
 
+        private readonly HashSet<Guid> _childNodeUuids = new();
+        private readonly HashSet<Guid> _childLeaveUuids = new();
+
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
         /// </summary>
@@ -134,10 +137,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ArgumentNullException.ThrowIfNull(parent);
 
-            OwningWorkingTree.ContentNodes.Add(this);
-
             if (parent is TreeNodeModel node)
                 ParentNode = node;
+
+            Parent.AddChild(this);
+            OwningWorkingTree.ContentNodes.Add(this);
 
             ChildNodes = new List<TreeNodeModel>();
             ChildLeaves = new List<TreeLeaveModel>();
@@ -162,13 +166,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool AddChild(IChildrenModel child)
         {
             if (child is TreeNodeModel n
-                && ChildNodes.Any(x => x.Uuid == child.Uuid) == false)
+                && _childNodeUuids.Add(child.Uuid))
             {
                 ChildNodes.Add(n);
                 return true;
             }
             else if (child is TreeLeaveModel l
-                && ChildNodes.Any(x => x.Uuid == child.Uuid) == false)
+                && _childLeaveUuids.Add(child.Uuid))
             {
                 ChildLeaves.Add(l);
                 return true;
@@ -186,14 +190,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool RemoveChild(IChildrenModel child)
         {
             if (child is TreeNodeModel n
-                && ChildNodes.Any(x => x.Uuid == child.Uuid))
+                && _childNodeUuids.Remove(child.Uuid))
             {
                 var remItem = ChildNodes.First(x => x.Uuid == child.Uuid);
                 ChildNodes.Remove(remItem);
                 return true;
             }
             else if (child is TreeLeaveModel l
-                && ChildNodes.Any(x => x.Uuid == child.Uuid))
+                && _childLeaveUuids.Remove(child.Uuid))
             {
                 var remItem = ChildLeaves.First(x => x.Uuid == child.Uuid);
                 ChildLeaves.Remove(remItem);
@@ -213,6 +217,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ChildNodes.Clear();
             ChildLeaves.Clear();
+            _childNodeUuids.Clear();
+            _childLeaveUuids.Clear();
             return true;
         }
 

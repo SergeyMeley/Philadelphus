@@ -64,7 +64,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Получить содержимое репозитория
         /// </summary>
         /// <param name="repository">Репозиторий</param>
-        /// <param name="force">Признак принудительного получения из хранилища данных</param>
         /// <returns>Репозиторий с содержимым</returns>
         public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository)
         {
@@ -75,6 +74,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             repository.ContentShrub.ContentWorkingTrees.Clear();
 
             var sw = Stopwatch.StartNew();
+
             var result = GetShrubContentForce(repository);
 
             sw.Stop();
@@ -87,10 +87,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         }
 
         /// <summary>
-        /// Асинхронно получить содержимое репозитория
+        /// Получить коллекцию элементов репозитория
         /// </summary>
         /// <param name="repository">Репозиторий</param>
-        /// <param name="force">Признак принудительного получения из хранилища данных</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Репозиторий с содержимым</returns>
         public Task<PhiladelphusRepositoryModel> GetShrubContentAsync(
@@ -106,353 +105,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }, cancellationToken);
         }
 
-        /// <summary>
-        /// Получить элементы рабочего дерева
-        /// </summary>
-        /// <param name="tree">Рабочее дерево</param>
-        /// <param name="force">Признак принудительного получения из хранилища данных</param>
-        /// <returns>Дерево с содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree)
-        {
-            ArgumentNullException.ThrowIfNull(tree);
-
-            var sw = Stopwatch.StartNew();
-            tree.ContentRoot = null;
-
-            var result = GetWorkingTreeContentForce(tree);
-
-            sw.Stop();
-
-            SendContentLoadNotification("Содержимое рабочего дерева", tree.Name, "БД", sw.Elapsed);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Асинхронно получить элементы рабочего дерева
-        /// </summary>
-        /// <param name="tree">Рабочее дерево</param>
-        /// <param name="force">Признак принудительного получения из хранилища данных</param>
-        /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns>Дерево с содержимым</returns>
-        public Task<WorkingTreeModel> GetWorkingTreeContentAsync(
-            WorkingTreeModel tree,
-            CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(tree);
-
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                return GetWorkingTreeContent(tree);
-            }, cancellationToken);
-        }
-
-        /// <summary>
-        /// Распределить содержимое рабочего дерева без атрибутов по доменной модели
-        /// </summary>
-        /// <param name="tree">Рабочее дерево</param>
-        /// <param name="dbRoots">Сущности корней рабочего дерева</param>
-        /// <param name="dbNodes">Сущности узлов рабочего дерева</param>
-        /// <param name="dbLeaves">Сущности листьев рабочего дерева</param>
-        private void ApplyWorkingTreeContentWithoutAttributes(
-            WorkingTreeModel tree,
-            IReadOnlyCollection<TreeRoot> dbRoots,
-            IReadOnlyCollection<TreeNode> dbNodes,
-            IReadOnlyCollection<TreeLeave> dbLeaves)
-        {
-            if (dbRoots.Count != 1)
-            {
-                throw new InvalidOperationException(
-                    $"Рабочее дерево '{tree.Name}' [{tree.Uuid}] должно иметь ровно один корень. Получено: {dbRoots.Count}.");
-            }
-
-            var dbRoot = dbRoots.Single();
-            var root = _mapper.MapTreeRoot(dbRoot, tree, _notificationService, new EmptyPropertiesPolicy<TreeRootModel>());
-
-            if (root == null)
-            {
-                return;
-            }
-
-            tree.ContentRoot = root;
-            SetModelState(root, State.SavedOrLoaded);
-
-            var nodes = _mapper.MapTreeNodes(dbNodes, new[] { tree.ContentRoot }, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            var allNodes = new List<TreeNodeModel>();
-            while (nodes.Any())
-            {
-                allNodes.AddRange(nodes);
-                nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            }
-
-            var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree, _notificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
-
-            tree.UnavailableNames.Add(root.Name);
-            foreach (var item in allNodes)
-            {
-                tree.UnavailableNames.Add(item.Name);
-            }
-            foreach (var item in allLeaves)
-            {
-                tree.UnavailableNames.Add(item.Name);
-            }
-
-            var nodesByParent = allNodes
-                .Where(x => x.Parent != null)
-                .GroupBy(x => x.Parent.Uuid)
-                .ToDictionary(x => x.Key, x => x.ToList());
-            var leavesByParent = allLeaves
-                .Where(x => x.Parent != null)
-                .GroupBy(x => x.Parent.Uuid)
-                .ToDictionary(x => x.Key, x => x.ToList());
-
-            DistributeTreeRootDescendants(root, nodesByParent, leavesByParent);
-        }
-
-        private TreeRootModel DistributeTreeRootDescendants(
-            TreeRootModel root,
-            IReadOnlyDictionary<Guid, List<TreeNodeModel>> nodesByParent,
-            IReadOnlyDictionary<Guid, List<TreeLeaveModel>> leavesByParent)
-        {
-            root.ChildNodes.Clear();
-
-            if (nodesByParent.TryGetValue(root.Uuid, out var childNodes))
-            {
-                foreach (var child in childNodes)
-                {
-                    SetModelState(child, State.SavedOrLoaded);
-                }
-                root.ChildNodes.AddRange(childNodes);
-
-                foreach (var child in childNodes)
-                {
-                    DistributeTreeNodeDescendants(child, nodesByParent, leavesByParent);
-                }
-            }
-
-            return root;
-        }
-
-        private TreeNodeModel DistributeTreeNodeDescendants(
-            TreeNodeModel node,
-            IReadOnlyDictionary<Guid, List<TreeNodeModel>> nodesByParent,
-            IReadOnlyDictionary<Guid, List<TreeLeaveModel>> leavesByParent)
-        {
-            node.ChildNodes.Clear();
-            node.ChildLeaves.Clear();
-
-            if (nodesByParent.TryGetValue(node.Uuid, out var childNodes))
-            {
-                foreach (var child in childNodes)
-                {
-                    SetModelState(child, State.SavedOrLoaded);
-                }
-                node.ChildNodes.AddRange(childNodes);
-
-                foreach (var child in childNodes)
-                {
-                    DistributeTreeNodeDescendants(child, nodesByParent, leavesByParent);
-                }
-            }
-
-            if (leavesByParent.TryGetValue(node.Uuid, out var childLeaves))
-            {
-                foreach (var child in childLeaves)
-                {
-                    SetModelState(child, State.SavedOrLoaded);
-                }
-                node.ChildLeaves.AddRange(childLeaves);
-
-                foreach (var child in childLeaves)
-                {
-                }
-            }
-
-            return node;
-        }
-
-        private IEnumerable<ElementAttributeModel> DistributeAttributes(IAttributeOwnerModel attributeOwner, IEnumerable<ElementAttributeModel> allAttributes, IEnumerable<TreeNodeModel> allDataTypes, IEnumerable<TreeLeaveModel> allValues)
-        {
-            attributeOwner.ClearAttributes();
-
-            foreach (var attribute in allAttributes.Where(x => x.Owner.Uuid == attributeOwner.Uuid))
-            {
-                attributeOwner.AddAttribute(attribute);
-                SetModelState(attribute, State.SavedOrLoaded);
-            }
-
-            return attributeOwner.Attributes;
-        }
-
         #endregion
 
 
-        /// <summary>
-        /// Принудительно получить содержимое репозитория из хранилища данных
-        /// </summary>
-        /// <param name="repository">Репозиторий</param>
-        /// <returns>Репозиторий с содержимым</returns>
-        private PhiladelphusRepositoryModel GetShrubContentForce(PhiladelphusRepositoryModel repository)
-        {
-            ArgumentNullException.ThrowIfNull(repository);
-            ArgumentNullException.ThrowIfNull(repository.ContentShrub);
-
-            repository.ContentShrub.ContentWorkingTrees.Clear();
-
-            foreach (var dataStorage in repository.DataStorages ?? Enumerable.Empty<IDataStorageModel>())
-            {
-                if (dataStorage.IsAvailable)
-                {
-                    var treesUuids = repository.ContentShrub.ContentWorkingTreesUuids?.ToArray();
-                    var dbTrees = SelectTreeAggregatesForce(dataStorage, treesUuids);
-                    var trees = _mapper.MapWorkingTrees(dbTrees, repository.DataStorages, repository.ContentShrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>());
-                    var dbTreesByUuid = dbTrees.ToDictionary(x => x.Uuid);
-                    var loadedTrees = new List<WorkingTreeModel>();
-
-                    foreach (var tree in trees?.Where(x => x.OwningRepository.Uuid == repository.Uuid))
-                    {
-                        tree.UnavailableNames.Add(tree.Name);
-
-                        repository.ContentShrub.ContentWorkingTrees.Add(tree);
-
-                        if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
-                        {
-                            LoadWorkingTreeContentWithoutAttributes(tree, dbTree);
-                        }
-
-                        SetModelState(tree, State.SavedOrLoaded);
-                        loadedTrees.Add(tree);
-                    }
-
-                    // Получение атрибутов всех элементов деревьев из БД
-                    foreach (var tree in loadedTrees)
-                    {
-                        if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
-                        {
-                            LoadWorkingTreeAttributes(tree, dbTree);
-                        }
-                    }
-                }
-            }
-
-            InitSystemWorkingTree(repository.ContentShrub);
-
-            SetModelState(repository, State.SavedOrLoaded);
-
-            return repository;
-        }
-
-        /// <summary>
-        /// Принудительно получить элементы рабочего дерева из хранилища данных
-        /// </summary>
-        /// <param name="tree">Рабочее дерево</param>
-        /// <returns>Дерево с содержимым</returns>
-        private WorkingTreeModel GetWorkingTreeContentForce(WorkingTreeModel tree)
-        {
-            ArgumentNullException.ThrowIfNull(tree);
-
-            // Получение дерева без атрибутов
-            tree.ContentRoot = null!;
-            var dbTree = SelectTreeAggregatesForce(tree.OwnDataStorage, new[] { tree.Uuid }).SingleOrDefault();
-            if (dbTree == null)
-            {
-                return tree;
-            }
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            LoadWorkingTreeContentWithoutAttributes(tree, dbTree);
-            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Применение агрегата рабочего дерева без атрибутов к доменной модели выполнено за {sw.ElapsedMilliseconds} мс. Дерево: '{tree.Name}' [{tree.Uuid}].",
-                criticalLevel: NotificationCriticalLevelModel.Info);
-            sw.Restart();
-
-            LoadWorkingTreeAttributes(tree, dbTree);
-
-            _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Привязка атрибутов выполнена за {sw.ElapsedMilliseconds} мс. Дерево: '{tree.Name}' [{tree.Uuid}].",
-                criticalLevel: NotificationCriticalLevelModel.Info);
-
-            return tree;
-        }
-
-        /// <summary>
-        /// Загрузить атрибуты рабочего дерева из агрегата.
-        /// </summary>
-        /// <param name="tree">Рабочее дерево.</param>
-        /// <param name="dbTree">Агрегат рабочего дерева из хранилища данных.</param>
-        private void LoadWorkingTreeAttributes(
-            WorkingTreeModel tree,
-            WorkingTree dbTree)
-        {
-            ApplyWorkingTreeAttributes(tree, dbTree.ContentAttributes.ToList());
-        }
-
-        private void ApplyWorkingTreeAttributes(
-            WorkingTreeModel tree,
-            IReadOnlyCollection<ElementAttribute> dbAttributes)
-        {
-
-            // Получение полных списков типов данных (узлов) и значений (листов) атрибутов со всего кустарника
-            var allShrubNodes = tree.OwningShrub.ContentWorkingTrees.SelectMany(x => x.GetAllNodesRecursive() ?? new List<TreeNodeModel>()).ToList();
-            var allShrubLeaves = tree.OwningShrub.ContentWorkingTrees.SelectMany(x => x.GetAllLeavesRecursive() ?? new List<TreeLeaveModel>()).ToList();
-
-            // Формирование списка владельцев атрибутов
-            var owners = new List<IAttributeOwnerModel>();
-            owners.Add(tree);
-            if (tree.ContentRoot != null)
-            {
-                owners.Add(tree.ContentRoot);
-            }
-
-            owners.AddRange(tree.GetAllNodesRecursive() ?? Enumerable.Empty<TreeNodeModel>());
-            owners.AddRange(tree.GetAllLeavesRecursive() ?? Enumerable.Empty<TreeLeaveModel>());
-
-            // Получение атрибутов всех элементов дерева из БД
-            var allAttributes = _mapper.MapAttributes(dbAttributes, owners, allShrubNodes, allShrubLeaves, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
-
-            // Распределение атрибутов по владельцам
-            foreach (var item in owners)
-            {
-                DistributeAttributes(item, allAttributes, allShrubNodes, allShrubLeaves);
-            }
-        }
-
-        /// <summary>
-        /// Загрузить содержимое рабочего дерева без атрибутов из агрегата.
-        /// </summary>
-        /// <param name="tree">Рабочее дерево.</param>
-        /// <param name="dbTree">Агрегат рабочего дерева из хранилища данных.</param>
-        private void LoadWorkingTreeContentWithoutAttributes(
-            WorkingTreeModel tree,
-            WorkingTree dbTree)
-        {
-            var dbRoots = dbTree.ContentRoot == null
-                ? Array.Empty<TreeRoot>()
-                : new[] { dbTree.ContentRoot };
-
-            ApplyWorkingTreeContentWithoutAttributes(
-                tree,
-                dbRoots,
-                dbTree.ContentNodes.ToList(),
-                dbTree.ContentLeaves.ToList());
-        }
-
-        /// <summary>
-        /// Принудительно прочитать агрегаты рабочих деревьев из хранилища данных.
-        /// </summary>
-        /// <param name="dataStorage">Хранилище данных.</param>
-        /// <param name="uuids">Идентификаторы деревьев.</param>
-        /// <returns>Коллекция агрегатов рабочих деревьев.</returns>
-        private IReadOnlyCollection<WorkingTree> SelectTreeAggregatesForce(IDataStorageModel dataStorage, Guid[]? uuids)
-        {
-            var items = dataStorage.ShrubMembersInfrastructureRepository
-                .SelectTreeAggregates(uuids)
-                .ToList();
-
-            return items;
-        }
 
         #region [ Save ]
 
@@ -507,7 +162,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 // Актуализация статуса
                 SetModelState(repository, State.SavedOrLoaded);
-                // TODO: Удалить?
 
                 // Сохранение содержимого
                 if (saveMode == SaveMode.WithContent ||
@@ -537,28 +191,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     criticalLevel: NotificationCriticalLevelModel.Error);
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Асинхронно сохранить изменения (репозиторий)
-        /// </summary>
-        /// <param name="repository">Репозиторий</param>
-        /// <param name="saveMode">Параметры сохранения</param>
-        /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns>Количество сохраненных изменений</returns>
-        public Task<long> SaveChangesAsync(
-            PhiladelphusRepositoryModel repository,
-            SaveMode saveMode,
-            CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(repository);
-
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var repositoryCopy = repository;
-                return SaveChanges(ref repositoryCopy, saveMode);
-            }, cancellationToken);
         }
 
         /// <summary>
@@ -894,111 +526,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
         #endregion
 
-        /// <summary>
-        /// Инициализировать системное рабочее дерево базовых типов
-        /// </summary>
-        /// <param name="shrub">Кустарник</param>
-        /// <returns>Признак инициализации системного рабочего дерева</returns>
-        private bool InitSystemWorkingTree(ShrubModel shrub)
-        {
-            var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid);
-            if (existTree != null)
-                return false;
-
-            var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
-                .SelectTreeAggregates(new Guid[] { WorkingTreeModel.SystemBaseUuid });
-            existTree = _mapper.MapWorkingTrees(dbExistTrees, shrub.OwningRepository.DataStorages, shrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>()).SingleOrDefault();
-
-            if (existTree != null)
-            {
-                shrub.ContentWorkingTrees.Add(existTree);
-                shrub.ContentWorkingTreesUuids.Add(existTree.Uuid);
-                return true;
-            }
-
-            // TODO: ех. долг #61187115
-
-            var tree = new WorkingTreeModel(
-                uuid: WorkingTreeModel.SystemBaseUuid,
-                dataStorage: shrub.DataStorage,
-                owner: shrub,
-                notificationService: _notificationService,
-                new EmptyPropertiesPolicy<WorkingTreeModel>())
-            {
-                Name = "Системное рабочее дерево"
-            };
-
-            var root = new TreeRootModel(
-                uuid: TreeRootModel.SystemBaseUuid,
-                owner: tree,
-                notificationService: _notificationService,
-                new EmptyPropertiesPolicy<TreeRootModel>())
-            {
-                Name = "Базовые типы данных"
-            };
-
-            tree.ContentRoot = root;
-
-            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            root.ChildNodes.Add(obj);
-
-            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            obj.ChildNodes.Add(str);
-
-            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            obj.ChildNodes.Add(num);
-
-            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            num.ChildNodes.Add(integer);
-
-            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-            num.ChildNodes.Add(flt);
-
-            shrub.ContentWorkingTrees.Add(tree);
-            shrub.ContentWorkingTreesUuids.Add(tree.Uuid);
-            return true;
-        }
-
-        /// <summary>
-        /// Сохранить изменения и вернуть данные аудита в доменные модели
-        /// </summary>
-        /// <typeparam name="TMainEntityModel">Тип доменной модели</typeparam>
-        /// <typeparam name="TMainEntity">Тип сущности хранилища данных</typeparam>
-        /// <param name="fullCollection">Полная коллекция доменных моделей</param>
-        /// <param name="state">Статус сохраняемых моделей</param>
-        /// <param name="persister">Делегат сохранения сущностей в хранилище данных</param>
-        /// <param name="result">Счетчик сохраненных изменений</param>
-        private void SaveAndReturnAuditInfo<TMainEntityModel, TMainEntity>(
-            IEnumerable<TMainEntityModel> fullCollection,
-            State state,
-            Func<IEnumerable<TMainEntity>, long> persister,
-            ref long result)
-            where TMainEntityModel : IMainEntityWritableModel
-            where TMainEntity : IMainEntity
-        {
-            // Проверки
-            ArgumentOutOfRangeException.ThrowIfEqual(state, State.SavedOrLoaded);
-
-            // Подготовка
-            var collection = fullCollection?
-                .Where(x => x != null && x.State == state)
-                .ToList() ?? new List<TMainEntityModel>();
-
-            if (collection.Count == 0)
-                return;
-
-            var dbCollection = _mapper.Map<List<TMainEntity>>(collection);
-
-            // Сохранение в хранилище
-            result += persister(dbCollection);
-
-            // Возвращение полей аудита их хранилища
-            foreach (var (src, dest) in collection.Zip(dbCollection, (src, dest) => (src, dest)))
-            {
-                src.AuditInfo = _mapper.Map<AuditInfoModel>(dest.AuditInfo);
-            }
-        }
-
         #region [ Create + Add ]
 
         /// <summary>
@@ -1131,11 +658,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     result.AssignAutoName();
                 }
 
-                if (parent is TreeNodeModel node)
-                    node.ChildNodes.Add(result);
-                if (parent is TreeRootModel root)
-                    root.ChildNodes.Add(result);
-
                 SetModelState(result, State.Initialized);
 
                 if (withoutInfoNotifications == false)
@@ -1197,8 +719,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     result.AssignAutoName();
                 }
-
-                parent.ChildLeaves.Add(result);
 
                 SetModelState(result, State.Initialized);
 
@@ -1403,13 +923,120 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="model">Элемент</param>
         /// <param name="newState">Новый статус</param>
-        private void SetModelState(IMainEntityWritableModel model, State newState)
+        private void SetModelState(
+            IMainEntityWritableModel model,
+            State newState)
         {
             model.SetState(newState);
         }
 
+        /// <summary>
+        /// Инициализировать системное рабочее дерево базовых типов
+        /// </summary>
+        /// <param name="shrub">Кустарник</param>
+        /// <returns>Признак инициализации системного рабочего дерева</returns>
+        private bool InitSystemWorkingTree(
+            ShrubModel shrub)
+        {
+            var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid);
+            if (existTree != null)
+                return false;
 
-        private void PostProcessSavedEntities(IEnumerable<IMainEntityWritableModel> collection)
+            var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
+                .SelectTreeAggregates(new Guid[] { WorkingTreeModel.SystemBaseUuid });
+            existTree = _mapper.MapWorkingTrees(dbExistTrees, shrub.OwningRepository.DataStorages, shrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>()).SingleOrDefault();
+
+            if (existTree != null)
+            {
+                shrub.ContentWorkingTrees.Add(existTree);
+                shrub.ContentWorkingTreesUuids.Add(existTree.Uuid);
+                return true;
+            }
+
+            // TODO: ех. долг #61187115
+
+            var tree = new WorkingTreeModel(
+                uuid: WorkingTreeModel.SystemBaseUuid,
+                dataStorage: shrub.DataStorage,
+                owner: shrub,
+                notificationService: _notificationService,
+                new EmptyPropertiesPolicy<WorkingTreeModel>())
+            {
+                Name = "Системное рабочее дерево"
+            };
+
+            var root = new TreeRootModel(
+                uuid: TreeRootModel.SystemBaseUuid,
+                owner: tree,
+                notificationService: _notificationService,
+                new EmptyPropertiesPolicy<TreeRootModel>())
+            {
+                Name = "Базовые типы данных"
+            };
+
+            tree.ContentRoot = root;
+
+            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            shrub.ContentWorkingTrees.Add(tree);
+            shrub.ContentWorkingTreesUuids.Add(tree.Uuid);
+            return true;
+        }
+
+        /// <summary>
+        /// Сохранить изменения и вернуть данные аудита в доменные модели
+        /// </summary>
+        /// <typeparam name="TMainEntityModel">Тип доменной модели</typeparam>
+        /// <typeparam name="TMainEntity">Тип сущности хранилища данных</typeparam>
+        /// <param name="fullCollection">Полная коллекция доменных моделей</param>
+        /// <param name="state">Статус сохраняемых моделей</param>
+        /// <param name="persister">Делегат сохранения сущностей в хранилище данных</param>
+        /// <param name="result">Счетчик сохраненных изменений</param>
+        private void SaveAndReturnAuditInfo<TMainEntityModel, TMainEntity>(
+            IEnumerable<TMainEntityModel> fullCollection,
+            State state,
+            Func<IEnumerable<TMainEntity>, long> persister,
+            ref long result)
+            where TMainEntityModel : IMainEntityWritableModel
+            where TMainEntity : IMainEntity
+        {
+            // Проверки
+            ArgumentOutOfRangeException.ThrowIfEqual(state, State.SavedOrLoaded);
+
+            // Подготовка
+            var collection = fullCollection?
+                .Where(x => x != null && x.State == state)
+                .ToList() ?? new List<TMainEntityModel>();
+
+            if (collection.Count == 0)
+                return;
+
+            var dbCollection = _mapper.Map<List<TMainEntity>>(collection);
+
+            // Сохранение в хранилище
+            result += persister(dbCollection);
+
+            // Возвращение полей аудита их хранилища
+            foreach (var (src, dest) in collection.Zip(dbCollection, (src, dest) => (src, dest)))
+            {
+                src.AuditInfo = _mapper.Map<AuditInfoModel>(dest.AuditInfo);
+            }
+        }
+
+        /// <summary>
+        /// Постобработка сохраненных элементов
+        /// </summary>
+        /// <param name="collection">Коллекция элементов</param>
+        private void PostProcessSavedEntities(
+            IEnumerable<IMainEntityWritableModel> collection)
         {
             // Постобработка удаленных элементов
             var remItems = new List<IMainEntityWritableModel>();
@@ -1446,6 +1073,147 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 SetModelState(item, State.SavedOrLoaded);
             }
+        }
+
+        /// <summary>
+        /// Принудительно получить содержимое репозитория из хранилища данных
+        /// </summary>
+        /// <param name="repository">Репозиторий</param>
+        /// <returns>Репозиторий с содержимым</returns>
+        private PhiladelphusRepositoryModel GetShrubContentForce(
+            PhiladelphusRepositoryModel repository)
+        {
+            ArgumentNullException.ThrowIfNull(repository);
+            ArgumentNullException.ThrowIfNull(repository.ContentShrub);
+
+            repository.ContentShrub.ContentWorkingTrees.Clear();
+
+            foreach (var dataStorage in repository.DataStorages ?? Enumerable.Empty<IDataStorageModel>())
+            {
+                if (dataStorage.IsAvailable)
+                {
+                    var treesUuids = repository.ContentShrub.ContentWorkingTreesUuids?.ToArray();
+                    var dbTrees = dataStorage.ShrubMembersInfrastructureRepository
+                        .SelectTreeAggregates(treesUuids)
+                        .ToList();
+                    var trees = _mapper.MapWorkingTrees(dbTrees, repository.DataStorages, repository.ContentShrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>());
+                    
+                    var dbTreesByUuid = dbTrees.ToDictionary(x => x.Uuid);
+
+                    foreach (var tree in trees)
+                    {
+                        repository.ContentShrub.ContentWorkingTrees.Add(tree);
+
+                        if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
+                        {
+                            var dbRoots = dbTree.ContentRoot == null
+                                ? Array.Empty<TreeRoot>()
+                                : new[] { dbTree.ContentRoot };
+
+                            DistributeWorkingTreeContentWithoutAttributes(
+                                tree,
+                                dbRoots,
+                                dbTree.ContentNodes.ToList(),
+                                dbTree.ContentLeaves.ToList());
+                        }
+                    }
+
+                    // Получение атрибутов всех элементов деревьев из БД
+                    foreach (var tree in trees)
+                    {
+                        if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
+                        {
+                            DistributeWorkingTreeAttributes(tree, dbTree);
+                        }
+                    }
+                }
+            }
+
+            InitSystemWorkingTree(repository.ContentShrub);
+
+            SetModelState(repository, State.SavedOrLoaded);
+
+            return repository;
+        }
+
+        /// <summary>
+        /// Распределить содержимое рабочего дерева без атрибутов по доменной модели
+        /// </summary>
+        /// <param name="tree">Рабочее дерево</param>
+        /// <param name="dbRoots">Сущности корней рабочего дерева</param>
+        /// <param name="dbNodes">Сущности узлов рабочего дерева</param>
+        /// <param name="dbLeaves">Сущности листьев рабочего дерева</param>
+        private void DistributeWorkingTreeContentWithoutAttributes(
+            WorkingTreeModel tree,
+            IReadOnlyCollection<TreeRoot> dbRoots,
+            IReadOnlyCollection<TreeNode> dbNodes,
+            IReadOnlyCollection<TreeLeave> dbLeaves)
+        {
+            if (dbRoots.Count != 1)
+            {
+                throw new InvalidOperationException(
+                    $"Рабочее дерево '{tree.Name}' [{tree.Uuid}] должно иметь ровно один корень. Получено: {dbRoots.Count}.");
+            }
+
+            var dbRoot = dbRoots.Single();
+            var root = _mapper.MapTreeRoot(dbRoot, tree, _notificationService, new EmptyPropertiesPolicy<TreeRootModel>());
+
+            if (root == null)
+                return;
+
+            var nodes = _mapper.MapTreeNodes(dbNodes, new[] { tree.ContentRoot }, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+            var allNodes = new List<TreeNodeModel>();
+            while (nodes.Any())
+            {
+                allNodes.AddRange(nodes);
+                nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+            }
+
+            var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree, _notificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
+
+            // Обновление статусов
+            SetModelState(tree, State.SavedOrLoaded);
+            SetModelState(tree.ContentRoot, State.SavedOrLoaded);
+            tree.ContentNodes.ToList().ForEach(x => SetModelState(x, State.SavedOrLoaded));
+            tree.ContentLeaves.ToList().ForEach(x => SetModelState(x, State.SavedOrLoaded));
+
+            // Регистрация имен
+            tree.UnavailableNames.Add(tree.Name);
+            tree.UnavailableNames.Add(tree.ContentRoot.Name);
+            tree.ContentNodes.ToList().ForEach(x => tree.UnavailableNames.Add(x.Name));
+            tree.ContentLeaves.ToList().ForEach(x => tree.UnavailableNames.Add(x.Name));
+        }
+
+        /// <summary>
+        /// Распределить атрибуты рабочего дерева из агрегата.
+        /// </summary>
+        /// <param name="tree">Рабочее дерево.</param>
+        /// <param name="dbTree">Агрегат рабочего дерева из хранилища данных.</param>
+        private void DistributeWorkingTreeAttributes(
+            WorkingTreeModel tree,
+            WorkingTree dbTree)
+        {
+            var allShrubNodes = tree.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentNodes ?? new List<TreeNodeModel>()).ToList();
+            var allShrubLeaves = tree.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentLeaves ?? new List<TreeLeaveModel>()).ToList();
+
+            // Формирование списка владельцев атрибутов
+            var owners = new List<IAttributeOwnerModel>();
+            owners.Add(tree);
+            if (tree.ContentRoot != null)
+            {
+                owners.Add(tree.ContentRoot);
+            }
+
+            owners.AddRange(tree.ContentNodes ?? Enumerable.Empty<TreeNodeModel>());
+            owners.AddRange(tree.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>());
+
+            var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodes, allShrubLeaves, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
+
+            // Обновление статусов
+            tree.ContentAttributes.ToList().ForEach(x => SetModelState(x, State.SavedOrLoaded));
+
+            // Регистрация имен
+            tree.ContentAttributes.ToList().ForEach(x => tree.UnavailableNames.Add(x.Name));
         }
 
         #endregion

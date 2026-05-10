@@ -20,6 +20,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     {
         #region [ Fields ]
 
+        private readonly HashSet<Guid> _childNodeUuids = new();
+
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
         /// </summary>
@@ -128,7 +130,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool AddChild(IChildrenModel child)
         {
             if (child is TreeNodeModel n
-                && ChildNodes.Any(x => x.Uuid == child.Uuid) == false)
+                && _childNodeUuids.Add(child.Uuid))
             {
                 ChildNodes.Add(n);
                 return true;
@@ -146,7 +148,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool RemoveChild(IChildrenModel child)
         {
             if (child is TreeNodeModel n
-                && ChildNodes.Any(x => x.Uuid == child.Uuid))
+                && _childNodeUuids.Remove(child.Uuid))
             {
                 var remItem = ChildNodes.First(x => x.Uuid == child.Uuid);
                 ChildNodes.Remove(remItem);
@@ -165,6 +167,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public bool ClearChilds()
         {
             ChildNodes.Clear();
+            _childNodeUuids.Clear();
             return true;
         }
 

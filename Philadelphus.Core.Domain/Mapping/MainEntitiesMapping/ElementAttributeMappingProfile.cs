@@ -142,8 +142,6 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             }
                         }
                     }
-
-                    (dest.Owner as IAttributeOwnerModel).AddAttribute(dest);
                 });
         }
     }

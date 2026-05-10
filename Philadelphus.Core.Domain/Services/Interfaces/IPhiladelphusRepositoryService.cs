@@ -20,38 +20,18 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// Получить участников и содержимое репозитория
         /// </summary>
         /// <param name="repository">Репозиторий</param>
-        /// <param name="force">Признак принудительного чтения из хранилища</param>
-        /// <returns></returns>
-        public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository);
+        /// <returns>Репозиторий с участниками и содержимым</returns>
+        public PhiladelphusRepositoryModel GetShrubContent(
+            PhiladelphusRepositoryModel repository);
 
         /// <summary>
         /// Получить участников и содержимое репозитория (асинхронно)
         /// </summary>
         /// <param name="repository">Репозиторий</param>
-        /// <param name="force">Признак принудительного чтения из хранилища</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Репозиторий с участниками и содержимым</returns>
         public Task<PhiladelphusRepositoryModel> GetShrubContentAsync(
             PhiladelphusRepositoryModel repository,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Получить рабочее дерево
-        /// </summary>
-        /// <param name="tree">Рабочее дерево</param>
-        /// <param name="force">Признак принудительного чтения из хранилища</param>
-        /// <returns>Корень с содержимым</returns>
-        public WorkingTreeModel GetWorkingTreeContent(WorkingTreeModel tree);
-
-        /// <summary>
-        /// Получить рабочее дерево (асинхронно)
-        /// </summary>
-        /// <param name="tree">Рабочее дерево</param>
-        /// <param name="force">Признак принудительного чтения из хранилища</param>
-        /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns>Корень с содержимым</returns>
-        public Task<WorkingTreeModel> GetWorkingTreeContentAsync(
-            WorkingTreeModel tree,
             CancellationToken cancellationToken = default);
 
         #endregion
@@ -64,19 +44,9 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="PhiladelphusRepository">Репозиторий</param>
         /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(ref PhiladelphusRepositoryModel PhiladelphusRepository, SaveMode saveMode);
-
-        /// <summary>
-        /// Сохранить изменения (репозиторий, асинхронно)
-        /// </summary>
-        /// <param name="PhiladelphusRepository">Репозиторий</param>
-        /// <param name="saveMode">Параметры сохранения</param>
-        /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns>Количество сохраненных изменений</returns>
-        public Task<long> SaveChangesAsync(
-            PhiladelphusRepositoryModel PhiladelphusRepository,
-            SaveMode saveMode,
-            CancellationToken cancellationToken = default);
+        public long SaveChanges(
+            ref PhiladelphusRepositoryModel PhiladelphusRepository,
+            SaveMode saveMode);
 
         /// <summary>
         /// Сохранить изменения (корни)
@@ -84,7 +54,9 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="treeRoots">Коллекция корней</param>
         /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<TreeRootModel> treeRoots, SaveMode saveMode);
+        public long SaveChanges(
+            IEnumerable<TreeRootModel> treeRoots, 
+            SaveMode saveMode);
 
         /// <summary>
         /// Сохранить изменения (узлы)
@@ -92,7 +64,9 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="treeNodes">Коллекция узлов</param>
         /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<TreeNodeModel> treeNodes, SaveMode saveMode);
+        public long SaveChanges(
+            IEnumerable<TreeNodeModel> treeNodes, 
+            SaveMode saveMode);
 
         /// <summary>
         /// Сохранить изменения (листы)
@@ -100,24 +74,83 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="treeLeaves">Коллекция листов</param>
         /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveChanges(IEnumerable<TreeLeaveModel> treeLeaves, SaveMode saveMode);
+        public long SaveChanges(
+            IEnumerable<TreeLeaveModel> treeLeaves,
+            SaveMode saveMode);
 
         /// <summary>
         /// Сохранить изменения (атрибуты элемента)
         /// </summary>
         /// <param name="elementAttributes">Коллекция атрибутов</param>
         /// <returns>Количество сохраненных изменений</returns>
-        public long SaveContentChanges(IEnumerable<ElementAttributeModel> elementAttributes);
+        public long SaveContentChanges(
+            IEnumerable<ElementAttributeModel> elementAttributes);
 
         #endregion
 
         #region [ Create + Add ]
 
-        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel parentElement, IDataStorageModel dataStorage, bool needAutoName = true, bool withoutInfoNotifications = false);
-        public TreeRootModel CreateTreeRoot(WorkingTreeModel owner, bool needAutoName = true, bool withoutInfoNotifications = false);
-        public TreeNodeModel CreateTreeNode(IParentModel parentElement, bool needAutoName = true, bool withoutInfoNotifications = false);
-        public TreeLeaveModel CreateTreeLeave(TreeNodeModel parentElement, bool needAutoName = true, bool withoutInfoNotifications = false);
-        public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner, bool needAutoName = true, bool withoutInfoNotifications = false);
+        /// <summary>
+        /// Создать рабочее дерево
+        /// </summary>
+        /// <param name="owner">Владелец</param>
+        /// <param name="dataStorage">Собственное хранилище данных</param>
+        /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
+        /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
+        /// <returns></returns>
+        public WorkingTreeModel CreateWorkingTree(
+            PhiladelphusRepositoryModel owner, 
+            IDataStorageModel dataStorage, 
+            bool needAutoName = true, 
+            bool withoutInfoNotifications = false);
+
+        /// <summary>
+        /// Создать корень
+        /// </summary>
+        /// <param name="owner">Владелец</param>
+        /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
+        /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
+        /// <returns></returns>
+        public TreeRootModel CreateTreeRoot(
+            WorkingTreeModel owner, 
+            bool needAutoName = true, 
+            bool withoutInfoNotifications = false);
+
+        /// <summary>
+        /// Создать узел
+        /// </summary>
+        /// <param name="parentElement">Родитель</param>
+        /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
+        /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
+        /// <returns></returns>
+        public TreeNodeModel CreateTreeNode(
+            IParentModel parentElement, 
+            bool needAutoName = true,
+            bool withoutInfoNotifications = false);
+
+        /// <summary>
+        /// Создать лист
+        /// </summary>
+        /// <param name="parentElement">Родитель</param>
+        /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
+        /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
+        /// <returns></returns>
+        public TreeLeaveModel CreateTreeLeave(
+            TreeNodeModel parentElement,
+            bool needAutoName = true, 
+            bool withoutInfoNotifications = false);
+
+        /// <summary>
+        /// Создать атрибут
+        /// </summary>
+        /// <param name="owner">Владелец атрибута</param>
+        /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
+        /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
+        /// <returns></returns>
+        public ElementAttributeModel CreateElementAttribute(
+            IAttributeOwnerModel owner, 
+            bool needAutoName = true,
+            bool withoutInfoNotifications = false);
 
         #endregion
 
@@ -127,7 +160,13 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Delete + Remove ]
 
-        public bool SoftDeleteShrubMember(IContentModel element);
+        /// <summary>
+        /// Удалить элемент рабочего кустарника (мягко)
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public bool SoftDeleteShrubMember(
+            IContentModel element);
 
         #endregion
     }
