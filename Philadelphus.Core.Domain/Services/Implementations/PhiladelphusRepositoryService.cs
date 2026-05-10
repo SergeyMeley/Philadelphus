@@ -1087,6 +1087,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             ArgumentNullException.ThrowIfNull(repository.ContentShrub);
 
             repository.ContentShrub.ContentWorkingTrees.Clear();
+            var loadedTreeAggregates = new List<(WorkingTreeModel tree, WorkingTree dbTree)>();
 
             foreach (var dataStorage in repository.DataStorages ?? Enumerable.Empty<IDataStorageModel>())
             {
@@ -1115,31 +1116,28 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                                 dbRoots,
                                 dbTree.ContentNodes.ToList(),
                                 dbTree.ContentLeaves.ToList());
-                        }
-                    }
 
-                    // Получение атрибутов всех элементов деревьев из БД
-                    var allShrubNodes = repository.ContentShrub.ContentWorkingTrees
-                        .SelectMany(x => x.ContentNodes ?? Enumerable.Empty<TreeNodeModel>())
-                        .ToList();
-                    var allShrubLeaves = repository.ContentShrub.ContentWorkingTrees
-                        .SelectMany(x => x.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>())
-                        .ToList();
-                    var allShrubNodesByUuid = allShrubNodes.ToDictionary(x => x.Uuid);
-                    var allShrubLeavesByUuid = allShrubLeaves.ToDictionary(x => x.Uuid);
-
-                    foreach (var tree in trees)
-                    {
-                        if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
-                        {
-                            DistributeWorkingTreeAttributes(
-                                tree,
-                                dbTree,
-                                allShrubNodesByUuid,
-                                allShrubLeavesByUuid);
+                            loadedTreeAggregates.Add((tree, dbTree));
                         }
                     }
                 }
+            }
+
+            // Получение атрибутов всех элементов деревьев из БД
+            var allShrubNodesByUuid = repository.ContentShrub.ContentWorkingTrees
+                .SelectMany(x => x.ContentNodes ?? Enumerable.Empty<TreeNodeModel>())
+                .ToDictionary(x => x.Uuid);
+            var allShrubLeavesByUuid = repository.ContentShrub.ContentWorkingTrees
+                .SelectMany(x => x.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>())
+                .ToDictionary(x => x.Uuid);
+
+            foreach (var (tree, dbTree) in loadedTreeAggregates)
+            {
+                DistributeWorkingTreeAttributes(
+                    tree,
+                    dbTree,
+                    allShrubNodesByUuid,
+                    allShrubLeavesByUuid);
             }
 
             InitSystemWorkingTree(repository.ContentShrub);

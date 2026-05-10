@@ -18,6 +18,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     {
         #region [ Fields ]
 
+        private readonly List<TreeNodeModel> _childNodes;
+        private readonly List<TreeLeaveModel> _childLeaves;
         private readonly HashSet<Guid> _childNodeUuids = new();
         private readonly HashSet<Guid> _childLeaveUuids = new();
 
@@ -65,12 +67,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Дочерние узлы
         /// </summary>
-        public List<TreeNodeModel> ChildNodes { get; }
+        public IReadOnlyList<TreeNodeModel> ChildNodes { get => _childNodes; }
 
         /// <summary>
         /// Дочерние листы
         /// </summary>
-        public List<TreeLeaveModel> ChildLeaves { get; }
+        public IReadOnlyList<TreeLeaveModel> ChildLeaves { get => _childLeaves; }
 
         /// <summary>
         /// Наследники
@@ -81,12 +83,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 var result = new Dictionary<Guid, IChildrenModel>();
 
-                foreach (var node in ChildNodes)
+                foreach (var node in _childNodes)
                 {
                     result.Add(node.Uuid, node);
                 }
 
-                foreach (var leave in ChildLeaves)
+                foreach (var leave in _childLeaves)
                 {
                     result.Add(leave.Uuid, leave);
                 }
@@ -143,8 +145,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             Parent.AddChild(this);
             OwningWorkingTree.ContentNodes.Add(this);
 
-            ChildNodes = new List<TreeNodeModel>();
-            ChildLeaves = new List<TreeLeaveModel>();
+            _childNodes = new List<TreeNodeModel>();
+            _childLeaves = new List<TreeLeaveModel>();
         }
 
         #endregion
@@ -168,13 +170,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             if (child is TreeNodeModel n
                 && _childNodeUuids.Add(child.Uuid))
             {
-                ChildNodes.Add(n);
+                _childNodes.Add(n);
                 return true;
             }
             else if (child is TreeLeaveModel l
                 && _childLeaveUuids.Add(child.Uuid))
             {
-                ChildLeaves.Add(l);
+                _childLeaves.Add(l);
                 return true;
             }
             else
@@ -192,15 +194,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             if (child is TreeNodeModel n
                 && _childNodeUuids.Remove(child.Uuid))
             {
-                var remItem = ChildNodes.First(x => x.Uuid == child.Uuid);
-                ChildNodes.Remove(remItem);
+                var remItem = _childNodes.First(x => x.Uuid == child.Uuid);
+                _childNodes.Remove(remItem);
                 return true;
             }
             else if (child is TreeLeaveModel l
                 && _childLeaveUuids.Remove(child.Uuid))
             {
-                var remItem = ChildLeaves.First(x => x.Uuid == child.Uuid);
-                ChildLeaves.Remove(remItem);
+                var remItem = _childLeaves.First(x => x.Uuid == child.Uuid);
+                _childLeaves.Remove(remItem);
                 return true;
             }
             else
@@ -215,8 +217,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public bool ClearChilds()
         {
-            ChildNodes.Clear();
-            ChildLeaves.Clear();
+            _childNodes.Clear();
+            _childLeaves.Clear();
             _childNodeUuids.Clear();
             _childLeaveUuids.Clear();
             return true;

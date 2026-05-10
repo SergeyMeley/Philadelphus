@@ -225,8 +225,8 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="mapper">Автомаппер</param>
         /// <param name="attributes">Атрибуты для маппинга</param>
         /// <param name="owners"></param>
-        /// <param name="valueTypes">Все типы данных атрибутов</param>
-        /// <param name="values">Все значения атрибутов</param>
+        /// <param name="valueTypesByUuid">Все типы данных атрибутов, сгруппированные по идентификатору</param>
+        /// <param name="valuesByUuid">Все значения атрибутов, сгруппированные по идентификатору</param>
         /// <returns></returns>
         public static IEnumerable<ElementAttributeModel> MapAttributes(
             this IMapper mapper,

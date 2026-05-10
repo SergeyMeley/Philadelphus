@@ -20,6 +20,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     {
         #region [ Fields ]
 
+        private readonly List<TreeNodeModel> _childNodes;
         private readonly HashSet<Guid> _childNodeUuids = new();
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Дочерние узлы репозитория Чубушника
         /// </summary>
-        public List<TreeNodeModel> ChildNodes { get; }
+        public IReadOnlyList<TreeNodeModel> ChildNodes { get => _childNodes; }
 
         /// <summary>
         /// Наследники
@@ -61,9 +62,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 var result = new Dictionary<Guid, IChildrenModel>();
 
-                if (ChildNodes != null)
+                if (_childNodes != null)
                 {
-                    foreach (var node in ChildNodes)
+                    foreach (var node in _childNodes)
                     {
                         result.Add(node.Uuid, node);
                     }
@@ -111,7 +112,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             owner.ContentRoot = this;
 
-            ChildNodes = new List<TreeNodeModel>();
+            _childNodes = new List<TreeNodeModel>();
 
             if (uuid == SystemBaseUuid)
             {
@@ -132,7 +133,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             if (child is TreeNodeModel n
                 && _childNodeUuids.Add(child.Uuid))
             {
-                ChildNodes.Add(n);
+                _childNodes.Add(n);
                 return true;
             }
             else
@@ -150,8 +151,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             if (child is TreeNodeModel n
                 && _childNodeUuids.Remove(child.Uuid))
             {
-                var remItem = ChildNodes.First(x => x.Uuid == child.Uuid);
-                ChildNodes.Remove(remItem);
+                var remItem = _childNodes.First(x => x.Uuid == child.Uuid);
+                _childNodes.Remove(remItem);
                 return true;
             }
             else
@@ -166,7 +167,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public bool ClearChilds()
         {
-            ChildNodes.Clear();
+            _childNodes.Clear();
             _childNodeUuids.Clear();
             return true;
         }
