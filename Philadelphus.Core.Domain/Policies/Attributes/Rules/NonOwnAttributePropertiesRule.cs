@@ -95,7 +95,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
                 if (_mustBeInherited.Contains(prop)
                     || value == default)
                 {
-                    return GetInheritedValue(model, prop);
+                    return GetInheritedValue(model, prop) ?? value;
                 }
             }
 

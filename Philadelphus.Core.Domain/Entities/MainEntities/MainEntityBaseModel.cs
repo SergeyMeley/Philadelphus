@@ -212,24 +212,38 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             if (EqualityComparer<TValue>.Default.Equals(field, value))
                 return false;
 
-            if (_propertiesPolicy?.CanWrite((T)this, prop, value) == false)
-            {
-                _notificationService.SendTextMessage<MainEntityBaseModel<T>>(
-                    $"Ошибка присвоения значения свойству '{prop}' - нарушены ограничения системы.",
-                    criticalLevel: NotificationCriticalLevelModel.Warning);
+            var ctx = _context.Value ??= new PropertiesPolicyContext();
+
+            // Защита от зацикливания при записи
+            if (ctx.IsWriteInProgress(this, prop))
                 return false;
+
+            try
+            {
+                ctx.EnterWrite(this, prop);
+
+                if (_propertiesPolicy?.CanWrite((T)this, prop, value) == false)
+                {
+                    _notificationService.SendTextMessage<MainEntityBaseModel<T>>(
+                        $"Ошибка присвоения значения свойству '{prop}' - нарушены ограничения системы.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
+                var oldValue = field;
+
+                field = value;
+
+                _propertiesPolicy?.OnWrite((T)this, prop, oldValue, value);
+
+                UpdateStateStateAfterChange();
+
+                return true;
             }
-                
-
-            var oldValue = field;
-
-            field = value;
-
-            _propertiesPolicy?.OnWrite((T)this, prop, oldValue, value);
-
-            UpdateStateStateAfterChange();
-
-            return true;
+            finally
+            {
+                ctx.ExitWrite(this, prop);
+            }
         }
 
         #endregion

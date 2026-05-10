@@ -39,7 +39,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private VisibilityScope _visibility;
         private OverrideType _override;
-        private ElementAttributeModel _inheritedAttributeFromParent;
+        private ElementAttributeModel? _inheritedAttributeFromParent;
 
         #endregion
 
@@ -144,7 +144,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Унаследованный атрибут родителя
         /// </summary>
-        public ElementAttributeModel InheritedAttributeFromParent 
+        public ElementAttributeModel? InheritedAttributeFromParent 
         {
             get => GetValue(_inheritedAttributeFromParent); 
         }
@@ -343,7 +343,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             if (_isCollectionValue == false)
                 return false;
-            if (_values != null)
+            if (_values == null)
                 return false;
             _values?.Clear();
             UpdateStateStateAfterChange(); 

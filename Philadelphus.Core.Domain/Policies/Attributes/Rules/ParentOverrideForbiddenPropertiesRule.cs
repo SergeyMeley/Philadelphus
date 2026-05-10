@@ -31,7 +31,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
         {
             // Если атрибут НЕ собственный и переопределение запрещено родителем, то изменение значений свойств атрибута запрещено
             if (model.IsOwn == false 
-                && model.InheritedAttributeFromParent.Override == OverrideType.Sealed)
+                && model.InheritedAttributeFromParent?.Override == OverrideType.Sealed)
             {
                 _notificationService.SendTextMessage<CompositeAttributePropertiesPolicy>(
                     $"Для атрибута '{model.Name}' [{model.Uuid}] элемента '{(model.Owner as IMainEntityModel)?.Name}' [{(model.Owner as IMainEntityModel)?.Uuid}] " +
@@ -45,7 +45,8 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             if (model.IsOwn == false
                 && prop == nameof(model.Override))
             {
-                if (model.InheritedAttributeFromParent.Override != OverrideType.Abstract && (OverrideType)value == OverrideType.Abstract)
+                if (model.InheritedAttributeFromParent is { Override: not OverrideType.Abstract }
+                    && (OverrideType)value == OverrideType.Abstract)
                 {
                     _notificationService.SendTextMessage<CompositeAttributePropertiesPolicy>(
                         $"Для атрибута '{model.Name}' [{model.Uuid}] элемента '{(model.Owner as IMainEntityModel)?.Name}' [{(model.Owner as IMainEntityModel)?.Uuid}] " +
@@ -64,7 +65,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             // Если атрибут НЕ собственный и переопределение запрещено родителем, разрешить его у наследников нельзя
             if (prop == nameof(model.Override)
                 && model.IsOwn == false
-                && model.InheritedAttributeFromParent.Override == OverrideType.Sealed)
+                && model.InheritedAttributeFromParent?.Override == OverrideType.Sealed)
             {
                 return OverrideType.Sealed;
             }

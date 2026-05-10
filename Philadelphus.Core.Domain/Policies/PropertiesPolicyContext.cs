@@ -7,6 +7,7 @@ namespace Philadelphus.Core.Domain.Policies
     internal class PropertiesPolicyContext
     {
         private readonly HashSet<(object, object, string)> _readingProps = new();
+        private readonly HashSet<(object, string)> _writingProps = new();
 
         public bool Enter(object model, object field, string prop)
         {
@@ -21,6 +22,21 @@ namespace Philadelphus.Core.Domain.Policies
         public bool IsInProgress(object model, object field, string prop)
         {
             return _readingProps.Contains((model, field, prop));
+        }
+
+        public bool EnterWrite(object model, string prop)
+        {
+            return _writingProps.Add((model, prop));
+        }
+
+        public void ExitWrite(object model, string prop)
+        {
+            _writingProps.Remove((model, prop));
+        }
+
+        public bool IsWriteInProgress(object model, string prop)
+        {
+            return _writingProps.Contains((model, prop));
         }
     }
 }
