@@ -1119,11 +1119,24 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     }
 
                     // Получение атрибутов всех элементов деревьев из БД
+                    var allShrubNodes = repository.ContentShrub.ContentWorkingTrees
+                        .SelectMany(x => x.ContentNodes ?? Enumerable.Empty<TreeNodeModel>())
+                        .ToList();
+                    var allShrubLeaves = repository.ContentShrub.ContentWorkingTrees
+                        .SelectMany(x => x.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>())
+                        .ToList();
+                    var allShrubNodesByUuid = allShrubNodes.ToDictionary(x => x.Uuid);
+                    var allShrubLeavesByUuid = allShrubLeaves.ToDictionary(x => x.Uuid);
+
                     foreach (var tree in trees)
                     {
                         if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
                         {
-                            DistributeWorkingTreeAttributes(tree, dbTree);
+                            DistributeWorkingTreeAttributes(
+                                tree,
+                                dbTree,
+                                allShrubNodesByUuid,
+                                allShrubLeavesByUuid);
                         }
                     }
                 }
@@ -1191,11 +1204,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="dbTree">Агрегат рабочего дерева из хранилища данных.</param>
         private void DistributeWorkingTreeAttributes(
             WorkingTreeModel tree,
-            WorkingTree dbTree)
+            WorkingTree dbTree,
+            IReadOnlyDictionary<Guid, TreeNodeModel> allShrubNodesByUuid,
+            IReadOnlyDictionary<Guid, TreeLeaveModel> allShrubLeavesByUuid)
         {
-            var allShrubNodes = tree.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentNodes ?? new List<TreeNodeModel>()).ToList();
-            var allShrubLeaves = tree.OwningShrub.ContentWorkingTrees.SelectMany(x => x.ContentLeaves ?? new List<TreeLeaveModel>()).ToList();
-
             // Формирование списка владельцев атрибутов
             var owners = new List<IAttributeOwnerModel>();
             owners.Add(tree);
@@ -1207,7 +1219,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             owners.AddRange(tree.ContentNodes ?? Enumerable.Empty<TreeNodeModel>());
             owners.AddRange(tree.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>());
 
-            var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodes, allShrubLeaves, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
+            var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodesByUuid, allShrubLeavesByUuid, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
 
             // Обновление статусов
             tree.ContentAttributes.ToList().ForEach(x => SetModelState(x, State.SavedOrLoaded));

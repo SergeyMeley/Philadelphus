@@ -232,15 +232,13 @@ namespace Philadelphus.Core.Domain.Mapping
             this IMapper mapper,
             IEnumerable<ElementAttribute> attributes,
             IEnumerable<IAttributeOwnerModel> owners,
-            IEnumerable<TreeNodeModel> valueTypes,
-            IEnumerable<TreeLeaveModel> values,
+            IReadOnlyDictionary<Guid, TreeNodeModel> valueTypesByUuid,
+            IReadOnlyDictionary<Guid, TreeLeaveModel> valuesByUuid,
             WorkingTreeModel owningWorkingTree,
             INotificationService notificationService,
             IPropertiesPolicy<ElementAttributeModel> propertiesPolicy)
         {
             var ownersByUuid = owners.ToDictionary(x => x.Uuid);
-            var valueTypesByUuid = valueTypes.ToDictionary(x => x.Uuid);
-            var valuesByUuid = values.ToDictionary(x => x.Uuid);
 
             var correctAttributes = attributes.Where(x => ownersByUuid.ContainsKey(x.OwnerUuid));
 
