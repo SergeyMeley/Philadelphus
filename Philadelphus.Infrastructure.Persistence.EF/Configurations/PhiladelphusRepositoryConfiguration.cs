@@ -4,8 +4,15 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
 {
+    /// <summary>
+    /// Представляет объект конфигурации EF репозитория Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryConfiguration : IEntityTypeConfiguration<PhiladelphusRepository>
     {
+        /// <summary>
+        /// Выполняет операцию Configure.
+        /// </summary>
+        /// <param name="builder">Построитель конфигурации сущности.</param>
         public void Configure(EntityTypeBuilder<PhiladelphusRepository> builder)
         {
             builder.ToTable("philadelphus_repositories", "repositories");

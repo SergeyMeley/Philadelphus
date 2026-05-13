@@ -15,6 +15,9 @@ using System.Linq;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
 {
+    /// <summary>
+    /// Представляет объект базового репозитория БД.
+    /// </summary>
     public abstract class EfInfrastructureRepositoryBase<TContext> : IInfrastructureRepository
         where TContext : DbContext
     {
@@ -26,6 +29,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         }
 
         protected readonly ILogger _logger;
+        
+        /// <summary>
+        /// Группа инфраструктурных сущностей.
+        /// </summary>
         public abstract InfrastructureEntityGroups EntityGroup { get; }
         protected string _connectionString { get; }     //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
         protected TContext _context { get; init; }
@@ -40,6 +47,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
             InitDb();
         }
 
+        /// <summary>
+        /// Проверить доступность.
+        /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public virtual bool CheckAvailability()
         {
             var sw = new Stopwatch();

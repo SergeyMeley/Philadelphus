@@ -5,8 +5,15 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attribu
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
 {
+    /// <summary>
+    /// Представляет объект конфигурации EF атрибута элемента.
+    /// </summary>
     public class ElementAttributeConfiguration : IEntityTypeConfiguration<ElementAttribute>
     {
+        /// <summary>
+        /// Выполняет операцию Configure.
+        /// </summary>
+        /// <param name="builder">Построитель конфигурации сущности.</param>
         public void Configure(EntityTypeBuilder<ElementAttribute> builder)
         {
             builder.ToTable("element_attributes", "shrub_members_content");

@@ -5,8 +5,15 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.Philadelphus
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
 {
+    /// <summary>
+    /// Представляет объект конфигурации EF корня рабочего дерева.
+    /// </summary>
     public class TreeRootConfiguration : IEntityTypeConfiguration<TreeRoot>
     {
+        /// <summary>
+        /// Выполняет операцию Configure.
+        /// </summary>
+        /// <param name="builder">Построитель конфигурации сущности.</param>
         public void Configure(EntityTypeBuilder<TreeRoot> builder)
         {
             builder.ToTable("tree_roots", "shrub_members");

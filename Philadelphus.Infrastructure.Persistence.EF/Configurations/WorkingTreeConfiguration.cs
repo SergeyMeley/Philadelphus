@@ -10,8 +10,15 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
 {
+    /// <summary>
+    /// Представляет объект конфигурации EF рабочего дерева.
+    /// </summary>
     public class WorkingTreeConfiguration : IEntityTypeConfiguration<WorkingTree>
     {
+        /// <summary>
+        /// Выполняет операцию Configure.
+        /// </summary>
+        /// <param name="builder">Построитель конфигурации сущности.</param>
         public void Configure(EntityTypeBuilder<WorkingTree> builder)
         {
             builder.ToTable("working_trees", "shrub_members");
