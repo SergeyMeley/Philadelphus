@@ -29,6 +29,7 @@ namespace Philadelphus.Infrastructure.Cache.Redis.Implementations
         /// </summary>
         /// <param name="distributedCache">Распределенный кэш.</param>
         /// <param name="logger">Сервис логгирования.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public DistributedPhiladelphusRepositoryContentCache(
             IDistributedCache distributedCache,
             ILogger logger)
