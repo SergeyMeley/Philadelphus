@@ -12,13 +12,22 @@ using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace Philadelphus.Infrastructure.Messaging.Kafka
 {
+    /// <summary>
+    /// Представляет объект KafkaProducer.
+    /// </summary>
     public class KafkaProducer<TMessage> : IMessageProducer<TMessage>, IDisposable
     {
         private readonly IProducer<string, TMessage> _producer;
         private readonly string _topic;
         private bool _disposed;
 
-        public KafkaProducer(IOptions<KafkaOptions<TMessage>> options)
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="KafkaProducer" />.
+        /// </summary>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public KafkaProducer(
+            IOptions<KafkaOptions<TMessage>> options)
         {
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
@@ -34,7 +43,19 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
 
             _topic = options.Value.Topic ?? KafkaOptions<TMessage>.DefaultTopic;
         }
-        public Task ProduceAsync(TMessage message, CancellationToken cancellationToken, string? key = null)
+
+        /// <summary>
+        /// Отправить сообщение.
+        /// </summary>
+        /// <param name="message">Сообщение.</param>
+        /// <param name="cancellationToken">Токен отмены операции.</param>
+        /// <param name="key">Ключ.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public Task ProduceAsync(
+            TMessage message, 
+            CancellationToken cancellationToken,
+            string? key = null)
         {
             ArgumentNullException.ThrowIfNull(message);
 
@@ -45,6 +66,10 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
             };
             return _producer.ProduceAsync(_topic, mes, cancellationToken);
         }
+
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             if (_disposed)

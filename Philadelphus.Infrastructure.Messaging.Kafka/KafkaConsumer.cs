@@ -6,6 +6,9 @@ using Serilog;
 
 namespace Philadelphus.Infrastructure.Messaging.Kafka
 {
+    /// <summary>
+    /// Представляет объект KafkaConsumer.
+    /// </summary>
     public class KafkaConsumer<TMessage> : BackgroundService, IMessageConsumer<TMessage>, IDisposable
     {
         private readonly ILogger _logger;
@@ -14,7 +17,15 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
         private bool _disposed;
         public event Func<TMessage, CancellationToken, Task>? MessageReceived;
 
-        public KafkaConsumer(ILogger logger, IOptions<KafkaOptions<TMessage>> options)
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="KafkaConsumer" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public KafkaConsumer(
+            ILogger logger, 
+            IOptions<KafkaOptions<TMessage>> options)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(options);
@@ -36,6 +47,9 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
             _topic = options.Value.Topic ?? KafkaOptions<TMessage>.DefaultTopic;
         }
 
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             if (_disposed) 

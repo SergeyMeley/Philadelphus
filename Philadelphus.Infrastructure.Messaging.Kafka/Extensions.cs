@@ -5,6 +5,9 @@ using Philadelphus.Core.Domain.Infrastructure.Messaging;
 
 namespace Philadelphus.Infrastructure.Messaging.Kafka
 {
+    /// <summary>
+    /// Представляет объект расширения.
+    /// </summary>
     public static class Extensions
     {
         public static void AddKafkaProducer<TMessage>(this IServiceCollection services, IConfigurationSection configurationSection)

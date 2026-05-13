@@ -8,9 +8,20 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Infrastructure.Messaging.Kafka
 {
+    /// <summary>
+    /// Представляет объект KafkaJsonSerializer.
+    /// </summary>
     internal class KafkaJsonSerializer<TMessage> : ISerializer<TMessage>
     {
-        public byte[] Serialize(TMessage data, SerializationContext context)
+        /// <summary>
+        /// Сериализовать сообщение.
+        /// </summary>
+        /// <param name="data">Данные.</param>
+        /// <param name="context">Контекст операции.</param>
+        /// <returns>Коллекция полученных данных.</returns>
+        public byte[] Serialize(
+            TMessage data,
+            SerializationContext context)
         {
             return JsonSerializer.SerializeToUtf8Bytes(data);
         }
