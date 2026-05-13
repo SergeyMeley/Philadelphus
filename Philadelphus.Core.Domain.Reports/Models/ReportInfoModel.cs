@@ -4,12 +4,35 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.Reports.Models
 {
+    /// <summary>
+    /// Доменная модель отчета.
+    /// </summary>
     public class ReportInfoModel
     {
+        /// <summary>
+        /// Наименование.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Схема.
+        /// </summary>
         public string Schema { get; set; }
-        public string Type { get; set; } // "View", "MaterializedView", "Function"
+
+        /// <summary>
+        /// Тип (View, MaterializedView, Function).
+        /// </summary>
+        public string Type { get; set; }
+        
+        /// <summary>
+        /// Описание.
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// Параметры отчета.
+        /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public List<ReportParameterModel> Parameters { get; set; } = new();
 
         /// <summary>

@@ -32,6 +32,7 @@ namespace Philadelphus.Core.Domain.Reports.Services
         /// <param name="mapper">Автомаппер</param>
         /// <param name="logger">Логгер</param>
         /// <param name="notificationService">Сервис уведомлений</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ReportService(
             IMapper mapper,
             ILogger logger,
@@ -50,7 +51,8 @@ namespace Philadelphus.Core.Domain.Reports.Services
         /// Получить список отчетов из хранилищ
         /// </summary>
         /// <param name="dataStorageModels">Хранилища</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public async Task<List<ReportInfoModel>> GetReportsListAsync(
             IEnumerable<IDataStorageModel> dataStorageModels)
         {
@@ -94,7 +96,8 @@ namespace Philadelphus.Core.Domain.Reports.Services
         /// <param name="preliminaryRefresh">Флаг предварительного обновления данных:
         /// 1. Материализованное представление в БД.
         /// 2. Любой тип в кэше</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public async Task<DataTable> ExecuteReportAsync(
             ReportInfoModel report,
             IReportsInfrastructureRepository repository,
@@ -160,7 +163,8 @@ namespace Philadelphus.Core.Domain.Reports.Services
         /// </summary>
         /// <param name="report">Отчет</param>
         /// <param name="repository">Репозиторий БД</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public async Task RefreshCachedReportAsync(
             ReportInfoModel report,
             IReportsInfrastructureRepository repository)
@@ -178,7 +182,8 @@ namespace Philadelphus.Core.Domain.Reports.Services
         /// </summary>
         /// <param name="report">Отчет</param>
         /// <param name="repository">Репозиторий БД</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public async Task RefreshMaterializedViewAsync(ReportInfoModel report, IReportsInfrastructureRepository repository)
         {
             ArgumentNullException.ThrowIfNull(report);

@@ -8,8 +8,14 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.Reports.Mapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления отчета.
+    /// </summary>
     public class ReportInfoMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ReportInfoMappingProfile" />.
+        /// </summary>
         public ReportInfoMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры
