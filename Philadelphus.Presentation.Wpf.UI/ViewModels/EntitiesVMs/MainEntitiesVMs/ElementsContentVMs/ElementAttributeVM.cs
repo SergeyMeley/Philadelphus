@@ -164,6 +164,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IPhiladelphusRepositoryService service) 
             : base(elementAttribute, dataStoragesCollectionVM, service)
         {
+            ArgumentNullException.ThrowIfNull(elementAttribute);
+            ArgumentNullException.ThrowIfNull(elementAttribute.Values);
+            ArgumentNullException.ThrowIfNull(service);
+
             _service = service;
 
             _model = elementAttribute;

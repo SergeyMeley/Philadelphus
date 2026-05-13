@@ -59,6 +59,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IPhiladelphusRepositoryService service) 
             : base(treeNode, dataStoragesCollectionVM, service)
         {
+            ArgumentNullException.ThrowIfNull(treeNode);
+            ArgumentNullException.ThrowIfNull(treeNode.ChildNodes);
+            ArgumentNullException.ThrowIfNull(treeNode.ChildLeaves);
+            ArgumentNullException.ThrowIfNull(service);
+
             _service = service;
 
             _model = treeNode;

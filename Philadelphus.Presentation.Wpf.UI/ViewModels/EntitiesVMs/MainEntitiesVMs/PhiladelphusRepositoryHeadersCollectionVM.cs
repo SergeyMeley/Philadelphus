@@ -85,6 +85,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> philadelphusRepositoryHeadersCollectionConfig)
         {
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(dataStoragesSettingsVM);
+            ArgumentNullException.ThrowIfNull(configurationService);
+            ArgumentNullException.ThrowIfNull(appConfig);
+            ArgumentNullException.ThrowIfNull(appConfig.Value);
+            ArgumentNullException.ThrowIfNull(philadelphusRepositoryHeadersCollectionConfig);
+            ArgumentNullException.ThrowIfNull(philadelphusRepositoryHeadersCollectionConfig.Value);
+
             _logger = logger;
             _notificationService = notificationService;
             _mapper = mapper;
@@ -138,6 +149,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
         private ObservableCollection<PhiladelphusRepositoryHeaderVM> LoadPhiladelphusRepositoryHeadersVMs(IOptions<PhiladelphusRepositoryHeadersCollectionConfig> config) 
         {
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(config.Value);
+
             _PhiladelphusRepositoryHeadersVMs.Clear();
             var headers = config.Value.PhiladelphusRepositoryHeaders;
             if (headers == null)
@@ -154,6 +168,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
         internal PhiladelphusRepositoryHeaderVM  AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(PhiladelphusRepositoryVM PhiladelphusRepositoryVM)
         {
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
+
             var header = _service.CreatePhiladelphusRepositoryHeaderFromPhiladelphusRepository(PhiladelphusRepositoryVM.Model);
 
             _philadelphusRepositoryHeadersCollectionConfig.Value.PhiladelphusRepositoryHeaders.Add(_mapper.Map<PhiladelphusRepositoryHeader>(header));

@@ -106,6 +106,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
 
         private bool SendNotification(Notification notification)
         {
+            ArgumentNullException.ThrowIfNull(notification);
+
             var newList = new List<Notification>(_notificationList);
             newList.Add(notification);
             _notificationList = newList;

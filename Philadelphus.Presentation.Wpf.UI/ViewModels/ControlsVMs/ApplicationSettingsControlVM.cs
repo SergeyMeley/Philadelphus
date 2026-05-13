@@ -80,6 +80,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(configurationService);
+            ArgumentNullException.ThrowIfNull(appConfig);
+            ArgumentNullException.ThrowIfNull(appConfig.Value);
+            ArgumentNullException.ThrowIfNull(appConfig.Value.ConfigurationFilesPathes);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value.ConnectionStringsContainers);
+
             _configurationService = configurationService; 
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;

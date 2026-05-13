@@ -76,6 +76,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IPhiladelphusRepositoryService service)
             : base(repositoryModel, dataStoragesCollectionVM, service)
         {
+            ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub);
+            ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub.ContentWorkingTrees);
+
             foreach (var item in repositoryModel.ContentShrub.ContentWorkingTrees.Select(x => x.ContentRoot))
             {
                 Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service));

@@ -48,6 +48,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(configurationService);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
+            ArgumentNullException.ThrowIfNull(infrastructureRepositoryFactory);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionConfig);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionConfig.Value);
+
             _service = service;
             _configurationService = configurationService;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;

@@ -18,6 +18,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             ApplicationCommandsVM applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(applicationCommandsVM);
+
             _serviceProvider = serviceProvider;
             _mapper = mapper;
             _logger = logger;

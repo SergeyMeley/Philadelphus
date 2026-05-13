@@ -159,6 +159,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollectionConfig)
         {
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(philadelphusRepositoryHeader);
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(dataStoragesVM);
+            ArgumentNullException.ThrowIfNull(updatePhiladelphusRepositoryHeaders);
+            ArgumentNullException.ThrowIfNull(configurationService);
+            ArgumentNullException.ThrowIfNull(appConfig);
+            ArgumentNullException.ThrowIfNull(appConfig.Value);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryHeadersCollectionConfig);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryHeadersCollectionConfig.Value);
+
             _mapper = mapper;
             _model = philadelphusRepositoryHeader;
             _service = service;

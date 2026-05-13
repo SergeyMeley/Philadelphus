@@ -20,6 +20,8 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 
         public AttributeExportDTO(ElementAttributeModel attr)
         {
+            ArgumentNullException.ThrowIfNull(attr);
+
             Name = attr.Name;
             Description = attr.Description;
             DataTypeNodeName = attr.ValueType?.Name ?? "Не определён";
@@ -31,6 +33,9 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 
         public AttributeExportDTO(string name, string description)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentNullException.ThrowIfNull(description);
+
             Name = name;
             Description = description;
         }

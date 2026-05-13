@@ -11,6 +11,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs
 
         public ExtensionInstanceVM(ExtensionInstance extensionInstance)
         {
+            ArgumentNullException.ThrowIfNull(extensionInstance);
+
             _extensionInstance = extensionInstance;
             _extensionInstance.PropertyChanged += (s, e) => OnPropertyChanged(e.PropertyName);
         }
@@ -41,11 +43,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs
 
         public async Task ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service)
         {
+            ArgumentNullException.ThrowIfNull(element);
+            ArgumentNullException.ThrowIfNull(service);
+
             await _extensionInstance.ExecuteAsync(element, service);
         }
 
         public async Task UpdateCanExecuteAsync(IMainEntityModel element)
         {
+            ArgumentNullException.ThrowIfNull(element);
+
             await _extensionInstance.UpdateCanExecuteAsync(element);
         }
 

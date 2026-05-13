@@ -72,6 +72,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             IOptions<DataStoragesCollectionConfig> dataStoragesCollection,
             IInfrastructureRepositoryFactory infrastructureRepositoryFactory)
         {
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(dataStoragesService);
+            ArgumentNullException.ThrowIfNull(applicationSettings);
+            ArgumentNullException.ThrowIfNull(applicationSettings.Value);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollection);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollection.Value);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollection);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollection.Value);
+            ArgumentNullException.ThrowIfNull(infrastructureRepositoryFactory);
+
             _logger = logger;
             _notificationService = notificationService;
             _dataStoragesService = dataStoragesService;

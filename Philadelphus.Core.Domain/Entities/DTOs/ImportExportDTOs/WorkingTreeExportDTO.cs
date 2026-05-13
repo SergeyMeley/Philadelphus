@@ -13,11 +13,17 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
         public TreeRootExportDTO ContentRoot { get; }
         public WorkingTreeExportDTO(string name, TreeRootExportDTO root) 
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentNullException.ThrowIfNull(root);
+
             Name = name;
             ContentRoot = root;
         }
         public WorkingTreeExportDTO(WorkingTreeModel tree)
         {
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(tree.ContentRoot);
+
             Name = tree.Name;
             ContentRoot = new TreeRootExportDTO(tree.ContentRoot);
         }

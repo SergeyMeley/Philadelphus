@@ -16,6 +16,8 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 
         public TreeLeaveExportDTO(TreeLeaveModel leave)
         {
+            ArgumentNullException.ThrowIfNull(leave);
+
             Name = leave.Name;
             Description = leave.Description;
             OwningNodeName = leave.ParentNode?.Name ?? "Неизвестный";
@@ -24,6 +26,10 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 
         public TreeLeaveExportDTO(string name, string description, string owningNodeName)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentNullException.ThrowIfNull(description);
+            ArgumentException.ThrowIfNullOrWhiteSpace(owningNodeName);
+
             Name = name;
             Description = description;
             OwningNodeName = owningNodeName;

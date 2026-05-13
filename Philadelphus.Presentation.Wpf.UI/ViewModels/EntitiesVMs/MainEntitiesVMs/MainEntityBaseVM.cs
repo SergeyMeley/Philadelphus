@@ -104,9 +104,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service)
         {
-            _service = service ?? throw new NullReferenceException();
-            _model = IMainEntityModel ?? throw new NullReferenceException();
-            _dataStoragesCollectionVM = dataStoragesCollectionVM ?? throw new NullReferenceException();
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(IMainEntityModel);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM.DataStoragesVMs);
+            ArgumentNullException.ThrowIfNull(IMainEntityModel.DataStorage);
+
+            _service = service;
+            _model = IMainEntityModel;
+            _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _storageVM = dataStoragesCollectionVM?.DataStoragesVMs?.SingleOrDefault(x => x.Uuid == _model.DataStorage.Uuid) ?? throw new NullReferenceException();
         }
         public ElementAttributeVM AddAttribute()

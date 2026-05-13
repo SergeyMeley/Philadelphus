@@ -73,6 +73,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesV
             Notification model,
             INotificationService service)
         {
+            ArgumentNullException.ThrowIfNull(model);
+            ArgumentNullException.ThrowIfNull(service);
+
             _model = model;
             _service = service;
         }

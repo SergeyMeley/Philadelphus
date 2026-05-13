@@ -13,6 +13,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         public ApplicationCommandsVM(
             IServiceProvider serviceProvider)
         {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+
             _serviceProvider = serviceProvider;
         }
         public RelayCommand OpenMainWindowCommand

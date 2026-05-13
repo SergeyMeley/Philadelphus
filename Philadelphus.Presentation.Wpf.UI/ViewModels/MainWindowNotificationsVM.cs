@@ -44,7 +44,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             ModalWindowNotificationsControlVM modalControlVM,
             INotificationService notificationService)
         {
-             _notificationService = notificationService;
+            ArgumentNullException.ThrowIfNull(messageLogControlVM);
+            ArgumentNullException.ThrowIfNull(popupControlVM);
+            ArgumentNullException.ThrowIfNull(modalControlVM);
+            ArgumentNullException.ThrowIfNull(notificationService);
+
+            _notificationService = notificationService;
 
             _messageLogControlVM = messageLogControlVM;
             _popupControlVM = popupControlVM;

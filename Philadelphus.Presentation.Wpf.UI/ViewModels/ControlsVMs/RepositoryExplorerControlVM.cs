@@ -597,6 +597,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private void UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryModel newRepo)
         {
+            ArgumentNullException.ThrowIfNull(newRepo);
+            ArgumentNullException.ThrowIfNull(newRepo.ContentShrub);
+            ArgumentNullException.ThrowIfNull(newRepo.ContentShrub.ContentWorkingTrees);
+
             var selectedUuid = SelectedRepositoryMember?.Uuid;
 
             SelectedRepositoryMember = null;
@@ -647,6 +651,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(Guid uuid)
         {
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
             foreach (var root in _philadelphusRepositoryVM.Childs)
             {
                 var found = FindRepositoryMemberByUuid(root, uuid);
@@ -661,6 +667,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private static IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(TreeRootVM root, Guid uuid)
         {
+            ArgumentNullException.ThrowIfNull(root);
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
             if (root.Uuid == uuid)
             {
                 return root;
@@ -680,6 +689,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private static IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(TreeNodeVM node, Guid uuid)
         {
+            ArgumentNullException.ThrowIfNull(node);
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
             if (node.Uuid == uuid)
             {
                 return node;
@@ -730,6 +742,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private bool UpdateChildsCollection(ViewModelBase parent)    //TODO: Переделать временный костыль
         {
+            ArgumentNullException.ThrowIfNull(parent);
+
             if (parent is PhiladelphusRepositoryVM repository)
             {
                 for (int i = repository.Childs.Count - 1; i >= 0; i--)
@@ -788,6 +802,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private void OnProcessChanged(string currentProcess)
         {
+            ArgumentNullException.ThrowIfNull(currentProcess);
+
             Application.Current.Dispatcher.Invoke(() =>
             {
                 CurrentProcess = currentProcess;
@@ -797,6 +813,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private void OnProgressChanged(int currentNumber, int totalCount)
         {
+            ArgumentOutOfRangeException.ThrowIfNegative(currentNumber);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalCount);
+
             Application.Current.Dispatcher.Invoke(() =>
             {
                 CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round(((double)currentNumber / (double)totalCount * 100), 1)} %)";

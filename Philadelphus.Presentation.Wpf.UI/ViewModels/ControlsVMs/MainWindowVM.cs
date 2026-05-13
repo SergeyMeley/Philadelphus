@@ -77,6 +77,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             MainWindowNotificationsVM mainWindowNotificationsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+            ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
+            ArgumentNullException.ThrowIfNull(extensionVMFactory);
+            ArgumentNullException.ThrowIfNull(applicationSettingsControlVM);
+            ArgumentNullException.ThrowIfNull(reportsControlVM);
+            ArgumentNullException.ThrowIfNull(mainWindowNotificationsVM);
+
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;

@@ -122,6 +122,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM) 
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(reportService);
+            ArgumentNullException.ThrowIfNull(tablesExportServiceFactory);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
+
             _reportService = reportService;
             _xlsxExportService = tablesExportServiceFactory.Create(TablesExportFormat.Xlsx);
             _jsonExportService = tablesExportServiceFactory.Create(TablesExportFormat.Json);
@@ -194,6 +198,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private async Task ExportTableAsync(ITablesExportService tablesExportService)
         {
+            ArgumentNullException.ThrowIfNull(tablesExportService);
+
             if (ReportResult == null || ReportResult.Rows.Count == 0)
                 return;
 

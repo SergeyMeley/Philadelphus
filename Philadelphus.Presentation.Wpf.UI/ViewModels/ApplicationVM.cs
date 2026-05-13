@@ -44,6 +44,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             RepositoryCreationControlVM RepositoryCreationVM,
             LaunchWindowVM launchVM)
         {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+            ArgumentNullException.ThrowIfNull(applicationCommandsVM);
+            ArgumentNullException.ThrowIfNull(dataStoragesSettingsVM);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryCollectionVM);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryHeadersCollectionVM);
+            ArgumentNullException.ThrowIfNull(RepositoryCreationVM);
+            ArgumentNullException.ThrowIfNull(launchVM);
+
             //var configPath = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings.Get("ConfigsDirectory"));
             //if (configPath == null)
             //    throw new Exception("Не найден путь к настроечным файлам. Проверьте параметр \'ConfigsDirectory\' в \'App.config\'.");

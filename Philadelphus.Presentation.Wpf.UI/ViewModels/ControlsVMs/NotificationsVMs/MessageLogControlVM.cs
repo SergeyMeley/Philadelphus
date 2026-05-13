@@ -207,6 +207,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
 
         private void AddNewMessageFromHistory(Notification notification)
         {
+            ArgumentNullException.ThrowIfNull(notification);
+
             AddNewMessage(notification);
         }
 
@@ -294,6 +296,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
 
         private bool IsVisible(NotificationVM notification)
         {
+            ArgumentNullException.ThrowIfNull(notification);
+
             return (IsErrorMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Error || notification.CriticalLevel == NotificationCriticalLevelModel.Alarm))
                 || (IsWarningMessagesVisible && notification.CriticalLevel == NotificationCriticalLevelModel.Warning)
                 || (IsInfoMessagesVisible && (notification.CriticalLevel == NotificationCriticalLevelModel.Info || notification.CriticalLevel == NotificationCriticalLevelModel.None))

@@ -45,6 +45,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
 
         private bool ShowModal(Notification notification)
         {
+            ArgumentNullException.ThrowIfNull(notification);
+
             MessageBoxImage image;
             switch (notification.CriticalLevel)
             {

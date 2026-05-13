@@ -12,6 +12,9 @@ public class TreeNodeExportDTO
     public TreeNodeExportDTO() { }
     public TreeNodeExportDTO(TreeNodeModel node)
     {
+        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(node.ChildLeaves);
+
         Name = node.Name;
         Description = node.Description;
         OwningRootName = node.OwningWorkingTree?.ContentRoot?.Name ?? "Неизвестный";
@@ -21,6 +24,9 @@ public class TreeNodeExportDTO
 
     public TreeNodeExportDTO(string name, string description)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(description);
+
         Name = name;
         Description = description;
     }

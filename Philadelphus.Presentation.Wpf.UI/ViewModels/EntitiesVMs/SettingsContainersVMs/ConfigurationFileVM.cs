@@ -15,6 +15,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
         public bool Exists { get => FileInfo.Exists; }
         public ConfigurationFileVM(string name, FileInfo fileInfo)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentNullException.ThrowIfNull(fileInfo);
+
             ConfigName = name;
             FileInfo = fileInfo;
         }
@@ -27,6 +30,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
 
         public bool ChangeFile(FileInfo newFile)
         {
+            ArgumentNullException.ThrowIfNull(newFile);
+
             FileInfo = newFile;
             OnPropertyChanged(nameof(FileInfo));
             return true;

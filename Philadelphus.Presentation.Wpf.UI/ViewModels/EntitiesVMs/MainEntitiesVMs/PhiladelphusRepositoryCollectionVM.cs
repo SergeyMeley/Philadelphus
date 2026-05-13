@@ -30,6 +30,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             DataStoragesCollectionVM dataStoragesSettings,
             IOptions<ApplicationSettingsConfig> options)
         {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(collectionService);
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(dataStoragesSettings);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+
             _serviceProvider = serviceProvider;
             _logger = logger;
             _notificationService = notificationService;
@@ -147,6 +156,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
         internal bool CheckPhiladelphusRepositoryVMAvailable(Guid uuid, out PhiladelphusRepositoryVM outPhiladelphusRepositoryVM)
         {
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
             outPhiladelphusRepositoryVM = PhiladelphusRepositoriesVMs.FirstOrDefault(x => x.Uuid == uuid);
             if (outPhiladelphusRepositoryVM != null && outPhiladelphusRepositoryVM.OwnDataStorage.IsAvailable == true)
                 return true;
@@ -157,6 +168,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
         private PhiladelphusRepositoryVM InitPhiladelphusRepositoryVM(Guid uuid)
         {
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
             var storages = _dataStoragesSettingsVM.DataStoragesVMs.Select(x => x.Model);
             var repositories = _collectionService.GetPhiladelphusRepositoriesCollection(storages, new[] { uuid });
             if (repositories == null)
