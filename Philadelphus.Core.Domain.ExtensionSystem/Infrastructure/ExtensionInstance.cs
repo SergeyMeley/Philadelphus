@@ -145,6 +145,11 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         public event EventHandler<ExtensionStateChangedEventArgs> StateChanged;
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ExtensionInstance" />.
+        /// </summary>
+        /// <param name="extension">Расширение.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ExtensionInstance(IExtensionModel extension)
         {
             ArgumentNullException.ThrowIfNull(extension);
@@ -164,7 +169,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <summary>
         /// Запустить расширение
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public async Task StartAsync()
         {
             try
@@ -186,7 +191,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <summary>
         /// Остановить расширение
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public async Task StopAsync()
         {
             try
@@ -210,8 +215,14 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// </summary>
         /// <param name="element">Текущий элемент репозитория</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns></returns>
-        public async Task<IMainEntityModel> ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default)
+        /// <param name="service">Доменный сервис.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
+        public async Task<IMainEntityModel> ExecuteAsync(
+            IMainEntityModel element,
+            IPhiladelphusRepositoryService service,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(element);
             ArgumentNullException.ThrowIfNull(service);
@@ -236,6 +247,12 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Обновляет данные UpdateCanExecuteAsync.
+        /// </summary>
+        /// <param name="element">Элемент.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public async Task UpdateCanExecuteAsync(IMainEntityModel element)
         {
             ArgumentNullException.ThrowIfNull(element);

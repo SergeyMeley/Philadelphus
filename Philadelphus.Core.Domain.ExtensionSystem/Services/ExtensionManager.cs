@@ -17,14 +17,28 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         public event EventHandler<ExtensionLoadedEventArgs> ExtensionLoaded;
         public event EventHandler<ExtensionErrorEventArgs> ExtensionError;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ExtensionManager" />.
+        /// </summary>
         public ExtensionManager()
         {
             _extensions = new List<ExtensionInstance>();
         }
 
+        /// <summary>
+        /// Получает доступные расширения.
+        /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public IReadOnlyList<ExtensionInstance> GetExtensions() => _extensions.AsReadOnly();
 
-        public async Task LoadExtensionsAsync(string pluginsFolderPath)
+        /// <summary>
+        /// Загружает доступные расширения.
+        /// </summary>
+        /// <param name="pluginsFolderPath">Путь к папке расширений.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
+        public async Task LoadExtensionsAsync(
+            string pluginsFolderPath)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(pluginsFolderPath);
 
@@ -64,7 +78,14 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             await Task.CompletedTask;
         }
 
-        public async Task StartExtensionAsync(ExtensionInstance extension)
+        /// <summary>
+        /// Запустить расширение.
+        /// </summary>
+        /// <param name="extension">Расширение.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public async Task StartExtensionAsync(
+            ExtensionInstance extension)
         {
             ArgumentNullException.ThrowIfNull(extension);
 
@@ -83,7 +104,14 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             }
         }
 
-        public async Task StopExtensionAsync(ExtensionInstance extension)
+        /// <summary>
+        /// Остановить расширение.
+        /// </summary>
+        /// <param name="extension">Расширение.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public async Task StopExtensionAsync(
+            ExtensionInstance extension)
         {
             ArgumentNullException.ThrowIfNull(extension);
 
@@ -102,7 +130,18 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             }
         }
 
-        public async Task<IMainEntityModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, IMainEntityModel element)
+        /// <summary>
+        /// Выполняет операцию расширения.
+        /// </summary>
+        /// <param name="extension">Расширение.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="element">Элемент.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public async Task<IMainEntityModel> ExecuteExtensionAsync(
+            ExtensionInstance extension, 
+            IPhiladelphusRepositoryService service,
+            IMainEntityModel element)
         {
             ArgumentNullException.ThrowIfNull(extension);
             ArgumentNullException.ThrowIfNull(service);
@@ -123,6 +162,10 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             }
         }
 
+        /// <summary>
+        /// Запустить расширения с автоматическим стартом.
+        /// </summary>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
         public async Task AutoStartExtensionsAsync()
         {
             var autoStartExtensions = _extensions.Where(e => e.Metadata.AutoStart).ToList();
@@ -142,7 +185,14 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             await Task.CompletedTask;
         }
 
-        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(IMainEntityModel element)
+        /// <summary>
+        /// Получает данные расширения.
+        /// </summary>
+        /// <param name="element">Элемент.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(
+            IMainEntityModel element)
         {
             ArgumentNullException.ThrowIfNull(element);
 
@@ -160,7 +210,13 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
             return compatible;
         }
 
-        public void RegisterExtension(ExtensionInstance extensionInstance)
+        /// <summary>
+        /// Зарегистрировать расширение.
+        /// </summary>
+        /// <param name="extensionInstance">Экземпляр расширения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public void RegisterExtension(
+            ExtensionInstance extensionInstance)
         {
             ArgumentNullException.ThrowIfNull(extensionInstance);
 
