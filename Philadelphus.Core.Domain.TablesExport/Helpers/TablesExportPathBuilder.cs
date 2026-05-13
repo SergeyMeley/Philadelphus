@@ -10,6 +10,9 @@ namespace Philadelphus.Core.Domain.TablesExport.Helpers
     {
         public static string BuildExportPath(string reportName, string extension)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(reportName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(extension);
+
             var now = DateTimeOffset.Now;
             var safeReportName = SanitizeFileName(reportName);
 

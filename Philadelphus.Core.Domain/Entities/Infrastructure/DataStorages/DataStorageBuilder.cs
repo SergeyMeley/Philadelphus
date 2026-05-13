@@ -34,7 +34,8 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public DataStorageBuilder SetGeneralParameters(ILogger logger, string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
         {
             ArgumentNullException.ThrowIfNull(logger);
-            ArgumentException.ThrowIfNullOrEmpty(name);
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
             _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled);
             return this;

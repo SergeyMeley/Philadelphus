@@ -127,6 +127,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public bool ChangeOwner(IOwnerModel newOwner)
         {
+            ArgumentNullException.ThrowIfNull(newOwner);
+
             throw new NotImplementedException();
         }
 

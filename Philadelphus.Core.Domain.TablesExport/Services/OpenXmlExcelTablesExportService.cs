@@ -57,6 +57,7 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
         {
             ArgumentNullException.ThrowIfNull(data);
             ArgumentNullException.ThrowIfNull(columns);
+            ArgumentException.ThrowIfNullOrWhiteSpace(reportName);
 
             if (columns.Count == 0)
                 throw new ArgumentException("Не задан список колонок для экспорта.", nameof(columns));

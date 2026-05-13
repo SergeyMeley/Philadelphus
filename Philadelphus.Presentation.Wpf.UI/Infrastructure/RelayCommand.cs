@@ -15,6 +15,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
 
         public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
+            ArgumentNullException.ThrowIfNull(execute);
+
             this.execute = execute;
             this.canExecute = canExecute;
         }

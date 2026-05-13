@@ -26,6 +26,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public async Task LoadExtensionsAsync(string pluginsFolderPath)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(pluginsFolderPath);
+
             if (!Directory.Exists(pluginsFolderPath))
                 throw new DirectoryNotFoundException($"Папка расширений не найдена: {pluginsFolderPath}");
 
@@ -103,6 +105,7 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
         public async Task<IMainEntityModel> ExecuteExtensionAsync(ExtensionInstance extension, IPhiladelphusRepositoryService service, IMainEntityModel element)
         {
             ArgumentNullException.ThrowIfNull(extension);
+            ArgumentNullException.ThrowIfNull(service);
             ArgumentNullException.ThrowIfNull(element);
 
             try
@@ -141,6 +144,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Services
 
         public async Task<List<ExtensionInstance>> GetCompatibleExtensionsAsync(IMainEntityModel element)
         {
+            ArgumentNullException.ThrowIfNull(element);
+
             var compatible = new List<ExtensionInstance>();
 
             foreach (var extension in _extensions)

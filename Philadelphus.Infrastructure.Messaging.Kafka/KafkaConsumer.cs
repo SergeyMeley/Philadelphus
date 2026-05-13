@@ -16,6 +16,10 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
 
         public KafkaConsumer(ILogger logger, IOptions<KafkaOptions<TMessage>> options)
         {
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+
             _logger = logger;
 
             var config = new ConsumerConfig()

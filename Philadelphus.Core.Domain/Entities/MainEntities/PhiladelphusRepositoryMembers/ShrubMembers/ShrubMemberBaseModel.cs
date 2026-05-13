@@ -227,6 +227,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="attribute">Атрибут</param>
         public virtual bool AddAttribute(ElementAttributeModel attribute)
         {
+            ArgumentNullException.ThrowIfNull(attribute);
+
             lock (_lockObject)
             {
                 if (_attributes.Any(x => x.Uuid == attribute.Uuid))
@@ -259,6 +261,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="attribute">Атрибут</param>
         public virtual bool RemoveAttribute(ElementAttributeModel attribute)
         {
+            ArgumentNullException.ThrowIfNull(attribute);
+
             lock (_lockObject)
             {
                 if (_attributes.Any(x => x.Uuid == attribute.Uuid))
@@ -366,6 +370,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="content">Содержимое</param>
         public bool AddContent(IContentModel content)
         {
+            ArgumentNullException.ThrowIfNull(content);
+
             if (content is ElementAttributeModel a)
             {
                 return AddAttribute(a);
@@ -385,6 +391,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="content">Содержимое</param>
         public bool RemoveContent(IContentModel content)
         {
+            ArgumentNullException.ThrowIfNull(content);
+
             if (content is ElementAttributeModel a)
             {
                 return RemoveAttribute(a);

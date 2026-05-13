@@ -49,21 +49,28 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="notificationService">Сервис уведомлений</param>
         /// <param name="PhiladelphusRepositoryService">Сервис работы с репозиторием и его элементами</param>
         /// <param name="applicationSettings"></param>
-        /// <param name="PhiladelphusRepositoryHeadersCollection"></param>
+        /// <param name="philadelphusRepositoryHeadersCollection"></param>
         public PhiladelphusRepositoryCollectionService(
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
             IPhiladelphusRepositoryService PhiladelphusRepositoryService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
-            IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollection)
+            IOptions<PhiladelphusRepositoryHeadersCollectionConfig> philadelphusRepositoryHeadersCollection)
         {
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryService);
+            ArgumentNullException.ThrowIfNull(applicationSettings);
+            ArgumentNullException.ThrowIfNull(philadelphusRepositoryHeadersCollection);
+
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
             _philadelphusRepositoryService = PhiladelphusRepositoryService;
             _applicationSettings = applicationSettings;
-            _PhiladelphusRepositoryHeadersCollection = PhiladelphusRepositoryHeadersCollection;
+            _PhiladelphusRepositoryHeadersCollection = philadelphusRepositoryHeadersCollection;
 
             _logger.Information("PhiladelphusRepositoryCollectionService инициализирован.");
         }
@@ -90,6 +97,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Коллекция репозиториев (модели)</returns>
         public IEnumerable<PhiladelphusRepositoryModel> GetPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null)
         {
+            ArgumentNullException.ThrowIfNull(dataStorages);
+
             IEnumerable<PhiladelphusRepositoryModel> result = DataPhiladelphusRepositories.Values;
             if (result == null || result?.Count() == 0)
             {
@@ -105,8 +114,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns></returns>
         public IEnumerable<PhiladelphusRepositoryModel> ForceLoadPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null)
         {
-            if (dataStorages == null)
-                return null;
+            ArgumentNullException.ThrowIfNull(dataStorages);
+
             var result = new List<PhiladelphusRepositoryModel>();
             foreach (var dataStorage in dataStorages.Where(x => x.PhiladelphusRepositoriesInfrastructureRepository != null))
             {
@@ -145,6 +154,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveChanges(ref PhiladelphusRepositoryModel repository)
         {
+            ArgumentNullException.ThrowIfNull(repository);
+
             long result = 0;
             result = _philadelphusRepositoryService.SaveChanges(ref repository, SaveMode.OnlyHeader);
             return result;
@@ -161,6 +172,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Репозиторий</returns>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true)
         {
+            ArgumentNullException.ThrowIfNull(dataStorage);
+
             var result = new PhiladelphusRepositoryModel(
                 Guid.CreateVersion7(), 
                 dataStorage, 
@@ -184,6 +197,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Заголовок репозитория</returns>
         public PhiladelphusRepositoryHeaderModel CreatePhiladelphusRepositoryHeaderFromPhiladelphusRepository(PhiladelphusRepositoryModel philadelphusRepositoryModel)
         {
+            ArgumentNullException.ThrowIfNull(philadelphusRepositoryModel);
+
             var result = new PhiladelphusRepositoryHeaderModel(philadelphusRepositoryModel.Uuid);
             result.Name = philadelphusRepositoryModel.Name;
             result.Description = philadelphusRepositoryModel.Description;
@@ -201,6 +216,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Коллекция репозиториев</returns>
         public IEnumerable<PhiladelphusRepositoryModel> AddExistPhiladelphusRepository(DirectoryInfo path)
         {
+            ArgumentNullException.ThrowIfNull(path);
+
             var result = new List<PhiladelphusRepositoryModel>();
             return result;
         }

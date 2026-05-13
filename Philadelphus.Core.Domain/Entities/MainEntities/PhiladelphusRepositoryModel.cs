@@ -217,6 +217,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <exception cref="NotImplementedException"></exception>
         public bool ChangeDataStorage(IDataStorageModel storage)
         {
+            ArgumentNullException.ThrowIfNull(storage);
+
             throw new NotImplementedException();
         }
 
@@ -226,6 +228,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="content">Содержимое</param>
         public bool AddContent(IContentModel content)
         {
+            ArgumentNullException.ThrowIfNull(content);
+
             return false;
         }
 
@@ -235,6 +239,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <param name="content">Содержимое</param>
         public bool RemoveContent(IContentModel content)
         {
+            ArgumentNullException.ThrowIfNull(content);
+
             return false;
         }
 

@@ -157,6 +157,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             DataStoragesCollectionVM dataStoragesCollectionVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(extensionVMFactory);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
+
             _service = service;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;

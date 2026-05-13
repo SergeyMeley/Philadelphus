@@ -34,6 +34,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             IOptions<DataStoragesCollectionConfig> dataStoragesCollectionConfig,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollectionConfig)
         {
+            ArgumentNullException.ThrowIfNull(appConfig);
+            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
+            ArgumentNullException.ThrowIfNull(dataStoragesCollectionConfig);
+            ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryHeadersCollectionConfig);
+
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _dataStoragesCollectionConfig = dataStoragesCollectionConfig;
@@ -42,6 +47,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public bool MoveConfigFile(FileInfo configFile, DirectoryInfo newDirectory)
         {
+            ArgumentNullException.ThrowIfNull(configFile);
+            ArgumentNullException.ThrowIfNull(newDirectory);
+
             if (configFile.DirectoryName == newDirectory.FullName)
                 return true;
             if (newDirectory.Exists == false)
@@ -65,6 +73,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
         }
         public bool SelectAnotherConfigFile(ConfigurationFileVM configurationFileVM, FileInfo newFile)
         {
+            ArgumentNullException.ThrowIfNull(configurationFileVM);
+            ArgumentNullException.ThrowIfNull(newFile);
+
             var originPath = configurationFileVM.FileInfo;
             var result = configurationFileVM.ChangeFile(newFile);
             if (result)
@@ -89,6 +100,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public bool UpdateConfigFile<T>(FileInfo configFile, IOptions<T> newConfigObject) where T : class
         {
+            ArgumentNullException.ThrowIfNull(configFile);
+            ArgumentNullException.ThrowIfNull(newConfigObject);
+            ArgumentNullException.ThrowIfNull(newConfigObject.Value);
+
             var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
                 ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
                 ?? "Production";
@@ -156,6 +171,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public static string ContractEnvironmentVariables(string expandedPath)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(expandedPath);
+
             // Основные переменные среды из вашего конфига
             var envVars = new Dictionary<string, string>
             {
@@ -179,6 +196,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public static async Task CheckOrInitDirectory(DirectoryInfo path)
         {
+            ArgumentNullException.ThrowIfNull(path);
+
             if (path.Exists == false)
             {
                 Log.Warning($"Директория не существует: '{path.FullName}', Создаётся...");
@@ -196,6 +215,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public static async Task CheckOrInitFile<T>(FileInfo file, T configObject)
         {
+            ArgumentNullException.ThrowIfNull(file);
+            ArgumentNullException.ThrowIfNull(configObject);
+
             if (file.Exists == false)
             {
                 try

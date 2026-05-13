@@ -536,6 +536,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Корень</returns>
         public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel owner, IDataStorageModel dataStorage, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
+            ArgumentNullException.ThrowIfNull(owner);
+            ArgumentNullException.ThrowIfNull(dataStorage);
+
             try
             {
                 if (withoutInfoNotifications == false)
@@ -590,6 +593,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Корень</returns>
         public TreeRootModel CreateTreeRoot(WorkingTreeModel owner, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
+            ArgumentNullException.ThrowIfNull(owner);
+
             try
             {
                 if (withoutInfoNotifications == false)
@@ -637,6 +642,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Узел</returns>
         public TreeNodeModel CreateTreeNode(IParentModel parent, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
+            ArgumentNullException.ThrowIfNull(parent);
+
             try
             {
                 if (withoutInfoNotifications == false)
@@ -685,6 +692,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Лист</returns>
         public TreeLeaveModel CreateTreeLeave(TreeNodeModel parent, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
+            ArgumentNullException.ThrowIfNull(parent);
+
             try
             {
                 if (withoutInfoNotifications == false)
@@ -747,6 +756,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Атрибут</returns>
         public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
+            ArgumentNullException.ThrowIfNull(owner);
+
             try
             {
                 if (withoutInfoNotifications == false)
@@ -826,6 +837,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns></returns>
         public bool SoftDeleteShrubMember(IContentModel element)
         {
+            ArgumentNullException.ThrowIfNull(element);
+
             try
             {
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(

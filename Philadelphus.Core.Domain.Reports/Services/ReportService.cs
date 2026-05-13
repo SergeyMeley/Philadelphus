@@ -37,6 +37,10 @@ namespace Philadelphus.Core.Domain.Reports.Services
             ILogger logger,
             INotificationService notificationService)
         {
+            ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(notificationService);
+
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
@@ -50,6 +54,8 @@ namespace Philadelphus.Core.Domain.Reports.Services
         public async Task<List<ReportInfoModel>> GetReportsListAsync(
             IEnumerable<IDataStorageModel> dataStorageModels)
         {
+            ArgumentNullException.ThrowIfNull(dataStorageModels);
+
             return await Task.Run(async () =>
             {
                 var storagesDescs = new List<string>();
@@ -94,6 +100,9 @@ namespace Philadelphus.Core.Domain.Reports.Services
             IReportsInfrastructureRepository repository,
             bool preliminaryRefresh = true)
         {
+            ArgumentNullException.ThrowIfNull(report);
+            ArgumentNullException.ThrowIfNull(repository);
+
             _notificationService.SendTextMessage<ReportService>(
                 $"Начало получения отчета. Отчет - '{report.Name}', параметров - {report.Parameters?.Count} шт.",
                 criticalLevel: NotificationCriticalLevelModel.Info);
@@ -156,6 +165,9 @@ namespace Philadelphus.Core.Domain.Reports.Services
             ReportInfoModel report,
             IReportsInfrastructureRepository repository)
         {
+            ArgumentNullException.ThrowIfNull(report);
+            ArgumentNullException.ThrowIfNull(repository);
+
             _notificationService.SendTextMessage<ReportService>(
                 $"Отчет не кэширован. Обновление не выполнено.",
                 criticalLevel: NotificationCriticalLevelModel.Info);
@@ -169,6 +181,9 @@ namespace Philadelphus.Core.Domain.Reports.Services
         /// <returns></returns>
         public async Task RefreshMaterializedViewAsync(ReportInfoModel report, IReportsInfrastructureRepository repository)
         {
+            ArgumentNullException.ThrowIfNull(report);
+            ArgumentNullException.ThrowIfNull(repository);
+
             var sw = new Stopwatch();
             sw.Start();
 

@@ -55,6 +55,7 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
         {
             ArgumentNullException.ThrowIfNull(data);
             ArgumentNullException.ThrowIfNull(columns);
+            ArgumentException.ThrowIfNullOrWhiteSpace(reportName);
 
             var path = TablesExportPathBuilder.BuildExportPath(reportName, FileExtension);
 

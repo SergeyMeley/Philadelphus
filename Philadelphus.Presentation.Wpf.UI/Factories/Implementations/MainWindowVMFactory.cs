@@ -9,6 +9,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         private readonly IServiceProvider _serviceProvider;
         public MainWindowVMFactory(IServiceProvider serviceProvider)
         {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+
             _serviceProvider = serviceProvider;
         }
         public MainWindowVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)

@@ -213,6 +213,9 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
         /// <returns></returns>
         public async Task<IMainEntityModel> ExecuteAsync(IMainEntityModel element, IPhiladelphusRepositoryService service, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(element);
+            ArgumentNullException.ThrowIfNull(service);
+
             try
             {
                 if (State != ExtensionState.Running)
@@ -235,6 +238,8 @@ namespace Philadelphus.Core.Domain.ExtensionSystem.Infrastructure
 
         public async Task UpdateCanExecuteAsync(IMainEntityModel element)
         {
+            ArgumentNullException.ThrowIfNull(element);
+
             try
             {
                 LastCanExecuteResultModel = await Extension.CanExecuteAsync(element);

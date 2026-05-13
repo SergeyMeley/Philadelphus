@@ -158,6 +158,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public bool ChangeParent(IParentModel newParent)
         {
+            ArgumentNullException.ThrowIfNull(newParent);
+
             throw new NotImplementedException();
         }
 
@@ -167,6 +169,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="child">Наследник</param>
         public bool AddChild(IChildrenModel child)
         {
+            ArgumentNullException.ThrowIfNull(child);
+
             if (child is TreeNodeModel n
                 && _childNodeUuids.Add(child.Uuid))
             {
@@ -191,6 +195,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="child">Наследник</param>
         public bool RemoveChild(IChildrenModel child)
         {
+            ArgumentNullException.ThrowIfNull(child);
+
             if (child is TreeNodeModel n
                 && _childNodeUuids.Remove(child.Uuid))
             {

@@ -156,6 +156,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="content">Содержимое</param>
         public bool AddContent(IContentModel content)
         {
+            ArgumentNullException.ThrowIfNull(content);
+
             if (content is WorkingTreeModel wt 
                 && ContentWorkingTrees.Any(x => x.Uuid == content.Uuid) == false)
             {
@@ -175,6 +177,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="content">Содержимое</param>
         public bool RemoveContent(IContentModel content)
         {
+            ArgumentNullException.ThrowIfNull(content);
+
             if (content is WorkingTreeModel wt
                 && ContentWorkingTrees.Any(x => x.Uuid == content.Uuid))
             {

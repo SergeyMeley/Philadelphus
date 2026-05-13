@@ -300,6 +300,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public bool ChangeOwner(IOwnerModel newOwner)
         {
+            ArgumentNullException.ThrowIfNull(newOwner);
+
             throw new NotImplementedException();
         }
 
@@ -310,6 +312,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <returns></returns>
         public bool TryAddValueToValuesCollection(TreeLeaveModel value)
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             if (_isCollectionValue == false)
                 return false; 
             if (_values != null && _values.Any(x => x.Uuid == value.Uuid))
@@ -326,6 +330,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <returns></returns>
         public bool TryRemoveValueFromValuesCollection(TreeLeaveModel value)
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             if (_isCollectionValue == false)
                 return false;
             if (_values != null && _values.Any(x => x == value) == false)
@@ -357,6 +363,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <returns></returns>
         public ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
         {
+            ArgumentNullException.ThrowIfNull(newOwner);
+
             var result = new ElementAttributeModel(
                 localUuid: Guid.CreateVersion7(),
                 localOwner: newOwner,
@@ -407,6 +415,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <returns></returns>
         public ElementAttributeModel GetInheritedAttributeFromParent(int elevationLevel = 1)
         {
+            ArgumentOutOfRangeException.ThrowIfNegative(elevationLevel);
+
             if (elevationLevel == 0 || IsOwn)
                 return this;
 

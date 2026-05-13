@@ -9,12 +9,18 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
     {
         public static void AddKafkaProducer<TMessage>(this IServiceCollection services, IConfigurationSection configurationSection)
         { 
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configurationSection);
+
             services.Configure<KafkaOptions<TMessage>>(configurationSection);
             services.AddSingleton<IMessageProducer<TMessage>, KafkaProducer<TMessage>>();
         }
 
         public static void AddKafkaConsumer<TMessage>(this IServiceCollection services, IConfigurationSection configurationSection)
         {
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configurationSection);
+
             services.Configure<KafkaOptions<TMessage>>(configurationSection);
             services.AddSingleton<KafkaConsumer<TMessage>>();
             services.AddHostedService(sp => sp.GetRequiredService<KafkaConsumer<TMessage>>());

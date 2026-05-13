@@ -102,6 +102,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         public bool ChangeParent(IParentModel newParent)
         {
+            ArgumentNullException.ThrowIfNull(newParent);
+
             return false;
         }
 

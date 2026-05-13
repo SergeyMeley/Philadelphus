@@ -20,6 +20,9 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
 
         public KafkaProducer(IOptions<KafkaOptions<TMessage>> options)
         {
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(options.Value);
+
             var config = new ProducerConfig()
             {
                 BootstrapServers = options.Value.BootstrapServers
@@ -33,6 +36,8 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
         }
         public Task ProduceAsync(TMessage message, CancellationToken cancellationToken, string? key = null)
         {
+            ArgumentNullException.ThrowIfNull(message);
+
             var mes = new Message<string, TMessage>()
             {
                 Key = key ?? Guid.CreateVersion7().ToString(),

@@ -55,6 +55,8 @@ namespace Philadelphus.Core.Domain.Helpers
 
         public static string GetJson(WorkingTreeModel tree)
         {
+            ArgumentNullException.ThrowIfNull(tree);
+
             var exportDto = new WorkingTreeExportDTO(tree);
             return JsonSerializer.Serialize(exportDto, _options);
         }
@@ -68,6 +70,8 @@ namespace Philadelphus.Core.Domain.Helpers
         {
             ArgumentNullException.ThrowIfNull(service);
             ArgumentNullException.ThrowIfNull(repository);
+            ArgumentNullException.ThrowIfNull(refreshProcess);
+            ArgumentNullException.ThrowIfNull(refreshProgress);
 
             // Валидация входных данных
             ArgumentException.ThrowIfNullOrWhiteSpace(json);
