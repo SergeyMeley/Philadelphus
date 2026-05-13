@@ -5,10 +5,16 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.Philadelphus
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
+    /// <summary>
+    /// Доменная модель системного листа рабочего дерева.
+    /// </summary>
     public class SystemBaseTreeLeaveModel : TreeLeaveModel
     {
         private string _stringValue;
 
+        /// <summary>
+        /// Тип.
+        /// </summary>
         public override SystemBaseType SystemBaseType { get; }
         public string StringValue 
         { 

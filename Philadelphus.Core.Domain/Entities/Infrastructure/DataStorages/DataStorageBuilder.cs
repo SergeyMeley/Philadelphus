@@ -31,6 +31,8 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="isDisabled">Состояние отключенности хранилища данных</param>
         /// <returns>Строитель хранилища данных</returns>
         /// <exception cref="ArgumentException">Выбрасывается, если наименование пусто или некорректно</exception>
+        /// <param name="logger">Логгер.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public DataStorageBuilder SetGeneralParameters(ILogger logger, string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
         {
             ArgumentNullException.ThrowIfNull(logger);
@@ -46,7 +48,8 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// </summary>
         /// <param name="repository">Репозиторий БД</param>
         /// <returns>Строитель хранилища данных</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public DataStorageBuilder SetRepository(IInfrastructureRepository repository)
         {
             if (repository == null)

@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.Policies
 {
+    /// <summary>
+    /// Задает контракт для политик чтения и записи значений свойств.
+    /// </summary>
     public interface IPropertiesPolicy<T>
         where T : MainEntityBaseModel<T>
     {

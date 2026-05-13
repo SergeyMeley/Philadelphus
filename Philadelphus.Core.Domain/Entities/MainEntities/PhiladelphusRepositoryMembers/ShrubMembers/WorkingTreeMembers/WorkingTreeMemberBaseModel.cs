@@ -92,7 +92,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="parent">Родительский элемент Чубушника</param>
-        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="owner">Владелец.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public WorkingTreeMemberBaseModel(
             Guid uuid,
             IOwnerModel owner,

@@ -18,8 +18,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления рабочего дерева.
+    /// </summary>
     public class WorkingTreeMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="WorkingTreeMappingProfile" />.
+        /// </summary>
         public WorkingTreeMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

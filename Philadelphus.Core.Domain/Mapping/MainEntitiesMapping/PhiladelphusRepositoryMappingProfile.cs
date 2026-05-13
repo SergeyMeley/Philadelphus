@@ -16,8 +16,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления репозитория Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryMappingProfile" />.
+        /// </summary>
         public PhiladelphusRepositoryMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

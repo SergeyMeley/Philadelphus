@@ -7,8 +7,16 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.Policies.Attributes.Builders
 {
+    /// <summary>
+    /// Строитель политик атрибутов.
+    /// </summary>
     public static class AttributePolicyBuilder
     {
+        /// <summary>
+        /// Создает политики атрибутов.
+        /// </summary>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <returns>Созданный объект.</returns>
         public static IAttributePropertiesPolicy CreateDefault(INotificationService notificationService)
         {
             return new CompositeAttributePropertiesPolicy(notificationService, new IAttributePropertiesRule<ElementAttributeModel>[]

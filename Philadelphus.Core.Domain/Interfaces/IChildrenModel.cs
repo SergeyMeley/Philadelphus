@@ -20,6 +20,8 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// <summary>
         /// Сменить родителя
         /// </summary>
+        /// <param name="newParent">Новый родительский элемент.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ChangeParent(IParentModel newParent);
     }
 }

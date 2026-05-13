@@ -72,6 +72,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Информация для аудита
         /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
 
         /// <summary>
@@ -110,7 +111,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Основная сущность Чубушника
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
-        /// <param name="dbEntity">Сущность БД</param>
         internal MainEntityBaseModel(
             Guid uuid,
             INotificationService notificationService,
@@ -132,7 +132,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Назначить статус
         /// </summary>
         /// <param name="newState">Новый статус</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         bool IMainEntityWritableModel.SetState(State newState)
         {
             if (_state == State.Initialized
@@ -147,6 +147,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Пересчитать статус при изменении значений свойств
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected bool UpdateStateStateAfterChange()
         {
             if (_state != State.Initialized
@@ -162,7 +163,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Присвоить автоматически сгенерированное наименование
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public string AssignAutoName()
         {
             Name = NamingHelper.GetNewName(fixedPartOfName: _defaultFixedPartOfName);
@@ -203,7 +204,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         /// <param name="field">Поле</param>
         /// <param name="prop">Свойство</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         protected bool SetValue<TValue>(
             ref TValue field,
             TValue value,

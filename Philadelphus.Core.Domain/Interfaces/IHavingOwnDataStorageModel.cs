@@ -16,8 +16,8 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// <summary>
         /// Изменить собственное хранилище
         /// </summary>
-        /// <param name="storage"></param>
-        /// <returns></returns>
+        /// <param name="storage">Хранилище данных.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public bool ChangeDataStorage(IDataStorageModel storage);
     }
 }

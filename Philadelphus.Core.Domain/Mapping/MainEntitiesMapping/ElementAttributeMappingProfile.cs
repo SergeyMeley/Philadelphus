@@ -18,8 +18,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления атрибута элемента.
+    /// </summary>
     public class ElementAttributeMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ElementAttributeMappingProfile" />.
+        /// </summary>
         public ElementAttributeMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

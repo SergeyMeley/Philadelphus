@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.Enums
 {
+    /// <summary>
+    /// Перечисляет варианты OverrideType.
+    /// </summary>
     public enum OverrideType
     {
         [Display(Name = "Ошибка системы")]
@@ -22,9 +25,18 @@ namespace Philadelphus.Core.Domain.Entities.Enums
         Abstract
     }
 
+    /// <summary>
+    /// Представляет объект OverrideTypeItem.
+    /// </summary>
     public class OverrideTypeItem
     {
+        /// <summary>
+        /// Отображаемое наименование.
+        /// </summary>
         public string DisplayName { get; set; }
+        /// <summary>
+        /// Значение.
+        /// </summary>
         public OverrideType Value { get; set; }
     }
 }

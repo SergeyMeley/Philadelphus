@@ -53,6 +53,12 @@ namespace Philadelphus.Core.Domain.Helpers
             CommentHandling = JsonCommentHandling.Disallow
         };
 
+        /// <summary>
+        /// Сериализует в json.
+        /// </summary>
+        /// <param name="tree">Рабочее дерево.</param>
+        /// <returns>Полученные данные.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public static string GetJson(WorkingTreeModel tree)
         {
             ArgumentNullException.ThrowIfNull(tree);
@@ -61,6 +67,18 @@ namespace Philadelphus.Core.Domain.Helpers
             return JsonSerializer.Serialize(exportDto, _options);
         }
 
+        /// <summary>
+        /// Преобразует .phjson в бизнес-модель.
+        /// </summary>
+        /// <param name="json">JSON-строка.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="repository">Репозиторий Чубушника.</param>
+        /// <param name="refreshProcess">Действие обновления описания процесса.</param>
+        /// <param name="refreshProgress">Действие обновления прогресса.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public static WorkingTreeModel ParseJson(
             string json, 
             IPhiladelphusRepositoryService service,

@@ -11,6 +11,9 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
 {
+    /// <summary>
+    /// Доменная модель рабочего дерева.
+    /// </summary>
     public class WorkingTreeModel : ShrubMemberBaseModel<WorkingTreeModel>, IPhiladelphusRepositoryMemberModel, IHavingOwnDataStorageModel, IOwnerModel, IContentModel
     {
         #region [ Fields ]
@@ -40,11 +43,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Уникальный идентификатор системного рабочего дерева
         /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         internal static Guid SystemBaseUuid { get => Guid.Parse("00000000-0000-0000-0000-0000002018ee"); }
 
         /// <summary>
         /// Недоступные (занятые) имена
         /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         public HashSet<string> UnavailableNames { get; } = new HashSet<string>();
 
         #endregion
@@ -201,9 +206,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Рабочее дерево
         /// </summary>
-        /// <param name="uuid"></param>
-        /// <param name="dataStorage"></param>
-        /// <param name="owner"></param>
+        /// <param name="uuid">Уникальный идентификатор.</param>
+        /// <param name="dataStorage">Хранилище данных.</param>
+        /// <param name="owner">Владелец.</param>
         internal WorkingTreeModel(
             Guid uuid,
             IDataStorageModel dataStorage,
@@ -230,8 +235,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Изменить хранилище данных (не реализовано)
         /// </summary>
         /// <param name="storage">Новое хранилище</param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public bool ChangeDataStorage(IDataStorageModel storage)
         {
             throw new NotImplementedException();
@@ -240,6 +245,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Получить все узлы рабочего дерева (рекурсивно)
         /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public IEnumerable<TreeNodeModel> GetAllNodesRecursive()
         {
             return ContentRoot?.GetAllNodesRecursive() ?? Enumerable.Empty<TreeNodeModel>();
@@ -248,6 +254,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Получить все листы рабочего дерева (рекурсивно)
         /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public IEnumerable<TreeLeaveModel> GetAllLeavesRecursive()
         {
             return ContentRoot?.GetAllLeavesRecursive() ?? Enumerable.Empty<TreeLeaveModel>();
@@ -290,6 +297,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected override bool ClearContentDetailed()
         {
             ContentRoot = null;

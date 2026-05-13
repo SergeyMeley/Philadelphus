@@ -6,6 +6,9 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.Philadelphus
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
+    /// <summary>
+    /// Доменная модель системного узла рабочего дерева.
+    /// </summary>
     public class SystemBaseTreeNodeModel : TreeNodeModel
     {
         private static Dictionary<Guid, SystemBaseType> _baseUuids = new Dictionary<Guid, SystemBaseType>()
@@ -17,6 +20,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             { Guid.Parse("00000000-0000-0000-0000-0000f1215a20"), SystemBaseType.FLOAT },
         };
 
+        /// <summary>
+        /// Тип.
+        /// </summary>
         public override SystemBaseType SystemBaseType { get; }
 
         internal SystemBaseTreeNodeModel(

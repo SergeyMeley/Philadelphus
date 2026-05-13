@@ -5,6 +5,9 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces
 {
+    /// <summary>
+    /// Задает контракт для работы с коллекции репозиториев Чубушника.
+    /// </summary>
     public interface IPhiladelphusRepositoryCollectionService
     {
         #region [ Props ]
@@ -18,6 +21,10 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
 
         #region [ Get + Load ]
 
+        /// <summary>
+        /// Получить коллекцию элементов коллекции заголовков репозиториев Чубушника.
+        /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public IEnumerable<PhiladelphusRepositoryHeaderModel> GetPhiladelphusRepositoryHeadersCollection();
 
         /// <summary>
@@ -25,7 +32,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="dataStorages">Хранилища данных</param>
         /// <param name="uuids">Уникальные идентификаторы</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public IEnumerable<PhiladelphusRepositoryModel> GetPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
 
         /// <summary>
@@ -33,7 +40,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="dataStorages">Хранилище данных</param>
         /// <param name="uuids">Уникальные идентификаторы</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public IEnumerable<PhiladelphusRepositoryModel> ForceLoadPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null);
 
         #endregion
@@ -54,8 +61,9 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Создать новый репозиторий
         /// </summary>
-        /// <param name="dataStorage"></param>
+        /// <param name="dataStorage">Хранилище данных.</param>
         /// <returns>Репозиторий</returns>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true);
 
         /// <summary>

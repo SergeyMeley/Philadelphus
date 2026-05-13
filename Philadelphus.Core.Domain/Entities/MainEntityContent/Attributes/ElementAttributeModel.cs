@@ -247,7 +247,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="owner">Владелец атрибута</param>
-        /// <param name="dbEntity">Сущность БД</param>
+        /// <param name="localUuid">Локальный уникальный идентификатор.</param>
+        /// <param name="localOwner">Локальный владелец.</param>
+        /// <param name="declaringUuid">Уникальный идентификатор объявления.</param>
+        /// <param name="declaringOwner">Владелец объявления.</param>
+        /// <param name="owningWorkingTree">Владеющее рабочее дерево.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ElementAttributeModel(
             Guid localUuid, 
             IAttributeOwnerModel localOwner, 
@@ -298,6 +305,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Сменить владельца
         /// </summary>
+        /// <param name="newOwner">Новый владелец.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public bool ChangeOwner(IOwnerModel newOwner)
         {
             ArgumentNullException.ThrowIfNull(newOwner);
@@ -309,7 +320,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// Добавить значение атрибута в коллекцию
         /// </summary>
         /// <param name="value">Значение</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool TryAddValueToValuesCollection(TreeLeaveModel value)
         {
             ArgumentNullException.ThrowIfNull(value);
@@ -327,7 +339,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// Исключить значение атрибута из коллекции
         /// </summary>
         /// <param name="value">Значение</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool TryRemoveValueFromValuesCollection(TreeLeaveModel value)
         {
             ArgumentNullException.ThrowIfNull(value);
@@ -344,7 +357,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Очистить коллекцию значений атрибута
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool ClearValuesCollection()
         {
             if (_isCollectionValue == false)
@@ -359,8 +372,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Получить копию для наследника
         /// </summary>
-        /// <param name="newOwner"></param>
-        /// <returns></returns>
+        /// <param name="newOwner">Новый владелец.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
         {
             ArgumentNullException.ThrowIfNull(newOwner);
@@ -412,7 +426,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <param name="elevationLevel">Уровень поднятия. Величина обратная к глубине наследования. 
         ///     elevationLevel = this.InheritanceDepth - targetParent.InheritanceDepth 
         ///     (0 - текущий владелец, 1 - ближайший родитель, int.Max - изначальный владелец)</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public ElementAttributeModel GetInheritedAttributeFromParent(int elevationLevel = 1)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(elevationLevel);
@@ -447,7 +461,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Попробовать получить унаследованный атрибут с родителя в процессе формирования дерева, пока у владельца еще нет родителя (без выбрасывания исключений)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         private ElementAttributeModel? TryGetInheritedAttributeFromParent()
         {
             if (IsOwn)

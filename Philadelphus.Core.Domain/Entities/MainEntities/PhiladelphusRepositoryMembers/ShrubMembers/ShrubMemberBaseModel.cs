@@ -193,7 +193,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Участник репозитория Чубушника
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
-        /// <param name="dbEntity">Сущность БД</param>
         internal ShrubMemberBaseModel(
             Guid uuid,
             IOwnerModel owner,
@@ -225,6 +224,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public virtual bool AddAttribute(ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
@@ -259,6 +260,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public virtual bool RemoveAttribute(ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
@@ -277,6 +280,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить атрибуты
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public virtual bool ClearAttributes()
         {
             lock (_lockObject)
@@ -291,7 +295,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Получить видимые атрибуты родителей
         /// </summary>
         /// <param name="viewer">Текущий элемент</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public IEnumerable<ElementAttributeModel> GetVisibleAttributesRecursive(IWorkingTreeMemberModel? viewer)
         {
             if (viewer == null) yield break;
@@ -368,6 +372,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool AddContent(IContentModel content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -389,6 +395,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool RemoveContent(IContentModel content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -409,6 +417,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearContent()
         {
             ClearAttributes();
@@ -419,6 +428,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected abstract bool ClearContentDetailed();
 
         #endregion

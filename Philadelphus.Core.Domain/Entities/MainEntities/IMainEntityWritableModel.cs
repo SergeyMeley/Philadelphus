@@ -19,7 +19,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Изменить статус
         /// </summary>
         /// <param name="newState">Новый статус</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         internal bool SetState(State newState);
 
         #endregion

@@ -25,6 +25,9 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Mapping
 {
+    /// <summary>
+    /// Методы расширения для AutoMapper.
+    /// </summary>
     public static class MappingExtensions
     {
         ///// <summary>
@@ -66,7 +69,7 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="dataStorage">Хранилище данных для маппинга</param>
         /// <param name="infrastructureRepositories">Репозитории БД</param>
         /// <param name="logger">Логгер</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static DataStorageModel MapDataStorage(
             this IMapper mapper,
             DataStorage dataStorage,
@@ -88,7 +91,9 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="mapper">Автомаппер</param>
         /// <param name="philadelphusRepositories">Репозитории для маппинга</param>
         /// <param name="dataStorages">Хранилища данных</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
         public static IEnumerable<PhiladelphusRepositoryModel> MapPhiladelphusRepositories(
             this IMapper mapper,
             IEnumerable<PhiladelphusRepository> philadelphusRepositories,
@@ -116,7 +121,9 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="workingTrees">Рабочие деревья для маппинга</param>
         /// <param name="dataStorages">Хранилища данных</param>
         /// <param name="owner">Владелец</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
         public static IEnumerable<WorkingTreeModel> MapWorkingTrees(
             this IMapper mapper,
             IEnumerable<WorkingTree> workingTrees,
@@ -142,7 +149,9 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="mapper">Автомаппер</param>
         /// <param name="treeRoot">Корень для маппинга</param>
         /// <param name="owner">Владелец</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
         public static TreeRootModel MapTreeRoot(
             this IMapper mapper,
             TreeRoot treeRoot,
@@ -167,7 +176,9 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="treeNodes">Узлы для маппинга</param>
         /// <param name="parents">Родители</param>
         /// <param name="owner">Владелец</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
         public static IEnumerable<TreeNodeModel> MapTreeNodes(
             this IMapper mapper,
             IEnumerable<TreeNode> treeNodes,
@@ -196,7 +207,9 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="treeLeaves">Листы для маппинга</param>
         /// <param name="parents">Родители</param>
         /// <param name="owner">Владелец</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
         public static IEnumerable<TreeLeaveModel> MapTreeLeaves(
             this IMapper mapper,
             IEnumerable<TreeLeave> treeLeaves,
@@ -224,10 +237,13 @@ namespace Philadelphus.Core.Domain.Mapping
         /// </summary>
         /// <param name="mapper">Автомаппер</param>
         /// <param name="attributes">Атрибуты для маппинга</param>
-        /// <param name="owners"></param>
+        /// <param name="owners">Коллекция владельцев.</param>
         /// <param name="valueTypesByUuid">Все типы данных атрибутов, сгруппированные по идентификатору</param>
         /// <param name="valuesByUuid">Все значения атрибутов, сгруппированные по идентификатору</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="owningWorkingTree">Владеющее рабочее дерево.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
         public static IEnumerable<ElementAttributeModel> MapAttributes(
             this IMapper mapper,
             IEnumerable<ElementAttribute> attributes,

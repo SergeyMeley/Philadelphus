@@ -188,7 +188,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="dataStorage">Хранилище данных</param>
-        /// <param name="dbEntity">Сущность БД</param>
         internal PhiladelphusRepositoryModel(
             Guid uuid, 
             IDataStorageModel dataStorage,
@@ -213,8 +212,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Изменить хранилище данных (не реализовано)
         /// </summary>
         /// <param name="storage">Новое хранилище</param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool ChangeDataStorage(IDataStorageModel storage)
         {
             ArgumentNullException.ThrowIfNull(storage);
@@ -226,6 +226,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Добавить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool AddContent(IContentModel content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -237,6 +239,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Удалить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool RemoveContent(IContentModel content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -247,6 +251,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearContent()
         {
             return false;

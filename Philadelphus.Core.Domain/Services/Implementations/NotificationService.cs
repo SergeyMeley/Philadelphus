@@ -80,6 +80,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         public int HistoryCapacity { get; set; } = int.MaxValue;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="NotificationService" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="consumerJoinedMessageConsumer">Потребитель сообщений о подключении потребителя.</param>
+        /// <param name="consumerJoinedMessageProducer">Производитель сообщений о подключении потребителя.</param>
+        /// <param name="mainConsumer">Основной потребитель сообщений.</param>
+        /// <param name="mainProducer">Основной производитель сообщений.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public NotificationService(
             ILogger logger,
             IMessageConsumer<MessagingUser> consumerJoinedMessageConsumer,
@@ -118,7 +128,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <param name="type">Тип уведомления</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendNotification<TCallerClass>(
             string text, 
             NotificationCriticalLevelModel criticalLevel,
@@ -160,7 +170,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendTextMessage<TCallerClass>(
             string text, 
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -182,7 +192,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendPopUpWindow<TCallerClass>(
             string text, 
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -204,7 +214,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendModalWindow<TCallerClass>(
             string text, 
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -226,7 +236,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendEmail<TCallerClass>(
             string text, 
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -248,7 +258,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendSms<TCallerClass>(
             string text, 
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -270,7 +280,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendCall<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -351,7 +361,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Уведомить об отсутствии обработчика
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         private bool SendMissHandlerNotification(string handlerName, string source)
         {
             var notification = new Notification(
@@ -470,6 +480,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Внутренний метод освобождения ресурсов
         /// </summary>
+        /// <param name="disposing">Признак вызова из Dispose.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)

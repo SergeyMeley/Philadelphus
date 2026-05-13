@@ -9,7 +9,7 @@
         /// Получить словарь свойств
         /// </summary>
         /// <param name="instance">Элемент</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static Dictionary<string, string> GetProperties(object instance)
         {
             if (instance == null)

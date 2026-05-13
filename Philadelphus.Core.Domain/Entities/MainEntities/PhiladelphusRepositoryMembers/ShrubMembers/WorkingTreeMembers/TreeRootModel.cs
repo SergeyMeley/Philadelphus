@@ -102,7 +102,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="owner">Владелец</param>
-        /// <param name="dbEntity">Сущность БД</param>
         internal TreeRootModel(
             Guid uuid,
             WorkingTreeModel owner,
@@ -128,6 +127,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool AddChild(IChildrenModel child)
         {
             ArgumentNullException.ThrowIfNull(child);
@@ -148,6 +149,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool RemoveChild(IChildrenModel child)
         {
             ArgumentNullException.ThrowIfNull(child);
@@ -169,6 +172,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить список наследников
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearChilds()
         {
             _childNodes.Clear();
@@ -197,6 +201,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected override bool ClearContentDetailed()
         {
             return true;

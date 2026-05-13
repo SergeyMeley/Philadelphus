@@ -22,17 +22,20 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Добавить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool AddChild(IChildrenModel child);
 
         /// <summary>
         /// Удалить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool RemoveChild(IChildrenModel child);
 
         /// <summary>
         /// Очистить список наследников
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearChilds();
     }
 }

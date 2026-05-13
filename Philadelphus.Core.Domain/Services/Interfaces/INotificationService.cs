@@ -67,7 +67,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
         /// <param name="type">Тип уведомления</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendNotification<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel,
@@ -81,7 +81,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendTextMessage<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -94,7 +94,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendPopUpWindow<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -107,7 +107,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendModalWindow<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -120,7 +120,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendEmail<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -133,7 +133,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendSms<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,
@@ -146,7 +146,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="text">Текст</param>
         /// <param name="criticalLevel">Уровень критичности</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SendCall<TCallerClass>(
             string text,
             NotificationCriticalLevelModel criticalLevel = NotificationCriticalLevelModel.Error,

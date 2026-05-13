@@ -181,7 +181,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// Запустить автоматическую проверку доступности всех репозиториев
         /// </summary>
         /// <param name="interval">Интервал проверки (сек.). Не рекомендуется устанавливать период менее 60 сек.</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool StartAvailableAutoChecking(int interval = 60)
         {
             if (_isHidden)
@@ -213,7 +213,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Проверить доступность всех репозиториев
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool CheckAvailable()
         {
             return CheckAvailableAsync().Result;
@@ -222,7 +222,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Проверить доступность всех репозиториев
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public Task<bool> CheckAvailableAsync()
         {
             var task = Task.Run(() =>
@@ -259,7 +259,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Остановить автоматическую проверку доступности
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool StopAvailableAutoChecking()
         {
             if (_isAutoChecking == false)
@@ -273,6 +273,9 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             return true;
         }
 
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             _timer?.Stop();

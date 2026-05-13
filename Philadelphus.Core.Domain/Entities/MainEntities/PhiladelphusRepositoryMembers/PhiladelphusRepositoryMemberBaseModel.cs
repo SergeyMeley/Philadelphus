@@ -14,6 +14,9 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers
 {
+    /// <summary>
+    /// Доменная модель репозитория Чубушника.
+    /// </summary>
     public abstract class PhiladelphusRepositoryMemberBaseModel<T> : MainEntityBaseModel<T>, IPhiladelphusRepositoryMemberModel, IContentModel
         where T : PhiladelphusRepositoryMemberBaseModel<T>
     {
@@ -125,6 +128,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Сменить родителя
         /// </summary>
+        /// <param name="newOwner">Новый владелец.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public bool ChangeOwner(IOwnerModel newOwner)
         {
             ArgumentNullException.ThrowIfNull(newOwner);

@@ -10,8 +10,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления информации аудита.
+    /// </summary>
     public class AuditInfoMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="AuditInfoMappingProfile" />.
+        /// </summary>
         public AuditInfoMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

@@ -19,7 +19,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Получить коллекцию хранилищ данных
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="getInfrastructureRepository">Функция получения инфраструктурного репозитория.</param>
         public IEnumerable<IDataStorageModel> GetStoragesModels(
             Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository);
 
@@ -36,7 +37,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// </summary>
         /// <param name="storagesConfigFullPath">Путь к настроечному файлу хранилищ данных</param>
         /// <param name="repositoryHeadersConfigFullPath">Путь к настроечному файлу запусков репозиториев</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="basePath">Базовый путь.</param>
         public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo basePath);
 
         /// <summary>
@@ -45,8 +47,9 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="name">Наименование</param>
         /// <param name="desctiption">Описание</param>
         /// <param name="connectionString">Строка подключенияя</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="getInfrastructureRepository">Функция получения инфраструктурного репозитория.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringsContainer connectionString,
             Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository);
 

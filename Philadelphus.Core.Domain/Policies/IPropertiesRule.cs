@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.Policies
 {
+    /// <summary>
+    /// Задает контракт для правил чтения и записи значений свойств.
+    /// </summary>
     public interface IPropertiesRule<T>
     {
         bool CanRead(ElementAttributeModel model, string prop, object value);

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.Enums
 {
+    /// <summary>
+    /// Перечисляет варианты VisibilityScope.
+    /// </summary>
     public enum VisibilityScope
     {
         [Display(Name = "Ошибка системы")]
@@ -24,9 +27,18 @@ namespace Philadelphus.Core.Domain.Entities.Enums
         InternalProtected 
     }
 
+    /// <summary>
+    /// Представляет объект VisibilityScopeItem.
+    /// </summary>
     public class VisibilityScopeItem
     {
+        /// <summary>
+        /// Отображаемое наименование.
+        /// </summary>
         public string DisplayName { get; set; }
+        /// <summary>
+        /// Значение.
+        /// </summary>
         public VisibilityScope Value { get; set; }
     }
 }

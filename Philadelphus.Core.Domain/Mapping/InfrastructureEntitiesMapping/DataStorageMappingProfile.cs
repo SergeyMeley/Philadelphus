@@ -14,8 +14,14 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления хранилища данных.
+    /// </summary>
     public class DataStorageMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DataStorageMappingProfile" />.
+        /// </summary>
         public DataStorageMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

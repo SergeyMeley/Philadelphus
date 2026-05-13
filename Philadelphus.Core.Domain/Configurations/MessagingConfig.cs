@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Configurations
 {
+    /// <summary>
+    /// Конфигурация MessagingConfig.
+    /// </summary>
     public class MessagingConfig
     {
         /// <summary>

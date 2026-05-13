@@ -34,6 +34,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ General Properties ]
 
+        /// <summary>
+        /// Тип.
+        /// </summary>
         public virtual SystemBaseType SystemBaseType { get => SystemBaseType.USER_DEFINED; }
 
         #endregion
@@ -128,7 +131,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="parent">Родительский узел или корень Чубушника</param>
-        /// <param name="dbEntity">Сущность БД</param>
         internal TreeNodeModel(
             Guid uuid,
             IParentModel parent,
@@ -156,6 +158,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Сменить родителя
         /// </summary>
+        /// <param name="newParent">Новый родительский элемент.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public bool ChangeParent(IParentModel newParent)
         {
             ArgumentNullException.ThrowIfNull(newParent);
@@ -167,6 +173,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool AddChild(IChildrenModel child)
         {
             ArgumentNullException.ThrowIfNull(child);
@@ -193,6 +201,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool RemoveChild(IChildrenModel child)
         {
             ArgumentNullException.ThrowIfNull(child);
@@ -221,6 +231,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить список наследников
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearChilds()
         {
             _childNodes.Clear();
@@ -243,6 +254,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected override bool RemoveContentDetailed(IContentModel content)
         {
             return true;
@@ -251,6 +263,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected override bool ClearContentDetailed()
         {
             return true;

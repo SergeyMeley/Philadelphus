@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
 {
+    /// <summary>
+    /// Задает контракт для правила свойств атрибутов.
+    /// </summary>
     public interface IAttributePropertiesRule<T>
     {
         bool CanRead(T model, string prop);

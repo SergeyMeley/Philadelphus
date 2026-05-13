@@ -97,7 +97,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="dataStorage">Собственное хранилище данных</param>
         /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
         /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public WorkingTreeModel CreateWorkingTree(
             PhiladelphusRepositoryModel owner, 
             IDataStorageModel dataStorage, 
@@ -110,7 +110,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="owner">Владелец</param>
         /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
         /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public TreeRootModel CreateTreeRoot(
             WorkingTreeModel owner, 
             bool needAutoName = true, 
@@ -122,7 +122,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="parentElement">Родитель</param>
         /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
         /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public TreeNodeModel CreateTreeNode(
             IParentModel parentElement, 
             bool needAutoName = true,
@@ -134,7 +134,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="parentElement">Родитель</param>
         /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
         /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public TreeLeaveModel CreateTreeLeave(
             TreeNodeModel parentElement,
             bool needAutoName = true, 
@@ -146,7 +146,7 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <param name="owner">Владелец атрибута</param>
         /// <param name="needAutoName">Потребность в автоматической генерации наименования</param>
         /// <param name="withoutInfoNotifications">Отключить уведомления о создании</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public ElementAttributeModel CreateElementAttribute(
             IAttributeOwnerModel owner, 
             bool needAutoName = true,
@@ -163,8 +163,8 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         /// <summary>
         /// Удалить элемент рабочего кустарника (мягко)
         /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
+        /// <param name="element">Элемент.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public bool SoftDeleteShrubMember(
             IContentModel element);
 

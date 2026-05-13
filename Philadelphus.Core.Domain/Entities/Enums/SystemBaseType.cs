@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.Enums
 {
+    /// <summary>
+    /// Перечисляет варианты SystemBaseType.
+    /// </summary>
     public enum SystemBaseType  // НЕ МЕНЯТЬ НУМЕРАЦИЮ
     {
         USER_DEFINED = 0,

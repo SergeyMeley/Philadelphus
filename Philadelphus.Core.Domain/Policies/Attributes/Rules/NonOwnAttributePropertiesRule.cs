@@ -41,17 +41,34 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
 
         private static readonly Dictionary<(Type, string), Func<object, object>> _propertyGetters = new();
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="NonOwnAttributePropertiesRule" />.
+        /// </summary>
+        /// <param name="notificationService">Сервис уведомлений.</param>
         public NonOwnAttributePropertiesRule(
             INotificationService notificationService)
         {
             _notificationService = notificationService;
         }
 
+        /// <summary>
+        /// Признак доступности чтения.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <param name="prop">Свойство.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool CanRead(ElementAttributeModel model, string prop)
         {
             return true;
         }
 
+        /// <summary>
+        /// Признак доступности записи.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <param name="prop">Свойство.</param>
+        /// <param name="value">Значение.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool CanWrite(ElementAttributeModel model, string prop, object value)
         {
             if (prop == nameof(model.IsOwn))
@@ -81,6 +98,13 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             return result;
         }
 
+        /// <summary>
+        /// Выполняет операцию OnRead.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <param name="prop">Свойство.</param>
+        /// <param name="value">Значение.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public object OnRead(ElementAttributeModel model, string prop, object value)
         {
             if (prop == nameof(model.IsOwn))
@@ -102,6 +126,13 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             return value;
         }
 
+        /// <summary>
+        /// Выполняет операцию OnWrite.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <param name="prop">Свойство.</param>
+        /// <param name="oldValue">Предыдущее значение.</param>
+        /// <param name="newValue">Новое значение.</param>
         public void OnWrite(ElementAttributeModel model, string prop, object oldValue, object newValue) 
         { 
         }

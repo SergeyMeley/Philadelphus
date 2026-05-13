@@ -81,26 +81,26 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Проверить доступность
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool CheckAvailable();
 
         /// <summary>
         /// Проверить доступность
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public Task<bool> CheckAvailableAsync();
 
         /// <summary>
         /// Запустить автоматическую проверку доступности
         /// </summary>
         /// <param name="interval">Интервал проверки (сек.). Не рекомендуется устанавливать период менее 60 сек.</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool StartAvailableAutoChecking(int interval);
 
         /// <summary>
         /// Остановить автоматическую проверку доступности
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public bool StopAvailableAutoChecking();
     }
 }

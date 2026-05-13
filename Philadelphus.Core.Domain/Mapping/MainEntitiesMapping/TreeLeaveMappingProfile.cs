@@ -17,8 +17,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления листа рабочего дерева.
+    /// </summary>
     public class TreeLeaveMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeLeaveMappingProfile" />.
+        /// </summary>
         public TreeLeaveMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

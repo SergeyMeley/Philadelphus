@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления заголовка репозитория Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryHeaderMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryHeaderMappingProfile" />.
+        /// </summary>
         public PhiladelphusRepositoryHeaderMappingProfile()
         {
             // Модель бизнес-слоя => Сущность инфраструктуры

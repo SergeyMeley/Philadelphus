@@ -31,6 +31,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ General Properties ]
 
+        /// <summary>
+        /// Тип.
+        /// </summary>
         public virtual SystemBaseType SystemBaseType { get => SystemBaseType.USER_DEFINED; }
 
         #endregion
@@ -76,7 +79,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="parent">Родительский узел Чубушника</param>
-        /// <param name="dbEntity">Сущность БД</param>
         internal TreeLeaveModel(
             Guid uuid,
             TreeNodeModel parent,
@@ -100,6 +102,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Сменить родителя
         /// </summary>
+        /// <param name="newParent">Новый родительский элемент.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool ChangeParent(IParentModel newParent)
         {
             ArgumentNullException.ThrowIfNull(newParent);
@@ -128,6 +133,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected override bool ClearContentDetailed()
         {
             return true;

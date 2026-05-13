@@ -26,17 +26,20 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Добавить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool AddContent(IContentModel content);
 
         /// <summary>
         /// Удалить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool RemoveContent(IContentModel content);
 
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearContent();
     }
 }

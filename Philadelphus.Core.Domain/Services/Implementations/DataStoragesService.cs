@@ -39,9 +39,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="mapper">Автомаппер</param>
         /// <param name="logger">Сервис логгирования</param>
         /// <param name="notificationService">Сервис уведомлений</param>
-        /// <param name="applicationSettings"></param>
-        /// <param name="connectionStringsCollection"></param>
-        /// <param name="dataStoragesCollection"></param>
+        /// <param name="applicationSettings">Настройки приложения.</param>
+        /// <param name="connectionStringsCollection">Коллекция строк подключения.</param>
+        /// <param name="dataStoragesCollection">Коллекция хранилищ данных.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public DataStoragesService(
             IMapper mapper,
             ILogger logger,
@@ -74,7 +75,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Получить коллекцию хранилищ данных
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <param name="getInfrastructureRepository">Функция получения инфраструктурного репозитория.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public IEnumerable<IDataStorageModel> GetStoragesModels(
             Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
@@ -127,9 +131,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Создать основное хранилище данных
         /// </summary>
-        /// <param name="storagesConfigFullPath">Путь к настроечному файлу хранилищ данных</param>
-        /// <param name="repositoryHeadersConfigFullPath">Путь к настроечному файлу запусков репозиториев</param>
-        /// <returns></returns>
+        /// <param name="basePath">Базовый путь.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public IDataStorageModel CreateMainDataStorageModel(DirectoryInfo basePath)
         {
             ArgumentNullException.ThrowIfNull(basePath);
@@ -166,9 +171,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="name">Наименование</param>
         /// <param name="desctiption">Описание</param>
         /// <param name="connectionString">Строка подключенияя</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public IDataStorageModel CreateDataStorageModel(string name, string desctiption, ConnectionStringsContainer connectionString,
+        /// <param name="getInfrastructureRepository">Функция получения инфраструктурного репозитория.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
+        public IDataStorageModel CreateDataStorageModel(
+            string name, 
+            string desctiption, 
+            ConnectionStringsContainer connectionString,
             Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name);

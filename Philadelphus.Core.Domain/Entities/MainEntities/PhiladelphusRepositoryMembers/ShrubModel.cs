@@ -16,6 +16,9 @@ using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers
 {
+    /// <summary>
+    /// Доменная модель кустарника рабочих деревьев.
+    /// </summary>
     public class ShrubModel : PhiladelphusRepositoryMemberBaseModel<ShrubModel>, IOwnerModel, IContentModel
     {
         #region [ Fields ]
@@ -130,7 +133,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Рабочий кустарник
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
-        /// <param name="dbEntity">Сущность БД</param>
         /// <param name="owner">Владелец</param>
         internal ShrubModel(
             Guid uuid,
@@ -154,6 +156,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Добавить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool AddContent(IContentModel content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -175,6 +179,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Удалить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool RemoveContent(IContentModel content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -196,6 +202,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Очистить содержимое
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearContent()
         {
             ContentWorkingTrees.Clear();

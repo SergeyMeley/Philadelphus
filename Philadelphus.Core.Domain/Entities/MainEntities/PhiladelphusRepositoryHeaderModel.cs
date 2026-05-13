@@ -185,6 +185,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Заголовок репозитория Чубушника
         /// </summary>
+        /// <param name="uuid">Уникальный идентификатор.</param>
         internal PhiladelphusRepositoryHeaderModel(Guid uuid)
         {
             Uuid = uuid;

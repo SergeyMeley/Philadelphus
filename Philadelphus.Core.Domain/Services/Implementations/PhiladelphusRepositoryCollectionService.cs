@@ -48,8 +48,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="logger">Логгер</param>
         /// <param name="notificationService">Сервис уведомлений</param>
         /// <param name="PhiladelphusRepositoryService">Сервис работы с репозиторием и его элементами</param>
-        /// <param name="applicationSettings"></param>
-        /// <param name="philadelphusRepositoryHeadersCollection"></param>
+        /// <param name="applicationSettings">Настройки приложения.</param>
+        /// <param name="philadelphusRepositoryHeadersCollection">Коллекция заголовков репозиториев Чубушника.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryCollectionService(
             IMapper mapper,
             ILogger logger,
@@ -95,6 +96,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="dataStorages">Коллекция хранилищ</param>
         /// <param name="uuids">UUIDs</param>
         /// <returns>Коллекция репозиториев (модели)</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public IEnumerable<PhiladelphusRepositoryModel> GetPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null)
         {
             ArgumentNullException.ThrowIfNull(dataStorages);
@@ -109,9 +111,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Загрузка коллекции репозиториев (модели) по их UUID из заданной коллекции хранилищ
         /// </summary>
-        /// <param name="dataStorages"></param>
-        /// <param name="uuids"></param>
-        /// <returns></returns>
+        /// <param name="dataStorages">Коллекция хранилищ данных.</param>
+        /// <param name="uuids">Уникальные идентификаторы.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public IEnumerable<PhiladelphusRepositoryModel> ForceLoadPhiladelphusRepositoriesCollection(IEnumerable<IDataStorageModel> dataStorages, Guid[] uuids = null)
         {
             ArgumentNullException.ThrowIfNull(dataStorages);
@@ -152,6 +155,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns>Количество сохраненных изменений</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public long SaveChanges(ref PhiladelphusRepositoryModel repository)
         {
             ArgumentNullException.ThrowIfNull(repository);
@@ -170,6 +174,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="dataStorage">Хранилище данных</param>
         /// <returns>Репозиторий</returns>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryModel CreateNewPhiladelphusRepository(IDataStorageModel dataStorage, bool needAutoName = true)
         {
             ArgumentNullException.ThrowIfNull(dataStorage);
@@ -195,6 +201,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="philadelphusRepositoryModel">Репозиторий</param>
         /// <returns>Заголовок репозитория</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryHeaderModel CreatePhiladelphusRepositoryHeaderFromPhiladelphusRepository(PhiladelphusRepositoryModel philadelphusRepositoryModel)
         {
             ArgumentNullException.ThrowIfNull(philadelphusRepositoryModel);
@@ -214,6 +221,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="path">Путь к репозиторию</param>
         /// <returns>Коллекция репозиториев</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public IEnumerable<PhiladelphusRepositoryModel> AddExistPhiladelphusRepository(DirectoryInfo path)
         {
             ArgumentNullException.ThrowIfNull(path);

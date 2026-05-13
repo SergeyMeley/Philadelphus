@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.Enums
 {
+    /// <summary>
+    /// Перечисляет варианты SaveMode.
+    /// </summary>
     public enum SaveMode
     {
         OnlyHeader,

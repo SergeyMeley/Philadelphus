@@ -51,7 +51,10 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
         /// Уведомление
         /// </summary>
         /// <param name="text">Текст уведомления</param>
+        /// <param name="sendingUser">Пользователь-отправитель.</param>
+        /// <param name="source">Исходный объект.</param>
         /// <param name="criticalLevel">Уровень критичности уведомления</param>
+        /// <param name="notificationType">Тип уведомления.</param>
         public Notification(
             string text, 
             MessagingUser sendingUser,
@@ -66,6 +69,10 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
             NotificationType = notificationType;
         }
 
+        /// <summary>
+        /// Выполняет операцию ToString.
+        /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         public override string ToString()
         {
             return $"" +

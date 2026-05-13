@@ -23,7 +23,7 @@ namespace Philadelphus.Core.Domain.Helpers
         /// </summary>
         /// <param name="fixedPartOfName">Фиксированная часть наименования</param>
         /// <param name="existNames">Коллекция занятых наименований</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static string GetNewName(string fixedPartOfName = "Новое наименование")
         {
             if (_indexesByFixedParts.ContainsKey(fixedPartOfName) == false)
@@ -58,7 +58,7 @@ namespace Philadelphus.Core.Domain.Helpers
         /// Проверить доступность наименования
         /// </summary>
         /// <param name="name">Наименование для проверки</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static bool CheckName(string name)
         {
             return ExistNames.Any(x => x == name) == false;
@@ -68,7 +68,7 @@ namespace Philadelphus.Core.Domain.Helpers
         /// Добавить занятые наименования
         /// </summary>
         /// <param name="existNames">Наименования</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static bool AddExistNames(IEnumerable<string> existNames)
         {
             foreach (string name in existNames?.Where(x => ExistNames.Contains(x) == false))

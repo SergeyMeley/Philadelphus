@@ -33,24 +33,27 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Добавить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool AddAttribute(ElementAttributeModel attribute);
 
         /// <summary>
         /// Удалить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool RemoveAttribute(ElementAttributeModel attribute);
 
         /// <summary>
         /// Очистить атрибуты
         /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearAttributes();
 
         /// <summary>
         /// Получить видимые атрибуты родителей
         /// </summary>
         /// <param name="viewer">Текущий элемент</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public IEnumerable<ElementAttributeModel> GetVisibleAttributesRecursive(IWorkingTreeMemberModel? viewer);
 
         /// <summary>

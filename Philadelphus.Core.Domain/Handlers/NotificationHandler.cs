@@ -5,7 +5,6 @@ namespace Philadelphus.Core.Domain.Handlers
     /// <summary>
     /// Обработчик уведомления
     /// </summary>
-    /// <param name="notification"></param>
-    /// <returns></returns>
+    /// <param name="notification">Уведомление.</param>
     public delegate bool NotificationHandler(Notification notification);
 }

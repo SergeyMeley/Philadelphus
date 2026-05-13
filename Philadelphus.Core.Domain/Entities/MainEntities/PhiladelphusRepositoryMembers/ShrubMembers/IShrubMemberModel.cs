@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
 {
+    /// <summary>
+    /// Задает контракт для работы с участника кустарника.
+    /// </summary>
     public interface IShrubMemberModel : IPhiladelphusRepositoryMemberModel, IAttributeOwnerModel, IOwnerModel, IContentModel, ISequencableModel
     {
         #region [ Properties ] 

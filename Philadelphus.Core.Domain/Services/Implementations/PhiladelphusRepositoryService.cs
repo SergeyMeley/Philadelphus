@@ -42,6 +42,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="mapper">Автомаппер</param>
         /// <param name="logger">Сервис логгирования</param>
         /// <param name="notificationService">Сервис уведомлений</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryService(
             IMapper mapper,
             ILogger logger,
@@ -65,6 +66,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="repository">Репозиторий</param>
         /// <returns>Репозиторий с содержимым</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public PhiladelphusRepositoryModel GetShrubContent(PhiladelphusRepositoryModel repository)
         {
             ArgumentNullException.ThrowIfNull(repository);
@@ -92,6 +95,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="repository">Репозиторий</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Репозиторий с содержимым</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public Task<PhiladelphusRepositoryModel> GetShrubContentAsync(
             PhiladelphusRepositoryModel repository,
             CancellationToken cancellationToken = default)
@@ -117,6 +121,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <param name="repository">Репозиторий</param>
         /// <param name="saveMode">Параметры сохранения</param>
         /// <returns>Количество сохраненных изменений</returns>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public long SaveChanges(ref PhiladelphusRepositoryModel repository, SaveMode saveMode)
         {
             // Проверка исходных данных
@@ -533,8 +538,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="owner">Родитель</param>
         /// <param name="dataStorage">Хранилище</param>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
+        /// <param name="withoutInfoNotifications">Признак отключения информационных уведомлений.</param>
         /// <returns>Корень</returns>
-        public WorkingTreeModel CreateWorkingTree(PhiladelphusRepositoryModel owner, IDataStorageModel dataStorage, bool needAutoName = true, bool withoutInfoNotifications = false)
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public WorkingTreeModel CreateWorkingTree(
+            PhiladelphusRepositoryModel owner, 
+            IDataStorageModel dataStorage, 
+            bool needAutoName = true,
+            bool withoutInfoNotifications = false)
         {
             ArgumentNullException.ThrowIfNull(owner);
             ArgumentNullException.ThrowIfNull(dataStorage);
@@ -590,7 +602,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// </summary>
         /// <param name="parentElement">Родитель</param>
         /// <param name="dataStorage">Хранилище</param>
+        /// <param name="owner">Владелец.</param>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
+        /// <param name="withoutInfoNotifications">Признак отключения информационных уведомлений.</param>
         /// <returns>Корень</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public TreeRootModel CreateTreeRoot(WorkingTreeModel owner, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             ArgumentNullException.ThrowIfNull(owner);
@@ -639,7 +655,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Создать узел и добавить родителю
         /// </summary>
         /// <param name="parent">Родитель</param>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
+        /// <param name="withoutInfoNotifications">Признак отключения информационных уведомлений.</param>
         /// <returns>Узел</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public TreeNodeModel CreateTreeNode(IParentModel parent, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             ArgumentNullException.ThrowIfNull(parent);
@@ -689,7 +708,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Создать лист и добавить родителю
         /// </summary>
         /// <param name="parent">Родитель</param>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
+        /// <param name="withoutInfoNotifications">Признак отключения информационных уведомлений.</param>
         /// <returns>Лист</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public TreeLeaveModel CreateTreeLeave(TreeNodeModel parent, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             ArgumentNullException.ThrowIfNull(parent);
@@ -753,7 +775,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Создать атрибут и добавить владельцу
         /// </summary>
         /// <param name="owner">Владелец</param>
+        /// <param name="needAutoName">Признак необходимости автоматической генерации наименования.</param>
+        /// <param name="withoutInfoNotifications">Признак отключения информационных уведомлений.</param>
         /// <returns>Атрибут</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ElementAttributeModel CreateElementAttribute(IAttributeOwnerModel owner, bool needAutoName = true, bool withoutInfoNotifications = false)
         {
             ArgumentNullException.ThrowIfNull(owner);
@@ -834,7 +859,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// Мягкое удаление элемента репозитория
         /// </summary>
         /// <param name="element">Элемент</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool SoftDeleteShrubMember(IContentModel element)
         {
             ArgumentNullException.ThrowIfNull(element);
