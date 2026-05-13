@@ -6,9 +6,21 @@ using System.Text.RegularExpressions;
 
 namespace Philadelphus.Core.Domain.TablesExport.Helpers
 {
+    /// <summary>
+    /// Строитель пути экспорта отчета.
+    /// </summary>
     internal static class TablesExportPathBuilder
     {
-        public static string BuildExportPath(string reportName, string extension)
+        /// <summary>
+        /// Построить путь.
+        /// </summary>
+        /// <param name="reportName">Наименование отчета.</param>
+        /// <param name="extension">Расширение.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
+        public static string BuildExportPath(
+            string reportName, 
+            string extension)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(reportName);
             ArgumentException.ThrowIfNullOrWhiteSpace(extension);

@@ -7,17 +7,30 @@ using System.Text;
 
 namespace Philadelphus.Core.Domain.TablesExport.Factories
 {
+    /// <summary>
+    /// Фабрика создания экспорта таблиц.
+    /// </summary>
     public sealed class TablesExportServiceFactory : ITablesExportServiceFactory
     {
         private readonly INotificationService _notificationService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TablesExportServiceFactory" />.
+        /// </summary>
+        /// <param name="notificationService">Сервис уведомлений.</param>
         public TablesExportServiceFactory(
             INotificationService notificationService)
         {
             _notificationService = notificationService;
         }
 
-        public ITablesExportService Create(TablesExportFormat format)
+        /// <summary>
+        /// Создает объект.
+        /// </summary>
+        /// <param name="format">Формат.</param>
+        /// <returns>Созданный объект.</returns>
+        public ITablesExportService Create(
+            TablesExportFormat format)
         {
             switch (format)
             {

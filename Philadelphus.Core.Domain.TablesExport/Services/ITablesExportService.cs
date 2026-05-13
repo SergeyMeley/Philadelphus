@@ -28,7 +28,7 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
         /// <param name="columns">Колонки таблицы</param>
         /// <param name="reportName">Наименование отчета</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         Task<string> ExportAsync<T>(
             IAsyncEnumerable<T> data,
             IReadOnlyList<TableExportColumn<T>> columns,

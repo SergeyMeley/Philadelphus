@@ -31,6 +31,7 @@ namespace Philadelphus.Core.Domain.TablesExport.Services
         /// Сервис экспорта таблиц в файл
         /// </summary>
         /// <param name="notificationService">Сервис уведомлений</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public JsonTablesExportService(
             INotificationService notificationService)
         {
