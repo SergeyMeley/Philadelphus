@@ -2,8 +2,14 @@
 
 namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
 {
+    /// <summary>
+    /// Задает контракт для работы с основной сущностью.
+    /// </summary>
     public interface IMainEntity
     {
+        /// <summary>
+        /// Уникальный идентификатор.
+        /// </summary>
         public Guid Uuid { get; set; }
 
         /// <summary>
@@ -15,8 +21,20 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
         /// Описание
         /// </summary>
         public string? Description { get; set; }
+        
+        /// <summary>
+        /// Порядковый номер.
+        /// </summary>
         public long? Sequence { get; set; }
+        
+        /// <summary>
+        /// Псевдоним.
+        /// </summary>
         public string? Alias { get; set; }
+       
+        /// <summary>
+        /// Пользовательский код.
+        /// </summary>
         public string? CustomCode { get; set; }
 
         /// <summary>
