@@ -10,10 +10,21 @@ using System.IO;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 {
+    /// <summary>
+    /// Репозиторий доступа к данным отчета.
+    /// </summary>
     public class SqliteEfReportsInfrastructureRepository : SqliteEfInfrastructureRepositoryBase<SqliteEfReportsContext>, IReportsInfrastructureRepository
     {
+        /// <summary>
+        /// Группа инфраструктурных сущностей.
+        /// </summary>
         public override InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.Reports; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="SqliteEfReportsInfrastructureRepository" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="connectionString">Строка подключения.</param>
         public SqliteEfReportsInfrastructureRepository(
             ILogger logger,
             string connectionString)
@@ -32,6 +43,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
             };
         }
 
+        /// <summary>
+        /// Получает данные отчета.
+        /// </summary>
+        /// <param name="schemaName">Имя схемы.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
         public async Task<List<ReportInfo>> GetAvailableReportsAsync(string schemaName)
         {
             var reports = new List<ReportInfo>();
@@ -40,6 +56,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
             return reports;
         }
 
+        /// <summary>
+        /// Выполняет операцию отчета.
+        /// </summary>
+        /// <param name="report">Отчет.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
         public async Task<DataTable> ExecuteReportAsync(ReportInfo report)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -87,6 +108,12 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
             return result;
         }
 
+        /// <summary>
+        /// Выполняет операцию RefreshMaterializedViewAsync.
+        /// </summary>
+        /// <param name="report">Отчет.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public async Task RefreshMaterializedViewAsync(ReportInfo report)
         {
             // Для SQLite "материализованные представления" - это таблицы, созданные через CREATE TABLE AS SELECT

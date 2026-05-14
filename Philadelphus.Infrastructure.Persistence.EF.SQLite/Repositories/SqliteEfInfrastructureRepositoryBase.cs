@@ -5,6 +5,9 @@ using Serilog;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 {
+    /// <summary>
+    /// Представляет объект инфраструктурного репозитория.
+    /// </summary>
     public abstract class SqliteEfInfrastructureRepositoryBase<TContext> : EfInfrastructureRepositoryBase<TContext>
         where TContext : DbContext
     {

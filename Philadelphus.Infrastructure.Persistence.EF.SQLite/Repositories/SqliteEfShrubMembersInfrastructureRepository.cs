@@ -9,10 +9,21 @@ using Serilog;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 {
+    /// <summary>
+    /// Репозиторий доступа к данным участника кустарника.
+    /// </summary>
     public class SqliteEfShrubMembersInfrastructureRepository : SqliteEfInfrastructureRepositoryBase<SqliteEfShrubMembersContext>, IShrubMembersInfrastructureRepository
     {
+        /// <summary>
+        /// Группа инфраструктурных сущностей.
+        /// </summary>
         public override InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.ShrubMembers; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="SqliteEfShrubMembersInfrastructureRepository" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="connectionString">Строка подключения.</param>
         public SqliteEfShrubMembersInfrastructureRepository(
             ILogger logger,
             string connectionString)
@@ -37,6 +48,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 
         #region [ Select ]
 
+        /// <summary>
+        /// Выполняет операцию SelectTreeAggregates.
+        /// </summary>
+        /// <param name="uuids">Уникальные идентификаторы.</param>
+        /// <returns>Коллекция полученных данных.</returns>
         public IEnumerable<WorkingTree> SelectTreeAggregates(Guid[]? uuids = null)
             => SelectWorkingTreeAggregates(uuids);
 
@@ -44,18 +60,43 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 
         #region [ Insert ]
 
+        /// <summary>
+        /// Выполняет операцию InsertTrees.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long InsertTrees(IEnumerable<WorkingTree> items)
             => Insert(items);
 
+        /// <summary>
+        /// Выполняет операцию InsertRoots.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long InsertRoots(IEnumerable<TreeRoot> items)
             => Insert(items);
 
+        /// <summary>
+        /// Выполняет операцию InsertNodes.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long InsertNodes(IEnumerable<TreeNode> items)
             => Insert(items);
 
+        /// <summary>
+        /// Выполняет операцию InsertLeaves.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long InsertLeaves(IEnumerable<TreeLeave> items)
             => Insert(items);
 
+        /// <summary>
+        /// Выполняет операцию InsertAttributes.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long InsertAttributes(IEnumerable<ElementAttribute> items)
             => Insert(items);
 
@@ -63,18 +104,43 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 
         #region [ Update ]
 
+        /// <summary>
+        /// Обновляет данные UpdateTrees.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long UpdateTrees(IEnumerable<WorkingTree> items)
             => Update(items);
 
+        /// <summary>
+        /// Обновляет данные UpdateRoots.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long UpdateRoots(IEnumerable<TreeRoot> items)
             => Update(items);
 
+        /// <summary>
+        /// Обновляет данные UpdateNodes.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long UpdateNodes(IEnumerable<TreeNode> items)
             => Update(items);
 
+        /// <summary>
+        /// Обновляет данные UpdateLeaves.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long UpdateLeaves(IEnumerable<TreeLeave> items)
             => Update(items);
 
+        /// <summary>
+        /// Обновляет данные UpdateAttributes.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long UpdateAttributes(IEnumerable<ElementAttribute> items)
             => Update(items);
 
@@ -82,18 +148,43 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 
         #region [ Delete ]
 
+        /// <summary>
+        /// Выполняет операцию SoftDeleteTrees.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long SoftDeleteTrees(IEnumerable<WorkingTree> items)
             => SoftDelete(items);
 
+        /// <summary>
+        /// Выполняет операцию SoftDeleteRoots.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long SoftDeleteRoots(IEnumerable<TreeRoot> items)
             => SoftDelete(items);
 
+        /// <summary>
+        /// Выполняет операцию SoftDeleteNodes.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long SoftDeleteNodes(IEnumerable<TreeNode> items)
             => SoftDelete(items);
 
+        /// <summary>
+        /// Выполняет операцию SoftDeleteLeaves.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long SoftDeleteLeaves(IEnumerable<TreeLeave> items)
             => SoftDelete(items);
 
+        /// <summary>
+        /// Выполняет операцию SoftDeleteAttributes.
+        /// </summary>
+        /// <param name="items">Коллекция элементов.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public long SoftDeleteAttributes(IEnumerable<ElementAttribute> items)
             => SoftDelete(items);
 
