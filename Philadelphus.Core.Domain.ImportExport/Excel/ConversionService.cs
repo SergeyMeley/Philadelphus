@@ -16,10 +16,17 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
     public class ConversionService
     {
         private readonly IExcelDataTypeDetector _dataTypeDetector;
+        private readonly IExcelImportSourceReader _sourceReader;
+        private readonly IExcelImportInheritanceResolver _inheritanceResolver;
 
-        public ConversionService(IExcelDataTypeDetector dataTypeDetector)
+        public ConversionService(
+            IExcelDataTypeDetector dataTypeDetector,
+            IExcelImportSourceReader sourceReader,
+            IExcelImportInheritanceResolver inheritanceResolver)
         {
             _dataTypeDetector = dataTypeDetector;
+            _sourceReader = sourceReader;
+            _inheritanceResolver = inheritanceResolver;
         }
 
         // Эмуляция получения корней из хранилища "Чубушник"
@@ -76,6 +83,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             string finalRootName = createNewRoot ? rootNameInput : rootNameInput;
             // Примечание: если createNewRoot = false, rootNameInput приходит из ComboBox (выбранный существующий корень)
 
+            if (importProfiles != null
+                && importProfiles.Count > 0
+                && importProfiles.Any(x => x.Relation.HasParent))
+            {
+                return ProcessFileWithRelations(filePath, finalRootName, excelFileName, importProfiles);
+            }
+
             var root = new TreeRootExportDTO(finalRootName, $"Импортировано из книги «{excelFileName}»");
 
             var jsonObject = new WorkingTreeExportDTO(root.Name, root);
@@ -83,10 +97,11 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             using (var workbook = new XLWorkbook(filePath))
             {
                 var allNodes = new List<TreeNodeExportDTO>();
+                var rootAttributes = new Dictionary<string, AttributeExportDTO>(StringComparer.OrdinalIgnoreCase);
 
                 if (importProfiles == null || importProfiles.Count == 0)
                 {
-                    foreach (var worksheet in workbook.Worksheets)
+                    foreach (var worksheet in _sourceReader.GetImportableWorksheets(workbook))
                     {
                         var worksheetRange = worksheet.RangeUsed();
                         if (worksheetRange == null)
@@ -96,14 +111,16 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                             worksheet.Name,
                             $"Импортировано с листа «{worksheet.Name}»",
                             finalRootName,
-                            worksheetRange));
+                            worksheetRange,
+                            null,
+                            rootAttributes));
                     }
                 }
                 else
                 {
                     foreach (var importProfile in importProfiles)
                     {
-                        var selectedRange = ResolveRange(workbook, importProfile.SourceSelection);
+                        var selectedRange = _sourceReader.ResolveRange(workbook, importProfile.SourceSelection);
                         if (selectedRange == null)
                         {
                             throw new InvalidOperationException($"Не удалось найти лист «{importProfile.SourceSelection.SourceName}» в Excel-файле.");
@@ -114,10 +131,12 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                             $"Импортировано с листа «{importProfile.SourceSelection.SourceName}»",
                             finalRootName,
                             selectedRange,
-                            importProfile));
+                            importProfile,
+                            rootAttributes));
                     }
                 }
 
+                root.Attributes.AddRange(rootAttributes.Values);
                 root.ChildNodes.AddRange(allNodes);
             }
 
@@ -147,7 +166,229 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             return jsonResult;
         }
 
-        private TreeNodeExportDTO CreateNodeFromRange(string nodeName, string description, string owningRootName, IXLRange range, ExcelImportProfile? importProfile = null)
+        private string ProcessFileWithRelations(
+            string filePath,
+            string finalRootName,
+            string excelFileName,
+            IReadOnlyCollection<ExcelImportProfile> importProfiles)
+        {
+            var rootPayload = new RelatedRootPayload
+            {
+                Name = finalRootName,
+                Description = $"Импортировано из книги «{excelFileName}»"
+            };
+            var treePayload = new RelatedWorkingTreePayload
+            {
+                Name = finalRootName,
+                ContentRoot = rootPayload
+            };
+
+            using var workbook = new XLWorkbook(filePath);
+            var contexts = BuildRelationContexts(workbook, importProfiles);
+            var contextsBySource = contexts.ToDictionary(x => x.SourceName, StringComparer.OrdinalIgnoreCase);
+            var childContextsByParent = contexts
+                .Where(x => x.Profile.Relation.HasParent)
+                .GroupBy(x => x.Profile.Relation.ParentSourceName, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.ToList(), StringComparer.OrdinalIgnoreCase);
+            var rootAttributes = new Dictionary<string, AttributeExportDTO>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var context in contexts)
+            {
+                foreach (var profile in context.ColumnProfiles.Where(x => x.Role == ExcelImportColumnRole.Attribute && x.DefinitionScope == ExcelImportDefinitionScope.Root))
+                {
+                    if (rootAttributes.ContainsKey(profile.HeaderName))
+                        continue;
+
+                    var inheritanceInfo = _inheritanceResolver.Resolve(context.Range, profile);
+                    rootAttributes[profile.HeaderName] = new AttributeExportDTO(profile.HeaderName, ResolveAttributeDescription(profile))
+                    {
+                        DataTypeNodeName = profile.DataTypeNodeName,
+                        ValueLeaveName = ResolveParentAttributeValue(profile, inheritanceInfo),
+                        IsCollectionValue = profile.IsCollectionValue,
+                        Visibility = profile.Visibility,
+                        Override = profile.Override
+                    };
+                }
+            }
+
+            var rootContexts = contexts
+                .Where(x => x.Profile.Relation.HasParent == false
+                    || contextsBySource.ContainsKey(x.Profile.Relation.ParentSourceName) == false)
+                .ToList();
+
+            foreach (var context in rootContexts)
+            {
+                rootPayload.ChildNodes.Add(BuildRelatedSheetContainerNode(
+                    context,
+                    finalRootName,
+                    childContextsByParent));
+            }
+
+            rootPayload.Attributes.AddRange(rootAttributes.Values);
+
+            JsonSerializerOptions options = new()
+            {
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Cyrillic),
+                Converters = { new JsonStringEnumConverter() },
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            return System.Text.Json.JsonSerializer.Serialize(treePayload, options);
+        }
+
+        private List<RelatedSheetContext> BuildRelationContexts(XLWorkbook workbook, IReadOnlyCollection<ExcelImportProfile> importProfiles)
+        {
+            var result = new List<RelatedSheetContext>();
+
+            foreach (var importProfile in importProfiles)
+            {
+                var selectedRange = _sourceReader.ResolveRange(workbook, importProfile.SourceSelection);
+                if (selectedRange == null)
+                {
+                    throw new InvalidOperationException($"Не удалось найти лист «{importProfile.SourceSelection.SourceName}» в Excel-файле.");
+                }
+
+                var columnProfiles = BuildColumnProfiles(selectedRange, importProfile);
+                var rows = selectedRange.RowsUsed()
+                    .Skip(1)
+                    .Select(row => new RelatedRowContext
+                    {
+                        ExcelRowNumber = row.RowNumber(),
+                        ValuesByColumnIndex = columnProfiles.ToDictionary(
+                            profile => profile.ColumnIndex,
+                            profile => NormalizeRelationKey(row.Cell(profile.ColumnIndex).GetString()))
+                    })
+                    .ToList();
+
+                result.Add(new RelatedSheetContext
+                {
+                    Profile = importProfile,
+                    Range = selectedRange,
+                    ColumnProfiles = columnProfiles,
+                    Rows = rows
+                });
+            }
+
+            return result;
+        }
+
+        private RelatedNodePayload BuildRelatedSheetContainerNode(
+            RelatedSheetContext context,
+            string owningRootName,
+            IReadOnlyDictionary<string, List<RelatedSheetContext>> childContextsByParent)
+        {
+            var node = new RelatedNodePayload
+            {
+                Name = context.SourceName,
+                Description = $"Импортировано с листа «{context.SourceName}»",
+                OwningRootName = owningRootName
+            };
+
+            foreach (var profile in context.ColumnProfiles.Where(x =>
+                         x.Role == ExcelImportColumnRole.Attribute
+                         && x.DefinitionScope == ExcelImportDefinitionScope.Node
+                         && x.ValueMode == ExcelImportValueMode.InheritedConstant))
+            {
+                var inheritanceInfo = _inheritanceResolver.Resolve(context.Range, profile);
+                node.Attributes.Add(new AttributeExportDTO(profile.HeaderName, ResolveAttributeDescription(profile))
+                {
+                    DataTypeNodeName = profile.DataTypeNodeName,
+                    ValueLeaveName = ResolveParentAttributeValue(profile, inheritanceInfo),
+                    IsCollectionValue = profile.IsCollectionValue,
+                    Visibility = profile.Visibility,
+                    Override = profile.Override
+                });
+            }
+
+            var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var row in context.Rows)
+            {
+                node.ChildNodes.Add(BuildRelatedRowNode(
+                    context,
+                    row,
+                    owningRootName,
+                    childContextsByParent,
+                    usedNames));
+            }
+
+            return node;
+        }
+
+        private RelatedNodePayload BuildRelatedRowNode(
+            RelatedSheetContext context,
+            RelatedRowContext row,
+            string owningRootName,
+            IReadOnlyDictionary<string, List<RelatedSheetContext>> childContextsByParent,
+            HashSet<string> usedSiblingNames)
+        {
+            var node = new RelatedNodePayload
+            {
+                Name = ResolveRelatedRowNodeName(context.ColumnProfiles, row, usedSiblingNames),
+                Description = ResolveRelatedRowNodeDescription(context.ColumnProfiles, row),
+                OwningRootName = owningRootName
+            };
+
+            foreach (var profile in context.ColumnProfiles.Where(x =>
+                         x.Role == ExcelImportColumnRole.Attribute
+                         && x.DefinitionScope == ExcelImportDefinitionScope.Node
+                         && x.ValueMode != ExcelImportValueMode.InheritedConstant))
+            {
+                var rawValue = GetRowValue(row, profile);
+                var finalValue = string.IsNullOrWhiteSpace(rawValue) && profile.ValueMode == ExcelImportValueMode.InheritedIfEmpty
+                    ? profile.DefaultValue?.Trim() ?? string.Empty
+                    : rawValue;
+
+                if (string.IsNullOrWhiteSpace(finalValue))
+                    continue;
+
+                node.Attributes.Add(new AttributeExportDTO(profile.HeaderName, ResolveAttributeDescription(profile))
+                {
+                    DataTypeNodeName = profile.DataTypeNodeName,
+                    ValueLeaveName = finalValue,
+                    IsCollectionValue = profile.IsCollectionValue,
+                    Visibility = profile.Visibility,
+                    Override = profile.Override
+                });
+            }
+
+            if (childContextsByParent.TryGetValue(context.SourceName, out var childContexts) == false)
+                return node;
+
+            var usedChildNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var childContext in childContexts)
+            {
+                var parentKeyValue = GetRowValue(row, childContext.Profile.Relation.ParentKeyColumnName, context.ColumnProfiles);
+                if (string.IsNullOrWhiteSpace(parentKeyValue))
+                    continue;
+
+                foreach (var childRow in childContext.Rows.Where(x =>
+                             RelationKeysEqual(GetRowValue(x, childContext.Profile.Relation.ChildKeyColumnName, childContext.ColumnProfiles), parentKeyValue)))
+                {
+                    node.ChildNodes.Add(BuildRelatedRowNode(
+                        childContext,
+                        childRow,
+                        owningRootName,
+                        childContextsByParent,
+                        usedChildNames));
+                }
+            }
+
+            return node;
+        }
+
+        private TreeNodeExportDTO CreateNodeFromRange(
+            string nodeName,
+            string description,
+            string owningRootName,
+            IXLRange range,
+            ExcelImportProfile? importProfile,
+            IDictionary<string, AttributeExportDTO> rootAttributes)
         {
             var node = new TreeNodeExportDTO
             {
@@ -165,14 +406,26 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
             foreach (var profile in columnProfiles.Where(x => x.Role == ExcelImportColumnRole.Attribute))
             {
-                node.Attributes.Add(new AttributeExportDTO(profile.HeaderName, $"Импортировано из колонки «{profile.HeaderName}»")
+                var inheritanceInfo = _inheritanceResolver.Resolve(range, profile);
+                var attributeDto = new AttributeExportDTO(profile.HeaderName, ResolveAttributeDescription(profile))
                 {
                     DataTypeNodeName = profile.DataTypeNodeName,
-                    ValueLeaveName = null,
+                    ValueLeaveName = ResolveParentAttributeValue(profile, inheritanceInfo),
                     IsCollectionValue = profile.IsCollectionValue,
                     Visibility = profile.Visibility,
                     Override = profile.Override
-                });
+                };
+
+                if (profile.DefinitionScope == ExcelImportDefinitionScope.Root)
+                {
+                    if (rootAttributes.ContainsKey(attributeDto.Name) == false)
+                    {
+                        rootAttributes[attributeDto.Name] = attributeDto;
+                    }
+                    continue;
+                }
+
+                node.Attributes.Add(attributeDto);
             }
 
             var allRows = range.RowsUsed().ToList();
@@ -194,8 +447,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                 {
                     var attributeProfile = attributeProfiles[attrIndex];
                     var columnNumber = attributeProfile.ColumnIndex;
-                    var cellValue = row.Cell(columnNumber).GetString();
-                    var attrDef = node.Attributes[attrIndex];
+                    var cellValue = row.Cell(columnNumber).GetString().Trim();
+                    var attrDef = GetAttributeDefinition(attributeProfile, node, rootAttributes);
+                    if (attrDef == null)
+                        continue;
+
+                    if (ShouldEmitLeafAttribute(attributeProfile, cellValue) == false)
+                        continue;
 
                     leaf.Attributes.Add(new AttributeExportDTO(attrDef.Name, attrDef.Description)
                     {
@@ -293,19 +551,115 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             return long.TryParse(sequenceValue, out var parsed) ? parsed : null;
         }
 
-        private IXLRange? ResolveRange(XLWorkbook workbook, ExcelImportSourceSelection sourceSelection)
+        private static AttributeExportDTO? GetAttributeDefinition(
+            ExcelImportColumnProfile columnProfile,
+            TreeNodeExportDTO node,
+            IDictionary<string, AttributeExportDTO> rootAttributes)
         {
-            if (sourceSelection.SourceType == ExcelPreviewSourceType.Worksheet)
+            if (columnProfile.DefinitionScope == ExcelImportDefinitionScope.Root)
             {
-                var worksheet = workbook.Worksheets.FirstOrDefault(x => string.Equals(x.Name, sourceSelection.SourceName, StringComparison.OrdinalIgnoreCase));
-                return worksheet?.RangeUsed();
+                return rootAttributes.TryGetValue(columnProfile.HeaderName, out var attribute)
+                    ? attribute
+                    : null;
             }
 
-            var namedRange = workbook.DefinedNames
-                .Concat(workbook.Worksheets.SelectMany(x => x.DefinedNames))
-                .FirstOrDefault(x => string.Equals(x.Name, sourceSelection.SourceName, StringComparison.OrdinalIgnoreCase));
+            return node.Attributes.FirstOrDefault(x => string.Equals(x.Name, columnProfile.HeaderName, StringComparison.OrdinalIgnoreCase));
+        }
 
-            return namedRange?.Ranges.FirstOrDefault()?.RangeAddress.AsRange();
+        private static bool ShouldEmitLeafAttribute(ExcelImportColumnProfile profile, string cellValue)
+        {
+            return profile.ValueMode switch
+            {
+                ExcelImportValueMode.PerLeaf => true,
+                ExcelImportValueMode.InheritedConstant => false,
+                ExcelImportValueMode.InheritedIfEmpty => string.IsNullOrWhiteSpace(cellValue) == false,
+                _ => true
+            };
+        }
+
+        private static string? ResolveParentAttributeValue(ExcelImportColumnProfile profile, ExcelImportInheritanceInfo inheritanceInfo)
+        {
+            return profile.ValueMode switch
+            {
+                ExcelImportValueMode.InheritedConstant => inheritanceInfo.ResolvedParentValue,
+                ExcelImportValueMode.InheritedIfEmpty => inheritanceInfo.ResolvedParentValue,
+                _ => null
+            };
+        }
+
+        private static string ResolveAttributeDescription(ExcelImportColumnProfile profile)
+        {
+            return string.IsNullOrWhiteSpace(profile.Description)
+                ? $"Импортировано из колонки «{profile.HeaderName}»"
+                : profile.Description;
+        }
+
+        private static string ResolveRelatedRowNodeName(
+            List<ExcelImportColumnProfile> columnProfiles,
+            RelatedRowContext row,
+            HashSet<string> usedNames)
+        {
+            var baseName = columnProfiles
+                .Where(x => x.Role == ExcelImportColumnRole.SystemName)
+                .Select(x => GetRowValue(row, x))
+                .FirstOrDefault(x => string.IsNullOrWhiteSpace(x) == false);
+
+            if (string.IsNullOrWhiteSpace(baseName))
+            {
+                baseName = columnProfiles
+                    .Where(x => x.Role != ExcelImportColumnRole.Ignore)
+                    .Select(x => GetRowValue(row, x))
+                    .FirstOrDefault(x => string.IsNullOrWhiteSpace(x) == false);
+            }
+
+            if (string.IsNullOrWhiteSpace(baseName))
+                baseName = row.ExcelRowNumber.ToString();
+
+            var uniqueName = baseName;
+            var counter = 2;
+            while (usedNames.Contains(uniqueName))
+            {
+                uniqueName = $"{baseName} ({counter})";
+                counter++;
+            }
+
+            usedNames.Add(uniqueName);
+            return uniqueName;
+        }
+
+        private static string ResolveRelatedRowNodeDescription(List<ExcelImportColumnProfile> columnProfiles, RelatedRowContext row)
+        {
+            var description = columnProfiles
+                .Where(x => x.Role == ExcelImportColumnRole.SystemDescription)
+                .Select(x => GetRowValue(row, x))
+                .FirstOrDefault(x => string.IsNullOrWhiteSpace(x) == false);
+
+            return string.IsNullOrWhiteSpace(description)
+                ? $"Импортировано из строки «{row.ExcelRowNumber}»"
+                : description;
+        }
+
+        private static string GetRowValue(RelatedRowContext row, ExcelImportColumnProfile profile)
+        {
+            return row.ValuesByColumnIndex.TryGetValue(profile.ColumnIndex, out var value)
+                ? value
+                : string.Empty;
+        }
+
+        private static string GetRowValue(RelatedRowContext row, string headerName, IEnumerable<ExcelImportColumnProfile> columnProfiles)
+        {
+            var profile = columnProfiles.FirstOrDefault(x => string.Equals(x.HeaderName, headerName, StringComparison.OrdinalIgnoreCase));
+            return profile == null ? string.Empty : GetRowValue(row, profile);
+        }
+
+        private static bool RelationKeysEqual(string left, string right)
+        {
+            return ExcelRelationKeyHelper.AreEqual(left, right);
+        }
+
+        private static string NormalizeRelationKey(string? value)
+        {
+            return ExcelRelationKeyHelper.Normalize(value);
         }
 
         private string DetermineDataType(IXLRange range, int colNumber)
@@ -316,6 +670,59 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                 .ToList();
 
             return _dataTypeDetector.DetermineBestDataType(values);
+        }
+
+        private sealed class RelatedWorkingTreePayload
+        {
+            public string Name { get; set; } = string.Empty;
+
+            public RelatedRootPayload ContentRoot { get; set; } = new();
+        }
+
+        private sealed class RelatedRootPayload
+        {
+            public string Name { get; set; } = string.Empty;
+
+            public string Description { get; set; } = string.Empty;
+
+            public List<AttributeExportDTO> Attributes { get; set; } = new();
+
+            public List<RelatedNodePayload> ChildNodes { get; set; } = new();
+        }
+
+        private sealed class RelatedNodePayload
+        {
+            public string Name { get; set; } = string.Empty;
+
+            public string Description { get; set; } = string.Empty;
+
+            public string OwningRootName { get; set; } = string.Empty;
+
+            public List<AttributeExportDTO> Attributes { get; set; } = new();
+
+            public List<RelatedNodePayload> ChildNodes { get; set; } = new();
+
+            public List<TreeLeaveExportDTO> ChildLeaves { get; set; } = new();
+        }
+
+        private sealed class RelatedSheetContext
+        {
+            public ExcelImportProfile Profile { get; set; } = new();
+
+            public IXLRange Range { get; set; } = null!;
+
+            public List<ExcelImportColumnProfile> ColumnProfiles { get; set; } = new();
+
+            public List<RelatedRowContext> Rows { get; set; } = new();
+
+            public string SourceName => Profile.SourceSelection.SourceName;
+        }
+
+        private sealed class RelatedRowContext
+        {
+            public int ExcelRowNumber { get; set; }
+
+            public Dictionary<int, string> ValuesByColumnIndex { get; set; } = new();
         }
     }
 }

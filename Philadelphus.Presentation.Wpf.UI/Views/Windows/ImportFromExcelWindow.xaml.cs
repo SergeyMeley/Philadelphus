@@ -44,6 +44,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private readonly ConversionService _service;
         private readonly ExcelPreviewService _previewService;
         private readonly IServiceProvider _serviceProvider;
+        private const string NoParentRelationOption = "(Нет родителя)";
         private WindowMode _mode = WindowMode.ConvertToPhjson;
         private PhiladelphusRepositoryModel? _repository;
         private IPhiladelphusRepositoryService? _repositoryService;
@@ -52,6 +53,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private ExcelPreviewWorkbookInfo? _workbookPreview;
         private ExcelImportProfile? _currentImportProfile;
         private readonly Dictionary<string, ExcelImportProfile> _importProfilesBySource = new(StringComparer.OrdinalIgnoreCase);
+        private bool _isUpdatingRelationControls;
 
         public Array AvailableColumnRoles => Enum.GetValues(typeof(ExcelImportColumnRole));
         public List<VisibilityScopeItem> AvailableVisibilityScopes { get; } = Enum.GetValues<VisibilityScope>()
@@ -63,6 +65,20 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             .ToList();
         public List<OverrideTypeItem> AvailableOverrideTypes { get; } = Enum.GetValues<OverrideType>()
             .Select(x => new OverrideTypeItem
+            {
+                Value = x,
+                DisplayName = GetDisplayName(x)
+            })
+            .ToList();
+        public List<ExcelImportDefinitionScopeItem> AvailableDefinitionScopes { get; } = Enum.GetValues<ExcelImportDefinitionScope>()
+            .Select(x => new ExcelImportDefinitionScopeItem
+            {
+                Value = x,
+                DisplayName = GetDisplayName(x)
+            })
+            .ToList();
+        public List<ExcelImportValueModeItem> AvailableValueModes { get; } = Enum.GetValues<ExcelImportValueMode>()
+            .Select(x => new ExcelImportValueModeItem
             {
                 Value = x,
                 DisplayName = GetDisplayName(x)
@@ -246,15 +262,15 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 }
 
                 SetBusyState(true);
-                var exportProfiles = ChkUseAllWorksheets.IsChecked == true ? null : GetImportProfilesForExecution();
-                if (exportProfiles != null && exportProfiles.Count == 0)
+                var exportProfiles = GetImportProfilesForExecution();
+                if (exportProfiles.Count == 0)
                 {
                     SetBusyState(false);
                     MessageBox.Show("Не выбраны листы Excel для конвертации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                if (exportProfiles != null)
+                if (exportProfiles.Count > 0)
                 {
                     var validationResult = ValidateImportProfiles(exportProfiles);
                     if (validationResult.HasErrors)
@@ -310,6 +326,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             ChkUseAllWorksheets.IsEnabled = !isBusy;
             LstPreviewSources.IsEnabled = !isBusy;
             DgColumnSettings.IsEnabled = !isBusy;
+            CmbParentSource.IsEnabled = !isBusy && CmbParentSource.ItemsSource != null;
+            CmbParentKeyColumn.IsEnabled = !isBusy && CmbParentKeyColumn.ItemsSource != null;
+            CmbCurrentKeyColumn.IsEnabled = !isBusy && CmbCurrentKeyColumn.ItemsSource != null;
             ProgressOperation.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
             Mouse.OverrideCursor = isBusy ? Cursors.Wait : null;
         }
@@ -409,6 +428,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 _currentImportProfile = null;
                 RefreshPreviewSourceList();
                 UpdateAllWorksheetStatuses();
+                RefreshRelationControls();
             }
             catch (Exception ex)
             {
@@ -418,6 +438,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 DgPreview.ItemsSource = null;
                 DgColumnSettings.ItemsSource = null;
                 TxtPreviewInfo.Text = $"Не удалось загрузить предпросмотр: {ex.Message}";
+                RefreshRelationControls();
             }
         }
 
@@ -476,6 +497,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 TxtPreviewInfo.Text = $"Активный лист: {preview.SourceName}. Строк данных: {preview.TotalRowCount}. Колонок: {preview.TotalColumnCount}.";
                 DgPreview.ItemsSource = BuildPreviewTable(preview).DefaultView;
                 DgColumnSettings.ItemsSource = _currentImportProfile.Columns;
+                RefreshRelationControls();
                 UpdatePreviewInfoSuffix();
             }
             catch (Exception ex)
@@ -483,6 +505,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 DgPreview.ItemsSource = null;
                 DgColumnSettings.ItemsSource = null;
                 TxtPreviewInfo.Text = $"Не удалось построить предпросмотр: {ex.Message}";
+                RefreshRelationControls();
             }
         }
 
@@ -524,13 +547,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
         private ExcelImportValidationResult ValidateImportProfiles(IEnumerable<ExcelImportProfile> importProfiles)
         {
-            var result = new ExcelImportValidationResult();
-
-            foreach (var profile in importProfiles)
-            {
-                var profileResult = _previewService.ValidateImportProfile(_selectedFilePath, profile);
-                result.Errors.AddRange(profileResult.Errors);
-            }
+            var validator = _serviceProvider.GetRequiredService<IExcelImportProfileValidator>();
+            var result = validator.ValidateProfiles(_selectedFilePath, importProfiles);
 
             UpdateAllWorksheetStatuses();
 
@@ -592,6 +610,135 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             }), DispatcherPriority.Background);
         }
 
+        private void RefreshRelationControls()
+        {
+            if (CmbParentSource == null || CmbParentKeyColumn == null || CmbCurrentKeyColumn == null)
+                return;
+
+            _isUpdatingRelationControls = true;
+            try
+            {
+                if (_currentImportProfile == null || _workbookPreview == null)
+                {
+                    CmbParentSource.ItemsSource = null;
+                    CmbParentSource.SelectedItem = null;
+                    CmbParentKeyColumn.ItemsSource = null;
+                    CmbParentKeyColumn.SelectedItem = null;
+                    CmbCurrentKeyColumn.ItemsSource = null;
+                    CmbCurrentKeyColumn.SelectedItem = null;
+                    CmbParentSource.IsEnabled = false;
+                    CmbParentKeyColumn.IsEnabled = false;
+                    CmbCurrentKeyColumn.IsEnabled = false;
+                    return;
+                }
+
+                var parentOptions = new List<string> { NoParentRelationOption };
+                parentOptions.AddRange(_workbookPreview.Worksheets
+                    .Select(x => x.Name)
+                    .Where(x => string.Equals(x, _currentImportProfile.SourceSelection.SourceName, StringComparison.OrdinalIgnoreCase) == false)
+                    .OrderBy(x => x));
+
+                CmbParentSource.ItemsSource = parentOptions;
+                CmbCurrentKeyColumn.ItemsSource = _currentImportProfile.Columns
+                    .Select(x => x.HeaderName)
+                    .OrderBy(x => x)
+                    .ToList();
+
+                CmbParentSource.IsEnabled = true;
+                CmbCurrentKeyColumn.IsEnabled = true;
+
+                var selectedParent = string.IsNullOrWhiteSpace(_currentImportProfile.Relation.ParentSourceName)
+                    ? NoParentRelationOption
+                    : _currentImportProfile.Relation.ParentSourceName;
+                CmbParentSource.SelectedItem = parentOptions.Contains(selectedParent) ? selectedParent : NoParentRelationOption;
+
+                CmbCurrentKeyColumn.SelectedItem = string.IsNullOrWhiteSpace(_currentImportProfile.Relation.ChildKeyColumnName)
+                    ? null
+                    : _currentImportProfile.Relation.ChildKeyColumnName;
+
+                RefreshParentKeyColumnOptions();
+            }
+            finally
+            {
+                _isUpdatingRelationControls = false;
+            }
+        }
+
+        private void RefreshParentKeyColumnOptions()
+        {
+            if (CmbParentKeyColumn == null)
+                return;
+
+            if (_currentImportProfile == null || string.IsNullOrWhiteSpace(_currentImportProfile.Relation.ParentSourceName))
+            {
+                CmbParentKeyColumn.ItemsSource = null;
+                CmbParentKeyColumn.SelectedItem = null;
+                CmbParentKeyColumn.IsEnabled = false;
+                return;
+            }
+
+            if (_importProfilesBySource.TryGetValue(_currentImportProfile.Relation.ParentSourceName, out var parentProfile) == false)
+            {
+                var parentSelection = new ExcelImportSourceSelection
+                {
+                    SourceName = _currentImportProfile.Relation.ParentSourceName,
+                    SourceType = ExcelPreviewSourceType.Worksheet
+                };
+                parentProfile = GetOrCreateImportProfile(parentSelection);
+            }
+
+            var parentHeaders = parentProfile.Columns
+                .Select(x => x.HeaderName)
+                .OrderBy(x => x)
+                .ToList();
+
+            CmbParentKeyColumn.ItemsSource = parentHeaders;
+            CmbParentKeyColumn.IsEnabled = true;
+            CmbParentKeyColumn.SelectedItem = string.IsNullOrWhiteSpace(_currentImportProfile.Relation.ParentKeyColumnName)
+                ? null
+                : _currentImportProfile.Relation.ParentKeyColumnName;
+        }
+
+        private void CmbParentSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingRelationControls || _currentImportProfile == null)
+                return;
+
+            var selectedParent = CmbParentSource.SelectedItem as string;
+            if (string.IsNullOrWhiteSpace(selectedParent) || selectedParent == NoParentRelationOption)
+            {
+                _currentImportProfile.Relation.ParentSourceName = string.Empty;
+                _currentImportProfile.Relation.ParentKeyColumnName = string.Empty;
+                _currentImportProfile.Relation.ChildKeyColumnName = string.Empty;
+                RefreshRelationControls();
+            }
+            else
+            {
+                _currentImportProfile.Relation.ParentSourceName = selectedParent;
+                RefreshParentKeyColumnOptions();
+            }
+
+            UpdateAllWorksheetStatuses();
+        }
+
+        private void CmbParentKeyColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingRelationControls || _currentImportProfile == null)
+                return;
+
+            _currentImportProfile.Relation.ParentKeyColumnName = CmbParentKeyColumn.SelectedItem as string ?? string.Empty;
+            UpdateAllWorksheetStatuses();
+        }
+
+        private void CmbCurrentKeyColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isUpdatingRelationControls || _currentImportProfile == null)
+                return;
+
+            _currentImportProfile.Relation.ChildKeyColumnName = CmbCurrentKeyColumn.SelectedItem as string ?? string.Empty;
+            UpdateAllWorksheetStatuses();
+        }
+
         private static DataTable BuildPreviewTable(ExcelPreviewTable preview)
         {
             var table = new DataTable();
@@ -624,9 +771,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         {
             var lines = validationResult.Errors
                 .Take(15)
-                .Select(error => error.IsConfigurationError
-                    ? $"Лист \"{error.SourceName}\", настройка колонки \"{error.ColumnName}\": {error.Message}"
-                    : $"Лист \"{error.SourceName}\", строка {error.RowNumber}, колонка \"{error.ColumnName}\": {error.Message}")
+                .Select(error =>
+                {
+                    if (error.IsConfigurationError)
+                    {
+                        return string.IsNullOrWhiteSpace(error.ColumnName)
+                            ? $"Лист \"{error.SourceName}\": {error.Message}"
+                            : $"Лист \"{error.SourceName}\", настройка колонки \"{error.ColumnName}\": {error.Message}";
+                    }
+
+                    return $"Лист \"{error.SourceName}\", строка {error.RowNumber}, колонка \"{error.ColumnName}\": {error.Message}";
+                })
                 .ToList();
 
             if (validationResult.Errors.Count > 15)
@@ -700,29 +855,27 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
             repositoryService.GetShrubContent(previewRepository);
 
-            var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService);
-            var previewExplorerVm = repositoryExplorerFactory.Create(previewRepositoryVm);
-
-            previewRepositoryVm.Childs.Clear();
-
             TreeRootModel? previewTargetRoot = null;
             if (string.IsNullOrWhiteSpace(targetExistingRootName) == false)
             {
-                var previewTree = repositoryService.CreateWorkingTree(previewRepository, previewStorage, needAutoName: false, withoutInfoNotifications: true);
-                previewTree.Name = $"Предпросмотр: {targetExistingRootName}";
-                previewTargetRoot = repositoryService.CreateTreeRoot(previewTree, needAutoName: false, withoutInfoNotifications: true);
+                var previewWorkingTree = repositoryService.CreateWorkingTree(previewRepository, previewStorage, needAutoName: false, withoutInfoNotifications: true);
+                previewWorkingTree.Name = $"Предпросмотр: {targetExistingRootName}";
+                previewTargetRoot = repositoryService.CreateTreeRoot(previewWorkingTree, needAutoName: false, withoutInfoNotifications: true);
                 previewTargetRoot.Name = targetExistingRootName;
             }
 
-            JsonImportExportHelper.ParseJson(json, repositoryService, previewRepository, previewTargetRoot);
+            var previewTree = JsonImportExportHelper.ParseJson(json, repositoryService, previewRepository, previewTargetRoot);
 
-            foreach (var root in previewRepository.ContentShrub.ContentWorkingTrees
-                         .Select(x => x.ContentRoot)
-                         .Where(x => x != null && x.IsSystemBase == false))
+            var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService);
+            previewRepositoryVm.Childs.Clear();
+
+            var rootForPreview = previewTargetRoot ?? previewTree.ContentRoot;
+            if (rootForPreview != null && rootForPreview.IsSystemBase == false)
             {
-                previewRepositoryVm.Childs.Add(new TreeRootVM(root, dataStoragesCollectionVm, repositoryService));
+                previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService));
             }
 
+            var previewExplorerVm = repositoryExplorerFactory.Create(previewRepositoryVm, skipInitialLoad: true);
             previewExplorerVm.SelectedRepositoryMember = previewRepositoryVm.Childs.FirstOrDefault();
             return previewExplorerVm;
         }

@@ -227,6 +227,11 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<AttributeValuesCollectionWindow>();
                     services.AddSingleton<SplashWindow>();
                     services.AddSingleton<IExcelDataTypeDetector, ExcelDataTypeDetector>();
+                    services.AddSingleton<IExcelImportSourceReader, ExcelImportSourceReader>();
+                    services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
+                    services.AddSingleton<IExcelImportProfileResolver, ExcelImportProfileResolver>();
+                    services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
+                    services.AddSingleton<IExcelImportProfileValidator, ExcelImportProfileValidator>();
                     services.AddTransient<ConversionService>();
                     services.AddTransient<ExcelPreviewService>();
                     services.AddTransient<ExcelImportPreviewService>();

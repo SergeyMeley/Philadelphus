@@ -64,6 +64,27 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         Ignore
     }
 
+    public enum ExcelImportDefinitionScope
+    {
+        [Display(Name = "Узел")]
+        Node,
+
+        [Display(Name = "Корень")]
+        Root
+    }
+
+    public enum ExcelImportValueMode
+    {
+        [Display(Name = "Для каждого leaf")]
+        PerLeaf,
+
+        [Display(Name = "Наследуемая константа")]
+        InheritedConstant,
+
+        [Display(Name = "Наследовать если пусто")]
+        InheritedIfEmpty
+    }
+
     public class ExcelImportColumnProfile
     {
         public int ColumnIndex { get; set; }
@@ -74,6 +95,8 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         public ExcelImportColumnRole Role { get; set; } = ExcelImportColumnRole.Attribute;
 
+        public string Description { get; set; } = string.Empty;
+
         public string DataTypeNodeName { get; set; } = "Текст";
 
         public bool IsCollectionValue { get; set; }
@@ -81,6 +104,16 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         public VisibilityScope Visibility { get; set; } = VisibilityScope.Public;
 
         public OverrideType Override { get; set; } = OverrideType.Virtual;
+
+        public ExcelImportDefinitionScope DefinitionScope { get; set; } = ExcelImportDefinitionScope.Node;
+
+        public ExcelImportValueMode ValueMode { get; set; } = ExcelImportValueMode.PerLeaf;
+
+        public string DefaultValue { get; set; } = string.Empty;
+
+        public string DefinitionScopeDisplayName => ExcelImportDisplayHelper.GetDisplayName(DefinitionScope);
+
+        public string ValueModeDisplayName => ExcelImportDisplayHelper.GetDisplayName(ValueMode);
 
         public string VisibilityDisplayName => ExcelImportDisplayHelper.GetDisplayName(Visibility);
 
@@ -91,7 +124,20 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
     {
         public ExcelImportSourceSelection SourceSelection { get; set; } = new();
 
+        public ExcelImportRelationProfile Relation { get; set; } = new();
+
         public List<ExcelImportColumnProfile> Columns { get; set; } = new();
+    }
+
+    public class ExcelImportRelationProfile
+    {
+        public string ParentSourceName { get; set; } = string.Empty;
+
+        public string ParentKeyColumnName { get; set; } = string.Empty;
+
+        public string ChildKeyColumnName { get; set; } = string.Empty;
+
+        public bool HasParent => string.IsNullOrWhiteSpace(ParentSourceName) == false;
     }
 
     public class ExcelImportValidationError
@@ -114,6 +160,73 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         public List<ExcelImportValidationError> Errors { get; set; } = new();
 
         public bool HasErrors => Errors.Count > 0;
+    }
+
+    public class ExcelImportDefinitionScopeItem
+    {
+        public ExcelImportDefinitionScope Value { get; set; }
+
+        public string DisplayName { get; set; } = string.Empty;
+    }
+
+    public class ExcelImportValueModeItem
+    {
+        public ExcelImportValueMode Value { get; set; }
+
+        public string DisplayName { get; set; } = string.Empty;
+    }
+
+    public class ExcelImportSettingsRowDto
+    {
+        public string RuleType { get; set; } = string.Empty;
+
+        public string SourceName { get; set; } = string.Empty;
+
+        public string ParentSourceName { get; set; } = string.Empty;
+
+        public string ParentKeyColumnName { get; set; } = string.Empty;
+
+        public string ChildKeyColumnName { get; set; } = string.Empty;
+
+        public int? ColumnIndex { get; set; }
+
+        public string HeaderName { get; set; } = string.Empty;
+
+        public ExcelImportColumnRole? Role { get; set; }
+
+        public ExcelImportDefinitionScope? DefinitionScope { get; set; }
+
+        public ExcelImportValueMode? ValueMode { get; set; }
+
+        public string DataTypeNodeName { get; set; } = string.Empty;
+
+        public bool? IsCollectionValue { get; set; }
+
+        public VisibilityScope? Visibility { get; set; }
+
+        public OverrideType? Override { get; set; }
+
+        public string Description { get; set; } = string.Empty;
+
+        public string DefaultValue { get; set; } = string.Empty;
+    }
+
+    public class ExcelImportSettingsDocument
+    {
+        public List<ExcelImportSettingsRowDto> WorkbookDefaults { get; set; } = new();
+
+        public List<ExcelImportSettingsRowDto> WorksheetDefaults { get; set; } = new();
+
+        public List<ExcelImportSettingsRowDto> ColumnRules { get; set; } = new();
+    }
+
+    public class ExcelImportInheritanceInfo
+    {
+        public IReadOnlyList<string> DistinctNonEmptyValues { get; set; } = Array.Empty<string>();
+
+        public string? ResolvedParentValue { get; set; }
+
+        public bool HasResolvedParentValue => string.IsNullOrWhiteSpace(ResolvedParentValue) == false;
     }
 
     public enum ImportTreePreviewItemType

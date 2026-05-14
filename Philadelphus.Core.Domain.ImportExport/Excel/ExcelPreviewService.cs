@@ -8,10 +8,20 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
     public class ExcelPreviewService
     {
         private readonly IExcelDataTypeDetector _dataTypeDetector;
+        private readonly IExcelImportSourceReader _sourceReader;
+        private readonly IExcelImportProfileResolver _profileResolver;
+        private readonly IExcelImportProfileValidator _profileValidator;
 
-        public ExcelPreviewService(IExcelDataTypeDetector dataTypeDetector)
+        public ExcelPreviewService(
+            IExcelDataTypeDetector dataTypeDetector,
+            IExcelImportSourceReader sourceReader,
+            IExcelImportProfileResolver profileResolver,
+            IExcelImportProfileValidator profileValidator)
         {
             _dataTypeDetector = dataTypeDetector;
+            _sourceReader = sourceReader;
+            _profileResolver = profileResolver;
+            _profileValidator = profileValidator;
         }
 
         public ExcelPreviewWorkbookInfo GetWorkbookPreview(string filePath)
@@ -20,7 +30,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
             var result = new ExcelPreviewWorkbookInfo
             {
-                Worksheets = workbook.Worksheets
+                Worksheets = _sourceReader.GetImportableWorksheets(workbook)
                     .Select(worksheet => CreateSourceInfo(worksheet.Name, ExcelPreviewSourceType.Worksheet, worksheet.RangeUsed()))
                     .ToList(),
                 NamedRanges = GetNamedRanges(workbook)
@@ -34,7 +44,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         public ExcelPreviewTable GetPreview(string filePath, ExcelImportSourceSelection selection, int maxRows = 30)
         {
             using var workbook = new XLWorkbook(filePath);
-            var range = ResolveRange(workbook, selection);
+            var range = _sourceReader.ResolveRange(workbook, selection);
 
             if (range == null)
                 throw new InvalidOperationException("Не удалось определить диапазон данных для предпросмотра.");
@@ -45,7 +55,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         public ExcelImportProfile BuildImportProfile(string filePath, ExcelImportSourceSelection selection)
         {
             using var workbook = new XLWorkbook(filePath);
-            var range = ResolveRange(workbook, selection);
+            var range = _sourceReader.ResolveRange(workbook, selection);
 
             if (range == null)
                 throw new InvalidOperationException("Не удалось определить диапазон данных для построения профиля импорта.");
@@ -73,122 +83,22 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                     HeaderName = header,
                     SampleValue = sampleValue,
                     Role = DetectRole(header),
+                    Description = $"Импортировано из колонки «{header}»",
                     DataTypeNodeName = DetermineDataTypeFromValues(allValues)
                 });
             }
 
-            return profile;
+            return _profileResolver.Resolve(filePath, selection, profile);
         }
 
         public ExcelImportValidationResult ValidateImportProfile(string filePath, ExcelImportProfile profile)
         {
-            var configurationValidation = ValidateProfileConfiguration(profile);
-            if (configurationValidation.HasErrors)
-                return configurationValidation;
-
-            using var workbook = new XLWorkbook(filePath);
-            var range = ResolveRange(workbook, profile.SourceSelection);
-
-            if (range == null)
-                throw new InvalidOperationException("Не удалось определить диапазон данных для проверки импорта.");
-
-            var result = new ExcelImportValidationResult();
-            var rows = range.RowsUsed().ToList();
-
-            for (var rowIndex = 1; rowIndex < rows.Count; rowIndex++)
-            {
-                var row = rows[rowIndex];
-
-                foreach (var column in profile.Columns.Where(x => x.Role == ExcelImportColumnRole.Attribute))
-                {
-                    var value = row.Cell(column.ColumnIndex).GetString().Trim();
-                    if (string.IsNullOrWhiteSpace(value))
-                        continue;
-
-                    if (IsValueCompatibleWithDataType(value, column.DataTypeNodeName))
-                        continue;
-
-                    result.Errors.Add(new ExcelImportValidationError
-                    {
-                        SourceName = profile.SourceSelection.SourceName,
-                        RowNumber = row.RowNumber(),
-                        ColumnName = column.HeaderName,
-                        Value = value,
-                        Message = $"Значение \"{value}\" не соответствует типу \"{column.DataTypeNodeName}\"."
-                    });
-                }
-
-                var sequenceColumn = profile.Columns.FirstOrDefault(x => x.Role == ExcelImportColumnRole.SystemSequence);
-                if (sequenceColumn != null)
-                {
-                    var sequenceValue = row.Cell(sequenceColumn.ColumnIndex).GetString().Trim();
-                    if (string.IsNullOrWhiteSpace(sequenceValue) == false && long.TryParse(sequenceValue, out _) == false)
-                    {
-                        result.Errors.Add(new ExcelImportValidationError
-                        {
-                            SourceName = profile.SourceSelection.SourceName,
-                            RowNumber = row.RowNumber(),
-                            ColumnName = sequenceColumn.HeaderName,
-                            Value = sequenceValue,
-                            Message = $"Значение \"{sequenceValue}\" не соответствует типу \"Целое число\" для последовательности."
-                        });
-                    }
-                }
-            }
-
-            return result;
+            return _profileValidator.ValidateProfile(filePath, profile);
         }
 
         public ExcelImportValidationResult ValidateProfileConfiguration(ExcelImportProfile profile)
         {
-            var result = new ExcelImportValidationResult();
-            var columns = profile.Columns;
-
-            var systemNameColumns = columns.Where(x => x.Role == ExcelImportColumnRole.SystemName).ToList();
-            if (systemNameColumns.Count > 1)
-            {
-                foreach (var column in systemNameColumns.Skip(1))
-                {
-                    result.Errors.Add(CreateConfigurationError(
-                        profile.SourceSelection.SourceName,
-                        column.HeaderName,
-                        "Назначено больше одной колонки с ролью SystemName."));
-                }
-            }
-
-            var systemDescriptionColumns = columns.Where(x => x.Role == ExcelImportColumnRole.SystemDescription).ToList();
-            if (systemDescriptionColumns.Count > 1)
-            {
-                foreach (var column in systemDescriptionColumns.Skip(1))
-                {
-                    result.Errors.Add(CreateConfigurationError(
-                        profile.SourceSelection.SourceName,
-                        column.HeaderName,
-                        "Назначено больше одной колонки с ролью SystemDescription."));
-                }
-            }
-
-            var systemSequenceColumns = columns.Where(x => x.Role == ExcelImportColumnRole.SystemSequence).ToList();
-            if (systemSequenceColumns.Count > 1)
-            {
-                foreach (var column in systemSequenceColumns.Skip(1))
-                {
-                    result.Errors.Add(CreateConfigurationError(
-                        profile.SourceSelection.SourceName,
-                        column.HeaderName,
-                        "Назначено больше одной колонки с ролью SystemSequence."));
-                }
-            }
-
-            if (columns.Any(x => x.Role == ExcelImportColumnRole.Attribute) == false)
-            {
-                result.Errors.Add(CreateConfigurationError(
-                    profile.SourceSelection.SourceName,
-                    string.Empty,
-                    "Не выбрано ни одной колонки с ролью Attribute."));
-            }
-
-            return result;
+            return _profileValidator.ValidateConfiguration(profile);
         }
 
         private static ExcelPreviewSourceInfo CreateSourceInfo(string name, ExcelPreviewSourceType sourceType, IXLRange? range)
@@ -283,20 +193,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                 .ToList();
         }
 
-        private static IXLRange? ResolveRange(XLWorkbook workbook, ExcelImportSourceSelection selection)
-        {
-            if (selection.SourceType == ExcelPreviewSourceType.Worksheet)
-            {
-                var worksheet = workbook.Worksheets.FirstOrDefault(x => string.Equals(x.Name, selection.SourceName, StringComparison.OrdinalIgnoreCase));
-                return worksheet?.RangeUsed();
-            }
-
-            var namedRange = GetNamedRanges(workbook)
-                .FirstOrDefault(x => string.Equals(x.Name, selection.SourceName, StringComparison.OrdinalIgnoreCase));
-
-            return namedRange == null ? null : GetSingleRange(namedRange);
-        }
-
         private static IXLRange? GetSingleRange(IXLDefinedName definedName)
         {
             var ranges = definedName.Ranges.ToList();
@@ -327,20 +223,5 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             return _dataTypeDetector.DetermineBestDataType(values);
         }
 
-        private bool IsValueCompatibleWithDataType(string value, string dataTypeNodeName)
-        {
-            return _dataTypeDetector.IsValueCompatibleWithDataType(value, dataTypeNodeName);
-        }
-
-        private static ExcelImportValidationError CreateConfigurationError(string sourceName, string columnName, string message)
-        {
-            return new ExcelImportValidationError
-            {
-                SourceName = sourceName,
-                ColumnName = columnName,
-                Message = message,
-                IsConfigurationError = true
-            };
-        }
     }
 }

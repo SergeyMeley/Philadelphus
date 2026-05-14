@@ -142,15 +142,53 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Для активного выбранного листа можно задать роль колонки, тип данных и параметры наследования импортируемых атрибутов."
+                    <GroupBox Header="Связь текущего листа с родителем" Padding="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Родительский лист:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                            <ComboBox x:Name="CmbParentSource"
+                                      Grid.Row="0"
+                                      Grid.Column="1"
+                                      Margin="0,0,0,8"
+                                      SelectionChanged="CmbParentSource_SelectionChanged"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Ключ у родителя:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                            <ComboBox x:Name="CmbParentKeyColumn"
+                                      Grid.Row="1"
+                                      Grid.Column="1"
+                                      Margin="0,0,0,8"
+                                      SelectionChanged="CmbParentKeyColumn_SelectionChanged"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Ключ у текущего листа:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox x:Name="CmbCurrentKeyColumn"
+                                      Grid.Row="2"
+                                      Grid.Column="1"
+                                      SelectionChanged="CmbCurrentKeyColumn_SelectionChanged"/>
+                        </Grid>
+                    </GroupBox>
+
+                    <TextBlock Grid.Row="1"
+                               Text="Для активного листа настраиваются роль колонки, тип данных и наследование: где объявляется атрибут, как передается значение детям и какое значение использовать по умолчанию."
                                Margin="0,0,0,10"
                                Foreground="DimGray"/>
 
                     <DataGrid x:Name="DgColumnSettings"
-                              Grid.Row="1"
+                              Grid.Row="4"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
@@ -188,6 +226,37 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Где объявлять" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DefinitionScopeDisplayName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableDefinitionScopes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  SelectedValuePath="Value"
+                                                  SelectedValue="{Binding DefinitionScope, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Наследование значения" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ValueModeDisplayName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableValueModes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  SelectedValuePath="Value"
+                                                  SelectedValue="{Binding ValueMode, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Значение по умолчанию" Binding="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
                             <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" Width="*"/>
                             <DataGridTemplateColumn Header="Область видимости" Width="2*">
                                 <DataGridTemplateColumn.CellTemplate>

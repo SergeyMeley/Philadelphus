@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Philadelphus.Core.Domain.ImportExport.Excel
 {
     public interface IExcelDataTypeDetector

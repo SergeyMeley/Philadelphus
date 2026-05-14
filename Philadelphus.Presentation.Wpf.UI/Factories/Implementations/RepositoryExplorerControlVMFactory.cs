@@ -12,11 +12,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
         {
             _serviceProvider = serviceProvider;
         }
-        public RepositoryExplorerControlVM Create(PhiladelphusRepositoryVM repositoryVM)
+        public RepositoryExplorerControlVM Create(PhiladelphusRepositoryVM repositoryVM, bool skipInitialLoad = false)
         {
             if (repositoryVM == null)
                 throw new ArgumentNullException();
-            return ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(_serviceProvider, repositoryVM);
+            return ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(_serviceProvider, repositoryVM, skipInitialLoad);
         }
     }
 }

@@ -121,7 +121,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
-            DataStoragesCollectionVM dataStoragesCollectionVM)
+            DataStoragesCollectionVM dataStoragesCollectionVM,
+            bool skipInitialLoad = false)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _service = service;
@@ -129,7 +130,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
 
-            LoadPhiladelphusRepository();
+            if (skipInitialLoad == false)
+            {
+                LoadPhiladelphusRepository();
+            }
 
             _notificationService.SendTextMessage<RepositoryExplorerControlVM>("Обозреватель репозитория. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
@@ -401,15 +405,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         _service,
                         () =>
                         {
-                            var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.LastOrDefault()?.ContentRoot;
-                            if (root != null)
-                            {
-                                var rootVm = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
-                                PhiladelphusRepositoryVM.Childs.Add(rootVm);
-                                OnPropertyChanged(nameof(PhiladelphusRepositoryVM));
-                                OnPropertyChanged(nameof(PhiladelphusRepositoryVM.Childs));
-                                OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
-                            }
+                            RebuildRepositoryTreeRootsFromCurrentModel();
                         });
                     window.ShowDialog();
                 });
@@ -436,17 +432,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         internal bool LoadPhiladelphusRepository()
         {
             var newRepo = _service.GetShrubContent(_philadelphusRepositoryVM.Model);
-            _philadelphusRepositoryVM.Childs.Clear();
-            foreach (var item in newRepo.ContentShrub.ContentWorkingTrees)
-            {
-                if (item.ContentRoot != null)
-                {
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service));
-                }
-            }
-            OnPropertyChanged(nameof(_philadelphusRepositoryVM));
-            OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
-            OnPropertyChanged(nameof(_philadelphusRepositoryVM.ChildsCount));
+            RebuildRepositoryTreeRootsFromCurrentModel();
             return _philadelphusRepositoryVM.Childs != null;
         }
         public bool CheckPhiladelphusRepositoryAvailability()
@@ -523,6 +509,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
             }
             return true;
+        }
+
+        private void RebuildRepositoryTreeRootsFromCurrentModel()
+        {
+            _philadelphusRepositoryVM.Childs.Clear();
+
+            foreach (var item in _philadelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees)
+            {
+                if (item.ContentRoot != null)
+                {
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service));
+                }
+            }
+
+            OnPropertyChanged(nameof(_philadelphusRepositoryVM));
+            OnPropertyChanged(nameof(_philadelphusRepositoryVM.Childs));
+            OnPropertyChanged(nameof(_philadelphusRepositoryVM.ChildsCount));
         }
 
         #endregion
