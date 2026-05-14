@@ -6,25 +6,61 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attribu
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts
 {
+    /// <summary>
+    /// Контекст данных для участников кустарника.
+    /// </summary>
     public partial class PostgreEfShrubMembersContext : DbContext
     {
         private readonly string _connectionString;
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PostgreEfShrubMembersContext" />.
+        /// </summary>
         public PostgreEfShrubMembersContext()
         {
         }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PostgreEfShrubMembersContext" />.
+        /// </summary>
+        /// <param name="connectionString">Строка подключения.</param>
         public PostgreEfShrubMembersContext(string connectionString)
         {
             _connectionString = connectionString;
         }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PostgreEfShrubMembersContext" />.
+        /// </summary>
+        /// <param name="options">Параметры конфигурации приложения.</param>
         public PostgreEfShrubMembersContext(DbContextOptions<PostgreEfShrubMembersContext> options)
             : base(options)
         {
         }
 
+        /// <summary>
+        /// Рабочие деревья.
+        /// </summary>
         public virtual DbSet<WorkingTree> WorkingTrees { get; set; }
+        
+        /// <summary>
+        /// Корни рабочих деревьев.
+        /// </summary>
         public virtual DbSet<TreeRoot> TreeRoots { get; set; }
+        
+        /// <summary>
+        /// Узлы рабочих деревьев.
+        /// </summary>
         public virtual DbSet<TreeNode> TreeNodes { get; set; }
+        
+        /// <summary>
+        /// Листы рабочих деревьев.
+        /// </summary>
         public virtual DbSet<TreeLeave> TreeLeaves { get; set; }
+
+        /// <summary>
+        /// Атрибут элементов рабочих деревьев.
+        /// </summary>
         public virtual DbSet<ElementAttribute> ElementAttributes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

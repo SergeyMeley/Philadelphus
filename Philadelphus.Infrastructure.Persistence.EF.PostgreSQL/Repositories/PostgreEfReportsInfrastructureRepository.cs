@@ -9,10 +9,21 @@ using System.Data;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
+    /// <summary>
+    /// Репозиторий доступа к данным отчета.
+    /// </summary>
     public class PostgreEfReportsInfrastructureRepository : PostgreEfInfrastructureRepositoryBase<PostgreEfReportsContext>, IReportsInfrastructureRepository
     {
+        /// <summary>
+        /// Группа инфраструктурных сущностей.
+        /// </summary>
         public override InfrastructureEntityGroups EntityGroup { get => InfrastructureEntityGroups.Reports; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PostgreEfReportsInfrastructureRepository" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="connectionString">Строка подключения.</param>
         public PostgreEfReportsInfrastructureRepository(
             ILogger logger,
             string connectionString) 
@@ -31,6 +42,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             };
         }
 
+        /// <summary>
+        /// Получает данные отчета.
+        /// </summary>
+        /// <param name="schemaName">Имя схемы.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
         public async Task<List<ReportInfo>> GetAvailableReportsAsync(string schemaName)
         {
             var reports = new List<ReportInfo>();
@@ -171,6 +187,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             return parameters;
         }
 
+        /// <summary>
+        /// Выполняет операцию отчета.
+        /// </summary>
+        /// <param name="report">Отчет.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
         public async Task<DataTable> ExecuteReportAsync(ReportInfo report)
         {
             using var connection = new NpgsqlConnection(_connectionString);
@@ -208,6 +229,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             return result;
         }
 
+        /// <summary>
+        /// Выполняет операцию RefreshMaterializedViewAsync.
+        /// </summary>
+        /// <param name="report">Отчет.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
         public async Task RefreshMaterializedViewAsync(ReportInfo report)
         {
             if (report.Type != "MaterializedView")
@@ -223,6 +249,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             await cmd.ExecuteNonQueryAsync();
         }
 
+        /// <summary>
+        /// Асинхронно проверяет корректность уникального индекса.
+        /// </summary>
+        /// <param name="schema">Схема БД.</param>
+        /// <param name="viewName">Имя представления БД.</param>
+        /// <param name="connection">Подключение к БД.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат содержит возвращаемые данные.</returns>
         public async Task<bool> HasValidUniqueIndexAsync(
             string schema,
             string viewName,

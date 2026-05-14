@@ -5,6 +5,9 @@ using Serilog;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
 {
+    /// <summary>
+    /// Представляет объект базового репозитория БД PostgreSQL.
+    /// </summary>
     public abstract class PostgreEfInfrastructureRepositoryBase<TContext> : EfInfrastructureRepositoryBase<TContext>
         where TContext : DbContext
     {

@@ -143,7 +143,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL
         /// Преобразовать тип PosgreSQL к типу .NET
         /// </summary>
         /// <param name="postgresType">PosgreSQL тип</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static Type ToDotNetType(string postgresType)
         {
             var normalizedType = postgresType.ToLowerInvariant();
@@ -156,7 +156,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL
         /// Преобразовать тип .NET к типу PosgreSQL
         /// </summary>
         /// <param name="dotNetType">.NET тип</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static string ToPostgresType(Type dotNetType)
         {
             return DotNetToPostgresMap.TryGetValue(dotNetType, out var pgType)
@@ -168,7 +168,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL
         /// Преобразовать тип .NET к типу Npgsql
         /// </summary>
         /// <param name="dotNetType">.NET тип</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static NpgsqlDbType ToNpgsqlDbType(Type dotNetType)
         {
             return dotNetType switch
@@ -208,7 +208,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL
         /// </summary>
         /// <param name="value">Значение .NET</param>
         /// <param name="targetType">Тип .NET</param>
-        /// <returns></returns>
+        /// <returns>Результат выполнения операции.</returns>
         public static object ConvertValue(object value, Type targetType)
         {
             if (value == null || targetType == null)
