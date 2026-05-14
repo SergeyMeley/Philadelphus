@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class RepositoryOpen : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="RepositoryOpen" />.
+        /// </summary>
         public RepositoryOpen()
         {
             InitializeComponent();

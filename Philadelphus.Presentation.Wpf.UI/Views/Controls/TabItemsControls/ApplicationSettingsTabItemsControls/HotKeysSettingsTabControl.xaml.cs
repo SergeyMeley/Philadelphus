@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.Appli
     /// </summary>
     public partial class HotKeysSettingsTabControl : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="HotKeysSettingsTabControl" />.
+        /// </summary>
         public HotKeysSettingsTabControl()
         {
             InitializeComponent();

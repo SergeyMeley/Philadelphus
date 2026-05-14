@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.Mapping
 {
+    /// <summary>
+    /// Профиль AutoMapper для сопоставления ViewModelsMappingProfile.
+    /// </summary>
     public class ViewModelsMappingProfile : Profile
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ViewModelsMappingProfile" />.
+        /// </summary>
         public ViewModelsMappingProfile()
         {
             CreateMap<ConnectionStringsContainer, ConnectionStringsContainerVM>().ReverseMap();

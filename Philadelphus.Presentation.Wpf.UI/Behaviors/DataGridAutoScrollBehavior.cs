@@ -11,14 +11,28 @@ using System.Windows.Threading;
 
 namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 {
+    /// <summary>
+    /// Представляет объект DataGridAutoScrollBehavior.
+    /// </summary>
     public class DataGridAutoScrollBehavior : Behavior<DataGrid>
     {
         private const int MaxHighlightedRowsPerBatch = 20;
 
         private sealed class RowHighlightState
         {
+            /// <summary>
+            /// Исходное локальное значение фона.
+            /// </summary>
             public object OriginalBackgroundLocalValue { get; set; } = DependencyProperty.UnsetValue;
+            
+            /// <summary>
+            /// Кисть подсветки.
+            /// </summary>
             public SolidColorBrush HighlightBrush { get; set; } = null!;
+           
+            /// <summary>
+            /// Обработчик выгрузки.
+            /// </summary>
             public RoutedEventHandler UnloadedHandler { get; set; } = null!;
         }
 

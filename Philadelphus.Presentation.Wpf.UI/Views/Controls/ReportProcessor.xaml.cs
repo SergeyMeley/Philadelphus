@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class ReportProcessor : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ReportProcessor" />.
+        /// </summary>
         public ReportProcessor()
         {
             InitializeComponent();

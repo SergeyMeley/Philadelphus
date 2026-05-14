@@ -14,6 +14,9 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления для репозитория.
+    /// </summary>
     public class RepositoryCreationControlVM : ControlBaseVM
     {
         private readonly IPhiladelphusRepositoryCollectionService _collectionService;
@@ -60,8 +63,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Коллекция хранилищ данных.
+        /// </summary>
         public DataStoragesCollectionVM DataStoragesCollectionVM { get => _dataStoragesCollectionVM; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="RepositoryCreationControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="collectionService">Параметр collectionService.</param>
+        /// <param name="repositoryService">Параметр repositoryService.</param>
+        /// <param name="configurationService">Параметр configurationService.</param>
+        /// <param name="repositoryCollectionVM">Параметр repositoryCollectionVM.</param>
+        /// <param name="repositoryHeadersCollectionVM">Параметр repositoryHeadersCollectionVM.</param>
+        /// <param name="dataStoragesSettingsVM">Параметр dataStoragesSettingsVM.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <param name="headersCollectionConfig">Параметр headersCollectionConfig.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryCreationControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -141,6 +164,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Команда выполнения операции хранилища данных.
+        /// </summary>
         public RelayCommand OpenDataStoragesSettingsControlCommand { get; set; }
     }
 }

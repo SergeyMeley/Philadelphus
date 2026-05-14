@@ -31,11 +31,18 @@ using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления для настроек приложения.
+    /// </summary>
     public class ApplicationSettingsControlVM : ControlBaseVM
     {
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
+        
+        /// <summary>
+        /// Настройки приложения.
+        /// </summary>
         public List<ApplicationSettingsTabItemControlVM> ApplicationSettingsTabItemsVMs { get; set; }
 
         private ApplicationSettingsTabItemControlVM _selectedApplicationSettingsTabItemVM;
@@ -51,9 +58,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
             }
         }
+       
+        /// <summary>
+        /// Выполняет операцию ConfigFiles.
+        /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         public HashSet<ConfigurationFileVM> ConfigFiles { get; } = new HashSet<ConfigurationFileVM>();
+       
+        /// <summary>
+        /// Выбранный конфигурационный файл.
+        /// </summary>
         public ConfigurationFileVM SelectedConfigFile { get; set; }
+       
+        /// <summary>
+        /// Выполняет операцию контейнера строк подключения.
+        /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public ObservableCollection<ConnectionStringsContainerVM> ConnectionStringsContainersVMs { get; } = new ObservableCollection<ConnectionStringsContainerVM>();
+      
+        /// <summary>
+        /// Контейнер строк подключения.
+        /// </summary>
         public ConnectionStringsContainerVM SelectedConnectionStringsContainerVM {  get; set; } 
         public string[] ProvidersNames
         { 
@@ -66,10 +91,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Контейнер строк подключения.
+        /// </summary>
         public string NewConnectionStringsContainerSelectedProvider { get; set; }
+       
+        /// <summary>
+        /// Контейнер строк подключения.
+        /// </summary>
         public string NewConnectionStringsContainerConnectionString { get; set; }
 
-
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ApplicationSettingsControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="configurationService">Параметр configurationService.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="appConfig">Параметр appConfig.</param>
+        /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
             IMapper mapper,
             ILogger logger,

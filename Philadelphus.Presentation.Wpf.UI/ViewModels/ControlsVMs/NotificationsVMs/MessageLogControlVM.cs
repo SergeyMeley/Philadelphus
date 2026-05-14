@@ -16,6 +16,9 @@ using System.Windows.Threading;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
+    /// <summary>
+    /// Модель представления для элемента управления.
+    /// </summary>
     public class MessageLogControlVM : ControlBaseVM, IDisposable
     {
         private readonly ObservableCollection<NotificationVM> _currentMessageLogAllNotifications = new ObservableCollection<NotificationVM>();
@@ -135,10 +138,24 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             }
         }
 
+        /// <summary>
+        /// Уведомление.
+        /// </summary>
         public ObservableCollection<NotificationVM> CurrentMessageLogFilteredNotifications => _currentMessageLogFilteredNotifications;
 
+        /// <summary>
+        /// Пользователь системы сообщений.
+        /// </summary>
         public string MessagingUserName => _notificationService.CurrentUser.NameWithNanoid;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MessageLogControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         public MessageLogControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -304,6 +321,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
                 || (IsOkMessagesVisible && notification.CriticalLevel == NotificationCriticalLevelModel.Ok);
         }
 
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             _pendingNotificationsFlushTimer.Stop();

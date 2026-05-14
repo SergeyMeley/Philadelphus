@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.Settings
     /// </summary>
     public partial class ConfigurationFilesSettings : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConfigurationFilesSettings" />.
+        /// </summary>
         public ConfigurationFilesSettings()
         {
             InitializeComponent();

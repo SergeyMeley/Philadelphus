@@ -1,5 +1,8 @@
 ﻿namespace Philadelphus.Presentation.Wpf.UI.Models.Entities.Enums
 {
+    /// <summary>
+    /// Перечисляет варианты репозитория.
+    /// </summary>
     internal enum RepositoryExplorerRepresentations
     {
         ByChildren_tree,

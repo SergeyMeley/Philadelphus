@@ -9,6 +9,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
     /// </summary>
     public partial class LaunchWindow : Window
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="LaunchWindow" />.
+        /// </summary>
+        /// <param name="vm">Параметр vm.</param>
         public LaunchWindow(LaunchWindowVM vm)
         {
             InitializeComponent();

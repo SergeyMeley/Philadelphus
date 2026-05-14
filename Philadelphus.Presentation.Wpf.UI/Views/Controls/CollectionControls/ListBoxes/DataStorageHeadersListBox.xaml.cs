@@ -29,6 +29,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.CollectionControls.Lis
             set { SetValue(DataStorageHeadersSelectedItemProperty, value); }
         }
         
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DataStorageHeadersListBox" />.
+        /// </summary>
         public DataStorageHeadersListBox()
         {
             InitializeComponent();

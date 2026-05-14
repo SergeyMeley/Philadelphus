@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGri
     /// </summary>
     public partial class TreeRootMemberDetails : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeRootMemberDetails" />.
+        /// </summary>
         public TreeRootMemberDetails()
         {
             InitializeComponent();

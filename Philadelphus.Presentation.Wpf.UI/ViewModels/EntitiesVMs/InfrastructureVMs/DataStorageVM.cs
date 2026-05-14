@@ -4,6 +4,9 @@ using System.Timers;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
+    /// <summary>
+    /// Модель представления для хранилища данных.
+    /// </summary>
     public class DataStorageVM : ViewModelBase, IDisposable
     {
         private System.Timers.Timer? _timer;
@@ -98,6 +101,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
                 return _model.LastCheckTime;
             }
         }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DataStorageVM" />.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public DataStorageVM(IDataStorageModel model)
         {
             ArgumentNullException.ThrowIfNull(model);
@@ -117,6 +126,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             _timer.AutoReset = true;
             _timer.Enabled = true;
         }
+
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             _timer?.Stop();

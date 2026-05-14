@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class ExtensionWidgetContainer : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ExtensionWidgetContainer" />.
+        /// </summary>
         public ExtensionWidgetContainer()
         {
             InitializeComponent();

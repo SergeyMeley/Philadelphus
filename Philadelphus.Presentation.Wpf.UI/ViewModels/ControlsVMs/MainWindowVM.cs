@@ -15,6 +15,9 @@ using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления для главного окна.
+    /// </summary>
     public class MainWindowVM : ControlBaseVM
     {
         private readonly ExtensionsControlVM _extensionsControlVM;
@@ -23,7 +26,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly ReportsControlVM _reportsControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
 
+        /// <summary>
+        /// Команды приложения.
+        /// </summary>
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
+      
+        /// <summary>
+        /// Расширение.
+        /// </summary>
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
         public RepositoryExplorerControlVM RepositoryExplorerVM
         {
@@ -58,11 +68,43 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return title;
             }
         }
+    
+        /// <summary>
+        /// Выполняет операцию AssemblyVersion.
+        /// </summary>
+        /// <returns>Полученные данные.</returns>
         public string AssemblyVersion { get => $"v.{Assembly.GetExecutingAssembly().GetName().Version}"; }
+       
+        /// <summary>
+        /// Имя пользователя.
+        /// </summary>
         public string UserName { get => _mainWindowNotificationsVM.MessageLogControlVM.MessagingUserName; }
+    
+        /// <summary>
+        /// Уведомление.
+        /// </summary>
         public MainWindowNotificationsVM MainWindowNotificationsVM { get => _mainWindowNotificationsVM; }
+     
+        /// <summary>
+        /// Выбранная модель представления элемента.
+        /// </summary>
         public IMainEntityVM<IMainEntityModel> SelectedElementVM { get => _repositoryExplorerControlVM?.SelectedRepositoryMember; } //TODO: Временно только элементы репозитория
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MainWindowVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="repositoryExplorerControlVM">Параметр repositoryExplorerControlVM.</param>
+        /// <param name="extensionVMFactory">Фабрика создания модели представления расширений.</param>
+        /// <param name="applicationSettingsControlVM">Параметр applicationSettingsControlVM.</param>
+        /// <param name="reportsControlVM">Параметр reportsControlVM.</param>
+        /// <param name="mainWindowNotificationsVM">Параметр mainWindowNotificationsVM.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public MainWindowVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -96,6 +138,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _notificationService.SendTextMessage<MainWindowVM>($"Основное окно. Расширения инициализированы ({ExtensionsControlVM.Extensions?.Count()} шт.).", NotificationCriticalLevelModel.Ok);
         }
 
+        /// <summary>
+        /// Команда выполнения операции стартового окна.
+        /// </summary>
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
         public RelayCommand OpenRepositoryMemberDetailsWindowCommand
         {

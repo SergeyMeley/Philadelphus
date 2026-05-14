@@ -62,6 +62,10 @@ namespace Philadelphus.Presentation.Wpf.UI
         [DllImport("kernel32.dll")]
         private static extern bool FreeConsole();
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="App" />.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Если операция недопустима для текущего состояния объекта.</exception>
         public App()
         {
             AllocConsole();

@@ -27,6 +27,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.CollectionControls.Lis
             set { SetValue(RepositoriesSelectedItemProperty, value); }
         }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="AvailableRepositoriesListBox" />.
+        /// </summary>
         public AvailableRepositoriesListBox()
         {
             InitializeComponent();

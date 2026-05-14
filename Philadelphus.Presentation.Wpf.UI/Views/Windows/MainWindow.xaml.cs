@@ -8,6 +8,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MainWindow" />.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();

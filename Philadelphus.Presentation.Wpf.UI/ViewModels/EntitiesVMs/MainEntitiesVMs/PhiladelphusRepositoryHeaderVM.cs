@@ -10,6 +10,9 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
+    /// <summary>
+    /// Модель представления для заголовка репозитория Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryHeaderVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
@@ -149,6 +152,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryHeaderVM" />.
+        /// </summary>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="philadelphusRepositoryHeader">Параметр philadelphusRepositoryHeader.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="dataStoragesVM">Параметр dataStoragesVM.</param>
+        /// <param name="updatePhiladelphusRepositoryHeaders">Параметр updatePhiladelphusRepositoryHeaders.</param>
+        /// <param name="configurationService">Параметр configurationService.</param>
+        /// <param name="appConfig">Параметр appConfig.</param>
+        /// <param name="PhiladelphusRepositoryHeadersCollectionConfig">Параметр PhiladelphusRepositoryHeadersCollectionConfig.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryHeaderVM(
             IMapper mapper,
             PhiladelphusRepositoryHeaderModel philadelphusRepositoryHeader,

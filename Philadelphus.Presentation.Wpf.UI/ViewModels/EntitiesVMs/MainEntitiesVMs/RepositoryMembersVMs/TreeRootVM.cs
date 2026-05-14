@@ -7,6 +7,9 @@ using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs
 {
+    /// <summary>
+    /// Модель представления для корня рабочего дерева.
+    /// </summary>
     public class TreeRootVM : MainEntityBaseVM<TreeRootModel>, INodeParent  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
@@ -35,13 +38,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 }
             }
         }
+
+        /// <summary>
+        /// Дочерние узлы.
+        /// </summary>
         public ObservableCollection<TreeNodeVM> ChildNodes { get => _childNodes; }
+      
+        /// <summary>
+        /// Дочерние элементы.
+        /// </summary>
         public CompositeCollection Childs { get; }
 
         #endregion
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeRootVM" />.
+        /// </summary>
+        /// <param name="treeRoot">Корень рабочего дерева.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public TreeRootVM(
             TreeRootModel treeRoot,
             DataStoragesCollectionVM dataStoragesCollectionVM,
@@ -77,6 +95,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         #region [ Methods ]
 
+        /// <summary>
+        /// Создает объект узла рабочего дерева.
+        /// </summary>
+        /// <returns>Созданный объект.</returns>
         public TreeNodeVM CreateTreeNode()
         {
             var resultModel = _service.CreateTreeNode(_model as TreeRootModel);

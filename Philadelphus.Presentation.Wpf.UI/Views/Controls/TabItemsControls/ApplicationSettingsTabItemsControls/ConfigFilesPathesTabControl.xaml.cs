@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.Appli
     /// </summary>
     public partial class ConfigFilesPathesTabControl : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConfigFilesPathesTabControl" />.
+        /// </summary>
         public ConfigFilesPathesTabControl()
         {
             InitializeComponent();

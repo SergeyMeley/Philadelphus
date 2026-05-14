@@ -95,10 +95,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return result;
             }
         }
+
+        /// <summary>
+        /// Выбранная модель представления атрибута.
+        /// </summary>
         public ElementAttributeVM SelectedAttributeVM { get; set; }
 
         private DataStorageVM _storageVM;
+
+        /// <summary>
+        /// Модель представления хранилища данных.
+        /// </summary>
         public DataStorageVM StorageVM { get => _storageVM; }
+      
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MainEntityBaseVM" />.
+        /// </summary>
+        /// <param name="IMainEntityModel">Параметр IMainEntityModel.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public MainEntityBaseVM(
             T IMainEntityModel,
             DataStoragesCollectionVM dataStoragesCollectionVM,
@@ -115,6 +131,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _storageVM = dataStoragesCollectionVM?.DataStoragesVMs?.SingleOrDefault(x => x.Uuid == _model.DataStorage.Uuid) ?? throw new NullReferenceException();
         }
+       
+        /// <summary>
+        /// Добавляет данные AddAttribute.
+        /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         public ElementAttributeVM AddAttribute()
         {
             if (_model is IAttributeOwnerModel)

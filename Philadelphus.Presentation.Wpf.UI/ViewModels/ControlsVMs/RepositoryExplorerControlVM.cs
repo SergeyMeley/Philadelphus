@@ -31,6 +31,9 @@ using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления обозревателя репозитория Чубушника.
+    /// </summary>
     public  class RepositoryExplorerControlVM : ControlBaseVM, IDisposable
     {
         #region [ Props ]
@@ -74,6 +77,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Имя открытого репозитория Чубушника.
+        /// </summary>
         public string CurentRepositoryName { get => _philadelphusRepositoryVM.Name; }
 
         //public List<IMainEntityModel> ElementsCollection { get; internal set; } = new List<IMainEntityModel>();
@@ -112,9 +118,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
 
         private ExtensionsControlVM _extensionsControlVM;
+
+        /// <summary>
+        /// Модель представления панели расширений текущего обозревателя.
+        /// </summary>
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
 
+        /// <summary>
+        /// Описание текущего фонового процесса.
+        /// </summary>
         public string CurrentProcess { get; private set; }
+
+        /// <summary>
+        /// Текстовое представление прогресса текущего фонового процесса.
+        /// </summary>
         public string CurrentProgress { get; private set; }
 
         private bool _isRepositoryLoading;
@@ -134,8 +151,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Указывает, доступно ли содержимое репозитория для взаимодействия.
+        /// </summary>
         public bool IsRepositoryContentEnabled => IsRepositoryLoading == false;
 
+        /// <summary>
+        /// Видимость индикатора загрузки репозитория.
+        /// </summary>
         public Visibility RepositoryLoadingVisibility => IsRepositoryLoading
             ? Visibility.Visible
             : Visibility.Collapsed;
@@ -144,6 +167,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="RepositoryExplorerControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="extensionVMFactory">Фабрика создания модели представления расширений.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="PhiladelphusRepositoryVM">Модель представления репозитория Чубушника.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -722,6 +759,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return IsRepositoryLoading == false;
         }
 
+        /// <summary>
+        /// Проверяет доступность текущего репозитория Чубушника.
+        /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool CheckPhiladelphusRepositoryAvailability()
         {
             if (_philadelphusRepositoryVM.Model == null)
@@ -823,6 +864,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             });
         }
 
+        /// <summary>
+        /// Освобождает ресурсы обозревателя репозитория.
+        /// </summary>
         public void Dispose()
         {
             if (_isDisposed)

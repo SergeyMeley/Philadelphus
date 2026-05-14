@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer
     /// </summary>
     public partial class RepositoryExplorerLeavesList : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="RepositoryExplorerLeavesList" />.
+        /// </summary>
         public RepositoryExplorerLeavesList()
         {
             InitializeComponent();

@@ -7,12 +7,20 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs
 {
+    /// <summary>
+    /// Модель представления для контейнера строк подключения.
+    /// </summary>
     public class ConnectionStringsContainerVM : ViewModelBase
     {
         private ConnectionStringsContainer _connectionStringsContainer;
         private string _providerName;
         private string _connectionString;
         private bool _forDelete;
+      
+        /// <summary>
+        /// Выполняет операцию Uuid.
+        /// </summary>
+        /// <returns>Созданный объект.</returns>
         public Guid Uuid { get; internal set; } = Guid.CreateVersion7();
         public string ProviderName 
         { 
@@ -56,6 +64,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContai
                 }
             }
         }
+      
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConnectionStringsContainerVM" />.
+        /// </summary>
         public ConnectionStringsContainerVM()
         {
             _connectionStringsContainer = new ConnectionStringsContainer()

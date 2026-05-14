@@ -5,12 +5,18 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
+    /// <summary>
+    /// Модель представления для листа рабочего дерева.
+    /// </summary>
     public class TreeLeaveVM : MainEntityBaseVM<TreeLeaveModel> //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
 
         private readonly IPhiladelphusRepositoryService _service;
 
+        /// <summary>
+        /// Родительский элемент.
+        /// </summary>
         public TreeNodeVM Parent { get; }
 
         public string Alias
@@ -54,6 +60,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeLeaveVM" />.
+        /// </summary>
+        /// <param name="parent">Родительский элемент.</param>
+        /// <param name="treeLeave">Лист рабочего дерева.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public TreeLeaveVM(
             TreeNodeVM parent,
             TreeLeaveModel treeLeave,

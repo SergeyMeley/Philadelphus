@@ -9,6 +9,9 @@ using System.IO;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs
 {
+    /// <summary>
+    /// Модель представления для коллекции хранилищ данных.
+    /// </summary>
     public class DataStoragesCollectionVM : ViewModelBase, IDisposable
     {
         private readonly ILogger _logger;
@@ -63,6 +66,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DataStoragesCollectionVM" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="dataStoragesService">Параметр dataStoragesService.</param>
+        /// <param name="applicationSettings">Параметр applicationSettings.</param>
+        /// <param name="connectionStringsCollection">Параметр connectionStringsCollection.</param>
+        /// <param name="dataStoragesCollection">Параметр dataStoragesCollection.</param>
+        /// <param name="infrastructureRepositoryFactory">Параметр infrastructureRepositoryFactory.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public DataStoragesCollectionVM(
             ILogger logger,
             INotificationService notificationService,
@@ -136,6 +150,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.Infrastructure
             return true;
         }
 
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             foreach (var vm in DataStoragesVMs)

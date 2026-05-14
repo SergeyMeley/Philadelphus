@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class MessageLog : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MessageLog" />.
+        /// </summary>
         public MessageLog()
         {
             InitializeComponent();

@@ -10,6 +10,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
     /// </summary>
     public partial class DetailsWindow : Window
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DetailsWindow" />.
+        /// </summary>
+        /// <param name="vm">Параметр vm.</param>
         public DetailsWindow(IMainEntityVM<IMainEntityModel> vm)
         {
             InitializeComponent();

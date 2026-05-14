@@ -28,6 +28,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.CollectionControls.Lis
             get { return GetValue(RepositoryHeadersSelectedItemProperty); }
             set { SetValue(RepositoryHeadersSelectedItemProperty, value); }
         }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="RepositoryHeadersListBox" />.
+        /// </summary>
         public RepositoryHeadersListBox()
         {
             InitializeComponent();

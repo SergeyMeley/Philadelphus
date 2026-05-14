@@ -9,6 +9,9 @@ using System.Windows.Threading;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 {
+    /// <summary>
+    /// Представляет объект окна.
+    /// </summary>
     public partial class SplashWindow : Window
     {
         private readonly IServiceProvider _serviceProvider;
@@ -17,6 +20,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private bool _isClosing = false;
         private readonly DispatcherPriority _animationPriority = DispatcherPriority.Background;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="SplashWindow" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
         public SplashWindow(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -266,6 +273,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             _dotTimer.Start();
         }
 
+        /// <summary>
+        /// Обновляет данные UpdateLoadingText.
+        /// </summary>
+        /// <param name="message">Сообщение.</param>
         public void UpdateLoadingText(string message)
         {
             Dispatcher.BeginInvoke(new Action(() =>
@@ -278,11 +289,19 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             }), _animationPriority);
         }
 
+        /// <summary>
+        /// Обновляет данные UpdateProgress.
+        /// </summary>
+        /// <param name="percent">Параметр percent.</param>
         public void UpdateProgress(int percent)
         {
             UpdateLoadingText($"Загрузка... {percent}%");
         }
 
+        /// <summary>
+        /// Выполняет операцию CloseWithAnimation.
+        /// </summary>
+        /// <param name="nextWindow">Параметр nextWindow.</param>
         public void CloseWithAnimation(Window nextWindow)
         {
             if (_isClosing) return;

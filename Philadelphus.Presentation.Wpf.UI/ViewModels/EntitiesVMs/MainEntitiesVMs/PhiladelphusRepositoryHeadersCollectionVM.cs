@@ -12,6 +12,9 @@ using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
+    /// <summary>
+    /// Модель представления для коллекции заголовков репозиториев Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryHeadersCollectionVM : ViewModelBase  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         private readonly ILogger _logger;
@@ -40,7 +43,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
+        /// <summary>
+        /// Заголовок репозитория Чубушника.
+        /// </summary>
         public CollectionViewSource FavoritePhiladelphusRepositoryHeadersVMs { get; }
+       
+        /// <summary>
+        /// Заголовок репозитория Чубушника.
+        /// </summary>
         public CollectionViewSource LastPhiladelphusRepositoryHeadersVMs { get; }
 
         private PhiladelphusRepositoryHeaderVM _selectedPhiladelphusRepositoryHeaderVM;
@@ -75,6 +85,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 });
             }
         }
+      
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryHeadersCollectionVM" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="dataStoragesSettingsVM">Параметр dataStoragesSettingsVM.</param>
+        /// <param name="configurationService">Параметр configurationService.</param>
+        /// <param name="appConfig">Параметр appConfig.</param>
+        /// <param name="philadelphusRepositoryHeadersCollectionConfig">Параметр philadelphusRepositoryHeadersCollectionConfig.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryHeadersCollectionVM(
             ILogger logger,
             INotificationService notificationService,
@@ -138,6 +161,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 LastPhiladelphusRepositoryHeadersVMs.View.Refresh();
             };
         }
+    
+        /// <summary>
+        /// Выполняет операцию репозитория Чубушника.
+        /// </summary>
+        /// <param name="header">Параметр header.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool CheckPhiladelphusRepositoryAvailable(PhiladelphusRepositoryHeaderVM header)
         {
             if (header == null)

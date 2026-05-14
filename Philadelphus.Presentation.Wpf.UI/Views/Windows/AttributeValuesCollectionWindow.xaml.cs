@@ -19,6 +19,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
     /// </summary>
     public partial class AttributeValuesCollectionWindow : Window
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="AttributeValuesCollectionWindow" />.
+        /// </summary>
         public AttributeValuesCollectionWindow()
         {
             InitializeComponent();

@@ -9,6 +9,9 @@ using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
+    /// <summary>
+    /// Модель представления для приложения.
+    /// </summary>
     public class ApplicationVM : ViewModelBase
     {
         private readonly IServiceProvider _serviceProvider;
@@ -17,20 +20,55 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         private readonly INotificationService _notificationService;
 
         private ApplicationCommandsVM _applicationCommandsVM;
+     
+        /// <summary>
+        /// Команды приложения.
+        /// </summary>
         public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
 
         private LaunchWindowVM _launchVM;
+       
+        /// <summary>
+        /// Модель представления стартового окна.
+        /// </summary>
         public LaunchWindowVM LaunchVM { get { return _launchVM; } }
 
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
+       
+        /// <summary>
+        /// Хранилище данных.
+        /// </summary>
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
 
         private PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
+      
+        /// <summary>
+        /// Репозиторий.
+        /// </summary>
         public PhiladelphusRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
 
         private PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
+       
+        /// <summary>
+        /// Репозиторий.
+        /// </summary>
         public PhiladelphusRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ApplicationVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="dataStoragesSettingsVM">Параметр dataStoragesSettingsVM.</param>
+        /// <param name="PhiladelphusRepositoryCollectionVM">Параметр PhiladelphusRepositoryCollectionVM.</param>
+        /// <param name="PhiladelphusRepositoryHeadersCollectionVM">Параметр PhiladelphusRepositoryHeadersCollectionVM.</param>
+        /// <param name="RepositoryCreationVM">Параметр RepositoryCreationVM.</param>
+        /// <param name="launchVM">Параметр launchVM.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationVM(
             IServiceProvider serviceProvider,
             IMapper mapper,

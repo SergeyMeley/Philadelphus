@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.Appli
     /// </summary>
     public partial class ConnectionStringsTabControl : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConnectionStringsTabControl" />.
+        /// </summary>
         public ConnectionStringsTabControl()
         {
             InitializeComponent();

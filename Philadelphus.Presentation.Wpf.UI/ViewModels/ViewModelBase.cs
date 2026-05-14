@@ -3,6 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
+    /// <summary>
+    /// Представляет объект ViewModelBase.
+    /// </summary>
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;

@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class About : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="About" />.
+        /// </summary>
         public About()
         {
             InitializeComponent();

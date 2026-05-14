@@ -12,10 +12,21 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
+    /// <summary>
+    /// Модель представления для уведомления.
+    /// </summary>
     public class ModalWindowNotificationsControlVM : ControlBaseVM, IDisposable
     {
         private bool _isSetedHandler;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ModalWindowNotificationsControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         public ModalWindowNotificationsControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -76,6 +87,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             return true;
         }
 
+        /// <summary>
+        /// Выполняет операцию Dispose.
+        /// </summary>
         public void Dispose()
         {
             if (_isSetedHandler)

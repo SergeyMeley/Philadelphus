@@ -14,8 +14,14 @@ using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления для стартового окна.
+    /// </summary>
     public class LaunchWindowVM : ControlBaseVM
     {
+        /// <summary>
+        /// Стартовое окно.
+        /// </summary>
         public List<LaunchWindowTabItemControlVM> LaunchWindowTabItemsVMs { get; set; }
 
         private LaunchWindowTabItemControlVM _selectedLaunchWindowTabItemVM;
@@ -33,25 +39,68 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
 
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
+        /// <summary>
+        /// Настройки приложения.
+        /// </summary>
         public ApplicationSettingsControlVM ApplicationSettingsControlVM { get => _applicationSettingsControlVM; }
 
         private DataStoragesCollectionVM _dataStoragesCollectionVM;
+        /// <summary>
+        /// Хранилище данных.
+        /// </summary>
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesCollectionVM; }
 
         private PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
+        /// <summary>
+        /// Репозиторий.
+        /// </summary>
         public PhiladelphusRepositoryCollectionVM RepositoryCollectionVM { get => _repositoryCollectionVM; }
 
         private PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
+        /// <summary>
+        /// Репозиторий.
+        /// </summary>
         public PhiladelphusRepositoryHeadersCollectionVM RepositoryHeadersCollectionVM { get => _repositoryHeadersCollectionVM; }
 
         private StorageCreationControlVM _storageCreationControlVM;
+        /// <summary>
+        /// Элемент управления.
+        /// </summary>
         public StorageCreationControlVM StorageCreationControlVM { get => _storageCreationControlVM; }
 
         private RepositoryCreationControlVM _repositoryCreationVM;
+        /// <summary>
+        /// Репозиторий.
+        /// </summary>
         public RepositoryCreationControlVM RepositoryCreationVM { get => _repositoryCreationVM; }
+        /// <summary>
+        /// Имя пользователя.
+        /// </summary>
         public string UserName { get => Environment.UserName; }
+        /// <summary>
+        /// Заголовок.
+        /// </summary>
         public string Title { get => $"Чубушник {AssemblyVersion}"; }
+        /// <summary>
+        /// Выполняет операцию AssemblyVersion.
+        /// </summary>
+        /// <returns>Полученные данные.</returns>
         public string AssemblyVersion { get => $"v.{Assembly.GetExecutingAssembly().GetName().Version}"; }
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="LaunchWindowVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="repositoryCollectionVM">Параметр repositoryCollectionVM.</param>
+        /// <param name="repositoryHeadersCollectionVM">Параметр repositoryHeadersCollectionVM.</param>
+        /// <param name="storageCreationControlVM">Параметр storageCreationControlVM.</param>
+        /// <param name="repositoryCreationControlVM">Параметр repositoryCreationControlVM.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="applicationSettingsControlVM">Параметр applicationSettingsControlVM.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public LaunchWindowVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -87,6 +136,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             InitializeTabs();
         }
 
+        /// <summary>
+        /// Команда выполнения операции главного окна.
+        /// </summary>
         public RelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;
         public RelayCommand OpenMainWindowWithHeaderCommand
         {

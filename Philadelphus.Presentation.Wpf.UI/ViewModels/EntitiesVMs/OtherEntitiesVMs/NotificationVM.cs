@@ -9,11 +9,17 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesVMs
 {
+    /// <summary>
+    /// Модель представления для уведомления.
+    /// </summary>
     public class NotificationVM : ViewModelBase
     {
         private readonly Notification _model;
         private readonly INotificationService _service;
 
+        /// <summary>
+        /// Модель.
+        /// </summary>
         public Notification Model { get => _model; }
 
         /// <summary>
@@ -69,6 +75,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesV
             }
         }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="NotificationVM" />.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public NotificationVM(
             Notification model,
             INotificationService service)

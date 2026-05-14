@@ -6,8 +6,14 @@ using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
+    /// <summary>
+    /// WPF-конвертер значений для UtcToLocalTimeConverter.
+    /// </summary>
     public class UtcToLocalTimeConverter : IValueConverter
     {
+        /// <summary>
+        /// Перечисляет варианты DateTimeStyle.
+        /// </summary>
         public enum DateTimeStyle
         {
             // Российские форматы
@@ -31,6 +37,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
 
         private readonly CultureInfo _russianCulture = new CultureInfo("ru-RU");
 
+        /// <summary>
+        /// Преобразует значение для Convert.
+        /// </summary>
+        /// <param name="value">Значение.</param>
+        /// <param name="targetType">Целевой тип преобразования.</param>
+        /// <param name="parameter">Дополнительный параметр преобразования.</param>
+        /// <param name="culture">Культура преобразования.</param>
+        /// <returns>Преобразованное значение.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is DateTime dateTime)
@@ -88,6 +102,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
             return dateTime.ToString("dd.MM.yyyy HH:mm", _russianCulture);
         }
 
+        /// <summary>
+        /// Преобразует значение для ConvertBack.
+        /// </summary>
+        /// <param name="value">Значение.</param>
+        /// <param name="targetType">Целевой тип преобразования.</param>
+        /// <param name="parameter">Дополнительный параметр преобразования.</param>
+        /// <param name="culture">Культура преобразования.</param>
+        /// <returns>Преобразованное значение.</returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))

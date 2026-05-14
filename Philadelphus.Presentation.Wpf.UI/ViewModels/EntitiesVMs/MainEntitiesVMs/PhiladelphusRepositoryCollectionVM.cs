@@ -11,6 +11,9 @@ using System.IO;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
+    /// <summary>
+    /// Модель представления для коллекции репозиториев Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryCollectionVM : ViewModelBase //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         private readonly IServiceProvider _serviceProvider;
@@ -20,7 +23,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly IPhiladelphusRepositoryService _service;
 
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
+
+        /// <summary>
+        /// Хранилище данных.
+        /// </summary>
         public DataStoragesCollectionVM DataStoragesSettingsVM { get => _dataStoragesSettingsVM; }
+       
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryCollectionVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="collectionService">Параметр collectionService.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="dataStoragesSettings">Параметр dataStoragesSettings.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryCollectionVM(
             IServiceProvider serviceProvider,
             ILogger logger,

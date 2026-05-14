@@ -22,12 +22,24 @@ using static System.Net.WebRequestMethods;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 {
+    /// <summary>
+    /// Сервис для работы с ConfigurationService.
+    /// </summary>
     public class ConfigurationService : IConfigurationService
     {
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollectionConfig;
         private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _PhiladelphusRepositoryHeadersCollectionConfig;
+       
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConfigurationService" />.
+        /// </summary>
+        /// <param name="appConfig">Параметр appConfig.</param>
+        /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
+        /// <param name="dataStoragesCollectionConfig">Параметр dataStoragesCollectionConfig.</param>
+        /// <param name="PhiladelphusRepositoryHeadersCollectionConfig">Параметр PhiladelphusRepositoryHeadersCollectionConfig.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ConfigurationService(
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
@@ -45,6 +57,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             _PhiladelphusRepositoryHeadersCollectionConfig = PhiladelphusRepositoryHeadersCollectionConfig;
         }
 
+        /// <summary>
+        /// Выполняет операцию MoveConfigFile.
+        /// </summary>
+        /// <param name="configFile">Параметр configFile.</param>
+        /// <param name="newDirectory">Параметр newDirectory.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool MoveConfigFile(FileInfo configFile, DirectoryInfo newDirectory)
         {
             ArgumentNullException.ThrowIfNull(configFile);
@@ -71,6 +90,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
             return true;
         }
+
+        /// <summary>
+        /// Выполняет операцию SelectAnotherConfigFile.
+        /// </summary>
+        /// <param name="configurationFileVM">Параметр configurationFileVM.</param>
+        /// <param name="newFile">Параметр newFile.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool SelectAnotherConfigFile(ConfigurationFileVM configurationFileVM, FileInfo newFile)
         {
             ArgumentNullException.ThrowIfNull(configurationFileVM);
@@ -169,6 +196,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             return true;
         }
 
+        /// <summary>
+        /// Выполняет операцию ContractEnvironmentVariables.
+        /// </summary>
+        /// <param name="expandedPath">Параметр expandedPath.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
         public static string ContractEnvironmentVariables(string expandedPath)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(expandedPath);
@@ -194,6 +227,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             return result.Replace("\\", "\\\\");
         }
 
+        /// <summary>
+        /// Выполняет операцию CheckOrInitDirectory.
+        /// </summary>
+        /// <param name="path">Путь.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public static async Task CheckOrInitDirectory(DirectoryInfo path)
         {
             ArgumentNullException.ThrowIfNull(path);

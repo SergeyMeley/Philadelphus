@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.Launc
     /// </summary>
     public partial class LaunchWindowMainTabControl : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="LaunchWindowMainTabControl" />.
+        /// </summary>
         public LaunchWindowMainTabControl()
         {
             InitializeComponent();

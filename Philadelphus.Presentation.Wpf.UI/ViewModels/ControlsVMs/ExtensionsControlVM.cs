@@ -34,7 +34,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             set => SetProperty(ref _repositoryVM, value);
         }
 
+        /// <summary>
+        /// Выполняет операцию расширения.
+        /// </summary>
+        /// <returns>Коллекция полученных данных.</returns>
         public static ObservableCollection<ExtensionInstanceVM> Extensions { get; } = new ObservableCollection<ExtensionInstanceVM>();
+        /// <summary>
+        /// Последние операции.
+        /// </summary>
         public ObservableCollection<OperationLog> RecentOperations { get; }
 
         public ExtensionInstanceVM SelectedExtension
@@ -67,11 +74,34 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             set => SetProperty(ref _isExecuting, value);
         }
 
+        /// <summary>
+        /// Команда выполнения операции расширения.
+        /// </summary>
         public ICommand StartExtensionCommand { get; }
+        /// <summary>
+        /// Команда выполнения операции расширения.
+        /// </summary>
         public ICommand StopExtensionCommand { get; }
+        /// <summary>
+        /// Команда выполнения операции расширения.
+        /// </summary>
         public ICommand ExecuteExtensionCommand { get; }
+        /// <summary>
+        /// Команда выполнения операции главного окна.
+        /// </summary>
         public ICommand OpenMainWindowCommand { get; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ExtensionsControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="extensionManager">Параметр extensionManager.</param>
+        /// <param name="repositoryExplorerControlVM">Параметр repositoryExplorerControlVM.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ExtensionsControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -95,6 +125,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
         }
 
+        /// <summary>
+        /// Инициализирует данные InitializeAsync.
+        /// </summary>
+        /// <param name="pluginsFolderPaths">Параметр pluginsFolderPaths.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
         public async Task InitializeAsync(IEnumerable<DirectoryInfo> pluginsFolderPaths)
         {
             if (Extensions.Count > 0
@@ -136,6 +171,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Инициализирует данные InitializeAsync.
+        /// </summary>
+        /// <param name="extensions">Параметр extensions.</param>
+        /// <returns>Задача, представляющая асинхронную операцию.</returns>
         public async Task InitializeAsync(IEnumerable<ExtensionInstance> extensions)
         {
             foreach (var ext in extensions)

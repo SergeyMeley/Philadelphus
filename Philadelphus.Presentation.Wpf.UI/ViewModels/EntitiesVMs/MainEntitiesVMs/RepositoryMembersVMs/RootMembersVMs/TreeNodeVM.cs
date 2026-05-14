@@ -7,6 +7,9 @@ using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
+    /// <summary>
+    /// Модель представления для узла рабочего дерева.
+    /// </summary>
     public class TreeNodeVM : MainEntityBaseVM<TreeNodeModel>, INodeParent, ILeaveParent  //TODO: Вынести команды в RepositoryExplorerControlVM, исключить сервисы
     {
         #region [ Props ]
@@ -43,16 +46,35 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
 
         private readonly ObservableCollection<TreeNodeVM> _childNodes = new ObservableCollection<TreeNodeVM>();
+        
+        /// <summary>
+        /// Дочерние узлы.
+        /// </summary>
         public ObservableCollection<TreeNodeVM> ChildNodes { get => _childNodes; }
 
         private readonly ObservableCollection<TreeLeaveVM> _childLeaves = new ObservableCollection<TreeLeaveVM>();
+        
+        /// <summary>
+        /// Дочерние листья.
+        /// </summary>
         public ObservableCollection<TreeLeaveVM> ChildLeaves { get => _childLeaves; }
+       
+        /// <summary>
+        /// Дочерние элементы.
+        /// </summary>
         public CompositeCollection Childs { get; }
 
         #endregion
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeNodeVM" />.
+        /// </summary>
+        /// <param name="treeNode">Узел рабочего дерева.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public TreeNodeVM(
             TreeNodeModel treeNode,
             DataStoragesCollectionVM dataStoragesCollectionVM,
@@ -92,6 +114,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
         #region [ Methods ]
 
+        /// <summary>
+        /// Создает объект узла рабочего дерева.
+        /// </summary>
+        /// <returns>Созданный объект.</returns>
         public TreeNodeVM CreateTreeNode()
         {
             var resultModel = _service.CreateTreeNode(_model);
@@ -103,6 +129,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             return result;
         }
 
+        /// <summary>
+        /// Создает объект листа рабочего дерева.
+        /// </summary>
+        /// <returns>Созданный объект.</returns>
         public TreeLeaveVM CreateTreeLeave()
         {
             var resultModel = _service.CreateTreeLeave(_model);

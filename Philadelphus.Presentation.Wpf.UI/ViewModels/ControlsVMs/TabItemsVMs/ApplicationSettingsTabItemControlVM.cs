@@ -9,8 +9,19 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs
 {
+    /// <summary>
+    /// Модель представления для настроек приложения.
+    /// </summary>
     public class ApplicationSettingsTabItemControlVM : TabItemControlBaseVM
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ApplicationSettingsTabItemControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         public ApplicationSettingsTabItemControlVM(
             IServiceProvider serviceProvider, 
             IMapper mapper, 

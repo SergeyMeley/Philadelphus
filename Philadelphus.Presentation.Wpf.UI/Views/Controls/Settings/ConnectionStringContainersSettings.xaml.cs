@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.Settings
     /// </summary>
     public partial class ConnectionStringContainersSettings : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ConnectionStringContainersSettings" />.
+        /// </summary>
         public ConnectionStringContainersSettings()
         {
             InitializeComponent();

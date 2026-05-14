@@ -10,6 +10,9 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs
 {
+    /// <summary>
+    /// Модель представления для атрибута элемента.
+    /// </summary>
     public class ElementAttributeVM : MainEntityBaseVM<ElementAttributeModel>
     {
         #region [ Props ]
@@ -19,7 +22,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly ElementAttributeModel _model;
         private ObservableCollection<TreeLeaveModel> _assignedValues = new ObservableCollection<TreeLeaveModel>();
 
+        /// <summary>
+        /// Владелец.
+        /// </summary>
         public IOwnerModel Owner { get => _model.Owner; }
+        
+        /// <summary>
+        /// Хранилище данных.
+        /// </summary>
         public IDataStorageModel DataStorage { get => _model.DataStorage; }
         public TreeNodeModel SelectedValueType 
         { 
@@ -44,6 +54,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 
             }
         }
+      
+        /// <summary>
+        /// Список типов значений.
+        /// </summary>
         public IEnumerable<TreeNodeModel>? ValueTypesList { get => _model.ValueTypesList; }
 
         public bool IsCollectionValue
@@ -105,6 +119,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         {
             get => string.Join("; ", _assignedValues?.Select(x => x.Name) ?? new List<string>());
         }
+       
+        /// <summary>
+        /// Выбранное значение.
+        /// </summary>
         public TreeLeaveModel SelectedValue { get; set; }
         public IEnumerable<TreeLeaveModel>? ValuesList 
         { 
@@ -133,6 +151,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
+        /// <summary>
+        /// Список областей видимости.
+        /// </summary>
         public List<VisibilityScopeItem> VisibilityScopesList { get; }
 
         public OverrideType Override
@@ -148,16 +169,32 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
+        /// <summary>
+        /// Список режимов переопределения.
+        /// </summary>
         public List<OverrideTypeItem> OverrideTypesList { get; }
 
+        /// <summary>
+        /// Глубина наследования.
+        /// </summary>
         public int InheritanceDepth => _model.InheritanceDepth;
 
+        /// <summary>
+        /// Владелец объявления.
+        /// </summary>
         public IOwnerModel DeclaringOwner => _model.DeclaringOwner;
 
         #endregion
 
         #region [ Construct ]
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ElementAttributeVM" />.
+        /// </summary>
+        /// <param name="elementAttribute">Параметр elementAttribute.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ElementAttributeVM(
             ElementAttributeModel elementAttribute,
             DataStoragesCollectionVM dataStoragesCollectionVM,
@@ -209,6 +246,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             OnPropertyChanged(nameof(State));
         }
 
+        /// <summary>
+        /// Добавляет данные AddSelectedValue.
+        /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool AddSelectedValue()
         {
             if (IsCollectionValue == false)
@@ -230,6 +271,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             return false;
         }
 
+        /// <summary>
+        /// Удаляет данные RemoveSelectedValue.
+        /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool RemoveSelectedValue()
         {
             if (IsCollectionValue == false)

@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class FavoriteAndLastRepositoryHeaders : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="FavoriteAndLastRepositoryHeaders" />.
+        /// </summary>
         public FavoriteAndLastRepositoryHeaders()
         {
             InitializeComponent();

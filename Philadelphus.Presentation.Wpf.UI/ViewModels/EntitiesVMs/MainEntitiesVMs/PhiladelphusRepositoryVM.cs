@@ -10,6 +10,9 @@ using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
+    /// <summary>
+    /// Модель представления для репозитория Чубушника.
+    /// </summary>
     public class PhiladelphusRepositoryVM : MainEntityBaseVM<PhiladelphusRepositoryModel>
     {
         public IDataStorageModel OwnDataStorage 
@@ -21,6 +24,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
 
         private DataStorageVM _storageVM;
+       
+        /// <summary>
+        /// Модель представления хранилища данных.
+        /// </summary>
         public DataStorageVM StorageVM { get => _storageVM; }
         public string OwnDataStorageName
         {
@@ -38,11 +45,24 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
 
         private ObservableCollection<IDataStorageModel> _dataStorages { get; }
+      
+        /// <summary>
+        /// Хранилище данных.
+        /// </summary>
         public ObservableCollection<IDataStorageModel> DataStorages { get => _dataStorages; }
 
         private ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
+       
+        /// <summary>
+        /// Дочерние элементы.
+        /// </summary>
         public ObservableCollection<TreeRootVM> Childs { get => _childs; }
 
+       
+        /// <summary>
+        /// Выполняет операцию ChildsCount.
+        /// </summary>
+        /// <returns>Результат выполнения операции.</returns>
         public string ChildsCount { get => $"Детей: {Childs?.Count()}, Корней: {_model?.ContentShrub?.ContentWorkingTrees?.Count()}, Uuids: NOT IMPLEMENTED"; }
 
         public bool IsFavorite
@@ -69,7 +89,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
-
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryVM" />.
+        /// </summary>
+        /// <param name="repositoryModel">Параметр repositoryModel.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryVM(
             PhiladelphusRepositoryModel repositoryModel,
             DataStoragesCollectionVM dataStoragesCollectionVM,

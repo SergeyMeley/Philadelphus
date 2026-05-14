@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class ApplicationSettings : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ApplicationSettings" />.
+        /// </summary>
         public ApplicationSettings()
         {
             InitializeComponent();

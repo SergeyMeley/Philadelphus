@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGri
     /// </summary>
     public partial class UniversalDetails : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="UniversalDetails" />.
+        /// </summary>
         public UniversalDetails()
         {
             InitializeComponent();

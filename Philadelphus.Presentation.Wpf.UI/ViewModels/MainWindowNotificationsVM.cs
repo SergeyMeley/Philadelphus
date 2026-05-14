@@ -10,6 +10,9 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
+    /// <summary>
+    /// Модель представления для уведомления.
+    /// </summary>
     public class MainWindowNotificationsVM : ViewModelBase
     {
         private readonly INotificationService _notificationService;
@@ -38,6 +41,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
                 return _modalControlVM;
             }
         }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MainWindowNotificationsVM" />.
+        /// </summary>
+        /// <param name="messageLogControlVM">Параметр messageLogControlVM.</param>
+        /// <param name="popupControlVM">Параметр popupControlVM.</param>
+        /// <param name="modalControlVM">Параметр modalControlVM.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public MainWindowNotificationsVM(
             MessageLogControlVM messageLogControlVM,
             PopUpNotificationsControlVM popupControlVM,

@@ -20,6 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer
     /// </summary>
     public partial class Attributes : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="Attributes" />.
+        /// </summary>
         public Attributes()
         {
             InitializeComponent();

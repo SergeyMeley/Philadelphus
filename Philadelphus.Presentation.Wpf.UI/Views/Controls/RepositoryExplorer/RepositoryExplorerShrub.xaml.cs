@@ -24,7 +24,15 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer
     /// </summary>
     public partial class RepositoryExplorerShrub : UserControl
     {
+        /// <summary>
+        /// Выполняет операцию ViewModel.
+        /// </summary>
+        /// <param name="RepositoryExplorerControlVM">Параметр RepositoryExplorerControlVM.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public RepositoryExplorerControlVM ViewModel { get { return (RepositoryExplorerControlVM)DataContext; } }
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="RepositoryExplorerShrub" />.
+        /// </summary>
         public RepositoryExplorerShrub()
         {
             InitializeComponent();

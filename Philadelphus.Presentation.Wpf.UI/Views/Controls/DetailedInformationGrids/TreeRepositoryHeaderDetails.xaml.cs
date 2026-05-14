@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGri
     /// </summary>
     public partial class PhiladelphusRepositoryHeaderDetails : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PhiladelphusRepositoryHeaderDetails" />.
+        /// </summary>
         public PhiladelphusRepositoryHeaderDetails()
         {
             InitializeComponent();

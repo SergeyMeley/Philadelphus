@@ -7,9 +7,18 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
+    /// <summary>
+    /// Модель представления для команд приложения.
+    /// </summary>
     public class ApplicationCommandsVM
     {
         private readonly IServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ApplicationCommandsVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationCommandsVM(
             IServiceProvider serviceProvider)
         {

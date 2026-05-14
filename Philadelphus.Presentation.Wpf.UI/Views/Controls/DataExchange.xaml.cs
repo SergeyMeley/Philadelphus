@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls
     /// </summary>
     public partial class DataExchange : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DataExchange" />.
+        /// </summary>
         public DataExchange()
         {
             InitializeComponent();

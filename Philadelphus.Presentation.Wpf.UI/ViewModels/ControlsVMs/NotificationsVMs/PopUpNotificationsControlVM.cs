@@ -5,6 +5,9 @@ using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
+    /// <summary>
+    /// Модель представления для уведомления.
+    /// </summary>
     public class PopUpNotificationsControlVM : ControlBaseVM
     {
         private TimeSpan _periodicity = new TimeSpan(hours: 0, minutes: 0, seconds: 3);
@@ -12,6 +15,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         private DateTime _lastUpdate;
 
         private static bool _isOpen;
+
+        /// <summary>
+        /// Признак открытого состояния.
+        /// </summary>
         public bool IsOpen { get => _isOpen; set => _isOpen = value; }
 
         private static List<Notification> _notificationList = new List<Notification>();
@@ -43,6 +50,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         //    set => _lastNotification = value; 
         //}
 
+        /// <summary>
+        /// Выполняет операцию уведомления.
+        /// </summary>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool StartReceivingNotifications()
         {
             _isOpen = true;
@@ -94,6 +105,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             }
         }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PopUpNotificationsControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         public PopUpNotificationsControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,

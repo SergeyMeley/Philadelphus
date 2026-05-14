@@ -7,6 +7,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGri
     /// </summary>
     public partial class AuditInfoDetails : UserControl
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="AuditInfoDetails" />.
+        /// </summary>
         public AuditInfoDetails()
         {
             InitializeComponent();

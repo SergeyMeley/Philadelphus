@@ -24,6 +24,9 @@ using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления для отчета.
+    /// </summary>
     public class ReportsControlVM : ControlBaseVM
     {
         private readonly IReportService _reportService;
@@ -96,6 +99,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
             }
         }
+
+        /// <summary>
+        /// Предварительное обновление.
+        /// </summary>
         public bool PreliminaryRefresh { get; set; }
 
         public DataTable ReportResult
@@ -111,6 +118,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ReportsControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="reportService">Параметр reportService.</param>
+        /// <param name="tablesExportServiceFactory">Параметр tablesExportServiceFactory.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ReportsControlVM(
             IServiceProvider serviceProvider, 
             IMapper mapper, 

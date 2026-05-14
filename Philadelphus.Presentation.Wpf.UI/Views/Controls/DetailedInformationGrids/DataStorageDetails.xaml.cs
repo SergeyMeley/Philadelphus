@@ -18,6 +18,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGri
             set { SetValue(IsReadOnlyProperty, value); }
         }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="DataStorageDetails" />.
+        /// </summary>
         public DataStorageDetails()
         {
             InitializeComponent();

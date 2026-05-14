@@ -14,6 +14,9 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
+    /// <summary>
+    /// Модель представления для элемента управления.
+    /// </summary>
     public class StorageCreationControlVM : ControlBaseVM
     {
         private readonly IDataStoragesService _service;
@@ -24,15 +27,52 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly FileInfo _configFile;
 
         private string _name;
+
+        /// <summary>
+        /// Наименование.
+        /// </summary>
         public string Name { get => _name; set => _name = value; }
 
         private string _description;
+
+        /// <summary>
+        /// Описание.
+        /// </summary>
         public string Description { get => _description; set => _description = value; }
+       
+        /// <summary>
+        /// Контейнер строк подключения.
+        /// </summary>
         public List<ConnectionStringsContainer> ConnectionStringsContainers { get => _connectionStringsCollectionConfig.Value.ConnectionStringsContainers; }
+      
+        /// <summary>
+        /// Контейнер строк подключения.
+        /// </summary>
         public ConnectionStringsContainer SelectedConnectionStringsContainer { get; set; }
 
         private DataStoragesCollectionVM _dataStoragesCollectionVM;
+      
+        /// <summary>
+        /// Коллекция хранилищ данных.
+        /// </summary>
         public DataStoragesCollectionVM DataStoragesCollectionVM { get => _dataStoragesCollectionVM; set => _dataStoragesCollectionVM = value; }
+     
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="StorageCreationControlVM" />.
+        /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="logger">Логгер.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="service">Доменный сервис.</param>
+        /// <param name="configurationService">Параметр configurationService.</param>
+        /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="infrastructureRepositoryFactory">Параметр infrastructureRepositoryFactory.</param>
+        /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
+        /// <param name="dataStoragesCollectionConfig">Параметр dataStoragesCollectionConfig.</param>
+        /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public StorageCreationControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -103,6 +143,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Команда выполнения операции элемента управления.
+        /// </summary>
         public RelayCommand OpenConnectionStringsSettingsControlCommand { get; set; }
     }
 }

@@ -13,15 +13,31 @@ using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
 {
+    /// <summary>
+    /// Фабрика создания репозитория.
+    /// </summary>
     public class InfrastructureRepositoryFactory : IInfrastructureRepositoryFactory
     {
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="InfrastructureRepositoryFactory" />.
+        /// </summary>
+        /// <param name="logger">Логгер.</param>
         public InfrastructureRepositoryFactory(
             ILogger logger)
         {
             _logger = logger;
         }
+
+        /// <summary>
+        /// Создает объект Create.
+        /// </summary>
+        /// <param name="infrastructureType">Тип инфраструктуры.</param>
+        /// <param name="entityGroup">Группа инфраструктурных сущностей.</param>
+        /// <param name="connectionString">Строка подключения.</param>
+        /// <returns>Созданный объект.</returns>
+        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public IInfrastructureRepository Create(InfrastructureTypes infrastructureType, InfrastructureEntityGroups entityGroup, string connectionString)
         {
             switch (infrastructureType)
