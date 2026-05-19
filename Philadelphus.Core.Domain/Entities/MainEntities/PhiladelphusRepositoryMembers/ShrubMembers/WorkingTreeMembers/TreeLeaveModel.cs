@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
@@ -34,6 +35,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Тип.
         /// </summary>
+        [Display(Name = "Системный тип", Description = "Системный базовый тип")]
         public virtual SystemBaseType SystemBaseType { get => SystemBaseType.USER_DEFINED; }
 
         #endregion
@@ -43,16 +45,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Родитель
         /// </summary>
+        [Display(Name = "Родитель", Description = "Родительский узел")]
         public TreeNodeModel ParentNode { get; }
 
         /// <summary>
         /// Родитель
         /// </summary>
+        [Display(Name = "Родитель", Description = "Родитель")]
         public IParentModel Parent { get => ParentNode; }
 
         /// <summary>
         /// Все родители (рекурсивно)
         /// </summary>
+        [Display(Name = "Родители", Description = "Все родители (рекурсивно)")]
         public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive
         {
             get => throw new NotImplementedException();

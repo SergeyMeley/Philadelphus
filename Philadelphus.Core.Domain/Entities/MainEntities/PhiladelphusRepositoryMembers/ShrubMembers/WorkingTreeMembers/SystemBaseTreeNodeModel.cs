@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
@@ -23,6 +24,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Тип.
         /// </summary>
+        [Display(Name = "Системный тип", Description = "Системный базовый тип")]
         public override SystemBaseType SystemBaseType { get; }
 
         internal SystemBaseTreeNodeModel(

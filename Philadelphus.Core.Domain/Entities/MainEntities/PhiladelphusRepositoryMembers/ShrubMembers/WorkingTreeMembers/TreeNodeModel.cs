@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
@@ -37,6 +38,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Тип.
         /// </summary>
+        [Display(Name = "Системный тип", Description = "Системный базовый тип")]
         public virtual SystemBaseType SystemBaseType { get => SystemBaseType.USER_DEFINED; }
 
         #endregion
@@ -46,11 +48,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Родитель
         /// </summary>
+        [Display(Name = "Родитель", Description = "Родительский узел")]
         public TreeNodeModel ParentNode { get; }
 
         /// <summary>
         /// Родитель
         /// </summary>
+        [Display(Name = "Родитель", Description = "Родитель")]
         public IParentModel Parent
         {
             get
@@ -62,6 +66,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Все родители (рекурсивно)
         /// </summary>
+        [Display(Name = "Родители", Description = "Все родители (рекурсивно)")]
         public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive
         {
             get => throw new NotImplementedException();
@@ -70,16 +75,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Дочерние узлы
         /// </summary>
+        [Display(Name = "Узлы", Description = "Дочерние узлы")]
         public IReadOnlyList<TreeNodeModel> ChildNodes { get => _childNodes; }
 
         /// <summary>
         /// Дочерние листы
         /// </summary>
+        [Display(Name = "Листы", Description = "Дочерние листы")]
         public IReadOnlyList<TreeLeaveModel> ChildLeaves { get => _childLeaves; }
 
         /// <summary>
         /// Наследники
         /// </summary>
+        [Display(Name = "Наследники", Description = "Наследники")]
         public ReadOnlyDictionary<Guid, IChildrenModel> Childs
         {
             get
@@ -103,6 +111,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Все наследники (рекурсивно)
         /// </summary>
+        [Display(Name = "Наследники", Description = "Все наследники (рекурсивно)")]
         public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive
         {
             get => throw new NotImplementedException();

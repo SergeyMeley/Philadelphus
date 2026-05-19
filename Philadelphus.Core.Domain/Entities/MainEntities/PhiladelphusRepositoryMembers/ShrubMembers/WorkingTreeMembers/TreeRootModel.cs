@@ -10,6 +10,7 @@ using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
@@ -77,6 +78,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Все наследники (рекурсивно)
         /// </summary>
+        [Display(Name = "Наследники", Description = "Все наследники (рекурсивно)")]
         public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive { get; }
 
         #endregion
