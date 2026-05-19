@@ -24,5 +24,17 @@ namespace Philadelphus.Core.Domain.Entities.Enums
             var attribute = field?.GetCustomAttribute<DisplayAttribute>();
             return attribute?.Name ?? value.ToString();
         }
+
+        /// <summary>
+        /// Получить Display Description для элемента Enum.
+        /// </summary>
+        /// <param name="value">Элемент</param>
+        /// <returns></returns>
+        public static string GetDisplayDescription(this Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = field?.GetCustomAttribute<DisplayAttribute>();
+            return attribute?.Description ?? value.ToString();
+        }
     }
 }

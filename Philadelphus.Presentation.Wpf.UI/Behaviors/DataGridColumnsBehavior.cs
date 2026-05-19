@@ -11,6 +11,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
     public static class DataGridColumnsBehavior
     {
         private static readonly StateToColorConverter StateToColorConverter = new StateToColorConverter();
+        private static readonly EnumDisplayAttributeConverter EnumDisplayAttributeConverter = new EnumDisplayAttributeConverter();
 
         public static readonly DependencyProperty ColumnsSourceProperty =
             DependencyProperty.RegisterAttached(
@@ -67,15 +68,37 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 Control.BackgroundProperty,
                 new Binding($"[{column.BindingKey}]") { Converter = StateToColorConverter }));
             cellStyle.Setters.Add(new Setter(Control.ForegroundProperty, System.Windows.Media.Brushes.Black));
+            cellStyle.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Center));
+            cellStyle.Setters.Add(new Setter(
+                FrameworkElement.ToolTipProperty,
+                new Binding($"[{column.BindingKey}]")
+                {
+                    Converter = EnumDisplayAttributeConverter,
+                    ConverterParameter = "Description",
+                }));
 
             return new DataGridTextColumn
             {
-                Header = column.Header,
-                Binding = new Binding($"[{column.BindingKey}]") { Mode = BindingMode.OneWay },
+                Header = CreateStateColumnHeader(),
+                Binding = new Binding($"[{column.BindingKey}]")
+                {
+                    Mode = BindingMode.OneWay,
+                    Converter = EnumDisplayAttributeConverter,
+                },
                 IsReadOnly = true,
                 Width = DataGridLength.Auto,
-                MinWidth = 90,
+                MinWidth = 20,
                 CellStyle = cellStyle,
+                ElementStyle = CreateCenteredTextBlockStyle(),
+            };
+        }
+
+        private static TextBlock CreateStateColumnHeader()
+        {
+            return new TextBlock
+            {
+                Text = "С.",
+                ToolTip = "Состояние",
             };
         }
 
@@ -129,6 +152,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         {
             var style = new Style(typeof(ComboBox));
             style.Setters.Add(new Setter(ItemsControl.ItemsSourceProperty, itemsSourceBinding));
+            return style;
+        }
+
+        private static Style CreateCenteredTextBlockStyle()
+        {
+            var style = new Style(typeof(TextBlock));
+            style.Setters.Add(new Setter(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center));
+            style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center));
             return style;
         }
     }
