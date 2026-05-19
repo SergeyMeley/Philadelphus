@@ -16,7 +16,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
             bool isAttribute = false,
             Func<IChildrenModel, Func<object?, object?>?>? setterFactory = null,
             Func<IChildrenModel, IEnumerable<object>?>? valueOptionsGetter = null,
-            string? bindingKey = null)
+            string? bindingKey = null,
+            string? headerToolTip = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentException.ThrowIfNullOrWhiteSpace(header);
@@ -26,6 +27,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
             Key = key;
             BindingKey = string.IsNullOrWhiteSpace(bindingKey) ? key : bindingKey;
             Header = header;
+            HeaderToolTip = string.IsNullOrWhiteSpace(headerToolTip) ? null : headerToolTip;
             Order = order;
             ValueGetter = valueGetter;
             IsReadOnly = isReadOnly;
@@ -39,6 +41,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
         public string BindingKey { get; }
 
         public string Header { get; }
+
+        public string? HeaderToolTip { get; }
 
         public int Order { get; }
 

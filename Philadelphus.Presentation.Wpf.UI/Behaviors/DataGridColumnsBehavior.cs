@@ -79,22 +79,22 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             return new DataGridTemplateColumn
             {
-                Header = CreateStateColumnHeader(),
+                Header = CreateStateColumnHeader(column),
                 IsReadOnly = true,
-                Width = new DataGridLength(8),
-                MinWidth = 8,
+                Width = new DataGridLength(7),
+                MinWidth = 7,
                 CellStyle = cellStyle,
                 CellTemplate = CreateEmptyCellTemplate(),
             };
         }
 
-        private static TextBlock CreateStateColumnHeader()
+        private static TextBlock CreateStateColumnHeader(ChildCollectionTableColumn column)
         {
             return new TextBlock
             {
                 Text = string.Empty,
-                ToolTip = "Состояние",
-                MinWidth = 8,
+                ToolTip = column.HeaderToolTip ?? column.Header,
+                MinWidth = 7,
             };
         }
 
@@ -110,7 +110,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             return new DataGridComboBoxColumn
             {
-                Header = column.Header,
+                Header = CreateColumnHeader(column),
                 SelectedItemBinding = selectedItemBinding,
                 DisplayMemberPath = "Name",
                 IsReadOnly = column.IsReadOnly,
@@ -136,7 +136,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             return new DataGridTextColumn
             {
-                Header = column.Header,
+                Header = CreateColumnHeader(column),
                 Binding = binding,
                 IsReadOnly = column.IsReadOnly,
                 Width = DataGridLength.Auto,
@@ -156,6 +156,20 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             var template = new DataTemplate();
             template.VisualTree = new FrameworkElementFactory(typeof(Border));
             return template;
+        }
+
+        private static object CreateColumnHeader(ChildCollectionTableColumn column)
+        {
+            if (string.IsNullOrWhiteSpace(column.HeaderToolTip))
+            {
+                return column.Header;
+            }
+
+            return new TextBlock
+            {
+                Text = column.Header,
+                ToolTip = column.HeaderToolTip,
+            };
         }
     }
 }

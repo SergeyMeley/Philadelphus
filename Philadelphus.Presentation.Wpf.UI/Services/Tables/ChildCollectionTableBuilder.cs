@@ -5,6 +5,8 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Models.Tables;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
 {
@@ -34,42 +36,48 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
         {
             var result = new List<ChildCollectionTableColumn>
             {
-                new(
+                CreateColumn(
                     nameof(IMainEntityModel.State),
-                    "State",
                     0,
-                    child => child is IMainEntityModel entity ? entity.State : null),
-                new(
+                    child => child is IMainEntityModel entity ? entity.State : null,
+                    typeof(IMainEntityModel),
+                    nameof(IMainEntityModel.State)),
+                CreateColumn(
                     nameof(ISequencableModel.Sequence),
-                    "№",
                     1,
                     child => child is ISequencableModel sequencable ? sequencable.Sequence : null,
+                    typeof(ISequencableModel),
+                    nameof(ISequencableModel.Sequence),
                     isReadOnly: false,
                     setterFactory: GetSequenceSetter),
-                new(
+                CreateColumn(
                     nameof(IMainEntityModel.Type),
-                    "Тип",
                     2,
-                    child => child is IMainEntityModel entity ? entity.Type : child.GetType().Name),
-                new(
+                    child => child is IMainEntityModel entity ? entity.Type : child.GetType().Name,
+                    typeof(IMainEntityModel),
+                    nameof(IMainEntityModel.Type)),
+                CreateColumn(
                     nameof(IMainEntityModel.Name),
-                    "Name",
                     3,
                     child => child is IMainEntityModel entity ? NullIfEmpty(entity.Name) : null,
+                    typeof(IMainEntityModel),
+                    nameof(IMainEntityModel.Name),
                     isReadOnly: false,
                     setterFactory: GetNameSetter),
-                new(
+                CreateColumn(
                     nameof(IMainEntityModel.Description),
-                    "Description",
                     4,
                     child => child is IMainEntityModel entity ? NullIfEmpty(entity.Description) : null,
+                    typeof(IMainEntityModel),
+                    nameof(IMainEntityModel.Description),
                     isReadOnly: false,
                     setterFactory: GetDescriptionSetter),
-                new(
+                CreateColumn(
                     nameof(IWorkingTreeMemberModel.CustomCode),
-                    "CustomCode",
                     5,
                     GetCustomCode,
+                    typeof(IWorkingTreeMemberModel),
+                    nameof(IWorkingTreeMemberModel.CustomCode),
                     isReadOnly: false,
                     setterFactory: GetCustomCodeSetter),
             };
@@ -100,54 +108,134 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
 
             result.AddRange(new[]
             {
-                new ChildCollectionTableColumn(
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}",
-                    "CreatedBy",
                     order++,
-                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.CreatedBy) : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.CreatedBy) : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.CreatedBy)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedAt)}",
-                    "CreatedAt",
                     order++,
-                    child => child is IMainEntityModel entity ? NullIfDefault(entity.AuditInfo?.CreatedAt) : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? NullIfDefault(entity.AuditInfo?.CreatedAt) : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.CreatedAt)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.UpdatedBy)}",
-                    "UpdatedBy",
                     order++,
-                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.UpdatedBy) : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.UpdatedBy) : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.UpdatedBy)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.UpdatedAt)}",
-                    "UpdatedAt",
                     order++,
-                    child => child is IMainEntityModel entity ? entity.AuditInfo?.UpdatedAt : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? entity.AuditInfo?.UpdatedAt : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.UpdatedAt)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.ContentUpdatedBy)}",
-                    "ContentUpdatedBy",
                     order++,
-                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.ContentUpdatedBy) : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.ContentUpdatedBy) : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.ContentUpdatedBy)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.ContentUpdatedAt)}",
-                    "ContentUpdatedAt",
                     order++,
-                    child => child is IMainEntityModel entity ? entity.AuditInfo?.ContentUpdatedAt : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? entity.AuditInfo?.ContentUpdatedAt : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.ContentUpdatedAt)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.IsDeleted)}",
-                    "IsDeleted",
                     order++,
-                    child => child is IMainEntityModel entity ? entity.AuditInfo?.IsDeleted : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? entity.AuditInfo?.IsDeleted : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.IsDeleted)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.DeletedBy)}",
-                    "DeletedBy",
                     order++,
-                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.DeletedBy) : null),
-                new ChildCollectionTableColumn(
+                    child => child is IMainEntityModel entity ? NullIfEmpty(entity.AuditInfo?.DeletedBy) : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.DeletedBy)),
+                CreateColumn(
                     $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.DeletedAt)}",
-                    "DeletedAt",
                     order++,
-                    child => child is IMainEntityModel entity ? entity.AuditInfo?.DeletedAt : null),
+                    child => child is IMainEntityModel entity ? entity.AuditInfo?.DeletedAt : null,
+                    typeof(AuditInfoModel),
+                    nameof(AuditInfoModel.DeletedAt)),
             });
 
             return result.OrderBy(x => x.Order).ToList();
+        }
+
+        private static ChildCollectionTableColumn CreateColumn(
+            string key,
+            int order,
+            Func<IChildrenModel, object?> valueGetter,
+            Type displayType,
+            string displayPropertyName,
+            bool isReadOnly = true,
+            bool isAttribute = false,
+            Func<IChildrenModel, Func<object?, object?>?>? setterFactory = null,
+            Func<IChildrenModel, IEnumerable<object>?>? valueOptionsGetter = null,
+            string? bindingKey = null)
+        {
+            var display = GetPropertyDisplay(displayType, displayPropertyName);
+
+            return new ChildCollectionTableColumn(
+                key,
+                display.Name,
+                order,
+                valueGetter,
+                isReadOnly,
+                isAttribute,
+                setterFactory,
+                valueOptionsGetter,
+                bindingKey,
+                display.Description);
+        }
+
+        private static (string Name, string? Description) GetPropertyDisplay(Type type, string propertyName)
+        {
+            if (TryGetPropertyDisplay(type, propertyName, out var display))
+            {
+                return display;
+            }
+
+            foreach (var candidateType in type.Assembly.GetTypes()
+                .Where(x => x != type && type.IsAssignableFrom(x)))
+            {
+                if (TryGetPropertyDisplay(candidateType, propertyName, out display))
+                {
+                    return display;
+                }
+            }
+
+            return (propertyName, null);
+        }
+
+        private static bool TryGetPropertyDisplay(
+            Type type,
+            string propertyName,
+            out (string Name, string? Description) display)
+        {
+            var property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
+            var attribute = property?.GetCustomAttribute<DisplayAttribute>();
+
+            if (attribute == null)
+            {
+                display = default;
+                return false;
+            }
+
+            var name = string.IsNullOrWhiteSpace(attribute?.Name)
+                ? propertyName
+                : attribute.Name!;
+            var description = string.IsNullOrWhiteSpace(attribute?.Description)
+                ? null
+                : attribute.Description;
+
+            display = (name, description);
+            return true;
         }
 
         public static IReadOnlyList<ChildCollectionTableRow> buildChildCollectionTableRows(
