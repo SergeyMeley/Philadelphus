@@ -11,6 +11,8 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.Wpf.UI.Models.Tables;
+using Philadelphus.Presentation.Wpf.UI.Services.Tables;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
@@ -38,12 +40,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         #region [ Props ]
 
+        private bool _isDisposed;
+
         private readonly IPhiladelphusRepositoryService _service;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
-        private PhiladelphusRepositoryVM _philadelphusRepositoryVM;     // TODO: Тех. долг. Вернуть readonly
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
+       
+        private PhiladelphusRepositoryVM _philadelphusRepositoryVM;     // TODO: Тех. долг. Вернуть readonly
         private int _repositoryLoadVersion;
-        private bool _isDisposed;
+
+        private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
+        private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
+        private IReadOnlyList<ChildCollectionTableRow> _childCollectionTableRows = Array.Empty<ChildCollectionTableRow>();
+
         public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
         { 
             get 
@@ -82,9 +91,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// </summary>
         public string CurentRepositoryName { get => _philadelphusRepositoryVM.Name; }
 
-        //public List<IMainEntityModel> ElementsCollection { get; internal set; } = new List<IMainEntityModel>();
-
-        private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
         public IMainEntityVM<IMainEntityModel>? SelectedRepositoryMember
         {
             get
@@ -94,6 +100,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             set
             {
                 _selectedRepositoryMember = value;
+                RebuildChildCollectionTable();
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
                 OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
@@ -115,6 +122,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     return null;
                 return PropertyGridHelper.GetProperties(_selectedRepositoryMember);
             }
+        }
+
+        public IReadOnlyList<ChildCollectionTableColumn> ChildCollectionTableColumns
+        {
+            get => _childCollectionTableColumns;
+        }
+
+        public IReadOnlyList<ChildCollectionTableRow> ChildCollectionTableRows
+        {
+            get => _childCollectionTableRows;
         }
 
         private ExtensionsControlVM _extensionsControlVM;
@@ -270,6 +287,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember is INodeParent np)
                     {
                         np.CreateTreeNode();
+                        RebuildChildCollectionTable();
                     }
                     _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
                 },
@@ -290,6 +308,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember is ILeaveParent lp)
                     {
                         lp.CreateTreeLeave();
+                        RebuildChildCollectionTable();
                     }
                     else if (_selectedRepositoryMember is TreeLeaveVM leave)
                     {
@@ -312,6 +331,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember == null)
                         return;
                     _selectedRepositoryMember.AddAttribute();
+                    RebuildChildCollectionTable();
                     
                     _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
                 },
@@ -385,6 +405,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
+                    RebuildChildCollectionTable();
                 },
                 ce =>
                 {
@@ -400,6 +421,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
+                    RebuildChildCollectionTable();
                 },
                 ce =>
                 {
@@ -757,6 +779,83 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private bool CanModifyRepository()
         {
             return IsRepositoryLoading == false;
+        }
+
+        private void RebuildChildCollectionTable()
+        {
+            var children = GetSelectedRepositoryMemberChildren();
+
+            _childCollectionTableColumns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                _selectedRepositoryMember?.Model as IAttributeOwnerModel,
+                children);
+
+            _childCollectionTableRows = ChildCollectionTableBuilder.buildChildCollectionTableRows(
+                children,
+                _childCollectionTableColumns,
+                OnChildCollectionTableCellChanged);
+
+            OnPropertyChanged(nameof(ChildCollectionTableColumns));
+            OnPropertyChanged(nameof(ChildCollectionTableRows));
+        }
+
+        private void OnChildCollectionTableCellChanged(Guid sourceUuid, string columnKey)
+        {
+            if (sourceUuid == Guid.Empty || string.IsNullOrWhiteSpace(columnKey))
+            {
+                return;
+            }
+
+            var target = FindRepositoryMemberByUuid(sourceUuid);
+            if (target is not ViewModelBase targetVM)
+            {
+                return;
+            }
+
+            targetVM.OnPropertyChanged(columnKey);
+            targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.State));
+            OnPropertyChanged(nameof(PropertyList));
+
+            if (target.Model is IAttributeOwnerModel attributeOwner
+                && attributeOwner.Attributes?.Any(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal)) == true)
+            {
+                targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
+            }
+
+            if (columnKey == nameof(ISequencableModel.Sequence))
+            {
+                NotifyChildParentCollectionChanged(target);
+            }
+        }
+
+        private void NotifyChildParentCollectionChanged(IMainEntityVM<IMainEntityModel> child)
+        {
+            if (child.Model is not IChildrenModel childModel)
+            {
+                return;
+            }
+
+            if (childModel.Parent is not IMainEntityModel parentModel)
+            {
+                return;
+            }
+
+            var parent = FindRepositoryMemberByUuid(parentModel.Uuid);
+            switch (parent)
+            {
+                case TreeRootVM root:
+                    root.OnPropertyChanged(nameof(TreeRootVM.ChildNodes));
+                    break;
+                case TreeNodeVM node:
+                    node.OnPropertyChanged(nameof(TreeNodeVM.ChildNodes));
+                    node.OnPropertyChanged(nameof(TreeNodeVM.ChildLeaves));
+                    break;
+            }
+        }
+
+        private IReadOnlyList<IChildrenModel> GetSelectedRepositoryMemberChildren()
+        {
+            return ChildCollectionTableBuilder.buildChildCollectionTableChildren(
+                _selectedRepositoryMember?.Model as IParentModel);
         }
 
         /// <summary>

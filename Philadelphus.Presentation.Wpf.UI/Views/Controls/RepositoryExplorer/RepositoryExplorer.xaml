@@ -8,6 +8,7 @@
              xmlns:mainentities="clr-namespace:Philadelphus.Core.Domain.Entities.MainEntities;assembly=Philadelphus.Core.Domain"
              xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
              xmlns:detail="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids"
+             xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid IsEnabled="{Binding IsRepositoryContentEnabled}">
@@ -80,12 +81,23 @@
                 <TabItem Header="Атрибуты">
                     <local:Attributes></local:Attributes>
                 </TabItem>
-                <TabItem Header="Атрибуты детей" Visibility="{Binding ParentControlVisibility}">
+                <TabItem Header="Наследники" 
+                         Visibility="{Binding ParentControlVisibility}">
                     <TabControl>
-                        <TabItem Header="Плоская таблица значений">
-
+                        <TabItem Header="Плоская таблица">
+                            <DataGrid Margin="1"
+                                      MinHeight="50"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      EnableRowVirtualization="True"
+                                      EnableColumnVirtualization="True"
+                                      IsReadOnly="False"
+                                      behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
+                                      ItemsSource="{Binding ChildCollectionTableRows}" />
                         </TabItem>
-                        <TabItem Header="Перекрестная таблица значений">
+                        <TabItem Header="Перекрестная таблица значений" 
+                                 Visibility="Collapsed">
                             <StackPanel>
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -113,10 +125,12 @@
                                 <DataGrid></DataGrid>
                             </StackPanel>
                         </TabItem>
-                        <TabItem Header="Плоская таблица допустимых значений">
+                        <TabItem Header="Плоская таблица допустимых значений"
+                                  Visibility="Collapsed">
 
                         </TabItem>
-                        <TabItem Header="Перекрестная таблица допустимых значений">
+                        <TabItem Header="Перекрестная таблица допустимых значений"
+                                  Visibility="Collapsed">
 
                         </TabItem>
                     </TabControl>
