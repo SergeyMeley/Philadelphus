@@ -11,7 +11,10 @@
         <converters:StateToColorConverter x:Key="stateToColorConverter"/>
     </UserControl.Resources>
     <Grid>
-        <TreeView Name="MainTreeView" DataContext="{Binding PhiladelphusRepositoryVM}" ItemsSource="{Binding Childs}" SelectedItemChanged="MainTreeView_SelectedItemChanged">
+        <TreeView Name="MainTreeView"
+                  DataContext="{Binding PhiladelphusRepositoryVM}" 
+                  ItemsSource="{Binding Childs}" 
+                  SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">

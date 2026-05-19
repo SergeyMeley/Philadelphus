@@ -79,6 +79,25 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return _model.State;
             }
         }
+
+        public long Sequence 
+        { 
+            get
+            {
+                if (_model is ISequencableModel s)
+                {
+                    return s.Sequence;
+                }
+                return -1;
+            }
+            set
+            {
+                if (_model is ISequencableModel s)
+                {
+                    s.Sequence = value;
+                }
+            }
+        }
         public ObservableCollection<ElementAttributeVM> AttributesVMs 
         { 
             get

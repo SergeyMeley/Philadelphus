@@ -17,12 +17,18 @@
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="auto"></ColumnDefinition>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="Иерархия данных репозитория" Margin="1" Grid.RowSpan="2">
-            <Grid>
+        <Expander Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" IsExpanded="True" ExpandDirection="Left" Margin="1">
+            <Expander.Header>
+                <TextBlock Text="Рабочий кустарник">
+                    <TextBlock.LayoutTransform>
+                        <RotateTransform Angle="-90"/>
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+            </Expander.Header>
+            <Grid Width="450">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
@@ -51,112 +57,147 @@
                         </ComboBox>
                     </StackPanel>
                 </DockPanel>
-
-                <GroupBox Grid.Row="1" Grid.Column="0" Header="Дерево данных" Margin="1" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="1" Grid.Column="0" Header="Корень и узлы" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerShrub></local:RepositoryExplorerShrub>
                 </GroupBox>
                 <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
-                <GroupBox Grid.Row="3" Grid.Column="0" Header="Проводник" Margin="1" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="3" Grid.Column="0" Header="Листы" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerLeavesList></local:RepositoryExplorerLeavesList>
                 </GroupBox>
             </Grid>
-        </GroupBox>
-        <GridSplitter Grid.Row="0" Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" Grid.RowSpan="2"/>
-        <GroupBox Grid.Row="0" Grid.Column="2" Header="Текущий элемент">
-            <TabControl SelectedIndex="0">
-                <TabItem Header="Значение" Visibility="{Binding SystemBaseLeaveControlVisibility}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
-                            <ColumnDefinition Width="*" MinWidth="100"></ColumnDefinition>
-                            <ColumnDefinition Width="auto"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="1"></TextBlock>
-                        <TextBox Grid.Row="0" Grid.Column="1" DataContext="{Binding SelectedRepositoryMember}" Text="{Binding StringValue}" Margin="1"></TextBox>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Атрибуты">
-                    <local:Attributes></local:Attributes>
-                </TabItem>
-                <TabItem Header="Наследники" 
+        </Expander>
+        <GroupBox Grid.Row="0" Grid.Column="1">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Текущий элемент"></TextBlock>
+                    <TextBlock Text="  "></TextBlock>
+                    <TextBlock Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
+                    <TextBox Text="{Binding SelectedRepositoryMember.Name, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                    <TextBlock Text="  "></TextBlock>
+                    <TextBlock Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Bottom"></TextBlock>
+                    <TextBox Text="{Binding SelectedRepositoryMember.Uuid, Mode=OneWay}" FontStyle="Italic" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                </StackPanel>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    </StackPanel>
+                </DockPanel>
+                <TabControl Grid.Row="1" SelectedIndex="0">
+                    <TabItem Header="Значение" Visibility="{Binding SystemBaseLeaveControlVisibility}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
+                                <ColumnDefinition Width="*" MinWidth="100"></ColumnDefinition>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="1"></TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="1" DataContext="{Binding SelectedRepositoryMember}" Text="{Binding StringValue}" Margin="1"></TextBox>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Атрибуты">
+                        <local:Attributes></local:Attributes>
+                    </TabItem>
+                    <TabItem Header="Наследники" 
                          Visibility="{Binding ParentControlVisibility}">
-                    <TabControl>
-                        <TabItem Header="Плоская таблица">
-                            <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns, чтобы ViewModel
+                        <TabControl>
+                            <TabItem Header="Плоская таблица">
+                                <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns, чтобы ViewModel
                                  оставалась независимой от WPF DataGrid и code-behind. -->
-                            <DataGrid Margin="1"
-                                      MinHeight="50"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      CanUserDeleteRows="False"
-                                      EnableRowVirtualization="True"
-                                      EnableColumnVirtualization="True"
-                                      IsReadOnly="False"
-                                      behaviors:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}"
-                                      behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
-                                      ItemsSource="{Binding ChildCollectionTableRows}" />
-                        </TabItem>
-                        <TabItem Header="Перекрестная таблица значений" 
-                                 Visibility="Collapsed">
-                            <StackPanel>
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="auto"></RowDefinition>
                                     </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" Grid.Column="0">
+                                    <DataGrid x:Name="SelectedElementChildsDataGrid" 
+                                              Grid.Row="0"
+                                              Margin="1"
+                                              MinHeight="50"
+                                              AutoGenerateColumns="False"
+                                              CanUserAddRows="False"
+                                              CanUserDeleteRows="False"
+                                              EnableRowVirtualization="True"
+                                              EnableColumnVirtualization="True"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto"
+                                              IsReadOnly="False"
+                                              behaviors:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}"
+                                              behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
+                                              ItemsSource="{Binding ChildCollectionTableRows}">
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                        <TextBlock Text="{Binding SelectedIndex,ElementName=SelectedElementChildsDataGrid,Converter={StaticResource selectedIndexConverter}}" FontSize="10"></TextBlock>
+                                        <TextBlock Text=" / " FontSize="10"></TextBlock>
+                                        <TextBlock Text="{Binding Items.Count,ElementName=SelectedElementChildsDataGrid}" FontSize="10"></TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Перекрестная таблица значений" 
+                                 Visibility="Collapsed">
+                                <StackPanel>
+                                    <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition></RowDefinition>
                                             <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
-                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="1"></ComboBox>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
-                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="1"></ComboBox>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="1"></TextBlock>
-                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="1"></ComboBox>
+                                        <Grid Grid.Row="0" Grid.Column="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                            <ComboBox Grid.Row="0" Grid.Column="1" Margin="1"></ComboBox>
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="1"></ComboBox>
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="1"></TextBlock>
+                                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="1"></ComboBox>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                                <DataGrid></DataGrid>
-                            </StackPanel>
-                        </TabItem>
-                        <TabItem Header="Плоская таблица допустимых значений"
+                                    <DataGrid></DataGrid>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem Header="Плоская таблица допустимых значений"
                                   Visibility="Collapsed">
 
-                        </TabItem>
-                        <TabItem Header="Перекрестная таблица допустимых значений"
+                            </TabItem>
+                            <TabItem Header="Перекрестная таблица допустимых значений"
                                   Visibility="Collapsed">
 
-                        </TabItem>
-                    </TabControl>
-                </TabItem>
-                <TabItem Header="Свойства">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <GroupBox>
-                            <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
-                        </GroupBox>
-                    </ScrollViewer>
-                </TabItem>
-                <TabItem Header="Расширения">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <GroupBox>
-                            <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}"></ctrls:ExtensionWidgetContainer>
-                        </GroupBox>
-                    </ScrollViewer>
-                </TabItem>
-            </TabControl>
+                            </TabItem>
+                        </TabControl>
+                    </TabItem>
+                    <TabItem Header="Свойства">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <GroupBox>
+                                <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}"></detail:UniversalDetails>
+                            </GroupBox>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Header="Расширения">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <GroupBox>
+                                <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}"></ctrls:ExtensionWidgetContainer>
+                            </GroupBox>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Grid>
         </GroupBox>
         <ProgressBar Grid.Row="1"
                      Grid.Column="0"
-                     Grid.ColumnSpan="3"
+                     Grid.ColumnSpan="2"
                      Height="4"
                      Margin="1,0,1,1"
                      IsIndeterminate="True"

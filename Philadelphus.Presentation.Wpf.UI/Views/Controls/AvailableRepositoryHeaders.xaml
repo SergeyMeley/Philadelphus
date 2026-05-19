@@ -26,7 +26,7 @@
                     <ColumnDefinition Width="auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <lbs:AvailableRepositoriesListBox DataContext="{Binding RepositoryCollectionVM}" RepositoriesItemsSource="{Binding PhiladelphusRepositoriesVMs}" RepositoriesSelectedItem="{Binding CurrentRepositoryVM, Mode=TwoWay}"></lbs:AvailableRepositoriesListBox>
-                    <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="1" IsExpanded="False" ExpandDirection="Right">
+                <Expander Grid.Row="0" Grid.Column="1" Grid.RowSpan="1" IsExpanded="False" ExpandDirection="Right">
                     <Expander.Header>
                         <TextBlock Text="Детальная информация">
                             <TextBlock.LayoutTransform>

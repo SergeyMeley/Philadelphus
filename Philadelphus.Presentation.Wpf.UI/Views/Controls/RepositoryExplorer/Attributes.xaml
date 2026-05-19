@@ -10,13 +10,15 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button Content="{StaticResource imageAdd}" Command="{Binding CreateAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
             <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
             <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
         </StackPanel>
-        <DataGrid Grid.Row="1"
+        <DataGrid Name="SelectedElementAttributesDataGrid"
+                  Grid.Row="1"
                   Height="auto"
                   ColumnWidth="*"
                   DataContext="{Binding SelectedRepositoryMember}"
@@ -100,5 +102,10 @@
                 <DataGridTextColumn Header="Владелец" Binding="{Binding DeclaringOwner.Name}" IsReadOnly="True"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <TextBlock Text="{Binding SelectedIndex,ElementName=SelectedElementAttributesDataGrid,Converter={StaticResource selectedIndexConverter}}" FontSize="10"></TextBlock>
+            <TextBlock Text=" / " FontSize="10"></TextBlock>
+            <TextBlock Text="{Binding Items.Count,ElementName=SelectedElementAttributesDataGrid}" FontSize="10"></TextBlock>
+        </StackPanel>
     </Grid>
 </UserControl>
