@@ -18,7 +18,10 @@
                       Margin="1" 
                       MinHeight="50"
                       ItemsSource="{Binding SelectedRepositoryMember.ChildLeaves}" 
+                      SelectionChanged="SelectedElementLeavesDataGrid_SelectionChanged"
                       AutoGenerateColumns="False"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>

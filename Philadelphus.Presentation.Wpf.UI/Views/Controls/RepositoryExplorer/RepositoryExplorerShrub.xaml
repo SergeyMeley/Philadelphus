@@ -17,7 +17,7 @@
                   SelectedItemChanged="MainTreeView_SelectedItemChanged">
 
             <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=ChildNodes}">
                     <Grid Margin="1"
                           Background="Snow"
                           ToolTip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}">

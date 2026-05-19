@@ -57,7 +57,7 @@
                         </ComboBox>
                     </StackPanel>
                 </DockPanel>
-                <GroupBox Grid.Row="1" Grid.Column="0" Header="Корень и узлы" Margin="1" Grid.ColumnSpan="2">
+                <GroupBox Grid.Row="1" Grid.Column="0" Header="Деревья, корни и узлы" Margin="1" Grid.ColumnSpan="2">
                     <local:RepositoryExplorerShrub></local:RepositoryExplorerShrub>
                 </GroupBox>
                 <GridSplitter Grid.Row="2" Grid.Column="0" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="2"></GridSplitter>
