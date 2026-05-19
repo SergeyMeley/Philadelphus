@@ -48,11 +48,11 @@
                         
                     </RibbonQuickAccessToolBar>
                 </Ribbon.QuickAccessToolBar>-->
-                <Ribbon.ApplicationMenu>
+                <!--<Ribbon.ApplicationMenu>
                     <RibbonApplicationMenu>
-                        <!--<RibbonApplicationMenu.SmallImageSource>
+                        --><!--<RibbonApplicationMenu.SmallImageSource>
                             <BitmapImage UriSource="C:\Users\MeleychukSV\Downloads\icons8-квадратный-корень-2-64.png" />
-                        </RibbonApplicationMenu.SmallImageSource>-->
+                        </RibbonApplicationMenu.SmallImageSource>--><!--
                         <RibbonApplicationMenu.SmallImageSource>
                             <DrawingImage>
                                 <DrawingImage.Drawing>
@@ -82,7 +82,7 @@
                         <RibbonButton Label="Создать пустой репозиторий"/>
                         <RibbonButton Label="Создать из шаблона"/>
                     </RibbonApplicationMenu>
-                </Ribbon.ApplicationMenu>
+                </Ribbon.ApplicationMenu>-->
                 <RibbonTab Header="Главная">
                     <RibbonGroup Header="Общее">
                         <RibbonButton Label="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" />
