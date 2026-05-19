@@ -85,6 +85,8 @@
                          Visibility="{Binding ParentControlVisibility}">
                     <TabControl>
                         <TabItem Header="Плоская таблица">
+                            <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns, чтобы ViewModel
+                                 оставалась независимой от WPF DataGrid и code-behind. -->
                             <DataGrid Margin="1"
                                       MinHeight="50"
                                       AutoGenerateColumns="False"

@@ -52,6 +52,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
         private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
         private IReadOnlyList<ChildCollectionTableRow> _childCollectionTableRows = Array.Empty<ChildCollectionTableRow>();
+
+        // Sequence редактируется прямо в таблице. Пересортировку откладываем до ухода фокуса,
+        // чтобы строка не меняла позицию во время ввода значения.
         private bool _isChildCollectionTableOrderStale;
 
         public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
@@ -125,11 +128,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Динамические колонки плоской таблицы наследников выбранного элемента.
+        /// </summary>
         public IReadOnlyList<ChildCollectionTableColumn> ChildCollectionTableColumns
         {
             get => _childCollectionTableColumns;
         }
 
+        /// <summary>
+        /// Строки плоской таблицы наследников выбранного элемента.
+        /// </summary>
         public IReadOnlyList<ChildCollectionTableRow> ChildCollectionTableRows
         {
             get => _childCollectionTableRows;
