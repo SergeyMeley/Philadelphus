@@ -15,23 +15,28 @@
 
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Childs}">
-                    <StackPanel Margin="1" Background="Snow">
-                        <StackPanel Orientation="Horizontal">
-                            <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
+                    <Grid Margin="1"
+                          Background="Snow"
+                          ToolTip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <Rectangle Grid.RowSpan="2"
+                                   Grid.Column="0"
+                                   Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
+
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                             <Image Width="24" 
                                    Height="24" 
                                    Margin="10,0,10,0" 
                                    Source="{Binding ., Converter={StaticResource mainEntityToIconConverter}}"></Image>
                             <StackPanel Margin="0,2,10,2">
-                                <StackPanel Orientation="Horizontal">
-                                    <Grid MinWidth="30"
-                                          Margin="0,0,12,0"
-                                          VerticalAlignment="Center"
-                                          ToolTip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}">
-                                        <Rectangle Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" RadiusX="5" RadiusY="5" Width="{Binding Width,ElementName=textBlock}" Height="{Binding Height,ElementName=textBlock}" Stroke="Black" StrokeThickness="0.5"/>
-                                        <TextBlock x:Name="textBlock" Padding="5,0" Text="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}}" FontSize="10" Height="14" Width="Auto" Foreground="Black"/>
-                                    </Grid>
-                                </StackPanel>
                                 <TextBlock>
                                                 <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
                                                 <Run Text="{Binding Name}" FontStyle="Italic"  Foreground="Black"/>
@@ -42,8 +47,8 @@
                                 </TextBlock>
                             </StackPanel>
                         </StackPanel>
-                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="0.25"/>
-                    </StackPanel>
+                        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="0.25"/>
+                    </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
             <TreeView.Resources>

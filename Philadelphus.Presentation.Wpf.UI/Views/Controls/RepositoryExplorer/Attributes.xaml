@@ -26,28 +26,25 @@
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Uuid" Binding="{Binding Uuid, Mode=OneWay}"></DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding State, Mode=OneWay, Converter={StaticResource enumDisplayAttributeConverter}}"
-                                    Width="Auto"
-                                    MinWidth="20">
-                    <DataGridTextColumn.Header>
-                        <TextBlock Text="С." ToolTip="Состояние" HorizontalAlignment="Center" />
-                    </DataGridTextColumn.Header>
-                    <DataGridTextColumn.CellStyle>
+                <DataGridTemplateColumn Width="7"
+                                        MinWidth="7">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="" ToolTip="Состояние" MinWidth="7" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Setter Property="Background" Value="{Binding State, Converter={StaticResource stateToColorConverter}}" />
                             <Setter Property="Foreground" Value="Black" />
                             <Setter Property="ToolTip" Value="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
                         </Style>
-                    </DataGridTextColumn.CellStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center" />
-                            <Setter Property="TextAlignment" Value="Center" />
-                            <Setter Property="ToolTip" Value="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Uuid" Binding="{Binding Uuid, Mode=OneWay}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"></DataGridTextColumn>
                 <DataGridComboBoxColumn Header="Тип данных" DisplayMemberPath="Name" SelectedItemBinding="{Binding SelectedValueType}" SelectedValuePath="Name">
                     <DataGridComboBoxColumn.ElementStyle>

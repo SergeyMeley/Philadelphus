@@ -61,7 +61,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             }
         }
 
-        private static DataGridTextColumn CreateStateColumn(ChildCollectionTableColumn column)
+        private static DataGridColumn CreateStateColumn(ChildCollectionTableColumn column)
         {
             var cellStyle = new Style(typeof(DataGridCell));
             cellStyle.Setters.Add(new Setter(
@@ -77,19 +77,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                     ConverterParameter = "Description",
                 }));
 
-            return new DataGridTextColumn
+            return new DataGridTemplateColumn
             {
                 Header = CreateStateColumnHeader(),
-                Binding = new Binding($"[{column.BindingKey}]")
-                {
-                    Mode = BindingMode.OneWay,
-                    Converter = EnumDisplayAttributeConverter,
-                },
                 IsReadOnly = true,
-                Width = DataGridLength.Auto,
-                MinWidth = 20,
+                Width = new DataGridLength(8),
+                MinWidth = 8,
                 CellStyle = cellStyle,
-                ElementStyle = CreateCenteredTextBlockStyle(),
+                CellTemplate = CreateEmptyCellTemplate(),
             };
         }
 
@@ -97,8 +92,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         {
             return new TextBlock
             {
-                Text = "С.",
+                Text = string.Empty,
                 ToolTip = "Состояние",
+                MinWidth = 8,
             };
         }
 
@@ -155,12 +151,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             return style;
         }
 
-        private static Style CreateCenteredTextBlockStyle()
+        private static DataTemplate CreateEmptyCellTemplate()
         {
-            var style = new Style(typeof(TextBlock));
-            style.Setters.Add(new Setter(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center));
-            style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center));
-            return style;
+            var template = new DataTemplate();
+            template.VisualTree = new FrameworkElementFactory(typeof(Border));
+            return template;
         }
     }
 }
