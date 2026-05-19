@@ -8,7 +8,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Tests.Domain.Fakes.Services;
+using Philadelphus.Tests.Common.Fakes.Services;
 using Xunit;
 using Xunit.Sdk;
 
@@ -29,6 +29,7 @@ public class PhiladelphusRepositoryModelTests
 
         // Assert
         sut.Uuid.Should().Be(uuid);
+        sut.Type.Should().Be(nameof(PhiladelphusRepositoryModel));
         sut.Name.Should().StartWith("Новый репозиторий");
         sut.State.Should().Be(State.Initialized);
         sut.OwnDataStorage.Should().BeSameAs(dataStorage);

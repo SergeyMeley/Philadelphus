@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Tests.Common.Fakes.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +29,8 @@ namespace Philadelphus.Tests.Domain.Fakes.Entities
         public ReadOnlyDictionary<Guid, IContentModel> Content => throw new NotImplementedException();
 
         public ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive => throw new NotImplementedException();
+
+        public string Type => nameof(FakeAttributeOwnerModel);
 
         public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public string Description { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

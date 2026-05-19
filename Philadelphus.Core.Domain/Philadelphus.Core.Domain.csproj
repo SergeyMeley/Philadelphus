@@ -54,6 +54,12 @@
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
 			<_Parameter1>Philadelphus.Tests.Domain</_Parameter1>
 		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>Philadelphus.Tests.Presentation.Wpf.UI</_Parameter1>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>Philadelphus.Tests.Common</_Parameter1>
+		</AssemblyAttribute>
 	</ItemGroup>
 
 </Project>
