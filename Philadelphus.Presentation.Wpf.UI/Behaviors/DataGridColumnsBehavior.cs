@@ -8,11 +8,21 @@ using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 {
+    /// <summary>
+    /// Attached behavior, который строит WPF DataGrid-колонки из presentation-моделей таблицы наследников.
+    /// </summary>
+    /// <remarks>
+    /// Генерация колонок вынесена из code-behind: ViewModel отдает чистые дескрипторы колонок,
+    /// а behavior отвечает только за WPF-представление этих дескрипторов.
+    /// </remarks>
     public static class DataGridColumnsBehavior
     {
         private static readonly StateToColorConverter StateToColorConverter = new StateToColorConverter();
         private static readonly EnumDisplayAttributeConverter EnumDisplayAttributeConverter = new EnumDisplayAttributeConverter();
 
+        /// <summary>
+        /// Источник дескрипторов колонок для динамического DataGrid.
+        /// </summary>
         public static readonly DependencyProperty ColumnsSourceProperty =
             DependencyProperty.RegisterAttached(
                 "ColumnsSource",
@@ -42,6 +52,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             RebuildColumns(dataGrid, e.NewValue as IEnumerable);
         }
 
+        /// <summary>
+        /// Пересоздает DataGrid-колонки при изменении набора дескрипторов.
+        /// </summary>
         private static void RebuildColumns(DataGrid dataGrid, IEnumerable? columnsSource)
         {
             dataGrid.Columns.Clear();
@@ -61,6 +74,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             }
         }
 
+        /// <summary>
+        /// Создает узкую цветовую колонку состояния по аналогии с TreeView и таблицей атрибутов.
+        /// </summary>
         private static DataGridColumn CreateStateColumn(ChildCollectionTableColumn column)
         {
             var cellStyle = new Style(typeof(DataGridCell));
@@ -98,6 +114,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             };
         }
 
+        /// <summary>
+        /// Создает колонку выбора значения для редактируемых одиночных атрибутов.
+        /// </summary>
         private static DataGridComboBoxColumn CreateComboBoxColumn(ChildCollectionTableColumn column)
         {
             var selectedItemBinding = new Binding($"[{column.BindingKey}]")
@@ -121,6 +140,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             };
         }
 
+        /// <summary>
+        /// Создает текстовую колонку для readonly и простых редактируемых значений.
+        /// </summary>
         private static DataGridTextColumn CreateTextColumn(ChildCollectionTableColumn column)
         {
             var binding = new Binding($"[{column.BindingKey}]")

@@ -542,6 +542,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Перестраивает таблицу наследников, если после редактирования Sequence порядок строк стал устаревшим.
+        /// </summary>
         public RelayCommand RebuildChildCollectionTableIfOrderStaleCommand
         {
             get
@@ -799,6 +802,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return IsRepositoryLoading == false;
         }
 
+        /// <summary>
+        /// Перестраивает таблицу наследников для текущего выбранного элемента.
+        /// </summary>
+        /// <remarks>
+        /// Колонки строятся по текущему элементу и его видимым для наследников атрибутам,
+        /// строки - по рекурсивному списку наследников. После перестроения флаг устаревшего порядка сбрасывается.
+        /// </remarks>
         private void RebuildChildCollectionTable()
         {
             var children = GetSelectedRepositoryMemberChildren();
@@ -818,6 +828,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             CommandManager.InvalidateRequerySuggested();
         }
 
+        /// <summary>
+        /// Синхронизирует остальные части интерфейса после редактирования ячейки таблицы наследников.
+        /// </summary>
+        /// <remarks>
+        /// Для Sequence пересортировка откладывается до потери фокуса таблицей, чтобы строка не прыгала
+        /// во время редактирования. Остальные изменения сразу пробрасывают уведомления в соответствующую VM.
+        /// </remarks>
         private void OnChildCollectionTableCellChanged(Guid sourceUuid, string columnKey)
         {
             if (sourceUuid == Guid.Empty || string.IsNullOrWhiteSpace(columnKey))
@@ -849,6 +866,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Уведомляет родительскую VM ребенка, что состав или порядок ее коллекций мог измениться.
+        /// </summary>
         private void NotifyChildParentCollectionChanged(IMainEntityVM<IMainEntityModel> child)
         {
             if (child.Model is not IChildrenModel childModel)
@@ -874,6 +894,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Возвращает рекурсивный список наследников выбранного элемента для отображения в таблице.
+        /// </summary>
         private IReadOnlyList<IChildrenModel> GetSelectedRepositoryMemberChildren()
         {
             return ChildCollectionTableBuilder.buildChildCollectionTableChildren(

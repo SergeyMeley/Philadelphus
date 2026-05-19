@@ -5,8 +5,18 @@ using System.Windows.Threading;
 
 namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 {
+    /// <summary>
+    /// Attached behavior для выполнения команды после окончательного ухода клавиатурного фокуса из DataGrid.
+    /// </summary>
+    /// <remarks>
+    /// Используется для отложенной пересортировки таблицы: редактирование Sequence не дергает порядок строк
+    /// во время ввода, а перестроение выполняется, когда пользователь покидает таблицу.
+    /// </remarks>
     public static class DataGridLostKeyboardFocusCommandBehavior
     {
+        /// <summary>
+        /// Команда, выполняемая после потери клавиатурного фокуса DataGrid.
+        /// </summary>
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.RegisterAttached(
                 "Command",
@@ -42,6 +52,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             }
         }
 
+        /// <summary>
+        /// Откладывает проверку фокуса до фонового приоритета, чтобы WPF успел передать фокус новому элементу.
+        /// </summary>
         private static void OnLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             if (sender is not DataGrid dataGrid)

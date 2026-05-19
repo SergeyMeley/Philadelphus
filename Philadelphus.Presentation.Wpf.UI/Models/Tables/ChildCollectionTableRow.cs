@@ -4,8 +4,14 @@ using System.ComponentModel;
 namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
 {
     /// <summary>
-    /// Row values for child collection table.
+    /// Хранит значения одной строки таблицы наследников выбранного элемента.
     /// </summary>
+    /// <remarks>
+    /// Ключи внутренних словарей совпадают с <see cref="ChildCollectionTableColumn.BindingKey"/>,
+    /// но индексатор дополнительно принимает логические ключи колонок. Это позволяет WPF работать
+    /// с безопасными binding path-ами, а остальной код оставляет привязку к доменным именам свойств
+    /// и атрибутов.
+    /// </remarks>
     public sealed class ChildCollectionTableRow : INotifyPropertyChanged
     {
         private readonly Dictionary<string, object?> _cells;
@@ -52,14 +58,26 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// Uuid исходной доменной модели, которая представлена этой строкой.
+        /// </summary>
         public Guid SourceUuid { get; }
 
+        /// <summary>
+        /// Текущие значения ячеек, индексированные техническими binding-ключами.
+        /// </summary>
         public IReadOnlyDictionary<string, object?> Cells { get; }
 
+        /// <summary>
+        /// Допустимые значения combo-box ячеек, индексированные техническими binding-ключами.
+        /// </summary>
         public IReadOnlyDictionary<string, IEnumerable<object>?> ValueOptions { get; }
 
         private Action<Guid, string>? CellChanged { get; }
 
+        /// <summary>
+        /// Читает или записывает значение ячейки по логическому ключу колонки или по binding-ключу.
+        /// </summary>
         public object? this[string key]
         {
             get
@@ -105,6 +123,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
                 : key;
         }
 
+        /// <summary>
+        /// Возвращает логический ключ для уведомлений ViewModel после редактирования ячейки.
+        /// </summary>
         private string ResolveLogicalKey(string cellKey)
         {
             return _logicalKeys.TryGetValue(cellKey, out var logicalKey)

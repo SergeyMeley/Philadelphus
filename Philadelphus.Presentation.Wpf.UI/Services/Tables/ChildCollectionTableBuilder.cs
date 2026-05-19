@@ -11,10 +11,21 @@ using System.Reflection;
 namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
 {
     /// <summary>
-    /// Builds pure table descriptors for children of a selected repository member.
+    /// Строит чистые модели Excel-подобной таблицы наследников выбранного элемента.
     /// </summary>
+    /// <remarks>
+    /// Сервис не создает WPF-контролы и не хранит UI-состояние. Его результат можно тестировать
+    /// отдельно от представления и переиспользовать в других presentation-клиентах.
+    /// </remarks>
     public static class ChildCollectionTableBuilder
     {
+        /// <summary>
+        /// Возвращает всех наследников выбранного элемента в depth-first порядке.
+        /// </summary>
+        /// <remarks>
+        /// Дети каждого уровня сортируются по Sequence, имени и Uuid. Поэтому наследники n+1 порядка
+        /// идут сразу под своим родителем n порядка.
+        /// </remarks>
         public static IReadOnlyList<IChildrenModel> buildChildCollectionTableChildren(IParentModel? currentElement)
         {
             if (currentElement == null)
@@ -30,6 +41,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return result;
         }
 
+        /// <summary>
+        /// Формирует стабильный набор колонок: состояние, системные свойства, видимые детям атрибуты и audit-поля.
+        /// </summary>
+        /// <remarks>
+        /// Динамические атрибуты берутся только с текущего выбранного элемента и проходят проверку Visibility
+        /// относительно фактических наследников. Пользовательское имя атрибута остается логическим ключом,
+        /// а для WPF binding-а создается отдельный безопасный BindingKey.
+        /// </remarks>
         public static IReadOnlyList<ChildCollectionTableColumn> buildChildCollectionTableColumns(
             IAttributeOwnerModel? currentElement,
             IEnumerable<IChildrenModel>? children)
@@ -167,6 +186,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return result.OrderBy(x => x.Order).ToList();
         }
 
+        /// <summary>
+        /// Создает колонку свойства модели с заголовком и tooltip из DisplayAttribute, если он задан.
+        /// </summary>
         private static ChildCollectionTableColumn CreateColumn(
             string key,
             int order,
@@ -194,6 +216,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                 display.Description);
         }
 
+        /// <summary>
+        /// Ищет DisplayAttribute у свойства указанного типа или его реализаций.
+        /// </summary>
         private static (string Name, string? Description) GetPropertyDisplay(Type type, string propertyName)
         {
             if (TryGetPropertyDisplay(type, propertyName, out var display))
@@ -238,6 +263,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return true;
         }
 
+        /// <summary>
+        /// Формирует строки таблицы и связывает их с исходными доменными моделями.
+        /// </summary>
+        /// <remarks>
+        /// Ячейки, setter-ы и refresh-делегаты индексируются BindingKey. Одновременно создается карта
+        /// логических ключей в BindingKey, чтобы уведомления и тесты оставались привязаны к именам свойств
+        /// и атрибутов, а не к техническим ключам WPF.
+        /// </remarks>
         public static IReadOnlyList<ChildCollectionTableRow> buildChildCollectionTableRows(
             IEnumerable<IChildrenModel>? children,
             IEnumerable<ChildCollectionTableColumn>? columns,
@@ -282,6 +315,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return rows;
         }
 
+        /// <summary>
+        /// Рекурсивно добавляет наследников так, чтобы дочерние элементы располагались сразу под родителем.
+        /// </summary>
         private static void AddDescendantsDepthFirst(
             IParentModel parent,
             ICollection<IChildrenModel> result,
@@ -312,6 +348,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                 ?? Enumerable.Empty<IChildrenModel>();
         }
 
+        /// <summary>
+        /// Возвращает атрибуты текущего элемента, которые хотя бы один наследник может видеть по Visibility.
+        /// </summary>
         private static IEnumerable<ElementAttributeModel> GetTableAttributes(
             IAttributeOwnerModel? currentElement,
             IEnumerable<IChildrenModel>? children)
@@ -355,6 +394,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             }
         }
 
+        /// <summary>
+        /// Проверяет, доступен ли атрибут текущего элемента хотя бы одному наследнику таблицы.
+        /// </summary>
         private static bool CanAnyChildSeeAttribute(
             IAttributeOwnerModel currentElement,
             ElementAttributeModel attribute,
@@ -555,6 +597,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                 : attribute.Name;
         }
 
+        /// <summary>
+        /// Создает безопасный технический ключ для динамической колонки атрибута.
+        /// </summary>
+        /// <remarks>
+        /// Ключ не строится из имени атрибута, потому что имя является пользовательскими данными
+        /// и может ломать WPF binding path. Дополнительно проверяется отсутствие коллизий с логическими ключами.
+        /// </remarks>
         private static string CreateAttributeBindingKey(int order, ISet<string> reservedBindingKeys)
         {
             var index = order;
