@@ -65,13 +65,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             var cellStyle = new Style(typeof(DataGridCell));
             cellStyle.Setters.Add(new Setter(
                 Control.BackgroundProperty,
-                new Binding($"[{column.Key}]") { Converter = StateToColorConverter }));
+                new Binding($"[{column.BindingKey}]") { Converter = StateToColorConverter }));
             cellStyle.Setters.Add(new Setter(Control.ForegroundProperty, System.Windows.Media.Brushes.Black));
 
             return new DataGridTextColumn
             {
                 Header = column.Header,
-                Binding = new Binding($"[{column.Key}]") { Mode = BindingMode.OneWay },
+                Binding = new Binding($"[{column.BindingKey}]") { Mode = BindingMode.OneWay },
                 IsReadOnly = true,
                 Width = DataGridLength.Auto,
                 MinWidth = 90,
@@ -81,13 +81,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private static DataGridComboBoxColumn CreateComboBoxColumn(ChildCollectionTableColumn column)
         {
-            var selectedItemBinding = new Binding($"[{column.Key}]")
+            var selectedItemBinding = new Binding($"[{column.BindingKey}]")
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
             };
 
-            var itemsSourceBinding = new Binding($"ValueOptions[{column.Key}]");
+            var itemsSourceBinding = new Binding($"ValueOptions[{column.BindingKey}]");
 
             return new DataGridComboBoxColumn
             {
@@ -104,7 +104,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
         private static DataGridTextColumn CreateTextColumn(ChildCollectionTableColumn column)
         {
-            var binding = new Binding($"[{column.Key}]")
+            var binding = new Binding($"[{column.BindingKey}]")
             {
                 Mode = column.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.LostFocus,

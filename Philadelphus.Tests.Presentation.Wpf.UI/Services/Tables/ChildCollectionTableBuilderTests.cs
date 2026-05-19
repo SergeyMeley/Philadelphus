@@ -70,7 +70,38 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
             columns.Single(x => x.Header == "CreatedAt").Key.Should().Be($"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedAt)}");
             var attributeColumn = columns.Single(x => x.Order == 6);
             attributeColumn.Key.Should().Be(attributeColumn.Header);
+            attributeColumn.BindingKey.Should().NotBe(attributeColumn.Key);
+            attributeColumn.BindingKey.Should().StartWith("attribute_");
+            attributeColumn.BindingKey.Should().NotContain(",");
+            attributeColumn.BindingKey.Should().NotContain(" ");
             attributeColumn.IsAttribute.Should().BeTrue();
+        }
+
+        [Fact]
+        public void buildChildCollectionTableColumns_Avoids_Binding_Key_Collision_With_Attribute_Name()
+        {
+            var fixture = CreateFixture();
+            var attributeUuid = Guid.CreateVersion7();
+            _ = new ElementAttributeModel(
+                attributeUuid,
+                fixture.Root,
+                attributeUuid,
+                fixture.Root,
+                fixture.Root.OwningWorkingTree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<ElementAttributeModel>())
+            {
+                Name = "attribute_6",
+                Visibility = VisibilityScope.Public,
+            };
+
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                fixture.Root,
+                fixture.Root.Childs.Values);
+
+            var collisionColumn = columns.Single(x => x.Key == "attribute_6");
+            collisionColumn.BindingKey.Should().NotBe(collisionColumn.Key);
+            columns.Select(x => x.BindingKey).Should().OnlyHaveUniqueItems();
         }
 
         [Fact]
@@ -124,6 +155,7 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
             row[nameof(IMainEntityModel.Description)].Should().Be("Шток насоса");
             row[$"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}"].Should().Be("user123");
             row[priceColumn.Key].Should().Be(fixture.PriceValue);
+            row[priceColumn.BindingKey].Should().Be(fixture.PriceValue);
         }
 
         [Fact]
@@ -222,11 +254,12 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
             var priceColumn = columns.Single(x => x.Header == "Цена, руб");
             var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
 
-            row.ValueOptions[priceColumn.Key].Should().Contain(newPriceValue);
+            row.ValueOptions[priceColumn.BindingKey].Should().Contain(newPriceValue);
 
-            row[priceColumn.Key] = newPriceValue;
+            row[priceColumn.BindingKey] = newPriceValue;
 
             row[priceColumn.Key].Should().Be(newPriceValue);
+            row[priceColumn.BindingKey].Should().Be(newPriceValue);
             fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб").Value.Should().Be(newPriceValue);
         }
 

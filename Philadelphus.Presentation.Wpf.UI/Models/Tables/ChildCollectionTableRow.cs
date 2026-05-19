@@ -12,12 +12,15 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
         private readonly IReadOnlyDictionary<string, Func<object?, object?>?> _setters;
         private readonly Dictionary<string, IEnumerable<object>?> _valueOptions;
         private readonly IReadOnlyDictionary<string, Func<object?>> _refreshers;
+        private readonly IReadOnlyDictionary<string, string> _keyAliases;
+        private readonly IReadOnlyDictionary<string, string> _logicalKeys;
 
         public ChildCollectionTableRow(
             IReadOnlyDictionary<string, object?> cells,
             IReadOnlyDictionary<string, Func<object?, object?>?>? setters = null,
             IReadOnlyDictionary<string, IEnumerable<object>?>? valueOptions = null,
             IReadOnlyDictionary<string, Func<object?>>? refreshers = null,
+            IReadOnlyDictionary<string, string>? keyAliases = null,
             Guid sourceUuid = default,
             Action<Guid, string>? cellChanged = null)
         {
@@ -33,6 +36,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
             _refreshers = refreshers == null
                 ? new ReadOnlyDictionary<string, Func<object?>>(new Dictionary<string, Func<object?>>())
                 : new ReadOnlyDictionary<string, Func<object?>>(new Dictionary<string, Func<object?>>(refreshers));
+            _keyAliases = keyAliases == null
+                ? new ReadOnlyDictionary<string, string>(new Dictionary<string, string>())
+                : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(keyAliases));
+            _logicalKeys = new ReadOnlyDictionary<string, string>(
+                _keyAliases
+                    .GroupBy(x => x.Value, StringComparer.Ordinal)
+                    .ToDictionary(x => x.Key, x => x.First().Key, StringComparer.Ordinal));
 
             Cells = new ReadOnlyDictionary<string, object?>(_cells);
             ValueOptions = new ReadOnlyDictionary<string, IEnumerable<object>?>(_valueOptions);
@@ -59,7 +69,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
                     return null;
                 }
 
-                return Cells.TryGetValue(key, out var value)
+                return Cells.TryGetValue(ResolveCellKey(key), out var value)
                     ? value
                     : null;
             }
@@ -70,12 +80,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
                     return;
                 }
 
-                if (_setters.TryGetValue(key, out var setter) == false || setter == null)
+                var cellKey = ResolveCellKey(key);
+                if (_setters.TryGetValue(cellKey, out var setter) == false || setter == null)
                 {
                     return;
                 }
 
-                _cells[key] = setter(value);
+                _cells[cellKey] = setter(value);
                 foreach (var refresher in _refreshers)
                 {
                     _cells[refresher.Key] = refresher.Value();
@@ -83,8 +94,22 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Cells)));
-                CellChanged?.Invoke(SourceUuid, key);
+                CellChanged?.Invoke(SourceUuid, ResolveLogicalKey(cellKey));
             }
+        }
+
+        private string ResolveCellKey(string key)
+        {
+            return _keyAliases.TryGetValue(key, out var bindingKey)
+                ? bindingKey
+                : key;
+        }
+
+        private string ResolveLogicalKey(string cellKey)
+        {
+            return _logicalKeys.TryGetValue(cellKey, out var logicalKey)
+                ? logicalKey
+                : cellKey;
         }
     }
 }

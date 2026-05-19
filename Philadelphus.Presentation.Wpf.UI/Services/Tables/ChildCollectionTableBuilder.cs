@@ -75,9 +75,15 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             };
 
             var order = 6;
-            foreach (var attribute in GetTableAttributes(currentElement, children))
+            var attributes = GetTableAttributes(currentElement, children).ToList();
+            var reservedBindingKeys = new HashSet<string>(
+                result.Select(x => x.Key).Concat(attributes.Select(GetAttributeHeader)),
+                StringComparer.Ordinal);
+
+            foreach (var attribute in attributes)
             {
                 var header = GetAttributeHeader(attribute);
+                var bindingKey = CreateAttributeBindingKey(order, reservedBindingKeys);
                 result.Add(new ChildCollectionTableColumn(
                     header,
                     header,
@@ -88,7 +94,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                     setterFactory: child => GetAttributeValueSetter(child, header),
                     valueOptionsGetter: attribute.IsCollectionValue
                         ? null
-                        : child => GetAttributeValueOptions(child, header)));
+                        : child => GetAttributeValueOptions(child, header),
+                    bindingKey: bindingKey));
             }
 
             result.AddRange(new[]
@@ -160,24 +167,28 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             foreach (var child in children)
             {
                 var cells = columnsList.ToDictionary(
-                    x => x.Key,
+                    x => x.BindingKey,
                     x => x.GetValue(child));
 
                 var setters = columnsList.ToDictionary(
-                    x => x.Key,
+                    x => x.BindingKey,
                     x => x.GetSetter(child));
 
                 var valueOptions = columnsList
                     .Where(x => x.HasValueOptions)
                     .ToDictionary(
-                        x => x.Key,
+                        x => x.BindingKey,
                         x => x.GetValueOptions(child));
 
                 var refreshers = columnsList.ToDictionary(
-                    x => x.Key,
+                    x => x.BindingKey,
                     x => new Func<object?>(() => x.GetValue(child)));
 
-                rows.Add(new ChildCollectionTableRow(cells, setters, valueOptions, refreshers, child.Uuid, cellChanged));
+                var keyAliases = columnsList.ToDictionary(
+                    x => x.Key,
+                    x => x.BindingKey);
+
+                rows.Add(new ChildCollectionTableRow(cells, setters, valueOptions, refreshers, keyAliases, child.Uuid, cellChanged));
             }
 
             return rows;
@@ -454,6 +465,19 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return string.IsNullOrWhiteSpace(attribute.Name)
                 ? attribute.DeclaringUuid.ToString()
                 : attribute.Name;
+        }
+
+        private static string CreateAttributeBindingKey(int order, ISet<string> reservedBindingKeys)
+        {
+            var index = order;
+            string bindingKey;
+            do
+            {
+                bindingKey = $"attribute_{index++}";
+            }
+            while (reservedBindingKeys.Add(bindingKey) == false);
+
+            return bindingKey;
         }
 
         private static string? NullIfEmpty(string? value)
