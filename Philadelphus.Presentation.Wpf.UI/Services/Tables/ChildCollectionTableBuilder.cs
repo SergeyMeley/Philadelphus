@@ -299,7 +299,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
 
             return value =>
             {
-                sequencable.Sequence = ConvertToInt64(value);
+                if (TryConvertToInt64(value, out var sequence) == false)
+                {
+                    return sequencable.Sequence;
+                }
+
+                sequencable.Sequence = sequence;
                 return sequencable.Sequence;
             };
         }
@@ -367,19 +372,21 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return value?.ToString() ?? string.Empty;
         }
 
-        private static long ConvertToInt64(object? value)
+        private static bool TryConvertToInt64(object? value, out long result)
         {
             if (value is long longValue)
             {
-                return longValue;
+                result = longValue;
+                return true;
             }
 
             if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
             {
-                return 0;
+                result = 0;
+                return true;
             }
 
-            return Convert.ToInt64(value);
+            return long.TryParse(value.ToString(), out result);
         }
 
         private static string? GetCustomCode(IChildrenModel child)

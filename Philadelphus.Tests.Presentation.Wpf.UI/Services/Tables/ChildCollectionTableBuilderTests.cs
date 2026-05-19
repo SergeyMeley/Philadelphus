@@ -167,6 +167,22 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
         }
 
         [Fact]
+        public void buildChildCollectionTableRows_Rolls_Back_Sequence_Cell_On_Invalid_Number()
+        {
+            var fixture = CreateFixture();
+            var children = new IChildrenModel[] { fixture.Leave };
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                fixture.Root,
+                children);
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+
+            row[nameof(ISequencableModel.Sequence)] = "not a number";
+
+            fixture.Leave.Sequence.Should().Be(10);
+            row[nameof(ISequencableModel.Sequence)].Should().Be(10);
+        }
+
+        [Fact]
         public void buildChildCollectionTableRows_Notifies_Cell_Change_After_Successful_Edit()
         {
             var fixture = CreateFixture();

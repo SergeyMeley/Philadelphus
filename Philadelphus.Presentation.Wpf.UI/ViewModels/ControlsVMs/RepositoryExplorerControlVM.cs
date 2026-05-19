@@ -52,6 +52,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
         private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
         private IReadOnlyList<ChildCollectionTableRow> _childCollectionTableRows = Array.Empty<ChildCollectionTableRow>();
+        private bool _isChildCollectionTableOrderStale;
 
         public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
         { 
@@ -541,6 +542,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        public RelayCommand RebuildChildCollectionTableIfOrderStaleCommand
+        {
+            get
+            {
+                return new RelayCommand(_ =>
+                {
+                    if (_isChildCollectionTableOrderStale == false)
+                    {
+                        return;
+                    }
+
+                    RebuildChildCollectionTable();
+                },
+                _ => _isChildCollectionTableOrderStale && IsRepositoryLoading == false);
+            }
+        }
+
         #endregion
 
         #region [ Methods ]
@@ -796,6 +814,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             OnPropertyChanged(nameof(ChildCollectionTableColumns));
             OnPropertyChanged(nameof(ChildCollectionTableRows));
+            _isChildCollectionTableOrderStale = false;
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void OnChildCollectionTableCellChanged(Guid sourceUuid, string columnKey)
@@ -823,6 +843,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             if (columnKey == nameof(ISequencableModel.Sequence))
             {
+                _isChildCollectionTableOrderStale = true;
+                CommandManager.InvalidateRequerySuggested();
                 NotifyChildParentCollectionChanged(target);
             }
         }

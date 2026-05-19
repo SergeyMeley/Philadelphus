@@ -93,6 +93,7 @@
                                       EnableRowVirtualization="True"
                                       EnableColumnVirtualization="True"
                                       IsReadOnly="False"
+                                      behaviors:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}"
                                       behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
                                       ItemsSource="{Binding ChildCollectionTableRows}" />
                         </TabItem>
