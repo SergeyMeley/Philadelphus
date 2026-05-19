@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
@@ -44,6 +45,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Порядковый номер
         /// </summary>
+        [Display(Name = "№", Description = "Порядковый номер")]
         public long Sequence
         {
             get
@@ -73,16 +75,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Кустарник рабочих деревьев
         /// </summary>
+        [Display(Name = "Кустарник", Description = "Владеющий кустарник")]
         public ShrubModel OwningShrub { get; }
 
         /// <summary>
         /// Содержимое
         /// </summary>
+        [Display(Name = "Содержимое", Description = "Содержимое")]
         public abstract ReadOnlyDictionary<Guid, IContentModel> Content { get; }
 
         /// <summary>
         /// Все содержимое (рекурсивно)
         /// </summary>
+        [Display(Name = "Все содержимое", Description = "Все содержимое")]
         public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
             get => throw new NotImplementedException(); 
@@ -91,6 +96,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Атрибуты (собственные и унаследованные)
         /// </summary>
+        [Display(Name = "Атрибуты", Description = "Атрибуты (собственные и унаследованные)")]
         public IReadOnlyList<ElementAttributeModel> Attributes 
         {
             get
@@ -152,6 +158,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Собственные атрибуты
         /// </summary>
+        [Display(Name = "Собственные атрибуты", Description = "Собственные атрибуты")]
         public IReadOnlyList<ElementAttributeModel> PersonalAttributes 
         { 
             get => Attributes?.Where(x => x.IsOwn).ToList(); 
@@ -160,6 +167,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Унаследованные атрибуты
         /// </summary>
+        [Display(Name = "Унаследованные атрибуты", Description = "Унаследованные атрибуты")]
         public IReadOnlyList<ElementAttributeModel> ParentElementAttributes
         {
             get => Attributes?.Where(x => x.IsOwn == false).ToList();

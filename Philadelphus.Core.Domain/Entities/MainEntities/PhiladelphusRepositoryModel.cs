@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Xml.Linq;
 
@@ -39,6 +40,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Время последнего открытия пользователем репозитория Чубушника
         /// </summary>
+        [Display(Name = "Последнее открытие", Description = "Последнее открытие")]
         public DateTime? LastOpening
         {
             get
@@ -58,6 +60,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Избранный
         /// </summary>
+        [Display(Name = "Избранное", Description = "Избранное")]
         public bool IsFavorite
         {
             get
@@ -77,6 +80,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Список псевдонимов репозитория
         /// </summary>
+        [Display(Name = "Псевдонимы", Description = "Коллекция применяемых псевдонимов")]
         public Dictionary<string, object> AliasesList { get; } = new Dictionary<string, object>();
 
         #endregion
@@ -92,11 +96,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Кустарник рабочих деревьев
         /// </summary>
+        [Display(Name = "Кустарник", Description = "Содержащийся кустарник")]
         public ShrubModel ContentShrub { get; }
 
         /// <summary>
         /// Содержимое
         /// </summary>
+        [Display(Name = "Содержимое", Description = "Содержимое")]
         public ReadOnlyDictionary<Guid, IContentModel> Content 
         {
             get => new Dictionary<Guid, IContentModel>(
@@ -107,6 +113,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Все содержимое (рекурсивно)
         /// </summary>
+        [Display(Name = "Все содержимое", Description = "Все содержимое")]
         public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
             get => throw new NotImplementedException(); 
@@ -119,6 +126,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Собственное хранилище данных
         /// </summary>
+        [Display(Name = "Собственное хранилище", Description = "Собственное хранилище данных")]
         public IDataStorageModel OwnDataStorage
         {
             get
@@ -140,6 +148,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Наименование собственного хранилища данных
         /// </summary>
+        [Display(Name = "Наименование собственного хранилища", Description = "Наименование собственного хранилища данных")]
         public string OwnDataStorageName
         {
             get
@@ -159,6 +168,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Уникальный идентификатор собственного хранилища данных
         /// </summary>
+        [Display(Name = "UUID собственного хранилища", Description = "UUID собственного хранилища данных")]
         public Guid OwnDataStorageUuid 
         { 
             get => _ownDataStorage.Uuid; 
@@ -167,11 +177,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Коллекция допустимых хранилищ данных дочерних элементов
         /// </summary>
+        [Display(Name = "Хранилища", Description = "Хранилища данных")]
         public List<IDataStorageModel> DataStorages { get; } = new List<IDataStorageModel>();
 
         /// <summary>
         /// Хранилище данных
         /// </summary>
+        [Display(Name = "Хранилище", Description = "Хранилище данных")]
         public override IDataStorageModel DataStorage 
         { 
             get => OwnDataStorage; 

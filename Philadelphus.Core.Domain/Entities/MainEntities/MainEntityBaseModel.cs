@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
@@ -45,6 +46,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Тип основной сущности.
         /// </summary>
+        [Display(Name = "Тип", Description = "Тип сущности - репозиторий, кустарник, рабочее дерево, корень, узел или лист")]
         public string Type
         {
             get => typeof(T).Name;
@@ -53,6 +55,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Уникальный идентификатор
         /// </summary>
+        [Display(Name = "UUID", Description = "Уникальный идентификатор UUID")]
         public Guid Uuid
         {
             get => GetValue(_uuid);
@@ -62,6 +65,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Наименование
         /// </summary>
+        [Display(Name = "Наименование", Description = "Наименование")]
         public string Name
         {
             get => GetValue(_name);
@@ -71,6 +75,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Описание
         /// </summary>
+        [Display(Name = "Описание", Description = "Описание")]
         public string? Description
         {
             get => GetValue(_description);
@@ -81,11 +86,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Информация для аудита
         /// </summary>
         /// <returns>Результат выполнения операции.</returns>
+        [Display(Name = "Аудит", Description = "Информация для аудита")]
         public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
 
         /// <summary>
         /// Скрыт от нового использования (устаревший для бизнеса)
         /// </summary>
+        [Display(Name = "Скрыто", Description = "Скрыто")]
         public bool IsHidden
         {
             get => GetValue(_isHidden);
@@ -99,6 +106,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Состояние
         /// </summary>
+        [Display(Name = "Состояние", Description = "Состояние элемента - создано, изменено, удалено или сохранено")]
         public State State
         {
             get => GetValue(_state);
@@ -107,6 +115,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Хранилище данных
         /// </summary>
+        [Display(Name = "Хранилище", Description = "Хранилище данных")]
         public abstract IDataStorageModel DataStorage { get; }
 
         #endregion

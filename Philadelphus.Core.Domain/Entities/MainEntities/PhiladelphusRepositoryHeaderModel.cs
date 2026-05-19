@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities
 {
@@ -25,11 +26,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Уникальный идентификатор
         /// </summary>
+        [Display(Name = "UUID", Description = "Уникальный идентификатор UUID")]
         public Guid Uuid { get; }
 
         /// <summary>
         /// Наименование
         /// </summary>
+        [Display(Name = "Наименование", Description = "Наименование")]
         public string Name
         {
             get
@@ -49,6 +52,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Описание
         /// </summary>
+        [Display(Name = "Описание", Description = "Описание")]
         public string? Description
         {
             get
@@ -68,6 +72,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Наименование собственного хранилища данных
         /// </summary>
+        [Display(Name = "Наименование собственного хранилища", Description = "Наименование собственного хранилища данных")]
         public string OwnDataStorageName
         {
             get
@@ -87,6 +92,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Уникальный идентификатор собственного хранилища данных
         /// </summary>
+        [Display(Name = "UUID собственного хранилища", Description = "UUID собственного хранилища данных")]
         public Guid OwnDataStorageUuid
         {
             get
@@ -106,6 +112,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Время последнего открытия пользователем репозитория Чубушника
         /// </summary>
+        [Display(Name = "Последнее открытие", Description = "Последнее открытие")]
         public DateTime? LastOpening
         {
             get
@@ -125,6 +132,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Избранный
         /// </summary>
+        [Display(Name = "Избранное", Description = "Избранное")]
         public bool IsFavorite
         {
             get
@@ -144,6 +152,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Скрытый
         /// </summary>
+        [Display(Name = "Скрыто", Description = "Скрыто")]
         public bool IsHidden
         {
             get
@@ -163,6 +172,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// <summary>
         /// Состояние
         /// </summary>
+        [Display(Name = "Состояние", Description = "Состояние элемента - создано, изменено, удалено или сохранено")]
         public State State
         {
             get

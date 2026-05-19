@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
@@ -33,6 +34,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Пользовательский код
         /// Уникален в рамках дерева сущностей
         /// </summary>
+        [Display(Name = "Код", Description = "Пользовательский код")]
         public string CustomCode
         {
             get
@@ -62,11 +64,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Родительский корень репозитория Чубушника
         /// </summary>
+        [Display(Name = "Рабочее дерево", Description = "Владеющее рабочее дерево")]
         public WorkingTreeModel OwningWorkingTree { get; }
 
         /// <summary>
         /// Содержимое
         /// </summary>
+        [Display(Name = "Содержимое", Description = "Содержимое")]
         public override ReadOnlyDictionary<Guid, IContentModel> Content { get; }
 
         #endregion
@@ -76,6 +80,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Хранилище данных
         /// </summary>
+        [Display(Name = "Хранилище", Description = "Хранилище данных")]
         public override IDataStorageModel DataStorage
         { 
             get => OwningWorkingTree.DataStorage;

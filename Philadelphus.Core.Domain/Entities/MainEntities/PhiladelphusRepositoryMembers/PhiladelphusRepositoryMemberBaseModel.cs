@@ -7,6 +7,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Используется в рамках локальной сессии пользователя для ускорения работы со ссылками
         /// Уникален в рамках репозитория
         /// </summary>
+        [Display(Name = "Псевдоним", Description = "Псевдоним. Используется в рамках локальной сессии пользователя для ускорения работы со ссылками")]
         public string Alias
         {
             get
@@ -69,16 +71,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Владеющий репозиторий
         /// </summary>
+        [Display(Name = "Репозиторий", Description = "Владеющий репозиторий")]
         public PhiladelphusRepositoryModel OwningRepository { get; }
 
         /// <summary>
         /// Владелец
         /// </summary>
+        [Display(Name = "Владелец", Description = "Владелец")]
         public IOwnerModel Owner { get; }
 
         /// <summary>
         /// Все владельцы (рекурсивно)
         /// </summary>
+        [Display(Name = "Все владельцы", Description = "Все владельцы")]
         public virtual ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive 
         { 
             get => throw new NotImplementedException(); 

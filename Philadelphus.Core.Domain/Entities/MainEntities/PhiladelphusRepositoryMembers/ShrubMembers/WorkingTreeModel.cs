@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers
 {
@@ -38,6 +39,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Системное рабочее дерево
         /// </summary>
+        [Display(Name = "Системный", Description = "Системный элемент")]
         public bool IsSystemBase { get; } = false;
 
         /// <summary>
@@ -47,9 +49,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         internal static Guid SystemBaseUuid { get => Guid.Parse("00000000-0000-0000-0000-0000002018ee"); }
 
         /// <summary>
-        /// Недоступные (занятые) имена
+        /// Недоступные (занятые) наименования
         /// </summary>
         /// <returns>Результат выполнения операции.</returns>
+        [Display(Name = "Недоступные наименования", Description = "Недоступные (занятые) наименования")]
         public HashSet<string> UnavailableNames { get; } = new HashSet<string>();
 
         #endregion
@@ -65,6 +68,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Содержимое
         /// </summary>
+        [Display(Name = "Содержимое", Description = "Содержимое")]
         public override ReadOnlyDictionary<Guid, IContentModel> Content
         {
             get
@@ -96,6 +100,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Все содержимое (рекурсивно)
         /// </summary>
+        [Display(Name = "Все содержимое", Description = "Все содержимое")]
         public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
             get => throw new NotImplementedException(); 
@@ -104,6 +109,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Корень рабочего дерева
         /// </summary>
+        [Display(Name = "Корень", Description = "Содержащийся корень")]
         public TreeRootModel ContentRoot
         {
             get
@@ -123,6 +129,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Узлы рабочего дерева
         /// </summary>
+        [Display(Name = "Узлы", Description = "Содержащиеся узлы")]
         public ICollection<TreeNodeModel> ContentNodes
         {
             get
@@ -142,6 +149,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Листы рабочего дерева
         /// </summary>
+        [Display(Name = "Листы", Description = "Содержащиеся листы")]
         public ICollection<TreeLeaveModel> ContentLeaves 
         {
             get
@@ -161,6 +169,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Атрибуты элементов рабочего дерева
         /// </summary>
+        [Display(Name = "Атрибуты", Description = "Содержащиеся атрибуты")]
         public ICollection<ElementAttributeModel> ContentAttributes
         {
             get
@@ -184,8 +193,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Собственное хранилище данных
         /// </summary>
+        [Display(Name = "Собственное хранилище", Description = "Собственное хранилище данных")]
         public IDataStorageModel OwnDataStorage
-        {
+        { 
             get
             {
                 return _ownDataStorage;
@@ -195,6 +205,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Хранилище данных
         /// </summary>
+        [Display(Name = "Хранилище", Description = "Хранилище данных")]
         public sealed override IDataStorageModel DataStorage { get => OwnDataStorage; }
 
         #endregion
