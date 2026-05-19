@@ -17,6 +17,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         #region [ General Properties ]
 
         /// <summary>
+        /// Тип основной сущности.
+        /// </summary>
+        public string Type { get; }
+
+        /// <summary>
         /// Наименование
         /// Уникально в рамках дерева сущностей
         /// </summary>

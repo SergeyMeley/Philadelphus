@@ -43,6 +43,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         #region [ General Properties ]
 
         /// <summary>
+        /// Тип основной сущности.
+        /// </summary>
+        public string Type
+        {
+            get => typeof(T).Name;
+        }
+
+        /// <summary>
         /// Уникальный идентификатор
         /// </summary>
         public Guid Uuid
