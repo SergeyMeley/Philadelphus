@@ -35,6 +35,23 @@
             </StackPanel>
             <DataGrid Name="SelectedElementChildsDataGrid"  Grid.Row="1" Grid.Column="0" Margin="1" MinHeight="50" ItemsSource="{Binding SelectedRepositoryMember.Childs}" AutoGenerateColumns="False">
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="7"
+                                            MinWidth="7">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="" ToolTip="Состояние" MinWidth="7" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Background" Value="{Binding State, Converter={StaticResource stateToColorConverter}}" />
+                                <Setter Property="ToolTip" Value="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="№" Binding="{Binding Sequence}"></DataGridTextColumn>
                     <DataGridCheckBoxColumn Header="Внешний" IsReadOnly="True" Binding="{Binding IsOriginal}"></DataGridCheckBoxColumn>
                     <DataGridTextColumn Header="Тип элемента" IsReadOnly="True" Binding="{Binding EntityType}"></DataGridTextColumn>
