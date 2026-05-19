@@ -66,7 +66,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 if (Owner is IShrubMemberModel sm)
                 {
                     return sm.OwningShrub.ContentWorkingTrees
-                        .SelectMany(x => x.GetAllNodesRecursive());
+                        .SelectMany(x => x.ContentNodes);
                 }
                 throw new Exception("Владелец атрибута не является элементом репозитория. Непредвиденная ситуация, обратитесь к разработчику.");
             }
