@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Core.Domain.Policies.Builders;
 using Philadelphus.Core.Domain.Policies.Rules;
@@ -195,6 +196,36 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void AttributeSequence_Should_Block_Duplicate_Inherited_Attribute_Value()
+        {
+            var root = CreateRoot();
+            var node = CreateNode(root);
+            var rootAttribute = CreateOwnAttribute(root);
+            var inheritedAttribute = rootAttribute.CloneForChild(node);
+            var ownAttribute = CreateOwnAttributeWithDefaultPolicy(node);
+
+            inheritedAttribute.Sequence = 10;
+            ownAttribute.Sequence = 10;
+
+            Assert.Equal(0, ownAttribute.Sequence);
+        }
+
+        [Fact]
+        public void AttributeName_Should_Block_Duplicate_Inherited_Attribute_Value()
+        {
+            var root = CreateRoot();
+            var node = CreateNode(root);
+            var rootAttribute = CreateOwnAttribute(root);
+            rootAttribute.Name = "Same";
+            _ = rootAttribute.CloneForChild(node);
+            var ownAttribute = CreateOwnAttributeWithDefaultPolicy(node);
+
+            ownAttribute.Name = "Same";
+
+            Assert.Null(ownAttribute.Name);
+        }
+
+        [Fact]
         public void CustomCode_Should_Block_Duplicate_Value_In_WorkingTree()
         {
             var root = CreateRoot();
@@ -205,6 +236,21 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             secondNode.CustomCode = "CODE";
 
             Assert.Null(secondNode.CustomCode);
+        }
+
+        [Fact]
+        public void AttributeCustomCode_Should_Block_Duplicate_Inherited_Attribute_Value()
+        {
+            var root = CreateRoot();
+            var node = CreateNode(root);
+            var rootAttribute = CreateOwnAttribute(root);
+            var inheritedAttribute = rootAttribute.CloneForChild(node);
+            inheritedAttribute.CustomCode = "CODE";
+            var ownAttribute = CreateOwnAttributeWithDefaultPolicy(node);
+
+            ownAttribute.CustomCode = "CODE";
+
+            Assert.Null(ownAttribute.CustomCode);
         }
 
         [Fact]
@@ -276,6 +322,24 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
                 owner.OwningWorkingTree,
                 new FakeNotificationService(),
                 new EmptyPropertiesPolicy<ElementAttributeModel>());
+        }
+
+        private static ElementAttributeModel CreateOwnAttributeWithDefaultPolicy(IAttributeOwnerModel owner)
+        {
+            var uuid = Guid.NewGuid();
+            var tree = owner is IWorkingTreeMemberModel workingTreeMember
+                ? workingTreeMember.OwningWorkingTree
+                : ((TreeRootModel)owner).OwningWorkingTree;
+            var notificationService = new FakeNotificationService();
+
+            return new ElementAttributeModel(
+                uuid,
+                owner,
+                uuid,
+                owner,
+                tree,
+                notificationService,
+                AttributePolicyBuilder.CreateDefault(notificationService));
         }
 
         private class TestWorkingTreeModel : WorkingTreeModel

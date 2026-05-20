@@ -269,6 +269,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             }
         }
 
+        /// <summary>
+        /// Заменяет политику свойств уже созданной модели.
+        /// </summary>
+        /// <remarks>
+        /// Основной сценарий - загрузка из хранилища. Во время AutoMapper-маппинга модели создаются с
+        /// <see cref="EmptyPropertiesPolicy{T}" />, чтобы старые или неконсистентные данные из БД можно было
+        /// прочитать без срабатывания новых правил. После завершения маппинга сервис назначает рабочую
+        /// политику, и дальнейшие пользовательские изменения снова проходят обычные проверки.
+        /// </remarks>
+        /// <param name="propertiesPolicy">Политика, которая будет применяться к последующим чтениям и записям.</param>
         internal void SetPropertiesPolicy(IPropertiesPolicy<T> propertiesPolicy)
         {
             ArgumentNullException.ThrowIfNull(propertiesPolicy);

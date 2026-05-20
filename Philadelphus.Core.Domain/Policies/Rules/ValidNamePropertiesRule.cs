@@ -15,6 +15,14 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         private readonly INotificationService _notificationService;
         private readonly INameUniquenessStrategy<T> _strategy;
 
+        /// <summary>
+        /// Инициализирует правило проверки свойства <c>Name</c>.
+        /// </summary>
+        /// <param name="notificationService">Сервис пользовательских уведомлений.</param>
+        /// <param name="strategy">
+        /// Стратегия, определяющая область уникальности имени и набор типов, имена свойств которых зарезервированы.
+        /// Одна реализация правила используется для разных моделей, а различия между ними вынесены в стратегию.
+        /// </param>
         public ValidNamePropertiesRule(
             INotificationService notificationService,
             INameUniquenessStrategy<T> strategy)
@@ -36,11 +44,15 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 return true;
             }
 
+            // Унаследованный атрибут получает Name от родительского атрибута.
+            // Его изменение контролирует NonOwnAttributePropertiesRule, поэтому здесь не проверяем его повторно.
             if (model is ElementAttributeModel { IsOwn: false })
             {
                 return true;
             }
 
+            // Запрещаем пользовательские имена, совпадающие с системными свойствами модели.
+            // Это защищает табличные представления и импорт/экспорт, где имя атрибута может использоваться как ключ.
             var reservedNames = _strategy.ReservedPropertyTypes
                 .SelectMany(x => x.GetProperties())
                 .Select(x => x.Name)
@@ -52,6 +64,9 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 return false;
             }
 
+            // Стратегия возвращает только те элементы, с которыми текущая модель должна делить область имен:
+            // для узла это непосредственное содержимое родителя, для атрибута - содержимое его владельца,
+            // для рабочего дерева - деревья внутри ShrubModel.
             if (_strategy.GetNamedItems(model).Any(x => x.Uuid != model.Uuid && x.Name == newName))
             {
                 SendRestrictionNotification(model, prop, $"у текущего владельца уже есть другой элемент с наименованием '{newName}'");
@@ -74,6 +89,8 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 return value;
             }
 
+            // Невалидные символы не делают запись ошибочной: пользовательское значение мягко нормализуется,
+            // а отдельное RequiredNamePropertiesRule затем проверяет, что после нормализации имя не стало пустым.
             var normalizedName = NormalizeName(newName);
             var invalidCharacters = GetInvalidNameCharacters(newName).ToList();
             if (invalidCharacters.Count > 0)
@@ -86,6 +103,16 @@ namespace Philadelphus.Core.Domain.Policies.Rules
             return normalizedName;
         }
 
+        /// <summary>
+        /// Нормализует имя так же, как это делает setter модели: удаляет запрещенные символы и обрезает края.
+        /// </summary>
+        /// <remarks>
+        /// Метод используется не только при записи свойства, но и при импорте JSON для поиска уже созданных
+        /// атрибутов по имени. Это важно, потому что имя из файла и фактическое имя в модели должны проходить
+        /// одинаковое преобразование.
+        /// </remarks>
+        /// <param name="value">Исходное имя.</param>
+        /// <returns>Имя без запрещенных символов и лишних пробелов по краям.</returns>
         internal static string NormalizeName(string? value)
         {
             if (value == null)
@@ -131,6 +158,9 @@ namespace Philadelphus.Core.Domain.Policies.Rules
 
         private static bool IsInvalidNameCharacter(char value)
         {
+            // Список намеренно является списком запрещенных символов, а не белым списком допустимых.
+            // Требование: удалять только явно перечисленные символы, оставляя остальные пользовательские
+            // символы имени без изменений.
             return value == '{'
                 || value == '}'
                 || value == '['

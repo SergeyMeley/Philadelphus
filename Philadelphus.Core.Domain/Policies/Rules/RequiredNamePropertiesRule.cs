@@ -43,6 +43,9 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool CanWrite(T model, string prop, object value)
         {
+            // Это правило отделено от ValidNamePropertiesRule намеренно:
+            // ValidNamePropertiesRule отвечает за уникальность и нормализацию,
+            // а здесь проверяется обязательность значения уже после всех PrepareWriteValue-преобразований.
             if (prop == nameof(MainEntityBaseModel<T>.Name)
                 && value is string newName
                 && string.IsNullOrWhiteSpace(newName))

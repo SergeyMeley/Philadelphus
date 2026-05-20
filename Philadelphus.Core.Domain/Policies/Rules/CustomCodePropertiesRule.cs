@@ -15,6 +15,14 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         private readonly INotificationService _notificationService;
         private readonly ICustomCodeUniquenessStrategy<T> _strategy;
 
+        /// <summary>
+        /// Инициализирует правило проверки свойства <c>CustomCode</c>.
+        /// </summary>
+        /// <param name="notificationService">Сервис пользовательских уведомлений.</param>
+        /// <param name="strategy">
+        /// Стратегия, определяющая область уникальности кода:
+        /// для элементов дерева это все рабочее дерево, для атрибутов - атрибуты одного владельца.
+        /// </param>
         public CustomCodePropertiesRule(
             INotificationService notificationService,
             ICustomCodeUniquenessStrategy<T> strategy)
@@ -36,12 +44,16 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 return true;
             }
 
+            // Пустой код запрещен после предварительной нормализации.
+            // Если пользователь ввел только недопустимые символы, PrepareWriteValue вернет пустую строку,
+            // и именно эта проверка заблокирует изменение.
             if (string.IsNullOrWhiteSpace(newCustomCode))
             {
                 SendRestrictionNotification(model, prop, "значение не может быть пустым");
                 return false;
             }
 
+            // Не сравниваем объект с самим собой: повторное присвоение текущего значения не должно считаться дублем.
             if (_strategy.GetCustomCodeItems(model).Any(x => x.Uuid != model.Uuid && x.CustomCode == newCustomCode))
             {
                 SendRestrictionNotification(model, prop, $"уже есть другой элемент с CustomCode = '{newCustomCode}'");
@@ -59,6 +71,8 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 return value;
             }
 
+            // CustomCode хранится в более строгом формате, чем Name:
+            // допускаются только латинские буквы и цифры, остальные символы удаляются без блокировки записи.
             return NormalizeCustomCode(newCustomCode);
         }
 
@@ -71,6 +85,11 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         {
         }
 
+        /// <summary>
+        /// Удаляет из пользовательского кода все символы, кроме латинских букв и цифр.
+        /// </summary>
+        /// <param name="value">Исходное значение CustomCode.</param>
+        /// <returns>Строка, содержащая только символы <c>A-Z</c>, <c>a-z</c> и <c>0-9</c>.</returns>
         internal static string NormalizeCustomCode(string? value)
         {
             if (value == null)

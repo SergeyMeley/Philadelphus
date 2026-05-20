@@ -16,6 +16,14 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         private readonly INotificationService _notificationService;
         private readonly ISequenceUniquenessStrategy<T> _strategy;
 
+        /// <summary>
+        /// Инициализирует правило проверки свойства <c>Sequence</c>.
+        /// </summary>
+        /// <param name="notificationService">Сервис пользовательских уведомлений.</param>
+        /// <param name="strategy">
+        /// Стратегия, возвращающая элементы той коллекции, внутри которой значение <c>Sequence</c>
+        /// должно быть уникальным.
+        /// </param>
         public SequencePropertiesRule(
             INotificationService notificationService,
             ISequenceUniquenessStrategy<T> strategy)
@@ -37,12 +45,18 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 return true;
             }
 
+            // Sequence используется для пользовательского порядка в коллекциях.
+            // Ноль и отрицательные значения не допускаются, чтобы не смешивать реальные значения
+            // с дефолтным значением поля long.
             if (newSequence <= 0)
             {
                 SendRestrictionNotification(model, prop, "значение должно быть больше 0");
                 return false;
             }
 
+            // Область уникальности зависит от типа модели:
+            // узлы сравниваются с узлами своего родителя, листья - с листьями родительского узла,
+            // атрибуты - с другими непосредственными атрибутами владельца.
             if (_strategy.GetSequencedItems(model).Any(x => x.Uuid != model.Uuid && x.Sequence == newSequence))
             {
                 SendRestrictionNotification(model, prop, $"в этой коллекции уже есть элемент с Sequence = {newSequence}");

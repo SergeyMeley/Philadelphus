@@ -10,28 +10,36 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     {
         public static ICustomCodeUniquenessStrategy<TreeRootModel> TreeRoot()
         {
+            // Для любых элементов рабочего дерева CustomCode уникален в пределах всего WorkingTreeModel.
             return new CustomCodeUniquenessStrategy<TreeRootModel>(model => GetWorkingTreeMembers(model));
         }
 
         public static ICustomCodeUniquenessStrategy<TreeNodeModel> TreeNode()
         {
+            // Для любых элементов рабочего дерева CustomCode уникален в пределах всего WorkingTreeModel.
             return new CustomCodeUniquenessStrategy<TreeNodeModel>(model => GetWorkingTreeMembers(model));
         }
 
         public static ICustomCodeUniquenessStrategy<TreeLeaveModel> TreeLeave()
         {
+            // Для любых элементов рабочего дерева CustomCode уникален в пределах всего WorkingTreeModel.
             return new CustomCodeUniquenessStrategy<TreeLeaveModel>(model => GetWorkingTreeMembers(model));
         }
 
         public static ICustomCodeUniquenessStrategy<ElementAttributeModel> ElementAttribute()
         {
+            // Для атрибута область уникальности ограничена текущим владельцем, но в нее входят
+            // и собственные, и унаследованные атрибуты, потому что пользователь работает с ними
+            // как с единой коллекцией атрибутов владельца.
             return new CustomCodeUniquenessStrategy<ElementAttributeModel>(
-                model => PolicyRuleModelQueries.GetDirectAttributes(model.Owner).Select(ToCustomCodeItem));
+                model => PolicyRuleModelQueries.GetAttributes(model.Owner).Select(ToCustomCodeItem));
         }
 
         private static IEnumerable<CustomCodeItem> GetWorkingTreeMembers<T>(T model)
             where T : WorkingTreeMemberBaseModel<T>
         {
+            // Собираем корень, все узлы и все листья дерева. Атрибуты сюда не входят:
+            // для них используется отдельная стратегия ElementAttribute().
             if (model.OwningWorkingTree.ContentRoot != null)
                 yield return ToCustomCodeItem(model.OwningWorkingTree.ContentRoot);
 

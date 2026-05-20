@@ -1128,6 +1128,10 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     var dbTrees = dataStorage.ShrubMembersInfrastructureRepository
                         .SelectTreeAggregates(treesUuids)
                         .ToList();
+
+                    // Деревья при чтении из БД сначала создаются с пустой политикой.
+                    // Это позволяет загрузить данные, которые могли быть сохранены до появления новых правил.
+                    // Рабочая политика назначается сразу после добавления модели в доменный граф.
                     var trees = _mapper.MapWorkingTrees(dbTrees, repository.DataStorages, repository.ContentShrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>());
                     
                     var dbTreesByUuid = dbTrees.ToDictionary(x => x.Uuid);
@@ -1135,6 +1139,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     foreach (var tree in trees)
                     {
                         repository.ContentShrub.ContentWorkingTrees.Add(tree);
+
+                        // После загрузки модель снова должна вести себя как обычная пользовательская модель:
+                        // все дальнейшие изменения из UI, включая таблицу "Наследники", проходят через правила.
                         tree.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateWorkingTreeDefault(_notificationService));
 
                         if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
@@ -1199,23 +1206,29 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
 
             var dbRoot = dbRoots.Single();
+            // Корень, узлы и листья также мапятся с EmptyPropertiesPolicy. Иначе новые правила могли бы
+            // заблокировать присвоение сохраненных значений во время восстановления объекта из БД.
             var root = _mapper.MapTreeRoot(dbRoot, tree, _notificationService, new EmptyPropertiesPolicy<TreeRootModel>());
 
             if (root == null)
                 return;
 
+            // С этого момента корень уже находится в графе дерева, поэтому можно возвращать рабочую политику.
             root.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeRootDefault(_notificationService));
 
             var nodes = _mapper.MapTreeNodes(dbNodes, new[] { tree.ContentRoot }, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
             var allNodes = new List<TreeNodeModel>();
             while (nodes.Any())
             {
+                // Узлы загружаются уровнями: сначала дети корня, затем дети уже найденных узлов.
+                // Политика назначается каждому загруженному уровню до перехода к следующему.
                 nodes.ToList().ForEach(x => x.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeNodeDefault(_notificationService)));
                 allNodes.AddRange(nodes);
                 nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
             }
 
             var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree, _notificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
+            // Листья загружаются после всех узлов, поэтому к моменту назначения политики их родители уже известны.
             allLeaves.ToList().ForEach(x => x.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService)));
 
             // Обновление статусов

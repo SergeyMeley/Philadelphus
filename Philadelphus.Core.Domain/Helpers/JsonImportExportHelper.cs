@@ -134,11 +134,16 @@ namespace Philadelphus.Core.Domain.Helpers
                     treeRoot.Name = rootName;
                 }
 
+                // Атрибуты создаются раньше, чем их ссылки на тип данных и значение могут быть разрешены.
+                // Поэтому здесь храним "обещание привязки": имя узла-типа, имя листа-значения и сам атрибут.
+                // Реальные ValueType и Value будут назначены позже, когда вся структура узлов и листьев уже создана.
                 var attributeLinkMap = new Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)>();
 
                 refreshProgress?.Invoke(1, 1);
 
-                // 2. Атрибуты корня должны быть созданы до наследников, чтобы узлы и листья могли их унаследовать
+                // 2. Атрибуты корня должны быть созданы до наследников, чтобы узлы и листья могли их унаследовать.
+                // На этом шаге заполняются только собственные свойства атрибута. Ссылочные свойства ValueType и Value
+                // намеренно не назначаются сразу: соответствующие узлы и листья могут появиться ниже в JSON.
                 refreshProcess?.Invoke("Атрибуты корня");
                 refreshProgress?.Invoke(0, 1);
 
@@ -146,7 +151,8 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 refreshProgress?.Invoke(1, 1);
 
-                // 3. Создаём структуру + сохраняем атрибуты для привязки
+                // 3. Создаём структуру + сохраняем атрибуты для привязки.
+                // Каждый созданный атрибут добавляется в attributeLinkMap, но его ValueType/Value остаются отложенными.
                 refreshProcess?.Invoke("Создаём структуру");
                 refreshProgress?.Invoke(0, 1);
 
@@ -165,11 +171,13 @@ namespace Philadelphus.Core.Domain.Helpers
                     }
                 }
 
-                // ✅ 4. Загружаем полную структуру (узлы + листы)
+                // 4. Загружаем полную структуру (узлы + листы)
                 //service.GetWorkingTreeContent(treeRoot.OwningWorkingTree);
                 //treeRoot.OwningWorkingTree.ContentRoot = treeRoot;
 
-                // ✅ 5. ПРИВЯЗЫВАЕМ типы данных и значения к атрибутам!
+                // 5. Привязываем типы данных и значения к атрибутам.
+                // К этому моменту импорт уже создал все узлы и листья, поэтому поиск по именам может найти
+                // как пользовательские типы текущего дерева, так и типы системного дерева.
                 refreshProcess?.Invoke("Привязываем значения к атрибутам");
                 refreshProgress?.Invoke(0, attributeLinkMap.Count());
 
@@ -267,13 +275,20 @@ namespace Philadelphus.Core.Domain.Helpers
                 var name = attrElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
                 var needName = string.IsNullOrEmpty(name);
 
+                // Имена в JSON нормализуются тем же способом, что и при записи Name в доменную модель.
+                // Это важно после введения автоматического удаления запрещенных символов:
+                // в файле может быть старое имя с символами, которые в модели уже были удалены.
                 var normalizedName = NormalizeImportName(name);
 
+                // Сначала пытаемся найти уже существующий атрибут. Для узлов и листьев это обычно
+                // унаследованный атрибут, созданный ранее при создании родителя.
                 var attr = element.Attributes.ToList().FirstOrDefault(x => NormalizeImportName(x.Name) == normalizedName);
                 if (attr == null)
                 {
                     if (element is TreeLeaveModel)
                     {
+                        // Листья не могут создавать собственные атрибуты. Если атрибут не найден,
+                        // значит он не успел или не смог унаследоваться от родителя, и импорт должен упасть явно.
                         throw new InvalidOperationException(
                             $"Не найден унаследованный атрибут '{name}' у листа '{GetElementName(element)}' [{element.Uuid}]. " +
                             "Создание собственных атрибутов для листов запрещено.");
@@ -311,7 +326,9 @@ namespace Philadelphus.Core.Domain.Helpers
                 if (attrElement.TryGetProperty("description", out var descProp))
                     attr.Description = descProp.GetString();
 
-                // ✅ СОХРАНЯЕМ АТРИБУТ + ССЫЛКИ для привязки
+                // Сохраняем атрибут и строковые ссылки для поздней привязки.
+                // ValueType и Value не задаются здесь, потому что нужные TreeNodeModel/TreeLeaveModel
+                // могут быть созданы только после полного обхода JSON-структуры.
                 var dataTypeName = attrElement.TryGetProperty("dataTypeNodeName", out var dtProp) ? dtProp.GetString() ?? "Текст" : "Текст";
                 dataTypeName = dataTypeName == "Строка" ? "Текст" : dataTypeName;
                 var valueLeafName = attrElement.TryGetProperty("valueLeaveName", out var vlProp)
@@ -324,18 +341,33 @@ namespace Philadelphus.Core.Domain.Helpers
         }
 
         /// <summary>
-        /// ✅ ГЛАВНЫЙ МЕТОД: Привязывает реальные DataType и ValueLeaf к атрибутам
+        /// Привязывает реальные узлы типов данных и листья значений к ранее созданным атрибутам.
         /// </summary>
+        /// <remarks>
+        /// Импорт разделен на два этапа. Сначала создаются элементы дерева и атрибуты, чтобы механика
+        /// наследования могла построить копии атрибутов для дочерних элементов. Затем, когда все узлы и листья
+        /// уже существуют, этот метод преобразует строковые имена из JSON в реальные ссылки на доменные модели.
+        /// Такой порядок нужен, потому что атрибут корня может ссылаться на тип или значение, объявленные ниже
+        /// по JSON-дереву.
+        /// </remarks>
+        /// <param name="service">Доменный сервис, используемый для создания отсутствующих листьев-значений.</param>
+        /// <param name="treeRoot">Корень импортируемого рабочего дерева.</param>
+        /// <param name="attributeLinkMap">Отложенные ссылки атрибутов, собранные при создании структуры.</param>
+        /// <param name="refreshProgress">Callback обновления прогресса импорта.</param>
         private static void LinkAttributesToRealEntities(
             IPhiladelphusRepositoryService service,
             TreeRootModel treeRoot,
             Dictionary<Guid, (string dataTypeName, string valueLeafName, ElementAttributeModel attribute)> attributeLinkMap,
             Action<int, int> refreshProgress)
         {
+            // Ищем типы не только в импортируемом дереве, но и во всех деревьях ShrubModel.
+            // Это сохраняет возможность ссылаться на системные типы данных.
             var allNodes = treeRoot.OwningShrub.ContentWorkingTrees
                 .SelectMany(x => x.ContentNodes ?? Enumerable.Empty<TreeNodeModel>())
                 .ToList();
 
+            // Листья также собираются заранее, чтобы быстро искать значение по паре:
+            // "родительский тип данных" + "имя листа".
             var allLeaves = treeRoot.OwningShrub.ContentWorkingTrees
                 .SelectMany(x => x.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>())
                 .ToList();
@@ -347,6 +379,8 @@ namespace Philadelphus.Core.Domain.Helpers
             var count = attributeLinkMap.Count;
             int i = 0;
 
+            // Кэшируем атрибуты по владельцу. У одного владельца может быть несколько атрибутов,
+            // и для каждого из них нужно найти фактический экземпляр, который получит ValueType и Value.
             var attributesByOwner = new Dictionary<IShrubMemberModel, Dictionary<string, ElementAttributeModel>>();
 
             foreach (var kvp in attributeLinkMap)
@@ -363,6 +397,8 @@ namespace Philadelphus.Core.Domain.Helpers
                     attributesByOwner[sm] = attributesByName;
                 }
 
+                // attr может быть как собственным атрибутом, так и унаследованной копией.
+                // Поэтому перед записью еще раз находим атрибут в коллекции владельца по нормализованному имени.
                 if (!attributesByName.TryGetValue(NormalizeImportName(attr.Name), out var ownAtt))
                     throw new Exception();
 
@@ -370,6 +406,7 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 ownAtt.ValueType = valueType;
 
+                // Если лист-значение уже существует под найденным типом данных, просто привязываем его.
                 if (valueType != null &&
                     leavesByParentUuidAndName.TryGetValue((valueType.Uuid, NormalizeImportName(valueLeafName)), out var value))
                 {
@@ -382,6 +419,8 @@ namespace Philadelphus.Core.Domain.Helpers
                         if (valueType == null)
                             throw new InvalidOperationException($"Не найден тип данных '{dataTypeName}' для атрибута '{attr.Name}'");
 
+                        // Старый JSON может содержать значение атрибута, которого еще нет среди листьев типа.
+                        // В этом случае создаем новый лист под найденным типом данных и используем его как Value.
                         var newValue = service.CreateTreeLeave(
                             valueType,
                             needAutoName: false,
@@ -403,6 +442,8 @@ namespace Philadelphus.Core.Domain.Helpers
 
         private static Dictionary<string, ElementAttributeModel> BuildAttributesByName(IShrubMemberModel owner)
         {
+            // После нормализации два разных имени из JSON могут стать одинаковыми.
+            // В таком случае нельзя выбирать атрибут автоматически: импорт должен явно сообщить о конфликте.
             var duplicateNames = owner.Attributes
                 .GroupBy(x => NormalizeImportName(x.Name))
                 .Where(x => x.Count() > 1)
@@ -430,6 +471,8 @@ namespace Philadelphus.Core.Domain.Helpers
 
             var normalizedNodeName = NormalizeImportName(nodeName);
 
+            // Сначала ищем все узлы с таким именем после той же нормализации,
+            // которая используется при записи Name и при поиске атрибутов в JSON.
             var candidates = allNodes
                 .Where(x => NormalizeImportName(x.Name) == normalizedNodeName)
                 .ToList();
@@ -439,6 +482,8 @@ namespace Philadelphus.Core.Domain.Helpers
                 return candidates.SingleOrDefault();
             }
 
+            // Если имя типа данных встречается в нескольких деревьях, предпочитаем импортируемое дерево:
+            // пользовательский тип должен иметь приоритет над одноименным типом из других рабочих деревьев.
             var preferredTreeCandidates = candidates
                 .Where(x => x.OwningWorkingTree?.Uuid == preferredTree.Uuid)
                 .ToList();
@@ -448,6 +493,8 @@ namespace Philadelphus.Core.Domain.Helpers
                 return preferredTreeCandidates[0];
             }
 
+            // Если в импортируемом дереве такого типа нет, но есть ровно один системный тип,
+            // используем его как стабильный fallback.
             var systemTreeCandidates = candidates
                 .Where(x => x.OwningWorkingTree?.Uuid == WorkingTreeModel.SystemBaseUuid)
                 .ToList();
