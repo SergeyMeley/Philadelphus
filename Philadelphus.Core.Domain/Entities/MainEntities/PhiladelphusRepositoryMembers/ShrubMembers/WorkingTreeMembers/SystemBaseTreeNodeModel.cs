@@ -12,6 +12,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// </summary>
     public class SystemBaseTreeNodeModel : TreeNodeModel
     {
+        /// <summary>
+        /// Предопределенные идентификаторы системных базовых типов.
+        /// </summary>
         private static Dictionary<Guid, SystemBaseType> _baseUuids = new Dictionary<Guid, SystemBaseType>()
         {
             { Guid.Parse("00000000-0000-0000-0000-00015b10ec20"), SystemBaseType.OBJECT },
@@ -33,6 +36,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         [Display(Name = "Системный тип", Description = "Системный базовый тип")]
         public override SystemBaseType SystemBaseType { get; }
 
+        /// <summary>
+        /// Создать системный узел по системному базовому типу.
+        /// </summary>
+        /// <param name="parent">Родительский элемент рабочего дерева.</param>
+        /// <param name="owner">Рабочее дерево, которому принадлежит узел.</param>
+        /// <param name="type">Системный базовый тип.</param>
+        /// <param name="notificationService">Сервис уведомлений об изменениях модели.</param>
+        /// <param name="propertiesPolicy">Политика доступности свойств узла.</param>
         internal SystemBaseTreeNodeModel(
             IParentModel parent, 
             WorkingTreeModel owner, 
@@ -45,6 +56,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             InitProperties(type);
         }
 
+        /// <summary>
+        /// Восстановить системный узел по предопределенному идентификатору.
+        /// </summary>
+        /// <param name="uuid">Идентификатор системного узла.</param>
+        /// <param name="parent">Родительский элемент рабочего дерева.</param>
+        /// <param name="owner">Рабочее дерево, которому принадлежит узел.</param>
+        /// <param name="notificationService">Сервис уведомлений об изменениях модели.</param>
+        /// <param name="propertiesPolicy">Политика доступности свойств узла.</param>
         internal SystemBaseTreeNodeModel(
             Guid uuid,
             IParentModel parent,
@@ -57,6 +76,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             InitProperties(SystemBaseType);
         }
 
+        /// <summary>
+        /// Инициализировать отображаемые свойства системного узла.
+        /// </summary>
+        /// <param name="type">Системный базовый тип.</param>
         private void InitProperties(SystemBaseType type)
         {
             switch (type)
@@ -132,6 +155,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             }
         }
 
+        /// <summary>
+        /// Получить предопределенный идентификатор системного узла по типу.
+        /// </summary>
+        /// <param name="type">Системный базовый тип.</param>
+        /// <returns>Идентификатор системного узла.</returns>
         internal static Guid GetUuidByType(SystemBaseType type)
         {
             if (_baseUuids.ContainsValue(type))
@@ -141,6 +169,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             throw new Exception();
         }
 
+        /// <summary>
+        /// Получить системный базовый тип по предопределенному идентификатору узла.
+        /// </summary>
+        /// <param name="uuid">Идентификатор системного узла.</param>
+        /// <returns>Системный базовый тип.</returns>
         internal static SystemBaseType GetTypeByUuid(Guid uuid)
         {
             if (_baseUuids.ContainsKey(uuid))
@@ -150,6 +183,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             throw new Exception();
         }
 
+        /// <summary>
+        /// Проверить, относится ли идентификатор к предопределенным системным узлам.
+        /// </summary>
+        /// <param name="uuid">Проверяемый идентификатор.</param>
+        /// <returns>Признак системного узла.</returns>
         internal static bool IsSystemBaseType(Guid uuid)
         {
             return _baseUuids.ContainsKey(uuid);

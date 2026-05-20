@@ -1015,6 +1015,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             return true;
         }
 
+        /// <summary>
+        /// Инициализировать недостающие системные базовые типы и их предопределенные значения.
+        /// </summary>
+        /// <param name="tree">Системное рабочее дерево.</param>
+        /// <returns>Признак изменения дерева.</returns>
         private bool EnsureSystemBaseTypes(
             WorkingTreeModel tree)
         {
@@ -1028,7 +1033,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             var obj = GetOrCreateSystemBaseNode(tree, root, SystemBaseType.OBJECT, ref changed);
 
             GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.STRING, ref changed);
-            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.BOOL, ref changed);
+            var boolean = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.BOOL, ref changed);
             GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.FILE, ref changed);
 
             var num = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.NUMERIC, ref changed);
@@ -1042,9 +1047,23 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.DATE, ref changed);
             GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.TIME, ref changed);
 
+            // Значения логического типа хранятся системными листьями под узлом BOOL.
+            foreach (var value in SystemBaseTreeLeaveModel.GetValuesByType(SystemBaseType.BOOL))
+            {
+                GetOrCreateSystemBaseLeave(tree, boolean, value, ref changed);
+            }
+
             return changed;
         }
 
+        /// <summary>
+        /// Получить существующий системный узел или создать его с предопределенными свойствами.
+        /// </summary>
+        /// <param name="tree">Системное рабочее дерево.</param>
+        /// <param name="parent">Родительский элемент системного узла.</param>
+        /// <param name="type">Системный базовый тип.</param>
+        /// <param name="changed">Признак изменения дерева.</param>
+        /// <returns>Системный узел.</returns>
         private SystemBaseTreeNodeModel GetOrCreateSystemBaseNode(
             WorkingTreeModel tree,
             IParentModel parent,
@@ -1067,6 +1086,40 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 type,
                 _notificationService,
                 new EmptyPropertiesPolicy<TreeNodeModel>());
+        }
+
+        /// <summary>
+        /// Получить существующий системный лист или создать его с предопределенными свойствами.
+        /// </summary>
+        /// <param name="tree">Системное рабочее дерево.</param>
+        /// <param name="parent">Родительский системный узел.</param>
+        /// <param name="value">Строковое значение системного листа.</param>
+        /// <param name="changed">Признак изменения дерева.</param>
+        /// <returns>Системный лист.</returns>
+        private SystemBaseTreeLeaveModel GetOrCreateSystemBaseLeave(
+            WorkingTreeModel tree,
+            SystemBaseTreeNodeModel parent,
+            string value,
+            ref bool changed)
+        {
+            // Ищем лист по UUID, чтобы сохранить те же правила идемпотентной инициализации, что и для узлов.
+            var uuid = SystemBaseTreeLeaveModel.GetUuidByValue(parent.SystemBaseType, value);
+            var existing = tree.ContentLeaves
+                .OfType<SystemBaseTreeLeaveModel>()
+                .SingleOrDefault(x => x.Uuid == uuid);
+
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            changed = true;
+            return new SystemBaseTreeLeaveModel(
+                parent,
+                tree,
+                value,
+                _notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
         }
 
         /// <summary>
