@@ -25,6 +25,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Builders
                 new ParentOverrideForbiddenPropertiesRule(notificationService),
                 new OverrideVisibilityPropertiesRule(notificationService),
                 new RequiredOverrideValuePropertiesRule(notificationService),
+                new ReservedAttributeNamePropertiesRule(notificationService),
             });
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Tests.Domain.Fakes.PoliciesAndRules;
@@ -101,6 +103,72 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             var result = rule.CanWrite(model, nameof(ElementAttributeModel.Value), new object());
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public void ReservedName_Should_Block_ElementAttribute_Property_Name()
+        {
+            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var model = CreateOwnAttribute(new FakeWorkingTreeModel());
+
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), nameof(ElementAttributeModel.Value));
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReservedName_Should_Block_WorkingTreeMember_Property_Name()
+        {
+            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var model = CreateOwnAttribute(new FakeWorkingTreeModel());
+
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), nameof(WorkingTreeMemberBaseModel<ElementAttributeModel>.CustomCode));
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReservedName_Should_Block_Other_Attribute_Name_With_Same_Owner()
+        {
+            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var owner = new FakeWorkingTreeModel();
+            var existingAttribute = CreateOwnAttribute(owner);
+            var model = CreateOwnAttribute(owner);
+
+            existingAttribute.Name = "Existing";
+
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), "Existing");
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReservedName_Should_Allow_Unique_Attribute_Name()
+        {
+            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var owner = new FakeWorkingTreeModel();
+            var existingAttribute = CreateOwnAttribute(owner);
+            var model = CreateOwnAttribute(owner);
+
+            existingAttribute.Name = "Existing";
+
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), "Unique");
+
+            Assert.True(result);
+        }
+
+        private static ElementAttributeModel CreateOwnAttribute(FakeWorkingTreeModel owner)
+        {
+            var uuid = Guid.NewGuid();
+
+            return new ElementAttributeModel(
+                uuid,
+                owner,
+                uuid,
+                owner,
+                owner,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<ElementAttributeModel>());
         }
     }
 }
