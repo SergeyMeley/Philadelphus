@@ -17,5 +17,11 @@ namespace Philadelphus.Core.Domain.Entities.Enums
         NUMERIC = 3,
         INTEGER = 4,
         FLOAT = 5,
+        BOOL = 6,
+        DATETIME = 7,
+        DATE = 8,
+        TIME = 9,
+        FILE = 10,
+        MONEY = 11,
     }
 }
