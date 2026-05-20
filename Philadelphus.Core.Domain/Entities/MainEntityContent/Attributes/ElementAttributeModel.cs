@@ -395,6 +395,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _value = this._value,
                 _values = new List<TreeLeaveModel>(this._values),
                 _visibility = this._visibility,
+                _inheritedAttributeFromParent = this,
             };
 
             if (newOwner is not TreeLeaveModel)

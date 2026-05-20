@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
+using Philadelphus.Core.Domain.Policies.Rules;
 using Philadelphus.Tests.Domain.Fakes.PoliciesAndRules;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -108,7 +109,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         [Fact]
         public void ReservedName_Should_Block_ElementAttribute_Property_Name()
         {
-            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
             var model = CreateOwnAttribute(new FakeWorkingTreeModel());
 
             var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), nameof(ElementAttributeModel.Value));
@@ -119,7 +120,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         [Fact]
         public void ReservedName_Should_Block_WorkingTreeMember_Property_Name()
         {
-            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
             var model = CreateOwnAttribute(new FakeWorkingTreeModel());
 
             var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), nameof(WorkingTreeMemberBaseModel<ElementAttributeModel>.CustomCode));
@@ -130,7 +131,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         [Fact]
         public void ReservedName_Should_Block_Other_Attribute_Name_With_Same_Owner()
         {
-            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
             var owner = new FakeWorkingTreeModel();
             var existingAttribute = CreateOwnAttribute(owner);
             var model = CreateOwnAttribute(owner);
@@ -145,7 +146,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         [Fact]
         public void ReservedName_Should_Allow_Unique_Attribute_Name()
         {
-            var rule = new ReservedAttributeNamePropertiesRule(new FakeNotificationService());
+            var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
             var owner = new FakeWorkingTreeModel();
             var existingAttribute = CreateOwnAttribute(owner);
             var model = CreateOwnAttribute(owner);

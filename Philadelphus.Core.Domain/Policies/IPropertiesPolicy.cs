@@ -15,6 +15,7 @@ namespace Philadelphus.Core.Domain.Policies
     {
         bool CanRead(T model, string prop);
         bool CanWrite(T model, string prop, object value);
+        object PrepareWriteValue(T model, string prop, object value);
         object OnRead(T model, string prop, object value);
         void OnWrite(T model, string prop, object oldValue, object newValue);
     }

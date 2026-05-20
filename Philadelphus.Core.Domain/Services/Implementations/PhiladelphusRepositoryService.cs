@@ -11,6 +11,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
+using Philadelphus.Core.Domain.Policies.Builders;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
@@ -565,7 +566,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     dataStorage,
                     owner.ContentShrub,
                     _notificationService,
-                    new EmptyPropertiesPolicy<WorkingTreeModel>());
+                    PropertiesPolicyBuilder.CreateWorkingTreeDefault(_notificationService));
 
                 if (needAutoName)
                 {
@@ -624,7 +625,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     Guid.CreateVersion7(),
                     owner,
                     _notificationService,
-                    new EmptyPropertiesPolicy<TreeRootModel>());
+                    PropertiesPolicyBuilder.CreateTreeRootDefault(_notificationService));
 
                 if (needAutoName)
                 {
@@ -677,7 +678,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     parent,
                     (parent as IWorkingTreeMemberModel)?.OwningWorkingTree,
                     _notificationService,
-                    new EmptyPropertiesPolicy<TreeNodeModel>());
+                    PropertiesPolicyBuilder.CreateTreeNodeDefault(_notificationService));
 
                 if (needAutoName)
                 {
@@ -734,7 +735,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         sbn.OwningWorkingTree,
                         sbn.SystemBaseType,
                         _notificationService,
-                        new EmptyPropertiesPolicy<TreeLeaveModel>());
+                        PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
                 }
                 else
                 {
@@ -743,7 +744,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         parent,
                         parent.OwningWorkingTree,
                         _notificationService,
-                        new EmptyPropertiesPolicy<TreeLeaveModel>());
+                        PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
                 }
 
                 if (needAutoName)
@@ -1134,6 +1135,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     foreach (var tree in trees)
                     {
                         repository.ContentShrub.ContentWorkingTrees.Add(tree);
+                        tree.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateWorkingTreeDefault(_notificationService));
 
                         if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
                         {
@@ -1202,15 +1204,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (root == null)
                 return;
 
+            root.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeRootDefault(_notificationService));
+
             var nodes = _mapper.MapTreeNodes(dbNodes, new[] { tree.ContentRoot }, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
             var allNodes = new List<TreeNodeModel>();
             while (nodes.Any())
             {
+                nodes.ToList().ForEach(x => x.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeNodeDefault(_notificationService)));
                 allNodes.AddRange(nodes);
                 nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
             }
 
             var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree, _notificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
+            allLeaves.ToList().ForEach(x => x.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService)));
 
             // Обновление статусов
             SetModelState(tree, State.SavedOrLoaded);

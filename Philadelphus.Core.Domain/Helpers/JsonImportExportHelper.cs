@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using System.Globalization;
@@ -137,7 +138,15 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 refreshProgress?.Invoke(1, 1);
 
-                // 2. Создаём структуру + сохраняем атрибуты для привязки
+                // 2. Атрибуты корня должны быть созданы до наследников, чтобы узлы и листья могли их унаследовать
+                refreshProcess?.Invoke("Атрибуты корня");
+                refreshProgress?.Invoke(0, 1);
+
+                CreateAttributesFromElement(service, treeRoot, contentRootElement, attributeLinkMap);
+
+                refreshProgress?.Invoke(1, 1);
+
+                // 3. Создаём структуру + сохраняем атрибуты для привязки
                 refreshProcess?.Invoke("Создаём структуру");
                 refreshProgress?.Invoke(0, 1);
 
@@ -155,14 +164,6 @@ namespace Philadelphus.Core.Domain.Helpers
                         refreshProgress?.Invoke(i++, count);
                     }
                 }
-
-                // 3. Атрибуты корня
-                refreshProcess?.Invoke("Атрибуты корня");
-                refreshProgress?.Invoke(0, 1);
-
-                CreateAttributesFromElement(service, treeRoot, contentRootElement, attributeLinkMap);
-
-                refreshProgress?.Invoke(1, 1);
 
                 // ✅ 4. Загружаем полную структуру (узлы + листы)
                 //service.GetWorkingTreeContent(treeRoot.OwningWorkingTree);
@@ -266,10 +267,25 @@ namespace Philadelphus.Core.Domain.Helpers
                 var name = attrElement.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : string.Empty;
                 var needName = string.IsNullOrEmpty(name);
 
-                var attr = element.Attributes.ToList().FirstOrDefault(x => x.Name == name);
+                var normalizedName = NormalizeImportName(name);
+
+                var attr = element.Attributes.ToList().FirstOrDefault(x => NormalizeImportName(x.Name) == normalizedName);
                 if (attr == null)
                 {
+                    if (element is TreeLeaveModel)
+                    {
+                        throw new InvalidOperationException(
+                            $"Не найден унаследованный атрибут '{name}' у листа '{GetElementName(element)}' [{element.Uuid}]. " +
+                            "Создание собственных атрибутов для листов запрещено.");
+                    }
+
                     attr = service.CreateElementAttribute(element, needAutoName: needName, withoutInfoNotifications: true);
+                    if (attr == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Не удалось создать атрибут '{name}' для элемента '{GetElementName(element)}' [{element.Uuid}].");
+                    }
+
                     if (needName == false)
                     {
                         attr.Name = name;
@@ -325,7 +341,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 .ToList();
 
             var leavesByParentUuidAndName = allLeaves
-                .GroupBy(x => (ParentUuid: x.ParentNode.Uuid, LeafName: x.Name))
+                .GroupBy(x => (ParentUuid: x.ParentNode.Uuid, LeafName: NormalizeImportName(x.Name)))
                 .ToDictionary(x => x.Key, x => x.First());
 
             var count = attributeLinkMap.Count;
@@ -347,7 +363,7 @@ namespace Philadelphus.Core.Domain.Helpers
                     attributesByOwner[sm] = attributesByName;
                 }
 
-                if (!attributesByName.TryGetValue(attr.Name, out var ownAtt))
+                if (!attributesByName.TryGetValue(NormalizeImportName(attr.Name), out var ownAtt))
                     throw new Exception();
 
                 var valueType = ResolveNodeByName(dataTypeName, allNodes, treeRoot.OwningWorkingTree);
@@ -355,7 +371,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 ownAtt.ValueType = valueType;
 
                 if (valueType != null &&
-                    leavesByParentUuidAndName.TryGetValue((valueType.Uuid, valueLeafName), out var value))
+                    leavesByParentUuidAndName.TryGetValue((valueType.Uuid, NormalizeImportName(valueLeafName)), out var value))
                 {
                     ownAtt.Value = value;
                 }
@@ -376,7 +392,7 @@ namespace Philadelphus.Core.Domain.Helpers
 
                         if (valueType != null)
                         {
-                            leavesByParentUuidAndName[(valueType.Uuid, valueLeafName)] = newValue;
+                            leavesByParentUuidAndName[(valueType.Uuid, NormalizeImportName(newValue.Name))] = newValue;
                         }
                     }
                 }
@@ -388,7 +404,7 @@ namespace Philadelphus.Core.Domain.Helpers
         private static Dictionary<string, ElementAttributeModel> BuildAttributesByName(IShrubMemberModel owner)
         {
             var duplicateNames = owner.Attributes
-                .GroupBy(x => x.Name)
+                .GroupBy(x => NormalizeImportName(x.Name))
                 .Where(x => x.Count() > 1)
                 .Select(x => x.Key)
                 .ToList();
@@ -399,7 +415,7 @@ namespace Philadelphus.Core.Domain.Helpers
                     $"У элемента '{owner.Name}' [{owner.Uuid}] найдено несколько атрибутов с одинаковыми именами: {string.Join(", ", duplicateNames.Select(x => $"'{x}'"))}.");
             }
 
-            return owner.Attributes.ToDictionary(x => x.Name);
+            return owner.Attributes.ToDictionary(x => NormalizeImportName(x.Name));
         }
 
         private static TreeNodeModel? ResolveNodeByName(
@@ -412,8 +428,10 @@ namespace Philadelphus.Core.Domain.Helpers
                 return null;
             }
 
+            var normalizedNodeName = NormalizeImportName(nodeName);
+
             var candidates = allNodes
-                .Where(x => x.Name == nodeName)
+                .Where(x => NormalizeImportName(x.Name) == normalizedNodeName)
                 .ToList();
 
             if (candidates.Count <= 1)
@@ -444,6 +462,18 @@ namespace Philadelphus.Core.Domain.Helpers
 
             throw new InvalidOperationException(
                 $"Найдено несколько типов данных с именем '{nodeName}', невозможно однозначно привязать атрибут. Кандидаты: {candidateDescriptions}.");
+        }
+
+        private static string NormalizeImportName(string? name)
+        {
+            return ValidNamePropertiesRule<ElementAttributeModel>.NormalizeName(name);
+        }
+
+        private static string GetElementName(IAttributeOwnerModel element)
+        {
+            return element is IMainEntityModel mainEntity
+                ? mainEntity.Name
+                : element.GetType().Name;
         }
     }
 }

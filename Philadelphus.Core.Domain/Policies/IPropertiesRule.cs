@@ -1,7 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 
 namespace Philadelphus.Core.Domain.Policies
 {
@@ -9,10 +6,14 @@ namespace Philadelphus.Core.Domain.Policies
     /// Задает контракт для правил чтения и записи значений свойств.
     /// </summary>
     public interface IPropertiesRule<T>
+        where T : MainEntityBaseModel<T>
     {
-        bool CanRead(ElementAttributeModel model, string prop, object value);
-        bool CanWrite(ElementAttributeModel model, string prop, object value);
-        object OnRead(ElementAttributeModel model, string prop, object value);
-        void OnWrite(ElementAttributeModel model, string prop, object oldValue, object newValue);
+        bool CanRead(T model, string prop);
+
+        bool CanWrite(T model, string prop, object value);
+
+        object OnRead(T model, string prop, object value);
+
+        void OnWrite(T model, string prop, object oldValue, object newValue);
     }
 }

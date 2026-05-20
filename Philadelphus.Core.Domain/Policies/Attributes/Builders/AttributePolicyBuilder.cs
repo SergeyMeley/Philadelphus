@@ -1,9 +1,7 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
+using Philadelphus.Core.Domain.Policies.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Philadelphus.Core.Domain.Policies.Attributes.Builders
 {
@@ -25,7 +23,10 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Builders
                 new ParentOverrideForbiddenPropertiesRule(notificationService),
                 new OverrideVisibilityPropertiesRule(notificationService),
                 new RequiredOverrideValuePropertiesRule(notificationService),
-                new ReservedAttributeNamePropertiesRule(notificationService),
+                new RequiredNamePropertiesRule<ElementAttributeModel>(notificationService),
+                new ValidNamePropertiesRule<ElementAttributeModel>(notificationService, NameUniquenessStrategy.ElementAttribute()),
+                new SequencePropertiesRule<ElementAttributeModel>(notificationService, SequenceUniquenessStrategy.ElementAttribute()),
+                new CustomCodePropertiesRule<ElementAttributeModel>(notificationService, CustomCodeUniquenessStrategy.ElementAttribute()),
             });
         }
     }

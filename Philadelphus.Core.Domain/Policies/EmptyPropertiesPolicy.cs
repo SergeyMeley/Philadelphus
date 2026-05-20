@@ -36,6 +36,18 @@ namespace Philadelphus.Core.Domain.Policies
         }
 
         /// <summary>
+        /// Выполняет предварительную подготовку значения перед записью.
+        /// </summary>
+        /// <param name="model">Модель.</param>
+        /// <param name="prop">Свойство.</param>
+        /// <param name="value">Значение.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        public object PrepareWriteValue(T model, string prop, object value)
+        {
+            return value;
+        }
+
+        /// <summary>
         /// Выполняет операцию OnRead.
         /// </summary>
         /// <param name="model">Модель.</param>

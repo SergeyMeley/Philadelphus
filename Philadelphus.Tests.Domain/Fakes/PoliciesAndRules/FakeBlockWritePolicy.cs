@@ -13,6 +13,8 @@ namespace Philadelphus.Tests.Domain.Fakes.PoliciesAndRules
 
         public bool CanWrite(T model, string prop, object value) => false;
 
+        public object PrepareWriteValue(T model, string prop, object value) => value;
+
         public object OnRead(T model, string prop, object value) => value;
 
         public void OnWrite(T model, string prop, object oldValue, object newValue) { }

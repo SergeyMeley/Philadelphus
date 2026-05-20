@@ -23,6 +23,13 @@ namespace Philadelphus.Tests.Domain.Fakes.PoliciesAndRules
             return true;
         }
 
+        public object PrepareWriteValue(T model, string prop, object value)
+        {
+            var temp = model.Uuid;
+            model.Name = "Fake";
+            return value;
+        }
+
         public object OnRead(T model, string prop, object value)
         {
             var temp = model.Uuid;

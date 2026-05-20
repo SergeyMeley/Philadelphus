@@ -28,7 +28,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         protected virtual string _defaultFixedPartOfName => "Новая основная сущность";
 
-        protected readonly IPropertiesPolicy<T> _propertiesPolicy;
+        protected IPropertiesPolicy<T> _propertiesPolicy;
         private static readonly AsyncLocal<PropertiesPolicyContext> _context = new();
 
         private Guid _uuid;
@@ -240,6 +240,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             {
                 ctx.EnterWrite(this, prop);
 
+                if (_propertiesPolicy != null)
+                {
+                    value = (TValue)_propertiesPolicy.PrepareWriteValue((T)this, prop, value);
+                }
+
                 if (_propertiesPolicy?.CanWrite((T)this, prop, value) == false)
                 {
                     _notificationService.SendTextMessage<MainEntityBaseModel<T>>(
@@ -262,6 +267,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             {
                 ctx.ExitWrite(this, prop);
             }
+        }
+
+        internal void SetPropertiesPolicy(IPropertiesPolicy<T> propertiesPolicy)
+        {
+            ArgumentNullException.ThrowIfNull(propertiesPolicy);
+
+            _propertiesPolicy = propertiesPolicy;
         }
 
         #endregion
