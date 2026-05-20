@@ -37,18 +37,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         [Display(Name = "Код", Description = "Пользовательский код")]
         public string CustomCode
         {
-            get
-            {
-                return _customCode;
-            }
-            set
-            {
-                if (_customCode != value)
-                {
-                    _customCode = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_customCode);
+            set => SetValue(ref _customCode, value);
         }
 
         #endregion

@@ -48,18 +48,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         [Display(Name = "№", Description = "Порядковый номер")]
         public long Sequence
         {
-            get
-            {
-                return _sequence;
-            }
-            set
-            {
-                if (_sequence != value)
-                {
-                    _sequence = value;
-                    UpdateStateStateAfterChange();
-                }
-            }
+            get => GetValue(_sequence);
+            set => SetValue(ref _sequence, value);
         }
 
         #endregion
