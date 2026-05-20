@@ -23,6 +23,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Builders
                 new ParentOverrideForbiddenPropertiesRule(notificationService),
                 new OverrideVisibilityPropertiesRule(notificationService),
                 new RequiredOverrideValuePropertiesRule(notificationService),
+                new SystemBaseAttributeValuePropertiesRule(notificationService),
                 new RequiredNamePropertiesRule<ElementAttributeModel>(notificationService),
                 new ValidNamePropertiesRule<ElementAttributeModel>(notificationService, NameUniquenessStrategy.ElementAttribute()),
                 new SequencePropertiesRule<ElementAttributeModel>(notificationService, SequenceUniquenessStrategy.ElementAttribute()),
