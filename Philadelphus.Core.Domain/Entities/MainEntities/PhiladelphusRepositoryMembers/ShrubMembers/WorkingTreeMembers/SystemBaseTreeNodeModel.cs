@@ -19,6 +19,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             { Guid.Parse("00000000-0000-0000-0000-142113e1809c"), SystemBaseType.NUMERIC },
             { Guid.Parse("00000000-0000-0000-0000-914200507e18"), SystemBaseType.INTEGER },
             { Guid.Parse("00000000-0000-0000-0000-0000f1215a20"), SystemBaseType.FLOAT },
+            { Guid.Parse("00000000-0000-0000-0000-0b151512ea14"), SystemBaseType.BOOL },
+            { Guid.Parse("00000000-0000-0000-0000-da20e200913e"), SystemBaseType.DATETIME },
+            { Guid.Parse("00000000-0000-0000-0000-0000000da20e"), SystemBaseType.DATE },
+            { Guid.Parse("00000000-0000-0000-0000-00000200913e"), SystemBaseType.TIME },
+            { Guid.Parse("00000000-0000-0000-0000-000000f0912e"), SystemBaseType.FILE },
+            { Guid.Parse("00000000-0000-0000-0000-001315141e25"), SystemBaseType.MONEY },
         };
 
         /// <summary>
@@ -84,6 +90,42 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                     Description = "float";
                     CustomCode = "FLT0";
                     Alias = "flt";
+                    break;
+                case SystemBaseType.BOOL:
+                    Name = "Логическое значение";
+                    Description = "bool, boolean";
+                    CustomCode = "BOOL";
+                    Alias = "bol";
+                    break;
+                case SystemBaseType.DATETIME:
+                    Name = "Дата и время";
+                    Description = "datetime";
+                    CustomCode = "DTIM";
+                    Alias = "dtm";
+                    break;
+                case SystemBaseType.DATE:
+                    Name = "Дата";
+                    Description = "date";
+                    CustomCode = "DATE";
+                    Alias = "dat";
+                    break;
+                case SystemBaseType.TIME:
+                    Name = "Время";
+                    Description = "time";
+                    CustomCode = "TIME";
+                    Alias = "tim";
+                    break;
+                case SystemBaseType.FILE:
+                    Name = "Файл";
+                    Description = "file, binary";
+                    CustomCode = "FILE";
+                    Alias = "fil";
+                    break;
+                case SystemBaseType.MONEY:
+                    Name = "Деньги";
+                    Description = "money, currency";
+                    CustomCode = "MNY0";
+                    Alias = "mny";
                     break;
                 default:
                     throw new Exception();

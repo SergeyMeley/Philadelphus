@@ -971,7 +971,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid);
             if (existTree != null)
-                return false;
+                return EnsureSystemBaseTypes(existTree);
 
             var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
                 .SelectTreeAggregates(new Guid[] { WorkingTreeModel.SystemBaseUuid });
@@ -981,6 +981,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 shrub.ContentWorkingTrees.Add(existTree);
                 shrub.ContentWorkingTreesUuids.Add(existTree.Uuid);
+                EnsureSystemBaseTypes(existTree);
                 return true;
             }
 
@@ -1007,19 +1008,65 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             tree.ContentRoot = root;
 
-            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+            EnsureSystemBaseTypes(tree);
 
             shrub.ContentWorkingTrees.Add(tree);
             shrub.ContentWorkingTreesUuids.Add(tree.Uuid);
             return true;
+        }
+
+        private bool EnsureSystemBaseTypes(
+            WorkingTreeModel tree)
+        {
+            ArgumentNullException.ThrowIfNull(tree);
+
+            var root = tree.ContentRoot
+                ?? throw new InvalidOperationException("Системное рабочее дерево должно иметь корень.");
+
+            var changed = false;
+
+            var obj = GetOrCreateSystemBaseNode(tree, root, SystemBaseType.OBJECT, ref changed);
+
+            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.STRING, ref changed);
+            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.BOOL, ref changed);
+            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.FILE, ref changed);
+
+            var num = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.NUMERIC, ref changed);
+
+            GetOrCreateSystemBaseNode(tree, num, SystemBaseType.INTEGER, ref changed);
+            GetOrCreateSystemBaseNode(tree, num, SystemBaseType.FLOAT, ref changed);
+            GetOrCreateSystemBaseNode(tree, num, SystemBaseType.MONEY, ref changed);
+
+            var dateTime = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.DATETIME, ref changed);
+
+            GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.DATE, ref changed);
+            GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.TIME, ref changed);
+
+            return changed;
+        }
+
+        private SystemBaseTreeNodeModel GetOrCreateSystemBaseNode(
+            WorkingTreeModel tree,
+            IParentModel parent,
+            SystemBaseType type,
+            ref bool changed)
+        {
+            var existing = tree.ContentNodes
+                .OfType<SystemBaseTreeNodeModel>()
+                .SingleOrDefault(x => x.SystemBaseType == type);
+
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            changed = true;
+            return new SystemBaseTreeNodeModel(
+                parent,
+                tree,
+                type,
+                _notificationService,
+                new EmptyPropertiesPolicy<TreeNodeModel>());
         }
 
         /// <summary>
