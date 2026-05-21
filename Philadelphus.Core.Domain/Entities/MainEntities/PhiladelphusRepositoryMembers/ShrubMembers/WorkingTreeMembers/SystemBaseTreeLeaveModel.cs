@@ -58,11 +58,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                     return;
                 }
 
-                if (SetValue(ref _stringValue, value))
+                var isSameValue = string.Equals(_stringValue, value, StringComparison.Ordinal);
+                var changed = SetValue(ref _stringValue, value);
+                if (changed
+                    || (isSameValue
+                        && (_typedValue is null
+                            || string.Equals(Name, value, StringComparison.Ordinal) == false
+                            || string.Equals(Description, value, StringComparison.Ordinal) == false)))
                 {
-                    _typedValue = typedValue;
-                    Name = value;
-                    Description = value;
+                    ApplyStringValue(value, typedValue);
                 }
             }
         }
@@ -236,6 +240,27 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 criticalLevel: NotificationCriticalLevelModel.Warning);
 
             return false;
+        }
+
+        /// <summary>
+        /// Синхронизирует строковое значение с типизированным представлением и отображаемыми полями листа.
+        /// </summary>
+        /// <remarks>
+        /// Метод вызывается даже когда новое значение равно текущему. Это важно для дефолтных значений вроде
+        /// пустой строки: поле <see cref="_stringValue" /> уже равно string.Empty, но <see cref="TypedValue" />,
+        /// Name и Description еще должны быть инициализированы согласованным состоянием.
+        /// </remarks>
+        /// <param name="value">Строковое значение системного листа.</param>
+        /// <param name="typedValue">Типизированное представление строкового значения.</param>
+        private void ApplyStringValue(string value, object? typedValue)
+        {
+            _typedValue = typedValue;
+
+            // Name используется существующим маппингом как хранилище StringValue для системных листьев.
+            // Поэтому синхронизируем backing field напрямую: пустая строка допустима для STRING/OBJECT,
+            // но общая политика RequiredNamePropertiesRule заблокировала бы такой технический сценарий.
+            _name = value;
+            _description = value;
         }
     }
 }

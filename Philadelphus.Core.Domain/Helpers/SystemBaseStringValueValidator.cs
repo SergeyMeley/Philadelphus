@@ -101,7 +101,7 @@ namespace Philadelphus.Core.Domain.Helpers
 
                     return false;
                 case SystemBaseType.FILE:
-                    if (SystemBaseFileValueAccessValidator.IsAvailable(value))
+                    if (SystemBaseFileValueValidator.IsSupportedReference(value))
                     {
                         typedValue = value;
                         return true;
@@ -132,7 +132,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 SystemBaseType.DATETIME => "дата и время, распознаваемые DateTimeOffset.TryParse",
                 SystemBaseType.DATE => "дата, распознаваемая DateOnly.TryParse",
                 SystemBaseType.TIME => "время, распознаваемое TimeOnly.TryParse",
-                SystemBaseType.FILE => "путь к доступному локальному файлу; MinIO пока не поддерживается",
+                SystemBaseType.FILE => "непустая ссылка на файл: локальный путь, file:// URI или URI внешнего хранилища",
                 _ => $"тип {type} не поддерживается этим правилом",
             };
         }

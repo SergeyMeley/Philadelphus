@@ -104,7 +104,7 @@ public class SystemBaseAttributeValuePropertiesRuleTests
     }
 
     [Fact]
-    public void CanWrite_Blocks_File_SystemBaseLeave_WhenLocalFileDoesNotExist()
+    public void CanWrite_Allows_File_SystemBaseLeave_WhenLocalFileDoesNotExist()
     {
         var notificationService = new FakeNotificationService();
         var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
@@ -119,11 +119,8 @@ public class SystemBaseAttributeValuePropertiesRuleTests
 
         var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.Value), leave);
 
-        result.Should().BeFalse();
-        notificationService.Messages.Should().ContainSingle()
-            .Which.Should().Contain(missingFilePath)
-            .And.Contain(SystemBaseType.FILE.ToString())
-            .And.Contain("локальному файлу");
+        result.Should().BeTrue();
+        notificationService.Messages.Should().BeEmpty();
     }
 
     [Fact]

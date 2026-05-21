@@ -97,6 +97,8 @@ public class SystemBaseTreeNodeModelTests
 
     [Theory]
     [InlineData(SystemBaseType.INTEGER, "0", typeof(long))]
+    [InlineData(SystemBaseType.STRING, "", typeof(string))]
+    [InlineData(SystemBaseType.OBJECT, "", typeof(string))]
     [InlineData(SystemBaseType.NUMERIC, "0.0", typeof(double))]
     [InlineData(SystemBaseType.FLOAT, "0.0", typeof(double))]
     [InlineData(SystemBaseType.MONEY, "0.0", typeof(decimal))]
@@ -194,7 +196,7 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
-    public void SystemBaseTreeLeave_FileValue_BlocksMissingLocalFile()
+    public void SystemBaseTreeLeave_FileValue_AllowsMissingLocalFileReference()
     {
         var notificationService = new FakeNotificationService();
         var tree = new FakeWorkingTreeModel();
@@ -215,14 +217,13 @@ public class SystemBaseTreeNodeModelTests
             notificationService);
         var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
         var missingFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.missing");
+        notificationService.Messages.Clear();
 
         leave.StringValue = missingFilePath;
 
-        leave.StringValue.Should().BeEmpty();
-        notificationService.Messages.Should().Contain(x =>
-            x.Contains(missingFilePath)
-            && x.Contains(SystemBaseType.FILE.ToString())
-            && x.Contains("локальному файлу"));
+        leave.StringValue.Should().Be(missingFilePath);
+        leave.TypedValue.Should().Be(missingFilePath);
+        notificationService.Messages.Should().BeEmpty();
     }
 
     [Fact]
