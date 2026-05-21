@@ -741,6 +741,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         criticalLevel: NotificationCriticalLevelModel.Info);
                 }
 
+                // Узел BOOL обслуживается как системный справочник с двумя предопределенными листьями:
+                // "Истина" и "Ложь". Пользовательское расширение этого набора нарушит семантику bool.
+                if (parent is SystemBaseTreeNodeModel { SystemBaseType: SystemBaseType.BOOL })
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Создание листа в узле логических значений запрещено. Для типа BOOL допустимы только предопределенные значения 'Истина' и 'Ложь'.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return null;
+                }
+
                 TreeLeaveModel result = null;
                 if (parent is SystemBaseTreeNodeModel sbn)
                 {
@@ -905,6 +915,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 {
                     _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                         $"Удаление элемента невозможно. Изменение перечня атрибутов листов не допускается.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
+                // Логические системные листья нельзя удалять: на них могут ссылаться атрибуты,
+                // а сам набор значений должен оставаться полным и предсказуемым.
+                if (element is SystemBaseTreeLeaveModel { SystemBaseType: SystemBaseType.BOOL } boolLeave)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление логического значения '{boolLeave.StringValue}' запрещено. Для типа BOOL допустимы только предопределенные значения 'Истина' и 'Ложь'.",
                         criticalLevel: NotificationCriticalLevelModel.Warning);
                     return false;
                 }

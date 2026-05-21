@@ -1,27 +1,26 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.Policies.Rules
 {
     /// <summary>
-    /// Валидирует строковое значение системного листа при прямом редактировании листа.
+    /// Запрещает изменение предопределенных системных листов логического типа.
     /// </summary>
     /// <remarks>
-    /// Это правило закрывает сценарий, когда пользователь или код меняет
-    /// <see cref="SystemBaseTreeLeaveModel.StringValue" /> напрямую, без присваивания листа атрибуту.
-    /// Проверка атрибутного присваивания остается в отдельном attribute-rule.
+    /// Логический системный тип представлен фиксированным набором значений: <c>Истина</c> и <c>Ложь</c>.
+    /// Эти листья используются как справочник допустимых значений, поэтому их нельзя редактировать через
+    /// обычные свойства листа. Добавление и удаление таких листов дополнительно блокируется на уровне сервиса.
     /// </remarks>
-    internal class SystemBaseTreeLeaveStringValuePropertiesRule : IPropertiesRule<TreeLeaveModel>
+    internal class SystemBaseBoolTreeLeaveReadOnlyPropertiesRule : IPropertiesRule<TreeLeaveModel>
     {
         private readonly INotificationService _notificationService;
 
         /// <summary>
-        /// Создает правило проверки строкового значения системного листа.
+        /// Создает правило запрета изменения логических системных листов.
         /// </summary>
         /// <param name="notificationService">Сервис уведомлений для диагностических сообщений.</param>
-        public SystemBaseTreeLeaveStringValuePropertiesRule(INotificationService notificationService)
+        public SystemBaseBoolTreeLeaveReadOnlyPropertiesRule(INotificationService notificationService)
         {
             _notificationService = notificationService;
         }
@@ -38,31 +37,23 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         }
 
         /// <summary>
-        /// Проверяет запись <see cref="SystemBaseTreeLeaveModel.StringValue" /> по системному типу листа.
+        /// Запрещает запись любого свойства системного листа типа BOOL.
         /// </summary>
         /// <param name="model">Проверяемый лист.</param>
         /// <param name="prop">Имя записываемого свойства.</param>
         /// <param name="value">Новое значение свойства.</param>
-        /// <returns>true, если запись разрешена; иначе false.</returns>
+        /// <returns>false для системных листов BOOL; иначе true.</returns>
         public bool CanWrite(TreeLeaveModel model, string prop, object value)
         {
-            if (prop != nameof(SystemBaseTreeLeaveModel.StringValue)
-                || model is not SystemBaseTreeLeaveModel systemBaseLeave)
+            if (model is not SystemBaseTreeLeaveModel systemBaseLeave
+                || systemBaseLeave.SystemBaseType != SystemBaseType.BOOL)
             {
                 return true;
             }
 
-            var stringValue = value as string;
-            var isValid = SystemBaseStringValueValidator.IsValid(systemBaseLeave.SystemBaseType, stringValue, out var expectedFormat);
-
-            if (isValid)
-            {
-                return true;
-            }
-
-            _notificationService.SendTextMessage<SystemBaseTreeLeaveStringValuePropertiesRule>(
-                $"Для системного листа '{model.Name}' [{model.Uuid}] значение '{stringValue ?? "<null>"}' " +
-                $"не соответствует системному типу '{systemBaseLeave.SystemBaseType}'. Ожидаемый формат: {expectedFormat}.",
+            _notificationService.SendTextMessage<SystemBaseBoolTreeLeaveReadOnlyPropertiesRule>(
+                $"Изменение системного логического значения '{model.Name}' [{model.Uuid}] запрещено. " +
+                $"Для типа BOOL допустимы только предопределенные значения 'Истина' и 'Ложь'.",
                 criticalLevel: NotificationCriticalLevelModel.Warning);
 
             return false;

@@ -3,8 +3,23 @@ using System.Globalization;
 
 namespace Philadelphus.Core.Domain.Helpers
 {
+    /// <summary>
+    /// Проверяет строковое представление значения системного базового типа.
+    /// </summary>
+    /// <remarks>
+    /// Сейчас системные листья хранят значение в строковом виде, поэтому этот helper является
+    /// общей точкой проверки для доменных правил, работающих с <see cref="SystemBaseType" />.
+    /// При добавлении нового системного типа сюда нужно добавить и проверку, и текст ожидаемого формата.
+    /// </remarks>
     internal static class SystemBaseStringValueValidator
     {
+        /// <summary>
+        /// Проверяет, может ли строка быть значением указанного системного типа.
+        /// </summary>
+        /// <param name="type">Системный базовый тип, по которому выбирается формат проверки.</param>
+        /// <param name="value">Проверяемое строковое значение.</param>
+        /// <param name="expectedFormat">Описание ожидаемого формата для диагностического сообщения.</param>
+        /// <returns>true, если значение соответствует системному типу; иначе false.</returns>
         public static bool IsValid(SystemBaseType type, string? value, out string expectedFormat)
         {
             expectedFormat = GetExpectedFormat(type);
@@ -30,6 +45,11 @@ namespace Philadelphus.Core.Domain.Helpers
             };
         }
 
+        /// <summary>
+        /// Возвращает человекочитаемое описание ожидаемого формата системного значения.
+        /// </summary>
+        /// <param name="type">Системный базовый тип.</param>
+        /// <returns>Описание формата, подходящее для сообщения валидации.</returns>
         public static string GetExpectedFormat(SystemBaseType type)
         {
             return type switch
@@ -48,6 +68,11 @@ namespace Philadelphus.Core.Domain.Helpers
             };
         }
 
+        /// <summary>
+        /// Проверяет логическое значение с учетом стандартного .NET-формата и системных русских значений.
+        /// </summary>
+        /// <param name="value">Проверяемая строка.</param>
+        /// <returns>true для true/false, Истина/Ложь; иначе false.</returns>
         private static bool IsBool(string value)
         {
             return bool.TryParse(value, out _)

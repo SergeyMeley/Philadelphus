@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Policies.Builders;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -98,7 +99,6 @@ public class SystemBaseTreeNodeModelTests
     [InlineData(SystemBaseType.INTEGER, "0")]
     [InlineData(SystemBaseType.FLOAT, "0.0")]
     [InlineData(SystemBaseType.MONEY, "0.0")]
-    [InlineData(SystemBaseType.BOOL, "false")]
     [InlineData(SystemBaseType.DATETIME, "1970-01-01T00:00:00+00:00")]
     [InlineData(SystemBaseType.DATE, "1970-01-01")]
     [InlineData(SystemBaseType.TIME, "00:00:00")]
@@ -187,6 +187,106 @@ public class SystemBaseTreeNodeModelTests
             x.Contains("not integer")
             && x.Contains(SystemBaseType.INTEGER.ToString())
             && x.Contains("Int64"));
+    }
+
+    [Fact]
+    public void CreateTreeLeave_BoolSystemBaseNode_BlocksAddingValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.BOOL,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+
+        var leave = service.CreateTreeLeave(node);
+
+        leave.Should().BeNull();
+        node.ChildLeaves.Should().BeEmpty();
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("Создание листа")
+            && x.Contains("BOOL"));
+    }
+
+    [Fact]
+    public void SoftDeleteShrubMember_BoolSystemBaseLeave_BlocksDeletingValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.BOOL,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var leave = new SystemBaseTreeLeaveModel(
+            node,
+            tree,
+            "Истина",
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+
+        var result = service.SoftDeleteShrubMember(leave);
+
+        result.Should().BeFalse();
+        leave.State.Should().NotBe(State.ForSoftDelete);
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("Удаление логического значения")
+            && x.Contains("Истина"));
+    }
+
+    [Fact]
+    public void SystemBaseTreeLeave_BoolValue_BlocksChangingExistingValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.BOOL,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var leave = new SystemBaseTreeLeaveModel(
+            node,
+            tree,
+            "Истина",
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        leave.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(notificationService));
+
+        leave.StringValue = "false";
+        leave.Name = "false";
+
+        leave.StringValue.Should().Be("Истина");
+        leave.Name.Should().Be("Истина");
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("Изменение системного логического значения")
+            && x.Contains("Истина"));
     }
 
     public static IEnumerable<object[]> SystemBaseTypes()
