@@ -330,6 +330,22 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false; 
             if (_values != null && _values.Any(x => x.Uuid == value.Uuid))
                 return false;
+            if (SystemBaseAttributeValueCompatibilityValidator.IsCompatible(
+                    ValueType,
+                    value,
+                    out var systemBaseType,
+                    out var stringValue,
+                    out var expectedFormat) == false)
+            {
+                _notificationService.SendTextMessage<ElementAttributeModel>(
+                    $"Для коллекционного атрибута '{Name}' [{Uuid}] элемента '{(Owner as IMainEntityModel)?.Name}' [{(Owner as IMainEntityModel)?.Uuid}] " +
+                    $"значение '{stringValue ?? "<null>"}' не соответствует системному типу '{systemBaseType}'. " +
+                    $"Ожидаемый формат: {expectedFormat}.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
+
+                return false;
+            }
+
             _values?.Add(value);
             UpdateStateStateAfterChange();
             return true;

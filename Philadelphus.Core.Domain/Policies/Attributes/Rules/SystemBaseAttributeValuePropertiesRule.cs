@@ -33,24 +33,24 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
 
         public bool CanWrite(ElementAttributeModel model, string prop, object value)
         {
-            if (prop != nameof(ElementAttributeModel.Value)
-                || model.ValueType is not SystemBaseTreeNodeModel systemBaseType
-                || value is not SystemBaseTreeLeaveModel systemBaseValue)
+            if (prop != nameof(ElementAttributeModel.Value))
             {
                 return true;
             }
 
-            var stringValue = systemBaseValue.StringValue;
-            var isValid = SystemBaseStringValueValidator.IsValid(systemBaseType.SystemBaseType, stringValue, out var expectedFormat);
-
-            if (isValid)
+            if (SystemBaseAttributeValueCompatibilityValidator.IsCompatible(
+                model.ValueType,
+                value as TreeLeaveModel,
+                out var systemBaseType,
+                out var stringValue,
+                out var expectedFormat))
             {
                 return true;
             }
 
             _notificationService.SendTextMessage<SystemBaseAttributeValuePropertiesRule>(
                 $"Для атрибута '{model.Name}' [{model.Uuid}] элемента '{(model.Owner as IMainEntityModel)?.Name}' [{(model.Owner as IMainEntityModel)?.Uuid}] " +
-                $"значение '{stringValue ?? "<null>"}' не соответствует системному типу '{systemBaseType.SystemBaseType}'. " +
+                $"значение '{stringValue ?? "<null>"}' не соответствует системному типу '{systemBaseType}'. " +
                 $"Ожидаемый формат: {expectedFormat}.",
                 criticalLevel: NotificationCriticalLevelModel.Warning);
 

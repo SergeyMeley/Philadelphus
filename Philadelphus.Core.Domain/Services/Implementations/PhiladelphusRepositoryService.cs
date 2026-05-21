@@ -1158,16 +1158,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             if (existing != null)
             {
+                existing.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
                 return existing;
             }
 
             changed = true;
-            return new SystemBaseTreeLeaveModel(
+            var result = new SystemBaseTreeLeaveModel(
                 parent,
                 tree,
                 value,
                 _notificationService,
                 new EmptyPropertiesPolicy<TreeLeaveModel>());
+            result.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
+
+            return result;
         }
 
         /// <summary>

@@ -93,6 +93,18 @@ public class SystemBaseTreeNodeModelTests
             x.StringValue == "Ложь"
             && x.CustomCode == "FALS"
             && x.Alias == "fls");
+
+        var trueLeave = boolLeaves.Single(x => x.StringValue == "Истина");
+        notificationService.Messages.Clear();
+
+        trueLeave.StringValue = "false";
+        trueLeave.Name = "false";
+
+        trueLeave.StringValue.Should().Be("Истина");
+        trueLeave.Name.Should().Be("Истина");
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("Изменение системного логического значения")
+            && x.Contains("Истина"));
     }
 
     [Theory]

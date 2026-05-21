@@ -170,6 +170,51 @@ public class SystemBaseAttributeValuePropertiesRuleTests
         notificationService.Messages.Should().BeEmpty();
     }
 
+    [Fact]
+    public void TryAddValueToValuesCollection_Blocks_Invalid_SystemBaseLeave_StringValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "not integer", tree, notificationService);
+
+        attribute.Name = "Collection attribute";
+        attribute.ValueType = integerNode;
+        attribute.IsCollectionValue = true;
+
+        var result = attribute.TryAddValueToValuesCollection(leave);
+
+        result.Should().BeFalse();
+        attribute.Values.Should().BeEmpty();
+        notificationService.Messages.Should().ContainSingle()
+            .Which.Should().Contain("Collection attribute")
+            .And.Contain("not integer")
+            .And.Contain(SystemBaseType.INTEGER.ToString())
+            .And.Contain("Int64");
+    }
+
+    [Fact]
+    public void TryAddValueToValuesCollection_Allows_Valid_SystemBaseLeave_StringValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "42", tree, notificationService);
+
+        attribute.ValueType = integerNode;
+        attribute.IsCollectionValue = true;
+
+        var result = attribute.TryAddValueToValuesCollection(leave);
+
+        result.Should().BeTrue();
+        attribute.Values.Should().ContainSingle(x => x == leave);
+        notificationService.Messages.Should().BeEmpty();
+    }
+
     private static FakeWorkingTreeModel CreateTreeWithRoot(
         FakeNotificationService notificationService,
         out TreeRootModel root)
