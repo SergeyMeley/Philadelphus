@@ -1,0 +1,45 @@
+<Window x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.ImportProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
+        mc:Ignorable="d"
+        Title="Выполнение операции"
+        Height="170"
+        Width="420"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="TxtHeader"
+                   Grid.Row="0"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Text="Выполнение операции"/>
+
+        <StackPanel Grid.Row="1" Margin="0,18,0,0">
+            <TextBlock x:Name="TxtStatus"
+                       Text="Подготовка..."
+                       Margin="0,0,0,10"/>
+            <ProgressBar x:Name="ProgressOperation"
+                         Height="16"
+                         IsIndeterminate="True"/>
+        </StackPanel>
+
+        <Button x:Name="BtnClose"
+                Grid.Row="2"
+                Width="100"
+                Height="30"
+                Margin="0,18,0,0"
+                HorizontalAlignment="Right"
+                Content="Закрыть"
+                Click="BtnClose_Click"
+                IsEnabled="False"/>
+    </Grid>
+</Window>

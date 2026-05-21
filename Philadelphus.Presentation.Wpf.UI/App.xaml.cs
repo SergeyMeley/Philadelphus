@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
+using Philadelphus.Core.Domain.ImportExport.Excel;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
@@ -21,6 +22,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Mapping;
+using Philadelphus.Presentation.Wpf.UI.Services;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
@@ -29,6 +31,7 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Core;
@@ -215,8 +218,23 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
                     services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();
+                    services.AddSingleton<ConversionService>();
+                    services.AddSingleton<ExcelPreviewService>();
+                    services.AddSingleton<IExcelDataTypeDetector, ExcelDataTypeDetector>();
+                    services.AddSingleton<IExcelImportSourceReader, ExcelImportSourceReader>();
+                    services.AddSingleton<IExcelImportSchemaBuilder, ExcelImportSchemaBuilder>();
+                    services.AddSingleton<IExcelImportProfileResolver, ExcelImportProfileResolver>();
+                    services.AddSingleton<IExcelImportProfileValidator, ExcelImportProfileValidator>();
+                    services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
+                    services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
+                    services.AddSingleton<IExcelImportSchemaTemplateStorage, ExcelImportSchemaTemplateStorage>();
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
+                    services.AddSingleton<IFileDialogService, FileDialogService>();
+                    services.AddSingleton<IMessageDialogService, MessageDialogService>();
+                    services.AddTransient<ExcelImportPipeline>();
+                    services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
+                    services.AddTransient<ExcelImportSessionState>();
 
                     // Регистрация ViewModel
                     // Общие ViewModel
@@ -229,6 +247,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // ViewModel окон
                     services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
+                    services.AddTransient<ImportFromExcelViewModel>();
                     // ViewModel контролов
                     services.AddSingleton<ApplicationSettingsControlVM>();
                     services.AddTransient<ApplicationSettingsTabItemControlVM>();
@@ -249,6 +268,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<AttributeValuesCollectionWindow>();
                     services.AddSingleton<SplashWindow>();
                     services.AddTransient<ImportFromExcelWindow>();
+                    services.AddTransient<ExcelImportDesignerWindow>();
+                    services.AddTransient<ImportProgressWindow>();
 
                     // Регистрация фабрик
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();

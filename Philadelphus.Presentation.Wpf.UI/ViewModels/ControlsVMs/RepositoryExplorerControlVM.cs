@@ -542,6 +542,38 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
+                    window.InitializeForConvert();
+                    window.ShowDialog();
+                },
+                ce =>
+                {
+                    return CanModifyRepository();
+                });
+            }
+        }
+
+        public RelayCommand ImportTreeFromXlsxCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (PhiladelphusRepositoryVM.Model.ContentShrub == null)
+                    {
+                        MessageBox.Show("Активный репозиторий не содержит рабочего дерева для импорта.", "Импорт Excel", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
+                    window.Owner = Application.Current?.MainWindow;
+                    window.Initialize(
+                        PhiladelphusRepositoryVM.Model.ContentShrub,
+                        PhiladelphusRepositoryVM.Model,
+                        _service,
+                        () =>
+                        {
+                            UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryVM.Model);
+                        });
                     window.ShowDialog();
                 },
                 ce =>
