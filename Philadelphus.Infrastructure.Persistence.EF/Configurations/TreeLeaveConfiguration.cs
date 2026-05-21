@@ -33,6 +33,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
             builder.Property(x => x.Description)
                 .HasColumnName("description");
 
+            builder.Property(x => x.StringValue)
+                .HasColumnName("string_value")
+                .IsRequired()
+                .HasDefaultValue("<empty>");
+
             builder.Property(x => x.Sequence)
                 .HasColumnName("sequence");
 

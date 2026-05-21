@@ -66,7 +66,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Наименование
         /// </summary>
         [Display(Name = "Наименование", Description = "Наименование")]
-        public string Name
+        public virtual string Name
         {
             get => GetValue(_name);
             set => SetValue(ref _name, value);

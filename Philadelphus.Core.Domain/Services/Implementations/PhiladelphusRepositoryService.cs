@@ -603,14 +603,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             return type switch
             {
-                SystemBaseType.STRING => string.Empty,
+                SystemBaseType.STRING => TreeLeaveModel.EmptyStringValue,
                 SystemBaseType.INTEGER => "0",
                 SystemBaseType.NUMERIC or SystemBaseType.FLOAT or SystemBaseType.MONEY => "0.0",
                 SystemBaseType.BOOL => "false",
                 SystemBaseType.DATETIME => "1970-01-01T00:00:00+00:00",
                 SystemBaseType.DATE => "1970-01-01",
                 SystemBaseType.TIME => "00:00:00",
-                _ => string.Empty,
+                SystemBaseType.OBJECT => TreeLeaveModel.EmptyStringValue,
+                _ => TreeLeaveModel.EmptyStringValue,
             };
         }
 

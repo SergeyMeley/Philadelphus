@@ -1,4 +1,4 @@
-using Philadelphus.Core.Domain.Entities.Enums;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
 using System.Globalization;
 
 namespace Philadelphus.Core.Domain.Helpers

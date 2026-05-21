@@ -1,34 +1,47 @@
-using Microsoft.Extensions.Primitives;
+﻿using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
-using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
-using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
-using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers
 {
     /// <summary>
-    /// Лист дерева участников репозитория Чубушника (аналог объекта в ООП)
+    /// Лист дерева участников репозитория Чубушника.
     /// </summary>
-    public class  TreeLeaveModel : WorkingTreeMemberBaseModel<TreeLeaveModel>, IWorkingTreeMemberModel, IChildrenModel, IOwnerModel
+    public class TreeLeaveModel : WorkingTreeMemberBaseModel<TreeLeaveModel>, IWorkingTreeMemberModel, IChildrenModel, IOwnerModel
     {
         #region [ Fields ]
 
         /// <summary>
-        /// Фиксированная часть наименования по умолчанию
+        /// Фиксированная часть наименования по умолчанию.
         /// </summary>
         protected override string _defaultFixedPartOfName => "Новый лист";
 
+        private string _stringValue = EmptyStringValue;
+
+        /// <summary>
+        /// Техническое значение пустого листа для хранения в не-null поле.
+        /// </summary>
+        public const string EmptyStringValue = "<empty>";
+
+        private static readonly JsonSerializerOptions _stringValueJsonOptions = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            Converters = { new JsonStringEnumConverter() },
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         #endregion
 
-        #region [ Properties ] 
+        #region [ Properties ]
 
         #region [ General Properties ]
 
@@ -36,28 +49,42 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Тип.
         /// </summary>
         [Display(Name = "Системный тип", Description = "Системный базовый тип")]
-        public virtual SystemBaseType SystemBaseType { get => SystemBaseType.USER_DEFINED; }
+        public virtual SystemBaseType SystemBaseType => SystemBaseType.USER_DEFINED;
+
+        /// <summary>
+        /// Строковое значение листа.
+        /// </summary>
+        /// <remarks>
+        /// Для пользовательских листьев значение вычисляется из текущей коллекции атрибутов и не вводится
+        /// вручную. Системные листы переопределяют это свойство и хранят валидируемое значение базового типа.
+        /// </remarks>
+        [Display(Name = "Значение", Description = "Строковое значение листа")]
+        public virtual string StringValue
+        {
+            get => BuildAttributesStringValue();
+            set => SetStoredStringValue(value);
+        }
 
         #endregion
 
         #region [ Hierarchy Properties ]
 
         /// <summary>
-        /// Родитель
+        /// Родительский узел.
         /// </summary>
         [Display(Name = "Родитель", Description = "Родительский узел")]
         public TreeNodeModel ParentNode { get; }
 
         /// <summary>
-        /// Родитель
+        /// Родитель.
         /// </summary>
         [Display(Name = "Родитель", Description = "Родитель")]
-        public IParentModel Parent { get => ParentNode; }
+        public IParentModel Parent => ParentNode;
 
         /// <summary>
-        /// Все родители (рекурсивно)
+        /// Все родители рекурсивно.
         /// </summary>
-        [Display(Name = "Родители", Description = "Все родители (рекурсивно)")]
+        [Display(Name = "Родители", Description = "Все родители рекурсивно")]
         public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive
         {
             get => throw new NotImplementedException();
@@ -80,10 +107,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         #region [ Construct ]
 
         /// <summary>
-        /// Лист репозитория Чубушника
+        /// Инициализирует новый экземпляр класса <see cref="TreeLeaveModel" />.
         /// </summary>
-        /// <param name="uuid">Уникальный идентификатор</param>
-        /// <param name="parent">Родительский узел Чубушника</param>
+        /// <param name="uuid">Уникальный идентификатор.</param>
+        /// <param name="parent">Родительский узел.</param>
+        /// <param name="owner">Рабочее дерево, которому принадлежит лист.</param>
+        /// <param name="notificationService">Сервис уведомлений.</param>
+        /// <param name="propertiesPolicy">Политика свойств.</param>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         internal TreeLeaveModel(
             Guid uuid,
             TreeNodeModel parent,
@@ -105,7 +136,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         #region [ Methods ]
 
         /// <summary>
-        /// Сменить родителя
+        /// Сменить родителя.
         /// </summary>
         /// <param name="newParent">Новый родительский элемент.</param>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
@@ -118,30 +149,77 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         }
 
         /// <summary>
-        /// Добавить содержимое
+        /// Добавить содержимое.
         /// </summary>
-        /// <param name="content">Содержимое</param>
+        /// <param name="content">Содержимое.</param>
+        /// <returns>true, если содержимое добавлено; иначе false.</returns>
         protected override bool AddContentDetailed(IContentModel content)
         {
             return true;
         }
 
         /// <summary>
-        /// Удалить содержимое
+        /// Удалить содержимое.
         /// </summary>
-        /// <param name="content">Содержимое</param>
+        /// <param name="content">Содержимое.</param>
+        /// <returns>true, если содержимое удалено; иначе false.</returns>
         protected override bool RemoveContentDetailed(IContentModel content)
         {
             return true;
         }
 
         /// <summary>
-        /// Очистить содержимое
+        /// Очистить содержимое.
         /// </summary>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         protected override bool ClearContentDetailed()
         {
             return true;
+        }
+
+        /// <summary>
+        /// Приводит строковое значение к не-null и не-empty представлению для хранения.
+        /// </summary>
+        /// <param name="value">Исходное значение.</param>
+        /// <returns>Нормализованное значение.</returns>
+        protected static string NormalizeStringValue(string? value)
+        {
+            return string.IsNullOrEmpty(value)
+                ? EmptyStringValue
+                : value;
+        }
+
+        /// <summary>
+        /// Возвращает явно сохраненное строковое значение.
+        /// </summary>
+        /// <remarks>
+        /// Метод нужен наследникам, которые используют persisted-значение напрямую, а не вычисляют его из
+        /// атрибутов пользовательского листа.
+        /// </remarks>
+        /// <returns>Сохраненное строковое значение.</returns>
+        protected string GetStoredStringValue()
+        {
+            return GetValue(_stringValue);
+        }
+
+        /// <summary>
+        /// Записывает строковое значение в backing field через общую политику свойств.
+        /// </summary>
+        /// <param name="value">Новое строковое значение.</param>
+        /// <returns>true, если значение было изменено; иначе false.</returns>
+        protected bool SetStoredStringValue(string? value)
+        {
+            return SetValue(ref _stringValue, NormalizeStringValue(value), nameof(StringValue));
+        }
+
+        private string BuildAttributesStringValue()
+        {
+            var attributes = Attributes?
+                .Select(x => new AttributeExportDTO(x))
+                .ToList()
+                ?? new List<AttributeExportDTO>();
+
+            return JsonSerializer.Serialize(attributes, _stringValueJsonOptions);
         }
 
         #endregion

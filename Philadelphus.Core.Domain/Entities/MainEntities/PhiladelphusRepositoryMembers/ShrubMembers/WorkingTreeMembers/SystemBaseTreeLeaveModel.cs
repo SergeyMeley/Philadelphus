@@ -12,7 +12,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     /// </summary>
     public class SystemBaseTreeLeaveModel : TreeLeaveModel
     {
-        private string _stringValue = string.Empty;
         private object? _typedValue;
 
         /// <summary>
@@ -42,31 +41,50 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public object? TypedValue => _typedValue;
 
         /// <summary>
+        /// Отображаемое имя системного листа.
+        /// </summary>
+        /// <remarks>
+        /// Для системных листьев имя является производным от <see cref="StringValue" />. Внешняя запись в
+        /// Name игнорируется, чтобы наименование не стало отдельным источником состояния и не расходилось с
+        /// persisted-значением базового типа.
+        /// </remarks>
+        public override string Name
+        {
+            get => StringValue;
+            set
+            {
+            }
+        }
+
+        /// <summary>
         /// Строковое значение
         /// </summary>
         [Display(Name = "Значение", Description = "Строковое значение")]
-        public string StringValue 
+        public override string StringValue 
         { 
             get
             {
-                return _stringValue; 
+                return GetStoredStringValue(); 
             }
             set
             {
-                if (TryParseStringValue(value, out var typedValue) == false)
+                var normalizedValue = NormalizeStringValue(value);
+                if (TryParseStringValue(normalizedValue, out var typedValue) == false)
                 {
                     return;
                 }
 
-                var isSameValue = string.Equals(_stringValue, value, StringComparison.Ordinal);
-                var changed = SetValue(ref _stringValue, value);
+                var oldValue = GetStoredStringValue();
+                var descriptionWasSynchronized = string.IsNullOrEmpty(Description)
+                    || string.Equals(Description, oldValue, StringComparison.Ordinal);
+                var isSameValue = string.Equals(oldValue, normalizedValue, StringComparison.Ordinal);
+                var changed = SetStoredStringValue(normalizedValue);
                 if (changed
                     || (isSameValue
                         && (_typedValue is null
-                            || string.Equals(Name, value, StringComparison.Ordinal) == false
-                            || string.Equals(Description, value, StringComparison.Ordinal) == false)))
+                            || string.Equals(Name, normalizedValue, StringComparison.Ordinal) == false)))
                 {
-                    ApplyStringValue(value, typedValue);
+                    ApplyStringValue(normalizedValue, typedValue, descriptionWasSynchronized);
                 }
             }
         }
@@ -252,15 +270,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </remarks>
         /// <param name="value">Строковое значение системного листа.</param>
         /// <param name="typedValue">Типизированное представление строкового значения.</param>
-        private void ApplyStringValue(string value, object? typedValue)
+        private void ApplyStringValue(string value, object? typedValue, bool descriptionWasSynchronized)
         {
             _typedValue = typedValue;
 
-            // Name используется существующим маппингом как хранилище StringValue для системных листьев.
-            // Поэтому синхронизируем backing field напрямую: пустая строка допустима для STRING/OBJECT,
-            // но общая политика RequiredNamePropertiesRule заблокировала бы такой технический сценарий.
+            // Name остается отображаемым представлением системного значения, но больше не является
+            // источником истины для сохранения: persistence пишет отдельное поле StringValue.
             _name = value;
-            _description = value;
+            if (descriptionWasSynchronized)
+            {
+                _description = value;
+            }
         }
     }
 }

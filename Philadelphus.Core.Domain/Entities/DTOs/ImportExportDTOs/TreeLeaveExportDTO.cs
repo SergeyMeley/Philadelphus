@@ -23,6 +23,11 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
         public string Description { get; }
 
         /// <summary>
+        /// Строковое значение листа.
+        /// </summary>
+        public string StringValue { get; }
+
+        /// <summary>
         /// Наименование владеющего узла.
         /// </summary>
         public string OwningNodeName { get; }
@@ -44,6 +49,7 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 
             Name = leave.Name;
             Description = leave.Description;
+            StringValue = leave.StringValue;
             OwningNodeName = leave.ParentNode?.Name ?? "Неизвестный";
             Attributes = leave.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
         }
@@ -64,6 +70,7 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
 
             Name = name;
             Description = description;
+            StringValue = TreeLeaveModel.EmptyStringValue;
             OwningNodeName = owningNodeName;
         }
     }

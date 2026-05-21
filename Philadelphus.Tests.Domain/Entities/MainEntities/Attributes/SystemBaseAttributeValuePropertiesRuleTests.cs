@@ -215,6 +215,115 @@ public class SystemBaseAttributeValuePropertiesRuleTests
         notificationService.Messages.Should().BeEmpty();
     }
 
+    [Fact]
+    public void CanWrite_Blocks_ValueType_Change_When_Current_Value_Becomes_Incompatible()
+    {
+        var notificationService = new FakeNotificationService();
+        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        var dateNode = CreateSystemNode(SystemBaseType.DATE, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "42", tree, notificationService);
+
+        attribute.Name = "Typed attribute";
+        attribute.ValueType = integerNode;
+        attribute.Value = leave;
+
+        var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.ValueType), dateNode);
+
+        result.Should().BeFalse();
+        notificationService.Messages.Should().ContainSingle()
+            .Which.Should().Contain("Typed attribute")
+            .And.Contain("42")
+            .And.Contain(SystemBaseType.DATE.ToString())
+            .And.Contain("DateOnly");
+    }
+
+    [Fact]
+    public void CanWrite_Blocks_ValueType_Change_When_Current_Collection_Value_Becomes_Incompatible()
+    {
+        var notificationService = new FakeNotificationService();
+        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        var dateNode = CreateSystemNode(SystemBaseType.DATE, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "42", tree, notificationService);
+
+        attribute.Name = "Collection attribute";
+        attribute.ValueType = integerNode;
+        attribute.IsCollectionValue = true;
+        attribute.TryAddValueToValuesCollection(leave).Should().BeTrue();
+        notificationService.Messages.Clear();
+
+        var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.ValueType), dateNode);
+
+        result.Should().BeFalse();
+        notificationService.Messages.Should().ContainSingle()
+            .Which.Should().Contain("Collection attribute")
+            .And.Contain("42")
+            .And.Contain(SystemBaseType.DATE.ToString())
+            .And.Contain("DateOnly");
+    }
+
+    [Fact]
+    public void OnWrite_ValueType_Change_Remap_Current_SystemBaseValue_To_New_SystemBaseNode()
+    {
+        var notificationService = new FakeNotificationService();
+        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        var numericNode = CreateSystemNode(SystemBaseType.NUMERIC, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "42", tree, notificationService);
+
+        attribute.ValueType = integerNode;
+        attribute.Value = leave;
+
+        var canWrite = rule.CanWrite(attribute, nameof(ElementAttributeModel.ValueType), numericNode);
+        attribute.ValueType = numericNode;
+        rule.OnWrite(attribute, nameof(ElementAttributeModel.ValueType), integerNode, numericNode);
+
+        canWrite.Should().BeTrue();
+        attribute.Value.Should().BeOfType<SystemBaseTreeLeaveModel>();
+        attribute.Value.Should().NotBeSameAs(leave);
+        attribute.Value.ParentNode.Should().Be(numericNode);
+        ((SystemBaseTreeLeaveModel)attribute.Value).StringValue.Should().Be("42");
+    }
+
+    [Fact]
+    public void OnWrite_ValueType_Change_Remap_Current_SystemBaseCollection_To_New_SystemBaseNode()
+    {
+        var notificationService = new FakeNotificationService();
+        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        var numericNode = CreateSystemNode(SystemBaseType.NUMERIC, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "42", tree, notificationService);
+
+        attribute.ValueType = integerNode;
+        attribute.IsCollectionValue = true;
+        attribute.TryAddValueToValuesCollection(leave).Should().BeTrue();
+
+        var canWrite = rule.CanWrite(attribute, nameof(ElementAttributeModel.ValueType), numericNode);
+        attribute.ValueType = numericNode;
+        rule.OnWrite(attribute, nameof(ElementAttributeModel.ValueType), integerNode, numericNode);
+
+        canWrite.Should().BeTrue();
+        attribute.Values.Should().ContainSingle();
+        var remappedValue = attribute.Values.Single();
+        remappedValue.Should().BeOfType<SystemBaseTreeLeaveModel>();
+        remappedValue.Should().NotBeSameAs(leave);
+        remappedValue.ParentNode.Should().Be(numericNode);
+        ((SystemBaseTreeLeaveModel)remappedValue).StringValue.Should().Be("42");
+    }
+
     private static FakeWorkingTreeModel CreateTreeWithRoot(
         FakeNotificationService notificationService,
         out TreeRootModel root)

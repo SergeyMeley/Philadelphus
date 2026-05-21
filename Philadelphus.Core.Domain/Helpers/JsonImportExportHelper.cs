@@ -256,6 +256,15 @@ namespace Philadelphus.Core.Domain.Helpers
                     leaf.Name = name;
                 }
 
+                if (leaf is SystemBaseTreeLeaveModel systemBaseLeaf)
+                {
+                    var stringValue = leafElement.TryGetProperty("stringValue", out var stringValueProp)
+                        ? stringValueProp.GetString()
+                        : name;
+
+                    systemBaseLeaf.StringValue = stringValue;
+                }
+
                 CreateAttributesFromElement(service, leaf, leafElement, attributeLinkMap);
             }
         }
@@ -426,7 +435,7 @@ namespace Philadelphus.Core.Domain.Helpers
                             needAutoName: false,
                             withoutInfoNotifications: true);
 
-                        newValue.Name = valueLeafName;
+                        SetImportedLeafValue(newValue, valueLeafName);
                         ownAtt.Value = newValue;
 
                         if (valueType != null)
@@ -438,6 +447,17 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 refreshProgress?.Invoke(i++, count);
             }
+        }
+
+        private static void SetImportedLeafValue(TreeLeaveModel leaf, string value)
+        {
+            if (leaf is SystemBaseTreeLeaveModel systemBaseLeaf)
+            {
+                systemBaseLeaf.StringValue = value;
+                return;
+            }
+
+            leaf.Name = value;
         }
 
         private static Dictionary<string, ElementAttributeModel> BuildAttributesByName(IShrubMemberModel owner)

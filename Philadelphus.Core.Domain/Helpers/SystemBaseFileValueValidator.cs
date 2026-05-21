@@ -1,4 +1,4 @@
-namespace Philadelphus.Core.Domain.Helpers
+﻿namespace Philadelphus.Core.Domain.Helpers
 {
     /// <summary>
     /// Проверяет строковое значение системного типа FILE как сохраняемую ссылку на файловый ресурс.
@@ -18,7 +18,8 @@ namespace Philadelphus.Core.Domain.Helpers
         /// <returns>true, если значение не null, не пустое и не состоит только из пробельных символов; иначе false.</returns>
         public static bool IsSupportedReference(string? value)
         {
-            return string.IsNullOrWhiteSpace(value) == false;
+            return string.IsNullOrWhiteSpace(value) == false
+                && string.Equals(value, Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeaveModel.EmptyStringValue, StringComparison.Ordinal) == false;
         }
     }
 }

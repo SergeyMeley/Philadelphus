@@ -109,8 +109,8 @@ public class SystemBaseTreeNodeModelTests
 
     [Theory]
     [InlineData(SystemBaseType.INTEGER, "0", typeof(long))]
-    [InlineData(SystemBaseType.STRING, "", typeof(string))]
-    [InlineData(SystemBaseType.OBJECT, "", typeof(string))]
+    [InlineData(SystemBaseType.STRING, TreeLeaveModel.EmptyStringValue, typeof(string))]
+    [InlineData(SystemBaseType.OBJECT, TreeLeaveModel.EmptyStringValue, typeof(string))]
     [InlineData(SystemBaseType.NUMERIC, "0.0", typeof(double))]
     [InlineData(SystemBaseType.FLOAT, "0.0", typeof(double))]
     [InlineData(SystemBaseType.MONEY, "0.0", typeof(decimal))]
@@ -144,6 +144,35 @@ public class SystemBaseTreeNodeModelTests
         systemBaseLeave.StringValue.Should().Be(expectedValue);
         systemBaseLeave.TypedValue.Should().BeOfType(expectedTypedValueType);
         leave.Name.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void SystemBaseTreeLeave_NameChange_DoesNotChangeNameOrStringValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
+
+        leave.Name = "abc";
+
+        leave.Name.Should().Be("0");
+        leave.StringValue.Should().Be("0");
+        leave.TypedValue.Should().Be(0L);
     }
 
     [Fact]

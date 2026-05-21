@@ -105,6 +105,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
                         .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
+                    b.Property<string>("StringValue")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("<empty>")
+                        .HasColumnName("string_value");
+
                     b.Property<int>("SystemBaseTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
