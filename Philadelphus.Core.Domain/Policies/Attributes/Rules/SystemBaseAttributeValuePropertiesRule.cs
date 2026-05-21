@@ -9,8 +9,14 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
 {
     /// <summary>
-    /// Validates string values assigned through system base leaves to system base attribute types.
+    /// Проверяет совместимость значения системного листа с системным типом атрибута.
     /// </summary>
+    /// <remarks>
+    /// Сам <see cref="SystemBaseTreeLeaveModel" /> уже гарантирует корректность значения для собственного
+    /// <see cref="SystemBaseTreeLeaveModel.SystemBaseType" />. Это правило остается отдельным, потому что
+    /// атрибут может ожидать другой системный тип, и тогда строковое значение листа нужно проверить уже
+    /// относительно типа атрибута.
+    /// </remarks>
     public class SystemBaseAttributeValuePropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
         private readonly INotificationService _notificationService;

@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
@@ -775,8 +776,14 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (result is SystemBaseTreeLeaveModel systemBaseLeave)
                 {
                     // У системного листа валидируемым значением является StringValue, а не автоимя.
-                    // Поэтому при создании сразу задаем корректный дефолт для его SystemBaseType.
-                    systemBaseLeave.StringValue = GetDefaultSystemBaseLeaveStringValue(systemBaseLeave.SystemBaseType);
+                    // Поэтому при создании сразу задаем корректный дефолт для его SystemBaseType, если такой
+                    // дефолт существует без обращения к пользовательскому ресурсу. Например, для FILE нельзя
+                    // безопасно выбрать универсальный путь, поэтому значение остается пустым до выбора файла.
+                    var defaultValue = GetDefaultSystemBaseLeaveStringValue(systemBaseLeave.SystemBaseType);
+                    if (SystemBaseStringValueValidator.IsValid(systemBaseLeave.SystemBaseType, defaultValue, out _))
+                    {
+                        systemBaseLeave.StringValue = defaultValue;
+                    }
                 }
                 else if (needAutoName)
                 {

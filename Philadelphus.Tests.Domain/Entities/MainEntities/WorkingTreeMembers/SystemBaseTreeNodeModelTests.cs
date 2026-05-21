@@ -96,13 +96,14 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Theory]
-    [InlineData(SystemBaseType.INTEGER, "0")]
-    [InlineData(SystemBaseType.FLOAT, "0.0")]
-    [InlineData(SystemBaseType.MONEY, "0.0")]
-    [InlineData(SystemBaseType.DATETIME, "1970-01-01T00:00:00+00:00")]
-    [InlineData(SystemBaseType.DATE, "1970-01-01")]
-    [InlineData(SystemBaseType.TIME, "00:00:00")]
-    public void CreateTreeLeave_SystemBaseNode_AppliesDefaultStringValue(SystemBaseType type, string expectedValue)
+    [InlineData(SystemBaseType.INTEGER, "0", typeof(long))]
+    [InlineData(SystemBaseType.NUMERIC, "0.0", typeof(double))]
+    [InlineData(SystemBaseType.FLOAT, "0.0", typeof(double))]
+    [InlineData(SystemBaseType.MONEY, "0.0", typeof(decimal))]
+    [InlineData(SystemBaseType.DATETIME, "1970-01-01T00:00:00+00:00", typeof(DateTimeOffset))]
+    [InlineData(SystemBaseType.DATE, "1970-01-01", typeof(DateOnly))]
+    [InlineData(SystemBaseType.TIME, "00:00:00", typeof(TimeOnly))]
+    public void CreateTreeLeave_SystemBaseNode_AppliesDefaultTypedValue(SystemBaseType type, string expectedValue, Type expectedTypedValueType)
     {
         var notificationService = new FakeNotificationService();
         var tree = new FakeWorkingTreeModel();
@@ -125,7 +126,9 @@ public class SystemBaseTreeNodeModelTests
         var leave = service.CreateTreeLeave(node);
 
         leave.Should().BeOfType<SystemBaseTreeLeaveModel>();
-        ((SystemBaseTreeLeaveModel)leave).StringValue.Should().Be(expectedValue);
+        var systemBaseLeave = (SystemBaseTreeLeaveModel)leave;
+        systemBaseLeave.StringValue.Should().Be(expectedValue);
+        systemBaseLeave.TypedValue.Should().BeOfType(expectedTypedValueType);
         leave.Name.Should().Be(expectedValue);
     }
 
@@ -155,6 +158,7 @@ public class SystemBaseTreeNodeModelTests
         leave.StringValue = "not a typed scalar";
 
         leave.StringValue.Should().Be("not a typed scalar");
+        leave.TypedValue.Should().Be("not a typed scalar");
         notificationService.Messages.Should().BeEmpty();
     }
 
@@ -219,6 +223,45 @@ public class SystemBaseTreeNodeModelTests
             x.Contains(missingFilePath)
             && x.Contains(SystemBaseType.FILE.ToString())
             && x.Contains("локальному файлу"));
+    }
+
+    [Fact]
+    public void SystemBaseTreeLeave_FileValue_AllowsExistingLocalFileAsTypedValue()
+    {
+        var filePath = Path.GetTempFileName();
+
+        try
+        {
+            var notificationService = new FakeNotificationService();
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new SystemBaseTreeNodeModel(
+                root,
+                tree,
+                SystemBaseType.FILE,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+            var service = new PhiladelphusRepositoryService(
+                Mock.Of<IMapper>(),
+                Mock.Of<ILogger>(),
+                notificationService);
+            var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
+            notificationService.Messages.Clear();
+
+            leave.StringValue = filePath;
+
+            leave.StringValue.Should().Be(filePath);
+            leave.TypedValue.Should().Be(filePath);
+            notificationService.Messages.Should().BeEmpty();
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
     }
 
     [Fact]

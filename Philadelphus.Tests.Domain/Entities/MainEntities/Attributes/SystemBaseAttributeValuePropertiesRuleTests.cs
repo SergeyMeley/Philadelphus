@@ -60,7 +60,8 @@ public class SystemBaseAttributeValuePropertiesRuleTests
         var tree = CreateTreeWithRoot(notificationService, out var root);
         var attribute = CreateAttribute(tree, notificationService);
         var node = CreateSystemNode(type, tree, root, notificationService);
-        var leave = CreateSystemLeave(node, type, value, tree, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, value, tree, notificationService);
 
         attribute.Name = "Test attribute";
         attribute.ValueType = node;
@@ -111,7 +112,8 @@ public class SystemBaseAttributeValuePropertiesRuleTests
         var attribute = CreateAttribute(tree, notificationService);
         var node = CreateSystemNode(SystemBaseType.FILE, tree, root, notificationService);
         var missingFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.missing");
-        var leave = CreateSystemLeave(node, SystemBaseType.FILE, missingFilePath, tree, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, missingFilePath, tree, notificationService);
 
         attribute.ValueType = node;
 
@@ -127,21 +129,11 @@ public class SystemBaseAttributeValuePropertiesRuleTests
     [Fact]
     public void CanWrite_Blocks_Unsupported_SystemBaseType()
     {
-        const SystemBaseType type = SystemBaseType.FILE;
-        var notificationService = new FakeNotificationService();
-        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
-        var tree = CreateTreeWithRoot(notificationService, out var root);
-        var attribute = CreateAttribute(tree, notificationService);
-        var node = CreateSystemNode(type, tree, root, notificationService);
-        var leave = CreateSystemLeave(node, type, "value", tree, notificationService);
-
-        attribute.ValueType = node;
-
-        var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.Value), leave);
+        const SystemBaseType type = (SystemBaseType)999;
+        var result = SystemBaseStringValueValidator.IsValid(type, "value", out var expectedFormat);
 
         result.Should().BeFalse();
-        notificationService.Messages.Should().ContainSingle()
-            .Which.Should().Contain("не поддерживается");
+        expectedFormat.Should().Contain(type.ToString());
     }
 
     [Fact]
@@ -152,7 +144,7 @@ public class SystemBaseAttributeValuePropertiesRuleTests
         var tree = CreateTreeWithRoot(notificationService, out var root);
         var attribute = CreateAttribute(tree, notificationService);
         var node = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
-        var leave = CreateSystemLeave(node, SystemBaseType.INTEGER, "not integer", tree, notificationService);
+        var leave = CreateSystemLeave(node, SystemBaseType.INTEGER, "0", tree, notificationService);
 
         attribute.ValueType = node;
 
@@ -171,7 +163,7 @@ public class SystemBaseAttributeValuePropertiesRuleTests
         var attribute = CreateAttribute(tree, notificationService);
         var userDefinedNode = CreateUserDefinedNode(tree, root, notificationService);
         var systemNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
-        var leave = CreateSystemLeave(systemNode, SystemBaseType.INTEGER, "not integer", tree, notificationService);
+        var leave = CreateSystemLeave(systemNode, SystemBaseType.INTEGER, "0", tree, notificationService);
 
         attribute.ValueType = userDefinedNode;
 

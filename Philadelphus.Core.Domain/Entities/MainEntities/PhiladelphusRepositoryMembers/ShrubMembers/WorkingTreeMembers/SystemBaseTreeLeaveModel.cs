@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -12,6 +13,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
     public class SystemBaseTreeLeaveModel : TreeLeaveModel
     {
         private string _stringValue = string.Empty;
+        private object? _typedValue;
 
         /// <summary>
         /// Предопределенные идентификаторы и строковые значения системных листьев.
@@ -29,6 +31,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         public override SystemBaseType SystemBaseType { get; }
 
         /// <summary>
+        /// Типизированное представление <see cref="StringValue" /> согласно <see cref="SystemBaseType" />.
+        /// </summary>
+        /// <remarks>
+        /// Наружный контракт системного листа остается строковым для совместимости с хранением, маппингом и
+        /// существующим UI. Это свойство фиксирует доменный тип значения внутри модели, чтобы проверка
+        /// корректности была инвариантом самого системного листа, а не только внешним правилом политики.
+        /// </remarks>
+        [Display(Name = "Типизированное значение", Description = "Значение системного листа, приведенное к системному базовому типу")]
+        public object? TypedValue => _typedValue;
+
+        /// <summary>
         /// Строковое значение
         /// </summary>
         [Display(Name = "Значение", Description = "Строковое значение")]
@@ -40,8 +53,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             }
             set
             {
+                if (TryParseStringValue(value, out var typedValue) == false)
+                {
+                    return;
+                }
+
                 if (SetValue(ref _stringValue, value))
                 {
+                    _typedValue = typedValue;
                     Name = value;
                     Description = value;
                 }
@@ -196,6 +215,27 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 default:
                     throw new Exception();
             }
+        }
+
+        /// <summary>
+        /// Проверяет строковое значение и подготавливает его типизированное представление.
+        /// </summary>
+        /// <param name="value">Новое строковое значение системного листа.</param>
+        /// <param name="typedValue">Типизированное значение, соответствующее <see cref="SystemBaseType" />.</param>
+        /// <returns>true, если строка допустима для типа листа; иначе false.</returns>
+        private bool TryParseStringValue(string value, out object? typedValue)
+        {
+            if (SystemBaseStringValueValidator.TryParse(SystemBaseType, value, out typedValue, out var expectedFormat))
+            {
+                return true;
+            }
+
+            _notificationService.SendTextMessage<SystemBaseTreeLeaveModel>(
+                $"Для системного листа '{Name}' [{Uuid}] значение '{value ?? "<null>"}' " +
+                $"не соответствует системному типу '{SystemBaseType}'. Ожидаемый формат: {expectedFormat}.",
+                criticalLevel: NotificationCriticalLevelModel.Warning);
+
+            return false;
         }
     }
 }

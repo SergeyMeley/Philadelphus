@@ -4,11 +4,11 @@ using System.Globalization;
 namespace Philadelphus.Core.Domain.Helpers
 {
     /// <summary>
-    /// Проверяет строковое представление значения системного базового типа.
+    /// Проверяет и разбирает строковое представление значения системного базового типа.
     /// </summary>
     /// <remarks>
     /// Сейчас системные листья хранят значение в строковом виде, поэтому этот helper является
-    /// общей точкой проверки для доменных правил, работающих с <see cref="SystemBaseType" />.
+    /// общей точкой разбора для самих системных листьев и доменных правил, работающих с <see cref="SystemBaseType" />.
     /// При добавлении нового системного типа сюда нужно добавить и проверку, и текст ожидаемого формата.
     /// </remarks>
     internal static class SystemBaseStringValueValidator
@@ -22,28 +22,95 @@ namespace Philadelphus.Core.Domain.Helpers
         /// <returns>true, если значение соответствует системному типу; иначе false.</returns>
         public static bool IsValid(SystemBaseType type, string? value, out string expectedFormat)
         {
+            return TryParse(type, value, out _, out expectedFormat);
+        }
+
+        /// <summary>
+        /// Проверяет строку системного базового типа и возвращает ее доменное типизированное представление.
+        /// </summary>
+        /// <param name="type">Системный базовый тип, по которому выбирается формат проверки.</param>
+        /// <param name="value">Проверяемое строковое значение.</param>
+        /// <param name="typedValue">Типизированное значение, полученное из строки.</param>
+        /// <param name="expectedFormat">Описание ожидаемого формата для диагностического сообщения.</param>
+        /// <returns>true, если значение успешно приведено к типу; иначе false.</returns>
+        public static bool TryParse(SystemBaseType type, string? value, out object? typedValue, out string expectedFormat)
+        {
             expectedFormat = GetExpectedFormat(type);
+            typedValue = null;
 
             if (value is null)
             {
                 return false;
             }
 
-            return type switch
+            switch (type)
             {
-                SystemBaseType.STRING or SystemBaseType.OBJECT => true,
-                SystemBaseType.INTEGER => long.TryParse(value, out _),
-                SystemBaseType.NUMERIC or SystemBaseType.FLOAT =>
-                    double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _),
-                SystemBaseType.MONEY =>
-                    decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _),
-                SystemBaseType.BOOL => IsBool(value),
-                SystemBaseType.DATETIME => DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out _),
-                SystemBaseType.DATE => DateOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out _),
-                SystemBaseType.TIME => TimeOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out _),
-                SystemBaseType.FILE => SystemBaseFileValueAccessValidator.IsAvailable(value),
-                _ => false,
-            };
+                case SystemBaseType.STRING:
+                case SystemBaseType.OBJECT:
+                    typedValue = value;
+                    return true;
+                case SystemBaseType.INTEGER:
+                    if (long.TryParse(value, out var integerValue))
+                    {
+                        typedValue = integerValue;
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.NUMERIC:
+                case SystemBaseType.FLOAT:
+                    if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var doubleValue))
+                    {
+                        typedValue = doubleValue;
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.MONEY:
+                    if (decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var decimalValue))
+                    {
+                        typedValue = decimalValue;
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.BOOL:
+                    return TryParseBool(value, out typedValue);
+                case SystemBaseType.DATETIME:
+                    if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeValue))
+                    {
+                        typedValue = dateTimeValue;
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.DATE:
+                    if (DateOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateValue))
+                    {
+                        typedValue = dateValue;
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.TIME:
+                    if (TimeOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var timeValue))
+                    {
+                        typedValue = timeValue;
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.FILE:
+                    if (SystemBaseFileValueAccessValidator.IsAvailable(value))
+                    {
+                        typedValue = value;
+                        return true;
+                    }
+
+                    return false;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
@@ -71,15 +138,33 @@ namespace Philadelphus.Core.Domain.Helpers
         }
 
         /// <summary>
-        /// Проверяет логическое значение с учетом стандартного .NET-формата и системных русских значений.
+        /// Разбирает логическое значение из стандартного .NET-формата или системных русских значений.
         /// </summary>
         /// <param name="value">Проверяемая строка.</param>
-        /// <returns>true для true/false, Истина/Ложь; иначе false.</returns>
-        private static bool IsBool(string value)
+        /// <param name="typedValue">Логическое значение.</param>
+        /// <returns>true, если строка распознана как boolean; иначе false.</returns>
+        private static bool TryParseBool(string value, out object? typedValue)
         {
-            return bool.TryParse(value, out _)
-                || string.Equals(value, "Истина", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(value, "Ложь", StringComparison.OrdinalIgnoreCase);
+            if (bool.TryParse(value, out var boolValue))
+            {
+                typedValue = boolValue;
+                return true;
+            }
+
+            if (string.Equals(value, "Истина", StringComparison.OrdinalIgnoreCase))
+            {
+                typedValue = true;
+                return true;
+            }
+
+            if (string.Equals(value, "Ложь", StringComparison.OrdinalIgnoreCase))
+            {
+                typedValue = false;
+                return true;
+            }
+
+            typedValue = null;
+            return false;
         }
     }
 }

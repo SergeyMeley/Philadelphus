@@ -66,9 +66,8 @@ namespace Philadelphus.Core.Domain.Policies.Builders
             return new CompositePropertiesPolicy<TreeLeaveModel>(notificationService, new IPropertiesRule<TreeLeaveModel>[]
             {
                 // BOOL-листья являются фиксированным справочником системных значений.
-                // Проверяем их первыми, чтобы любые изменения блокировались до обычной валидации StringValue.
+                // Проверяем их первыми, чтобы любые изменения блокировались до общих правил листа.
                 new SystemBaseBoolTreeLeaveReadOnlyPropertiesRule(notificationService),
-                new SystemBaseTreeLeaveStringValuePropertiesRule(notificationService),
                 new RequiredNamePropertiesRule<TreeLeaveModel>(notificationService),
                 new ValidNamePropertiesRule<TreeLeaveModel>(notificationService, NameUniquenessStrategy.TreeLeave()),
                 new SequencePropertiesRule<TreeLeaveModel>(notificationService, SequenceUniquenessStrategy.TreeLeave()),
