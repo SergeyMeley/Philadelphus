@@ -40,9 +40,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             }
             set
             {
-                _stringValue = value;
-                Name = value;
-                Description = value;
+                if (SetValue(ref _stringValue, value))
+                {
+                    Name = value;
+                    Description = value;
+                }
             }
         }
 

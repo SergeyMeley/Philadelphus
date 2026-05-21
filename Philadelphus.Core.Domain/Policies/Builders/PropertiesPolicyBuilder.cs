@@ -65,6 +65,7 @@ namespace Philadelphus.Core.Domain.Policies.Builders
         {
             return new CompositePropertiesPolicy<TreeLeaveModel>(notificationService, new IPropertiesRule<TreeLeaveModel>[]
             {
+                new SystemBaseTreeLeaveStringValuePropertiesRule(notificationService),
                 new RequiredNamePropertiesRule<TreeLeaveModel>(notificationService),
                 new ValidNamePropertiesRule<TreeLeaveModel>(notificationService, NameUniquenessStrategy.TreeLeave()),
                 new SequencePropertiesRule<TreeLeaveModel>(notificationService, SequenceUniquenessStrategy.TreeLeave()),

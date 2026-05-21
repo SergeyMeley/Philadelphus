@@ -598,6 +598,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
         }
 
+        private static string GetDefaultSystemBaseLeaveStringValue(SystemBaseType type)
+        {
+            return type switch
+            {
+                SystemBaseType.STRING => string.Empty,
+                SystemBaseType.INTEGER => "0",
+                SystemBaseType.NUMERIC or SystemBaseType.FLOAT or SystemBaseType.MONEY => "0.0",
+                SystemBaseType.BOOL => "false",
+                SystemBaseType.DATETIME => "1970-01-01T00:00:00+00:00",
+                SystemBaseType.DATE => "1970-01-01",
+                SystemBaseType.TIME => "00:00:00",
+                _ => string.Empty,
+            };
+        }
+
         /// <summary>
         /// Создать корень и добавить родителю
         /// </summary>
@@ -747,7 +762,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
                 }
 
-                if (needAutoName)
+                if (result is SystemBaseTreeLeaveModel systemBaseLeave)
+                {
+                    // У системного листа валидируемым значением является StringValue, а не автоимя.
+                    // Поэтому при создании сразу задаем корректный дефолт для его SystemBaseType.
+                    systemBaseLeave.StringValue = GetDefaultSystemBaseLeaveStringValue(systemBaseLeave.SystemBaseType);
+                }
+                else if (needAutoName)
                 {
                     result.AssignAutoName();
                 }

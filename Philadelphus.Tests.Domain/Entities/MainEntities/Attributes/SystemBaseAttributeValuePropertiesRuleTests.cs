@@ -23,6 +23,8 @@ public class SystemBaseAttributeValuePropertiesRuleTests
     [InlineData(SystemBaseType.TIME, "10:15:30")]
     [InlineData(SystemBaseType.STRING, "any value")]
     [InlineData(SystemBaseType.STRING, "")]
+    [InlineData(SystemBaseType.OBJECT, "any value")]
+    [InlineData(SystemBaseType.OBJECT, "")]
     public void CanWrite_Allows_Valid_SystemBaseLeave_StringValue(SystemBaseType type, string value)
     {
         var notificationService = new FakeNotificationService();
@@ -72,11 +74,10 @@ public class SystemBaseAttributeValuePropertiesRuleTests
             .And.Contain(expectedFormatPart);
     }
 
-    [Theory]
-    [InlineData(SystemBaseType.OBJECT)]
-    [InlineData(SystemBaseType.FILE)]
-    public void CanWrite_Blocks_Unsupported_SystemBaseType(SystemBaseType type)
+    [Fact]
+    public void CanWrite_Blocks_Unsupported_SystemBaseType()
     {
+        const SystemBaseType type = SystemBaseType.FILE;
         var notificationService = new FakeNotificationService();
         var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
         var tree = CreateTreeWithRoot(notificationService, out var root);
