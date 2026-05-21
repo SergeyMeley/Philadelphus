@@ -212,6 +212,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             return SetValue(ref _stringValue, NormalizeStringValue(value), nameof(StringValue));
         }
 
+        /// <summary>
+        /// Формирует строковое значение пользовательского листа из текущей коллекции атрибутов.
+        /// </summary>
+        /// <remarks>
+        /// Пользовательский лист не редактирует <see cref="StringValue" /> напрямую: значение является снимком
+        /// атрибутов в JSON-формате. Системные листья переопределяют это поведение и хранят валидируемое
+        /// значение базового типа.
+        /// </remarks>
+        /// <returns>JSON-представление атрибутов листа.</returns>
         private string BuildAttributesStringValue()
         {
             var attributes = Attributes?

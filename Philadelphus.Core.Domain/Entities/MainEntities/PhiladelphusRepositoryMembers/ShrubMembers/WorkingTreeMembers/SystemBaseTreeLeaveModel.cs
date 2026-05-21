@@ -270,6 +270,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </remarks>
         /// <param name="value">Строковое значение системного листа.</param>
         /// <param name="typedValue">Типизированное представление строкового значения.</param>
+        /// <param name="descriptionWasSynchronized">true, если описание до изменения совпадало со старым значением и может быть обновлено автоматически.</param>
         private void ApplyStringValue(string value, object? typedValue, bool descriptionWasSynchronized)
         {
             _typedValue = typedValue;

@@ -33,9 +33,8 @@ namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
         public string OwningNodeName { get; }
 
         /// <summary>
-        /// Выполняет операцию Attributes.
+        /// Атрибуты листа, выгружаемые вместе с ним.
         /// </summary>
-        /// <returns>Коллекция полученных данных.</returns>
         public List<AttributeExportDTO> Attributes { get; } = new();
 
         /// <summary>

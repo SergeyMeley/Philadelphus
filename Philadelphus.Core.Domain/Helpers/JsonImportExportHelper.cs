@@ -1,4 +1,4 @@
-using Npgsql.Internal.Postgres;
+﻿using Npgsql.Internal.Postgres;
 using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -258,6 +258,8 @@ namespace Philadelphus.Core.Domain.Helpers
 
                 if (leaf is SystemBaseTreeLeaveModel systemBaseLeaf)
                 {
+                    // В новом формате системные листья хранят значение отдельно от Name. Для старых .phjson,
+                    // где stringValue еще не было, сохраняем обратную совместимость и берем значение из name.
                     var stringValue = leafElement.TryGetProperty("stringValue", out var stringValueProp)
                         ? stringValueProp.GetString()
                         : name;
@@ -449,6 +451,15 @@ namespace Philadelphus.Core.Domain.Helpers
             }
         }
 
+        /// <summary>
+        /// Записывает импортированное значение в лист с учетом различий между системными и пользовательскими листьями.
+        /// </summary>
+        /// <remarks>
+        /// Для системных листьев источником истины является <see cref="SystemBaseTreeLeaveModel.StringValue" />.
+        /// Для пользовательских листьев импорт старого формата продолжает восстанавливать отображаемое имя.
+        /// </remarks>
+        /// <param name="leaf">Лист, созданный или найденный при импорте.</param>
+        /// <param name="value">Импортированное строковое значение.</param>
         private static void SetImportedLeafValue(TreeLeaveModel leaf, string value)
         {
             if (leaf is SystemBaseTreeLeaveModel systemBaseLeaf)
