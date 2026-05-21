@@ -190,6 +190,38 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
+    public void SystemBaseTreeLeave_FileValue_BlocksMissingLocalFile()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.FILE,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
+        var missingFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.missing");
+
+        leave.StringValue = missingFilePath;
+
+        leave.StringValue.Should().BeEmpty();
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains(missingFilePath)
+            && x.Contains(SystemBaseType.FILE.ToString())
+            && x.Contains("локальному файлу"));
+    }
+
+    [Fact]
     public void CreateTreeLeave_BoolSystemBaseNode_BlocksAddingValue()
     {
         var notificationService = new FakeNotificationService();

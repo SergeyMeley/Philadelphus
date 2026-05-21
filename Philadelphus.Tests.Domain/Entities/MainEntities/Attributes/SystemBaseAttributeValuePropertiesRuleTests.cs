@@ -2,6 +2,7 @@ using FluentAssertions;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Tests.Common.Fakes.Entities;
@@ -72,6 +73,55 @@ public class SystemBaseAttributeValuePropertiesRuleTests
             .And.Contain(value)
             .And.Contain(type.ToString())
             .And.Contain(expectedFormatPart);
+    }
+
+    [Fact]
+    public void CanWrite_Allows_File_SystemBaseLeave_WhenLocalFileExists()
+    {
+        var filePath = Path.GetTempFileName();
+
+        try
+        {
+            var notificationService = new FakeNotificationService();
+            var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+            var tree = CreateTreeWithRoot(notificationService, out var root);
+            var attribute = CreateAttribute(tree, notificationService);
+            var node = CreateSystemNode(SystemBaseType.FILE, tree, root, notificationService);
+            var leave = CreateSystemLeave(node, SystemBaseType.FILE, filePath, tree, notificationService);
+
+            attribute.ValueType = node;
+
+            var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.Value), leave);
+
+            result.Should().BeTrue();
+            notificationService.Messages.Should().BeEmpty();
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
+    public void CanWrite_Blocks_File_SystemBaseLeave_WhenLocalFileDoesNotExist()
+    {
+        var notificationService = new FakeNotificationService();
+        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var node = CreateSystemNode(SystemBaseType.FILE, tree, root, notificationService);
+        var missingFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.missing");
+        var leave = CreateSystemLeave(node, SystemBaseType.FILE, missingFilePath, tree, notificationService);
+
+        attribute.ValueType = node;
+
+        var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.Value), leave);
+
+        result.Should().BeFalse();
+        notificationService.Messages.Should().ContainSingle()
+            .Which.Should().Contain(missingFilePath)
+            .And.Contain(SystemBaseType.FILE.ToString())
+            .And.Contain("локальному файлу");
     }
 
     [Fact]

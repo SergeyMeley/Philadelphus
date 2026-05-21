@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Microsoft.Win32;
+using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using System.Diagnostics;
+using System.IO;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Core.Domain.Entities.Enums;
@@ -158,6 +162,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         {
             get => TryGetOffset(StringValue) ?? FormatOffset(DateTimeOffset.Now.Offset);
             set => StringValue = BuildDateTimeValue(DateTimeDateValue ?? DateTime.Today, DateTimeTimeValue, value);
+        }
+
+        /// <summary>
+        /// Команда выбора локального файла для значения системного типа FILE.
+        /// </summary>
+        /// <remarks>
+        /// Сейчас UI выбирает файл из локальной файловой системы. При появлении MinIO рядом можно добавить
+        /// отдельную команду/диалог выбора объекта внешнего хранилища, сохранив общий StringValue-контракт.
+        /// </remarks>
+        public RelayCommand BrowseFileValueCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    _ => BrowseFileValue(),
+                    _ => SystemBaseType == SystemBaseType.FILE);
+            }
+        }
+
+        /// <summary>
+        /// Команда открытия локального файла, указанного в значении системного типа FILE.
+        /// </summary>
+        public RelayCommand OpenFileValueCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    _ => OpenFileValue(),
+                    _ => SystemBaseType == SystemBaseType.FILE && IsLocalFileAvailable(StringValue));
+            }
         }
 
         #endregion
@@ -338,6 +372,94 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             var sign = offset < TimeSpan.Zero ? "-" : "+";
             offset = offset.Duration();
             return string.Create(CultureInfo.InvariantCulture, $"{sign}{offset:hh\\:mm}");
+        }
+
+        /// <summary>
+        /// Открывает стандартный диалог выбора локального файла и записывает выбранный путь в <see cref="StringValue" />.
+        /// </summary>
+        private void BrowseFileValue()
+        {
+            var dialog = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Multiselect = false,
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                StringValue = dialog.FileName;
+            }
+        }
+
+        /// <summary>
+        /// Открывает локальный файл, указанный в <see cref="StringValue" />, через ассоциации Windows.
+        /// </summary>
+        private void OpenFileValue()
+        {
+            var filePath = ResolveLocalFilePath(StringValue);
+
+            if (filePath is null || IsLocalFileAvailable(filePath) == false)
+            {
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo(filePath)
+            {
+                UseShellExecute = true,
+            });
+        }
+
+        /// <summary>
+        /// Преобразует строковое значение локального файла в путь, который можно передать shell.
+        /// </summary>
+        /// <param name="value">Путь к файлу или file:// URI.</param>
+        /// <returns>Локальный путь к файлу или null, если значение не похоже на локальный файл.</returns>
+        private static string? ResolveLocalFilePath(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+                ? (uri.IsFile ? uri.LocalPath : null)
+                : value;
+        }
+
+        /// <summary>
+        /// Проверяет, что строковое значение указывает на существующий локальный файл.
+        /// </summary>
+        /// <remarks>
+        /// UI пока открывает только локальные файлы. Значения будущих внешних хранилищ, например MinIO,
+        /// должны будут открываться через отдельный провайдер, а не через shell.
+        /// </remarks>
+        /// <param name="value">Путь к файлу или file:// URI.</param>
+        /// <returns>true, если файл существует; иначе false.</returns>
+        private static bool IsLocalFileAvailable(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            try
+            {
+                if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+                {
+                    return uri.IsFile && File.Exists(uri.LocalPath);
+                }
+
+                return File.Exists(value);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (NotSupportedException)
+            {
+                return false;
+            }
         }
 
         #endregion

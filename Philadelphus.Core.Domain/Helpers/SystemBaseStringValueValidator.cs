@@ -41,6 +41,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 SystemBaseType.DATETIME => DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out _),
                 SystemBaseType.DATE => DateOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out _),
                 SystemBaseType.TIME => TimeOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out _),
+                SystemBaseType.FILE => SystemBaseFileValueAccessValidator.IsAvailable(value),
                 _ => false,
             };
         }
@@ -64,6 +65,7 @@ namespace Philadelphus.Core.Domain.Helpers
                 SystemBaseType.DATETIME => "дата и время, распознаваемые DateTimeOffset.TryParse",
                 SystemBaseType.DATE => "дата, распознаваемая DateOnly.TryParse",
                 SystemBaseType.TIME => "время, распознаваемое TimeOnly.TryParse",
+                SystemBaseType.FILE => "путь к доступному локальному файлу; MinIO пока не поддерживается",
                 _ => $"тип {type} не поддерживается этим правилом",
             };
         }
