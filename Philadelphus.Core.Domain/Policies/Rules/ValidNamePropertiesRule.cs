@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Policies.Rules
 {
@@ -55,7 +56,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
             // Это защищает табличные представления и импорт/экспорт, где имя атрибута может использоваться как ключ.
             var reservedNames = _strategy.ReservedPropertyTypes
                 .SelectMany(x => x.GetProperties())
-                .Select(x => x.Name)
+                .SelectMany(GetReservedPropertyNames)
                 .ToHashSet(StringComparer.Ordinal);
 
             if (reservedNames.Contains(newName))
@@ -154,6 +155,21 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         private static IEnumerable<char> GetInvalidNameCharacters(string value)
         {
             return value.Where(IsInvalidNameCharacter).Distinct();
+        }
+
+        private static IEnumerable<string> GetReservedPropertyNames(System.Reflection.PropertyInfo property)
+        {
+            yield return property.Name;
+
+            var displayName = property.GetCustomAttributes(typeof(DisplayAttribute), inherit: true)
+                .OfType<DisplayAttribute>()
+                .FirstOrDefault()
+                ?.Name;
+
+            if (string.IsNullOrWhiteSpace(displayName) == false)
+            {
+                yield return displayName;
+            }
         }
 
         private static bool IsInvalidNameCharacter(char value)

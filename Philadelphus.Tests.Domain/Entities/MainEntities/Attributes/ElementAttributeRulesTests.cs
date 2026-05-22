@@ -118,6 +118,17 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         }
 
         [Fact]
+        public void ReservedName_Should_Block_WorkingTreeMember_Property_Display_Name()
+        {
+            var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
+            var model = CreateOwnAttribute(new FakeWorkingTreeModel());
+
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), "\u041a\u043e\u0434");
+
+            Assert.False(result);
+        }
+
+        [Fact]
         public void ReservedName_Should_Block_WorkingTreeMember_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());

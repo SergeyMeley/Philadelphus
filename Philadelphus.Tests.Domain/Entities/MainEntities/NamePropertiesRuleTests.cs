@@ -28,6 +28,18 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void TreeNodeName_Should_Block_Class_Property_Display_Name()
+        {
+            var rule = new ValidNamePropertiesRule<TreeNodeModel>(new FakeNotificationService(), NameUniquenessStrategy.TreeNode());
+            var root = CreateRoot();
+            var node = CreateNode(root);
+
+            var result = rule.CanWrite(node, nameof(TreeNodeModel.Name), "\u0421\u0438\u0441\u0442\u0435\u043c\u043d\u044b\u0439 \u0442\u0438\u043f");
+
+            Assert.False(result);
+        }
+
+        [Fact]
         public void TreeNodeName_Should_Block_WorkingTreeMember_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<TreeNodeModel>(new FakeNotificationService(), NameUniquenessStrategy.TreeNode());
