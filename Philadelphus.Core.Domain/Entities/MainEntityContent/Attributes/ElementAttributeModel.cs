@@ -37,6 +37,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeNodeModel _valueType;
         private TreeLeaveModel _value;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
+        private bool _isValueOverridden;    // Признак того, что одиночное значение унаследованного атрибута было переопределено локально.
+        private bool _areValuesOverridden;  // Признак того, что коллекция значений унаследованного атрибута была переопределена локально.
         private VisibilityScope _visibility;
         private OverrideType _override;
         private ElementAttributeModel? _inheritedAttributeFromParent;
@@ -86,8 +88,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public TreeLeaveModel Value
         {
-            get => GetValue(_value);
-            set => SetValue(ref _value, value);
+            get => GetValue(GetEffectiveValue());
+            set
+            {
+                var inheritedValue = _inheritedAttributeFromParent?.Value;
+                SetValue(ref _value, value);
+
+                if (_isOwn == false && SameValue(value, inheritedValue) == false)
+                {
+                    _isValueOverridden = true;
+                }
+            }
         }
 
         /// <summary>
@@ -95,7 +106,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// </summary>
         public IReadOnlyList<TreeLeaveModel> Values
         {
-            get => GetValue(_values.AsReadOnly());
+            get => GetValue(GetEffectiveValues());
         }
 
         /// <summary>
@@ -330,6 +341,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
             if (_isCollectionValue == false)
                 return false; 
+            PrepareValuesCollectionForOverride();
             if (_values != null && _values.Any(x => x.Uuid == value.Uuid))
                 return false;
             if (SystemBaseAttributeValueCompatibilityValidator.IsCompatible(
@@ -349,6 +361,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             }
 
             _values?.Add(value);
+            MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange();
             return true;
         }
@@ -367,9 +380,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
             if (_isCollectionValue == false)
                 return false;
+            PrepareValuesCollectionForOverride();
             if (_values != null && _values.Any(x => x == value) == false)
                 return false;
             _values?.Remove(value);
+            MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
         }
@@ -384,16 +399,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
             if (_isCollectionValue == false)
                 return false;
+            PrepareValuesCollectionForOverride();
             if (_values == null)
                 return false;
             _values?.Clear();
+            MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
-        }
-
-        private bool CanWriteValuesCollection()
-        {
-            return _propertiesPolicy?.CanWrite(this, nameof(Values), _values.AsReadOnly()) != false;
         }
 
         /// <summary>
@@ -502,6 +514,91 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Проверить, разрешает ли политика изменение коллекции значений.
+        /// </summary>
+        /// <returns>true, если коллекцию значений можно изменить; иначе false.</returns>
+        private bool CanWriteValuesCollection()
+        {
+            return _propertiesPolicy?.CanWrite(this, nameof(Values), _values.AsReadOnly()) != false;
+        }
+
+        /// <summary>
+        /// Получить актуальное одиночное значение с учетом наследования.
+        /// </summary>
+        /// <returns>Локальное значение или значение родительского атрибута, если оно еще не переопределено.</returns>
+        private TreeLeaveModel GetEffectiveValue()
+        {
+            if (_isOwn == false
+                && _isValueOverridden == false
+                && _inheritedAttributeFromParent != null)
+            {
+                return _inheritedAttributeFromParent.Value;
+            }
+
+            return _value;
+        }
+
+        /// <summary>
+        /// Получить актуальную коллекцию значений с учетом наследования.
+        /// </summary>
+        /// <returns>Локальная коллекция или коллекция родительского атрибута, если она еще не переопределена.</returns>
+        private IReadOnlyList<TreeLeaveModel> GetEffectiveValues()
+        {
+            if (_isOwn == false
+                && _areValuesOverridden == false
+                && _inheritedAttributeFromParent != null)
+            {
+                return _inheritedAttributeFromParent.Values;
+            }
+
+            return _values.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Подготовить локальную копию унаследованной коллекции перед ее изменением.
+        /// </summary>
+        private void PrepareValuesCollectionForOverride()
+        {
+            if (_isOwn == false
+                && _areValuesOverridden == false
+                && _inheritedAttributeFromParent != null)
+            {
+                _values = new List<TreeLeaveModel>(_inheritedAttributeFromParent.Values);
+            }
+        }
+
+        /// <summary>
+        /// Зафиксировать факт локального переопределения коллекции значений, если она отличается от родительской.
+        /// </summary>
+        private void MarkValuesOverriddenIfNeeded()
+        {
+            if (_isOwn && _inheritedAttributeFromParent == null)
+                return;
+
+            _areValuesOverridden = ValuesMatchInherited() == false;
+        }
+
+        /// <summary>
+        /// Проверить, совпадает ли локальная коллекция значений с унаследованной.
+        /// </summary>
+        /// <returns>true, если набор значений совпадает с родительским; иначе false.</returns>
+        private bool ValuesMatchInherited()
+        {
+            return _inheritedAttributeFromParent?.Values.Select(x => x.Uuid).SequenceEqual(_values.Select(x => x.Uuid)) == true;
+        }
+
+        /// <summary>
+        /// Проверить, совпадают ли одиночные значения атрибута.
+        /// </summary>
+        /// <param name="value">Локальное значение.</param>
+        /// <param name="inheritedValue">Унаследованное значение.</param>
+        /// <returns>true, если значения совпадают; иначе false.</returns>
+        private static bool SameValue(TreeLeaveModel value, TreeLeaveModel inheritedValue)
+        {
+            return value?.Uuid == inheritedValue?.Uuid;
         }
 
         #endregion

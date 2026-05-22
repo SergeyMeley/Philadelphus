@@ -124,6 +124,49 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         }
 
         [Fact]
+        public void InheritedAttributeValue_Should_Follow_Parent_Until_Overridden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.Value = firstValue;
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+
+            parentAttribute.Value = secondValue;
+
+            Assert.Same(secondValue, inheritedAttribute.Value);
+
+            inheritedAttribute.Value = firstValue;
+            parentAttribute.Value = secondValue;
+
+            Assert.Same(firstValue, inheritedAttribute.Value);
+        }
+
+        [Fact]
+        public void InheritedAttributeValues_Should_Follow_Parent_Until_Overridden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.IsCollectionValue = true;
+            parentAttribute.TryAddValueToValuesCollection(firstValue);
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+
+            parentAttribute.TryAddValueToValuesCollection(secondValue);
+
+            Assert.Contains(secondValue, inheritedAttribute.Values);
+
+            inheritedAttribute.TryRemoveValueFromValuesCollection(secondValue);
+            parentAttribute.ClearValuesCollection();
+
+            Assert.Contains(firstValue, inheritedAttribute.Values);
+        }
+
+        [Fact]
         public void ReservedName_Should_Block_ElementAttribute_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
