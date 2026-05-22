@@ -107,6 +107,23 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         }
 
         [Fact]
+        public void RequiredOverride_Should_Block_Adding_Value_To_Values()
+        {
+            var policy = AttributePolicyBuilder.CreateDefault(new FakeNotificationService());
+            var owner = new FakeWorkingTreeModel();
+            var model = CreateOwnAttribute(owner, policy);
+            var value = CreateLeave(owner);
+
+            model.IsCollectionValue = true;
+            model.Override = OverrideType.Abstract;
+
+            var result = model.TryAddValueToValuesCollection(value);
+
+            Assert.False(result);
+            Assert.Empty(model.Values);
+        }
+
+        [Fact]
         public void ReservedName_Should_Block_ElementAttribute_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
@@ -169,7 +186,9 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             Assert.True(result);
         }
 
-        private static ElementAttributeModel CreateOwnAttribute(FakeWorkingTreeModel owner)
+        private static ElementAttributeModel CreateOwnAttribute(
+            FakeWorkingTreeModel owner,
+            IPropertiesPolicy<ElementAttributeModel>? propertiesPolicy = null)
         {
             var uuid = Guid.NewGuid();
 
@@ -180,7 +199,29 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
                 owner,
                 owner,
                 new FakeNotificationService(),
-                new EmptyPropertiesPolicy<ElementAttributeModel>());
+                propertiesPolicy ?? new EmptyPropertiesPolicy<ElementAttributeModel>());
+        }
+
+        private static TreeLeaveModel CreateLeave(FakeWorkingTreeModel tree)
+        {
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            return new TreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
         }
     }
 }

@@ -326,6 +326,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             ArgumentNullException.ThrowIfNull(value);
 
+            if (CanWriteValuesCollection() == false)
+                return false;
             if (_isCollectionValue == false)
                 return false; 
             if (_values != null && _values.Any(x => x.Uuid == value.Uuid))
@@ -361,6 +363,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             ArgumentNullException.ThrowIfNull(value);
 
+            if (CanWriteValuesCollection() == false)
+                return false;
             if (_isCollectionValue == false)
                 return false;
             if (_values != null && _values.Any(x => x == value) == false)
@@ -376,6 +380,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <returns>Результат выполнения операции.</returns>
         public bool ClearValuesCollection()
         {
+            if (CanWriteValuesCollection() == false)
+                return false;
             if (_isCollectionValue == false)
                 return false;
             if (_values == null)
@@ -383,6 +389,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             _values?.Clear();
             UpdateStateStateAfterChange(); 
             return true;
+        }
+
+        private bool CanWriteValuesCollection()
+        {
+            return _propertiesPolicy?.CanWrite(this, nameof(Values), _values.AsReadOnly()) != false;
         }
 
         /// <summary>
