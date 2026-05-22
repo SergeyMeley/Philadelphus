@@ -42,6 +42,9 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         {
             EnsureEditableState(schema);
 
+            // На этапе выполнения книга Excel всегда импортируется как новый корень чубушника.
+            schema.CreateNewRoot = true;
+
             foreach (var sheet in schema.Sheets)
             {
                 NormalizeSheetForExecution(sheet);
@@ -112,7 +115,10 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
             sheet.Profile.SourceSelection.SourceName = sheet.SourceName;
             sheet.Profile.SourceSelection.SourceType = sheet.SourceType;
-            sheet.Profile.EntityKind = sheet.EntityKind;
+
+            // Старые настройки материализации не участвуют в импорте: каждая таблица Excel всегда становится узлом.
+            sheet.EntityKind = ExcelImportEntityKind.Node;
+            sheet.Profile.EntityKind = ExcelImportEntityKind.Node;
         }
 
         private static IReadOnlyList<ImportedEntityDefinition> BuildEntityDefinitions(ExcelImportSchema schema)
@@ -126,7 +132,8 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                     SourceType = sheet.SourceType,
                     DisplayName = string.IsNullOrWhiteSpace(sheet.DisplayName) ? sheet.SourceName : sheet.DisplayName,
                     IsEnabled = sheet.IsEnabled,
-                    EntityKind = sheet.EntityKind,
+                    // EntityKind хранится в схеме для совместимости шаблонов, но execution-модель всегда использует узлы.
+                    EntityKind = ExcelImportEntityKind.Node,
                     KeyColumnName = sheet.RowKeyColumnName,
                     NameColumnName = sheet.RowNameColumnName,
                     DescriptionColumnName = sheet.DescriptionColumnName,

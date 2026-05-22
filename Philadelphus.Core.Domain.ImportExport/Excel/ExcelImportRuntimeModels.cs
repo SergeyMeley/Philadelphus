@@ -30,5 +30,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         public HashSet<ImportedEntityRow> ChildRows { get; set; } = new();
 
         public HashSet<string> RelatedChildSourceNames { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+
+        public List<ExcelImportRelationSchema> Relations { get; set; } = new();
     }
 }

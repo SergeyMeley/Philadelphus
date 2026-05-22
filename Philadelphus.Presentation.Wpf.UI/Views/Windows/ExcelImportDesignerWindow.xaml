@@ -37,20 +37,22 @@
         <Grid Grid.Row="1" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Выбрать Excel файл" Click="BtnSelectFile_Click" Padding="10,5" Margin="0,0,12,0"/>
-            <TextBlock x:Name="TxtFilePath" Grid.Column="1" Text="Файл не выбран" VerticalAlignment="Center" Foreground="Gray"/>
-            <Button Grid.Column="2" Content="Загрузить шаблон" Click="BtnLoadTemplate_Click" Padding="10,5" Margin="12,0,8,0"/>
-            <Button Grid.Column="3" Content="Сохранить шаблон" Click="BtnSaveTemplate_Click" Padding="10,5"/>
+            <Button Grid.Column="1" Content="Загрузить шаблон" Click="BtnLoadTemplate_Click" Padding="10,5" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" Content="Сохранить шаблон" Click="BtnSaveTemplate_Click" Padding="10,5" Margin="0,0,12,0"/>
+            <TextBlock x:Name="TxtFilePath" Grid.Column="3" Text="Файл не выбран" VerticalAlignment="Center" Foreground="Gray"/>
         </Grid>
 
-        <GroupBox Grid.Row="2" Header="Параметры импорта в TreeRoot" Padding="10" Margin="0,0,0,16">
+        <GroupBox Grid.Row="2" Header="Параметры нового корня" Padding="10" Margin="0,0,0,16">
             <StackPanel>
                 <CheckBox x:Name="ChkCreateNewRoot" Content="Создать новый корень" Margin="0,0,0,10"
+                          Visibility="Collapsed"
+                          IsEnabled="False"
                           Checked="ChkCreateNewRoot_Checked" Unchecked="ChkCreateNewRoot_Unchecked"/>
 
                 <Grid Margin="0,0,0,10">
@@ -62,7 +64,7 @@
                     <TextBox x:Name="TxtRootName" Grid.Column="1" Margin="5,0,0,0"/>
                 </Grid>
 
-                <Grid>
+                <Grid Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="170"/>
                         <ColumnDefinition Width="*"/>
@@ -102,7 +104,6 @@
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
                                             <TextBlock Text="{Binding SourceName}" FontSize="11" Foreground="DimGray"/>
-                                            <TextBlock Text="{Binding EntityKindDisplayName}" FontSize="11" Foreground="DimGray"/>
                                         </StackPanel>
                                     </Grid>
                                 </DataTemplate>
@@ -124,28 +125,22 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="170"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="170"/>
-                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Имя сущности:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                <TextBox x:Name="TxtSheetDisplayName" Grid.Row="0" Grid.Column="1" Margin="0,0,12,8" TextChanged="TxtSheetDisplayName_TextChanged"/>
-                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Ключ строки:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                <ComboBox x:Name="CmbSheetKeyColumn" Grid.Row="0" Grid.Column="3" Margin="0,0,0,8" SelectionChanged="CmbSheetKeyColumn_SelectionChanged"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Имя сущности:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox x:Name="TxtSheetDisplayName" Grid.Row="0" Grid.Column="1" TextChanged="TxtSheetDisplayName_TextChanged"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Источник:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBlock x:Name="TxtCurrentSheetSource" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Foreground="DimGray"/>
-                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Строки листа:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <ComboBox x:Name="CmbSheetKeyColumn" Visibility="Collapsed" SelectionChanged="CmbSheetKeyColumn_SelectionChanged"/>
+                                <TextBlock x:Name="TxtCurrentSheetSource" Visibility="Collapsed"/>
                                 <ComboBox x:Name="CmbSheetEntityKind"
-                                          Grid.Row="1"
-                                          Grid.Column="3"
+                                          Visibility="Collapsed"
                                           ItemsSource="{Binding AvailableEntityKinds}"
                                           DisplayMemberPath="DisplayName"
                                           SelectedValuePath="Value"
+                                          IsEnabled="False"
                                           SelectionChanged="CmbSheetEntityKind_SelectionChanged"/>
                             </Grid>
                         </GroupBox>
@@ -205,42 +200,39 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellEditingTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn Header="Где объявлять" Width="2*">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding PlacementDisplayName}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                        <DataGridTemplateColumn.CellEditingTemplate>
-                                            <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding DataContext.AvailableDefinitionScopes, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                          DisplayMemberPath="DisplayName"
-                                                          SelectedValuePath="Value"
-                                                          SelectedValue="{Binding Placement, UpdateSourceTrigger=PropertyChanged}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellEditingTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn Header="Режим значения" Width="2*">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding PropagationModeDisplayName}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                        <DataGridTemplateColumn.CellEditingTemplate>
-                                            <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding DataContext.AvailableValueModes, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                          DisplayMemberPath="DisplayName"
-                                                          SelectedValuePath="Value"
-                                                          SelectedValue="{Binding PropagationMode, UpdateSourceTrigger=PropertyChanged}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellEditingTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="Значение по умолчанию" Binding="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}" Width="2*"/>
                                     <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
                     </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Диаграмма">
+                <Grid Margin="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Диаграмма связей листов"
+                               Foreground="DimGray"
+                               Margin="0,0,0,8"/>
+
+                    <Border Grid.Row="1" BorderBrush="#D0D0D0" BorderThickness="1" Background="#FAFAFA">
+                        <ScrollViewer x:Name="DiagramScrollViewer"
+                                      Background="#FAFAFA"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto"
+                                      PreviewMouseWheel="DiagramScrollViewer_PreviewMouseWheel">
+                            <Canvas x:Name="DiagramCanvas" Background="#FAFAFA" Width="1400" Height="900">
+                                <Canvas.LayoutTransform>
+                                    <ScaleTransform x:Name="DiagramCanvasScaleTransform" ScaleX="1" ScaleY="1"/>
+                                </Canvas.LayoutTransform>
+                            </Canvas>
+                        </ScrollViewer>
+                    </Border>
                 </Grid>
             </TabItem>
 
@@ -308,34 +300,6 @@
                                        Foreground="DimGray"/>
                         </Grid>
                     </GroupBox>
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="Диаграмма">
-                <Grid Margin="12">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0"
-                               Text="Диаграмма связей листов"
-                               Foreground="DimGray"
-                               Margin="0,0,0,8"/>
-
-                    <Border Grid.Row="1" BorderBrush="#D0D0D0" BorderThickness="1" Background="#FAFAFA">
-                        <ScrollViewer x:Name="DiagramScrollViewer"
-                                      Background="#FAFAFA"
-                                      HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Auto"
-                                      PreviewMouseWheel="DiagramScrollViewer_PreviewMouseWheel">
-                            <Canvas x:Name="DiagramCanvas" Background="#FAFAFA" Width="1400" Height="900">
-                                <Canvas.LayoutTransform>
-                                    <ScaleTransform x:Name="DiagramCanvasScaleTransform" ScaleX="1" ScaleY="1"/>
-                                </Canvas.LayoutTransform>
-                            </Canvas>
-                        </ScrollViewer>
-                    </Border>
                 </Grid>
             </TabItem>
 

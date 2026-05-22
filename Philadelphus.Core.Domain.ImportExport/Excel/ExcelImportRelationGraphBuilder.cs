@@ -12,7 +12,8 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
         {
             var graph = new ImportGraph
             {
-                EntitySets = entitySets.ToList()
+                EntitySets = entitySets.ToList(),
+                Relations = relations.Where(x => x.IsEnabled).ToList()
             };
             var setsBySource = entitySets.ToDictionary(x => x.Definition.SourceName, StringComparer.OrdinalIgnoreCase);
 
@@ -25,9 +26,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                 {
                     continue;
                 }
-
-                if (parentSet.Definition.EntityKind == ExcelImportEntityKind.Leaf)
-                    throw new InvalidOperationException($"Сущность «{parentSet.Definition.DisplayName}» является Leaf и не может быть родителем связи.");
 
                 var parentKey = FindProperty(parentSet.Definition, relation.ParentKeyColumnName);
                 var childKey = FindProperty(childSet.Definition, relation.ChildKeyColumnName);

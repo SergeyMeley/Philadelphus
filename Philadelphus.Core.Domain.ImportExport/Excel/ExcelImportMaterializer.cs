@@ -1,4 +1,3 @@
-using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +15,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         public DomainWorkingTreePayload Materialize(ExcelImportSchema schema, ImportGraph graph)
         {
+            // Фиксированное правило импорта: вся книга Excel материализуется как единственный корень чубушника.
             var root = new DomainRootPayload
             {
                 Name = schema.RootName,
@@ -24,9 +24,38 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
             root.Attributes.AddRange(_propertyResolver.ResolveRootAttributes(graph.EntitySets));
 
-            foreach (var row in GetTopLevelRows(graph))
+            var nodeBySourceName = graph.EntitySets
+                .ToDictionary(
+                    set => set.Definition.SourceName,
+                    set => BuildTableNode(set, graph, root.Name),
+                    StringComparer.OrdinalIgnoreCase);
+
+            // Связи наследования Excel-таблиц переносятся в иерархию узлов чубушника.
+            foreach (var relation in graph.Relations)
             {
-                MaterializeTopLevelRow(row, graph, root);
+                if (nodeBySourceName.TryGetValue(relation.ParentSourceName, out var parentNode) == false
+                    || nodeBySourceName.TryGetValue(relation.ChildSourceName, out var childNode) == false)
+                {
+                    continue;
+                }
+
+                if (parentNode.ChildNodes.Any(x => ReferenceEquals(x, childNode)) == false)
+                {
+                    parentNode.ChildNodes.Add(childNode);
+                }
+            }
+
+            var childSourceNames = graph.Relations
+                .Select(x => x.ChildSourceName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // Таблицы без родителя становятся узлами первого уровня под корнем книги.
+            foreach (var entitySet in graph.EntitySets)
+            {
+                if (childSourceNames.Contains(entitySet.Definition.SourceName))
+                    continue;
+
+                root.ChildNodes.Add(nodeBySourceName[entitySet.Definition.SourceName]);
             }
 
             return new DomainWorkingTreePayload
@@ -36,90 +65,154 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             };
         }
 
-        private void MaterializeTopLevelRow(ImportedEntityRow row, ImportGraph graph, DomainRootPayload root)
+        private DomainNodePayload BuildTableNode(ImportedEntitySet entitySet, ImportGraph graph, string owningRootName)
         {
-            if (row.Definition.EntityKind == ExcelImportEntityKind.Root)
-            {
-                root.Attributes.AddRange(_propertyResolver.ResolveAttributes(row, ExcelImportPropertyPlacement.Root, null));
-                foreach (var child in GetChildren(row, graph))
-                    MaterializeTopLevelRow(child, graph, root);
-                return;
-            }
+            var definition = entitySet.Definition;
+            var nodeName = string.IsNullOrWhiteSpace(definition.DisplayName)
+                ? definition.SourceName
+                : definition.DisplayName;
 
-            if (row.Definition.EntityKind == ExcelImportEntityKind.Node)
-            {
-                root.ChildNodes.Add(BuildNode(row, graph, null, root.Name));
-                return;
-            }
-
-            // В доменной модели leaf не может висеть прямо на root. Это не Excel-контейнер:
-            // это явный технический узел текущего root для legacy-сценариев без node-сущности.
-            var fallbackNodeName = string.IsNullOrWhiteSpace(row.Definition.DisplayName)
-                ? row.Definition.SourceName
-                : row.Definition.DisplayName;
-            if (string.IsNullOrWhiteSpace(fallbackNodeName))
-                fallbackNodeName = root.Name;
-
-            var fallbackNode = root.ChildNodes.FirstOrDefault(x => string.Equals(x.Name, fallbackNodeName, StringComparison.OrdinalIgnoreCase));
-            if (fallbackNode == null)
-            {
-                fallbackNode = new DomainNodePayload
-                {
-                    Name = fallbackNodeName,
-                    Description = "Технический узел для leaf-строк без родительской node-сущности",
-                    OwningRootName = root.Name
-                };
-                root.ChildNodes.Add(fallbackNode);
-            }
-
-            AddAttributesUnique(
-                fallbackNode.Attributes,
-                _propertyResolver.ResolveAttributeDefinitions(new[] { row }, ExcelImportPropertyPlacement.Leaf));
-            fallbackNode.ChildLeaves.Add(BuildLeaf(row, null, fallbackNode.Name));
-        }
-
-        private DomainNodePayload BuildNode(
-            ImportedEntityRow row,
-            ImportGraph graph,
-            ImportedEntityRow? parentRow,
-            string owningRootName)
-        {
             var node = new DomainNodePayload
             {
-                Name = ResolveName(row),
-                Description = ResolveDescription(row),
+                Name = nodeName,
+                Description = $"Импортировано из таблицы Excel «{definition.SourceName}»",
                 OwningRootName = owningRootName
             };
 
-            AddAttributesUnique(node.Attributes, _propertyResolver.ResolveAttributes(row, ExcelImportPropertyPlacement.Node, parentRow));
-            var children = GetChildren(row, graph);
-            // Leaf-свойства в PH-модели должны иметь определение на родительском node.
-            // Иначе значения на leaf не наследуют корректную декларацию атрибута и в UI выглядят пустыми.
-            AddAttributesUnique(node.Attributes, _propertyResolver.ResolveAttributeDefinitions(children, ExcelImportPropertyPlacement.Leaf));
-            AddAttributesUnique(node.Attributes, _propertyResolver.ResolveParentConstantAttributes(children, ExcelImportPropertyPlacement.Node));
+            var fkProperties = GetForeignKeyProperties(definition, graph).ToList();
+            var fkPropertyIndexes = fkProperties
+                .Select(x => x.Property.ColumnIndex)
+                .ToHashSet();
 
-            foreach (var child in children)
+            // FK-колонки не добавляются как обычные атрибуты листа: они будут ссылками на листы родительского узла.
+            AddAttributesUnique(
+                node.Attributes,
+                _propertyResolver.ResolveAttributeDefinitions(
+                    entitySet.Rows,
+                    ExcelImportPropertyPlacement.Leaf,
+                    fkPropertyIndexes));
+
+            // Описание FK-атрибута хранится на дочернем узле, а ссылочный тип указывает на родительский узел.
+            foreach (var fkProperty in fkProperties)
             {
-                if (child.Definition.EntityKind == ExcelImportEntityKind.Leaf)
-                {
-                    node.ChildLeaves.Add(BuildLeaf(child, row, node.Name));
-                }
-                else if (child.Definition.EntityKind == ExcelImportEntityKind.Node)
-                {
-                    node.ChildNodes.Add(BuildNode(child, graph, row, owningRootName));
-                }
-                else
-                {
-                    AddAttributesUnique(node.Attributes, _propertyResolver.ResolveAttributes(child, ExcelImportPropertyPlacement.Node, row));
-                }
+                AddAttributesUnique(
+                    node.Attributes,
+                    new[]
+                    {
+                        new ExcelImportAttributePayload
+                        {
+                            Name = fkProperty.Property.PropertyName,
+                            Description = $"Ссылка на строку таблицы «{fkProperty.ParentNodeName}»",
+                            DataTypeNodeName = fkProperty.ParentNodeName,
+                            ValueLeaveName = null!
+                        }
+                    });
+            }
+
+            foreach (var row in entitySet.Rows)
+            {
+                node.ChildLeaves.Add(BuildLeaf(row, node.Name, fkProperties, fkPropertyIndexes));
             }
 
             return node;
         }
 
+        private DomainLeafPayload BuildLeaf(
+            ImportedEntityRow row,
+            string owningNodeName,
+            IReadOnlyCollection<ForeignKeyProperty> fkProperties,
+            IReadOnlySet<int> fkPropertyIndexes)
+        {
+            var leaf = new DomainLeafPayload
+            {
+                Name = ResolveName(row),
+                Description = ResolveDescription(row),
+                OwningNodeName = owningNodeName
+            };
+
+            foreach (var attribute in _propertyResolver.ResolveAttributes(
+                         row,
+                         ExcelImportPropertyPlacement.Leaf,
+                         parentRow: null,
+                         excludedColumnIndexes: fkPropertyIndexes))
+            {
+                leaf.Attributes.Add(attribute);
+            }
+
+            // Для каждой строки дочерней таблицы FK-значение заменяется ссылкой на найденный лист родительской таблицы.
+            foreach (var fkProperty in fkProperties)
+            {
+                if (row.ValuesByColumnIndex.TryGetValue(fkProperty.Property.ColumnIndex, out var childKeyValue) == false
+                    || string.IsNullOrWhiteSpace(childKeyValue))
+                {
+                    continue;
+                }
+
+                if (fkProperty.ParentLeafNameByKey.TryGetValue(childKeyValue, out var parentLeafName) == false)
+                    continue;
+
+                leaf.Attributes.Add(new ExcelImportAttributePayload
+                {
+                    Name = fkProperty.Property.PropertyName,
+                    Description = $"Ссылка на строку таблицы «{fkProperty.ParentNodeName}»",
+                    DataTypeNodeName = fkProperty.ParentNodeName,
+                    ValueLeaveName = parentLeafName
+                });
+            }
+
+            return leaf;
+        }
+
+        private IEnumerable<ForeignKeyProperty> GetForeignKeyProperties(ImportedEntityDefinition definition, ImportGraph graph)
+        {
+            foreach (var relation in graph.Relations.Where(x =>
+                         string.Equals(x.ChildSourceName, definition.SourceName, StringComparison.OrdinalIgnoreCase)))
+            {
+                var childProperty = FindProperty(definition, relation.ChildKeyColumnName);
+                if (childProperty == null)
+                    continue;
+
+                var parentSet = graph.EntitySets.FirstOrDefault(x =>
+                    string.Equals(x.Definition.SourceName, relation.ParentSourceName, StringComparison.OrdinalIgnoreCase));
+                if (parentSet == null)
+                    continue;
+
+                var parentKeyProperty = FindProperty(parentSet.Definition, relation.ParentKeyColumnName);
+                if (parentKeyProperty == null)
+                    continue;
+
+                var parentNodeName = string.IsNullOrWhiteSpace(parentSet.Definition.DisplayName)
+                    ? parentSet.Definition.SourceName
+                    : parentSet.Definition.DisplayName;
+
+                // Индекс нужен для быстрого поиска родительского листа по значению внешнего ключа из дочерней строки.
+                var parentLeafNameByKey = parentSet.Rows
+                    .Select(row => new
+                    {
+                        Key = GetValue(row, parentKeyProperty),
+                        LeafName = ResolveName(row)
+                    })
+                    .Where(x => string.IsNullOrWhiteSpace(x.Key) == false)
+                    .GroupBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group.First().LeafName,
+                        StringComparer.OrdinalIgnoreCase);
+
+                yield return new ForeignKeyProperty(childProperty, parentNodeName, parentLeafNameByKey);
+            }
+        }
+
+        private static PropertyDefinition? FindProperty(ImportedEntityDefinition definition, string columnName)
+        {
+            return definition.Properties.FirstOrDefault(x =>
+                string.Equals(x.SourceColumnName, columnName, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(x.PropertyName, columnName, StringComparison.OrdinalIgnoreCase));
+        }
+
         private static void AddAttributesUnique(
-            List<AttributeExportDTO> target,
-            IEnumerable<AttributeExportDTO> source)
+            List<ExcelImportAttributePayload> target,
+            IEnumerable<ExcelImportAttributePayload> source)
         {
             foreach (var attribute in source)
             {
@@ -128,36 +221,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
                 target.Add(attribute);
             }
-        }
-
-        private TreeLeaveExportDTO BuildLeaf(ImportedEntityRow row, ImportedEntityRow? parentRow, string owningNodeName)
-        {
-            var leaf = new TreeLeaveExportDTO(ResolveName(row), ResolveDescription(row), owningNodeName);
-
-            foreach (var attribute in _propertyResolver.ResolveAttributes(row, ExcelImportPropertyPlacement.Leaf, parentRow))
-            {
-                leaf.Attributes.Add(attribute);
-            }
-
-            return leaf;
-        }
-
-        private static IEnumerable<ImportedEntityRow> GetTopLevelRows(ImportGraph graph)
-        {
-            return graph.EntitySets
-                .SelectMany(x => x.Rows)
-                .Where(row => graph.ChildRows.Contains(row) == false)
-                // Если сущность объявлена child в relation, но конкретная строка не нашла parent,
-                // она не становится самостоятельным root-level элементом. Связь опциональна по данным:
-                // совпавшие строки связываются, несовпавшие пропускаются.
-                .Where(row => graph.RelatedChildSourceNames.Contains(row.Definition.SourceName) == false);
-        }
-
-        private static IReadOnlyList<ImportedEntityRow> GetChildren(ImportedEntityRow row, ImportGraph graph)
-        {
-            return graph.ChildrenByParent.TryGetValue(row, out var children)
-                ? children
-                : Array.Empty<ImportedEntityRow>();
         }
 
         private static string ResolveName(ImportedEntityRow row)
@@ -193,22 +256,17 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                 : description;
         }
 
-        private static long? ResolveSequence(ImportedEntityRow row)
-        {
-            var sequence = row.Definition.Properties
-                .Where(x => x.Role == ExcelImportColumnRole.SystemSequence)
-                .Select(property => GetValue(row, property))
-                .FirstOrDefault(value => string.IsNullOrWhiteSpace(value) == false);
-
-            return long.TryParse(sequence, out var parsed) ? parsed : null;
-        }
-
         private static string GetValue(ImportedEntityRow row, PropertyDefinition property)
         {
             return row.ValuesByColumnIndex.TryGetValue(property.ColumnIndex, out var value)
                 ? value
                 : string.Empty;
         }
+
+        private sealed record ForeignKeyProperty(
+            PropertyDefinition Property,
+            string ParentNodeName,
+            IReadOnlyDictionary<string, string> ParentLeafNameByKey);
     }
 
     internal sealed class DomainWorkingTreePayload
@@ -224,7 +282,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         public string Description { get; set; } = string.Empty;
 
-        public List<AttributeExportDTO> Attributes { get; set; } = new();
+        public List<ExcelImportAttributePayload> Attributes { get; set; } = new();
 
         public List<DomainNodePayload> ChildNodes { get; set; } = new();
     }
@@ -237,10 +295,32 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         public string OwningRootName { get; set; } = string.Empty;
 
-        public List<AttributeExportDTO> Attributes { get; set; } = new();
+        public List<ExcelImportAttributePayload> Attributes { get; set; } = new();
 
         public List<DomainNodePayload> ChildNodes { get; set; } = new();
 
-        public List<TreeLeaveExportDTO> ChildLeaves { get; set; } = new();
+        public List<DomainLeafPayload> ChildLeaves { get; set; } = new();
+    }
+
+    internal sealed class DomainLeafPayload
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        public string OwningNodeName { get; set; } = string.Empty;
+
+        public List<ExcelImportAttributePayload> Attributes { get; set; } = new();
+    }
+
+    internal sealed class ExcelImportAttributePayload
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        public string DataTypeNodeName { get; set; } = "Не определён";
+
+        public string? ValueLeaveName { get; set; } = "Не задано";
     }
 }

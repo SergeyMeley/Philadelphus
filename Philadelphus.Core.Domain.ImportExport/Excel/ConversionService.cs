@@ -82,6 +82,8 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 
         private string ProcessSchema(XLWorkbook workbook, ExcelImportSchema schema)
         {
+            ExcelImportSchemaNormalizer.NormalizeForExecution(schema);
+
             var projector = new ExcelImportSourceProjector(_sourceReader);
             var graphBuilder = new ExcelImportRelationGraphBuilder();
             var propertyResolver = new ExcelImportPropertyResolver();

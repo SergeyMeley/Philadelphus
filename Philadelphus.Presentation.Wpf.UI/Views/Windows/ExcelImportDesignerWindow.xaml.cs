@@ -23,6 +23,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private const double DiagramCardWidth = 280;
         private const double DiagramCardMinHeight = 210;
         private const double DiagramCardMaxWidth = 520;
+        private const double DiagramGridPadding = 40;
+        private const double DiagramGridColumnGap = 48;
+        private const double DiagramGridRowGap = 48;
+        private const double DiagramGridRowHeight = 260;
         private const double DiagramZoomMin = 0.35;
         private const double DiagramZoomMax = 2.5;
         private const double DiagramZoomStep = 1.1;
@@ -80,6 +84,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private Line? _relationPreviewLine;
         private readonly Dictionary<string, FrameworkElement> _diagramColumnElements = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<DiagramRelationVisual> _diagramRelationVisuals = new();
+        private bool _diagramInitialLayoutPending;
         private double _diagramZoom = 1.0;
         private Point _dragStartPoint;
         private double _dragStartLeft;
@@ -142,6 +147,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         internal void LoadSchema(ExcelImportSchema schema)
         {
             _schema = schema;
+            _diagramInitialLayoutPending = true;
             ExcelImportSchemaNormalizer.EnsureEditableState(_schema);
             ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
 
@@ -176,17 +182,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             if (_schema == null)
                 return;
 
+            // Книга Excel всегда является корнем результата, поэтому выбор существующего корня отключен.
+            _schema.CreateNewRoot = true;
             TxtRootName.Text = _schema.RootName;
-            ChkCreateNewRoot.IsChecked = _schema.CreateNewRoot;
-            if (_schema.CreateNewRoot)
-            {
-                ChkCreateNewRoot_Checked(this, new RoutedEventArgs());
-            }
-            else
-            {
-                CmbExistingRoots.SelectedValue = _schema.RootName;
-                ChkCreateNewRoot_Unchecked(this, new RoutedEventArgs());
-            }
+            ChkCreateNewRoot.IsChecked = true;
+            ChkCreateNewRoot_Checked(this, new RoutedEventArgs());
         }
 
         private bool TrySyncSchemaFromImportParameters(bool isNewRoot, string rootName)
@@ -198,7 +198,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             }
 
             _schema.SourceFilePath = _selectedFilePath;
-            _schema.CreateNewRoot = isNewRoot;
+            _schema.CreateNewRoot = true;
             _schema.RootName = rootName;
             ExcelImportSchemaNormalizer.NormalizeForExecution(_schema);
             RefreshRelationViews();
@@ -211,10 +211,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 return;
 
             _schema.SourceFilePath = _selectedFilePath;
-            _schema.CreateNewRoot = ChkCreateNewRoot.IsChecked == true;
-            _schema.RootName = _schema.CreateNewRoot
-                ? TxtRootName.Text?.Trim() ?? string.Empty
-                : (CmbExistingRoots.SelectedItem as Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootModel)?.Name?.Trim() ?? string.Empty;
+            _schema.CreateNewRoot = true;
+            _schema.RootName = TxtRootName.Text?.Trim() ?? string.Empty;
             ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
         }
 
@@ -238,7 +236,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             TxtFilePath.Text = IOPath.GetFileName(filePath);
             _workbookPreview = _previewService.GetWorkbookPreview(filePath);
             _schema = _schemaBuilder.CreateDraftSchema(filePath, IOPath.GetFileNameWithoutExtension(filePath));
-            _schema.CreateNewRoot = ChkCreateNewRoot.IsChecked == true;
+            _diagramInitialLayoutPending = true;
+            _schema.CreateNewRoot = true;
             ApplyRootControlsFromSchema();
             BindSchema();
         }
@@ -277,7 +276,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 {
                     TxtSheetDisplayName.Text = string.Empty;
                     TxtCurrentSheetSource.Text = string.Empty;
-                    CmbSheetEntityKind.SelectedValue = ExcelImportEntityKind.Leaf;
+                    CmbSheetEntityKind.SelectedValue = ExcelImportEntityKind.Node;
                     DgSheetColumns.ItemsSource = null;
                     DgSheetPreview.ItemsSource = null;
                     TxtSheetPreviewInfo.Text = "Лист не выбран.";
@@ -288,7 +287,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
                 TxtSheetDisplayName.Text = _currentSheet.DisplayName;
                 TxtCurrentSheetSource.Text = _currentSheet.SourceName;
-                CmbSheetEntityKind.SelectedValue = _currentSheet.EntityKind;
+                _currentSheet.EntityKind = ExcelImportEntityKind.Node;
+                _currentSheet.Profile.EntityKind = ExcelImportEntityKind.Node;
+                CmbSheetEntityKind.SelectedValue = ExcelImportEntityKind.Node;
 
                 var headers = ExcelImportProfileEditorHelper.BuildHeaderOptions(_currentSheet.Profile.Columns, sort: false);
                 CmbSheetKeyColumn.ItemsSource = headers;
@@ -336,10 +337,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             if (_isUpdatingSheetControls || _currentSheet == null)
                 return;
 
-            _currentSheet.EntityKind = CmbSheetEntityKind.SelectedValue is ExcelImportEntityKind entityKind
-                ? entityKind
-                : ExcelImportEntityKind.Leaf;
-            ApplySheetEntityKind(_currentSheet, _currentSheet.EntityKind);
+            ApplySheetEntityKind(_currentSheet, ExcelImportEntityKind.Node);
             LstSchemaSheets.Items.Refresh();
             RenderDiagram();
         }
@@ -531,6 +529,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 return;
 
             var visibleSheets = _schema.Sheets.Where(x => x.IsEnabled).ToList();
+            if (_diagramInitialLayoutPending)
+            {
+                ArrangeDiagramCardsByGrid(visibleSheets);
+                _diagramInitialLayoutPending = false;
+            }
+
             foreach (var sheet in visibleSheets)
             {
                 var card = BuildDiagramCard(sheet);
@@ -543,6 +547,40 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             foreach (var relation in ExcelImportSchemaNormalizer.BuildRelationProjection(_schema).Where(x => x.IsEnabled))
             {
                 AddRelationVisual(relation);
+            }
+        }
+
+        private void ArrangeDiagramCardsByGrid(IReadOnlyList<ExcelImportSheetSchema> visibleSheets)
+        {
+            if (visibleSheets.Count == 0)
+                return;
+
+            var availableWidth = DiagramScrollViewer.ViewportWidth;
+            if (double.IsNaN(availableWidth) || availableWidth <= 0)
+                availableWidth = DiagramCanvas.Width;
+
+            var maxCardWidth = visibleSheets.Max(ResolveDiagramCardWidth);
+            var cellWidth = maxCardWidth + DiagramGridColumnGap;
+            var columnCount = Math.Max(1, (int)Math.Floor((availableWidth - DiagramGridPadding * 2 + DiagramGridColumnGap) / cellWidth));
+            columnCount = Math.Min(columnCount, visibleSheets.Count);
+
+            var rowCount = (int)Math.Ceiling((double)visibleSheets.Count / columnCount);
+            var canvasWidth = DiagramGridPadding * 2 + columnCount * maxCardWidth + Math.Max(0, columnCount - 1) * DiagramGridColumnGap;
+            var canvasHeight = DiagramGridPadding * 2 + rowCount * DiagramGridRowHeight + Math.Max(0, rowCount - 1) * DiagramGridRowGap;
+            DiagramCanvas.Width = Math.Max(1400, canvasWidth);
+            DiagramCanvas.Height = Math.Max(900, canvasHeight);
+
+            for (var index = 0; index < visibleSheets.Count; index++)
+            {
+                var sheet = visibleSheets[index];
+                var row = index / columnCount;
+                var column = index % columnCount;
+                var cardWidth = ResolveDiagramCardWidth(sheet);
+
+                sheet.CanvasX = DiagramGridPadding
+                    + column * (maxCardWidth + DiagramGridColumnGap)
+                    + (maxCardWidth - cardWidth) / 2;
+                sheet.CanvasY = DiagramGridPadding + row * (DiagramGridRowHeight + DiagramGridRowGap);
             }
         }
 
@@ -565,9 +603,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            layout.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             var title = new TextBlock
             {
@@ -577,10 +613,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             };
             Grid.SetRow(title, 0);
             layout.Children.Add(title);
-
-            var entityKindEditor = BuildDiagramEntityKindEditor(sheet);
-            Grid.SetRow(entityKindEditor, 1);
-            layout.Children.Add(entityKindEditor);
 
             var relation = new TextBlock
             {
@@ -594,8 +626,33 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 Margin = new Thickness(0, 6, 0, 0),
                 TextWrapping = TextWrapping.Wrap
             };
-            Grid.SetRow(relation, 2);
-            layout.Children.Add(relation);
+
+            var relationPanel = new Grid();
+            relationPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            relationPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            Grid.SetColumn(relation, 0);
+            relationPanel.Children.Add(relation);
+
+            if (string.IsNullOrWhiteSpace(sheet.Profile.Relation.ParentSourceName) == false)
+            {
+                var removeRelationButton = new Button
+                {
+                    Content = "x",
+                    Width = 28,
+                    Height = 24,
+                    Padding = new Thickness(0),
+                    Margin = new Thickness(8, 2, 0, 0),
+                    Cursor = Cursors.Hand,
+                    ToolTip = "Удалить связь с родителем",
+                    VerticalAlignment = VerticalAlignment.Top
+                };
+                removeRelationButton.Click += (_, _) => ClearSheetRelation(sheet);
+                Grid.SetColumn(removeRelationButton, 1);
+                relationPanel.Children.Add(removeRelationButton);
+            }
+
+            Grid.SetRow(relationPanel, 1);
+            layout.Children.Add(relationPanel);
 
             var columnsTitle = new TextBlock
             {
@@ -604,7 +661,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 Foreground = Brushes.DimGray,
                 Margin = new Thickness(0, 8, 0, 3)
             };
-            Grid.SetRow(columnsTitle, 3);
+            Grid.SetRow(columnsTitle, 2);
             layout.Children.Add(columnsTitle);
 
             var columnsPanel = new StackPanel();
@@ -620,33 +677,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
             };
-            Grid.SetRow(columnsScroll, 4);
+            Grid.SetRow(columnsScroll, 3);
             layout.Children.Add(columnsScroll);
-
-            var actions = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
-
-            if (string.IsNullOrWhiteSpace(sheet.Profile.Relation.ParentSourceName) == false)
-            {
-                var removeRelationButton = new Button
-                {
-                    Content = "x",
-                    Width = 28,
-                    Height = 24,
-                    Padding = new Thickness(0),
-                    Margin = new Thickness(0, 4, 0, 0),
-                    Cursor = Cursors.Hand,
-                    ToolTip = "Удалить связь с родителем"
-                };
-                removeRelationButton.Click += (_, _) => ClearSheetRelation(sheet);
-                actions.Children.Add(removeRelationButton);
-            }
-
-            Grid.SetRow(actions, 5);
-            layout.Children.Add(actions);
             border.Child = layout;
 
             border.MouseLeftButtonDown += DiagramCard_MouseLeftButtonDown;
@@ -684,67 +716,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         {
             var visibleRowsHeight = Math.Max(1, sheet.Profile.Columns.Count) * 34;
             return Math.Clamp(visibleRowsHeight, 96, 260);
-        }
-
-        private FrameworkElement BuildDiagramEntityKindEditor(ExcelImportSheetSchema sheet)
-        {
-            var panel = new DockPanel
-            {
-                Margin = new Thickness(0, 6, 0, 0),
-                LastChildFill = true
-            };
-
-            panel.Children.Add(new TextBlock
-            {
-                Text = "Тип:",
-                Foreground = Brushes.DimGray,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 6, 0)
-            });
-
-            var combo = new ComboBox
-            {
-                ItemsSource = AvailableEntityKinds,
-                DisplayMemberPath = nameof(ExcelImportEntityKindItem.DisplayName),
-                SelectedValuePath = nameof(ExcelImportEntityKindItem.Value),
-                SelectedValue = sheet.EntityKind,
-                MinWidth = 100,
-                Height = 24,
-                Cursor = Cursors.Hand,
-                Tag = sheet,
-                ToolTip = "Тип импортируемой сущности"
-            };
-
-            combo.SelectionChanged += DiagramEntityKind_SelectionChanged;
-            panel.Children.Add(combo);
-            return panel;
-        }
-
-        private void DiagramEntityKind_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (sender is not ComboBox combo
-                || combo.Tag is not ExcelImportSheetSchema sheet
-                || combo.SelectedValue is not ExcelImportEntityKind entityKind)
-            {
-                return;
-            }
-
-            ApplySheetEntityKind(sheet, entityKind);
-            if (ReferenceEquals(sheet, _currentSheet))
-            {
-                _isUpdatingSheetControls = true;
-                try
-                {
-                    CmbSheetEntityKind.SelectedValue = entityKind;
-                }
-                finally
-                {
-                    _isUpdatingSheetControls = false;
-                }
-            }
-
-            LstSchemaSheets.Items.Refresh();
-            RenderDiagram();
         }
 
         private void DiagramScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1463,7 +1434,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
             _schema.SourceFilePath = _selectedFilePath;
             _schema.RootName = TxtRootName.Text.Trim();
-            _schema.CreateNewRoot = ChkCreateNewRoot.IsChecked == true;
+            _schema.CreateNewRoot = true;
 
             var dialog = new SaveFileDialog
             {
@@ -1489,7 +1460,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             out string rootName,
             out Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootModel? existingRoot)
         {
-            isNewRoot = ChkCreateNewRoot.IsChecked == true;
+            isNewRoot = true;
             rootName = string.Empty;
             existingRoot = null;
 
@@ -1499,10 +1470,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 return false;
             }
 
-            existingRoot = isNewRoot ? null : CmbExistingRoots.SelectedItem as Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootModel;
-            rootName = isNewRoot
-                ? TxtRootName.Text?.Trim() ?? string.Empty
-                : existingRoot?.Name?.Trim() ?? string.Empty;
+            rootName = TxtRootName.Text?.Trim() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(rootName))
             {
@@ -1521,8 +1489,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
         private void ChkCreateNewRoot_Unchecked(object sender, RoutedEventArgs e)
         {
-            TxtRootName.IsEnabled = false;
-            CmbExistingRoots.IsEnabled = true;
+            ChkCreateNewRoot.IsChecked = true;
+            TxtRootName.IsEnabled = true;
+            CmbExistingRoots.IsEnabled = false;
         }
 
         private ExcelImportSheetSchema? GetSheet(string? sourceName)

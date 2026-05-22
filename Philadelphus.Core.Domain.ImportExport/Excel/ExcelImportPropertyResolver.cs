@@ -1,4 +1,3 @@
-using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +6,17 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
 {
     internal sealed class ExcelImportPropertyResolver
     {
-        public IEnumerable<AttributeExportDTO> ResolveAttributes(
+        public IEnumerable<ExcelImportAttributePayload> ResolveAttributes(
             ImportedEntityRow row,
             ExcelImportPropertyPlacement placement,
-            ImportedEntityRow? parentRow)
+            ImportedEntityRow? parentRow,
+            IReadOnlySet<int>? excludedColumnIndexes = null)
         {
+            // Исключенные колонки уже обработаны специальной логикой, например FK-колонка как ссылочный атрибут.
             foreach (var property in row.Definition.Properties.Where(x =>
                          x.Role == ExcelImportColumnRole.Attribute
-                         && x.Placement == placement))
+                         && x.Placement == placement
+                         && (excludedColumnIndexes == null || excludedColumnIndexes.Contains(x.ColumnIndex) == false)))
             {
                 var value = ResolveValue(row, property, parentRow);
                 if (string.IsNullOrWhiteSpace(value))
@@ -24,7 +26,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             }
         }
 
-        public IEnumerable<AttributeExportDTO> ResolveRootAttributes(IReadOnlyCollection<ImportedEntitySet> entitySets)
+        public IEnumerable<ExcelImportAttributePayload> ResolveRootAttributes(IReadOnlyCollection<ImportedEntitySet> entitySets)
         {
             var emitted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -50,7 +52,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             }
         }
 
-        public IEnumerable<AttributeExportDTO> ResolveParentConstantAttributes(IReadOnlyCollection<ImportedEntityRow> childRows, ExcelImportPropertyPlacement placement)
+        public IEnumerable<ExcelImportAttributePayload> ResolveParentConstantAttributes(IReadOnlyCollection<ImportedEntityRow> childRows, ExcelImportPropertyPlacement placement)
         {
             var candidates = childRows
                 .SelectMany(row => row.Definition.Properties
@@ -71,14 +73,19 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
             }
         }
 
-        public IEnumerable<AttributeExportDTO> ResolveAttributeDefinitions(IReadOnlyCollection<ImportedEntityRow> rows, ExcelImportPropertyPlacement placement)
+        public IEnumerable<ExcelImportAttributePayload> ResolveAttributeDefinitions(
+            IReadOnlyCollection<ImportedEntityRow> rows,
+            ExcelImportPropertyPlacement placement,
+            IReadOnlySet<int>? excludedColumnIndexes = null)
         {
             var emitted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+            // Описания атрибутов не создаются для колонок, которые должны материализоваться не как обычные поля.
             foreach (var property in rows
                          .SelectMany(row => row.Definition.Properties)
                          .Where(property => property.Role == ExcelImportColumnRole.Attribute
                              && property.Placement == placement
+                             && (excludedColumnIndexes == null || excludedColumnIndexes.Contains(property.ColumnIndex) == false)
                              && property.PropagationMode != ExcelImportValuePropagationMode.ParentConstant))
             {
                 if (emitted.Add(property.PropertyName) == false)
@@ -135,19 +142,23 @@ namespace Philadelphus.Core.Domain.ImportExport.Excel
                 : string.Empty;
         }
 
-        private static AttributeExportDTO CreateAttribute(PropertyDefinition property, string value)
+        private static ExcelImportAttributePayload CreateAttribute(PropertyDefinition property, string value)
         {
-            return new AttributeExportDTO(property.PropertyName, ResolveDescription(property))
+            return new ExcelImportAttributePayload
             {
+                Name = property.PropertyName,
+                Description = ResolveDescription(property),
                 DataTypeNodeName = property.DataTypeNodeName,
                 ValueLeaveName = value
             };
         }
 
-        private static AttributeExportDTO CreateAttributeDefinition(PropertyDefinition property)
+        private static ExcelImportAttributePayload CreateAttributeDefinition(PropertyDefinition property)
         {
-            return new AttributeExportDTO(property.PropertyName, ResolveDescription(property))
+            return new ExcelImportAttributePayload
             {
+                Name = property.PropertyName,
+                Description = ResolveDescription(property),
                 DataTypeNodeName = property.DataTypeNodeName,
                 ValueLeaveName = null!
             };
