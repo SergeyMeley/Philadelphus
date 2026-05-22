@@ -93,14 +93,14 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
 
             node.Name = "  Bad{Name}[~]&%  ";
 
-            Assert.Equal("BadName", node.Name);
+            Assert.Equal("BadName%", node.Name);
             Assert.Contains(notificationService.Messages, x => x.Contains("'{'")
                 && x.Contains("'}'")
                 && x.Contains("'['")
                 && x.Contains("']'")
                 && x.Contains("'~'")
                 && x.Contains("'&'")
-                && x.Contains("'%'"));
+                && x.Contains("'%'") == false);
         }
 
         [Fact]
@@ -121,6 +121,22 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void Name_Should_Collapse_Duplicate_Spaces()
+        {
+            var root = CreateRoot();
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                root.OwningWorkingTree,
+                new FakeNotificationService(),
+                PropertiesPolicyBuilder.CreateTreeNodeDefault(new FakeNotificationService()));
+
+            node.Name = "  Bad   Name  Value  ";
+
+            Assert.Equal("Bad Name Value", node.Name);
+        }
+
+        [Fact]
         public void Name_Should_Block_Empty_Value_After_Removing_Special_Characters()
         {
             var root = CreateRoot();
@@ -132,7 +148,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
                 PropertiesPolicyBuilder.CreateTreeNodeDefault(new FakeNotificationService()));
 
             node.Name = "Old";
-            node.Name = " {}[]~&% ";
+            node.Name = " {}[]~& ";
 
             Assert.Equal("Old", node.Name);
         }

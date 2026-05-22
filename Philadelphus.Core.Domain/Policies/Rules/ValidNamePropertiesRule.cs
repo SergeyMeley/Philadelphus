@@ -119,7 +119,9 @@ namespace Philadelphus.Core.Domain.Policies.Rules
             if (value == null)
                 return string.Empty;
 
-            return new string(value.Where(x => IsInvalidNameCharacter(x) == false).ToArray()).Trim();
+            var valueWithoutInvalidCharacters = new string(value.Where(x => IsInvalidNameCharacter(x) == false).ToArray());
+
+            return CollapseSpaces(valueWithoutInvalidCharacters.Trim());
         }
 
         public object OnRead(T model, string prop, object value)
@@ -182,8 +184,37 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 || value == '['
                 || value == ']'
                 || value == '~'
-                || value == '&'
-                || value == '%';
+                || value == '&';
+        }
+
+        private static string CollapseSpaces(string value)
+        {
+            if (value.Length == 0)
+                return value;
+
+            var result = new System.Text.StringBuilder(value.Length);
+            var previousWasSpace = false;
+
+            foreach (var character in value)
+            {
+                if (character == ' ')
+                {
+                    if (previousWasSpace)
+                    {
+                        continue;
+                    }
+
+                    previousWasSpace = true;
+                }
+                else
+                {
+                    previousWasSpace = false;
+                }
+
+                result.Append(character);
+            }
+
+            return result.ToString();
         }
 
         private static string FormatCharacters(IEnumerable<char> values)
