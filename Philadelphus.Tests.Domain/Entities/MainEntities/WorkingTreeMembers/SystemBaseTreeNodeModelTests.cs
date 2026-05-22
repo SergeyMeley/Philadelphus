@@ -237,6 +237,45 @@ public class SystemBaseTreeNodeModelTests
             && x.Contains("Int64"));
     }
 
+    [Theory]
+    [InlineData(SystemBaseType.DATETIME, "2026-05-23T14:15:16+03:00", typeof(DateTimeOffset))]
+    [InlineData(SystemBaseType.DATE, "2026-05-23", typeof(DateOnly))]
+    [InlineData(SystemBaseType.TIME, "14:15:16", typeof(TimeOnly))]
+    public void SystemBaseTreeLeave_TemporalStringValue_AllowsOnlyExplicitInvariantFormat(
+        SystemBaseType type,
+        string validValue,
+        Type expectedTypedValueType)
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            type,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
+
+        leave.StringValue = validValue;
+        var storedValue = leave.StringValue;
+        leave.StringValue = GetNonInvariantTemporalValue(type);
+
+        leave.StringValue.Should().Be(storedValue);
+        leave.TypedValue.Should().BeOfType(expectedTypedValueType);
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains(GetNonInvariantTemporalValue(type))
+            && x.Contains("invariant culture"));
+    }
+
     [Fact]
     public void SystemBaseTreeLeave_FileValue_AllowsMissingLocalFileReference()
     {
@@ -524,5 +563,16 @@ public class SystemBaseTreeNodeModelTests
             owner,
             notificationService,
             new EmptyPropertiesPolicy<ElementAttributeModel>());
+    }
+
+    private static string GetNonInvariantTemporalValue(SystemBaseType type)
+    {
+        return type switch
+        {
+            SystemBaseType.DATETIME => "23.05.2026 14:15:16 +03:00",
+            SystemBaseType.DATE => "23.05.2026",
+            SystemBaseType.TIME => "2:15 PM",
+            _ => throw new ArgumentOutOfRangeException(nameof(type)),
+        };
     }
 }

@@ -13,6 +13,10 @@ namespace Philadelphus.Core.Domain.Helpers
     /// </remarks>
     internal static class SystemBaseStringValueValidator
     {
+        private const string DateTimeFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
+        private const string DateFormat = "yyyy-MM-dd";
+        private const string TimeFormat = "HH:mm:ss";
+
         /// <summary>
         /// Проверяет, может ли строка быть значением указанного системного типа.
         /// </summary>
@@ -77,7 +81,12 @@ namespace Philadelphus.Core.Domain.Helpers
                 case SystemBaseType.BOOL:
                     return TryParseBool(value, out typedValue);
                 case SystemBaseType.DATETIME:
-                    if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeValue))
+                    if (DateTimeOffset.TryParseExact(
+                        value,
+                        DateTimeFormat,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out var dateTimeValue))
                     {
                         typedValue = dateTimeValue;
                         return true;
@@ -85,7 +94,12 @@ namespace Philadelphus.Core.Domain.Helpers
 
                     return false;
                 case SystemBaseType.DATE:
-                    if (DateOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateValue))
+                    if (DateOnly.TryParseExact(
+                        value,
+                        DateFormat,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out var dateValue))
                     {
                         typedValue = dateValue;
                         return true;
@@ -93,7 +107,12 @@ namespace Philadelphus.Core.Domain.Helpers
 
                     return false;
                 case SystemBaseType.TIME:
-                    if (TimeOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var timeValue))
+                    if (TimeOnly.TryParseExact(
+                        value,
+                        TimeFormat,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out var timeValue))
                     {
                         typedValue = timeValue;
                         return true;
@@ -129,9 +148,9 @@ namespace Philadelphus.Core.Domain.Helpers
                 SystemBaseType.MONEY =>
                     "денежное значение в invariant culture, например 1234.56",
                 SystemBaseType.BOOL => "true/false или системные значения 'Истина'/'Ложь'",
-                SystemBaseType.DATETIME => "дата и время, распознаваемые DateTimeOffset.TryParse",
-                SystemBaseType.DATE => "дата, распознаваемая DateOnly.TryParse",
-                SystemBaseType.TIME => "время, распознаваемое TimeOnly.TryParse",
+                SystemBaseType.DATETIME => $"дата и время в invariant culture, формат {DateTimeFormat}, например 1970-01-01T00:00:00+00:00",
+                SystemBaseType.DATE => $"дата в invariant culture, формат {DateFormat}, например 1970-01-01",
+                SystemBaseType.TIME => $"время в invariant culture, формат {TimeFormat}, например 00:00:00",
                 SystemBaseType.FILE => "непустая ссылка на файл: локальный путь, file:// URI или URI внешнего хранилища",
                 _ => $"тип {type} не поддерживается этим правилом",
             };
