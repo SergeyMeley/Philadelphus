@@ -374,6 +374,49 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
+    public void SystemBaseBoolNode_BlocksDirectLeafCollectionEditing()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var boolNode = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.BOOL,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var userNode = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var userLeave = new TreeLeaveModel(
+            Guid.NewGuid(),
+            userNode,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var trueLeave = new SystemBaseTreeLeaveModel(
+            boolNode,
+            tree,
+            "\u0418\u0441\u0442\u0438\u043d\u0430",
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+
+        boolNode.AddChild(userLeave).Should().BeFalse();
+        boolNode.RemoveChild(trueLeave).Should().BeFalse();
+        boolNode.ClearChilds().Should().BeFalse();
+
+        boolNode.ChildLeaves.Should().ContainSingle(x => x == trueLeave);
+        boolNode.ChildLeaves.Should().NotContain(userLeave);
+    }
+
+    [Fact]
     public void SystemBaseTreeLeave_BoolValue_BlocksChangingExistingValue()
     {
         var notificationService = new FakeNotificationService();
