@@ -92,11 +92,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             set
             {
                 var inheritedValue = _inheritedAttributeFromParent?.Value;
-                SetValue(ref _value, value);
+                var alreadyLocalValue = SameValue(value, _value);
+                var valueChanged = SetValue(ref _value, value);
 
-                if (_isOwn == false && SameValue(value, inheritedValue) == false)
+                if (_isOwn == false
+                    && (valueChanged || alreadyLocalValue))
                 {
-                    _isValueOverridden = true;
+                    _isValueOverridden = SameValue(value, inheritedValue) == false;
                 }
             }
         }
@@ -108,6 +110,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             get => GetValue(GetEffectiveValues());
         }
+
+        /// <summary>
+        /// Признак того, что одиночное значение унаследованного атрибута отличается от родительского.
+        /// </summary>
+        public bool IsValueOverridden => _isOwn == false && _isValueOverridden;
+
+        /// <summary>
+        /// Признак того, что коллекция значений унаследованного атрибута отличается от родительской.
+        /// </summary>
+        public bool AreValuesOverridden => _isOwn == false && _areValuesOverridden;
 
         /// <summary>
         /// Коллекция допустимых значений (листы выбранного узла дерева репозитория Чубушника)
