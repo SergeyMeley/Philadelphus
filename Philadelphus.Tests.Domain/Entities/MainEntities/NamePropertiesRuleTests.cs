@@ -153,6 +153,23 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void TreeRootName_Should_Block_Other_Root_Name_In_Shrub()
+        {
+            var rule = new ValidNamePropertiesRule<TreeRootModel>(new FakeNotificationService(), NameUniquenessStrategy.TreeRoot());
+            var shrub = new FakeShrubModel();
+            var firstTree = CreateWorkingTree(shrub);
+            var secondTree = CreateWorkingTree(shrub);
+            var firstRoot = CreateRoot(firstTree);
+            var secondRoot = CreateRoot(secondTree);
+
+            firstRoot.Name = "Same";
+
+            var result = rule.CanWrite(secondRoot, nameof(TreeRootModel.Name), "Same");
+
+            Assert.False(result);
+        }
+
+        [Fact]
         public void InheritedAttributeName_Should_Not_Be_Prepared_By_Name_Rule()
         {
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
@@ -291,6 +308,12 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         private static TreeRootModel CreateRoot()
         {
             var tree = new FakeWorkingTreeModel();
+            tree.OwningShrub.AddContent(tree);
+            return CreateRoot(tree);
+        }
+
+        private static TreeRootModel CreateRoot(WorkingTreeModel tree)
+        {
             return new TreeRootModel(Guid.NewGuid(), tree, new FakeNotificationService(), new EmptyPropertiesPolicy<TreeRootModel>());
         }
 

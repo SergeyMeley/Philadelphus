@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
@@ -24,7 +25,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         {
             return new NameUniquenessStrategy<TreeRootModel>(
                 reservedPropertyTypes: GetReservedPropertyTypes<TreeRootModel>(),
-                getNamedItems: model => GetWorkingTreeNamedItems(model.OwningWorkingTree));
+                getNamedItems: model => GetShrubRootNamedItems(model.OwningShrub));
         }
 
         public static INameUniquenessStrategy<TreeNodeModel> TreeNode()
@@ -93,6 +94,20 @@ namespace Philadelphus.Core.Domain.Policies.Rules
 
             foreach (var item in model.ContentAttributes)
                 yield return ToNamedItem(item);
+        }
+
+        private static IEnumerable<NamedItem> GetShrubRootNamedItems(ShrubModel model)
+        {
+            if (model == null)
+                yield break;
+
+            foreach (var tree in model.ContentWorkingTrees)
+            {
+                if (tree.ContentRoot != null)
+                {
+                    yield return ToNamedItem(tree.ContentRoot);
+                }
+            }
         }
 
         private static IEnumerable<NamedItem> GetParentNamedItems(IParentModel parent)
