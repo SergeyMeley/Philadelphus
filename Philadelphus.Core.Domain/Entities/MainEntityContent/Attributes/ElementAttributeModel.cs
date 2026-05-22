@@ -114,12 +114,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Признак того, что одиночное значение унаследованного атрибута отличается от родительского.
         /// </summary>
-        public bool IsValueOverridden => _isOwn == false && _isValueOverridden;
+        public bool IsValueOverridden => _isOwn == false
+            && IsParentOverrideForbidden() == false
+            && _isValueOverridden;
 
         /// <summary>
         /// Признак того, что коллекция значений унаследованного атрибута отличается от родительской.
         /// </summary>
-        public bool AreValuesOverridden => _isOwn == false && _areValuesOverridden;
+        public bool AreValuesOverridden => _isOwn == false
+            && IsParentOverrideForbidden() == false
+            && _areValuesOverridden;
 
         /// <summary>
         /// Коллекция допустимых значений (листы выбранного узла дерева репозитория Чубушника)
@@ -544,7 +548,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeLeaveModel GetEffectiveValue()
         {
             if (_isOwn == false
-                && _isValueOverridden == false
+                && (IsParentOverrideForbidden() || _isValueOverridden == false)
                 && _inheritedAttributeFromParent != null)
             {
                 return _inheritedAttributeFromParent.Value;
@@ -560,13 +564,22 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private IReadOnlyList<TreeLeaveModel> GetEffectiveValues()
         {
             if (_isOwn == false
-                && _areValuesOverridden == false
+                && (IsParentOverrideForbidden() || _areValuesOverridden == false)
                 && _inheritedAttributeFromParent != null)
             {
                 return _inheritedAttributeFromParent.Values;
             }
 
             return _values.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Проверить, запрещает ли родительский атрибут локальное переопределение у наследника.
+        /// </summary>
+        /// <returns>true, если родительский атрибут запрещает переопределение; иначе false.</returns>
+        private bool IsParentOverrideForbidden()
+        {
+            return _inheritedAttributeFromParent?.Override == OverrideType.Sealed;
         }
 
         /// <summary>

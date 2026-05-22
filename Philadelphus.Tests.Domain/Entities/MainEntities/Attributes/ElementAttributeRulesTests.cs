@@ -167,6 +167,49 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         }
 
         [Fact]
+        public void InheritedAttributeValue_Should_Return_Parent_Value_When_Parent_Override_Is_Forbidden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.Value = firstValue;
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+            inheritedAttribute.Value = secondValue;
+
+            Assert.Same(secondValue, inheritedAttribute.Value);
+
+            parentAttribute.Override = OverrideType.Sealed;
+
+            Assert.Same(firstValue, inheritedAttribute.Value);
+            Assert.False(inheritedAttribute.IsValueOverridden);
+        }
+
+        [Fact]
+        public void InheritedAttributeValues_Should_Return_Parent_Values_When_Parent_Override_Is_Forbidden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.IsCollectionValue = true;
+            parentAttribute.TryAddValueToValuesCollection(firstValue);
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+            inheritedAttribute.TryRemoveValueFromValuesCollection(firstValue);
+            parentAttribute.TryAddValueToValuesCollection(secondValue);
+
+            Assert.Empty(inheritedAttribute.Values);
+
+            parentAttribute.Override = OverrideType.Sealed;
+
+            Assert.Contains(firstValue, inheritedAttribute.Values);
+            Assert.Contains(secondValue, inheritedAttribute.Values);
+            Assert.False(inheritedAttribute.AreValuesOverridden);
+        }
+
+        [Fact]
         public void ReservedName_Should_Block_ElementAttribute_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
