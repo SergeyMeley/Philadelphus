@@ -2,6 +2,7 @@ using FluentAssertions;
 using AutoMapper;
 using Moq;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Policies;
@@ -406,10 +407,79 @@ public class SystemBaseTreeNodeModelTests
             && x.Contains("Истина"));
     }
 
+    [Fact]
+    public void SystemBaseTreeNode_BlocksAttributeEditing()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var attribute = CreateAttribute(tree, notificationService);
+
+        node.AddAttribute(attribute).Should().BeFalse();
+        node.RemoveAttribute(attribute).Should().BeFalse();
+        node.ClearAttributes().Should().BeFalse();
+    }
+
+    [Fact]
+    public void SystemBaseTreeLeave_BlocksAttributeEditing()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var leave = new SystemBaseTreeLeaveModel(
+            Guid.NewGuid(),
+            node,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var attribute = CreateAttribute(tree, notificationService);
+
+        leave.AddAttribute(attribute).Should().BeFalse();
+        leave.RemoveAttribute(attribute).Should().BeFalse();
+        leave.ClearAttributes().Should().BeFalse();
+    }
+
     public static IEnumerable<object[]> SystemBaseTypes()
     {
         return Enum.GetValues<SystemBaseType>()
             .Where(x => x != SystemBaseType.USER_DEFINED)
             .Select(x => new object[] { x });
+    }
+
+    private static ElementAttributeModel CreateAttribute(
+        FakeWorkingTreeModel owner,
+        FakeNotificationService notificationService)
+    {
+        var uuid = Guid.NewGuid();
+
+        return new ElementAttributeModel(
+            uuid,
+            owner,
+            uuid,
+            owner,
+            owner,
+            notificationService,
+            new EmptyPropertiesPolicy<ElementAttributeModel>());
     }
 }
