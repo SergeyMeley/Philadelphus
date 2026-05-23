@@ -135,6 +135,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 IsReadOnly = column.IsReadOnly,
                 Width = DataGridLength.Auto,
                 MinWidth = column.IsAttribute ? 120 : 80,
+                CellStyle = column.IsAttribute ? CreateAttributeCellStyle(column) : null,
                 ElementStyle = CreateComboBoxStyle(itemsSourceBinding),
                 EditingElementStyle = CreateComboBoxStyle(itemsSourceBinding),
             };
@@ -163,7 +164,28 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 IsReadOnly = column.IsReadOnly,
                 Width = DataGridLength.Auto,
                 MinWidth = column.IsAttribute ? 120 : 80,
+                CellStyle = column.IsAttribute ? CreateAttributeCellStyle(column) : null,
             };
+        }
+
+        /// <summary>
+        /// Создает стиль ячейки атрибута с индикацией локального переопределения значения.
+        /// </summary>
+        private static Style CreateAttributeCellStyle(ChildCollectionTableColumn column)
+        {
+            var style = new Style(typeof(DataGridCell));
+            var trigger = new DataTrigger
+            {
+                Binding = new Binding($"ValueOverrideStates[{column.BindingKey}]"),
+                Value = true,
+            };
+            trigger.Setters.Add(new Setter(Control.BackgroundProperty, System.Windows.Media.Brushes.Moccasin));
+            trigger.Setters.Add(new Setter(
+                FrameworkElement.ToolTipProperty,
+                new Binding($"ValueOverrideToolTips[{column.BindingKey}]")));
+            style.Triggers.Add(trigger);
+
+            return style;
         }
 
         private static Style CreateComboBoxStyle(Binding itemsSourceBinding)

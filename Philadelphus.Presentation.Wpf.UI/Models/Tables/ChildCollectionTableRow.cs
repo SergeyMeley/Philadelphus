@@ -18,6 +18,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
         private readonly IReadOnlyDictionary<string, Func<object?, object?>?> _setters;
         private readonly Dictionary<string, IEnumerable<object>?> _valueOptions;
         private readonly IReadOnlyDictionary<string, Func<object?>> _refreshers;
+        private readonly Dictionary<string, bool> _valueOverrideStates;
+        private readonly IReadOnlyDictionary<string, Func<bool>> _valueOverrideStateRefreshers;
+        private readonly Dictionary<string, string?> _valueOverrideToolTips;
+        private readonly IReadOnlyDictionary<string, Func<string?>> _valueOverrideToolTipRefreshers;
         private readonly IReadOnlyDictionary<string, string> _keyAliases;
         private readonly IReadOnlyDictionary<string, string> _logicalKeys;
 
@@ -28,7 +32,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
             IReadOnlyDictionary<string, Func<object?>>? refreshers = null,
             IReadOnlyDictionary<string, string>? keyAliases = null,
             Guid sourceUuid = default,
-            Action<Guid, string>? cellChanged = null)
+            Action<Guid, string>? cellChanged = null,
+            IReadOnlyDictionary<string, bool>? valueOverrideStates = null,
+            IReadOnlyDictionary<string, Func<bool>>? valueOverrideStateRefreshers = null,
+            IReadOnlyDictionary<string, string?>? valueOverrideToolTips = null,
+            IReadOnlyDictionary<string, Func<string?>>? valueOverrideToolTipRefreshers = null)
         {
             ArgumentNullException.ThrowIfNull(cells);
 
@@ -42,6 +50,18 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
             _refreshers = refreshers == null
                 ? new ReadOnlyDictionary<string, Func<object?>>(new Dictionary<string, Func<object?>>())
                 : new ReadOnlyDictionary<string, Func<object?>>(new Dictionary<string, Func<object?>>(refreshers));
+            _valueOverrideStates = valueOverrideStates == null
+                ? new Dictionary<string, bool>()
+                : new Dictionary<string, bool>(valueOverrideStates);
+            _valueOverrideStateRefreshers = valueOverrideStateRefreshers == null
+                ? new ReadOnlyDictionary<string, Func<bool>>(new Dictionary<string, Func<bool>>())
+                : new ReadOnlyDictionary<string, Func<bool>>(new Dictionary<string, Func<bool>>(valueOverrideStateRefreshers));
+            _valueOverrideToolTips = valueOverrideToolTips == null
+                ? new Dictionary<string, string?>()
+                : new Dictionary<string, string?>(valueOverrideToolTips);
+            _valueOverrideToolTipRefreshers = valueOverrideToolTipRefreshers == null
+                ? new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>())
+                : new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>(valueOverrideToolTipRefreshers));
             _keyAliases = keyAliases == null
                 ? new ReadOnlyDictionary<string, string>(new Dictionary<string, string>())
                 : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(keyAliases));
@@ -52,6 +72,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
 
             Cells = new ReadOnlyDictionary<string, object?>(_cells);
             ValueOptions = new ReadOnlyDictionary<string, IEnumerable<object>?>(_valueOptions);
+            ValueOverrideStates = new ReadOnlyDictionary<string, bool>(_valueOverrideStates);
+            ValueOverrideToolTips = new ReadOnlyDictionary<string, string?>(_valueOverrideToolTips);
             SourceUuid = sourceUuid;
             CellChanged = cellChanged;
         }
@@ -72,6 +94,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
         /// Допустимые значения combo-box ячеек, индексированные техническими binding-ключами.
         /// </summary>
         public IReadOnlyDictionary<string, IEnumerable<object>?> ValueOptions { get; }
+
+        /// <summary>
+        /// Признаки переопределения значений атрибутов, индексированные техническими binding-ключами.
+        /// </summary>
+        public IReadOnlyDictionary<string, bool> ValueOverrideStates { get; }
+
+        /// <summary>
+        /// Подсказки переопределения значений атрибутов, индексированные техническими binding-ключами.
+        /// </summary>
+        public IReadOnlyDictionary<string, string?> ValueOverrideToolTips { get; }
 
         private Action<Guid, string>? CellChanged { get; }
 
@@ -110,8 +142,20 @@ namespace Philadelphus.Presentation.Wpf.UI.Models.Tables
                     _cells[refresher.Key] = refresher.Value();
                 }
 
+                foreach (var refresher in _valueOverrideStateRefreshers)
+                {
+                    _valueOverrideStates[refresher.Key] = refresher.Value();
+                }
+
+                foreach (var refresher in _valueOverrideToolTipRefreshers)
+                {
+                    _valueOverrideToolTips[refresher.Key] = refresher.Value();
+                }
+
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Cells)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideStates)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideToolTips)));
                 CellChanged?.Invoke(SourceUuid, ResolveLogicalKey(cellKey));
             }
         }

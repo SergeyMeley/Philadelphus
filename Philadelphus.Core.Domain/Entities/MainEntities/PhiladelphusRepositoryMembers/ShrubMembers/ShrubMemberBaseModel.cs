@@ -266,11 +266,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             lock (_lockObject)
             {
-                if (_attributes.Any(x => x.Uuid == attribute.Uuid))
+                var remItem = _attributes.FirstOrDefault(x => x.Uuid == attribute.Uuid);
+                if (remItem == null)
                     return false;
 
-                _attributes.Remove(attribute);
-                _version++;
+                _attributes.Remove(remItem);
+                ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
                 return true;
             }
         }

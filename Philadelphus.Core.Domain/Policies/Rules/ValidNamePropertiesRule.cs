@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Policies.Rules
 {
@@ -55,7 +56,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
             // Это защищает табличные представления и импорт/экспорт, где имя атрибута может использоваться как ключ.
             var reservedNames = _strategy.ReservedPropertyTypes
                 .SelectMany(x => x.GetProperties())
-                .Select(x => x.Name)
+                .SelectMany(GetReservedPropertyNames)
                 .ToHashSet(StringComparer.Ordinal);
 
             if (reservedNames.Contains(newName))
@@ -118,7 +119,9 @@ namespace Philadelphus.Core.Domain.Policies.Rules
             if (value == null)
                 return string.Empty;
 
-            return new string(value.Where(x => IsInvalidNameCharacter(x) == false).ToArray()).Trim();
+            var valueWithoutInvalidCharacters = new string(value.Where(x => IsInvalidNameCharacter(x) == false).ToArray());
+
+            return CollapseSpaces(valueWithoutInvalidCharacters.Trim());
         }
 
         public object OnRead(T model, string prop, object value)
@@ -156,6 +159,21 @@ namespace Philadelphus.Core.Domain.Policies.Rules
             return value.Where(IsInvalidNameCharacter).Distinct();
         }
 
+        private static IEnumerable<string> GetReservedPropertyNames(System.Reflection.PropertyInfo property)
+        {
+            yield return property.Name;
+
+            var displayName = property.GetCustomAttributes(typeof(DisplayAttribute), inherit: true)
+                .OfType<DisplayAttribute>()
+                .FirstOrDefault()
+                ?.Name;
+
+            if (string.IsNullOrWhiteSpace(displayName) == false)
+            {
+                yield return displayName;
+            }
+        }
+
         private static bool IsInvalidNameCharacter(char value)
         {
             // Список намеренно является списком запрещенных символов, а не белым списком допустимых.
@@ -166,8 +184,37 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 || value == '['
                 || value == ']'
                 || value == '~'
-                || value == '&'
-                || value == '%';
+                || value == '&';
+        }
+
+        private static string CollapseSpaces(string value)
+        {
+            if (value.Length == 0)
+                return value;
+
+            var result = new System.Text.StringBuilder(value.Length);
+            var previousWasSpace = false;
+
+            foreach (var character in value)
+            {
+                if (character == ' ')
+                {
+                    if (previousWasSpace)
+                    {
+                        continue;
+                    }
+
+                    previousWasSpace = true;
+                }
+                else
+                {
+                    previousWasSpace = false;
+                }
+
+                result.Append(character);
+            }
+
+            return result.ToString();
         }
 
         private static string FormatCharacters(IEnumerable<char> values)

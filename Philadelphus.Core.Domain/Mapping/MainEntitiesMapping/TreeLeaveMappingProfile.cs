@@ -34,6 +34,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.Uuid, opt => opt.MapFrom(src => src.Uuid))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.StringValue, opt => opt.MapFrom(src => src.StringValue))
                 .ForMember(dest => dest.Sequence, opt => opt.MapFrom(src => src.Sequence))
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(src => src.Alias))
                 .ForMember(dest => dest.CustomCode, opt => opt.MapFrom(src => src.CustomCode))
@@ -89,6 +90,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.StringValue, opt => opt.MapFrom(src => src.StringValue))
                 .ForMember(dest => dest.Sequence, opt => opt.MapFrom(src => src.Sequence))
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(src => src.Alias))
                 .ForMember(dest => dest.CustomCode, opt => opt.MapFrom(src => src.CustomCode))

@@ -111,6 +111,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             {
                 var header = GetAttributeHeader(attribute);
                 var bindingKey = CreateAttributeBindingKey(order, reservedBindingKeys);
+
                 result.Add(new ChildCollectionTableColumn(
                     header,
                     header,
@@ -305,11 +306,38 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                     x => x.BindingKey,
                     x => new Func<object?>(() => x.GetValue(child)));
 
+                var valueOverrideStates = columnsList.ToDictionary(
+                    x => x.BindingKey,
+                    x => IsAttributeValueOverridden(child, x));
+
+                var valueOverrideStateRefreshers = columnsList.ToDictionary(
+                    x => x.BindingKey,
+                    x => new Func<bool>(() => IsAttributeValueOverridden(child, x)));
+
+                var valueOverrideToolTips = columnsList.ToDictionary(
+                    x => x.BindingKey,
+                    x => GetAttributeValueOverrideToolTip(child, x));
+
+                var valueOverrideToolTipRefreshers = columnsList.ToDictionary(
+                    x => x.BindingKey,
+                    x => new Func<string?>(() => GetAttributeValueOverrideToolTip(child, x)));
+
                 var keyAliases = columnsList.ToDictionary(
                     x => x.Key,
                     x => x.BindingKey);
 
-                rows.Add(new ChildCollectionTableRow(cells, setters, valueOptions, refreshers, keyAliases, child.Uuid, cellChanged));
+                rows.Add(new ChildCollectionTableRow(
+                    cells,
+                    setters,
+                    valueOptions,
+                    refreshers,
+                    keyAliases,
+                    child.Uuid,
+                    cellChanged,
+                    valueOverrideStates,
+                    valueOverrideStateRefreshers,
+                    valueOverrideToolTips,
+                    valueOverrideToolTipRefreshers));
             }
 
             return rows;
@@ -557,6 +585,67 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             }
 
             return attribute.Value;
+        }
+
+        /// <summary>
+        /// Определяет, переопределено ли значение атрибута для строки таблицы наследников.
+        /// </summary>
+        private static bool IsAttributeValueOverridden(IChildrenModel child, ChildCollectionTableColumn column)
+        {
+            if (column.IsAttribute == false)
+            {
+                return false;
+            }
+
+            var attribute = GetAttribute(child, column.Key);
+            if (attribute == null)
+            {
+                return false;
+            }
+
+            return attribute.IsCollectionValue
+                ? attribute.AreValuesOverridden
+                : attribute.IsValueOverridden;
+        }
+
+        /// <summary>
+        /// Возвращает подсказку для переопределенного значения атрибута в таблице наследников.
+        /// </summary>
+        private static string? GetAttributeValueOverrideToolTip(IChildrenModel child, ChildCollectionTableColumn column)
+        {
+            if (IsAttributeValueOverridden(child, column) == false)
+            {
+                return null;
+            }
+
+            var attribute = GetAttribute(child, column.Key);
+            if (attribute == null)
+            {
+                return null;
+            }
+
+            var parentValue = attribute.IsCollectionValue
+                ? FormatValues(attribute.InheritedAttributeFromParent?.Values)
+                : FormatValue(attribute.InheritedAttributeFromParent?.Value);
+
+            return $"Значение атрибута переопределено относительно родительского атрибута. У родителя: {parentValue}";
+        }
+
+        private static string FormatValue(TreeLeaveModel? value)
+        {
+            return string.IsNullOrWhiteSpace(value?.Name) ? "<не задано>" : value.Name;
+        }
+
+        private static string FormatValues(IEnumerable<TreeLeaveModel>? values)
+        {
+            var names = values?
+                .Select(x => x.Name)
+                .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                .ToArray();
+
+            return names is { Length: > 0 }
+                ? string.Join("; ", names)
+                : "<не задано>";
         }
 
         private static Func<object?, object?>? GetAttributeValueSetter(IChildrenModel child, string attributeName)

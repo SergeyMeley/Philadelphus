@@ -197,6 +197,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             else if (child is TreeLeaveModel l
                 && _childLeaveUuids.Add(child.Uuid))
             {
+                if (IsSystemBaseBoolNode()
+                    && IsPredefinedSystemBaseBoolLeave(l) == false)
+                {
+                    _childLeaveUuids.Remove(child.Uuid);
+                    return false;
+                }
+
                 _childLeaves.Add(l);
                 return true;
             }
@@ -226,6 +233,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             else if (child is TreeLeaveModel l
                 && _childLeaveUuids.Remove(child.Uuid))
             {
+                if (IsSystemBaseBoolNode())
+                {
+                    _childLeaveUuids.Add(child.Uuid);
+                    return false;
+                }
+
                 var remItem = _childLeaves.First(x => x.Uuid == child.Uuid);
                 _childLeaves.Remove(remItem);
                 return true;
@@ -243,6 +256,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool ClearChilds()
         {
+            if (IsSystemBaseBoolNode()
+                && _childLeaves.Count != 0)
+            {
+                return false;
+            }
+
             _childNodes.Clear();
             _childLeaves.Clear();
             _childNodeUuids.Clear();
@@ -276,6 +295,27 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         protected override bool ClearContentDetailed()
         {
             return true;
+        }
+
+        /// <summary>
+        /// Проверить, является ли узел системным булевым типом с фиксированным набором листьев.
+        /// </summary>
+        /// <returns>true, если узел представляет системный тип bool; иначе false.</returns>
+        private bool IsSystemBaseBoolNode()
+        {
+            return this is SystemBaseTreeNodeModel { SystemBaseType: SystemBaseType.BOOL };
+        }
+
+        /// <summary>
+        /// Проверить, является ли лист предопределенным системным значением bool.
+        /// </summary>
+        /// <param name="leave">Проверяемый лист.</param>
+        /// <returns>true, если лист входит в фиксированный набор системных bool-значений; иначе false.</returns>
+        private static bool IsPredefinedSystemBaseBoolLeave(TreeLeaveModel leave)
+        {
+            return leave is SystemBaseTreeLeaveModel
+                && SystemBaseTreeLeaveModel.IsSystemBaseValue(leave.Uuid)
+                && SystemBaseTreeLeaveModel.GetTypeByUuid(leave.Uuid) == SystemBaseType.BOOL;
         }
 
         #endregion

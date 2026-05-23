@@ -28,6 +28,18 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void TreeNodeName_Should_Block_Class_Property_Display_Name()
+        {
+            var rule = new ValidNamePropertiesRule<TreeNodeModel>(new FakeNotificationService(), NameUniquenessStrategy.TreeNode());
+            var root = CreateRoot();
+            var node = CreateNode(root);
+
+            var result = rule.CanWrite(node, nameof(TreeNodeModel.Name), "\u0421\u0438\u0441\u0442\u0435\u043c\u043d\u044b\u0439 \u0442\u0438\u043f");
+
+            Assert.False(result);
+        }
+
+        [Fact]
         public void TreeNodeName_Should_Block_WorkingTreeMember_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<TreeNodeModel>(new FakeNotificationService(), NameUniquenessStrategy.TreeNode());
@@ -81,14 +93,14 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
 
             node.Name = "  Bad{Name}[~]&%  ";
 
-            Assert.Equal("BadName", node.Name);
+            Assert.Equal("BadName%", node.Name);
             Assert.Contains(notificationService.Messages, x => x.Contains("'{'")
                 && x.Contains("'}'")
                 && x.Contains("'['")
                 && x.Contains("']'")
                 && x.Contains("'~'")
                 && x.Contains("'&'")
-                && x.Contains("'%'"));
+                && x.Contains("'%'") == false);
         }
 
         [Fact]
@@ -109,6 +121,22 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void Name_Should_Collapse_Duplicate_Spaces()
+        {
+            var root = CreateRoot();
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                root.OwningWorkingTree,
+                new FakeNotificationService(),
+                PropertiesPolicyBuilder.CreateTreeNodeDefault(new FakeNotificationService()));
+
+            node.Name = "  Bad   Name  Value  ";
+
+            Assert.Equal("Bad Name Value", node.Name);
+        }
+
+        [Fact]
         public void Name_Should_Block_Empty_Value_After_Removing_Special_Characters()
         {
             var root = CreateRoot();
@@ -120,7 +148,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
                 PropertiesPolicyBuilder.CreateTreeNodeDefault(new FakeNotificationService()));
 
             node.Name = "Old";
-            node.Name = " {}[]~&% ";
+            node.Name = " {}[]~& ";
 
             Assert.Equal("Old", node.Name);
         }
@@ -136,6 +164,23 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             otherTree.Name = "Same";
 
             var result = rule.CanWrite(tree, nameof(WorkingTreeModel.Name), "Same");
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void TreeRootName_Should_Block_Other_Root_Name_In_Shrub()
+        {
+            var rule = new ValidNamePropertiesRule<TreeRootModel>(new FakeNotificationService(), NameUniquenessStrategy.TreeRoot());
+            var shrub = new FakeShrubModel();
+            var firstTree = CreateWorkingTree(shrub);
+            var secondTree = CreateWorkingTree(shrub);
+            var firstRoot = CreateRoot(firstTree);
+            var secondRoot = CreateRoot(secondTree);
+
+            firstRoot.Name = "Same";
+
+            var result = rule.CanWrite(secondRoot, nameof(TreeRootModel.Name), "Same");
 
             Assert.False(result);
         }
@@ -279,6 +324,12 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         private static TreeRootModel CreateRoot()
         {
             var tree = new FakeWorkingTreeModel();
+            tree.OwningShrub.AddContent(tree);
+            return CreateRoot(tree);
+        }
+
+        private static TreeRootModel CreateRoot(WorkingTreeModel tree)
+        {
             return new TreeRootModel(Guid.NewGuid(), tree, new FakeNotificationService(), new EmptyPropertiesPolicy<TreeRootModel>());
         }
 

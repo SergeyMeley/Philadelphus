@@ -62,6 +62,16 @@
                 </DataGridComboBoxColumn>
                 <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}"></DataGridCheckBoxColumn>
                 <DataGridComboBoxColumn Header="Значение" DisplayMemberPath="Name" SelectedItemBinding="{Binding AssignedValue}" SelectedValuePath="Name" IsReadOnly="{Binding IsSingleValue}">
+                    <DataGridComboBoxColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsValueOverridden}" Value="True">
+                                    <Setter Property="Background" Value="Moccasin" />
+                                    <Setter Property="ToolTip" Value="{Binding ValueOverrideToolTip}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridComboBoxColumn.CellStyle>
                     <DataGridComboBoxColumn.ElementStyle>
                         <Style TargetType="ComboBox">
                             <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
@@ -73,7 +83,18 @@
                         </Style>
                     </DataGridComboBoxColumn.EditingElementStyle>
                 </DataGridComboBoxColumn>
-                <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AreValuesOverridden}" Value="True">
+                                    <Setter Property="Background" Value="Moccasin" />
+                                    <Setter Property="ToolTip" Value="{Binding ValuesOverrideToolTip}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridComboBoxColumn Header="Область видимости" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Visibility}" SelectedValuePath="Value">
                     <DataGridComboBoxColumn.ElementStyle>
                         <Style TargetType="ComboBox">

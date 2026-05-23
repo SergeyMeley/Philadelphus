@@ -113,6 +113,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.Shrub
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
+                    b.Property<string>("StringValue")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("<empty>")
+                        .HasColumnName("string_value");
+
                     b.Property<int>("SystemBaseTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")

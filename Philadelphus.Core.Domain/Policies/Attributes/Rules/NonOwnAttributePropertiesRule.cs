@@ -80,6 +80,9 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
             {
                 var inheritedValue = GetInheritedValue(model, prop);
 
+                // Импорт может повторно записывать унаследованные значения в несобственный атрибут.
+                // Это не считается переопределением: запись разрешена только когда входящее значение
+                // точно совпадает со значением, уже унаследованным от родительского атрибута.
                 if (Equals(inheritedValue, value))
                 {
                     return true;

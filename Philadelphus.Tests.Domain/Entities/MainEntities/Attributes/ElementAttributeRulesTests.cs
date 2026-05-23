@@ -107,12 +107,126 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         }
 
         [Fact]
+        public void RequiredOverride_Should_Block_Adding_Value_To_Values()
+        {
+            var policy = AttributePolicyBuilder.CreateDefault(new FakeNotificationService());
+            var owner = new FakeWorkingTreeModel();
+            var model = CreateOwnAttribute(owner, policy);
+            var value = CreateLeave(owner);
+
+            model.IsCollectionValue = true;
+            model.Override = OverrideType.Abstract;
+
+            var result = model.TryAddValueToValuesCollection(value);
+
+            Assert.False(result);
+            Assert.Empty(model.Values);
+        }
+
+        [Fact]
+        public void InheritedAttributeValue_Should_Follow_Parent_Until_Overridden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.Value = firstValue;
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+
+            parentAttribute.Value = secondValue;
+
+            Assert.Same(secondValue, inheritedAttribute.Value);
+
+            inheritedAttribute.Value = firstValue;
+            parentAttribute.Value = secondValue;
+
+            Assert.Same(firstValue, inheritedAttribute.Value);
+        }
+
+        [Fact]
+        public void InheritedAttributeValues_Should_Follow_Parent_Until_Overridden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.IsCollectionValue = true;
+            parentAttribute.TryAddValueToValuesCollection(firstValue);
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+
+            parentAttribute.TryAddValueToValuesCollection(secondValue);
+
+            Assert.Contains(secondValue, inheritedAttribute.Values);
+
+            inheritedAttribute.TryRemoveValueFromValuesCollection(secondValue);
+            parentAttribute.ClearValuesCollection();
+
+            Assert.Contains(firstValue, inheritedAttribute.Values);
+        }
+
+        [Fact]
+        public void InheritedAttributeValue_Should_Return_Parent_Value_When_Parent_Override_Is_Forbidden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.Value = firstValue;
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+            inheritedAttribute.Value = secondValue;
+
+            Assert.Same(secondValue, inheritedAttribute.Value);
+
+            parentAttribute.Override = OverrideType.Sealed;
+
+            Assert.Same(firstValue, inheritedAttribute.Value);
+            Assert.False(inheritedAttribute.IsValueOverridden);
+        }
+
+        [Fact]
+        public void InheritedAttributeValues_Should_Return_Parent_Values_When_Parent_Override_Is_Forbidden()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var parentAttribute = CreateOwnAttribute(owner);
+            var firstValue = CreateLeave(owner);
+            var secondValue = CreateLeave(owner);
+
+            parentAttribute.IsCollectionValue = true;
+            parentAttribute.TryAddValueToValuesCollection(firstValue);
+            var inheritedAttribute = parentAttribute.CloneForChild(owner);
+            inheritedAttribute.TryRemoveValueFromValuesCollection(firstValue);
+            parentAttribute.TryAddValueToValuesCollection(secondValue);
+
+            Assert.Empty(inheritedAttribute.Values);
+
+            parentAttribute.Override = OverrideType.Sealed;
+
+            Assert.Contains(firstValue, inheritedAttribute.Values);
+            Assert.Contains(secondValue, inheritedAttribute.Values);
+            Assert.False(inheritedAttribute.AreValuesOverridden);
+        }
+
+        [Fact]
         public void ReservedName_Should_Block_ElementAttribute_Property_Name()
         {
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
             var model = CreateOwnAttribute(new FakeWorkingTreeModel());
 
             var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), nameof(ElementAttributeModel.Value));
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReservedName_Should_Block_WorkingTreeMember_Property_Display_Name()
+        {
+            var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
+            var model = CreateOwnAttribute(new FakeWorkingTreeModel());
+
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), "\u041a\u043e\u0434");
 
             Assert.False(result);
         }
@@ -158,7 +272,21 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             Assert.True(result);
         }
 
-        private static ElementAttributeModel CreateOwnAttribute(FakeWorkingTreeModel owner)
+        [Fact]
+        public void RemoveAttribute_Should_Remove_Existing_Attribute()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var attribute = CreateOwnAttribute(owner);
+
+            var result = owner.RemoveAttribute(attribute);
+
+            Assert.True(result);
+            Assert.DoesNotContain(owner.Attributes, x => x.Uuid == attribute.Uuid);
+        }
+
+        private static ElementAttributeModel CreateOwnAttribute(
+            FakeWorkingTreeModel owner,
+            IPropertiesPolicy<ElementAttributeModel>? propertiesPolicy = null)
         {
             var uuid = Guid.NewGuid();
 
@@ -169,7 +297,29 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
                 owner,
                 owner,
                 new FakeNotificationService(),
-                new EmptyPropertiesPolicy<ElementAttributeModel>());
+                propertiesPolicy ?? new EmptyPropertiesPolicy<ElementAttributeModel>());
+        }
+
+        private static TreeLeaveModel CreateLeave(FakeWorkingTreeModel tree)
+        {
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            return new TreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
         }
     }
 }

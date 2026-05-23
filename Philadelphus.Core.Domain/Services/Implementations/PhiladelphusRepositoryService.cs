@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
@@ -598,6 +599,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
         }
 
+        private static string GetDefaultSystemBaseLeaveStringValue(SystemBaseType type)
+        {
+            return type switch
+            {
+                SystemBaseType.STRING => TreeLeaveModel.EmptyStringValue,
+                SystemBaseType.INTEGER => "0",
+                SystemBaseType.NUMERIC or SystemBaseType.FLOAT or SystemBaseType.MONEY => "0.0",
+                SystemBaseType.BOOL => "false",
+                SystemBaseType.DATETIME => "1970-01-01T00:00:00+00:00",
+                SystemBaseType.DATE => "1970-01-01",
+                SystemBaseType.TIME => "00:00:00",
+                SystemBaseType.OBJECT => TreeLeaveModel.EmptyStringValue,
+                _ => TreeLeaveModel.EmptyStringValue,
+            };
+        }
+
         /// <summary>
         /// Создать корень и добавить родителю
         /// </summary>
@@ -726,6 +743,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         criticalLevel: NotificationCriticalLevelModel.Info);
                 }
 
+                // Узел BOOL обслуживается как системный справочник с двумя предопределенными листьями:
+                // "Истина" и "Ложь". Пользовательское расширение этого набора нарушит семантику bool.
+                if (parent is SystemBaseTreeNodeModel { SystemBaseType: SystemBaseType.BOOL })
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Создание листа в узле логических значений запрещено. Для типа BOOL допустимы только предопределенные значения 'Истина' и 'Ложь'.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return null;
+                }
+
                 TreeLeaveModel result = null;
                 if (parent is SystemBaseTreeNodeModel sbn)
                 {
@@ -747,7 +774,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
                 }
 
-                if (needAutoName)
+                if (result is SystemBaseTreeLeaveModel systemBaseLeave)
+                {
+                    // У системного листа валидируемым значением является StringValue, а не автоимя.
+                    // Поэтому при создании сразу задаем корректный дефолт для его SystemBaseType, если такой
+                    // дефолт существует без обращения к пользовательскому ресурсу. Например, для FILE нельзя
+                    // безопасно выбрать универсальный путь, поэтому значение остается пустым до выбора файла.
+                    var defaultValue = GetDefaultSystemBaseLeaveStringValue(systemBaseLeave.SystemBaseType);
+                    if (SystemBaseStringValueValidator.IsValid(systemBaseLeave.SystemBaseType, defaultValue, out _))
+                    {
+                        systemBaseLeave.StringValue = defaultValue;
+                    }
+                }
+                else if (needAutoName)
                 {
                     result.AssignAutoName();
                 }
@@ -888,6 +927,27 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     return false;
                 }
 
+                // TODO #65206730: Тех. долг. Проанализировать корректный сценарий удаления атрибута,
+                // если от него уже созданы унаследованные атрибуты у дочерних элементов.
+                if (element is ElementAttributeModel attribute
+                    && HasInheritedAttributesInDescendants(attribute))
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление атрибута '{attribute.Name}' невозможно. Атрибут уже унаследован дочерними элементами. Требуется отдельный анализ правил удаления унаследованных атрибутов.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
+                // Логические системные листья нельзя удалять: на них могут ссылаться атрибуты,
+                // а сам набор значений должен оставаться полным и предсказуемым.
+                if (element is SystemBaseTreeLeaveModel { SystemBaseType: SystemBaseType.BOOL } boolLeave)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление логического значения '{boolLeave.StringValue}' запрещено. Для типа BOOL допустимы только предопределенные значения 'Истина' и 'Ложь'.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
                 long result = 0;
                 if (element is IMainEntityWritableModel me)
                 {
@@ -971,7 +1031,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         {
             var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid);
             if (existTree != null)
-                return false;
+                return EnsureSystemBaseTypes(existTree);
 
             var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
                 .SelectTreeAggregates(new Guid[] { WorkingTreeModel.SystemBaseUuid });
@@ -981,6 +1041,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             {
                 shrub.ContentWorkingTrees.Add(existTree);
                 shrub.ContentWorkingTreesUuids.Add(existTree.Uuid);
+                EnsureSystemBaseTypes(existTree);
                 return true;
             }
 
@@ -1007,19 +1068,122 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             tree.ContentRoot = root;
 
-            var obj = new SystemBaseTreeNodeModel(root, tree, SystemBaseType.OBJECT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var str = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.STRING, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var num = new SystemBaseTreeNodeModel(obj, tree, SystemBaseType.NUMERIC, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var integer = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.INTEGER, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            var flt = new SystemBaseTreeNodeModel(num, tree, SystemBaseType.FLOAT, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
+            EnsureSystemBaseTypes(tree);
 
             shrub.ContentWorkingTrees.Add(tree);
             shrub.ContentWorkingTreesUuids.Add(tree.Uuid);
             return true;
+        }
+
+        /// <summary>
+        /// Инициализировать недостающие системные базовые типы и их предопределенные значения.
+        /// </summary>
+        /// <param name="tree">Системное рабочее дерево.</param>
+        /// <returns>Признак изменения дерева.</returns>
+        private bool EnsureSystemBaseTypes(
+            WorkingTreeModel tree)
+        {
+            ArgumentNullException.ThrowIfNull(tree);
+
+            var root = tree.ContentRoot
+                ?? throw new InvalidOperationException("Системное рабочее дерево должно иметь корень.");
+
+            var changed = false;
+
+            var obj = GetOrCreateSystemBaseNode(tree, root, SystemBaseType.OBJECT, ref changed);
+
+            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.STRING, ref changed);
+            var boolean = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.BOOL, ref changed);
+            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.FILE, ref changed);
+
+            var num = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.NUMERIC, ref changed);
+
+            GetOrCreateSystemBaseNode(tree, num, SystemBaseType.INTEGER, ref changed);
+            GetOrCreateSystemBaseNode(tree, num, SystemBaseType.FLOAT, ref changed);
+            GetOrCreateSystemBaseNode(tree, num, SystemBaseType.MONEY, ref changed);
+
+            var dateTime = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.DATETIME, ref changed);
+
+            GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.DATE, ref changed);
+            GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.TIME, ref changed);
+
+            // Значения логического типа хранятся системными листьями под узлом BOOL.
+            foreach (var value in SystemBaseTreeLeaveModel.GetValuesByType(SystemBaseType.BOOL))
+            {
+                GetOrCreateSystemBaseLeave(tree, boolean, value, ref changed);
+            }
+
+            return changed;
+        }
+
+        /// <summary>
+        /// Получить существующий системный узел или создать его с предопределенными свойствами.
+        /// </summary>
+        /// <param name="tree">Системное рабочее дерево.</param>
+        /// <param name="parent">Родительский элемент системного узла.</param>
+        /// <param name="type">Системный базовый тип.</param>
+        /// <param name="changed">Признак изменения дерева.</param>
+        /// <returns>Системный узел.</returns>
+        private SystemBaseTreeNodeModel GetOrCreateSystemBaseNode(
+            WorkingTreeModel tree,
+            IParentModel parent,
+            SystemBaseType type,
+            ref bool changed)
+        {
+            var existing = tree.ContentNodes
+                .OfType<SystemBaseTreeNodeModel>()
+                .SingleOrDefault(x => x.SystemBaseType == type);
+
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            changed = true;
+            return new SystemBaseTreeNodeModel(
+                parent,
+                tree,
+                type,
+                _notificationService,
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+        }
+
+        /// <summary>
+        /// Получить существующий системный лист или создать его с предопределенными свойствами.
+        /// </summary>
+        /// <param name="tree">Системное рабочее дерево.</param>
+        /// <param name="parent">Родительский системный узел.</param>
+        /// <param name="value">Строковое значение системного листа.</param>
+        /// <param name="changed">Признак изменения дерева.</param>
+        /// <returns>Системный лист.</returns>
+        private SystemBaseTreeLeaveModel GetOrCreateSystemBaseLeave(
+            WorkingTreeModel tree,
+            SystemBaseTreeNodeModel parent,
+            string value,
+            ref bool changed)
+        {
+            // Ищем лист по UUID, чтобы сохранить те же правила идемпотентной инициализации, что и для узлов.
+            var uuid = SystemBaseTreeLeaveModel.GetUuidByValue(parent.SystemBaseType, value);
+            var existing = tree.ContentLeaves
+                .OfType<SystemBaseTreeLeaveModel>()
+                .SingleOrDefault(x => x.Uuid == uuid);
+
+            if (existing != null)
+            {
+                existing.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
+                return existing;
+            }
+
+            changed = true;
+            var result = new SystemBaseTreeLeaveModel(
+                parent,
+                tree,
+                value,
+                _notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+            result.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
+
+            return result;
         }
 
         /// <summary>
@@ -1273,6 +1437,32 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Регистрация имен
             tree.ContentAttributes.ToList().ForEach(x => tree.UnavailableNames.Add(x.Name));
+        }
+
+        /// <summary>
+        /// Проверить, есть ли у атрибута унаследованные копии у дочерних элементов.
+        /// </summary>
+        private bool HasInheritedAttributesInDescendants(ElementAttributeModel attribute)
+        {
+            if (attribute.Owner is not IParentModel parent)
+                return false;
+
+            return parent.Childs.Values.Any(x => HasInheritedAttributeInBranch(x, attribute.DeclaringUuid));
+        }
+
+        /// <summary>
+        /// Проверить ветку наследования на наличие унаследованной копии атрибута.
+        /// </summary>
+        private bool HasInheritedAttributeInBranch(IChildrenModel child, Guid declaringUuid)
+        {
+            if (child is IAttributeOwnerModel attributeOwner
+                && attributeOwner.Attributes.Any(x => x.IsOwn == false && x.DeclaringUuid == declaringUuid))
+            {
+                return true;
+            }
+
+            return child is IParentModel parent
+                && parent.Childs.Values.Any(x => HasInheritedAttributeInBranch(x, declaringUuid));
         }
 
         #endregion

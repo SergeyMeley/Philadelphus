@@ -11,6 +11,13 @@
              xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Philadelphus.Presentation.Wpf.UI;component/Views/Controls/SystemBaseValueEditors/SystemBaseValueEditorResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid IsEnabled="{Binding IsRepositoryContentEnabled}">
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -99,7 +106,11 @@
                                 <RowDefinition Height="auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Значение" Margin="1"></TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1" DataContext="{Binding SelectedRepositoryMember}" Text="{Binding StringValue}" Margin="1"></TextBox>
+                            <ContentControl Grid.Row="0"
+                                            Grid.Column="1"
+                                            Content="{Binding SelectedRepositoryMember}"
+                                            Margin="1"
+                                            Style="{StaticResource SystemBaseValueEditorContentControlStyle}" />
                         </Grid>
                     </TabItem>
                     <TabItem Header="Атрибуты">

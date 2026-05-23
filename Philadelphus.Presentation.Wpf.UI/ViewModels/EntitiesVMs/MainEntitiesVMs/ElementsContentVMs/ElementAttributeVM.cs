@@ -50,6 +50,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                     OnPropertyChanged(nameof(AssignedValue)); 
                     _assignedValues = null;
                     OnPropertyChanged(nameof(AssignedValues));
+                    OnPropertyChanged(nameof(IsValueOverridden));
+                    OnPropertyChanged(nameof(ValueOverrideToolTip));
+                    OnPropertyChanged(nameof(AreValuesOverridden));
+                    OnPropertyChanged(nameof(ValuesOverrideToolTip));
                 }
                 
             }
@@ -82,6 +86,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 }
                 _model.IsCollectionValue = value;
                 OnPropertyChanged(nameof(IsCollectionValue));
+                OnPropertyChanged(nameof(IsValueOverridden));
+                OnPropertyChanged(nameof(ValueOverrideToolTip));
+                OnPropertyChanged(nameof(AreValuesOverridden));
+                OnPropertyChanged(nameof(ValuesOverrideToolTip));
             }
         }
 
@@ -99,8 +107,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 }
                 OnPropertyChanged(nameof(State));
                 OnPropertyChanged(nameof(AssignedValue));
+                OnPropertyChanged(nameof(IsValueOverridden));
+                OnPropertyChanged(nameof(ValueOverrideToolTip));
             }
         }
+
+        /// <summary>
+        /// Признак переопределения одиночного значения относительно родительского атрибута.
+        /// </summary>
+        public bool IsValueOverridden => _model.IsValueOverridden;
+
+        /// <summary>
+        /// Подсказка переопределения одиночного значения.
+        /// </summary>
+        public string ValueOverrideToolTip => _model.IsValueOverridden
+            ? $"Значение переопределено относительно родительского атрибута. У родителя: {FormatValue(_model.InheritedAttributeFromParent?.Value)}"
+            : "Значение наследуется от родительского атрибута";
+
         public ReadOnlyObservableCollection<TreeLeaveModel> AssignedValues 
         {
             get
@@ -119,6 +142,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         {
             get => string.Join("; ", _assignedValues?.Select(x => x.Name) ?? new List<string>());
         }
+
+        /// <summary>
+        /// Признак переопределения коллекции значений относительно родительского атрибута.
+        /// </summary>
+        public bool AreValuesOverridden => _model.AreValuesOverridden;
+
+        /// <summary>
+        /// Подсказка переопределения коллекции значений.
+        /// </summary>
+        public string ValuesOverrideToolTip => _model.AreValuesOverridden
+            ? $"Коллекция значений переопределена относительно родительского атрибута. У родителя: {FormatValues(_model.InheritedAttributeFromParent?.Values)}"
+            : "Коллекция значений наследуется от родительского атрибута";
        
         /// <summary>
         /// Выбранное значение.
@@ -264,6 +299,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 _assignedValues?.Add(SelectedValue);
                 OnPropertyChanged(nameof(AssignedValues)); 
                 OnPropertyChanged(nameof(AssignedValuesString));
+                OnPropertyChanged(nameof(AreValuesOverridden));
+                OnPropertyChanged(nameof(ValuesOverrideToolTip));
                 OnPropertyChanged(nameof(State));
                 return true;
             }
@@ -289,11 +326,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 _assignedValues?.Remove(SelectedValue);
                 OnPropertyChanged(nameof(AssignedValues));
                 OnPropertyChanged(nameof(AssignedValuesString));
+                OnPropertyChanged(nameof(AreValuesOverridden));
+                OnPropertyChanged(nameof(ValuesOverrideToolTip));
                 OnPropertyChanged(nameof(State));
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Получить отображаемое значение родительского атрибута для подсказки.
+        /// </summary>
+        private static string FormatValue(TreeLeaveModel? value)
+        {
+            return string.IsNullOrWhiteSpace(value?.Name) ? "<не задано>" : value.Name;
+        }
+
+        /// <summary>
+        /// Получить отображаемую коллекцию значений родительского атрибута для подсказки.
+        /// </summary>
+        private static string FormatValues(IEnumerable<TreeLeaveModel>? values)
+        {
+            var names = values?
+                .Select(x => x.Name)
+                .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                .ToArray();
+
+            return names is { Length: > 0 }
+                ? string.Join("; ", names)
+                : "<не задано>";
         }
 
         #endregion

@@ -6,6 +6,11 @@
     public class TreeLeave : WorkingTreeMemberBase
     {
         /// <summary>
+        /// Строковое значение листа.
+        /// </summary>
+        public string StringValue { get; set; } = "<empty>";
+
+        /// <summary>
         /// Родительский узел рабочего дерева.
         /// </summary>
         public Guid? ParentTreeNodeUuid { get; set; }
