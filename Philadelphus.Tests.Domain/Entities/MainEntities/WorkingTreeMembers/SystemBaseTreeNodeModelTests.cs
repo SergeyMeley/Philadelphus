@@ -308,6 +308,74 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
+    public void SystemBaseTreeLeave_FileValue_AllowsSupportedReferenceFormats()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.FILE,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
+        var localPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.missing");
+        var fileUri = new Uri(localPath).AbsoluteUri;
+        var externalUri = $"minio://bucket/{Guid.NewGuid():N}";
+        notificationService.Messages.Clear();
+
+        leave.StringValue = localPath;
+        leave.StringValue.Should().Be(localPath);
+
+        leave.StringValue = fileUri;
+        leave.StringValue.Should().Be(fileUri);
+
+        leave.StringValue = externalUri;
+        leave.StringValue.Should().Be(externalUri);
+        notificationService.Messages.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SystemBaseTreeLeave_FileValue_BlocksUnsupportedReferenceFormat()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.FILE,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        var leave = (SystemBaseTreeLeaveModel)service.CreateTreeLeave(node);
+
+        leave.StringValue = "relative-file-name.txt";
+
+        leave.StringValue.Should().Be(TreeLeaveModel.EmptyStringValue);
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("relative-file-name.txt")
+            && x.Contains("FILE")
+            && x.Contains("ссылка на файл"));
+    }
+
+    [Fact]
     public void SystemBaseTreeLeave_FileValue_AllowsExistingLocalFileAsTypedValue()
     {
         var filePath = Path.GetTempFileName();

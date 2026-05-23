@@ -1,4 +1,6 @@
-﻿namespace Philadelphus.Core.Domain.Helpers
+﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+
+namespace Philadelphus.Core.Domain.Helpers
 {
     /// <summary>
     /// Проверяет строковое значение системного типа FILE как сохраняемую ссылку на файловый ресурс.
@@ -11,15 +13,46 @@
     /// </remarks>
     internal static class SystemBaseFileValueValidator
     {
+        private static readonly IReadOnlyCollection<Func<string, bool>> _supportedReferenceFormats =
+        [
+            IsRootedLocalPath,
+            IsFileUri,
+            IsExternalStorageUri
+        ];
+
         /// <summary>
-        /// Проверяет, что значение содержит непустой идентификатор файлового ресурса.
+        /// Проверяет, что значение содержит ссылку на файловый ресурс в одном из поддерживаемых форматов.
         /// </summary>
         /// <param name="value">Проверяемое значение FILE.</param>
-        /// <returns>true, если значение не null, не пустое и не состоит только из пробельных символов; иначе false.</returns>
+        /// <returns>true, если значение является локальным путем, file:// URI или URI внешнего хранилища; иначе false.</returns>
         public static bool IsSupportedReference(string? value)
         {
-            return string.IsNullOrWhiteSpace(value) == false
-                && string.Equals(value, Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeLeaveModel.EmptyStringValue, StringComparison.Ordinal) == false;
+            if (string.IsNullOrWhiteSpace(value)
+                || string.Equals(value, TreeLeaveModel.EmptyStringValue, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return _supportedReferenceFormats.Any(x => x(value));
+        }
+
+        private static bool IsRootedLocalPath(string value)
+        {
+            return Path.IsPathRooted(value)
+                && Uri.TryCreate(value, UriKind.Absolute, out var uri) == false;
+        }
+
+        private static bool IsFileUri(string value)
+        {
+            return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+                && uri.IsFile;
+        }
+
+        private static bool IsExternalStorageUri(string value)
+        {
+            return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+                && uri.IsFile == false
+                && string.IsNullOrWhiteSpace(uri.Scheme) == false;
         }
     }
 }
