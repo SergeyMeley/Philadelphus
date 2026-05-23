@@ -183,6 +183,42 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         }
 
         /// <summary>
+        /// Добавить атрибут, если корень не является системным.
+        /// </summary>
+        /// <param name="attribute">Атрибут.</param>
+        /// <returns>true, если атрибут добавлен; false, если корень системный или операция не выполнена.</returns>
+        public override bool AddAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return IsSystemBase == false
+                && base.AddAttribute(attribute);
+        }
+
+        /// <summary>
+        /// Удалить атрибут, если корень не является системным.
+        /// </summary>
+        /// <param name="attribute">Атрибут.</param>
+        /// <returns>true, если атрибут удален; false, если корень системный или операция не выполнена.</returns>
+        public override bool RemoveAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return IsSystemBase == false
+                && base.RemoveAttribute(attribute);
+        }
+
+        /// <summary>
+        /// Очистить атрибуты, если корень не является системным.
+        /// </summary>
+        /// <returns>true, если атрибуты очищены; false, если корень системный.</returns>
+        public override bool ClearAttributes()
+        {
+            return IsSystemBase == false
+                && base.ClearAttributes();
+        }
+
+        /// <summary>
         /// Добавить содержимое
         /// </summary>
         /// <param name="content">Содержимое</param>

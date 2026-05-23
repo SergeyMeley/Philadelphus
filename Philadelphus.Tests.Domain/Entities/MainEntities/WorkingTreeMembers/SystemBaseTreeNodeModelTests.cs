@@ -513,6 +513,35 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
+    public void SystemBaseWorkingTree_BlocksAttributeEditing()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new TestSystemBaseWorkingTreeModel(notificationService);
+        var attribute = CreateAttribute(tree, notificationService);
+
+        tree.AddAttribute(attribute).Should().BeFalse();
+        tree.RemoveAttribute(attribute).Should().BeFalse();
+        tree.ClearAttributes().Should().BeFalse();
+    }
+
+    [Fact]
+    public void SystemBaseTreeRoot_BlocksAttributeEditing()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            TreeRootModel.SystemBaseUuid,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var attribute = CreateAttribute(tree, notificationService);
+
+        root.AddAttribute(attribute).Should().BeFalse();
+        root.RemoveAttribute(attribute).Should().BeFalse();
+        root.ClearAttributes().Should().BeFalse();
+    }
+
+    [Fact]
     public void TreeLeave_BlocksAttributeEditing()
     {
         var notificationService = new FakeNotificationService();
@@ -579,7 +608,7 @@ public class SystemBaseTreeNodeModelTests
     }
 
     private static ElementAttributeModel CreateAttribute(
-        FakeWorkingTreeModel owner,
+        WorkingTreeModel owner,
         FakeNotificationService notificationService)
     {
         var uuid = Guid.NewGuid();
@@ -592,6 +621,19 @@ public class SystemBaseTreeNodeModelTests
             owner,
             notificationService,
             new EmptyPropertiesPolicy<ElementAttributeModel>());
+    }
+
+    private sealed class TestSystemBaseWorkingTreeModel : WorkingTreeModel
+    {
+        public TestSystemBaseWorkingTreeModel(FakeNotificationService notificationService)
+            : base(
+                WorkingTreeModel.SystemBaseUuid,
+                new FakeDataStorageModel(),
+                new FakeShrubModel(),
+                notificationService,
+                new EmptyPropertiesPolicy<WorkingTreeModel>())
+        {
+        }
     }
 
     private static string GetNonInvariantTemporalValue(SystemBaseType type)

@@ -254,7 +254,43 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         }
 
         /// <summary>
-        /// Получить все узлы рабочего дерева (рекурсивно)
+        /// Добавить атрибут, если рабочее дерево не является системным.
+        /// </summary>
+        /// <param name="attribute">Атрибут.</param>
+        /// <returns>true, если атрибут добавлен; false, если рабочее дерево системное или операция не выполнена.</returns>
+        public override bool AddAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return IsSystemBase == false
+                && base.AddAttribute(attribute);
+        }
+
+        /// <summary>
+        /// Удалить атрибут, если рабочее дерево не является системным.
+        /// </summary>
+        /// <param name="attribute">Атрибут.</param>
+        /// <returns>true, если атрибут удален; false, если рабочее дерево системное или операция не выполнена.</returns>
+        public override bool RemoveAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return IsSystemBase == false
+                && base.RemoveAttribute(attribute);
+        }
+
+        /// <summary>
+        /// Очистить атрибуты, если рабочее дерево не является системным.
+        /// </summary>
+        /// <returns>true, если атрибуты очищены; false, если рабочее дерево системное.</returns>
+        public override bool ClearAttributes()
+        {
+            return IsSystemBase == false
+                && base.ClearAttributes();
+        }
+
+        /// <summary>
+        /// Получить все узлы рабочего дерева (рекурсивно).
         /// </summary>
         /// <returns>Коллекция полученных данных.</returns>
         public IEnumerable<TreeNodeModel> GetAllNodesRecursive()
