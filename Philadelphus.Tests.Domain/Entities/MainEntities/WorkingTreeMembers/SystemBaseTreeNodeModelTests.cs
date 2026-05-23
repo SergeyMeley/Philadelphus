@@ -2,9 +2,11 @@ using FluentAssertions;
 using AutoMapper;
 using Moq;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Builders;
 using Philadelphus.Core.Domain.Services.Implementations;
@@ -481,6 +483,63 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
+    public void SoftDeleteShrubMember_AttributeWithInheritedDescendants_BlocksDeleting()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        ((IMainEntityWritableModel)attribute).SetState(State.SavedOrLoaded);
+
+        node.ParentElementAttributes.Should().ContainSingle(x => x.DeclaringUuid == attribute.DeclaringUuid);
+
+        var result = service.SoftDeleteShrubMember(attribute);
+
+        result.Should().BeFalse();
+        attribute.State.Should().Be(State.SavedOrLoaded);
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("Удаление атрибута")
+            && x.Contains("унаследован"));
+    }
+
+    [Fact]
+    public void SoftDeleteShrubMember_AttributeWithoutInheritedDescendants_AllowsDeleting()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        ((IMainEntityWritableModel)attribute).SetState(State.SavedOrLoaded);
+
+        var result = service.SoftDeleteShrubMember(attribute);
+
+        result.Should().BeTrue();
+        attribute.State.Should().Be(State.ForSoftDelete);
+    }
+
+    [Fact]
     public void SystemBaseBoolNode_BlocksDirectLeafCollectionEditing()
     {
         var notificationService = new FakeNotificationService();
@@ -687,6 +746,23 @@ public class SystemBaseTreeNodeModelTests
             uuid,
             owner,
             owner,
+            notificationService,
+            new EmptyPropertiesPolicy<ElementAttributeModel>());
+    }
+
+    private static ElementAttributeModel CreateAttribute(
+        IAttributeOwnerModel owner,
+        WorkingTreeModel tree,
+        FakeNotificationService notificationService)
+    {
+        var uuid = Guid.NewGuid();
+
+        return new ElementAttributeModel(
+            uuid,
+            owner,
+            uuid,
+            owner,
+            tree,
             notificationService,
             new EmptyPropertiesPolicy<ElementAttributeModel>());
     }

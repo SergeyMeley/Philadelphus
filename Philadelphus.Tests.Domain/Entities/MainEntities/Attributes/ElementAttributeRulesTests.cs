@@ -272,6 +272,18 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             Assert.True(result);
         }
 
+        [Fact]
+        public void RemoveAttribute_Should_Remove_Existing_Attribute()
+        {
+            var owner = new FakeWorkingTreeModel();
+            var attribute = CreateOwnAttribute(owner);
+
+            var result = owner.RemoveAttribute(attribute);
+
+            Assert.True(result);
+            Assert.DoesNotContain(owner.Attributes, x => x.Uuid == attribute.Uuid);
+        }
+
         private static ElementAttributeModel CreateOwnAttribute(
             FakeWorkingTreeModel owner,
             IPropertiesPolicy<ElementAttributeModel>? propertiesPolicy = null)

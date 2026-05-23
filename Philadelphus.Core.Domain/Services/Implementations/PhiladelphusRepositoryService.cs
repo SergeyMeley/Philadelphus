@@ -927,6 +927,17 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     return false;
                 }
 
+                // TODO #65206730: Тех. долг. Проанализировать корректный сценарий удаления атрибута,
+                // если от него уже созданы унаследованные атрибуты у дочерних элементов.
+                if (element is ElementAttributeModel attribute
+                    && HasInheritedAttributesInDescendants(attribute))
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление атрибута '{attribute.Name}' невозможно. Атрибут уже унаследован дочерними элементами. Требуется отдельный анализ правил удаления унаследованных атрибутов.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
                 // Логические системные листья нельзя удалять: на них могут ссылаться атрибуты,
                 // а сам набор значений должен оставаться полным и предсказуемым.
                 if (element is SystemBaseTreeLeaveModel { SystemBaseType: SystemBaseType.BOOL } boolLeave)
@@ -1426,6 +1437,32 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Регистрация имен
             tree.ContentAttributes.ToList().ForEach(x => tree.UnavailableNames.Add(x.Name));
+        }
+
+        /// <summary>
+        /// Проверить, есть ли у атрибута унаследованные копии у дочерних элементов.
+        /// </summary>
+        private bool HasInheritedAttributesInDescendants(ElementAttributeModel attribute)
+        {
+            if (attribute.Owner is not IParentModel parent)
+                return false;
+
+            return parent.Childs.Values.Any(x => HasInheritedAttributeInBranch(x, attribute.DeclaringUuid));
+        }
+
+        /// <summary>
+        /// Проверить ветку наследования на наличие унаследованной копии атрибута.
+        /// </summary>
+        private bool HasInheritedAttributeInBranch(IChildrenModel child, Guid declaringUuid)
+        {
+            if (child is IAttributeOwnerModel attributeOwner
+                && attributeOwner.Attributes.Any(x => x.IsOwn == false && x.DeclaringUuid == declaringUuid))
+            {
+                return true;
+            }
+
+            return child is IParentModel parent
+                && parent.Childs.Values.Any(x => HasInheritedAttributeInBranch(x, declaringUuid));
         }
 
         #endregion
