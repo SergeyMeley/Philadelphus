@@ -284,37 +284,5 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             }
         }
 
-        /// <summary>
-        /// Запрещает пользовательское добавление атрибутов к системному базовому листу.
-        /// </summary>
-        /// <param name="attribute">Атрибут.</param>
-        /// <returns>false.</returns>
-        public override bool AddAttribute(global::Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel attribute)
-        {
-            ArgumentNullException.ThrowIfNull(attribute);
-
-            return false;
-        }
-
-        /// <summary>
-        /// Запрещает пользовательское удаление атрибутов системного базового листа.
-        /// </summary>
-        /// <param name="attribute">Атрибут.</param>
-        /// <returns>false.</returns>
-        public override bool RemoveAttribute(global::Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel attribute)
-        {
-            ArgumentNullException.ThrowIfNull(attribute);
-
-            return false;
-        }
-
-        /// <summary>
-        /// Запрещает пользовательскую очистку атрибутов системного базового листа.
-        /// </summary>
-        /// <returns>false.</returns>
-        public override bool ClearAttributes()
-        {
-            return false;
-        }
     }
 }

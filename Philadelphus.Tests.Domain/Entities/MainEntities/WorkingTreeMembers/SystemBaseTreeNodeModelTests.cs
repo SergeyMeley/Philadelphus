@@ -513,6 +513,35 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Fact]
+    public void TreeLeave_BlocksAttributeEditing()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var leave = new TreeLeaveModel(
+            Guid.NewGuid(),
+            node,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var attribute = CreateAttribute(tree, notificationService);
+
+        leave.AddAttribute(attribute).Should().BeFalse();
+        leave.RemoveAttribute(attribute).Should().BeFalse();
+        leave.ClearAttributes().Should().BeFalse();
+    }
+
+    [Fact]
     public void SystemBaseTreeLeave_BlocksAttributeEditing()
     {
         var notificationService = new FakeNotificationService();

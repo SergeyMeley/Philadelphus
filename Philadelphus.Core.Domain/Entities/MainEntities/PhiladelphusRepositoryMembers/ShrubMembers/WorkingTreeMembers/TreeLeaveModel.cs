@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -145,6 +146,39 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ArgumentNullException.ThrowIfNull(newParent);
 
+            return false;
+        }
+
+        /// <summary>
+        /// Запрещает пользовательское добавление атрибутов к листу.
+        /// </summary>
+        /// <param name="attribute">Атрибут.</param>
+        /// <returns>false.</returns>
+        public override bool AddAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return false;
+        }
+
+        /// <summary>
+        /// Запрещает пользовательское удаление атрибутов листа.
+        /// </summary>
+        /// <param name="attribute">Атрибут.</param>
+        /// <returns>false.</returns>
+        public override bool RemoveAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return false;
+        }
+
+        /// <summary>
+        /// Запрещает пользовательскую очистку атрибутов листа.
+        /// </summary>
+        /// <returns>false.</returns>
+        public override bool ClearAttributes()
+        {
             return false;
         }
 
