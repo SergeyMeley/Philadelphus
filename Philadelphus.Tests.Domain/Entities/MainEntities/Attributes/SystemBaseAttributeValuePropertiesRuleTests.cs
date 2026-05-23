@@ -47,9 +47,9 @@ public class SystemBaseAttributeValuePropertiesRuleTests
     [InlineData(SystemBaseType.INTEGER, "1.5", "Int64")]
     [InlineData(SystemBaseType.FLOAT, "1,5", "invariant culture")]
     [InlineData(SystemBaseType.BOOL, "yes", "true/false")]
-    [InlineData(SystemBaseType.DATETIME, "not a date", "DateTimeOffset")]
-    [InlineData(SystemBaseType.DATE, "10:15:30", "DateOnly")]
-    [InlineData(SystemBaseType.TIME, "2026-05-21", "TimeOnly")]
+    [InlineData(SystemBaseType.DATETIME, "not a date", "yyyy-MM-dd'T'HH:mm:sszzz")]
+    [InlineData(SystemBaseType.DATE, "10:15:30", "yyyy-MM-dd")]
+    [InlineData(SystemBaseType.TIME, "2026-05-21", "HH:mm:ss")]
     public void CanWrite_Blocks_Invalid_SystemBaseLeave_StringValue(
         SystemBaseType type,
         string value,
@@ -121,6 +121,30 @@ public class SystemBaseAttributeValuePropertiesRuleTests
 
         result.Should().BeTrue();
         notificationService.Messages.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CanWrite_Blocks_File_SystemBaseLeave_WhenReferenceFormatIsUnsupported()
+    {
+        var notificationService = new FakeNotificationService();
+        var rule = new SystemBaseAttributeValuePropertiesRule(notificationService);
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var node = CreateSystemNode(SystemBaseType.FILE, tree, root, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var leave = CreateSystemLeave(stringNode, SystemBaseType.STRING, "relative-file-name.txt", tree, notificationService);
+
+        attribute.Name = "File attribute";
+        attribute.ValueType = node;
+
+        var result = rule.CanWrite(attribute, nameof(ElementAttributeModel.Value), leave);
+
+        result.Should().BeFalse();
+        notificationService.Messages.Should().ContainSingle()
+            .Which.Should().Contain("File attribute")
+            .And.Contain("relative-file-name.txt")
+            .And.Contain(SystemBaseType.FILE.ToString())
+            .And.Contain("ссылка на файл");
     }
 
     [Fact]
@@ -238,7 +262,7 @@ public class SystemBaseAttributeValuePropertiesRuleTests
             .Which.Should().Contain("Typed attribute")
             .And.Contain("42")
             .And.Contain(SystemBaseType.DATE.ToString())
-            .And.Contain("DateOnly");
+            .And.Contain("yyyy-MM-dd");
     }
 
     [Fact]
@@ -266,7 +290,7 @@ public class SystemBaseAttributeValuePropertiesRuleTests
             .Which.Should().Contain("Collection attribute")
             .And.Contain("42")
             .And.Contain(SystemBaseType.DATE.ToString())
-            .And.Contain("DateOnly");
+            .And.Contain("yyyy-MM-dd");
     }
 
     [Fact]
