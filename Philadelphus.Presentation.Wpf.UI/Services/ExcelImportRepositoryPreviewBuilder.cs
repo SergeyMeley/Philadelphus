@@ -3,7 +3,6 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -27,7 +26,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         {
             var repositoryService = _serviceProvider.GetRequiredService<IPhiladelphusRepositoryService>();
             var repositoryCollectionService = _serviceProvider.GetRequiredService<IPhiladelphusRepositoryCollectionService>();
-            var repositoryExplorerFactory = _serviceProvider.GetRequiredService<IRepositoryExplorerControlVMFactory>();
             var dataStoragesCollectionVm = _serviceProvider.GetRequiredService<DataStoragesCollectionVM>();
 
             var previewStorage = dataStoragesCollectionVm.MainDataStorageVM?.Model
@@ -61,7 +59,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
                 previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService));
             }
 
-            var previewExplorerVm = repositoryExplorerFactory.Create(previewRepositoryVm);
+            var previewExplorerVm = ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(
+                _serviceProvider,
+                previewRepositoryVm,
+                false);
             previewExplorerVm.SelectedRepositoryMember = previewRepositoryVm.Childs.FirstOrDefault();
             return previewExplorerVm;
         }

@@ -218,7 +218,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
-            DataStoragesCollectionVM dataStoragesCollectionVM)
+            DataStoragesCollectionVM dataStoragesCollectionVM,
+            bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -233,7 +234,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
 
-            _ = LoadPhiladelphusRepositoryOnStartupAsync();
+            if (loadOnStartup)
+            {
+                _ = LoadPhiladelphusRepositoryOnStartupAsync();
+            }
 
             _notificationService.SendTextMessage<RepositoryExplorerControlVM>("Обозреватель репозитория. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
