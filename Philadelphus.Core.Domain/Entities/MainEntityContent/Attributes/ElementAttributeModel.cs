@@ -301,11 +301,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             _declaringUuid = declaringUuid;
             _declaringAttributeOwner = declaringOwner;
 
-            _attributeOwner.AddContent(this);
-            OwningWorkingTree.ContentAttributes.Add(this);
-
             _isOwn = localUuid == _declaringUuid
                 && _attributeOwner.Uuid == _declaringAttributeOwner.Uuid;
+
+            if (_isOwn)
+            {
+                _attributeOwner.AddContent(this);
+            }
+            else
+            {
+                _attributeOwner.AddInheritedAttribute(this);
+            }
+
+            OwningWorkingTree.ContentAttributes.Add(this);
 
             _inheritedAttributeFromParent = TryGetInheritedAttributeFromParent();
 

@@ -184,6 +184,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="child">Наследник</param>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <remarks>Implements requirement R-5.04 for BOOL system nodes.</remarks>
         public bool AddChild(IChildrenModel child)
         {
             ArgumentNullException.ThrowIfNull(child);
@@ -197,10 +198,15 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             else if (child is TreeLeaveModel l
                 && _childLeaveUuids.Add(child.Uuid))
             {
-                if (IsSystemBaseBoolNode()
-                    && IsPredefinedSystemBaseBoolLeave(l) == false)
+                if (IsSystemBaseBoolNode())
                 {
                     _childLeaveUuids.Remove(child.Uuid);
+                    if (IsPredefinedSystemBaseBoolLeave(l) == false
+                        && l is not SystemBaseTreeLeaveModel)
+                    {
+                        SendSystemBaseBoolNodeRestriction("R-5.04", "добавление дочерних листов");
+                    }
+
                     return false;
                 }
 
@@ -214,11 +220,32 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         }
 
         /// <summary>
+        /// Регистрирует предопределенный системный лист логического типа при инициализации системного справочника.
+        /// </summary>
+        /// <param name="leave">Предопределенный системный лист BOOL.</param>
+        /// <returns>true, если лист добавлен; иначе false.</returns>
+        internal bool AddPredefinedSystemBaseBoolLeave(TreeLeaveModel leave)
+        {
+            ArgumentNullException.ThrowIfNull(leave);
+
+            if (IsSystemBaseBoolNode() == false
+                || IsPredefinedSystemBaseBoolLeave(leave) == false
+                || _childLeaveUuids.Add(leave.Uuid) == false)
+            {
+                return false;
+            }
+
+            _childLeaves.Add(leave);
+            return true;
+        }
+
+        /// <summary>
         /// Удалить наследника
         /// </summary>
         /// <param name="child">Наследник</param>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        /// <remarks>Implements requirement R-5.04 for BOOL system nodes.</remarks>
         public bool RemoveChild(IChildrenModel child)
         {
             ArgumentNullException.ThrowIfNull(child);
@@ -236,6 +263,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 if (IsSystemBaseBoolNode())
                 {
                     _childLeaveUuids.Add(child.Uuid);
+                    SendSystemBaseBoolNodeRestriction("R-5.04", "удаление дочерних листов");
                     return false;
                 }
 
@@ -254,11 +282,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Очистить список наследников
         /// </summary>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        /// <remarks>Implements requirement R-5.04 for BOOL system nodes.</remarks>
         public bool ClearChilds()
         {
             if (IsSystemBaseBoolNode()
                 && _childLeaves.Count != 0)
             {
+                SendSystemBaseBoolNodeRestriction("R-5.04", "очистка дочерних листов");
                 return false;
             }
 
@@ -304,6 +334,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private bool IsSystemBaseBoolNode()
         {
             return this is SystemBaseTreeNodeModel { SystemBaseType: SystemBaseType.BOOL };
+        }
+
+        private void SendSystemBaseBoolNodeRestriction(string requirementCode, string operation)
+        {
+            _notificationService.SendTextMessage<TreeNodeModel>(
+                $"{requirementCode}: Для системного узла логического типа '{Name}' [{Uuid}] операция '{operation}' запрещена. " +
+                "Набор дочерних листов BOOL является фиксированным системным справочником.",
+                criticalLevel: NotificationCriticalLevelModel.Warning);
         }
 
         /// <summary>

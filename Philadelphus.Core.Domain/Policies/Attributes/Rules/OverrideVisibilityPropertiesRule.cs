@@ -12,6 +12,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
     /// <summary>
     /// Правило, ограничивающее создание приватного абстрактного атрибута
     /// </summary>
+    /// <remarks>Implements requirement R-4.04.</remarks>
     public class OverrideVisibilityPropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
         private readonly INotificationService _notificationService;

@@ -11,6 +11,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes
     /// <summary>
     /// Политика свойств атрибутов.
     /// </summary>
+    /// <remarks>Implements requirements R-0.01 and R-0.02 for attribute policies.</remarks>
     internal class CompositeAttributePropertiesPolicy : IAttributePropertiesPolicy
     {
         private readonly INotificationService _notificationService;

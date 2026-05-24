@@ -10,6 +10,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     /// <summary>
     /// Правило, ограничивающее значения свойства Name.
     /// </summary>
+    /// <remarks>Implements requirements R-1.01, R-1.02, R-1.03, R-1.04, R-1.05 and R-1.006.</remarks>
     internal class ValidNamePropertiesRule<T> : IPropertiesRule<T>, IPrepareWriteValuePropertiesRule<T>, IAttributePropertiesRule<ElementAttributeModel>
         where T : MainEntityBaseModel<T>
     {

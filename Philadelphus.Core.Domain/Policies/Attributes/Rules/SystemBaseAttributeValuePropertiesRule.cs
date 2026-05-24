@@ -18,6 +18,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
     /// атрибут может ожидать другой системный тип, и тогда строковое значение листа нужно проверить уже
     /// относительно типа атрибута.
     /// </remarks>
+    /// <remarks>Implements requirements R-5.01 and R-5.06.</remarks>
     public class SystemBaseAttributeValuePropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
         private readonly INotificationService _notificationService;

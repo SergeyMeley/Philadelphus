@@ -58,6 +58,11 @@ namespace Philadelphus.Tests.Domain.Fakes.Entities
             throw new NotImplementedException();
         }
 
+        public bool AddInheritedAttribute(ElementAttributeModel attribute)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool ChangeOwner(IOwnerModel newOwner)
         {
             throw new NotImplementedException();

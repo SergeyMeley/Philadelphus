@@ -11,6 +11,7 @@ namespace Philadelphus.Core.Domain.Helpers
     /// общей точкой разбора для самих системных листьев и доменных правил, работающих с <see cref="SystemBaseType" />.
     /// При добавлении нового системного типа сюда нужно добавить и проверку, и текст ожидаемого формата.
     /// </remarks>
+    /// <remarks>Implements requirements R-5.02, R-5.03, R-5.07, R-5.08 and R-5.09.</remarks>
     internal static class SystemBaseStringValueValidator
     {
         private const string DateTimeFormat = "yyyy-MM-dd'T'HH:mm:sszzz";

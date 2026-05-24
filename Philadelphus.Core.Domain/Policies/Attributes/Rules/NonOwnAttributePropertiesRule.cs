@@ -15,6 +15,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
     /// <summary>
     /// Правило, ограничивающее изменение значений некоторых свойств для унаследованных атрибутов
     /// </summary>
+    /// <remarks>Implements requirements R-4.01 and R-4.02.</remarks>
     public class NonOwnAttributePropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
         private readonly INotificationService _notificationService;

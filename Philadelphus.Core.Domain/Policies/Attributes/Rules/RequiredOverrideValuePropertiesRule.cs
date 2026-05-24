@@ -12,6 +12,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
     /// <summary>
     /// Правило, ограничивающее изменение значений атрибута, если он является собственным и абстрактным
     /// </summary>
+    /// <remarks>Implements requirement R-4.05.</remarks>
     public class RequiredOverrideValuePropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
         private readonly INotificationService _notificationService;

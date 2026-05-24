@@ -9,6 +9,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     /// <summary>
     /// Правило, запрещающее пустое значение свойства Name.
     /// </summary>
+    /// <remarks>Implements requirement R-1.07.</remarks>
     internal class RequiredNamePropertiesRule<T> : IPropertiesRule<T>, IAttributePropertiesRule<ElementAttributeModel>
         where T : MainEntityBaseModel<T>
     {

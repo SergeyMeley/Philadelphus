@@ -256,7 +256,12 @@ namespace Philadelphus.Core.Domain.Mapping
         {
             var ownersByUuid = owners.ToDictionary(x => x.Uuid);
 
-            var correctAttributes = attributes.Where(x => ownersByUuid.ContainsKey(x.OwnerUuid));
+            var ownerDepths = ownersByUuid.Values.ToDictionary(x => x.Uuid, GetOwnerDepth);
+
+            var correctAttributes = attributes
+                .Where(x => ownersByUuid.ContainsKey(x.OwnerUuid))
+                .OrderBy(x => ownerDepths.TryGetValue(x.OwnerUuid, out var depth) ? depth : int.MaxValue)
+                .ThenBy(x => x.OwnerUuid == x.DeclaringOwnerUuid && x.Uuid == x.DeclaringUuid ? 0 : 1);
 
             return mapper.Map<List<ElementAttributeModel>>(
                 correctAttributes,
@@ -269,6 +274,21 @@ namespace Philadelphus.Core.Domain.Mapping
                     opt.Items.Add(nameof(INotificationService), notificationService);
                     opt.Items.Add(nameof(IPropertiesPolicy<ElementAttributeModel>), propertiesPolicy);
                 });
+
+            static int GetOwnerDepth(IAttributeOwnerModel owner)
+            {
+                var depth = 0;
+                var current = owner;
+
+                while (current is IChildrenModel child
+                    && child.Parent is IAttributeOwnerModel parent)
+                {
+                    depth++;
+                    current = parent;
+                }
+
+                return depth;
+            }
         }
     }
 }

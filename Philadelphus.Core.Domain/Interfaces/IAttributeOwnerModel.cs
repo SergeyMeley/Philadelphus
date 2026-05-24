@@ -37,6 +37,13 @@ namespace Philadelphus.Core.Domain.Interfaces
         public bool AddAttribute(ElementAttributeModel attribute);
 
         /// <summary>
+        /// Добавить унаследованный атрибут.
+        /// </summary>
+        /// <param name="attribute">Унаследованный атрибут.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        public bool AddInheritedAttribute(ElementAttributeModel attribute);
+
+        /// <summary>
         /// Удалить атрибут
         /// </summary>
         /// <param name="attribute">Атрибут</param>

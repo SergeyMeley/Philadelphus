@@ -11,6 +11,7 @@ namespace Philadelphus.Core.Domain.Helpers
     /// Здесь проверяется только наличие непустого идентификатора ресурса. Проверка доступности должна выполняться
     /// отдельным сервисом/провайдером в сценариях, где файл действительно нужно открыть или прочитать.
     /// </remarks>
+    /// <remarks>Implements requirement R-5.09.</remarks>
     internal static class SystemBaseFileValueValidator
     {
         private static readonly IReadOnlyCollection<Func<string, bool>> _supportedReferenceFormats =

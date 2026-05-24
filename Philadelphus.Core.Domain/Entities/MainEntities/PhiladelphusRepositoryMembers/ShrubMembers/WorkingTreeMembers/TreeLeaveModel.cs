@@ -154,11 +154,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
         /// <returns>false.</returns>
+        /// <remarks>Implements requirement R-6.01.</remarks>
         public override bool AddAttribute(ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
+            SendAttributeCollectionRestriction("R-6.01", "добавление атрибута");
             return false;
+        }
+
+        /// <summary>
+        /// Разрешает восстановление и распространение унаследованных атрибутов на лист.
+        /// </summary>
+        /// <param name="attribute">Унаследованный атрибут.</param>
+        /// <returns>true, если унаследованный атрибут добавлен; иначе false.</returns>
+        public override bool AddInheritedAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return base.AddInheritedAttribute(attribute);
         }
 
         /// <summary>
@@ -166,10 +180,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
         /// <returns>false.</returns>
+        /// <remarks>Implements requirement R-6.01.</remarks>
         public override bool RemoveAttribute(ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
+            SendAttributeCollectionRestriction("R-6.01", "удаление атрибута");
             return false;
         }
 
@@ -177,8 +193,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Запрещает пользовательскую очистку атрибутов листа.
         /// </summary>
         /// <returns>false.</returns>
+        /// <remarks>Implements requirement R-6.01.</remarks>
         public override bool ClearAttributes()
         {
+            SendAttributeCollectionRestriction("R-6.01", "очистка атрибутов");
             return false;
         }
 
@@ -263,6 +281,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 ?? new List<AttributeExportDTO>();
 
             return JsonSerializer.Serialize(attributes, _stringValueJsonOptions);
+        }
+
+        private void SendAttributeCollectionRestriction(string requirementCode, string operation)
+        {
+            _notificationService.SendTextMessage<TreeLeaveModel>(
+                $"{requirementCode}: Для листа '{Name}' [{Uuid}] операция '{operation}' запрещена. " +
+                "Список атрибутов листа не редактируется пользователем и наследуется с узла.",
+                criticalLevel: NotificationCriticalLevelModel.Warning);
         }
 
         #endregion

@@ -1,6 +1,8 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
@@ -284,6 +286,60 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             Assert.DoesNotContain(owner.Attributes, x => x.Uuid == attribute.Uuid);
         }
 
+        [Fact]
+        public void ClearAttributes_Should_Recalculate_Inherited_Attributes_For_Children()
+        {
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+            var attribute = CreateOwnAttribute(root, tree);
+
+            Assert.Contains(node.ParentElementAttributes, x => x.DeclaringUuid == attribute.DeclaringUuid);
+
+            root.ClearAttributes();
+
+            Assert.DoesNotContain(node.ParentElementAttributes, x => x.DeclaringUuid == attribute.DeclaringUuid);
+        }
+
+        [Fact]
+        public void Leaf_Should_Allow_Adding_Inherited_Attribute_Only()
+        {
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+            var leaf = new TreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+            var ownAttribute = CreateOwnAttribute(root, tree);
+
+            var inheritedAttribute = ownAttribute.CloneForChild(leaf);
+
+            Assert.False(leaf.AddAttribute(ownAttribute));
+            Assert.Contains(leaf.ParentElementAttributes, x => x.Uuid == inheritedAttribute.Uuid);
+            Assert.DoesNotContain(leaf.PersonalAttributes, x => x.Uuid == ownAttribute.Uuid);
+        }
+
         private static ElementAttributeModel CreateOwnAttribute(
             FakeWorkingTreeModel owner,
             IPropertiesPolicy<ElementAttributeModel>? propertiesPolicy = null)
@@ -296,6 +352,23 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
                 uuid,
                 owner,
                 owner,
+                new FakeNotificationService(),
+                propertiesPolicy ?? new EmptyPropertiesPolicy<ElementAttributeModel>());
+        }
+
+        private static ElementAttributeModel CreateOwnAttribute(
+            IAttributeOwnerModel owner,
+            WorkingTreeModel tree,
+            IPropertiesPolicy<ElementAttributeModel>? propertiesPolicy = null)
+        {
+            var uuid = Guid.NewGuid();
+
+            return new ElementAttributeModel(
+                uuid,
+                owner,
+                uuid,
+                owner,
+                tree,
                 new FakeNotificationService(),
                 propertiesPolicy ?? new EmptyPropertiesPolicy<ElementAttributeModel>());
         }

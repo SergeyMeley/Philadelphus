@@ -9,6 +9,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     /// <summary>
     /// Правило, ограничивающее значения свойства CustomCode.
     /// </summary>
+    /// <remarks>Implements requirements R-3.01, R-3.02, R-3.03 and R-3.04.</remarks>
     internal class CustomCodePropertiesRule<T> : IPropertiesRule<T>, IPrepareWriteValuePropertiesRule<T>, IAttributePropertiesRule<ElementAttributeModel>
         where T : WorkingTreeMemberBaseModel<T>
     {
