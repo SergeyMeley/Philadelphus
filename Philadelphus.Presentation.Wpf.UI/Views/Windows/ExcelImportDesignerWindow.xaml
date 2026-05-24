@@ -6,7 +6,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:repo="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer"
         mc:Ignorable="d"
-        Title="Конструктор импорта Excel"
+        Title="Импорт дерева"
         Height="980"
         Width="1460"
         WindowStartupLocation="CenterScreen">
@@ -29,7 +29,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
-                   Text="Конструктор импорта Excel."
+                   Text="Импорт дерева"
                    FontSize="16"
                    FontWeight="SemiBold"
                    Margin="0,0,0,16"/>

@@ -1355,7 +1355,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 }
 
                 var progressWindow = _serviceProvider.GetRequiredService<ImportProgressWindow>();
-                progressWindow.Initialize("Конструктор импорта Excel", "Подготовка операции...");
+                progressWindow.Initialize("Импорт дерева", "Подготовка операции...");
                 progressWindow.Show();
 
                 var schema = _schema!;
