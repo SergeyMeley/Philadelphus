@@ -23,8 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Presentation.Wpf.UI\Philadelphus.Presentation.Wpf.UI.csproj" />
-    <ProjectReference Include="..\Philadelphus.Tests.Common\Philadelphus.Tests.Common.csproj" />
-  </ItemGroup>
+    </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
