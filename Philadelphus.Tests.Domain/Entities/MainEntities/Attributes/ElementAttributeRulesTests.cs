@@ -310,6 +310,36 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             Assert.DoesNotContain(node.ParentElementAttributes, x => x.DeclaringUuid == attribute.DeclaringUuid);
         }
 
+        [Fact]
+        public void Leaf_Should_Allow_Adding_Inherited_Attribute_Only()
+        {
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+            var leaf = new TreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                tree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+            var ownAttribute = CreateOwnAttribute(root, tree);
+
+            var inheritedAttribute = ownAttribute.CloneForChild(leaf);
+
+            Assert.False(leaf.AddAttribute(ownAttribute));
+            Assert.Contains(leaf.ParentElementAttributes, x => x.Uuid == inheritedAttribute.Uuid);
+            Assert.DoesNotContain(leaf.PersonalAttributes, x => x.Uuid == ownAttribute.Uuid);
+        }
+
         private static ElementAttributeModel CreateOwnAttribute(
             FakeWorkingTreeModel owner,
             IPropertiesPolicy<ElementAttributeModel>? propertiesPolicy = null)

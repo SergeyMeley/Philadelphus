@@ -228,6 +228,29 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
+            if (attribute.IsOwn == false)
+                return false;
+
+            return AddAttributeCore(attribute);
+        }
+
+        /// <summary>
+        /// Добавить унаследованный атрибут.
+        /// </summary>
+        /// <param name="attribute">Унаследованный атрибут.</param>
+        /// <returns>true, если операция выполнена успешно; иначе false.</returns>
+        public virtual bool AddInheritedAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            if (attribute.IsOwn)
+                return false;
+
+            return AddAttributeCore(attribute);
+        }
+
+        private bool AddAttributeCore(ElementAttributeModel attribute)
+        {
             lock (_lockObject)
             {
                 if (_attributes.Any(x => x.Uuid == attribute.Uuid))

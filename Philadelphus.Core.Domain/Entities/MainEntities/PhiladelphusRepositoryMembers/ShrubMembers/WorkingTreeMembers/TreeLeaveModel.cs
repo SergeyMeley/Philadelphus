@@ -162,6 +162,18 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         }
 
         /// <summary>
+        /// Разрешает восстановление и распространение унаследованных атрибутов на лист.
+        /// </summary>
+        /// <param name="attribute">Унаследованный атрибут.</param>
+        /// <returns>true, если унаследованный атрибут добавлен; иначе false.</returns>
+        public override bool AddInheritedAttribute(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            return base.AddInheritedAttribute(attribute);
+        }
+
+        /// <summary>
         /// Запрещает пользовательское удаление атрибутов листа.
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
