@@ -11,6 +11,7 @@ namespace Philadelphus.Core.Domain.Helpers
     /// Атрибут может ожидать другой системный тип, поэтому при присваивании одиночного или коллекционного
     /// значения нужна дополнительная проверка относительно <see cref="SystemBaseTreeNodeModel.SystemBaseType" /> атрибута.
     /// </remarks>
+    /// <remarks>Implements requirement R-5.01.</remarks>
     internal static class SystemBaseAttributeValueCompatibilityValidator
     {
         /// <summary>

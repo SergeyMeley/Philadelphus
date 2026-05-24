@@ -198,10 +198,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
         /// <returns>false.</returns>
+        /// <remarks>Implements requirement R-5.05.</remarks>
         public override bool AddAttribute(global::Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
+            SendAttributeCollectionRestriction("R-5.05", "добавление атрибута");
             return false;
         }
 
@@ -210,10 +212,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
         /// <returns>false.</returns>
+        /// <remarks>Implements requirement R-5.05.</remarks>
         public override bool RemoveAttribute(global::Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
+            SendAttributeCollectionRestriction("R-5.05", "удаление атрибута");
             return false;
         }
 
@@ -221,9 +225,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Запрещает пользовательскую очистку атрибутов системного базового узла.
         /// </summary>
         /// <returns>false.</returns>
+        /// <remarks>Implements requirement R-5.05.</remarks>
         public override bool ClearAttributes()
         {
+            SendAttributeCollectionRestriction("R-5.05", "очистка атрибутов");
             return false;
+        }
+
+        private void SendAttributeCollectionRestriction(string requirementCode, string operation)
+        {
+            _notificationService.SendTextMessage<SystemBaseTreeNodeModel>(
+                $"{requirementCode}: Для системного базового узла '{Name}' [{Uuid}] операция '{operation}' запрещена. " +
+                "Атрибуты элементов системного рабочего дерева не редактируются пользователем.",
+                criticalLevel: NotificationCriticalLevelModel.Warning);
         }
     }
 }

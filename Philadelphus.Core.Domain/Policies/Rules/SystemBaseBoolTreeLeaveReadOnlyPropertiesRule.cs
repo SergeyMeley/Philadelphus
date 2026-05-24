@@ -12,6 +12,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     /// Эти листья используются как справочник допустимых значений, поэтому их нельзя редактировать через
     /// обычные свойства листа. Добавление и удаление таких листов дополнительно блокируется на уровне сервиса.
     /// </remarks>
+    /// <remarks>Supports requirement R-5.04 for fixed BOOL system values.</remarks>
     internal class SystemBaseBoolTreeLeaveReadOnlyPropertiesRule : IPropertiesRule<TreeLeaveModel>
     {
         private readonly INotificationService _notificationService;

@@ -10,6 +10,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     /// <summary>
     /// Правило, ограничивающее значения свойства Sequence.
     /// </summary>
+    /// <remarks>Implements requirements R-2.01, R-2.02 and R-2.03.</remarks>
     internal class SequencePropertiesRule<T> : IPropertiesRule<T>, IAttributePropertiesRule<ElementAttributeModel>
         where T : MainEntityBaseModel<T>, ISequencableModel
     {

@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
@@ -258,12 +259,18 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
         /// <returns>true, если атрибут добавлен; false, если рабочее дерево системное или операция не выполнена.</returns>
+        /// <remarks>Implements requirement R-5.05 for the system working tree.</remarks>
         public override bool AddAttribute(ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
-            return IsSystemBase == false
-                && base.AddAttribute(attribute);
+            if (IsSystemBase)
+            {
+                SendAttributeCollectionRestriction("R-5.05", "добавление атрибута");
+                return false;
+            }
+
+            return base.AddAttribute(attribute);
         }
 
         /// <summary>
@@ -271,22 +278,42 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         /// <param name="attribute">Атрибут.</param>
         /// <returns>true, если атрибут удален; false, если рабочее дерево системное или операция не выполнена.</returns>
+        /// <remarks>Implements requirement R-5.05 for the system working tree.</remarks>
         public override bool RemoveAttribute(ElementAttributeModel attribute)
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
-            return IsSystemBase == false
-                && base.RemoveAttribute(attribute);
+            if (IsSystemBase)
+            {
+                SendAttributeCollectionRestriction("R-5.05", "удаление атрибута");
+                return false;
+            }
+
+            return base.RemoveAttribute(attribute);
         }
 
         /// <summary>
         /// Очистить атрибуты, если рабочее дерево не является системным.
         /// </summary>
         /// <returns>true, если атрибуты очищены; false, если рабочее дерево системное.</returns>
+        /// <remarks>Implements requirement R-5.05 for the system working tree.</remarks>
         public override bool ClearAttributes()
         {
-            return IsSystemBase == false
-                && base.ClearAttributes();
+            if (IsSystemBase)
+            {
+                SendAttributeCollectionRestriction("R-5.05", "очистка атрибутов");
+                return false;
+            }
+
+            return base.ClearAttributes();
+        }
+
+        private void SendAttributeCollectionRestriction(string requirementCode, string operation)
+        {
+            _notificationService.SendTextMessage<WorkingTreeModel>(
+                $"{requirementCode}: Для системного рабочего дерева '{Name}' [{Uuid}] операция '{operation}' запрещена. " +
+                "Атрибуты элементов системного рабочего дерева не редактируются пользователем.",
+                criticalLevel: NotificationCriticalLevelModel.Warning);
         }
 
         /// <summary>

@@ -7,6 +7,7 @@ namespace Philadelphus.Core.Domain.Policies
     /// <summary>
     /// Композитная политика свойств.
     /// </summary>
+    /// <remarks>Implements requirements R-0.01 and R-0.02.</remarks>
     internal class CompositePropertiesPolicy<T> : IPropertiesPolicy<T>
         where T : MainEntityBaseModel<T>
     {

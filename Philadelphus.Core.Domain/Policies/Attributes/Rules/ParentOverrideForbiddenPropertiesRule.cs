@@ -12,6 +12,7 @@ namespace Philadelphus.Core.Domain.Policies.Attributes.Rules
     /// <summary>
     /// Правило, ограничивающее изменение значений свойств атрибута, для которого запрещего переопределение
     /// </summary>
+    /// <remarks>Implements requirement R-4.03.</remarks>
     public class ParentOverrideForbiddenPropertiesRule : IAttributePropertiesRule<ElementAttributeModel>
     {
         private readonly INotificationService _notificationService;
