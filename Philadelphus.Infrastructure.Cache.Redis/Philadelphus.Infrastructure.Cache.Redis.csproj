@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-<ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Cache\Philadelphus.Infrastructure.Cache.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
