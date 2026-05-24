@@ -285,7 +285,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             lock (_lockObject)
             {
                 _attributes.Clear();
-                _version++;
+                ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
                 return true;
             }
         }
