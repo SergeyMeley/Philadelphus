@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 {
-    public class ImportFromExcelViewModel : ViewModelBase
+    public class ImportFromExcelVM : ViewModelBase
     {
         private readonly ExcelImportSessionState _session;
         private readonly IFileDialogService _fileDialogService;
@@ -25,7 +25,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private bool _useAllWorksheets = true;
         private bool _isBusy;
 
-        public ImportFromExcelViewModel(
+        public ImportFromExcelVM(
             ExcelImportSessionState session,
             IFileDialogService fileDialogService,
             IMessageDialogService messageDialogService)

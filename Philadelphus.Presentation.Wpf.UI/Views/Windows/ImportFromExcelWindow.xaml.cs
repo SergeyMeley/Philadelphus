@@ -5,9 +5,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 {
     public partial class ImportFromExcelWindow : Window
     {
-        private readonly ImportFromExcelViewModel _viewModel;
+        private readonly ImportFromExcelVM _viewModel;
 
-        public ImportFromExcelWindow(ImportFromExcelViewModel viewModel)
+        public ImportFromExcelWindow(ImportFromExcelVM viewModel)
         {
             InitializeComponent();
             _viewModel = viewModel;
