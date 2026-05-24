@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
+using Philadelphus.Core.Domain.Policies.Builders;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
@@ -391,6 +392,33 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
+        /// Назначить одиночное значение системного атрибута по строковому представлению.
+        /// </summary>
+        /// <param name="stringValue">Строковое значение базового системного типа.</param>
+        /// <returns>true, если значение найдено или создано и присвоено; иначе false.</returns>
+        public bool TrySetSystemBaseValueFromString(string? stringValue)
+        {
+            if (_isCollectionValue
+                || ValueType is not SystemBaseTreeNodeModel systemBaseNode
+                || string.IsNullOrWhiteSpace(stringValue))
+            {
+                return false;
+            }
+
+            if (TryGetOrCreateSystemBaseLeave(
+                    systemBaseNode,
+                    stringValue,
+                    out var systemBaseLeave) == false
+                || systemBaseLeave == null)
+            {
+                return false;
+            }
+
+            Value = systemBaseLeave;
+            return SameValue(Value, systemBaseLeave);
+        }
+
+        /// <summary>
         /// Исключить значение атрибута из коллекции
         /// </summary>
         /// <param name="value">Значение</param>
@@ -632,6 +660,70 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private static bool SameValue(TreeLeaveModel value, TreeLeaveModel inheritedValue)
         {
             return value?.Uuid == inheritedValue?.Uuid;
+        }
+
+        /// <summary>
+        /// Найти существующий системный лист в узле типа данных или создать новый допустимый лист.
+        /// </summary>
+        private bool TryGetOrCreateSystemBaseLeave(
+            SystemBaseTreeNodeModel systemBaseNode,
+            string stringValue,
+            out SystemBaseTreeLeaveModel? systemBaseLeave)
+        {
+            systemBaseLeave = systemBaseNode.ChildLeaves
+                .OfType<SystemBaseTreeLeaveModel>()
+                .FirstOrDefault(x => string.Equals(x.StringValue, stringValue, StringComparison.Ordinal));
+
+            if (systemBaseLeave != null)
+            {
+                return true;
+            }
+
+            if (SystemBaseStringValueValidator.IsValid(systemBaseNode.SystemBaseType, stringValue, out var expectedFormat) == false)
+            {
+                _notificationService.SendTextMessage<ElementAttributeModel>(
+                    $"Для атрибута '{Name}' [{Uuid}] элемента '{(Owner as IMainEntityModel)?.Name}' [{(Owner as IMainEntityModel)?.Uuid}] " +
+                    $"значение '{stringValue}' не соответствует системному типу '{systemBaseNode.SystemBaseType}'. " +
+                    $"Ожидаемый формат: {expectedFormat}.",
+                    criticalLevel: NotificationCriticalLevelModel.Warning);
+
+                return false;
+            }
+
+            if (systemBaseNode.SystemBaseType == SystemBaseType.BOOL)
+            {
+                systemBaseLeave = ResolveBoolSystemBaseLeave(systemBaseNode, stringValue);
+                return systemBaseLeave != null;
+            }
+
+            systemBaseLeave = new SystemBaseTreeLeaveModel(
+                Guid.CreateVersion7(),
+                systemBaseNode,
+                systemBaseNode.OwningWorkingTree,
+                systemBaseNode.SystemBaseType,
+                _notificationService,
+                PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
+
+            systemBaseLeave.StringValue = stringValue;
+            return true;
+        }
+
+        /// <summary>
+        /// Получить предопределенный BOOL-лист по введенному пользователем строковому значению.
+        /// </summary>
+        private static SystemBaseTreeLeaveModel? ResolveBoolSystemBaseLeave(
+            SystemBaseTreeNodeModel systemBaseNode,
+            string stringValue)
+        {
+            if (SystemBaseStringValueValidator.TryParse(SystemBaseType.BOOL, stringValue, out var typedValue, out _) == false
+                || typedValue is not bool boolValue)
+            {
+                return null;
+            }
+
+            return systemBaseNode.ChildLeaves
+                .OfType<SystemBaseTreeLeaveModel>()
+                .FirstOrDefault(x => x.TypedValue is bool existingBoolValue && existingBoolValue == boolValue);
         }
 
         #endregion

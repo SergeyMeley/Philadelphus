@@ -658,7 +658,18 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
 
             return value =>
             {
-                attribute.Value = value as TreeLeaveModel;
+                if (value is string stringValue
+                    && attribute.TrySetSystemBaseValueFromString(stringValue))
+                {
+                    return attribute.Value;
+                }
+
+                if (value is not TreeLeaveModel treeLeave)
+                {
+                    return attribute.Value;
+                }
+
+                attribute.Value = treeLeave;
                 return attribute.Value;
             };
         }

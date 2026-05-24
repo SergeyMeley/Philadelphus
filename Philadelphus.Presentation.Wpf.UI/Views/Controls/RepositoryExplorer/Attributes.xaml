@@ -61,8 +61,8 @@
                     </DataGridComboBoxColumn.EditingElementStyle>
                 </DataGridComboBoxColumn>
                 <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}"></DataGridCheckBoxColumn>
-                <DataGridComboBoxColumn Header="Значение" DisplayMemberPath="Name" SelectedItemBinding="{Binding AssignedValue}" SelectedValuePath="Name" IsReadOnly="{Binding IsSingleValue}">
-                    <DataGridComboBoxColumn.CellStyle>
+                <DataGridTemplateColumn Header="Значение">
+                    <DataGridTemplateColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsValueOverridden}" Value="True">
@@ -71,18 +71,28 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </DataGridComboBoxColumn.CellStyle>
-                    <DataGridComboBoxColumn.ElementStyle>
-                        <Style TargetType="ComboBox">
-                            <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
-                        </Style>
-                    </DataGridComboBoxColumn.ElementStyle>
-                    <DataGridComboBoxColumn.EditingElementStyle>
-                        <Style TargetType="ComboBox">
-                            <Setter Property="ItemsSource" Value="{Binding ValuesList}" />
-                        </Style>
-                    </DataGridComboBoxColumn.EditingElementStyle>
-                </DataGridComboBoxColumn>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding ValuesList}"
+                                      SelectedItem="{Binding AssignedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Text="{Binding AssignedValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      DisplayMemberPath="Name"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="False" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding ValuesList}"
+                                      SelectedItem="{Binding AssignedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Text="{Binding AssignedValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      DisplayMemberPath="Name"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="False" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">

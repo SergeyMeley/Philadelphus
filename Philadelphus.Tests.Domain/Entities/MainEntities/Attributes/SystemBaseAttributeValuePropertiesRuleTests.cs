@@ -240,6 +240,112 @@ public class SystemBaseAttributeValuePropertiesRuleTests
     }
 
     [Fact]
+    public void TrySetSystemBaseValueFromString_Uses_Existing_SystemBaseLeave()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+        var existing = CreateSystemLeave(stringNode, SystemBaseType.STRING, "Text", tree, notificationService);
+
+        attribute.ValueType = stringNode;
+
+        var result = attribute.TrySetSystemBaseValueFromString("Text");
+
+        result.Should().BeTrue();
+        attribute.Value.Should().BeSameAs(existing);
+        stringNode.ChildLeaves.OfType<SystemBaseTreeLeaveModel>()
+            .Count(x => x.StringValue == "Text")
+            .Should().Be(1);
+    }
+
+    [Fact]
+    public void TrySetSystemBaseValueFromString_Creates_New_SystemBaseLeave()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+
+        attribute.ValueType = integerNode;
+
+        var result = attribute.TrySetSystemBaseValueFromString("42");
+
+        result.Should().BeTrue();
+        attribute.Value.Should().BeOfType<SystemBaseTreeLeaveModel>();
+        attribute.Value.ParentNode.Should().Be(integerNode);
+        ((SystemBaseTreeLeaveModel)attribute.Value).StringValue.Should().Be("42");
+        integerNode.ChildLeaves.OfType<SystemBaseTreeLeaveModel>()
+            .Count(x => x.StringValue == "42")
+            .Should().Be(1);
+        notificationService.Messages.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void TrySetSystemBaseValueFromString_Empty_Input_Does_Not_Create_Leave(string? value)
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var stringNode = CreateSystemNode(SystemBaseType.STRING, tree, root, notificationService);
+
+        attribute.ValueType = stringNode;
+
+        var result = attribute.TrySetSystemBaseValueFromString(value);
+
+        result.Should().BeFalse();
+        stringNode.ChildLeaves.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void TrySetSystemBaseValueFromString_Invalid_Input_Does_Not_Create_Leave()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+
+        attribute.Name = "Integer attribute";
+        attribute.ValueType = integerNode;
+
+        var result = attribute.TrySetSystemBaseValueFromString("not integer");
+
+        result.Should().BeFalse();
+        integerNode.ChildLeaves.Should().BeEmpty();
+        notificationService.Messages.Should().ContainSingle()
+            .Which.Should().Contain("Integer attribute")
+            .And.Contain("not integer")
+            .And.Contain(SystemBaseType.INTEGER.ToString());
+    }
+
+    [Fact]
+    public void TrySetSystemBaseValueFromString_Non_SystemBase_ValueType_Does_Not_Change_Value()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var userDefinedNode = CreateUserDefinedNode(tree, root, notificationService);
+        var value = new TreeLeaveModel(
+            Guid.NewGuid(),
+            userDefinedNode,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+
+        attribute.ValueType = userDefinedNode;
+        attribute.Value = value;
+
+        var result = attribute.TrySetSystemBaseValueFromString("Text");
+
+        result.Should().BeFalse();
+        attribute.Value.Should().BeSameAs(value);
+        userDefinedNode.ChildLeaves.Should().ContainSingle().Which.Should().BeSameAs(value);
+    }
+
+    [Fact]
     public void CanWrite_Blocks_ValueType_Change_When_Current_Value_Becomes_Incompatible()
     {
         var notificationService = new FakeNotificationService();

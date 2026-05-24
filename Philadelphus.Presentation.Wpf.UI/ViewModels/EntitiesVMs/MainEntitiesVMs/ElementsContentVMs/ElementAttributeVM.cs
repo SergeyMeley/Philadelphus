@@ -107,8 +107,31 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 }
                 OnPropertyChanged(nameof(State));
                 OnPropertyChanged(nameof(AssignedValue));
+                OnPropertyChanged(nameof(AssignedValueText));
                 OnPropertyChanged(nameof(IsValueOverridden));
                 OnPropertyChanged(nameof(ValueOverrideToolTip));
+            }
+        }
+
+        /// <summary>
+        /// Текстовое представление одиночного значения для редактируемого ComboBox системных базовых типов.
+        /// </summary>
+        public string AssignedValueText
+        {
+            get => AssignedValue is SystemBaseTreeLeaveModel systemBaseValue
+                ? systemBaseValue.StringValue
+                : AssignedValue?.Name ?? string.Empty;
+            set
+            {
+                if (_model.TrySetSystemBaseValueFromString(value))
+                {
+                    OnPropertyChanged(nameof(State));
+                    OnPropertyChanged(nameof(AssignedValue));
+                    OnPropertyChanged(nameof(AssignedValueText));
+                    OnPropertyChanged(nameof(ValuesList));
+                    OnPropertyChanged(nameof(IsValueOverridden));
+                    OnPropertyChanged(nameof(ValueOverrideToolTip));
+                }
             }
         }
 

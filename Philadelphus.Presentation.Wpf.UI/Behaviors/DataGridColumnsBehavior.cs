@@ -4,6 +4,7 @@ using Philadelphus.Presentation.Wpf.UI.Models.Tables;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.Behaviors
@@ -117,7 +118,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         /// <summary>
         /// Создает колонку выбора значения для редактируемых одиночных атрибутов.
         /// </summary>
-        private static DataGridComboBoxColumn CreateComboBoxColumn(ChildCollectionTableColumn column)
+        private static DataGridColumn CreateComboBoxColumn(ChildCollectionTableColumn column)
         {
             var selectedItemBinding = new Binding($"[{column.BindingKey}]")
             {
@@ -127,18 +128,37 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             var itemsSourceBinding = new Binding($"ValueOptions[{column.BindingKey}]");
 
-            return new DataGridComboBoxColumn
+            var comboBoxFactory = CreateEditableComboBoxFactory(column, selectedItemBinding, itemsSourceBinding);
+            var template = new DataTemplate { VisualTree = comboBoxFactory };
+
+            return new DataGridTemplateColumn
             {
                 Header = CreateColumnHeader(column),
-                SelectedItemBinding = selectedItemBinding,
-                DisplayMemberPath = "Name",
                 IsReadOnly = column.IsReadOnly,
                 Width = DataGridLength.Auto,
                 MinWidth = column.IsAttribute ? 120 : 80,
                 CellStyle = column.IsAttribute ? CreateAttributeCellStyle(column) : null,
-                ElementStyle = CreateComboBoxStyle(itemsSourceBinding),
-                EditingElementStyle = CreateComboBoxStyle(itemsSourceBinding),
+                CellTemplate = template,
+                CellEditingTemplate = template,
             };
+        }
+
+        private static FrameworkElementFactory CreateEditableComboBoxFactory(
+            ChildCollectionTableColumn column,
+            Binding selectedItemBinding,
+            Binding itemsSourceBinding)
+        {
+            var comboBoxFactory = new FrameworkElementFactory(typeof(ComboBox));
+            comboBoxFactory.SetBinding(ItemsControl.ItemsSourceProperty, itemsSourceBinding);
+            comboBoxFactory.SetBinding(Selector.SelectedItemProperty, selectedItemBinding);
+            comboBoxFactory.SetValue(ItemsControl.DisplayMemberPathProperty, "Name");
+            comboBoxFactory.SetValue(ComboBox.IsEditableProperty, true);
+            comboBoxFactory.SetValue(ComboBox.IsTextSearchEnabledProperty, false);
+            comboBoxFactory.AddHandler(
+                UIElement.LostFocusEvent,
+                new RoutedEventHandler((sender, _) => CommitComboBoxText(sender, column.BindingKey)));
+
+            return comboBoxFactory;
         }
 
         /// <summary>
@@ -188,11 +208,22 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             return style;
         }
 
-        private static Style CreateComboBoxStyle(Binding itemsSourceBinding)
+        private static void CommitComboBoxText(object sender, string bindingKey)
         {
-            var style = new Style(typeof(ComboBox));
-            style.Setters.Add(new Setter(ItemsControl.ItemsSourceProperty, itemsSourceBinding));
-            return style;
+            if (sender is not ComboBox comboBox
+                || comboBox.DataContext is not ChildCollectionTableRow row
+                || string.IsNullOrWhiteSpace(comboBox.Text))
+            {
+                return;
+            }
+
+            var selectedName = comboBox.SelectedItem?.GetType().GetProperty("Name")?.GetValue(comboBox.SelectedItem)?.ToString();
+            if (string.Equals(selectedName, comboBox.Text, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            row[bindingKey] = comboBox.Text;
         }
 
         private static DataTemplate CreateEmptyCellTemplate()

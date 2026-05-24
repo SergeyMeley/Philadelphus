@@ -264,6 +264,94 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
         }
 
         [Fact]
+        public void buildChildCollectionTableRows_Allows_Manual_SystemBase_Attribute_Value_Input()
+        {
+            var notificationService = new FakeNotificationService();
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.CreateVersion7(),
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeRootModel>());
+
+            var stringNode = new SystemBaseTreeNodeModel(
+                root,
+                tree,
+                SystemBaseType.STRING,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            var existingValue = new SystemBaseTreeLeaveModel(
+                Guid.CreateVersion7(),
+                stringNode,
+                tree,
+                SystemBaseType.STRING,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+            existingValue.StringValue = "Existing";
+
+            var child = new TreeLeaveModel(
+                Guid.CreateVersion7(),
+                stringNode,
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>())
+            {
+                Name = "Child",
+            };
+
+            var attributeUuid = Guid.CreateVersion7();
+            var attribute = new ElementAttributeModel(
+                attributeUuid,
+                root,
+                attributeUuid,
+                root,
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<ElementAttributeModel>())
+            {
+                Name = "Text",
+                Visibility = VisibilityScope.Public,
+                ValueType = stringNode,
+                Value = existingValue,
+            };
+
+            _ = attribute;
+            _ = child.Attributes;
+            var children = new IChildrenModel[] { child };
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(root, children);
+            var textColumn = columns.Single(x => x.Header == "Text");
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+
+            row[textColumn.BindingKey] = "Manual";
+
+            var assignedValue = child.Attributes.Single(x => x.Name == "Text").Value;
+            assignedValue.Should().BeOfType<SystemBaseTreeLeaveModel>();
+            assignedValue.ParentNode.Should().Be(stringNode);
+            ((SystemBaseTreeLeaveModel)assignedValue).StringValue.Should().Be("Manual");
+            stringNode.ChildLeaves.OfType<SystemBaseTreeLeaveModel>()
+                .Count(x => x.StringValue == "Manual")
+                .Should().Be(1);
+        }
+
+        [Fact]
+        public void buildChildCollectionTableRows_Ignores_String_Input_For_Non_SystemBase_Attribute()
+        {
+            var fixture = CreateFixture();
+            var children = new IChildrenModel[] { fixture.Leave };
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                fixture.Root,
+                children);
+            var priceColumn = columns.Single(x => x.Header == "Цена, руб");
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+
+            row[priceColumn.BindingKey] = "not a TreeLeave";
+
+            fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб").Value.Should().Be(fixture.PriceValue);
+            row[priceColumn.BindingKey].Should().Be(fixture.PriceValue);
+        }
+
+        [Fact]
         public void buildChildCollectionTableRows_Returns_Fallbacks_For_Unknown_Child_And_Missing_Values()
         {
             var child = new UnknownChildModel();
