@@ -106,6 +106,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             : base(GetUuidByValue(parent.SystemBaseType, value), parent, owner, notificationService, propertiesPolicy)
         {
             SystemBaseType = parent.SystemBaseType;
+            parent.AddPredefinedSystemBaseBoolLeave(this);
             InitProperties(Uuid);
         }
 
@@ -130,6 +131,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             SystemBaseType = IsSystemBaseValue(uuid)
                 ? GetTypeByUuid(uuid)
                 : type;
+
+            parent.AddPredefinedSystemBaseBoolLeave(this);
 
             if (IsSystemBaseValue(uuid))
             {

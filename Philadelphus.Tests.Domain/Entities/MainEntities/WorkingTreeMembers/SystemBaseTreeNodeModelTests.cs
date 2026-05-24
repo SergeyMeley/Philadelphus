@@ -575,6 +575,7 @@ public class SystemBaseTreeNodeModelTests
             new EmptyPropertiesPolicy<TreeLeaveModel>());
 
         boolNode.AddChild(userLeave).Should().BeFalse();
+        boolNode.AddChild(trueLeave).Should().BeFalse();
         boolNode.RemoveChild(trueLeave).Should().BeFalse();
         boolNode.ClearChilds().Should().BeFalse();
 

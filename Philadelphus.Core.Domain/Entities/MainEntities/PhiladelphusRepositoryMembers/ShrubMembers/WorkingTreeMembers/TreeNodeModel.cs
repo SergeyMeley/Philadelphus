@@ -197,8 +197,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             else if (child is TreeLeaveModel l
                 && _childLeaveUuids.Add(child.Uuid))
             {
-                if (IsSystemBaseBoolNode()
-                    && IsPredefinedSystemBaseBoolLeave(l) == false)
+                if (IsSystemBaseBoolNode())
                 {
                     _childLeaveUuids.Remove(child.Uuid);
                     return false;
@@ -211,6 +210,26 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Регистрирует предопределенный системный лист логического типа при инициализации системного справочника.
+        /// </summary>
+        /// <param name="leave">Предопределенный системный лист BOOL.</param>
+        /// <returns>true, если лист добавлен; иначе false.</returns>
+        internal bool AddPredefinedSystemBaseBoolLeave(TreeLeaveModel leave)
+        {
+            ArgumentNullException.ThrowIfNull(leave);
+
+            if (IsSystemBaseBoolNode() == false
+                || IsPredefinedSystemBaseBoolLeave(leave) == false
+                || _childLeaveUuids.Add(leave.Uuid) == false)
+            {
+                return false;
+            }
+
+            _childLeaves.Add(leave);
+            return true;
         }
 
         /// <summary>
