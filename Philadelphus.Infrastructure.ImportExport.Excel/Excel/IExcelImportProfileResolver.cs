@@ -1,0 +1,7 @@
+namespace Philadelphus.Infrastructure.ImportExport.Excel
+{
+    public interface IExcelImportProfileResolver
+    {
+        ExcelImportProfile Resolve(string filePath, ExcelImportSourceSelection selection, ExcelImportProfile detectedProfile);
+    }
+}

@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 using FluentAssertions;
-using Philadelphus.Core.Domain.ImportExport.Excel;
+using Philadelphus.Infrastructure.ImportExport.Excel;
 using System.Text.Json.Nodes;
 
 namespace Philadelphus.Tests.Domain.ImportExport

@@ -149,7 +149,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport.Excel\Philadelphus.Core.Domain.ImportExport.Excel.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.Reports\Philadelphus.Core.Domain.Reports.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.TablesExport\Philadelphus.Core.Domain.TablesExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
@@ -159,6 +158,7 @@
     <ProjectReference Include="..\Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.SQLite\Philadelphus.Infrastructure.Persistence.EF.SQLite.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.ImportExport.Excel\Philadelphus.Infrastructure.ImportExport.Excel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
