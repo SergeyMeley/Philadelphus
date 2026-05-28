@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 
-namespace Philadelphus.Core.Domain.ImportExport.Interfaces
+namespace Philadelphus.Core.Domain.ImportExport.Contracts
 {
     /// <summary>
     /// Контракт адаптера импорта и экспорта для одного поддерживаемого формата файла.

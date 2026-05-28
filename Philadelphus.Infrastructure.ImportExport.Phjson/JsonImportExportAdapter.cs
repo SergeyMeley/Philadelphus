@@ -2,7 +2,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
-using Philadelphus.Core.Domain.ImportExport.Implementations;
+using Philadelphus.Core.Domain.ImportExport.Contracts;
 
 namespace Philadelphus.Infrastructure.ImportExport.Phjson
 {

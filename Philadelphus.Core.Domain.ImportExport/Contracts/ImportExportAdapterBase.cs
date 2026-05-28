@@ -1,8 +1,7 @@
 ﻿using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
-using Philadelphus.Core.Domain.ImportExport.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
-namespace Philadelphus.Core.Domain.ImportExport.Implementations
+namespace Philadelphus.Core.Domain.ImportExport.Contracts
 {
     /// <summary>
     /// Базовая реализация адаптера импорта и экспорта.

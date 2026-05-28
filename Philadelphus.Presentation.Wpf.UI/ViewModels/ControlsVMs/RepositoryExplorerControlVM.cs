@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Phjson;
@@ -36,6 +37,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private bool _isDisposed;
 
         private readonly IPhiladelphusRepositoryService _service;
+        private readonly IImportExportService _importExportService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -196,6 +198,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="notificationService">Сервис уведомлений.</param>
         /// <param name="options">Параметры конфигурации приложения.</param>
         /// <param name="service">Доменный сервис.</param>
+        /// <param name="importExportService">Сервис импорта и экспорта.</param>
         /// <param name="extensionVMFactory">Фабрика создания модели представления расширений.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <param name="PhiladelphusRepositoryVM">Модель представления репозитория Чубушника.</param>
@@ -208,6 +211,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             IPhiladelphusRepositoryService service,
+            IImportExportService importExportService,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
@@ -218,11 +222,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
             ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(importExportService);
             ArgumentNullException.ThrowIfNull(extensionVMFactory);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
 
             _service = service;
+            _importExportService = importExportService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -458,23 +464,29 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     var model = SelectedRepositoryMember.Model as TreeRootModel;
-                    var jsonAdapter = new JsonImportExportAdapter(_notificationService);
-
-                    var path = string.Empty;
-
-                    var dialog = new OpenFolderDialog
+                    if (model?.OwningWorkingTree == null)
                     {
-                        Title = "Выберите директорию",
-                        Multiselect = false,
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        path = dialog.FolderName;
+                        MessageBox.Show("Не найдено рабочее дерево для экспорта.", "Экспорт PHJSON", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
                     }
 
-                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.CreateVersion7()}.phjson");
-                    jsonAdapter.Serialize(model.OwningWorkingTree, file);
+                    var dialog = new SaveFileDialog
+                    {
+                        Title = "Сохранить файл экспорта",
+                        FileName = $"Чубушник экспорт элемента {SelectedRepositoryMember.Name} от {DateTimeOffset.UtcNow}.phjson",
+                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
+                        FilterIndex = 1,
+                        AddExtension = true,
+                        DefaultExt = ".phjson",
+                    };
+
+                    if (dialog.ShowDialog() != true)
+                    {
+                        return;
+                    }
+
+                    var file = dialog.FileName;
+                    _importExportService.Serialize(".phjson", "Базовый", model.OwningWorkingTree, file);
 
                     Process.Start(new ProcessStartInfo
                     {

@@ -1,6 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Infrastructure.ImportExport.Phjson;
@@ -66,24 +65,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         }
 
         /// <summary>
-        /// Формирует JSON-представление DTO рабочего дерева по схеме Excel.
+        /// Формирует JSON-представление результата импорта Excel.
         /// </summary>
         /// <param name="schema">Схема импорта Excel.</param>
-        /// <returns>JSON-представление DTO рабочего дерева.</returns>
+        /// <returns>JSON-представление результата импорта Excel.</returns>
         public string BuildJson(ExcelImportSchema schema)
         {
-            return JsonSerializer.Serialize(BuildDto(schema), CreateJsonOptions());
-        }
-
-        /// <summary>
-        /// Формирует DTO рабочего дерева по схеме Excel.
-        /// </summary>
-        /// <param name="schema">Схема импорта Excel.</param>
-        /// <returns>DTO рабочего дерева.</returns>
-        public WorkingTreeExportDTO BuildDto(ExcelImportSchema schema)
-        {
             EnsureValid(schema);
-            return _excelImportExportAdapter.Parse(ExcelImportSchemaNormalizer.GetCanonicalExecutionSchema(schema));
+            var importResult = _excelImportExportAdapter.Parse(ExcelImportSchemaNormalizer.GetCanonicalExecutionSchema(schema));
+
+            return JsonSerializer.Serialize(importResult, CreateJsonOptions());
         }
 
         /// <summary>
@@ -131,7 +122,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         {
             var validationResult = Validate(schema);
             if (validationResult.HasErrors)
+            {
                 throw new InvalidOperationException(ExcelImportValidationMessageBuilder.Build(validationResult));
+            }
         }
 
         /// <summary>
@@ -143,7 +136,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         {
             var profiles = ExcelImportSchemaNormalizer.GetEnabledProfiles(schema);
             if (profiles.Count == 0)
+            {
                 throw new InvalidOperationException(emptySelectionMessage);
+            }
         }
 
         private static JsonSerializerOptions CreateJsonOptions()

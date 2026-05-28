@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
-using Philadelphus.Core.Domain.ImportExport.Interfaces;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -38,6 +37,9 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Philadelphus.Core.Domain.ImportExport.Contracts;
+using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
+using Philadelphus.Core.Domain.ImportExport.Services.Implementations;
 
 namespace Philadelphus.Presentation.Wpf.UI
 {
@@ -249,13 +251,22 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IInfrastructureRepositoryFactory, InfrastructureRepositoryFactory>();
 
                     // Импорт из Excel
-                    RegisterExcelImport(services);
+                    RegisterImportExport(services);
                 })
                 .Build();
         }
 
-        private void RegisterExcelImport(IServiceCollection services)
+        private void RegisterImportExport(IServiceCollection services)
         {
+            // Общее
+            // Регистрация сервисов
+            // Слой Core
+            services.AddTransient<IImportExportService, ImportExportService>();
+            // Слой Infrastructure
+            services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
+            services.AddTransient<JsonImportExportAdapter>();
+
+            // Excel
             // Регистрация сервисов
             // Слой Core
             services.AddSingleton<ConversionService>();
@@ -268,10 +279,9 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
             services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
             services.AddSingleton<IExcelImportSchemaTemplateStorage, ExcelImportSchemaTemplateStorage>();
+            // Слой Infrastructure
             services.AddTransient<IImportExportAdapter, ExcelImportExportAdapter>();
             services.AddTransient<ExcelImportExportAdapter>();
-            services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
-            services.AddTransient<JsonImportExportAdapter>();
             // Слой Presentation
             services.AddTransient<ExcelImportPipeline>();
             services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
