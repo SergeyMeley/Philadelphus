@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
+namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
     /// <summary>
     /// DTO для передачи данных AttributeExportDTO.
@@ -16,12 +16,12 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
         /// <summary>
         /// Наименование.
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Описание.
         /// </summary>
-        public string Description { get; }
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Наименование узла типа данных.
@@ -36,17 +36,24 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
         /// <summary>
         /// Признак коллекции значений.
         /// </summary>
-        public bool IsCollectionValue { get; } = false;
+        public bool IsCollectionValue { get; set; } = false;
 
         /// <summary>
         /// Область видимости.
         /// </summary>
-        public VisibilityScope Visibility { get; } = VisibilityScope.Public;
+        public VisibilityScope Visibility { get; set; }
 
         /// <summary>
         /// Режим переопределения.
         /// </summary>
-        public OverrideType Override { get; } = OverrideType.Sealed;
+        public OverrideType Override { get; set; }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="AttributeExportDTO" />.
+        /// </summary>
+        public AttributeExportDTO()
+        {
+        }
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="AttributeExportDTO" />.
@@ -63,18 +70,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
             IsCollectionValue = attr.IsCollectionValue;
             Visibility = attr.Visibility;
             Override = attr.Override;
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="AttributeExportDTO" />.
-        /// </summary>
-        public AttributeExportDTO(string name, string description)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            ArgumentNullException.ThrowIfNull(description);
-
-            Name = name;
-            Description = description;
         }
     }
 }

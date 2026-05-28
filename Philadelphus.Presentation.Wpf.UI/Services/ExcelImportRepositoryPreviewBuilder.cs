@@ -1,15 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.ImportExport.Helpers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
-using System;
-using System.Linq;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services
 {
@@ -27,6 +24,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             var repositoryService = _serviceProvider.GetRequiredService<IPhiladelphusRepositoryService>();
             var repositoryCollectionService = _serviceProvider.GetRequiredService<IPhiladelphusRepositoryCollectionService>();
             var dataStoragesCollectionVm = _serviceProvider.GetRequiredService<DataStoragesCollectionVM>();
+            var jsonImportExportAdapter = _serviceProvider.GetRequiredService<JsonImportExportAdapter>();
 
             var previewStorage = dataStoragesCollectionVm.MainDataStorageVM?.Model
                 ?? dataStoragesCollectionVm.DataStoragesVMs?.Select(x => x.Model).FirstOrDefault(x => x != null);
@@ -49,7 +47,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
                 previewTargetRoot.Name = targetExistingRootName;
             }
 
-            var previewTree = JsonImportExportHelper.ParseJson(json, repositoryService, previewRepository, _ => { }, (_, _) => { });
+            var previewTree = jsonImportExportAdapter.ImportFromJson(json, repositoryService, previewRepository, _ => { }, (_, _) => { });
             var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService);
             previewRepositoryVm.Childs.Clear();
 

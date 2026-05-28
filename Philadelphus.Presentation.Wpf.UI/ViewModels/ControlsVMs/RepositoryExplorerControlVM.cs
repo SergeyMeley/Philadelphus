@@ -7,9 +7,9 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
-using Philadelphus.Core.Domain.ImportExport.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Models.Tables;
@@ -18,19 +18,11 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using PropertyTools.Wpf;
 using Serilog;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -466,9 +458,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return new RelayCommand(obj =>
                 {
                     var model = SelectedRepositoryMember.Model as TreeRootModel;
-                    var json = JsonImportExportHelper.GetJson(model.OwningWorkingTree);
-
-                    Clipboard.SetText(json);
+                    var jsonAdapter = new JsonImportExportAdapter(_notificationService);
 
                     var path = string.Empty;
 
@@ -484,7 +474,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
 
                     string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.CreateVersion7()}.phjson");
-                    File.WriteAllText(file, json, Encoding.UTF8);
+                    jsonAdapter.Serialize(model.OwningWorkingTree, file);
 
                     Process.Start(new ProcessStartInfo
                     {
@@ -519,9 +509,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                         _ = Task.Run(() =>
                         {
-                            var json = File.ReadAllText(file);
+                            var jsonAdapter = new JsonImportExportAdapter(_notificationService);
 
-                            JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model, OnProcessChanged, OnProgressChanged);
+                            jsonAdapter.ImportFromFile(file, _service, PhiladelphusRepositoryVM.Model, OnProcessChanged, OnProgressChanged);
 
                             Application.Current.Dispatcher.Invoke(() =>
                             {

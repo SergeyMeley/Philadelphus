@@ -1,28 +1,23 @@
 using AutoMapper;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
-using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
-using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.TablesExport.Factories;
 using Philadelphus.Infrastructure.Cache.Redis.Implementations;
 using Philadelphus.Infrastructure.Cache.RepositoryInterfaces;
+using Philadelphus.Infrastructure.ImportExport.Excel;
+using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Infrastructure.Messaging.Kafka;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Mapping;
 using Philadelphus.Presentation.Wpf.UI.Services;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
@@ -35,20 +30,13 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
 using StackExchange.Redis;
-using System;
-using System.Configuration;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using System.Windows;
-using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI
 {
@@ -279,6 +267,7 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
             services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
             services.AddSingleton<IExcelImportSchemaTemplateStorage, ExcelImportSchemaTemplateStorage>();
+            services.AddTransient<JsonImportExportAdapter>();
             // Слой Presentation
             services.AddTransient<ExcelImportPipeline>();
             services.AddTransient<ExcelImportRepositoryPreviewBuilder>();

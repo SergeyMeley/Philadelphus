@@ -1,6 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
-namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
+namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
     /// <summary>
     /// DTO для передачи данных узла рабочего дерева.

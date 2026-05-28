@@ -1,11 +1,8 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.ImportExport.Helpers;
-using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Xunit;
-using FluentAssertions;
 
 namespace Philadelphus.Tests.Domain.Entities.MainEntities
 {

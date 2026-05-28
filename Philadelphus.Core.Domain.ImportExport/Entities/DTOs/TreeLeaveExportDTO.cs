@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
+namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
     /// <summary>
     /// DTO для передачи данных листа рабочего дерева.
@@ -15,27 +15,34 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
         /// <summary>
         /// Наименование.
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Описание.
         /// </summary>
-        public string Description { get; }
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Строковое значение листа.
         /// </summary>
-        public string StringValue { get; }
+        public string StringValue { get; set; } = TreeLeaveModel.EmptyStringValue;
 
         /// <summary>
         /// Наименование владеющего узла.
         /// </summary>
-        public string OwningNodeName { get; }
+        public string OwningNodeName { get; set; } = string.Empty;
 
         /// <summary>
         /// Атрибуты листа, выгружаемые вместе с ним.
         /// </summary>
-        public List<AttributeExportDTO> Attributes { get; } = new();
+        public List<AttributeExportDTO> Attributes { get; set; } = new();
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeLeaveExportDTO" />.
+        /// </summary>
+        public TreeLeaveExportDTO()
+        {
+        }
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TreeLeaveExportDTO" />.
@@ -51,26 +58,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
             StringValue = leave.StringValue;
             OwningNodeName = leave.ParentNode?.Name ?? "Неизвестный";
             Attributes = leave.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="TreeLeaveExportDTO" />.
-        /// </summary>
-        /// <param name="name">Наименование.</param>
-        /// <param name="description">Описание.</param>
-        /// <param name="owningNodeName">Наименование владеющего узла.</param>
-        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
-        public TreeLeaveExportDTO(string name, string description, string owningNodeName)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            ArgumentNullException.ThrowIfNull(description);
-            ArgumentException.ThrowIfNullOrWhiteSpace(owningNodeName);
-
-            Name = name;
-            Description = description;
-            StringValue = TreeLeaveModel.EmptyStringValue;
-            OwningNodeName = owningNodeName;
         }
     }
 }

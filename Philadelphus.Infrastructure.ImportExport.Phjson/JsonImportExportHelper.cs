@@ -1,10 +1,10 @@
-﻿using Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs;
-using Philadelphus.Core.Domain.Entities.Enums;
+﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Text;
@@ -13,12 +13,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
-namespace Philadelphus.Core.Domain.ImportExport.Helpers
+namespace Philadelphus.Infrastructure.ImportExport.Phjson
 {
     /// <summary>
     /// Полностью сгенерировано нейронкой, корректность не гарантируется
     /// </summary>
-    public static class JsonImportExportHelper
+    internal static class JsonImportExportHelper
     {
         /// <summary>
         /// Максимальный размер JSON файла (500 МБ)
@@ -61,7 +61,46 @@ namespace Philadelphus.Core.Domain.ImportExport.Helpers
             ArgumentNullException.ThrowIfNull(tree);
 
             var exportDto = new WorkingTreeExportDTO(tree);
+            return GetJson(exportDto);
+        }
+
+        /// <summary>
+        /// Сериализует DTO рабочего дерева в JSON.
+        /// </summary>
+        /// <param name="exportDto">DTO рабочего дерева.</param>
+        /// <returns>JSON-представление рабочего дерева.</returns>
+        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
+        public static string GetJson(WorkingTreeExportDTO exportDto)
+        {
+            ArgumentNullException.ThrowIfNull(exportDto);
+
             return JsonSerializer.Serialize(exportDto, _options);
+        }
+
+        /// <summary>
+        /// Читает DTO рабочего дерева из JSON.
+        /// </summary>
+        /// <param name="json">JSON-строка.</param>
+        /// <returns>DTO рабочего дерева.</returns>
+        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
+        /// <exception cref="InvalidOperationException">Если JSON не удалось прочитать.</exception>
+        public static WorkingTreeExportDTO ParseDtoFromJson(string json)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(json);
+            ValidateJsonSize(json);
+
+            try
+            {
+                using var document = JsonDocument.Parse(json, _documentOptions);
+
+                return JsonSerializer.Deserialize<WorkingTreeExportDTO>(json, _options)
+                    ?? throw new InvalidOperationException("JSON не содержит данные рабочего дерева.");
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Ошибка парсинга JSON: {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -91,10 +130,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Helpers
             // Валидация входных данных
             ArgumentException.ThrowIfNullOrWhiteSpace(json);
 
-            var jsonSize = Encoding.UTF8.GetByteCount(json);
-            if (jsonSize > MaxJsonSize)
-                throw new InvalidOperationException(
-                    $"JSON слишком большой: {jsonSize} байт (максимум {MaxJsonSize} байт)");
+            ValidateJsonSize(json);
 
             refreshProcess?.Invoke("Читаем json");
             refreshProgress?.Invoke(0, 1);
@@ -204,6 +240,14 @@ namespace Philadelphus.Core.Domain.ImportExport.Helpers
                 throw new InvalidOperationException(
                     $"Неожиданная ошибка при импорте JSON: {ex.Message}", ex);
             }
+        }
+
+        private static void ValidateJsonSize(string json)
+        {
+            var jsonSize = Encoding.UTF8.GetByteCount(json);
+            if (jsonSize > MaxJsonSize)
+                throw new InvalidOperationException(
+                    $"JSON слишком большой: {jsonSize} байт (максимум {MaxJsonSize} байт)");
         }
 
         private static void CreateNodeRecursive(

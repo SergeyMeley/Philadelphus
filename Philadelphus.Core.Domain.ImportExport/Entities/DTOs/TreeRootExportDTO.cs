@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
+namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
     /// <summary>
     /// DTO для передачи данных корня рабочего дерева.
@@ -15,24 +15,31 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
         /// <summary>
         /// Наименование.
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Описание.
         /// </summary>
-        public string Description { get; }
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Выполняет операцию ChildNodes.
         /// </summary>
         /// <returns>Коллекция полученных данных.</returns>
-        public List<TreeNodeExportDTO> ChildNodes { get; } = new();
+        public List<TreeNodeExportDTO> ChildNodes { get; set; } = new();
 
         /// <summary>
         /// Выполняет операцию Attributes.
         /// </summary>
         /// <returns>Коллекция полученных данных.</returns>
         public List<AttributeExportDTO> Attributes { get; set; } = new();
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="TreeRootExportDTO" />.
+        /// </summary>
+        public TreeRootExportDTO()
+        {
+        }
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TreeRootExportDTO" />.
@@ -47,22 +54,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
             Description = root.Description;
             ChildNodes = root.ChildNodes?.Select(n => new TreeNodeExportDTO(n)).ToList() ?? new();
             Attributes = root.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="TreeRootExportDTO" />.
-        /// </summary>
-        /// <param name="name">Наименование.</param>
-        /// <param name="description">Описание.</param>
-        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
-        public TreeRootExportDTO(string name, string description)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            ArgumentNullException.ThrowIfNull(description);
-
-            Name = name;
-            Description = description;
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.ImportExport.Helpers;
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using System;
 using System.Collections.Generic;
+using Philadelphus.Core.Domain.ImportExport.Implementations;
+using Philadelphus.Infrastructure.ImportExport.Phjson;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services
 {
@@ -14,15 +15,18 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         private readonly ConversionService _conversionService;
         private readonly IExcelImportProfileValidator _profileValidator;
         private readonly ExcelImportRepositoryPreviewBuilder _repositoryPreviewBuilder;
+        private readonly JsonImportExportAdapter _jsonImportExportAdapter;
 
         public ExcelImportPipeline(
             ConversionService conversionService,
             IExcelImportProfileValidator profileValidator,
-            ExcelImportRepositoryPreviewBuilder repositoryPreviewBuilder)
+            ExcelImportRepositoryPreviewBuilder repositoryPreviewBuilder,
+            JsonImportExportAdapter jsonImportExportAdapter)
         {
             _conversionService = conversionService;
             _profileValidator = profileValidator;
             _repositoryPreviewBuilder = repositoryPreviewBuilder;
+            _jsonImportExportAdapter = jsonImportExportAdapter;
         }
 
         public List<ExcelImportProfile> GetProfilesForExecution(ExcelImportSchema schema)
@@ -63,7 +67,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             TreeRootModel? existingRoot)
         {
             var json = BuildJson(schema);
-            JsonImportExportHelper.ParseJson(json, repositoryService, repository, _ => { }, (_, _) => { });
+            _jsonImportExportAdapter.ImportFromJson(json, repositoryService, repository, _ => { }, (_, _) => { });
         }
 
         private void EnsureValid(ExcelImportSchema schema)
