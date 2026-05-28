@@ -33,7 +33,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Тип.
         /// </summary>
-        [Display(Name = "Системный тип", Description = "Системный базовый тип")]
+        [Display(Name = "[Системный тип]", Description = "Системный базовый тип")]
         public override SystemBaseType SystemBaseType { get; }
 
         /// <summary>
