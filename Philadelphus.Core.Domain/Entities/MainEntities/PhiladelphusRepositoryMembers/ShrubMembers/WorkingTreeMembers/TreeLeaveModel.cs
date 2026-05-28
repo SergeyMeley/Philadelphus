@@ -48,7 +48,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Тип.
         /// </summary>
-        [Display(Name = "Системный тип", Description = "Системный базовый тип")]
+        [Display(Name = "[Системный тип]", Description = "Системный базовый тип")]
         public virtual SystemBaseType SystemBaseType => SystemBaseType.USER_DEFINED;
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Для пользовательских листьев значение вычисляется из текущей коллекции атрибутов и не вводится
         /// вручную. Системные листы переопределяют это свойство и хранят валидируемое значение базового типа.
         /// </remarks>
-        [Display(Name = "Значение", Description = "Строковое значение листа")]
+        [Display(Name = "[Значение]", Description = "Строковое значение листа")]
         public virtual string StringValue
         {
             get => BuildAttributesStringValue();
@@ -72,19 +72,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Родительский узел.
         /// </summary>
-        [Display(Name = "Родитель", Description = "Родительский узел")]
+        [Display(Name = "[Родитель]", Description = "Родительский узел")]
         public TreeNodeModel ParentNode { get; }
 
         /// <summary>
         /// Родитель.
         /// </summary>
-        [Display(Name = "Родитель", Description = "Родитель")]
+        [Display(Name = "[Родитель]", Description = "Родитель")]
         public IParentModel Parent => ParentNode;
 
         /// <summary>
         /// Все родители рекурсивно.
         /// </summary>
-        [Display(Name = "Родители", Description = "Все родители рекурсивно")]
+        [Display(Name = "[Родители]", Description = "Все родители рекурсивно")]
         public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive
         {
             get => throw new NotImplementedException();
