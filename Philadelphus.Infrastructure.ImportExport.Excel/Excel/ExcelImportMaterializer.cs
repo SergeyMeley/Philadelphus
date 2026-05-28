@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Philadelphus.Core.Domain.Entities.Enums;
 
 namespace Philadelphus.Infrastructure.ImportExport.Excel
 {
@@ -104,7 +105,9 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                             Name = fkProperty.Property.PropertyName,
                             Description = $"Ссылка на строку таблицы «{fkProperty.ParentNodeName}»",
                             DataTypeNodeName = fkProperty.ParentNodeName,
-                            ValueLeaveName = null!
+                            ValueLeaveName = null!,
+                            Visibility = fkProperty.Property.Visibility,
+                            Override = fkProperty.Property.Override
                         }
                     });
             }
@@ -156,7 +159,9 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                     Name = fkProperty.Property.PropertyName,
                     Description = $"Ссылка на строку таблицы «{fkProperty.ParentNodeName}»",
                     DataTypeNodeName = fkProperty.ParentNodeName,
-                    ValueLeaveName = parentLeafName
+                    ValueLeaveName = parentLeafName,
+                    Visibility = fkProperty.Property.Visibility,
+                    Override = fkProperty.Property.Override
                 });
             }
 
@@ -322,5 +327,15 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
         public string DataTypeNodeName { get; set; } = "Не определён";
 
         public string? ValueLeaveName { get; set; } = "Не задано";
+
+        /// <summary>
+        /// Область видимости атрибута.
+        /// </summary>
+        public VisibilityScope Visibility { get; set; }
+
+        /// <summary>
+        /// Режим переопределения атрибута.
+        /// </summary>
+        public OverrideType Override { get; set; }
     }
 }

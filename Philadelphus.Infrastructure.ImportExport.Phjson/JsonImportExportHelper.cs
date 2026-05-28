@@ -364,14 +364,20 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
                 {
                     var visibilityString = visibilityProp.GetString();
                     Enum.TryParse<VisibilityScope>(visibilityString, true, out var visibility);
-                    attr.Visibility = visibility;
+                    if (visibility != VisibilityScope.SystemError)
+                    {
+                        attr.Visibility = visibility;
+                    }
                 }
 
                 if (attrElement.TryGetProperty("override", out var overrideProp))
                 {
                     var overrideString = overrideProp.GetString();
                     Enum.TryParse<OverrideType>(overrideString, true, out var overrideValue);
-                    attr.Override = overrideValue;
+                    if (overrideValue != OverrideType.SystemError)
+                    {
+                        attr.Override = overrideValue;
+                    }
                 }
 
                 if (attrElement.TryGetProperty("description", out var descProp))

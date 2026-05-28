@@ -149,7 +149,9 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 Name = property.PropertyName,
                 Description = ResolveDescription(property),
                 DataTypeNodeName = property.DataTypeNodeName,
-                ValueLeaveName = value
+                ValueLeaveName = value,
+                Visibility = property.Visibility,
+                Override = property.Override
             };
         }
 
@@ -160,7 +162,9 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 Name = property.PropertyName,
                 Description = ResolveDescription(property),
                 DataTypeNodeName = property.DataTypeNodeName,
-                ValueLeaveName = null!
+                ValueLeaveName = null!,
+                Visibility = property.Visibility,
+                Override = property.Override
             };
         }
 

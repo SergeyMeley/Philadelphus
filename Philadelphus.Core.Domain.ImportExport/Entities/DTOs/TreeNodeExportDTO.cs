@@ -23,6 +23,11 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         public string OwningRootName { get; set; } = string.Empty;
 
         /// <summary>
+        /// Дочерние узлы.
+        /// </summary>
+        public List<TreeNodeExportDTO> ChildNodes { get; set; } = new();
+
+        /// <summary>
         /// Выполняет операцию ChildLeaves.
         /// </summary>
         /// <returns>Коллекция полученных данных.</returns>
@@ -54,6 +59,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
             Name = node.Name;
             Description = node.Description;
             OwningRootName = node.OwningWorkingTree?.ContentRoot?.Name ?? "Неизвестный";
+            ChildNodes = node.ChildNodes.Select(n => new TreeNodeExportDTO(n)).ToList();
             ChildLeaves = node.ChildLeaves.Select(l => new TreeLeaveExportDTO(l)).ToList();
             Attributes = node.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
         }

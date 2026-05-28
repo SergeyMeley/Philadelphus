@@ -2,6 +2,7 @@ using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.ImportExport.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Philadelphus.Infrastructure.ImportExport.Excel
 {
@@ -103,7 +104,8 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
         {
             return new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
             };
         }
     }
