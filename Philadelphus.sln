@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Core.Applicati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B262F083-816F-4B29-B740-9E87DA8359AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Core.Domain.ImportExport", "Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj", "{88EE8FA1-4AC0-4C9D-A54D-D826A5CCB599}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Core.Domain.ImportExport.Excel", "Philadelphus.Core.Domain.ImportExport.Excel\Philadelphus.Core.Domain.ImportExport.Excel.csproj", "{88EE8FA1-4AC0-4C9D-A54D-D826A5CCB599}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philadelphus.Infrastructure.Messaging.Kafka", "Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj", "{E22E7733-2A49-4B36-5264-D1D7E1F2D630}"
 EndProject

@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
-    <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport.Excel\Philadelphus.Core.Domain.ImportExport.Excel.csproj" />
     <ProjectReference Include="..\Philadelphus.Tests.Common\Philadelphus.Tests.Common.csproj" />
   </ItemGroup>
 
