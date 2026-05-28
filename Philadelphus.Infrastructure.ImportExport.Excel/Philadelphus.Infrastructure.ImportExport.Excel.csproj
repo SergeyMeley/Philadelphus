@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
   </ItemGroup>
 
 </Project>

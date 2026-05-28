@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
+using Philadelphus.Core.Domain.ImportExport.Interfaces;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -267,6 +268,9 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
             services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
             services.AddSingleton<IExcelImportSchemaTemplateStorage, ExcelImportSchemaTemplateStorage>();
+            services.AddTransient<IImportExportAdapter, ExcelImportExportAdapter>();
+            services.AddTransient<ExcelImportExportAdapter>();
+            services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
             services.AddTransient<JsonImportExportAdapter>();
             // Слой Presentation
             services.AddTransient<ExcelImportPipeline>();
