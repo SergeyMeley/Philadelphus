@@ -1,4 +1,3 @@
-﻿using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
@@ -268,19 +267,30 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Формирует строковое значение пользовательского листа из текущей коллекции атрибутов.
         /// </summary>
         /// <remarks>
-        /// Пользовательский лист не редактирует <see cref="StringValue" /> напрямую: значение является снимком
-        /// атрибутов в JSON-формате. Системные листья переопределяют это поведение и хранят валидируемое
-        /// значение базового типа.
+        /// Пользовательский лист не редактирует <see cref="StringValue" /> напрямую: значение является JSON-словарем
+        /// пар "название атрибута - значение атрибута". Системные листья переопределяют это поведение и хранят
+        /// валидируемое значение базового типа.
         /// </remarks>
         /// <returns>JSON-представление атрибутов листа.</returns>
         private string BuildAttributesStringValue()
         {
             var attributes = Attributes?
-                .Select(x => new AttributeExportDTO(x))
-                .ToList()
-                ?? new List<AttributeExportDTO>();
+                .ToDictionary(x => x.Name, GetAttributeStringValue)
+                ?? new Dictionary<string, string>();
 
             return JsonSerializer.Serialize(attributes, _stringValueJsonOptions);
+        }
+
+        private static string GetAttributeStringValue(ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            if (attribute.IsCollectionValue)
+            {
+                return string.Join(", ", attribute.Values.Select(x => x.Name));
+            }
+
+            return attribute.Value?.Name ?? string.Empty;
         }
 
         private void SendAttributeCollectionRestriction(string requirementCode, string operation)
