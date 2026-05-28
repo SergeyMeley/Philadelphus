@@ -26,7 +26,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Тип.
         /// </summary>
-        [Display(Name = "Системный тип", Description = "Системный базовый тип")]
+        [Display(Name = "[Системный тип]", Description = "Системный базовый тип")]
         public override SystemBaseType SystemBaseType { get; }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// существующим UI. Это свойство фиксирует доменный тип значения внутри модели, чтобы проверка
         /// корректности была инвариантом самого системного листа, а не только внешним правилом политики.
         /// </remarks>
-        [Display(Name = "Типизированное значение", Description = "Значение системного листа, приведенное к системному базовому типу")]
+        [Display(Name = "[Типизированное значение]", Description = "Значение системного листа, приведенное к системному базовому типу")]
         public object? TypedValue => _typedValue;
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Строковое значение
         /// </summary>
-        [Display(Name = "Значение", Description = "Строковое значение")]
+        [Display(Name = "[Значение]", Description = "Строковое значение")]
         public override string StringValue 
         { 
             get

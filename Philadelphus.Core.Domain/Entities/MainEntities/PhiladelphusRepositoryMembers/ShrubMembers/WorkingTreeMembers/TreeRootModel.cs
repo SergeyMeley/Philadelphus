@@ -38,11 +38,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Системный корень
         /// </summary>
+        [Display(Name = "[Системный]", Description = "Системный элемент")]
         public bool IsSystemBase { get; } = false;
 
         /// <summary>
         /// Уникальный идентификатор системного корня
         /// </summary>
+        [Display(Name = "[UUID системного элемента]", Description = "UUID системного базового элемента")]
         internal static Guid SystemBaseUuid { get => Guid.Parse("00000000-0000-0000-0000-000018151520"); }
 
         #endregion
@@ -52,11 +54,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Дочерние узлы репозитория Чубушника
         /// </summary>
+        [Display(Name = "[Узлы]", Description = "Дочерние узлы")]
         public IReadOnlyList<TreeNodeModel> ChildNodes { get => _childNodes; }
 
         /// <summary>
         /// Наследники
         /// </summary>
+        [Display(Name = "[Наследники]", Description = "Наследники")]
         public ReadOnlyDictionary<Guid, IChildrenModel> Childs
         {
             get
@@ -78,7 +82,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Все наследники (рекурсивно)
         /// </summary>
-        [Display(Name = "Наследники", Description = "Все наследники (рекурсивно)")]
+        [Display(Name = "[Наследники]", Description = "Все наследники (рекурсивно)")]
         public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive { get; }
 
         #endregion

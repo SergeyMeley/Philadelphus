@@ -54,25 +54,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Владеющий репозиторий
         /// </summary>
-        [Display(Name = "Репозиторий", Description = "Владеющий репозиторий")]
+        [Display(Name = "[Репозиторий]", Description = "Владеющий репозиторий")]
         public PhiladelphusRepositoryModel OwningRepository { get; }
 
         /// <summary>
         /// Содержащиеся рабочие деревья
         /// </summary>
-        [Display(Name = "Рабочие деревья", Description = "Содержащиеся рабочие деревья")]
+        [Display(Name = "[Рабочие деревья]", Description = "Содержащиеся рабочие деревья")]
         public List<WorkingTreeModel> ContentWorkingTrees { get; }
 
         /// <summary>
         /// Системное рабочее дерево
         /// </summary>
-        [Display(Name = "Системное дерево", Description = "Системное рабочее дерево")]
+        [Display(Name = "[Системное дерево]", Description = "Системное рабочее дерево")]
         public WorkingTreeModel SystemBaseWorkingTree { get => ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid); }
 
         /// <summary>
         /// Содержимое
         /// </summary>
-        [Display(Name = "Содержимое", Description = "Содержимое")]
+        [Display(Name = "[Содержимое]", Description = "Содержимое")]
         public ReadOnlyDictionary<Guid, IContentModel> Content 
         {
             get
@@ -91,7 +91,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Все содержимое (рекурсивно)
         /// </summary>
-        [Display(Name = "Все содержимое", Description = "Все содержимое")]
+        [Display(Name = "[Все содержимое]", Description = "Все содержимое")]
         public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
             get => throw new NotImplementedException(); 
@@ -101,7 +101,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Уникальные идентификаторы содержащихся деревьев
         /// </summary>
-        [Display(Name = "UUID'ы деревьев", Description = "Уникальные идентификаторы содержащихся рабочих деревьев")]
+        [Display(Name = "[UUID'ы деревьев]", Description = "Уникальные идентификаторы содержащихся рабочих деревьев")]
         public List<Guid> ContentWorkingTreesUuids 
         { 
             get
@@ -125,7 +125,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Хранилище данных
         /// </summary>
-        [Display(Name = "Хранилище", Description = "Хранилище данных")]
+        [Display(Name = "[Хранилище]", Description = "Хранилище данных")]
         public override IDataStorageModel DataStorage 
         { 
             get => OwningRepository.DataStorage;
