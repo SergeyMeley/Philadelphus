@@ -1,4 +1,4 @@
-using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
+﻿using Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.ImportExport.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 

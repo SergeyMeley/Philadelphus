@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -117,12 +118,7 @@ namespace Philadelphus.Core.Domain.Policies.Rules
         /// <returns>Имя без запрещенных символов и лишних пробелов по краям.</returns>
         internal static string NormalizeName(string? value)
         {
-            if (value == null)
-                return string.Empty;
-
-            var valueWithoutInvalidCharacters = new string(value.Where(x => IsInvalidNameCharacter(x) == false).ToArray());
-
-            return CollapseSpaces(valueWithoutInvalidCharacters.Trim());
+            return NameNormalizationHelper.NormalizeName(value);
         }
 
         public object OnRead(T model, string prop, object value)
@@ -186,36 +182,6 @@ namespace Philadelphus.Core.Domain.Policies.Rules
                 || value == ']'
                 || value == '~'
                 || value == '&';
-        }
-
-        private static string CollapseSpaces(string value)
-        {
-            if (value.Length == 0)
-                return value;
-
-            var result = new System.Text.StringBuilder(value.Length);
-            var previousWasSpace = false;
-
-            foreach (var character in value)
-            {
-                if (character == ' ')
-                {
-                    if (previousWasSpace)
-                    {
-                        continue;
-                    }
-
-                    previousWasSpace = true;
-                }
-                else
-                {
-                    previousWasSpace = false;
-                }
-
-                result.Append(character);
-            }
-
-            return result.ToString();
         }
 
         private static string FormatCharacters(IEnumerable<char> values)

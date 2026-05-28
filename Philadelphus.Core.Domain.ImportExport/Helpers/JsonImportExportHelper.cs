@@ -1,23 +1,19 @@
-﻿using Npgsql.Internal.Postgres;
-using Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs;
+﻿using Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Core.Domain.Policies.Rules;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using System.Xml.Linq;
 
-namespace Philadelphus.Core.Domain.Helpers
+namespace Philadelphus.Core.Domain.ImportExport.Helpers
 {
     /// <summary>
     /// Полностью сгенерировано нейронкой, корректность не гарантируется
@@ -527,7 +523,7 @@ namespace Philadelphus.Core.Domain.Helpers
             // Если в импортируемом дереве такого типа нет, но есть ровно один системный тип,
             // используем его как стабильный fallback.
             var systemTreeCandidates = candidates
-                .Where(x => x.OwningWorkingTree?.Uuid == WorkingTreeModel.SystemBaseUuid)
+                .Where(x => x.OwningWorkingTree?.IsSystemBase == true)
                 .ToList();
 
             if (systemTreeCandidates.Count == 1)
@@ -544,7 +540,7 @@ namespace Philadelphus.Core.Domain.Helpers
 
         private static string NormalizeImportName(string? name)
         {
-            return ValidNamePropertiesRule<ElementAttributeModel>.NormalizeName(name);
+            return NameNormalizationHelper.NormalizeName(name);
         }
 
         private static string GetElementName(IAttributeOwnerModel element)

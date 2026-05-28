@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Core.Domain.Entities.DTOs.ImportExportDTOs
+namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs.ImportExportDTOs
 {
     /// <summary>
     /// DTO для передачи данных AttributeExportDTO.
