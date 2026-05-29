@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using System.Globalization;
 
 namespace Philadelphus.Core.Domain.ImportExport.Mapping
 {
@@ -242,12 +243,14 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
                 var valueType = ResolveNodeByName(link.DataTypeName, allNodes, treeRoot.OwningWorkingTree);
                 ownAttribute.ValueType = valueType;
 
+                var valueLeafName = NormalizeSystemBaseImportValue(valueType, link.ValueLeafName);
+
                 if (valueType != null
-                    && leavesByParentUuidAndName.TryGetValue((valueType.Uuid, NormalizeImportName(link.ValueLeafName)), out var value))
+                    && leavesByParentUuidAndName.TryGetValue((valueType.Uuid, NormalizeImportName(valueLeafName)), out var value))
                 {
                     ownAttribute.Value = value;
                 }
-                else if (string.IsNullOrWhiteSpace(link.ValueLeafName) == false)
+                else if (string.IsNullOrWhiteSpace(valueLeafName) == false)
                 {
                     if (valueType == null)
                     {
@@ -255,8 +258,16 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
                             $"Не найден тип данных '{link.DataTypeName}' для атрибута '{link.Attribute.Name}'.");
                     }
 
+                    if (valueType is SystemBaseTreeNodeModel
+                        && ownAttribute.IsCollectionValue == false)
+                    {
+                        ownAttribute.TrySetSystemBaseValueFromString(valueLeafName);
+                        refreshProgress(++current, count);
+                        continue;
+                    }
+
                     var newValue = service.CreateTreeLeave(valueType, needAutoName: false, withoutInfoNotifications: true);
-                    SetImportedLeafValue(newValue, link.ValueLeafName);
+                    SetImportedLeafValue(newValue, valueLeafName);
                     ownAttribute.Value = newValue;
                     leavesByParentUuidAndName[(valueType.Uuid, NormalizeImportName(newValue.Name))] = newValue;
                 }
@@ -354,6 +365,44 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
                 || attributeDto.ValueLeaveName == "Не задано"
                     ? string.Empty
                     : attributeDto.ValueLeaveName;
+        }
+
+        /// <summary>
+        /// Приводит строковое значение системного типа к формату, который принимает доменная валидация.
+        /// </summary>
+        /// <param name="valueType">Тип данных атрибута.</param>
+        /// <param name="valueLeafName">Импортированное строковое значение.</param>
+        /// <returns>Нормализованное значение.</returns>
+        private static string NormalizeSystemBaseImportValue(TreeNodeModel? valueType, string valueLeafName)
+        {
+            if (valueType is not SystemBaseTreeNodeModel systemBaseNode
+                || string.IsNullOrWhiteSpace(valueLeafName))
+            {
+                return valueLeafName;
+            }
+
+            var trimmedValue = valueLeafName.Trim();
+            switch (systemBaseNode.SystemBaseType)
+            {
+                case SystemBaseType.INTEGER:
+                    return long.TryParse(trimmedValue, NumberStyles.Integer, CultureInfo.CurrentCulture, out var integerValue)
+                        || long.TryParse(trimmedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out integerValue)
+                            ? integerValue.ToString(CultureInfo.InvariantCulture)
+                            : valueLeafName;
+                case SystemBaseType.NUMERIC:
+                case SystemBaseType.FLOAT:
+                    return double.TryParse(trimmedValue, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out var doubleValue)
+                        || double.TryParse(trimmedValue, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out doubleValue)
+                            ? doubleValue.ToString(CultureInfo.InvariantCulture)
+                            : valueLeafName;
+                case SystemBaseType.MONEY:
+                    return decimal.TryParse(trimmedValue, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out var decimalValue)
+                        || decimal.TryParse(trimmedValue, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out decimalValue)
+                            ? decimalValue.ToString(CultureInfo.InvariantCulture)
+                            : valueLeafName;
+                default:
+                    return valueLeafName;
+            }
         }
 
         private static string NormalizeImportName(string? name)

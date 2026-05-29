@@ -599,19 +599,20 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
         }
 
-        private static string GetDefaultSystemBaseLeaveStringValue(SystemBaseType type)
+        private static string? GetDefaultSystemBaseLeaveStringValue(SystemBaseType type)
         {
             return type switch
             {
-                SystemBaseType.STRING => TreeLeaveModel.EmptyStringValue,
-                SystemBaseType.INTEGER => "0",
-                SystemBaseType.NUMERIC or SystemBaseType.FLOAT or SystemBaseType.MONEY => "0.0",
-                SystemBaseType.BOOL => "false",
-                SystemBaseType.DATETIME => "1970-01-01T00:00:00+00:00",
-                SystemBaseType.DATE => "1970-01-01",
-                SystemBaseType.TIME => "00:00:00",
-                SystemBaseType.OBJECT => TreeLeaveModel.EmptyStringValue,
-                _ => TreeLeaveModel.EmptyStringValue,
+                _ => null,
+                //SystemBaseType.STRING => TreeLeaveModel.EmptyStringValue,
+                //SystemBaseType.INTEGER => "0",
+                //SystemBaseType.NUMERIC or SystemBaseType.FLOAT or SystemBaseType.MONEY => "0.0",
+                //SystemBaseType.BOOL => "false",
+                //SystemBaseType.DATETIME => "1970-01-01T00:00:00+00:00",
+                //SystemBaseType.DATE => "1970-01-01",
+                //SystemBaseType.TIME => "00:00:00",
+                //SystemBaseType.OBJECT => TreeLeaveModel.EmptyStringValue,
+                //_ => TreeLeaveModel.EmptyStringValue,
             };
         }
 
@@ -781,7 +782,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     // дефолт существует без обращения к пользовательскому ресурсу. Например, для FILE нельзя
                     // безопасно выбрать универсальный путь, поэтому значение остается пустым до выбора файла.
                     var defaultValue = GetDefaultSystemBaseLeaveStringValue(systemBaseLeave.SystemBaseType);
-                    if (SystemBaseStringValueValidator.IsValid(systemBaseLeave.SystemBaseType, defaultValue, out _))
+                    if (defaultValue != null
+                        && SystemBaseStringValueValidator.IsValid(systemBaseLeave.SystemBaseType, defaultValue, out _))
                     {
                         systemBaseLeave.StringValue = defaultValue;
                     }
