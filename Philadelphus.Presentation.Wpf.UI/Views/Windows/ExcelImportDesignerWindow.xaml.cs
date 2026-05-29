@@ -67,7 +67,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private readonly ExcelPreviewService _previewService;
         private readonly IExcelImportSchemaBuilder _schemaBuilder;
         private readonly IExcelImportSchemaTemplateStorage _templateStorage;
-        private readonly ExcelImportPipeline _importPipeline;
+        private readonly ExcelImportPresentationPipeline _importPipeline;
         private Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryModel? _repository;
         private IPhiladelphusRepositoryService? _repositoryService;
         private Action? _refreshRepositoryView;
@@ -103,7 +103,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             ExcelPreviewService previewService,
             IExcelImportSchemaBuilder schemaBuilder,
             IExcelImportSchemaTemplateStorage templateStorage,
-            ExcelImportPipeline importPipeline)
+            ExcelImportPresentationPipeline importPipeline)
         {
             InitializeComponent();
             DataContext = this;

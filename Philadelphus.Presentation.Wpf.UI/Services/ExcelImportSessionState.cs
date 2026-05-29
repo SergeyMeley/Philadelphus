@@ -14,12 +14,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
     {
         private readonly ExcelPreviewService _previewService;
         private readonly IExcelImportSchemaBuilder _schemaBuilder;
-        private readonly ExcelImportPipeline _importPipeline;
+        private readonly ExcelImportPresentationPipeline _importPipeline;
 
         public ExcelImportSessionState(
             ExcelPreviewService previewService,
             IExcelImportSchemaBuilder schemaBuilder,
-            ExcelImportPipeline importPipeline)
+            ExcelImportPresentationPipeline importPipeline)
         {
             _previewService = previewService;
             _schemaBuilder = schemaBuilder;

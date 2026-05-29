@@ -1,13 +1,19 @@
-using Philadelphus.Infrastructure.ImportExport.Excel;
-using System;
-using System.Linq;
-
-namespace Philadelphus.Presentation.Wpf.UI.Services
+namespace Philadelphus.Infrastructure.ImportExport.Excel
 {
-    internal static class ExcelImportValidationMessageBuilder
+    /// <summary>
+    /// Формирует текстовое описание ошибок проверки Excel-импорта.
+    /// </summary>
+    public static class ExcelImportValidationMessageBuilder
     {
-        internal static string Build(ExcelImportValidationResult validationResult)
+        /// <summary>
+        /// Формирует сообщение об ошибках проверки.
+        /// </summary>
+        /// <param name="validationResult">Результат проверки Excel-импорта.</param>
+        /// <returns>Текстовое описание ошибок.</returns>
+        public static string Build(ExcelImportValidationResult validationResult)
         {
+            ArgumentNullException.ThrowIfNull(validationResult);
+
             var lines = validationResult.Errors
                 .Take(15)
                 .Select(error =>
