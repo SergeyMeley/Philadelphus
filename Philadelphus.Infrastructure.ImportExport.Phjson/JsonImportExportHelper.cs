@@ -51,20 +51,6 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
         };
 
         /// <summary>
-        /// Сериализует в json.
-        /// </summary>
-        /// <param name="tree">Рабочее дерево.</param>
-        /// <returns>Полученные данные.</returns>
-        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public static string GetJson(WorkingTreeModel tree)
-        {
-            ArgumentNullException.ThrowIfNull(tree);
-
-            var exportDto = new WorkingTreeExportDTO(tree);
-            return GetJson(exportDto);
-        }
-
-        /// <summary>
         /// Сериализует DTO рабочего дерева в JSON.
         /// </summary>
         /// <param name="exportDto">DTO рабочего дерева.</param>

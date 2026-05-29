@@ -22,6 +22,30 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
         /// </summary>
         public ImportExportDtoMappingProfile()
         {
+            // Модель бизнес-слоя => DTO
+            CreateMap<WorkingTreeModel, WorkingTreeExportDTO>()
+                .ForMember(dest => dest.ContentRoot, opt => opt.MapFrom(src => src.ContentRoot));
+
+            CreateMap<TreeRootModel, TreeRootExportDTO>()
+                .ForMember(dest => dest.ChildNodes, opt => opt.MapFrom(src => src.ChildNodes))
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes));
+
+            CreateMap<TreeNodeModel, TreeNodeExportDTO>()
+                .ForMember(dest => dest.OwningRootName, opt => opt.MapFrom(src => GetOwningRootName(src)))
+                .ForMember(dest => dest.ChildNodes, opt => opt.MapFrom(src => src.ChildNodes))
+                .ForMember(dest => dest.ChildLeaves, opt => opt.MapFrom(src => src.ChildLeaves))
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes));
+
+            CreateMap<TreeLeaveModel, TreeLeaveExportDTO>()
+                .ForMember(dest => dest.OwningNodeName, opt => opt.MapFrom(src => GetOwningNodeName(src)))
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes));
+
+            CreateMap<ElementAttributeModel, AttributeExportDTO>()
+                .ForMember(dest => dest.DataTypeNodeName, opt => opt.MapFrom(src => GetDataTypeNodeName(src)))
+                .ForMember(dest => dest.ValueLeaveName, opt => opt.MapFrom(src => GetValueLeaveName(src)));
+
+
+            // DTO => Модель бизнес-слоя
             CreateMap<WorkingTreeExportDTO, WorkingTreeModel>()
                 .ConstructUsing((src, ctx) => MapWorkingTree(src, ctx))
                 .ForMember(dest => dest.Name, opt => opt.Ignore())
@@ -85,6 +109,26 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             refreshProgress(1, 1);
 
             return treeRoot.OwningWorkingTree;
+        }
+
+        private static string GetOwningRootName(TreeNodeModel node)
+        {
+            return node.OwningWorkingTree?.ContentRoot?.Name ?? "Неизвестный";
+        }
+
+        private static string GetOwningNodeName(TreeLeaveModel leaf)
+        {
+            return leaf.ParentNode?.Name ?? "Неизвестный";
+        }
+
+        private static string GetDataTypeNodeName(ElementAttributeModel attribute)
+        {
+            return attribute.ValueType?.Name ?? "Не определён";
+        }
+
+        private static string GetValueLeaveName(ElementAttributeModel attribute)
+        {
+            return attribute.Value?.Name ?? "Не задано";
         }
 
         private static T GetRequiredContextItem<T>(ResolutionContext context, string key)

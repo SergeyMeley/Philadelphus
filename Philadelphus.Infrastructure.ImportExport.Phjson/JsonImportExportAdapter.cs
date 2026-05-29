@@ -1,8 +1,8 @@
+using Philadelphus.Core.Domain.ImportExport.Contracts;
+using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
-using Philadelphus.Core.Domain.ImportExport.Contracts;
 
 namespace Philadelphus.Infrastructure.ImportExport.Phjson
 {
@@ -36,31 +36,6 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
             ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
             File.WriteAllText(filePath, JsonImportExportHelper.GetJson(dto));
-        }
-
-        /// <summary>
-        /// Сериализует рабочее дерево в JSON-строку формата PHJSON.
-        /// </summary>
-        /// <param name="tree">Рабочее дерево.</param>
-        /// <returns>JSON-представление рабочего дерева.</returns>
-        public string Serialize(WorkingTreeModel tree)
-        {
-            ArgumentNullException.ThrowIfNull(tree);
-
-            return JsonImportExportHelper.GetJson(tree);
-        }
-
-        /// <summary>
-        /// Сериализует рабочее дерево в файл PHJSON.
-        /// </summary>
-        /// <param name="tree">Рабочее дерево.</param>
-        /// <param name="filePath">Путь к файлу результата.</param>
-        public void Serialize(WorkingTreeModel tree, string filePath)
-        {
-            ArgumentNullException.ThrowIfNull(tree);
-            ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-
-            File.WriteAllText(filePath, Serialize(tree));
         }
 
         /// <summary>
@@ -99,34 +74,6 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
             Action<int, int> refreshProgress)
         {
             return JsonImportExportHelper.ParseJson(json, service, repository, refreshProcess, refreshProgress);
-        }
-
-        /// <summary>
-        /// Импортирует рабочее дерево из файла PHJSON в доменную модель.
-        /// </summary>
-        /// <param name="filePath">Путь к исходному файлу.</param>
-        /// <param name="service">Доменный сервис репозитория.</param>
-        /// <param name="repository">Репозиторий Чубушника.</param>
-        /// <param name="refreshProcess">Действие обновления описания процесса.</param>
-        /// <param name="refreshProgress">Действие обновления прогресса.</param>
-        /// <returns>Импортированное рабочее дерево.</returns>
-        public WorkingTreeModel ImportFromFile(
-            string filePath,
-            IPhiladelphusRepositoryService service,
-            PhiladelphusRepositoryModel repository,
-            Action<string> refreshProcess,
-            Action<int, int> refreshProgress)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-
-            if (File.Exists(filePath) == false)
-            {
-                throw new FileNotFoundException("Файл импорта не найден.", filePath);
-            }
-
-            var json = File.ReadAllText(filePath);
-
-            return ImportFromJson(json, service, repository, refreshProcess, refreshProgress);
         }
     }
 }

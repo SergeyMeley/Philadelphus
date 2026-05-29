@@ -58,7 +58,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Implementations
             ArgumentNullException.ThrowIfNull(workingTree);
             ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-            var dto = new WorkingTreeExportDTO(workingTree);
+            var dto = _mapper.Map<WorkingTreeExportDTO>(workingTree);
             GetAdapter(fileFormat, adapterName).Serialize(dto, filePath);
         }
 

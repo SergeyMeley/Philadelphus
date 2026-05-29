@@ -1,5 +1,3 @@
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-
 namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
     /// <summary>
@@ -28,15 +26,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         public List<TreeNodeExportDTO> ChildNodes { get; set; } = new();
 
         /// <summary>
-        /// Выполняет операцию ChildLeaves.
+        /// Дочерние листья.
         /// </summary>
-        /// <returns>Коллекция полученных данных.</returns>
         public List<TreeLeaveExportDTO> ChildLeaves { get; set; } = new();
 
         /// <summary>
-        /// Выполняет операцию Attributes.
+        /// Атрибуты узла.
         /// </summary>
-        /// <returns>Коллекция полученных данных.</returns>
         public List<AttributeExportDTO> Attributes { get; set; } = new();
 
         /// <summary>
@@ -44,40 +40,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         /// </summary>
         public TreeNodeExportDTO()
         {
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="TreeNodeExportDTO" />.
-        /// </summary>
-        /// <param name="node">Узел рабочего дерева.</param>
-        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public TreeNodeExportDTO(TreeNodeModel node)
-        {
-            ArgumentNullException.ThrowIfNull(node);
-            ArgumentNullException.ThrowIfNull(node.ChildLeaves);
-
-            Name = node.Name;
-            Description = node.Description;
-            OwningRootName = node.OwningWorkingTree?.ContentRoot?.Name ?? "Неизвестный";
-            ChildNodes = node.ChildNodes.Select(n => new TreeNodeExportDTO(n)).ToList();
-            ChildLeaves = node.ChildLeaves.Select(l => new TreeLeaveExportDTO(l)).ToList();
-            Attributes = node.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="TreeNodeExportDTO" />.
-        /// </summary>
-        /// <param name="name">Наименование.</param>
-        /// <param name="description">Описание.</param>
-        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        /// <exception cref="ArgumentException">Если строковый аргумент равен null, пустой строке или состоит только из пробельных символов.</exception>
-        public TreeNodeExportDTO(string name, string description)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            ArgumentNullException.ThrowIfNull(description);
-
-            Name = name;
-            Description = description;
         }
     }
 }

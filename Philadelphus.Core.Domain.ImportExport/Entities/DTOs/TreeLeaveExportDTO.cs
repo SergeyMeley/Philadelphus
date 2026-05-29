@@ -1,9 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
 namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
@@ -33,7 +28,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         public string OwningNodeName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Атрибуты листа, выгружаемые вместе с ним.
+        /// Атрибуты листа.
         /// </summary>
         public List<AttributeExportDTO> Attributes { get; set; } = new();
 
@@ -42,22 +37,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         /// </summary>
         public TreeLeaveExportDTO()
         {
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="TreeLeaveExportDTO" />.
-        /// </summary>
-        /// <param name="leave">Лист рабочего дерева.</param>
-        /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public TreeLeaveExportDTO(TreeLeaveModel leave)
-        {
-            ArgumentNullException.ThrowIfNull(leave);
-
-            Name = leave.Name;
-            Description = leave.Description;
-            StringValue = leave.StringValue;
-            OwningNodeName = leave.ParentNode?.Name ?? "Неизвестный";
-            Attributes = leave.Attributes?.Select(a => new AttributeExportDTO(a)).ToList() ?? new();
         }
     }
 }

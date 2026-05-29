@@ -1,15 +1,9 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Philadelphus.Core.Domain.Entities.Enums;
 
 namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
     /// <summary>
-    /// DTO для передачи данных AttributeExportDTO.
+    /// DTO для передачи данных атрибута элемента рабочего дерева.
     /// </summary>
     public class AttributeExportDTO
     {
@@ -53,23 +47,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         /// </summary>
         public AttributeExportDTO()
         {
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="AttributeExportDTO" />.
-        /// </summary>
-        /// <param name="attr"></param>
-        public AttributeExportDTO(ElementAttributeModel attr)
-        {
-            ArgumentNullException.ThrowIfNull(attr);
-
-            Name = attr.Name;
-            Description = attr.Description;
-            DataTypeNodeName = attr.ValueType?.Name ?? "Не определён";
-            ValueLeaveName = attr.Value?.Name ?? "Не задано";
-            IsCollectionValue = attr.IsCollectionValue;
-            Visibility = attr.Visibility;
-            Override = attr.Override;
         }
     }
 }
