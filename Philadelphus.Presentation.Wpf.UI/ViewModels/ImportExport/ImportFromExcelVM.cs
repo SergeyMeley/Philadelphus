@@ -14,7 +14,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 {
     public class ImportFromExcelVM : ViewModelBase
     {
-        private readonly ExcelImportSessionState _session;
+        private readonly ExcelImportPresentationSessionState _session;
         private readonly IFileDialogService _fileDialogService;
         private readonly IMessageDialogService _messageDialogService;
 
@@ -26,7 +26,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private bool _isBusy;
 
         public ImportFromExcelVM(
-            ExcelImportSessionState session,
+            ExcelImportPresentationSessionState session,
             IFileDialogService fileDialogService,
             IMessageDialogService messageDialogService)
         {

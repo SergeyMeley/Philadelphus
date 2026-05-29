@@ -282,6 +282,7 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddTransient<ExcelImportPresentationPipeline>();
             services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
             services.AddTransient<ExcelImportSessionState>();
+            services.AddTransient<ExcelImportPresentationSessionState>();
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<IMessageDialogService, MessageDialogService>();
 
