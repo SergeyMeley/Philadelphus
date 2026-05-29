@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
@@ -5,6 +6,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
@@ -16,6 +18,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
     /// </summary>
     public class ImportExportControlVM : ViewModelBase
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IImportExportService _importExportService;
         private readonly IPhiladelphusRepositoryService _repositoryService;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
@@ -23,18 +26,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ImportExportControlVM" />.
         /// </summary>
+        /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
         /// <param name="importExportService">Сервис импорта-экспорта.</param>
         /// <param name="repositoryService">Доменный сервис репозитория.</param>
         /// <param name="repositoryExplorerControlVM">Модель представления обозревателя репозитория.</param>
         public ImportExportControlVM(
+            IServiceProvider serviceProvider,
             IImportExportService importExportService,
             IPhiladelphusRepositoryService repositoryService,
             RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(importExportService);
             ArgumentNullException.ThrowIfNull(repositoryService);
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
 
+            _serviceProvider = serviceProvider;
             _importExportService = importExportService;
             _repositoryService = repositoryService;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
@@ -188,6 +195,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             ArgumentException.ThrowIfNullOrWhiteSpace(fileFormat);
             ArgumentException.ThrowIfNullOrWhiteSpace(adapterName);
 
+            // Временное решение до закрытия задачи #65496139:
+            // Excel-импорт пока должен идти через старый дизайнер, иначе теряются настройки схемы и атрибуты.
+            if (IsTemporaryExcelImport(fileFormat))
+            {
+                ImportFromExcelDesigner();
+                return;
+            }
+
             var openFileDialog = new OpenFileDialog
             {
                 Filter = BuildFileDialogFilter(fileFormat),
@@ -212,6 +227,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             {
                 _repositoryExplorerControlVM.AddTreeRoot(importedTree.ContentRoot);
             }
+        }
+
+        private void ImportFromExcelDesigner()
+        {
+            if (_repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model.ContentShrub == null)
+            {
+                MessageBox.Show(
+                    "Активный репозиторий не содержит рабочего дерева для импорта.",
+                    "Импорт Excel",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
+            window.Owner = Application.Current?.MainWindow;
+            window.Initialize(
+                _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model.ContentShrub,
+                _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model,
+                _repositoryService,
+                _repositoryExplorerControlVM.RefreshRepositoryView);
+            window.ShowDialog();
         }
 
         private void ConvertFile(
@@ -300,6 +337,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             return normalizedFileFormat.StartsWith(".", StringComparison.Ordinal)
                 ? normalizedFileFormat
                 : $".{normalizedFileFormat}";
+        }
+
+        private static bool IsTemporaryExcelImport(string fileFormat)
+        {
+            return string.Equals(NormalizeFileFormat(fileFormat), ".xlsx", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void OpenFile(string file)

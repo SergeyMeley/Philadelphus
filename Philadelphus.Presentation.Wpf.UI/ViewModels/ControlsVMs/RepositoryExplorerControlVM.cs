@@ -610,6 +610,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             NotifyRepositoryTreeChanged();
         }
 
+        /// <summary>
+        /// Обновляет отображаемое дерево репозитория из текущей доменной модели.
+        /// </summary>
+        public void RefreshRepositoryView()
+        {
+            UpdateLoadedPhiladelphusRepository(_philadelphusRepositoryVM.Model);
+        }
+
         private int BeginRepositoryLoad()
         {
             IsRepositoryLoading = true;
