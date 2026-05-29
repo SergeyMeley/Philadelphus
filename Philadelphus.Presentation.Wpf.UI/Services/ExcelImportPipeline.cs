@@ -1,11 +1,12 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
+using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
-using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using System;
-using System.Collections.Generic;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -21,7 +22,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         private readonly ExcelImportExportAdapter _excelImportExportAdapter;
         private readonly IExcelImportProfileValidator _profileValidator;
         private readonly ExcelImportRepositoryPreviewBuilder _repositoryPreviewBuilder;
-        private readonly JsonImportExportAdapter _jsonImportExportAdapter;
+        private readonly IImportExportService _importExportService;
+        private readonly IPhiladelphusRepositoryCollectionService _repositoryCollectionService;
+        private readonly IPhiladelphusRepositoryService _repositoryService;
+        private readonly DataStoragesCollectionVM _dataStoragesCollectionVm;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ExcelImportPipeline" />.
@@ -29,17 +33,26 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         /// <param name="excelImportExportAdapter">Адаптер импорта данных из Excel.</param>
         /// <param name="profileValidator">Валидатор профилей импорта Excel.</param>
         /// <param name="repositoryPreviewBuilder">Построитель предпросмотра репозитория.</param>
-        /// <param name="jsonImportExportAdapter">Адаптер импорта данных из PHJSON.</param>
+        /// <param name="importExportService">Сервис импорта-экспорта.</param>
+        /// <param name="repositoryCollectionService">Сервис коллекции репозиториев.</param>
+        /// <param name="repositoryService">Доменный сервис репозитория.</param>
+        /// <param name="dataStoragesCollectionVm">Модель представления хранилищ данных.</param>
         public ExcelImportPipeline(
             ExcelImportExportAdapter excelImportExportAdapter,
             IExcelImportProfileValidator profileValidator,
             ExcelImportRepositoryPreviewBuilder repositoryPreviewBuilder,
-            JsonImportExportAdapter jsonImportExportAdapter)
+            IImportExportService importExportService,
+            IPhiladelphusRepositoryCollectionService repositoryCollectionService,
+            IPhiladelphusRepositoryService repositoryService,
+            DataStoragesCollectionVM dataStoragesCollectionVm)
         {
             _excelImportExportAdapter = excelImportExportAdapter;
             _profileValidator = profileValidator;
             _repositoryPreviewBuilder = repositoryPreviewBuilder;
-            _jsonImportExportAdapter = jsonImportExportAdapter;
+            _importExportService = importExportService;
+            _repositoryCollectionService = repositoryCollectionService;
+            _repositoryService = repositoryService;
+            _dataStoragesCollectionVm = dataStoragesCollectionVm;
         }
 
         /// <summary>
@@ -72,7 +85,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         public string BuildJson(ExcelImportSchema schema)
         {
             EnsureValid(schema);
-            var importResult = _excelImportExportAdapter.Parse(ExcelImportSchemaNormalizer.GetCanonicalExecutionSchema(schema));
+            var importResult = BuildImportData(schema);
 
             return JsonSerializer.Serialize(importResult, CreateJsonOptions());
         }
@@ -87,8 +100,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             ExcelImportSchema schema,
             string? targetExistingRootName)
         {
-            var json = BuildJson(schema);
-            return _repositoryPreviewBuilder.Build(json, targetExistingRootName);
+            var importData = BuildImportData(schema);
+            var previewRepository = CreatePreviewRepository();
+            _repositoryService.GetShrubContent(previewRepository);
+
+            var previewTree = ImportPreparedData(importData, previewRepository, _repositoryService);
+            return _repositoryPreviewBuilder.Build(previewRepository, previewTree, targetExistingRootName);
         }
 
         /// <summary>
@@ -114,8 +131,22 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             IPhiladelphusRepositoryService repositoryService,
             TreeRootModel? existingRoot)
         {
-            var json = BuildJson(schema);
-            _jsonImportExportAdapter.ImportFromJson(json, repositoryService, repository, _ => { }, (_, _) => { });
+            var importData = BuildImportData(schema);
+            ImportPreparedData(importData, repository, repositoryService);
+        }
+
+        /// <summary>
+        /// Проверяет, что в схеме есть хотя бы один включенный лист.
+        /// </summary>
+        /// <param name="schema">Схема импорта.</param>
+        /// <param name="emptySelectionMessage">Сообщение об ошибке для пустого набора листов.</param>
+        public static void EnsureHasEnabledSheets(ExcelImportSchema schema, string emptySelectionMessage)
+        {
+            var profiles = ExcelImportSchemaNormalizer.GetEnabledProfiles(schema);
+            if (profiles.Count == 0)
+            {
+                throw new InvalidOperationException(emptySelectionMessage);
+            }
         }
 
         private void EnsureValid(ExcelImportSchema schema)
@@ -127,18 +158,39 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             }
         }
 
-        /// <summary>
-        /// Проверяет, что в схеме есть хотя бы один включенный лист.
-        /// </summary>
-        /// <param name="schema">Схема импорта Excel.</param>
-        /// <param name="emptySelectionMessage">Сообщение об ошибке для пустого набора листов.</param>
-        public static void EnsureHasEnabledSheets(ExcelImportSchema schema, string emptySelectionMessage)
+        private WorkingTreeExportDTO BuildImportData(ExcelImportSchema schema)
         {
-            var profiles = ExcelImportSchemaNormalizer.GetEnabledProfiles(schema);
-            if (profiles.Count == 0)
+            EnsureValid(schema);
+            return _excelImportExportAdapter.Parse(ExcelImportSchemaNormalizer.GetCanonicalExecutionSchema(schema));
+        }
+
+        private WorkingTreeModel ImportPreparedData(
+            WorkingTreeExportDTO importData,
+            PhiladelphusRepositoryModel repository,
+            IPhiladelphusRepositoryService repositoryService)
+        {
+            return _importExportService.ImportPreparedData(
+                importData,
+                repository,
+                repositoryService,
+                _ => { },
+                (_, _) => { });
+        }
+
+        private PhiladelphusRepositoryModel CreatePreviewRepository()
+        {
+            var previewStorage = _dataStoragesCollectionVm.MainDataStorageVM?.Model
+                ?? _dataStoragesCollectionVm.DataStoragesVMs?.Select(x => x.Model).FirstOrDefault(x => x != null);
+
+            if (previewStorage == null)
             {
-                throw new InvalidOperationException(emptySelectionMessage);
+                throw new InvalidOperationException("Не удалось получить временное хранилище для предпросмотра.");
             }
+
+            var previewRepository = _repositoryCollectionService.CreateNewPhiladelphusRepository(previewStorage, needAutoName: false);
+            previewRepository.Name = "Предпросмотр импорта";
+            previewRepository.Description = "Временный репозиторий для предпросмотра дерева из Excel";
+            return previewRepository;
         }
 
         private static JsonSerializerOptions CreateJsonOptions()

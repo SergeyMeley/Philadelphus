@@ -260,7 +260,6 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddTransient<IImportExportService, ImportExportService>();
             // Слой Infrastructure
             services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
-            services.AddTransient<JsonImportExportAdapter>();
 
             // Excel
             // Регистрация сервисов

@@ -89,7 +89,32 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Implementations
             ArgumentNullException.ThrowIfNull(refreshProgress);
 
             var dto = GetAdapter(fileFormat, adapterName).Parse(filePath);
-            return _mapper.Map<WorkingTreeModel>(dto, options =>
+            return ImportPreparedData(dto, repository, repositoryService, refreshProcess, refreshProgress);
+        }
+
+        /// <summary>
+        /// Импортирует рабочее дерево из подготовленных данных импорта.
+        /// </summary>
+        /// <param name="importData">Подготовленные данные импорта.</param>
+        /// <param name="repository">Репозиторий, в который выполняется импорт.</param>
+        /// <param name="repositoryService">Доменный сервис репозитория.</param>
+        /// <param name="refreshProcess">Действие обновления описания процесса.</param>
+        /// <param name="refreshProgress">Действие обновления прогресса.</param>
+        /// <returns>Импортированное рабочее дерево.</returns>
+        public WorkingTreeModel ImportPreparedData(
+            WorkingTreeExportDTO importData,
+            PhiladelphusRepositoryModel repository,
+            IPhiladelphusRepositoryService repositoryService,
+            Action<string> refreshProcess,
+            Action<int, int> refreshProgress)
+        {
+            ArgumentNullException.ThrowIfNull(importData);
+            ArgumentNullException.ThrowIfNull(repository);
+            ArgumentNullException.ThrowIfNull(repositoryService);
+            ArgumentNullException.ThrowIfNull(refreshProcess);
+            ArgumentNullException.ThrowIfNull(refreshProgress);
+
+            return _mapper.Map<WorkingTreeModel>(importData, options =>
             {
                 options.Items.SetImportRepository(repository);
                 options.Items.SetImportRepositoryService(repositoryService);

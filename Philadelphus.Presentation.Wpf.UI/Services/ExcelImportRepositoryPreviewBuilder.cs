@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -19,35 +20,26 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             _serviceProvider = serviceProvider;
         }
 
-        public RepositoryExplorerControlVM Build(string json, string? targetExistingRootName)
+        public RepositoryExplorerControlVM Build(
+            PhiladelphusRepositoryModel previewRepository,
+            WorkingTreeModel previewTree,
+            string? targetExistingRootName)
         {
             var repositoryService = _serviceProvider.GetRequiredService<IPhiladelphusRepositoryService>();
-            var repositoryCollectionService = _serviceProvider.GetRequiredService<IPhiladelphusRepositoryCollectionService>();
             var dataStoragesCollectionVm = _serviceProvider.GetRequiredService<DataStoragesCollectionVM>();
-            var jsonImportExportAdapter = _serviceProvider.GetRequiredService<JsonImportExportAdapter>();
-
-            var previewStorage = dataStoragesCollectionVm.MainDataStorageVM?.Model
-                ?? dataStoragesCollectionVm.DataStoragesVMs?.Select(x => x.Model).FirstOrDefault(x => x != null);
-
-            if (previewStorage == null)
-                throw new InvalidOperationException("Не удалось получить временное хранилище для предпросмотра.");
-
-            var previewRepository = repositoryCollectionService.CreateNewPhiladelphusRepository(previewStorage, needAutoName: false);
-            previewRepository.Name = "Предпросмотр импорта";
-            previewRepository.Description = "Временный репозиторий для предпросмотра дерева из Excel";
-
-            repositoryService.GetShrubContent(previewRepository);
 
             TreeRootModel? previewTargetRoot = null;
             if (string.IsNullOrWhiteSpace(targetExistingRootName) == false)
             {
+                var previewStorage = previewRepository.DataStorages?.FirstOrDefault(x => x.HasShrubMembersInfrastructureRepository)
+                    ?? throw new InvalidOperationException("Не удалось получить временное хранилище для предпросмотра.");
+
                 var previewWorkingTree = repositoryService.CreateWorkingTree(previewRepository, previewStorage, needAutoName: false, withoutInfoNotifications: true);
                 previewWorkingTree.Name = $"Предпросмотр: {targetExistingRootName}";
                 previewTargetRoot = repositoryService.CreateTreeRoot(previewWorkingTree, needAutoName: false, withoutInfoNotifications: true);
                 previewTargetRoot.Name = targetExistingRootName;
             }
 
-            var previewTree = jsonImportExportAdapter.ImportFromJson(json, repositoryService, previewRepository, _ => { }, (_, _) => { });
             var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService);
             previewRepositoryVm.Childs.Clear();
 

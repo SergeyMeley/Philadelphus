@@ -1,8 +1,11 @@
 using Philadelphus.Core.Domain.ImportExport.Contracts;
 using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
-using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace Philadelphus.Infrastructure.ImportExport.Phjson
 {
@@ -15,6 +18,27 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
         /// Расширение файлов PHJSON.
         /// </summary>
         public const string PhjsonFileFormat = ".phjson";
+
+        private const int MaxJsonSize = 500 * 1024 * 1024;
+        private const int MaxJsonDepth = 100;
+
+        private static readonly JsonSerializerOptions _options = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            Converters = { new JsonStringEnumConverter() },
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        private static readonly JsonDocumentOptions _documentOptions = new()
+        {
+            MaxDepth = MaxJsonDepth,
+            AllowTrailingCommas = false,
+            CommentHandling = JsonCommentHandling.Disallow
+        };
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="JsonImportExportAdapter" />.
@@ -35,7 +59,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
             ArgumentNullException.ThrowIfNull(dto);
             ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-            File.WriteAllText(filePath, JsonImportExportHelper.GetJson(dto));
+            File.WriteAllText(filePath, JsonSerializer.Serialize(dto, _options));
         }
 
         /// <summary>
@@ -53,27 +77,29 @@ namespace Philadelphus.Infrastructure.ImportExport.Phjson
             }
 
             var json = File.ReadAllText(filePath);
+            ValidateJsonSize(json);
 
-            return JsonImportExportHelper.ParseDtoFromJson(json);
+            try
+            {
+                using var document = JsonDocument.Parse(json, _documentOptions);
+
+                return JsonSerializer.Deserialize<WorkingTreeExportDTO>(json, _options)
+                    ?? throw new InvalidOperationException("JSON не содержит данные рабочего дерева.");
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Ошибка парсинга JSON: {ex.Message}", ex);
+            }
         }
 
-        /// <summary>
-        /// Импортирует рабочее дерево из JSON-строки формата PHJSON в доменную модель.
-        /// </summary>
-        /// <param name="json">JSON-строка.</param>
-        /// <param name="service">Доменный сервис репозитория.</param>
-        /// <param name="repository">Репозиторий Чубушника.</param>
-        /// <param name="refreshProcess">Действие обновления описания процесса.</param>
-        /// <param name="refreshProgress">Действие обновления прогресса.</param>
-        /// <returns>Импортированное рабочее дерево.</returns>
-        public WorkingTreeModel ImportFromJson(
-            string json,
-            IPhiladelphusRepositoryService service,
-            PhiladelphusRepositoryModel repository,
-            Action<string> refreshProcess,
-            Action<int, int> refreshProgress)
+        private static void ValidateJsonSize(string json)
         {
-            return JsonImportExportHelper.ParseJson(json, service, repository, refreshProcess, refreshProgress);
+            var jsonSize = Encoding.UTF8.GetByteCount(json);
+            if (jsonSize > MaxJsonSize)
+            {
+                throw new InvalidOperationException(
+                    $"JSON слишком большой: {jsonSize} байт (максимум {MaxJsonSize} байт).");
+            }
         }
     }
 }

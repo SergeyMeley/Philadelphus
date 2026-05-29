@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.ImportExport.Services.Interfaces
@@ -39,6 +40,22 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Interfaces
             string fileFormat,
             string adapterName,
             string filePath,
+            PhiladelphusRepositoryModel repository,
+            IPhiladelphusRepositoryService repositoryService,
+            Action<string> refreshProcess,
+            Action<int, int> refreshProgress);
+
+        /// <summary>
+        /// Импортирует рабочее дерево из подготовленных данных импорта.
+        /// </summary>
+        /// <param name="importData">Подготовленные данные импорта.</param>
+        /// <param name="repository">Репозиторий, в который выполняется импорт.</param>
+        /// <param name="repositoryService">Доменный сервис репозитория.</param>
+        /// <param name="refreshProcess">Действие обновления описания процесса.</param>
+        /// <param name="refreshProgress">Действие обновления прогресса.</param>
+        /// <returns>Импортированное рабочее дерево.</returns>
+        WorkingTreeModel ImportPreparedData(
+            WorkingTreeExportDTO importData,
             PhiladelphusRepositoryModel repository,
             IPhiladelphusRepositoryService repositoryService,
             Action<string> refreshProcess,
