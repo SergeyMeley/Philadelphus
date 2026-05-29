@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
-using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
@@ -20,7 +18,6 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -36,7 +33,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private bool _isDisposed;
 
         private readonly IPhiladelphusRepositoryService _service;
-        private readonly IImportExportService _importExportService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -145,16 +141,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// </summary>
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
 
-        /// <summary>
-        /// Описание текущего фонового процесса.
-        /// </summary>
-        public string CurrentProcess { get; private set; }
-
-        /// <summary>
-        /// Текстовое представление прогресса текущего фонового процесса.
-        /// </summary>
-        public string CurrentProgress { get; private set; }
-
         private bool _isRepositoryLoading;
         public bool IsRepositoryLoading
         {
@@ -197,7 +183,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="notificationService">Сервис уведомлений.</param>
         /// <param name="options">Параметры конфигурации приложения.</param>
         /// <param name="service">Доменный сервис.</param>
-        /// <param name="importExportService">Сервис импорта и экспорта.</param>
         /// <param name="extensionVMFactory">Фабрика создания модели представления расширений.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <param name="PhiladelphusRepositoryVM">Модель представления репозитория Чубушника.</param>
@@ -210,7 +195,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             IPhiladelphusRepositoryService service,
-            IImportExportService importExportService,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
@@ -221,13 +205,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
             ArgumentNullException.ThrowIfNull(service);
-            ArgumentNullException.ThrowIfNull(importExportService);
             ArgumentNullException.ThrowIfNull(extensionVMFactory);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
 
             _service = service;
-            _importExportService = importExportService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -456,143 +438,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand ExportToPhjsonCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var model = SelectedRepositoryMember.Model as TreeRootModel;
-                    if (model?.OwningWorkingTree == null)
-                    {
-                        MessageBox.Show("Не найдено рабочее дерево для экспорта.", "Экспорт PHJSON", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    var dialog = new SaveFileDialog
-                    {
-                        Title = "Сохранить файл экспорта",
-                        FileName = $"Чубушник экспорт элемента '{SelectedRepositoryMember.Name}' от {DateTimeOffset.UtcNow.ToString().Replace(":", "-")}.phjson",
-                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
-                        FilterIndex = 1,
-                        AddExtension = true,
-                        DefaultExt = ".phjson",
-                    };
-
-                    if (dialog.ShowDialog() != true)
-                    {
-                        return;
-                    }
-
-                    var file = dialog.FileName;
-                    _importExportService.ExportToFile(".phjson", "Базовый", model.OwningWorkingTree, file);
-
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = file,
-                        UseShellExecute = true
-                    });
-                },
-                ce =>
-                {
-                    return CanModifyRepository() && SelectedRepositoryMember is TreeRootVM;
-                });
-            }
-        }
-
-        public RelayCommand ImportFromPhjsonCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var dialog = new OpenFileDialog
-                    {
-                        Title = "Выберите файл",
-                        Multiselect = false,
-                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
-                        FilterIndex = 1,
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        var file = dialog.FileName;
-
-                        _ = Task.Run(() =>
-                        {
-                            var importedTree = _importExportService.ImportFromFile(
-                                ".phjson",
-                                "Базовый",
-                                file,
-                                PhiladelphusRepositoryVM.Model,
-                                _service,
-                                OnProcessChanged,
-                                OnProgressChanged);
-
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                var rootVM = new TreeRootVM(importedTree.ContentRoot, _dataStoragesCollectionVM, _service);
-
-                                PhiladelphusRepositoryVM.Childs.Add(rootVM);
-                            });
-                        });
-                    }
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
-            }
-        }
-
-        public RelayCommand ConvertXlsxToPhjsonCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
-                    window.InitializeForConvert();
-                    window.ShowDialog();
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
-            }
-        }
-
-        public RelayCommand ImportTreeFromXlsxCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    if (PhiladelphusRepositoryVM.Model.ContentShrub == null)
-                    {
-                        MessageBox.Show("Активный репозиторий не содержит рабочего дерева для импорта.", "Импорт Excel", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
-                    window.Owner = Application.Current?.MainWindow;
-                    window.Initialize(
-                        PhiladelphusRepositoryVM.Model.ContentShrub,
-                        PhiladelphusRepositoryVM.Model,
-                        _service,
-                        () =>
-                        {
-                            UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryVM.Model);
-                        });
-                    window.ShowDialog();
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
-            }
-        }
-
         /// <summary>
         /// Перестраивает таблицу наследников, если после редактирования Sequence порядок строк стал устаревшим.
         /// </summary>
@@ -749,6 +594,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 SelectedRepositoryMember = FindRepositoryMemberByUuid(selectedUuid.Value);
             }
 
+            NotifyRepositoryTreeChanged();
+        }
+
+        /// <summary>
+        /// Добавляет корневой узел рабочего дерева в отображаемый репозиторий.
+        /// </summary>
+        /// <param name="treeRoot">Корневой узел рабочего дерева.</param>
+        /// <exception cref="ArgumentNullException">Если корневой узел не задан.</exception>
+        public void AddTreeRoot(TreeRootModel treeRoot)
+        {
+            ArgumentNullException.ThrowIfNull(treeRoot);
+
+            _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(treeRoot, _dataStoragesCollectionVM, _service));
             NotifyRepositoryTreeChanged();
         }
 
@@ -1034,29 +892,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
             }
             return true;
-        }
-
-        private void OnProcessChanged(string currentProcess)
-        {
-            ArgumentNullException.ThrowIfNull(currentProcess);
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                CurrentProcess = currentProcess;
-                OnPropertyChanged(nameof(CurrentProcess));
-            });
-        }
-
-        private void OnProgressChanged(int currentNumber, int totalCount)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(currentNumber);
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalCount);
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round(((double)currentNumber / (double)totalCount * 100), 1)} %)";
-                OnPropertyChanged(nameof(CurrentProgress));
-            });
         }
 
         /// <summary>

@@ -18,6 +18,16 @@ namespace Philadelphus.Core.Domain.ImportExport.Contracts
         string AdapterName { get; }
 
         /// <summary>
+        /// Признак поддержки импорта из файла.
+        /// </summary>
+        bool CanImport { get; }
+
+        /// <summary>
+        /// Признак поддержки экспорта в файл.
+        /// </summary>
+        bool CanExport { get; }
+
+        /// <summary>
         /// Сериализует DTO импорта-экспорта в файл поддерживаемого формата.
         /// </summary>
         /// <param name="dto">DTO рабочего дерева.</param>

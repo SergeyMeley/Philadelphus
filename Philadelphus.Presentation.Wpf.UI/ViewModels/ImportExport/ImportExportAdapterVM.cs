@@ -18,6 +18,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
             FileFormat = adapterInfo.FileFormat;
             AdapterName = adapterInfo.AdapterName;
+            CanImport = adapterInfo.CanImport;
+            CanExport = adapterInfo.CanExport;
         }
 
         /// <summary>
@@ -29,6 +31,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// Наименование адаптера.
         /// </summary>
         public string AdapterName { get; }
+
+        /// <summary>
+        /// Признак поддержки импорта из файла.
+        /// </summary>
+        public bool CanImport { get; }
+
+        /// <summary>
+        /// Признак поддержки экспорта в файл.
+        /// </summary>
+        public bool CanExport { get; }
 
         /// <summary>
         /// Отображаемое наименование адаптера.

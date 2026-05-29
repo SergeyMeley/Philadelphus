@@ -56,7 +56,11 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Implementations
             return _adaptersByKey
                 .OrderBy(pair => pair.Key.FileFormat)
                 .ThenBy(pair => pair.Value.AdapterName)
-                .Select(pair => new ImportExportAdapterInfo(pair.Value.FileFormat, pair.Value.AdapterName))
+                .Select(pair => new ImportExportAdapterInfo(
+                    pair.Value.FileFormat,
+                    pair.Value.AdapterName,
+                    pair.Value.CanImport,
+                    pair.Value.CanExport))
                 .ToList()
                 .AsReadOnly();
         }

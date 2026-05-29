@@ -46,6 +46,16 @@ namespace Philadelphus.Core.Domain.ImportExport.Contracts
         public string AdapterName { get; }
 
         /// <summary>
+        /// Признак поддержки импорта из файла.
+        /// </summary>
+        public virtual bool CanImport => true;
+
+        /// <summary>
+        /// Признак поддержки экспорта в файл.
+        /// </summary>
+        public virtual bool CanExport => true;
+
+        /// <summary>
         /// Сервис уведомлений.
         /// </summary>
         protected INotificationService NotificationService => _notificationService;

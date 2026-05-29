@@ -16,6 +16,11 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
         /// </summary>
         public const string XlsxFileFormat = ".xlsx";
 
+        /// <summary>
+        /// Признак поддержки экспорта в файл.
+        /// </summary>
+        public override bool CanExport => false;
+
         private readonly ConversionService _conversionService;
 
         /// <summary>

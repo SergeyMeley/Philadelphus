@@ -1,7 +1,13 @@
+using Microsoft.Win32;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 {
@@ -11,21 +17,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
     public class ImportExportControlVM : ViewModelBase
     {
         private readonly IImportExportService _importExportService;
+        private readonly IPhiladelphusRepositoryService _repositoryService;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ImportExportControlVM" />.
         /// </summary>
         /// <param name="importExportService">Сервис импорта-экспорта.</param>
+        /// <param name="repositoryService">Доменный сервис репозитория.</param>
         /// <param name="repositoryExplorerControlVM">Модель представления обозревателя репозитория.</param>
         public ImportExportControlVM(
             IImportExportService importExportService,
+            IPhiladelphusRepositoryService repositoryService,
             RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
             ArgumentNullException.ThrowIfNull(importExportService);
+            ArgumentNullException.ThrowIfNull(repositoryService);
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
 
             _importExportService = importExportService;
+            _repositoryService = repositoryService;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
 
             RefreshAdapters();
@@ -37,47 +48,290 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         public ObservableCollection<ImportExportAdapterVM> AvailableAdapters { get; } = new();
 
         /// <summary>
+        /// Доступные операции импорта.
+        /// </summary>
+        public ObservableCollection<ImportExportOperationVM> ImportOperations { get; } = new();
+
+        /// <summary>
+        /// Доступные операции экспорта.
+        /// </summary>
+        public ObservableCollection<ImportExportOperationVM> ExportOperations { get; } = new();
+
+        /// <summary>
+        /// Доступные операции конвертации.
+        /// </summary>
+        public ObservableCollection<ImportExportOperationVM> ConversionOperations { get; } = new();
+
+        /// <summary>
+        /// Текущий этап операции импорта-экспорта.
+        /// </summary>
+        public string CurrentProcess { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Текущий прогресс операции импорта-экспорта.
+        /// </summary>
+        public string CurrentProgress { get; private set; } = string.Empty;
+
+        /// <summary>
         /// Команда обновления списка доступных адаптеров.
         /// </summary>
         public RelayCommand RefreshAdaptersCommand => new(_ => RefreshAdapters());
 
-        /// <summary>
-        /// Команда экспорта рабочего дерева в PHJSON.
-        /// </summary>
-        public RelayCommand ExportToPhjsonCommand => DelegateCommand(_repositoryExplorerControlVM.ExportToPhjsonCommand);
-
-        /// <summary>
-        /// Команда импорта рабочего дерева из PHJSON.
-        /// </summary>
-        public RelayCommand ImportFromPhjsonCommand => DelegateCommand(_repositoryExplorerControlVM.ImportFromPhjsonCommand);
-
-        /// <summary>
-        /// Команда импорта рабочего дерева из Excel.
-        /// </summary>
-        public RelayCommand ImportTreeFromXlsxCommand => DelegateCommand(_repositoryExplorerControlVM.ImportTreeFromXlsxCommand);
-
-        /// <summary>
-        /// Команда конвертации Excel в PHJSON.
-        /// </summary>
-        public RelayCommand ConvertXlsxToPhjsonCommand => DelegateCommand(_repositoryExplorerControlVM.ConvertXlsxToPhjsonCommand);
-
         private void RefreshAdapters()
         {
             AvailableAdapters.Clear();
+            ImportOperations.Clear();
+            ExportOperations.Clear();
+            ConversionOperations.Clear();
 
             foreach (var adapterInfo in _importExportService.GetAvailableAdapters())
             {
                 AvailableAdapters.Add(new ImportExportAdapterVM(adapterInfo));
             }
+
+            foreach (var adapter in AvailableAdapters)
+            {
+                AddImportOperation(adapter);
+                AddExportOperation(adapter);
+            }
+
+            foreach (var sourceAdapter in AvailableAdapters.Where(x => x.CanImport))
+            {
+                foreach (var targetAdapter in AvailableAdapters.Where(x => x.CanExport))
+                {
+                    AddConversionOperation(sourceAdapter, targetAdapter);
+                }
+            }
         }
 
-        private static RelayCommand DelegateCommand(RelayCommand command)
+        private void AddImportOperation(ImportExportAdapterVM adapter)
         {
-            ArgumentNullException.ThrowIfNull(command);
+            if (adapter.CanImport == false)
+            {
+                return;
+            }
 
-            return new RelayCommand(
-                command.Execute,
-                command.CanExecute);
+            ImportOperations.Add(new ImportExportOperationVM(
+                $"Импорт из {adapter.FileFormat}",
+                new RelayCommand(
+                    _ => ImportFromFile(adapter.FileFormat, adapter.AdapterName),
+                    _ => CanImportToRepository())));
+        }
+
+        private void AddExportOperation(ImportExportAdapterVM adapter)
+        {
+            if (adapter.CanExport == false)
+            {
+                return;
+            }
+
+            ExportOperations.Add(new ImportExportOperationVM(
+                $"Экспорт в {adapter.FileFormat}",
+                new RelayCommand(
+                    _ => ExportToFile(adapter.FileFormat, adapter.AdapterName),
+                    _ => CanExportSelectedWorkingTree())));
+        }
+
+        private void AddConversionOperation(
+            ImportExportAdapterVM sourceAdapter,
+            ImportExportAdapterVM targetAdapter)
+        {
+            if (IsSameAdapter(sourceAdapter, targetAdapter))
+            {
+                return;
+            }
+
+            ConversionOperations.Add(new ImportExportOperationVM(
+                $"Конвертировать {sourceAdapter.FileFormat} в {targetAdapter.FileFormat}",
+                new RelayCommand(
+                    _ => ConvertFile(
+                        sourceAdapter.FileFormat,
+                        sourceAdapter.AdapterName,
+                        targetAdapter.FileFormat,
+                        targetAdapter.AdapterName),
+                    _ => CanConvertFile())));
+        }
+
+        private void ExportToFile(string fileFormat, string adapterName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileFormat);
+            ArgumentException.ThrowIfNullOrWhiteSpace(adapterName);
+
+            if (_repositoryExplorerControlVM.SelectedRepositoryMember?.Model is not TreeRootModel treeRoot)
+            {
+                return;
+            }
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = BuildFileDialogFilter(fileFormat),
+                DefaultExt = NormalizeFileFormat(fileFormat),
+                AddExtension = true
+            };
+
+            if (saveFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            _importExportService.ExportToFile(
+                fileFormat,
+                adapterName,
+                treeRoot.OwningWorkingTree,
+                saveFileDialog.FileName);
+
+            OpenFile(saveFileDialog.FileName);
+        }
+
+        private void ImportFromFile(string fileFormat, string adapterName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileFormat);
+            ArgumentException.ThrowIfNullOrWhiteSpace(adapterName);
+
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = BuildFileDialogFilter(fileFormat),
+                DefaultExt = NormalizeFileFormat(fileFormat)
+            };
+
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var importedTree = _importExportService.ImportFromFile(
+                fileFormat,
+                adapterName,
+                openFileDialog.FileName,
+                _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model,
+                _repositoryService,
+                OnProcessChanged,
+                OnProgressChanged);
+
+            if (importedTree.ContentRoot != null)
+            {
+                _repositoryExplorerControlVM.AddTreeRoot(importedTree.ContentRoot);
+            }
+        }
+
+        private void ConvertFile(
+            string sourceFileFormat,
+            string sourceAdapterName,
+            string targetFileFormat,
+            string targetAdapterName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(sourceFileFormat);
+            ArgumentException.ThrowIfNullOrWhiteSpace(sourceAdapterName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(targetFileFormat);
+            ArgumentException.ThrowIfNullOrWhiteSpace(targetAdapterName);
+
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = BuildFileDialogFilter(sourceFileFormat),
+                DefaultExt = NormalizeFileFormat(sourceFileFormat)
+            };
+
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = BuildFileDialogFilter(targetFileFormat),
+                DefaultExt = NormalizeFileFormat(targetFileFormat),
+                AddExtension = true
+            };
+
+            if (saveFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            _importExportService.ConvertFile(
+                sourceFileFormat,
+                sourceAdapterName,
+                openFileDialog.FileName,
+                targetFileFormat,
+                targetAdapterName,
+                saveFileDialog.FileName);
+
+            OpenFile(saveFileDialog.FileName);
+        }
+
+        private bool CanImportToRepository()
+        {
+            return _repositoryExplorerControlVM.IsRepositoryLoading == false;
+        }
+
+        private bool CanExportSelectedWorkingTree()
+        {
+            return _repositoryExplorerControlVM.IsRepositoryLoading == false
+                && _repositoryExplorerControlVM.SelectedRepositoryMember is TreeRootVM;
+        }
+
+        private bool CanConvertFile()
+        {
+            return _repositoryExplorerControlVM.IsRepositoryLoading == false;
+        }
+
+        private static bool IsSameAdapter(
+            ImportExportAdapterVM sourceAdapter,
+            ImportExportAdapterVM targetAdapter)
+        {
+            ArgumentNullException.ThrowIfNull(sourceAdapter);
+            ArgumentNullException.ThrowIfNull(targetAdapter);
+
+            return string.Equals(sourceAdapter.FileFormat, targetAdapter.FileFormat, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(sourceAdapter.AdapterName, targetAdapter.AdapterName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string BuildFileDialogFilter(string fileFormat)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileFormat);
+
+            var normalizedFileFormat = NormalizeFileFormat(fileFormat);
+            return $"{normalizedFileFormat.ToUpperInvariant()} файлы (*{normalizedFileFormat})|*{normalizedFileFormat}|Все файлы (*.*)|*.*";
+        }
+
+        private static string NormalizeFileFormat(string fileFormat)
+        {
+            var normalizedFileFormat = fileFormat.Trim().ToLowerInvariant();
+            return normalizedFileFormat.StartsWith(".", StringComparison.Ordinal)
+                ? normalizedFileFormat
+                : $".{normalizedFileFormat}";
+        }
+
+        private static void OpenFile(string file)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = file,
+                UseShellExecute = true
+            });
+        }
+
+        private void OnProcessChanged(string currentProcess)
+        {
+            ArgumentNullException.ThrowIfNull(currentProcess);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentProcess = currentProcess;
+                OnPropertyChanged(nameof(CurrentProcess));
+            });
+        }
+
+        private void OnProgressChanged(int currentNumber, int totalCount)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(currentNumber);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalCount);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round((double)currentNumber / totalCount * 100, 1)} %)";
+                OnPropertyChanged(nameof(CurrentProgress));
+            });
         }
     }
 }
