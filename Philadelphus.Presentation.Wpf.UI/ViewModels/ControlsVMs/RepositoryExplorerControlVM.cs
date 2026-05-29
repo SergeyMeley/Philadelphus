@@ -10,7 +10,6 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Models.Tables;
@@ -486,7 +485,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
 
                     var file = dialog.FileName;
-                    _importExportService.Serialize(".phjson", "Базовый", model.OwningWorkingTree, file);
+                    _importExportService.ExportToFile(".phjson", "Базовый", model.OwningWorkingTree, file);
 
                     Process.Start(new ProcessStartInfo
                     {
@@ -521,14 +520,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                         _ = Task.Run(() =>
                         {
-                            var jsonAdapter = new JsonImportExportAdapter(_notificationService);
-
-                            jsonAdapter.ImportFromFile(file, _service, PhiladelphusRepositoryVM.Model, OnProcessChanged, OnProgressChanged);
+                            var importedTree = _importExportService.ImportFromFile(
+                                ".phjson",
+                                "Базовый",
+                                file,
+                                PhiladelphusRepositoryVM.Model,
+                                _service,
+                                OnProcessChanged,
+                                OnProgressChanged);
 
                             Application.Current.Dispatcher.Invoke(() =>
                             {
-                                var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.Last()?.ContentRoot;
-                                var rootVM = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
+                                var rootVM = new TreeRootVM(importedTree.ContentRoot, _dataStoragesCollectionVM, _service);
 
                                 PhiladelphusRepositoryVM.Childs.Add(rootVM);
                             });
