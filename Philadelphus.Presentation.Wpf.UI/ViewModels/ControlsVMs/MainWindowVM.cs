@@ -9,6 +9,7 @@ using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using System.Reflection;
@@ -22,6 +23,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
+        private readonly ImportExportControlVM _importExportControlVM;
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
         private readonly ReportsControlVM _reportsControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
@@ -40,6 +42,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             get
             {
                 return _repositoryExplorerControlVM;
+            }
+        }
+        public ImportExportControlVM ImportExportVM
+        {
+            get
+            {
+                return _importExportControlVM;
             }
         }
         public ApplicationSettingsControlVM ApplicationSettingsControlVM
@@ -128,6 +137,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(mainWindowNotificationsVM);
 
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
+            _importExportControlVM = ActivatorUtilities.CreateInstance<ImportExportControlVM>(_serviceProvider, repositoryExplorerControlVM);
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _reportsControlVM = reportsControlVM;
