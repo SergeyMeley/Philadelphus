@@ -472,7 +472,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     var dialog = new SaveFileDialog
                     {
                         Title = "Сохранить файл экспорта",
-                        FileName = $"Чубушник экспорт элемента {SelectedRepositoryMember.Name} от {DateTimeOffset.UtcNow}.phjson",
+                        FileName = $"Чубушник экспорт элемента '{SelectedRepositoryMember.Name}' от {DateTimeOffset.UtcNow.ToString().Replace(":", "-")}.phjson",
                         Filter = "PHJSON файлы (*.phjson)|*.phjson",
                         FilterIndex = 1,
                         AddExtension = true,
