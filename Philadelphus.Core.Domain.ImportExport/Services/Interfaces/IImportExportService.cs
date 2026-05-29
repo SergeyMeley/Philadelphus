@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.ImportExport.Entities;
 using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
@@ -15,6 +16,12 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Interfaces
         /// </summary>
         /// <returns>Коллекция расширений поддерживаемых файлов.</returns>
         IReadOnlyCollection<string> GetSupportedFileFormats();
+
+        /// <summary>
+        /// Возвращает доступные адаптеры импорта-экспорта.
+        /// </summary>
+        /// <returns>Коллекция описаний доступных адаптеров.</returns>
+        IReadOnlyCollection<ImportExportAdapterInfo> GetAvailableAdapters();
 
         /// <summary>
         /// Сериализует рабочее дерево в файл, выбирая адаптер по формату и наименованию, указанным пользователем.
@@ -44,6 +51,23 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Interfaces
             IPhiladelphusRepositoryService repositoryService,
             Action<string> refreshProcess,
             Action<int, int> refreshProgress);
+
+        /// <summary>
+        /// Конвертирует файл между форматами доступных адаптеров.
+        /// </summary>
+        /// <param name="sourceFileFormat">Формат исходного файла.</param>
+        /// <param name="sourceAdapterName">Наименование адаптера чтения исходного файла.</param>
+        /// <param name="sourceFilePath">Путь к исходному файлу.</param>
+        /// <param name="targetFileFormat">Формат результирующего файла.</param>
+        /// <param name="targetAdapterName">Наименование адаптера записи результирующего файла.</param>
+        /// <param name="targetFilePath">Путь к результирующему файлу.</param>
+        void ConvertFile(
+            string sourceFileFormat,
+            string sourceAdapterName,
+            string sourceFilePath,
+            string targetFileFormat,
+            string targetAdapterName,
+            string targetFilePath);
 
         /// <summary>
         /// Импортирует рабочее дерево из подготовленных данных импорта.
