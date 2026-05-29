@@ -1,5 +1,4 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
@@ -47,36 +46,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         }
 
         /// <summary>
-        /// Возвращает профили Excel, включенные в выполнение импорта.
-        /// </summary>
-        /// <param name="schema">Схема импорта Excel.</param>
-        /// <returns>Коллекция профилей, включенных в импорт.</returns>
-        public List<ExcelImportProfile> GetProfilesForExecution(ExcelImportSchema schema)
-        {
-            return _excelImportPipeline.GetProfilesForExecution(schema);
-        }
-
-        /// <summary>
-        /// Проверяет схему импорта Excel.
-        /// </summary>
-        /// <param name="schema">Схема импорта Excel.</param>
-        /// <returns>Результат проверки схемы.</returns>
-        public ExcelImportValidationResult Validate(ExcelImportSchema schema)
-        {
-            return _excelImportPipeline.Validate(schema);
-        }
-
-        /// <summary>
-        /// Формирует JSON-представление результата импорта Excel.
-        /// </summary>
-        /// <param name="schema">Схема импорта Excel.</param>
-        /// <returns>JSON-представление результата импорта Excel.</returns>
-        public string BuildJson(ExcelImportSchema schema)
-        {
-            return _excelImportPipeline.BuildJson(schema);
-        }
-
-        /// <summary>
         /// Строит модель предпросмотра репозитория по схеме импорта Excel.
         /// </summary>
         /// <param name="schema">Схема импорта Excel.</param>
@@ -102,32 +71,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
         public string BuildPreviewSummary(RepositoryExplorerControlVM previewViewModel)
         {
             return _repositoryPreviewBuilder.BuildSummary(previewViewModel);
-        }
-
-        /// <summary>
-        /// Импортирует данные Excel в репозиторий.
-        /// </summary>
-        /// <param name="schema">Схема импорта Excel.</param>
-        /// <param name="repository">Репозиторий, в который выполняется импорт.</param>
-        /// <param name="repositoryService">Доменный сервис репозитория.</param>
-        /// <param name="existingRoot">Существующий корень, в который выполняется импорт.</param>
-        public void ImportToRepository(
-            ExcelImportSchema schema,
-            PhiladelphusRepositoryModel repository,
-            IPhiladelphusRepositoryService repositoryService,
-            TreeRootModel? existingRoot)
-        {
-            _excelImportPipeline.ImportToRepository(schema, repository, repositoryService, existingRoot);
-        }
-
-        /// <summary>
-        /// Проверяет, что в схеме есть хотя бы один включенный лист.
-        /// </summary>
-        /// <param name="schema">Схема импорта.</param>
-        /// <param name="emptySelectionMessage">Сообщение об ошибке для пустого набора листов.</param>
-        public static void EnsureHasEnabledSheets(ExcelImportSchema schema, string emptySelectionMessage)
-        {
-            ExcelImportPipeline.EnsureHasEnabledSheets(schema, emptySelectionMessage);
         }
 
         private PhiladelphusRepositoryModel CreatePreviewRepository()

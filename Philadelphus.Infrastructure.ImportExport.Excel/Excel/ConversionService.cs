@@ -16,14 +16,20 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
     {
         private readonly IExcelDataTypeDetector _dataTypeDetector;
         private readonly IExcelImportSourceReader _sourceReader;
+        private readonly IExcelImportProfileResolver _profileResolver;
 
         public ConversionService(
             IExcelDataTypeDetector dataTypeDetector,
             IExcelImportSourceReader sourceReader,
-            IExcelImportInheritanceResolver inheritanceResolver)
+            IExcelImportProfileResolver profileResolver)
         {
+            ArgumentNullException.ThrowIfNull(dataTypeDetector);
+            ArgumentNullException.ThrowIfNull(sourceReader);
+            ArgumentNullException.ThrowIfNull(profileResolver);
+
             _dataTypeDetector = dataTypeDetector;
             _sourceReader = sourceReader;
+            _profileResolver = profileResolver;
         }
 
         public List<TreeRootModel> GetExistingRootsFromStorage(ShrubModel shrub)
@@ -121,15 +127,16 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 if (range == null)
                     throw new InvalidOperationException($"Не удалось найти источник «{profile.SourceSelection.SourceName}» в Excel-файле.");
 
-                var columns = BuildColumnProfiles(range, profile);
+                var resolvedProfile = ResolveExecutionProfile(filePath, profile, BuildColumnProfiles(range, profile));
+                var columns = resolvedProfile.Columns;
                 var entity = new ImportedEntityDefinition
                 {
-                    EntityId = profile.SourceSelection.SourceName,
-                    SourceName = profile.SourceSelection.SourceName,
-                    SourceType = profile.SourceSelection.SourceType,
-                    DisplayName = profile.SourceSelection.SourceName,
-                    EntityKind = profile.EntityKind,
-                    DataStartRowOffset = ExcelImportRangeHelper.NormalizeDataStartRowOffset(profile.DataStartRowOffset),
+                    EntityId = resolvedProfile.SourceSelection.SourceName,
+                    SourceName = resolvedProfile.SourceSelection.SourceName,
+                    SourceType = resolvedProfile.SourceSelection.SourceType,
+                    DisplayName = resolvedProfile.SourceSelection.SourceName,
+                    EntityKind = resolvedProfile.EntityKind,
+                    DataStartRowOffset = ExcelImportRangeHelper.NormalizeDataStartRowOffset(resolvedProfile.DataStartRowOffset),
                     Properties = columns
                         .Select(column => new PropertyDefinition
                         {
@@ -156,23 +163,54 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                     SourceType = entity.SourceType,
                     DisplayName = entity.DisplayName,
                     EntityKind = entity.EntityKind,
-                    Profile = profile
+                    Profile = resolvedProfile
                 });
 
-                if (profile.Relation.HasParent)
+                if (resolvedProfile.Relation.HasParent)
                 {
                     schema.Relations.Add(new ExcelImportRelationSchema
                     {
-                        ParentSourceName = profile.Relation.ParentSourceName,
-                        ChildSourceName = profile.SourceSelection.SourceName,
-                        ParentKeyColumnName = profile.Relation.ParentKeyColumnName,
-                        ChildKeyColumnName = profile.Relation.ChildKeyColumnName,
+                        ParentSourceName = resolvedProfile.Relation.ParentSourceName,
+                        ChildSourceName = resolvedProfile.SourceSelection.SourceName,
+                        ParentKeyColumnName = resolvedProfile.Relation.ParentKeyColumnName,
+                        ChildKeyColumnName = resolvedProfile.Relation.ChildKeyColumnName,
                         IsEnabled = true
                     });
                 }
             }
 
             return schema;
+        }
+
+        /// <summary>
+        /// Подготавливает профиль для выполнения импорта с учетом настроек, найденных в книге Excel.
+        /// </summary>
+        /// <param name="filePath">Путь к Excel-файлу.</param>
+        /// <param name="sourceProfile">Исходный профиль импорта.</param>
+        /// <param name="detectedColumns">Колонки, определенные по данным источника.</param>
+        /// <returns>Профиль, готовый к материализации.</returns>
+        private ExcelImportProfile ResolveExecutionProfile(
+            string filePath,
+            ExcelImportProfile sourceProfile,
+            List<ExcelImportColumnProfile> detectedColumns)
+        {
+            if (sourceProfile.Columns.Count > 0)
+            {
+                sourceProfile.Columns = detectedColumns;
+                return sourceProfile;
+            }
+
+            var detectedProfile = new ExcelImportProfile
+            {
+                SourceSelection = sourceProfile.SourceSelection,
+                EntityKind = sourceProfile.EntityKind,
+                DataStartRowOffset = detectedColumns.FirstOrDefault()?.DataStartRowOffset ?? sourceProfile.DataStartRowOffset,
+                Columns = detectedColumns,
+                Relation = sourceProfile.Relation
+            };
+
+            // При прямой конвертации файла нет UI-сессии, поэтому настройки профиля применяются здесь.
+            return _profileResolver.Resolve(filePath, sourceProfile.SourceSelection, detectedProfile);
         }
 
         private List<ExcelImportProfile> BuildDefaultProfiles(XLWorkbook workbook)

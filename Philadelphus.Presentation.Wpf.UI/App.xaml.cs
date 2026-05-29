@@ -254,16 +254,24 @@ namespace Philadelphus.Presentation.Wpf.UI
 
         private void RegisterImportExport(IServiceCollection services)
         {
-            // Общее
-            // Регистрация сервисов
-            // Слой Core
-            services.AddTransient<IImportExportService, ImportExportService>();
-            // Слой Infrastructure
-            services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
+            RegisterImportExportCore(services);
+            RegisterImportExportAdapters(services);
+            RegisterExcelImportInfrastructure(services);
+            RegisterExcelImportPresentation(services);
+        }
 
-            // Excel
-            // Регистрация сервисов
-            // Слой Core
+        private static void RegisterImportExportCore(IServiceCollection services)
+        {
+            services.AddTransient<IImportExportService, ImportExportService>();
+        }
+
+        private static void RegisterImportExportAdapters(IServiceCollection services)
+        {
+            services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
+        }
+
+        private static void RegisterExcelImportInfrastructure(IServiceCollection services)
+        {
             services.AddSingleton<ConversionService>();
             services.AddSingleton<ExcelPreviewService>();
             services.AddSingleton<IExcelDataTypeDetector, ExcelDataTypeDetector>();
@@ -274,28 +282,27 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
             services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
             services.AddSingleton<IExcelImportSchemaTemplateStorage, ExcelImportSchemaTemplateStorage>();
-            // Слой Infrastructure
+
             services.AddTransient<IImportExportAdapter, ExcelImportExportAdapter>();
             services.AddTransient<ExcelImportExportAdapter>();
-            // Слой Presentation
             services.AddTransient<ExcelImportPipeline>();
+            services.AddTransient<ExcelImportSessionState>();
+        }
+
+        private static void RegisterExcelImportPresentation(IServiceCollection services)
+        {
             services.AddTransient<ExcelImportPresentationPipeline>();
             services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
-            services.AddTransient<ExcelImportSessionState>();
             services.AddTransient<ExcelImportPresentationSessionState>();
+
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<IMessageDialogService, MessageDialogService>();
 
-
-            // Регистрация ViewModel
-            // ViewModel окон
             services.AddTransient<ImportFromExcelVM>();
 
-            // Регистрация View
             services.AddTransient<ImportFromExcelWindow>();
             services.AddTransient<ExcelImportDesignerWindow>();
             services.AddTransient<ImportProgressWindow>();
-
         }
 
         protected override async void OnStartup(StartupEventArgs e)
