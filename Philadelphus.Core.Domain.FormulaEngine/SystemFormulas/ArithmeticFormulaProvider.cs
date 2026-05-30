@@ -17,11 +17,35 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         /// <returns>Коллекция арифметических формул.</returns>
         public IEnumerable<FormulaDefinition> GetFormulas()
         {
-            yield return CreateBinaryFormula("СУММ", "+", "Складывает два числовых значения.", Add);
+            yield return CreateSumFormula();
             yield return CreateBinaryFormula("РАЗНОСТЬ", "-", "Вычитает второе числовое значение из первого.", Subtract);
             yield return CreateBinaryFormula("ПРОИЗВ", "*", "Умножает два числовых значения.", Multiply);
             yield return CreateBinaryFormula("ЧАСТНОЕ", "/", "Делит первое числовое значение на второе.", Divide);
             yield return CreateBinaryFormula("СТЕПЕНЬ", "^", "Возводит первое числовое значение в степень второго.", Power);
+        }
+
+        /// <summary>
+        /// Создает описание формулы СУММ и операторного псевдонима +.
+        /// </summary>
+        /// <returns>Определение формулы СУММ.</returns>
+        private static FormulaDefinition CreateSumFormula()
+        {
+            return new FormulaDefinition
+            {
+                Name = "СУММ",
+                Aliases = ["+"],
+                Description = "Складывает числовые значения.",
+                Arguments =
+                [
+                    new FormulaArgumentDefinition
+                    {
+                        Name = "значение",
+                        Description = "Числовое значение для сложения.",
+                        ExpectedType = SystemBaseType.NUMERIC
+                    }
+                ],
+                Evaluator = (_, arguments) => Sum(arguments)
+            };
         }
 
         /// <summary>
@@ -97,16 +121,35 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         }
 
         /// <summary>
-        /// Складывает два числовых аргумента.
+        /// Складывает один или несколько числовых аргументов.
         /// </summary>
-        /// <param name="arguments">Аргументы операции.</param>
-        /// <returns>Результат сложения.</returns>
-        private static FormulaResult Add(IReadOnlyList<FormulaResult> arguments)
+        /// <param name="arguments">Аргументы формулы СУММ.</param>
+        /// <returns>Результат сложения или ошибка аргументов.</returns>
+        private static FormulaResult Sum(IReadOnlyList<FormulaResult> arguments)
         {
-            var left = GetNumber(arguments[0]);
-            var right = GetNumber(arguments[1]);
+            if (arguments.Count == 0)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentCount,
+                    "Формула 'СУММ' ожидает минимум один аргумент.",
+                    "СУММ"));
+            }
 
-            return Numeric(left + right);
+            var result = 0d;
+            for (var index = 0; index < arguments.Count; index++)
+            {
+                if (TryGetNumber(arguments[index], out var value) == false)
+                {
+                    return FormulaResult.Failure(CreateError(
+                        FormulaErrorCode.TypeMismatch,
+                        $"Аргумент {index + 1} формулы 'СУММ' должен быть числовым.",
+                        "СУММ"));
+                }
+
+                result += value;
+            }
+
+            return Numeric(result);
         }
 
         /// <summary>

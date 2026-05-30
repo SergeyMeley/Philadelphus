@@ -29,6 +29,50 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет формулу СУММ с двумя аргументами.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Sum_Returns_Sum_Of_Two_Numbers()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("СУММ(2;3)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(5d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет формулу СУММ с вложенными числовыми выражениями.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Sum_Returns_Sum_Of_Nested_Numeric_Expressions()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("СУММ(1;ПРОИЗВ(2;4);СТЕПЕНЬ(2;3))", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(17d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа для нечислового аргумента СУММ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Sum_Returns_TypeMismatch_For_Text_Argument()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("СУММ(1;\"2\")", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
         /// Проверяет изменение приоритета арифметики через скобки.
         /// </summary>
         [Fact]
