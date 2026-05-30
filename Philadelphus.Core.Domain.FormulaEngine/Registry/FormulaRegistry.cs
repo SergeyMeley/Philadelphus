@@ -7,7 +7,14 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Registry
     /// </summary>
     public sealed class FormulaRegistry
     {
+        /// <summary>
+        /// Индекс формул по нормализованному имени или псевдониму.
+        /// </summary>
         private readonly Dictionary<string, FormulaDefinition> _formulasByKey = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Список формул в порядке регистрации.
+        /// </summary>
         private readonly List<FormulaDefinition> _formulas = new();
 
         /// <summary>
@@ -87,6 +94,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Registry
                 : FormulaResolveResult.Unknown(key);
         }
 
+        /// <summary>
+        /// Нормализует ключ поиска формулы.
+        /// </summary>
+        /// <param name="value">Исходное имя или псевдоним формулы.</param>
+        /// <param name="parameterName">Имя параметра для диагностик валидации.</param>
+        /// <returns>Нормализованный ключ поиска.</returns>
         private static string NormalizeKey(string value, string parameterName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(value, parameterName);

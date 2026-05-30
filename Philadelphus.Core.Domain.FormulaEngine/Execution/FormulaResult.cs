@@ -9,6 +9,13 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
     /// </summary>
     public sealed class FormulaResult
     {
+        /// <summary>
+        /// Инициализирует общий результат вычисления формулы.
+        /// </summary>
+        /// <param name="value">Значение результата.</param>
+        /// <param name="valueType">Системный тип результата.</param>
+        /// <param name="treeLeave">Лист дерева, если результатом является лист.</param>
+        /// <param name="error">Ошибка вычисления, если результат неуспешный.</param>
         private FormulaResult(
             object? value,
             SystemBaseType valueType,

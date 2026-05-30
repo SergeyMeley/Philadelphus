@@ -7,6 +7,13 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
     /// </summary>
     public sealed class FormulaToken
     {
+        /// <summary>
+        /// Инициализирует лексический токен формулы.
+        /// </summary>
+        /// <param name="kind">Тип токена.</param>
+        /// <param name="text">Исходный текст токена.</param>
+        /// <param name="span">Диапазон токена в исходной формуле.</param>
+        /// <param name="value">Разобранное значение токена, если оно есть.</param>
         public FormulaToken(
             FormulaTokenKind kind,
             string text,

@@ -7,6 +7,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
     /// </summary>
     public sealed class FormulaTokenizerResult
     {
+        /// <summary>
+        /// Инициализирует результат лексического анализа.
+        /// </summary>
+        /// <param name="tokens">Найденные токены формулы.</param>
+        /// <param name="errors">Ошибки, найденные при лексическом анализе.</param>
         public FormulaTokenizerResult(
             IReadOnlyList<FormulaToken> tokens,
             IReadOnlyList<FormulaError> errors)

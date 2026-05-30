@@ -8,11 +8,30 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
     /// </summary>
     public sealed class FormulaTokenizer
     {
+        /// <summary>
+        /// Исходный текст формулы.
+        /// </summary>
         private readonly string _source;
+
+        /// <summary>
+        /// Токены, найденные во время лексического анализа.
+        /// </summary>
         private readonly List<FormulaToken> _tokens = new();
+
+        /// <summary>
+        /// Ошибки, найденные во время лексического анализа.
+        /// </summary>
         private readonly List<FormulaError> _errors = new();
+
+        /// <summary>
+        /// Текущая позиция чтения в исходном тексте.
+        /// </summary>
         private int _position;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="FormulaTokenizer" />.
+        /// </summary>
+        /// <param name="source">Исходный текст формулы.</param>
         private FormulaTokenizer(string source)
         {
             _source = source;
@@ -29,6 +48,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return tokenizer.Tokenize();
         }
 
+        /// <summary>
+        /// Выполняет основной цикл лексического анализа.
+        /// </summary>
+        /// <returns>Результат лексического анализа.</returns>
         private FormulaTokenizerResult Tokenize()
         {
             while (IsAtEnd == false)
@@ -76,12 +99,24 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return new FormulaTokenizerResult(_tokens, _errors);
         }
 
+        /// <summary>
+        /// Признак того, что достигнут конец исходного текста.
+        /// </summary>
         private bool IsAtEnd => _position >= _source.Length;
 
+        /// <summary>
+        /// Текущий символ или '\0', если достигнут конец текста.
+        /// </summary>
         private char Current => IsAtEnd ? '\0' : _source[_position];
 
+        /// <summary>
+        /// Следующий символ или '\0', если он отсутствует.
+        /// </summary>
         private char Next => _position + 1 >= _source.Length ? '\0' : _source[_position + 1];
 
+        /// <summary>
+        /// Читает числовой литерал в формате invariant culture.
+        /// </summary>
         private void ReadNumber()
         {
             var start = _position;
@@ -132,6 +167,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             }
         }
 
+        /// <summary>
+        /// Читает строковый литерал в двойных кавычках.
+        /// </summary>
         private void ReadString()
         {
             var start = _position;
@@ -161,6 +199,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             AddError("Строковый литерал не закрыт двойной кавычкой.", start, _position - start);
         }
 
+        /// <summary>
+        /// Читает идентификатор функции, свойства или аргумента.
+        /// </summary>
         private void ReadIdentifier()
         {
             var start = _position;
@@ -174,6 +215,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             AddToken(FormulaTokenKind.Identifier, start, _position);
         }
 
+        /// <summary>
+        /// Читает ссылку на лист дерева в формате [uuid].
+        /// </summary>
         private void ReadTreeLeaveReference()
         {
             var start = _position;
@@ -206,6 +250,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                 _position - start);
         }
 
+        /// <summary>
+        /// Читает оператор или пунктуационный символ формулы.
+        /// </summary>
         private void ReadOperatorOrPunctuation()
         {
             var start = _position;
@@ -284,6 +331,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             }
         }
 
+        /// <summary>
+        /// Читает оператор '<', '<=' или '<>'.
+        /// </summary>
+        /// <param name="start">Начальная позиция оператора.</param>
         private void ReadLessOperator(int start)
         {
             _position++;
@@ -304,6 +355,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             AddToken(FormulaTokenKind.Less, start, _position);
         }
 
+        /// <summary>
+        /// Читает оператор '>' или '>='.
+        /// </summary>
+        /// <param name="start">Начальная позиция оператора.</param>
         private void ReadGreaterOperator(int start)
         {
             _position++;
@@ -317,6 +372,13 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             AddToken(FormulaTokenKind.Greater, start, _position);
         }
 
+        /// <summary>
+        /// Добавляет токен в результат лексического анализа.
+        /// </summary>
+        /// <param name="kind">Тип токена.</param>
+        /// <param name="start">Начальная позиция токена.</param>
+        /// <param name="end">Позиция сразу после конца токена.</param>
+        /// <param name="value">Разобранное значение токена.</param>
         private void AddToken(FormulaTokenKind kind, int start, int end, object? value = null)
         {
             _tokens.Add(new FormulaToken(
@@ -326,6 +388,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                 value));
         }
 
+        /// <summary>
+        /// Добавляет ошибку лексического анализа.
+        /// </summary>
+        /// <param name="message">Сообщение ошибки.</param>
+        /// <param name="start">Начальная позиция ошибки.</param>
+        /// <param name="length">Длина ошибочного участка.</param>
         private void AddError(string message, int start, int length)
         {
             _errors.Add(new FormulaError
@@ -336,11 +404,21 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             });
         }
 
+        /// <summary>
+        /// Проверяет, может ли символ начинать идентификатор.
+        /// </summary>
+        /// <param name="value">Проверяемый символ.</param>
+        /// <returns>true, если символ может начинать идентификатор; иначе false.</returns>
         private static bool IsIdentifierStart(char value)
         {
             return char.IsLetter(value) || value == '_';
         }
 
+        /// <summary>
+        /// Проверяет, может ли символ входить в идентификатор после первого символа.
+        /// </summary>
+        /// <param name="value">Проверяемый символ.</param>
+        /// <returns>true, если символ может входить в идентификатор; иначе false.</returns>
         private static bool IsIdentifierPart(char value)
         {
             return char.IsLetterOrDigit(value) || value == '_';

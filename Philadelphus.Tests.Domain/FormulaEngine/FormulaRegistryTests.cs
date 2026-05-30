@@ -126,6 +126,12 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             FormulaErrorCode.ParseError.GetDisplayName().Should().Be("#ОШИБКА_ПАРСИНГА");
         }
 
+        /// <summary>
+        /// Создает тестовое определение формулы с указанным именем и псевдонимами.
+        /// </summary>
+        /// <param name="name">Имя формулы.</param>
+        /// <param name="aliases">Псевдонимы формулы.</param>
+        /// <returns>Тестовое определение формулы.</returns>
         private static FormulaDefinition CreateFormula(string name, params string[] aliases)
         {
             return new FormulaDefinition
@@ -145,6 +151,10 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             };
         }
 
+        /// <summary>
+        /// Создает минимальный тестовый лист дерева для проверки результата формулы.
+        /// </summary>
+        /// <returns>Тестовый лист дерева.</returns>
         private static TreeLeaveModel CreateTreeLeave()
         {
             var notificationService = new FakeNotificationService();
@@ -169,15 +179,29 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 new EmptyPropertiesPolicy<TreeLeaveModel>());
         }
 
+        /// <summary>
+        /// Тестовый поставщик формул для проверки пакетной регистрации.
+        /// </summary>
         private sealed class TestFormulaProvider : IFormulaProvider
         {
+            /// <summary>
+            /// Формулы, возвращаемые тестовым поставщиком.
+            /// </summary>
             private readonly IReadOnlyList<FormulaDefinition> _formulas;
 
+            /// <summary>
+            /// Инициализирует тестовый поставщик формул.
+            /// </summary>
+            /// <param name="formulas">Формулы, которые должен вернуть поставщик.</param>
             public TestFormulaProvider(params FormulaDefinition[] formulas)
             {
                 _formulas = formulas;
             }
 
+            /// <summary>
+            /// Возвращает формулы тестового поставщика.
+            /// </summary>
+            /// <returns>Коллекция тестовых формул.</returns>
             public IEnumerable<FormulaDefinition> GetFormulas()
             {
                 return _formulas;

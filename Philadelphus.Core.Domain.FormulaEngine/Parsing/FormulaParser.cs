@@ -9,10 +9,25 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
     /// </summary>
     public sealed class FormulaParser
     {
+        /// <summary>
+        /// Токены исходной формулы.
+        /// </summary>
         private readonly IReadOnlyList<FormulaToken> _tokens;
+
+        /// <summary>
+        /// Ошибки, найденные во время синтаксического анализа.
+        /// </summary>
         private readonly List<FormulaError> _errors = new();
+
+        /// <summary>
+        /// Текущая позиция чтения в списке токенов.
+        /// </summary>
         private int _position;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="FormulaParser" />.
+        /// </summary>
+        /// <param name="tokens">Токены исходной формулы.</param>
         private FormulaParser(IReadOnlyList<FormulaToken> tokens)
         {
             _tokens = tokens;
@@ -47,6 +62,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return parser.Parse();
         }
 
+        /// <summary>
+        /// Выполняет основной синтаксический анализ и проверяет, что все токены употреблены.
+        /// </summary>
+        /// <returns>Результат синтаксического анализа.</returns>
         private FormulaParserResult Parse()
         {
             Match(FormulaTokenKind.FormulaStart);
@@ -61,6 +80,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return new FormulaParserResult(expression, _errors);
         }
 
+        /// <summary>
+        /// Разбирает условный оператор с минимальным приоритетом.
+        /// </summary>
+        /// <returns>Выражение условия или более приоритетное выражение.</returns>
         private FormulaExpression ParseConditionalExpression()
         {
             var condition = ParseBinaryExpression(0);
@@ -70,7 +93,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             }
 
             var whenTrue = ParseConditionalExpression();
-            var colon = Consume(FormulaTokenKind.Colon, "Условный оператор должен содержать ':'.");
+            Consume(FormulaTokenKind.Colon, "Условный оператор должен содержать ':'.");
             var whenFalse = ParseConditionalExpression();
 
             return new ConditionalFormulaExpression(
@@ -80,6 +103,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                 Merge(condition.Span, whenFalse.Span));
         }
 
+        /// <summary>
+        /// Разбирает бинарное выражение с учетом приоритетов операторов.
+        /// </summary>
+        /// <param name="parentPrecedence">Приоритет родительского оператора.</param>
+        /// <returns>Бинарное выражение или первичное выражение.</returns>
         private FormulaExpression ParseBinaryExpression(int parentPrecedence)
         {
             var left = ParsePrimaryExpression();
@@ -105,6 +133,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return left;
         }
 
+        /// <summary>
+        /// Разбирает первичное выражение: литерал, идентификатор, ссылку на лист или скобочную группу.
+        /// </summary>
+        /// <returns>Первичное выражение с учетом последующих объектных вызовов.</returns>
         private FormulaExpression ParsePrimaryExpression()
         {
             FormulaExpression expression;
@@ -150,6 +182,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return ParsePostfixExpression(expression);
         }
 
+        /// <summary>
+        /// Разбирает идентификатор как вызов функции или как самостоятельный идентификатор.
+        /// </summary>
+        /// <returns>Выражение идентификатора или вызова функции.</returns>
         private FormulaExpression ParseIdentifierExpression()
         {
             var identifier = Consume(FormulaTokenKind.Identifier, "Ожидался идентификатор.");
@@ -167,6 +203,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return new IdentifierFormulaExpression(identifier.Text, identifier.Span);
         }
 
+        /// <summary>
+        /// Разбирает выражение в круглых скобках.
+        /// </summary>
+        /// <returns>Выражение с диапазоном, расширенным до скобок.</returns>
         private FormulaExpression ParseParenthesizedExpression()
         {
             var openParenthesis = Consume(FormulaTokenKind.OpenParenthesis, "Ожидалась '('.");
@@ -176,6 +216,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return expression with { Span = Merge(openParenthesis.Span, closeParenthesis.Span) };
         }
 
+        /// <summary>
+        /// Разбирает постфиксные объектные вызовы вида target.МЕТОД(...).
+        /// </summary>
+        /// <param name="target">Выражение, от которого вызывается объектная функция.</param>
+        /// <returns>Исходное выражение или цепочка объектных вызовов.</returns>
         private FormulaExpression ParsePostfixExpression(FormulaExpression target)
         {
             var expression = target;
@@ -197,6 +242,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return expression;
         }
 
+        /// <summary>
+        /// Разбирает список аргументов до закрывающей скобки.
+        /// </summary>
+        /// <returns>Список выражений-аргументов.</returns>
         private IReadOnlyList<FormulaExpression> ParseArguments()
         {
             var arguments = new List<FormulaExpression>();
@@ -220,8 +269,16 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return arguments;
         }
 
+        /// <summary>
+        /// Текущий токен.
+        /// </summary>
         private FormulaToken Current => Peek(0);
 
+        /// <summary>
+        /// Возвращает токен со смещением от текущей позиции.
+        /// </summary>
+        /// <param name="offset">Смещение от текущей позиции.</param>
+        /// <returns>Токен со смещением или последний токен, если смещение вышло за границы.</returns>
         private FormulaToken Peek(int offset)
         {
             var index = _position + offset;
@@ -230,6 +287,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                 : _tokens[index];
         }
 
+        /// <summary>
+        /// Возвращает текущий токен и сдвигает позицию вперед.
+        /// </summary>
+        /// <returns>Текущий токен до сдвига.</returns>
         private FormulaToken Advance()
         {
             var current = Current;
@@ -241,6 +302,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return current;
         }
 
+        /// <summary>
+        /// Проверяет текущий токен и сдвигает позицию, если тип совпал.
+        /// </summary>
+        /// <param name="kind">Ожидаемый тип токена.</param>
+        /// <returns>true, если токен совпал; иначе false.</returns>
         private bool Match(FormulaTokenKind kind)
         {
             if (Current.Kind != kind)
@@ -252,6 +318,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return true;
         }
 
+        /// <summary>
+        /// Требует токен указанного типа или добавляет ошибку.
+        /// </summary>
+        /// <param name="kind">Ожидаемый тип токена.</param>
+        /// <param name="message">Сообщение ошибки, если тип не совпал.</param>
+        /// <returns>Найденный токен или синтетический токен ожидаемого типа.</returns>
         private FormulaToken Consume(FormulaTokenKind kind, string message)
         {
             if (Current.Kind == kind)
@@ -263,6 +335,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             return new FormulaToken(kind, string.Empty, Current.Span);
         }
 
+        /// <summary>
+        /// Добавляет ошибку синтаксического анализа.
+        /// </summary>
+        /// <param name="message">Сообщение ошибки.</param>
+        /// <param name="token">Токен, к которому относится ошибка.</param>
         private void AddError(string message, FormulaToken token)
         {
             _errors.Add(new FormulaError
@@ -273,6 +350,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             });
         }
 
+        /// <summary>
+        /// Возвращает приоритет бинарного оператора.
+        /// </summary>
+        /// <param name="kind">Тип токена оператора.</param>
+        /// <returns>Приоритет оператора или 0, если токен не является бинарным оператором.</returns>
         private static int GetBinaryPrecedence(FormulaTokenKind kind)
         {
             return kind switch
@@ -291,6 +373,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             };
         }
 
+        /// <summary>
+        /// Возвращает родительский приоритет для правой части бинарного выражения.
+        /// </summary>
+        /// <param name="kind">Тип токена оператора.</param>
+        /// <param name="precedence">Приоритет оператора.</param>
+        /// <returns>Приоритет для рекурсивного разбора правой части.</returns>
         private static int GetRightParentPrecedence(FormulaTokenKind kind, int precedence)
         {
             return kind == FormulaTokenKind.Caret
@@ -298,6 +386,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                 : precedence;
         }
 
+        /// <summary>
+        /// Объединяет два диапазона текста в один.
+        /// </summary>
+        /// <param name="left">Первый диапазон.</param>
+        /// <param name="right">Второй диапазон.</param>
+        /// <returns>Диапазон, покрывающий оба исходных диапазона.</returns>
         private static FormulaTextSpan Merge(FormulaTextSpan left, FormulaTextSpan right)
         {
             var start = Math.Min(left.Start, right.Start);

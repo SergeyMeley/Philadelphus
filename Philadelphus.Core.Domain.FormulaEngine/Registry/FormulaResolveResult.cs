@@ -8,6 +8,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Registry
     /// </summary>
     public sealed class FormulaResolveResult
     {
+        /// <summary>
+        /// Инициализирует результат поиска формулы.
+        /// </summary>
+        /// <param name="formula">Найденное определение формулы.</param>
+        /// <param name="error">Ошибка поиска, если формула не найдена.</param>
         private FormulaResolveResult(FormulaDefinition? formula, FormulaError? error)
         {
             Formula = formula;

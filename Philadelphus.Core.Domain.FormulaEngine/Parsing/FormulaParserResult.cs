@@ -8,6 +8,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
     /// </summary>
     public sealed class FormulaParserResult
     {
+        /// <summary>
+        /// Инициализирует результат синтаксического анализа.
+        /// </summary>
+        /// <param name="expression">Корневое выражение AST, если разбор успешен.</param>
+        /// <param name="errors">Ошибки, найденные при синтаксическом анализе.</param>
         public FormulaParserResult(
             FormulaExpression? expression,
             IReadOnlyList<FormulaError> errors)
