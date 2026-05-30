@@ -132,6 +132,79 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет формулу РАЗНОСТЬ с двумя аргументами.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Difference_Returns_Left_Minus_Right()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("РАЗНОСТЬ(10;3)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(7d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет формулу ЧАСТНОЕ с двумя аргументами.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Quotient_Returns_Left_Divided_By_Right()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ЧАСТНОЕ(10;2)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(5d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет деление на ноль в формуле ЧАСТНОЕ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Quotient_Returns_DivZero_For_Zero_Divisor()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ЧАСТНОЕ(1;0)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.DivZero);
+            result.Error.Code.GetDisplayName().Should().Be("#ДЕЛЕНИЕ_НА_НОЛЬ");
+        }
+
+        /// <summary>
+        /// Проверяет ошибку количества аргументов для бинарной формулы РАЗНОСТЬ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Difference_Returns_InvalidArgumentCount_For_Wrong_Argument_Count()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("РАЗНОСТЬ(10;3;1)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentCount);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа для нечислового аргумента ЧАСТНОЕ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Quotient_Returns_TypeMismatch_For_Text_Argument()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ЧАСТНОЕ(10;\"2\")", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
         /// Проверяет изменение приоритета арифметики через скобки.
         /// </summary>
         [Fact]
