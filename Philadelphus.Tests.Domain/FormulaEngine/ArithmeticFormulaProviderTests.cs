@@ -73,6 +73,65 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет формулу ПРОИЗВ с двумя аргументами.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Product_Returns_Product_Of_Two_Numbers()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ПРОИЗВ(2;3)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(6d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет формулу ПРОИЗВ с несколькими аргументами.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Product_Returns_Product_Of_Multiple_Numbers()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ПРОИЗВ(2;3;4)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(24d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет работу формулы ПРОИЗВ через оператор *.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Product_Works_Through_Multiply_Operator()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("2*3", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(6d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа для нечислового аргумента ПРОИЗВ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Product_Returns_TypeMismatch_For_Text_Argument()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ПРОИЗВ(2;\"3\")", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
         /// Проверяет изменение приоритета арифметики через скобки.
         /// </summary>
         [Fact]

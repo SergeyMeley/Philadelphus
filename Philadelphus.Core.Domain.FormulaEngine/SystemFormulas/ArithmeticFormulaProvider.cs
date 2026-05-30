@@ -19,7 +19,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         {
             yield return CreateSumFormula();
             yield return CreateBinaryFormula("РАЗНОСТЬ", "-", "Вычитает второе числовое значение из первого.", Subtract);
-            yield return CreateBinaryFormula("ПРОИЗВ", "*", "Умножает два числовых значения.", Multiply);
+            yield return CreateProductFormula();
             yield return CreateBinaryFormula("ЧАСТНОЕ", "/", "Делит первое числовое значение на второе.", Divide);
             yield return CreateBinaryFormula("СТЕПЕНЬ", "^", "Возводит первое числовое значение в степень второго.", Power);
         }
@@ -45,6 +45,30 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     }
                 ],
                 Evaluator = (_, arguments) => Sum(arguments)
+            };
+        }
+
+        /// <summary>
+        /// Создает описание формулы ПРОИЗВ и операторного псевдонима *.
+        /// </summary>
+        /// <returns>Определение формулы ПРОИЗВ.</returns>
+        private static FormulaDefinition CreateProductFormula()
+        {
+            return new FormulaDefinition
+            {
+                Name = "ПРОИЗВ",
+                Aliases = ["*"],
+                Description = "Умножает числовые значения.",
+                Arguments =
+                [
+                    new FormulaArgumentDefinition
+                    {
+                        Name = "значение",
+                        Description = "Числовое значение для умножения.",
+                        ExpectedType = SystemBaseType.NUMERIC
+                    }
+                ],
+                Evaluator = (_, arguments) => Product(arguments)
             };
         }
 
@@ -166,16 +190,35 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         }
 
         /// <summary>
-        /// Умножает два числовых аргумента.
+        /// Умножает один или несколько числовых аргументов.
         /// </summary>
-        /// <param name="arguments">Аргументы операции.</param>
-        /// <returns>Результат умножения.</returns>
-        private static FormulaResult Multiply(IReadOnlyList<FormulaResult> arguments)
+        /// <param name="arguments">Аргументы формулы ПРОИЗВ.</param>
+        /// <returns>Результат умножения или ошибка аргументов.</returns>
+        private static FormulaResult Product(IReadOnlyList<FormulaResult> arguments)
         {
-            var left = GetNumber(arguments[0]);
-            var right = GetNumber(arguments[1]);
+            if (arguments.Count == 0)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentCount,
+                    "Формула 'ПРОИЗВ' ожидает минимум один аргумент.",
+                    "ПРОИЗВ"));
+            }
 
-            return Numeric(left * right);
+            var result = 1d;
+            for (var index = 0; index < arguments.Count; index++)
+            {
+                if (TryGetNumber(arguments[index], out var value) == false)
+                {
+                    return FormulaResult.Failure(CreateError(
+                        FormulaErrorCode.TypeMismatch,
+                        $"Аргумент {index + 1} формулы 'ПРОИЗВ' должен быть числовым.",
+                        "ПРОИЗВ"));
+                }
+
+                result *= value;
+            }
+
+            return Numeric(result);
         }
 
         /// <summary>
