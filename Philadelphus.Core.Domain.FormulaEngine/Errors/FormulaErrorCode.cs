@@ -32,6 +32,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Errors
         TypeMismatch,
 
         /// <summary>
+        /// Значение аргумента не входит в допустимую область значений формулы.
+        /// </summary>
+        [Display(Name = "#НЕКОРРЕКТНОЕ_ЗНАЧЕНИЕ", Description = "Значение аргумента не входит в допустимую область")]
+        InvalidArgumentValue,
+
+        /// <summary>
         /// При вычислении выполнено деление на ноль.
         /// </summary>
         [Display(Name = "#ДЕЛЕНИЕ_НА_НОЛЬ", Description = "Деление на ноль")]

@@ -263,6 +263,65 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет формулу СТЕПЕНЬ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Power_Returns_Left_To_Right_Power()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("СТЕПЕНЬ(3;2)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(9d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет формулу КОРЕНЬ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_SquareRoot_Returns_Root_Of_Value()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("КОРЕНЬ(4)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(2d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку области значений для отрицательного аргумента КОРЕНЬ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_SquareRoot_Returns_InvalidArgumentValue_For_Negative_Value()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("КОРЕНЬ(РАЗНОСТЬ(0;1))", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentValue);
+            result.Error.Code.GetDisplayName().Should().Be("#НЕКОРРЕКТНОЕ_ЗНАЧЕНИЕ");
+        }
+
+        /// <summary>
+        /// Проверяет ошибку области значений для некорректной степени.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Power_Returns_InvalidArgumentValue_For_Invalid_Result()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("СТЕПЕНЬ(РАЗНОСТЬ(0;1);0.5)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentValue);
+        }
+
+        /// <summary>
         /// Проверяет изменение приоритета арифметики через скобки.
         /// </summary>
         [Fact]
@@ -324,6 +383,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             registry.TryResolve("/", out _).Should().BeTrue();
             registry.TryResolve("СТЕПЕНЬ", out _).Should().BeTrue();
             registry.TryResolve("^", out _).Should().BeTrue();
+            registry.TryResolve("КОРЕНЬ", out _).Should().BeTrue();
             registry.TryResolve("SIN", out _).Should().BeTrue();
             registry.TryResolve("COS", out _).Should().BeTrue();
         }

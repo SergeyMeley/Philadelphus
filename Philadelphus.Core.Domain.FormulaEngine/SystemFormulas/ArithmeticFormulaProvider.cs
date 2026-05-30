@@ -22,6 +22,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             yield return CreateProductFormula();
             yield return CreateBinaryFormula("ЧАСТНОЕ", "/", "Делит первое числовое значение на второе.", Divide);
             yield return CreateBinaryFormula("СТЕПЕНЬ", "^", "Возводит первое числовое значение в степень второго.", Power);
+            yield return CreateUnaryFormula("КОРЕНЬ", "Вычисляет квадратный корень числового значения.", SquareRoot);
             yield return CreateUnaryFormula("SIN", "Вычисляет синус угла в радианах.", Math.Sin);
             yield return CreateUnaryFormula("COS", "Вычисляет косинус угла в радианах.", Math.Cos);
         }
@@ -203,7 +204,16 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     formulaName));
             }
 
-            return Numeric(operation(value));
+            var result = operation(value);
+            if (IsValidNumber(result) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentValue,
+                    $"Формула '{formulaName}' получила значение вне допустимой области.",
+                    formulaName));
+            }
+
+            return Numeric(result);
         }
 
         /// <summary>
@@ -314,7 +324,26 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             var left = GetNumber(arguments[0]);
             var right = GetNumber(arguments[1]);
 
-            return Numeric(Math.Pow(left, right));
+            var result = Math.Pow(left, right);
+            if (IsValidNumber(result) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentValue,
+                    "Результат возведения в степень не является допустимым числом.",
+                    "СТЕПЕНЬ"));
+            }
+
+            return Numeric(result);
+        }
+
+        /// <summary>
+        /// Вычисляет квадратный корень числового аргумента.
+        /// </summary>
+        /// <param name="value">Числовой аргумент.</param>
+        /// <returns>Квадратный корень аргумента.</returns>
+        private static double SquareRoot(double value)
+        {
+            return Math.Sqrt(value);
         }
 
         /// <summary>
@@ -355,7 +384,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             try
             {
                 value = Convert.ToDouble(argument.Value, CultureInfo.InvariantCulture);
-                return double.IsNaN(value) == false && double.IsInfinity(value) == false;
+                return IsValidNumber(value);
             }
             catch (Exception)
             {
@@ -374,6 +403,16 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 or SystemBaseType.INTEGER
                 or SystemBaseType.FLOAT
                 or SystemBaseType.MONEY;
+        }
+
+        /// <summary>
+        /// Проверяет, что число не является NaN или бесконечностью.
+        /// </summary>
+        /// <param name="value">Проверяемое число.</param>
+        /// <returns>true, если число допустимо для результата формулы; иначе false.</returns>
+        private static bool IsValidNumber(double value)
+        {
+            return double.IsNaN(value) == false && double.IsInfinity(value) == false;
         }
 
         /// <summary>
