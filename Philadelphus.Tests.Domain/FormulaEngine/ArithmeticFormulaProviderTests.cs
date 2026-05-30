@@ -205,6 +205,64 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет формулу SIN с аргументом в радианах.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Sin_Returns_Sine_Of_Radians()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("SIN(0)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(0d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет формулу COS с аргументом в радианах.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Cos_Returns_Cosine_Of_Radians()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("COS(0)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(1d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа для нечислового аргумента SIN.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Sin_Returns_TypeMismatch_For_Text_Argument()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("SIN(\"0\")", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку количества аргументов для COS.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Cos_Returns_InvalidArgumentCount_For_Wrong_Argument_Count()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("COS(0;1)", new FormulaExecutionContext());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentCount);
+        }
+
+        /// <summary>
         /// Проверяет изменение приоритета арифметики через скобки.
         /// </summary>
         [Fact]
@@ -266,6 +324,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             registry.TryResolve("/", out _).Should().BeTrue();
             registry.TryResolve("СТЕПЕНЬ", out _).Should().BeTrue();
             registry.TryResolve("^", out _).Should().BeTrue();
+            registry.TryResolve("SIN", out _).Should().BeTrue();
+            registry.TryResolve("COS", out _).Should().BeTrue();
         }
 
         /// <summary>

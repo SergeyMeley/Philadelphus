@@ -22,6 +22,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             yield return CreateProductFormula();
             yield return CreateBinaryFormula("ЧАСТНОЕ", "/", "Делит первое числовое значение на второе.", Divide);
             yield return CreateBinaryFormula("СТЕПЕНЬ", "^", "Возводит первое числовое значение в степень второго.", Power);
+            yield return CreateUnaryFormula("SIN", "Вычисляет синус угла в радианах.", Math.Sin);
+            yield return CreateUnaryFormula("COS", "Вычисляет косинус угла в радианах.", Math.Cos);
         }
 
         /// <summary>
@@ -111,6 +113,35 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         }
 
         /// <summary>
+        /// Создает описание унарной числовой формулы.
+        /// </summary>
+        /// <param name="name">Имя формулы.</param>
+        /// <param name="description">Описание формулы.</param>
+        /// <param name="operation">Унарная числовая операция.</param>
+        /// <returns>Определение формулы.</returns>
+        private static FormulaDefinition CreateUnaryFormula(
+            string name,
+            string description,
+            Func<double, double> operation)
+        {
+            return new FormulaDefinition
+            {
+                Name = name,
+                Description = description,
+                Arguments =
+                [
+                    new FormulaArgumentDefinition
+                    {
+                        Name = "значение",
+                        Description = "Числовое значение.",
+                        ExpectedType = SystemBaseType.NUMERIC
+                    }
+                ],
+                Evaluator = (_, arguments) => EvaluateUnary(name, arguments, operation)
+            };
+        }
+
+        /// <summary>
         /// Проверяет общие требования к бинарной операции и выполняет ее.
         /// </summary>
         /// <param name="formulaName">Имя формулы для диагностики ошибок.</param>
@@ -142,6 +173,37 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             }
 
             return operation(arguments);
+        }
+
+        /// <summary>
+        /// Проверяет общие требования к унарной операции и выполняет ее.
+        /// </summary>
+        /// <param name="formulaName">Имя формулы для диагностики ошибок.</param>
+        /// <param name="arguments">Аргументы формулы.</param>
+        /// <param name="operation">Унарная числовая операция.</param>
+        /// <returns>Результат вычисления операции.</returns>
+        private static FormulaResult EvaluateUnary(
+            string formulaName,
+            IReadOnlyList<FormulaResult> arguments,
+            Func<double, double> operation)
+        {
+            if (arguments.Count != 1)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentCount,
+                    $"Формула '{formulaName}' ожидает один аргумент.",
+                    formulaName));
+            }
+
+            if (TryGetNumber(arguments[0], out var value) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    $"Аргумент 1 формулы '{formulaName}' должен быть числовым.",
+                    formulaName));
+            }
+
+            return Numeric(operation(value));
         }
 
         /// <summary>
