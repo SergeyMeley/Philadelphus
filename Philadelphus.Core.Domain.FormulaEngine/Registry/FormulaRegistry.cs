@@ -73,6 +73,20 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Registry
             return _formulasByKey.TryGetValue(key, out formula);
         }
 
+        /// <summary>
+        /// Ищет формулу по имени или псевдониму и возвращает ошибку, если формула неизвестна.
+        /// </summary>
+        /// <param name="nameOrAlias">Имя или псевдоним формулы.</param>
+        /// <returns>Результат поиска формулы.</returns>
+        public FormulaResolveResult Resolve(string nameOrAlias)
+        {
+            var key = NormalizeKey(nameOrAlias, nameof(nameOrAlias));
+
+            return _formulasByKey.TryGetValue(key, out var formula)
+                ? FormulaResolveResult.Resolved(formula)
+                : FormulaResolveResult.Unknown(key);
+        }
+
         private static string NormalizeKey(string value, string parameterName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(value, parameterName);

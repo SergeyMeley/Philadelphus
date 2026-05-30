@@ -51,6 +51,40 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет запрет конфликта основного имени с уже занятым псевдонимом.
+        /// </summary>
+        [Fact]
+        public void Register_Blocks_Name_Conflict_With_Existing_Alias()
+        {
+            var registry = new FormulaRegistry();
+
+            registry.Register(CreateFormula("СУММ", "+"));
+
+            var act = () => registry.Register(CreateFormula("+"));
+
+            act.Should().Throw<FormulaRegistrationException>()
+                .WithMessage("*+*");
+        }
+
+        /// <summary>
+        /// Проверяет результат поиска неизвестной формулы.
+        /// </summary>
+        [Fact]
+        public void Resolve_Returns_UnknownFunction_Error_When_Formula_Is_Not_Registered()
+        {
+            var registry = new FormulaRegistry();
+
+            var result = registry.Resolve("НЕТ");
+
+            result.IsResolved.Should().BeFalse();
+            result.Formula.Should().BeNull();
+            result.Error.Should().NotBeNull();
+            result.Error!.Code.Should().Be(FormulaErrorCode.UnknownFunction);
+            result.Error.Code.GetDisplayName().Should().Be("#НЕИЗВЕСТНАЯ_ФУНКЦИЯ");
+            result.Error.FunctionOrOperator.Should().Be("НЕТ");
+        }
+
+        /// <summary>
         /// Проверяет регистрацию всех формул из поставщика.
         /// </summary>
         [Fact]
