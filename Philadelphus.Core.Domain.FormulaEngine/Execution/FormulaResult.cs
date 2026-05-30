@@ -77,7 +77,24 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         {
             ArgumentNullException.ThrowIfNull(treeLeave);
 
+            if (treeLeave is SystemBaseTreeLeaveModel systemBaseTreeLeave)
+            {
+                return FromSystemBaseTreeLeave(systemBaseTreeLeave);
+            }
+
             return new FormulaResult(treeLeave, treeLeave.SystemBaseType, treeLeave, null);
+        }
+
+        /// <summary>
+        /// Создает результат по системному листу с использованием его типизированного значения.
+        /// </summary>
+        /// <param name="treeLeave">Системный лист рабочего дерева.</param>
+        /// <returns>Успешный результат с типизированным значением и ссылкой на исходный лист.</returns>
+        public static FormulaResult FromSystemBaseTreeLeave(SystemBaseTreeLeaveModel treeLeave)
+        {
+            ArgumentNullException.ThrowIfNull(treeLeave);
+
+            return new FormulaResult(treeLeave.TypedValue, treeLeave.SystemBaseType, treeLeave, null);
         }
 
         /// <summary>

@@ -14,6 +14,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         public WorkingTreeModel? WorkingTree { get; init; }
 
         /// <summary>
+        /// Системное рабочее дерево, из которого берутся предопределенные системные значения.
+        /// </summary>
+        public WorkingTreeModel? SystemBaseWorkingTree { get; init; }
+
+        /// <summary>
         /// Сервис уведомлений текущего приложения.
         /// </summary>
         public INotificationService? NotificationService { get; init; }

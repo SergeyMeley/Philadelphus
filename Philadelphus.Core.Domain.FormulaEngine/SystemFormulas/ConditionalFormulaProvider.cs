@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
@@ -32,34 +33,59 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     new FormulaArgumentDefinition
                     {
                         Name = "еслиИстина",
-                        Description = "Значение, возвращаемое при истинном условии."
+                        Description = "Значение, возвращаемое при истинном условии.",
+                        IsRequired = false,
+                        DefaultValue = true
                     },
                     new FormulaArgumentDefinition
                     {
                         Name = "еслиЛожь",
-                        Description = "Значение, возвращаемое при ложном условии."
+                        Description = "Значение, возвращаемое при ложном условии.",
+                        IsRequired = false,
+                        DefaultValue = false
                     }
                 ],
-                Evaluator = (_, arguments) => EvaluateIf(arguments)
+                Evaluator = (context, arguments) => EvaluateIf(context, arguments)
             };
         }
 
         /// <summary>
         /// Вычисляет именованную формулу ЕСЛИ по уже вычисленным аргументам.
         /// </summary>
+        /// <param name="context">Контекст вычисления, содержащий системное рабочее дерево.</param>
         /// <param name="arguments">Аргументы формулы ЕСЛИ.</param>
         /// <returns>Выбранный результат или ошибка условия.</returns>
-        private static FormulaResult EvaluateIf(IReadOnlyList<FormulaResult> arguments)
+        private static FormulaResult EvaluateIf(FormulaExecutionContext context, IReadOnlyList<FormulaResult> arguments)
         {
-            if (arguments.Count != 3)
+            if (arguments.Count is < 1 or > 3)
             {
                 return FormulaResult.Failure(CreateError(
                     FormulaErrorCode.InvalidArgumentCount,
-                    "Формула 'ЕСЛИ' ожидает три аргумента.",
+                    "Формула 'ЕСЛИ' ожидает от одного до трех аргументов.",
                     "ЕСЛИ"));
             }
 
-            return SelectBranch(arguments[0], arguments[1], arguments[2], "ЕСЛИ");
+            if (arguments.Count == 3)
+            {
+                return SelectBranch(arguments[0], arguments[1], arguments[2], "ЕСЛИ");
+            }
+
+            if (TryGetCondition(arguments[0], out var conditionValue) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Условный выбор ожидает логическое значение в условии.",
+                    "ЕСЛИ"));
+            }
+
+            if (conditionValue)
+            {
+                return arguments.Count > 1
+                    ? arguments[1]
+                    : ResolveSystemBaseBoolean(context, true);
+            }
+
+            return ResolveSystemBaseBoolean(context, false);
         }
 
         /// <summary>
@@ -103,6 +129,32 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
 
             value = conditionValue;
             return true;
+        }
+
+        /// <summary>
+        /// Возвращает предопределенный системный лист BOOL из системного рабочего дерева.
+        /// </summary>
+        /// <param name="context">Контекст вычисления формулы.</param>
+        /// <param name="value">Требуемое логическое значение.</param>
+        /// <returns>Результат на основе системного листа или ошибка отсутствия системного значения.</returns>
+        private static FormulaResult ResolveSystemBaseBoolean(FormulaExecutionContext context, bool value)
+        {
+            var treeLeave = context.SystemBaseWorkingTree?.ContentLeaves
+                .OfType<SystemBaseTreeLeaveModel>()
+                .SingleOrDefault(x =>
+                    x.SystemBaseType == SystemBaseType.BOOL
+                    && x.TypedValue is bool boolValue
+                    && boolValue == value);
+
+            if (treeLeave is null)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TreeLeaveNotFound,
+                    $"Системное логическое значение '{(value ? "Истина" : "Ложь")}' не найдено.",
+                    "ЕСЛИ"));
+            }
+
+            return FormulaResult.FromSystemBaseTreeLeave(treeLeave);
         }
 
         /// <summary>

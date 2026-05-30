@@ -222,12 +222,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
         /// <returns>Результат формулы для листа дерева.</returns>
         private static FormulaResult ConvertTreeLeaveToResult(TreeLeaveModel treeLeave)
         {
-            return treeLeave is SystemBaseTreeLeaveModel systemBaseTreeLeave
-                ? FormulaResult.Success(
-                    systemBaseTreeLeave.TypedValue,
-                    systemBaseTreeLeave.SystemBaseType,
-                    systemBaseTreeLeave)
-                : FormulaResult.FromTreeLeave(treeLeave);
+            return FormulaResult.FromTreeLeave(treeLeave);
         }
 
         /// <summary>
