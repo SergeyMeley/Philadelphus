@@ -11,6 +11,11 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
+        /// Порядковый номер.
+        /// </summary>
+        public long Sequence { get; set; }
+
+        /// <summary>
         /// Корень содержимого.
         /// </summary>
         public TreeRootExportDTO ContentRoot { get; set; } = new();

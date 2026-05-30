@@ -75,6 +75,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             var tree = service.CreateWorkingTree(repository, dataStorage, needAutoName: false, withoutInfoNotifications: true);
             tree.Name = string.IsNullOrWhiteSpace(source.Name) ? "Импортированное дерево" : source.Name;
 
+            AssignImportedSequence(
+                tree,
+                source.Sequence,
+                repository.ContentShrub.ContentWorkingTrees
+                    .Where(x => x.Uuid != tree.Uuid)
+                    .Select(x => x.Sequence));
+
             var needRootName = string.IsNullOrWhiteSpace(source.ContentRoot.Name);
             var treeRoot = service.CreateTreeRoot(tree, needAutoName: needRootName, withoutInfoNotifications: true);
             if (needRootName == false)
@@ -83,6 +90,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             }
 
             treeRoot.Description = source.ContentRoot.Description;
+
+            AssignImportedSequence(
+                treeRoot,
+                source.ContentRoot.Sequence,
+                tree.ContentRoot != null && tree.ContentRoot.Uuid != treeRoot.Uuid
+                    ? new[] { tree.ContentRoot.Sequence }
+                    : Enumerable.Empty<long>());
 
             var attributeLinkMap = new Dictionary<Guid, AttributeLink>();
 
@@ -114,6 +128,32 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
         private static string GetOwningRootName(TreeNodeModel node)
         {
             return node.OwningWorkingTree?.ContentRoot?.Name ?? "Неизвестный";
+        }
+
+        private static void AssignImportedSequence(
+            ISequencableModel model,
+            long importedSequence,
+            IEnumerable<long>? existSequences)
+        {
+            if (importedSequence > 0)
+            {
+                model.Sequence = importedSequence;
+                if (model.Sequence == importedSequence)
+                {
+                    return;
+                }
+            }
+
+            foreach (var sequence in SequenceHelper.GetNewSequences(existSequences ?? Enumerable.Empty<long>()))
+            {
+                model.Sequence = sequence;
+                if (model.Sequence == sequence)
+                {
+                    return;
+                }
+            }
+
+            throw new InvalidOperationException("Не удалось присвоить свободный порядковый номер.");
         }
 
         private static string GetOwningNodeName(TreeLeaveModel leaf)
@@ -155,6 +195,13 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             }
 
             node.Description = nodeDto.Description;
+            AssignImportedSequence(
+                node,
+                nodeDto.Sequence,
+                parent.Childs.Values
+                    .OfType<TreeNodeModel>()
+                    .Where(x => x.Uuid != node.Uuid)
+                    .Select(x => x.Sequence));
             CreateAttributesFromElement(service, node, nodeDto.Attributes, attributeLinkMap);
 
             foreach (var childNodeDto in nodeDto.ChildNodes)
@@ -182,6 +229,12 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             }
 
             leaf.Description = leaveDto.Description;
+            AssignImportedSequence(
+                leaf,
+                leaveDto.Sequence,
+                node.ChildLeaves
+                    .Where(x => x.Uuid != leaf.Uuid)
+                    .Select(x => x.Sequence));
             if (leaf is SystemBaseTreeLeaveModel systemBaseLeaf)
             {
                 systemBaseLeaf.StringValue = string.IsNullOrEmpty(leaveDto.StringValue)
@@ -235,6 +288,12 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
                 }
 
                 attribute.Description = attributeDto.Description;
+                AssignImportedSequence(
+                    attribute,
+                    attributeDto.Sequence,
+                    element.Attributes
+                        .Where(x => x.Uuid != attribute.Uuid)
+                        .Select(x => x.Sequence));
 
                 attributeLinkMap[attribute.LocalUuid] = new AttributeLink(
                     GetDataTypeNodeName(attributeDto),

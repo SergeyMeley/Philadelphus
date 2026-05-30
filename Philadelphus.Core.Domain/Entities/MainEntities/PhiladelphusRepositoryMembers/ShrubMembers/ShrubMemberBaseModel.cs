@@ -30,7 +30,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private List<ElementAttributeModel> _attributes = new List<ElementAttributeModel>();
         private IReadOnlyList<ElementAttributeModel> _cachedAttributes;
 
-        private long _sequence;
+        protected long _sequence;
 
         private object _lockObject = new();
         private int _version = 0;
@@ -131,7 +131,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                                     }
                                     else
                                     {
-                                        newParentAttributes.Add(attribute.CloneForChild(this));
+                                        var inheritedAttribute = attribute.CloneForChild(this);
+                                        inheritedAttribute.AssignInheritedAutoSequence(
+                                            attributes
+                                                .Concat(oldParentAttributes)
+                                                .Concat(newParentAttributes)
+                                                .Select(x => x.Sequence));
+                                        newParentAttributes.Add(inheritedAttribute);
                                     }
                                 }
                             }
@@ -311,6 +317,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Присвоить автоматически сгенерированный порядковый номер.
+        /// </summary>
+        /// <param name="existSequences">Занятые порядковые номера.</param>
+        /// <returns>Присвоенный порядковый номер.</returns>
+        public long AssignAutoSequence(IEnumerable<long>? existSequences = null)
+        {
+            foreach (var sequence in SequenceHelper.GetNewSequences(existSequences ?? Enumerable.Empty<long>()))
+            {
+                Sequence = sequence;
+                if (Sequence == sequence)
+                {
+                    return Sequence;
+                }
+            }
+
+            throw new InvalidOperationException("Не удалось присвоить свободный порядковый номер.");
         }
 
         /// <summary>

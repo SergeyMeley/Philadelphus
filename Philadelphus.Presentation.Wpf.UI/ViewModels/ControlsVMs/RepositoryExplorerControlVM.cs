@@ -775,7 +775,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
             }
 
-            if (columnKey == nameof(ISequencableModel.Sequence))
+            if (columnKey == nameof(IChildrenModel.SequencePath))
             {
                 _isChildCollectionTableOrderStale = true;
                 CommandManager.InvalidateRequerySuggested();

@@ -16,6 +16,11 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         public string Description { get; set; } = string.Empty;
 
         /// <summary>
+        /// Порядковый номер.
+        /// </summary>
+        public long Sequence { get; set; }
+
+        /// <summary>
         /// Наименование владеющего корня.
         /// </summary>
         public string OwningRootName { get; set; } = string.Empty;

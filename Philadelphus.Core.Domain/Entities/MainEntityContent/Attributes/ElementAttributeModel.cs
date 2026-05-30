@@ -497,6 +497,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             return result;
         }
 
+        internal long AssignInheritedAutoSequence(IEnumerable<long>? existSequences = null)
+        {
+            _sequence = SequenceHelper.GetNewSequence(existSequences);
+            return _sequence;
+        }
+
         protected override bool AddContentDetailed(IContentModel content)
         {
             throw new NotImplementedException();

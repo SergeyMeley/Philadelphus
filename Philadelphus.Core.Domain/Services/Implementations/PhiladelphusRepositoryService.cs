@@ -572,6 +572,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (needAutoName)
                 {
                     result.AssignAutoName();
+                    result.AssignAutoSequence(owner.ContentShrub.ContentWorkingTrees.Select(x => x.Sequence));
                 }
 
                 owner.ContentShrub.ContentWorkingTrees.Add(result);
@@ -648,6 +649,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (needAutoName)
                 {
                     result.AssignAutoName();
+                    result.AssignAutoSequence(owner.ContentRoot != null
+                        ? new[] { owner.ContentRoot.Sequence }
+                        : Enumerable.Empty<long>());
                 }
 
                 SetModelState(result, State.Initialized);
@@ -701,6 +705,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (needAutoName)
                 {
                     result.AssignAutoName();
+                    result.AssignAutoSequence(parent.Childs.Values
+                        .OfType<TreeNodeModel>()
+                        .Select(x => x.Sequence));
                 }
 
                 SetModelState(result, State.Initialized);
@@ -793,6 +800,11 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     result.AssignAutoName();
                 }
 
+                if (needAutoName)
+                {
+                    result.AssignAutoSequence(parent.ChildLeaves.Select(x => x.Sequence));
+                }
+
                 SetModelState(result, State.Initialized);
 
                 if (withoutInfoNotifications == false)
@@ -861,6 +873,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     if (needAutoName)
                     {
                         result.AssignAutoName();
+                        result.AssignAutoSequence(owner.Attributes.Select(x => x.Sequence));
                     }
 
                     SetModelState(result, State.Initialized);

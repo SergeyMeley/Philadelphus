@@ -24,18 +24,20 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
                 fixture.Root,
                 fixture.Root.Childs.Values);
 
-            columns.Select(x => x.Header).Should().StartWith(new[]
+            columns.Select(x => x.Key).Should().StartWith(new[]
             {
-                "State",
-                "№",
-                "Тип",
-                "Name",
-                "Description",
-                "CustomCode",
+                nameof(IMainEntityModel.State),
+                nameof(IChildrenModel.SequencePath),
+                nameof(IMainEntityModel.Type),
+                nameof(IMainEntityModel.Name),
+                nameof(IMainEntityModel.Description),
+                nameof(IWorkingTreeMemberModel.CustomCode),
                 "Цена, руб",
             });
 
-            columns.Select(x => x.Header).Should().ContainInOrder("CreatedBy", "CreatedAt");
+            columns.Select(x => x.Key).Should().ContainInOrder(
+                $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}",
+                $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedAt)}");
             columns.Select(x => x.Order).Should().BeInAscendingOrder();
         }
 
@@ -61,13 +63,13 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
                 fixture.Root.Childs.Values);
 
             columns.Single(x => x.Order == 0).Key.Should().Be(nameof(IMainEntityModel.State));
-            columns.Single(x => x.Order == 1).Key.Should().Be(nameof(ISequencableModel.Sequence));
+            columns.Single(x => x.Order == 1).Key.Should().Be(nameof(IChildrenModel.SequencePath));
             columns.Single(x => x.Order == 2).Key.Should().Be(nameof(IMainEntityModel.Type));
-            columns.Single(x => x.Header == "Name").Key.Should().Be(nameof(IMainEntityModel.Name));
-            columns.Single(x => x.Header == "Description").Key.Should().Be(nameof(IMainEntityModel.Description));
-            columns.Single(x => x.Header == "CustomCode").Key.Should().Be(nameof(IWorkingTreeMemberModel.CustomCode));
-            columns.Single(x => x.Header == "CreatedBy").Key.Should().Be($"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}");
-            columns.Single(x => x.Header == "CreatedAt").Key.Should().Be($"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedAt)}");
+            columns.Single(x => x.Key == nameof(IMainEntityModel.Name)).Header.Should().NotBeNullOrWhiteSpace();
+            columns.Single(x => x.Key == nameof(IMainEntityModel.Description)).Header.Should().NotBeNullOrWhiteSpace();
+            columns.Single(x => x.Key == nameof(IWorkingTreeMemberModel.CustomCode)).Header.Should().NotBeNullOrWhiteSpace();
+            columns.Single(x => x.Key == $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}").Header.Should().NotBeNullOrWhiteSpace();
+            columns.Single(x => x.Key == $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedAt)}").Header.Should().NotBeNullOrWhiteSpace();
             var attributeColumn = columns.Single(x => x.Order == 6);
             attributeColumn.Key.Should().Be(attributeColumn.Header);
             attributeColumn.BindingKey.Should().NotBe(attributeColumn.Key);
@@ -148,7 +150,7 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
             var row = rows.Single();
             var priceColumn = columns.Single(x => x.Header == "Цена, руб");
 
-            row[nameof(ISequencableModel.Sequence)].Should().Be(10);
+            row[nameof(IChildrenModel.SequencePath)].Should().Be("1.10");
             row[nameof(IMainEntityModel.State)].Should().Be(fixture.Leave.State);
             row[nameof(IMainEntityModel.Type)].Should().Be(nameof(TreeLeaveModel));
             row[nameof(IMainEntityModel.Name)].Should().Be("Шток");
@@ -156,6 +158,24 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
             row[$"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}"].Should().Be("user123");
             row[priceColumn.Key].Should().Be(fixture.PriceValue);
             row[priceColumn.BindingKey].Should().Be(fixture.PriceValue);
+        }
+
+        [Fact]
+        public void buildChildCollectionTableRows_Excludes_Sequenced_Root_From_SequencePath()
+        {
+            var fixture = CreateFixture();
+            fixture.Root.Sequence = 30;
+            var children = new IChildrenModel[] { fixture.Leave };
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                fixture.Root,
+                children);
+
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(
+                children,
+                columns)
+                .Single();
+
+            row[nameof(IChildrenModel.SequencePath)].Should().Be("1.10");
         }
 
         [Fact]
@@ -167,7 +187,8 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
                 fixture.Root,
                 fixture.Root.Childs.Values);
 
-            columns.Single(x => x.Key == nameof(ISequencableModel.Sequence)).IsReadOnly.Should().BeFalse();
+            columns.Select(x => x.Key).Should().NotContain(nameof(ISequencableModel.Sequence));
+            columns.Single(x => x.Key == nameof(IChildrenModel.SequencePath)).IsReadOnly.Should().BeFalse();
             columns.Single(x => x.Key == nameof(IMainEntityModel.State)).IsReadOnly.Should().BeTrue();
             columns.Single(x => x.Key == nameof(IMainEntityModel.Name)).IsReadOnly.Should().BeFalse();
             columns.Single(x => x.Key == nameof(IMainEntityModel.Description)).IsReadOnly.Should().BeFalse();
@@ -186,12 +207,13 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
                 children);
             var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
 
-            row[nameof(ISequencableModel.Sequence)] = "42";
+            row[nameof(IChildrenModel.SequencePath)] = "999.42";
             row[nameof(IMainEntityModel.Name)] = "Edited name";
             row[nameof(IMainEntityModel.Description)] = "Edited description";
             row[nameof(IWorkingTreeMemberModel.CustomCode)] = "EDIT-1";
 
             fixture.Leave.Sequence.Should().Be(42);
+            row[nameof(IChildrenModel.SequencePath)].Should().Be("1.42");
             fixture.Leave.Name.Should().Be("Edited name");
             fixture.Leave.Description.Should().Be("Edited description");
             fixture.Leave.CustomCode.Should().Be("EDIT-1");
@@ -208,10 +230,10 @@ namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
                 children);
             var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
 
-            row[nameof(ISequencableModel.Sequence)] = "not a number";
+            row[nameof(IChildrenModel.SequencePath)] = "not a number";
 
             fixture.Leave.Sequence.Should().Be(10);
-            row[nameof(ISequencableModel.Sequence)].Should().Be(10);
+            row[nameof(IChildrenModel.SequencePath)].Should().Be("1.10");
         }
 
         [Fact]
