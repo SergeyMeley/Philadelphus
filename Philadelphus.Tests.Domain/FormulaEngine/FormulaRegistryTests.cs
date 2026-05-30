@@ -1,0 +1,153 @@
+using FluentAssertions;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Errors;
+using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Tests.Common.Fakes.Entities;
+using Philadelphus.Tests.Common.Fakes.Services;
+
+namespace Philadelphus.Tests.Domain.FormulaEngine
+{
+    /// <summary>
+    /// Тесты базовых контрактов и реестра Formula Engine.
+    /// </summary>
+    public class FormulaRegistryTests
+    {
+        /// <summary>
+        /// Проверяет поиск зарегистрированной формулы по имени и псевдониму.
+        /// </summary>
+        [Fact]
+        public void Register_Allows_Resolve_By_Name_And_Alias()
+        {
+            var registry = new FormulaRegistry();
+            var formula = CreateFormula("СУММ", "+");
+
+            registry.Register(formula);
+
+            registry.TryResolve("СУММ", out var byName).Should().BeTrue();
+            byName.Should().BeSameAs(formula);
+
+            registry.TryResolve("+", out var byAlias).Should().BeTrue();
+            byAlias.Should().BeSameAs(formula);
+        }
+
+        /// <summary>
+        /// Проверяет запрет повторной регистрации имени или псевдонима.
+        /// </summary>
+        [Fact]
+        public void Register_Blocks_Duplicate_Name_Or_Alias()
+        {
+            var registry = new FormulaRegistry();
+
+            registry.Register(CreateFormula("СУММ", "+"));
+
+            var act = () => registry.Register(CreateFormula("PLUS", "+"));
+
+            act.Should().Throw<FormulaRegistrationException>()
+                .WithMessage("*+*");
+        }
+
+        /// <summary>
+        /// Проверяет регистрацию всех формул из поставщика.
+        /// </summary>
+        [Fact]
+        public void RegisterProvider_Registers_All_Provider_Formulas()
+        {
+            var registry = new FormulaRegistry();
+
+            registry.RegisterProvider(new TestFormulaProvider(
+                CreateFormula("СУММ", "+"),
+                CreateFormula("ПРОИЗВ", "*")));
+
+            registry.TryResolve("+", out _).Should().BeTrue();
+            registry.TryResolve("*", out _).Should().BeTrue();
+            registry.Formulas.Should().HaveCount(2);
+        }
+
+        /// <summary>
+        /// Проверяет, что результат с листом хранит сам экземпляр <see cref="TreeLeaveModel" />.
+        /// </summary>
+        [Fact]
+        public void FormulaResult_FromTreeLeave_Preserves_TreeLeave_Instance()
+        {
+            var treeLeave = CreateTreeLeave();
+
+            var result = FormulaResult.FromTreeLeave(treeLeave);
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().BeSameAs(treeLeave);
+            result.TreeLeave.Should().BeSameAs(treeLeave);
+            result.ValueType.Should().Be(treeLeave.SystemBaseType);
+        }
+
+        /// <summary>
+        /// Проверяет русское отображаемое значение кода ошибки.
+        /// </summary>
+        [Fact]
+        public void FormulaErrorCode_Uses_Russian_Display_Name()
+        {
+            FormulaErrorCode.ParseError.GetDisplayName().Should().Be("#ОШИБКА_ПАРСИНГА");
+        }
+
+        private static FormulaDefinition CreateFormula(string name, params string[] aliases)
+        {
+            return new FormulaDefinition
+            {
+                Name = name,
+                Aliases = aliases,
+                Description = "Тестовая формула",
+                Arguments =
+                [
+                    new FormulaArgumentDefinition
+                    {
+                        Name = "значение",
+                        ExpectedType = SystemBaseType.NUMERIC
+                    }
+                ],
+                Evaluator = (_, _) => FormulaResult.Success(1d, SystemBaseType.NUMERIC)
+            };
+        }
+
+        private static TreeLeaveModel CreateTreeLeave()
+        {
+            var notificationService = new FakeNotificationService();
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+
+            return new TreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+        }
+
+        private sealed class TestFormulaProvider : IFormulaProvider
+        {
+            private readonly IReadOnlyList<FormulaDefinition> _formulas;
+
+            public TestFormulaProvider(params FormulaDefinition[] formulas)
+            {
+                _formulas = formulas;
+            }
+
+            public IEnumerable<FormulaDefinition> GetFormulas()
+            {
+                return _formulas;
+            }
+        }
+    }
+}
