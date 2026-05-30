@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Expressions;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 {
@@ -175,7 +176,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                 return condition;
             }
 
-            if (condition.ValueType != SystemBaseType.BOOL || condition.Value is not bool conditionValue)
+            if (ConditionalFormulaProvider.TryGetCondition(condition, out var conditionValue) == false)
             {
                 return FormulaResult.Failure(CreateError(
                     FormulaErrorCode.TypeMismatch,
