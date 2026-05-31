@@ -298,6 +298,100 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет получение системного значения атрибута по названию.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Attribute_Object_Method_Returns_SystemBase_Attribute_Value()
+        {
+            var treeLeave = CreateTreeLeave();
+            var context = CreateMaterializingContext(treeLeave);
+            var value = CreateSystemBaseLeave(context, SystemBaseType.STRING, "Красный");
+            CreateInheritedAttribute(treeLeave, "Цвет", value);
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"=[{treeLeave.Uuid}].АТРИБУТ(\"Цвет\")",
+                context);
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be("Красный");
+            result.ValueType.Should().Be(SystemBaseType.STRING);
+            result.TreeLeave.Should().BeSameAs(value);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку, если атрибут с указанным названием не найден.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Attribute_Object_Method_Returns_AttributeNotFound_For_Missing_Attribute()
+        {
+            var treeLeave = CreateTreeLeave();
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"=[{treeLeave.Uuid}].АТРИБУТ(\"Цвет\")",
+                CreateMaterializingContext(treeLeave));
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.AttributeNotFound);
+            result.Error.FunctionOrOperator.Should().Be("АТРИБУТ");
+        }
+
+        /// <summary>
+        /// Проверяет ошибку, если у листа найдено несколько атрибутов с одинаковым названием.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Attribute_Object_Method_Returns_AttributeDuplicate_For_Duplicate_Attributes()
+        {
+            var treeLeave = CreateTreeLeave();
+            var context = CreateMaterializingContext(treeLeave);
+            var value = CreateSystemBaseLeave(context, SystemBaseType.STRING, "Красный");
+            CreateInheritedAttribute(treeLeave, "Цвет", value);
+            CreateInheritedAttribute(treeLeave, "Цвет", value);
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"=[{treeLeave.Uuid}].АТРИБУТ(\"Цвет\")",
+                context);
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.AttributeDuplicate);
+            result.Error.FunctionOrOperator.Should().Be("АТРИБУТ");
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа, если АТРИБУТ вызван не от листа дерева.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Attribute_Object_Method_Returns_TypeMismatch_For_Non_TreeLeave_Target()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("=\"text\".АТРИБУТ(\"Цвет\")", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа, если имя атрибута передано не строковым литералом.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Attribute_Object_Method_Returns_TypeMismatch_For_Non_Text_Attribute_Name()
+        {
+            var treeLeave = CreateTreeLeave();
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"=[{treeLeave.Uuid}].АТРИБУТ(Цвет)",
+                CreateMaterializingContext(treeLeave));
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+            result.Error.FunctionOrOperator.Should().Be("АТРИБУТ");
+        }
+
+        /// <summary>
         /// Проверяет ошибку для свойства вне whitelist.
         /// </summary>
         [Fact]
@@ -379,6 +473,63 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 NotificationService = context.NotificationService,
                 Items = context.Items
             };
+        }
+
+        /// <summary>
+        /// Создает унаследованный атрибут листа с одиночным значением.
+        /// </summary>
+        /// <param name="owner">Лист, которому доступен атрибут.</param>
+        /// <param name="name">Название атрибута.</param>
+        /// <param name="value">Значение атрибута.</param>
+        /// <returns>Созданный атрибут.</returns>
+        private static Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel CreateInheritedAttribute(
+            TreeLeaveModel owner,
+            string name,
+            TreeLeaveModel value)
+        {
+            var uuid = Guid.NewGuid();
+            var attribute = new Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel(
+                uuid,
+                owner.ParentNode,
+                uuid,
+                owner.ParentNode,
+                owner.OwningWorkingTree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes.ElementAttributeModel>())
+            {
+                Name = name,
+                ValueType = value.ParentNode,
+                Value = value
+            };
+
+            return attribute;
+        }
+
+        /// <summary>
+        /// Создает системный лист указанного типа в системном дереве контекста.
+        /// </summary>
+        /// <param name="context">Контекст с системным рабочим деревом.</param>
+        /// <param name="type">Системный тип листа.</param>
+        /// <param name="stringValue">Строковое значение системного листа.</param>
+        /// <returns>Созданный системный лист.</returns>
+        private static SystemBaseTreeLeaveModel CreateSystemBaseLeave(
+            FormulaExecutionContext context,
+            SystemBaseType type,
+            string stringValue)
+        {
+            var node = context.SystemBaseWorkingTree!.ContentNodes
+                .OfType<SystemBaseTreeNodeModel>()
+                .Single(x => x.SystemBaseType == type);
+
+            var result = new SystemBaseTreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                context.SystemBaseWorkingTree,
+                type,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+            result.StringValue = stringValue;
+            return result;
         }
 
         /// <summary>

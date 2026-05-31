@@ -275,11 +275,94 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                 return EvaluatePropertyObjectMethod(objectMethodCall, target);
             }
 
+            if (string.Equals(objectMethodCall.MethodName, "АТРИБУТ", StringComparison.OrdinalIgnoreCase))
+            {
+                return EvaluateAttributeObjectMethod(objectMethodCall, target);
+            }
+
             return FormulaResult.Failure(CreateError(
                 FormulaErrorCode.NotImplemented,
                 $"Объектная функция '{objectMethodCall.MethodName}' будет реализована отдельной подзадачей.",
                 objectMethodCall.Span,
                 objectMethodCall.MethodName));
+        }
+
+        /// <summary>
+        /// Вычисляет объектную функцию АТРИБУТ для результата, содержащего лист дерева.
+        /// </summary>
+        /// <param name="objectMethodCall">Выражение объектного вызова АТРИБУТ.</param>
+        /// <param name="target">Вычисленный объект, от которого запрошен атрибут.</param>
+        /// <returns>Значение атрибута или диагностическая ошибка.</returns>
+        private static FormulaResult EvaluateAttributeObjectMethod(
+            ObjectMethodCallFormulaExpression objectMethodCall,
+            FormulaResult target)
+        {
+            if (objectMethodCall.Arguments.Count != 1)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentCount,
+                    "Объектная функция 'АТРИБУТ' ожидает один аргумент.",
+                    objectMethodCall.Span,
+                    objectMethodCall.MethodName));
+            }
+
+            if (target.TreeLeave is null)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Объектная функция 'АТРИБУТ' может вызываться только от листа дерева.",
+                    objectMethodCall.Target.Span,
+                    objectMethodCall.MethodName));
+            }
+
+            if (TryGetAttributeName(objectMethodCall.Arguments[0], out var attributeName) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Аргумент объектной функции 'АТРИБУТ' должен быть строковым названием атрибута.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName));
+            }
+
+            var attributes = target.TreeLeave.Attributes
+                .Where(x => string.Equals(x.Name, attributeName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (attributes.Count == 0)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.AttributeNotFound,
+                    $"Атрибут '{attributeName}' не найден у листа дерева.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName));
+            }
+
+            if (attributes.Count > 1)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.AttributeDuplicate,
+                    $"У листа дерева найдено несколько атрибутов с названием '{attributeName}'.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName));
+            }
+
+            var attribute = attributes[0];
+            if (attribute.IsCollectionValue)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    $"Атрибут '{attributeName}' содержит коллекцию значений, а формула 'АТРИБУТ' ожидает одиночное значение.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName));
+            }
+
+            return attribute.Value is null
+                ? FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.AttributeNotFound,
+                    $"Атрибут '{attributeName}' найден, но значение атрибута не задано.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName))
+                : FormulaResult.FromTreeLeave(attribute.Value);
         }
 
         /// <summary>
@@ -344,6 +427,21 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
             };
 
             return string.IsNullOrWhiteSpace(propertyName) == false;
+        }
+
+        /// <summary>
+        /// Извлекает название атрибута из аргумента АТРИБУТ без вычисления как выражения.
+        /// </summary>
+        /// <param name="argument">AST-аргумент объектной функции.</param>
+        /// <param name="attributeName">Название атрибута.</param>
+        /// <returns>true, если аргумент задает непустое строковое название атрибута; иначе false.</returns>
+        private static bool TryGetAttributeName(FormulaExpression argument, out string attributeName)
+        {
+            attributeName = argument is LiteralFormulaExpression { Type: SystemBaseType.STRING, Value: string value }
+                ? value
+                : string.Empty;
+
+            return string.IsNullOrWhiteSpace(attributeName) == false;
         }
 
         /// <summary>
