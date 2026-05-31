@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -205,6 +206,21 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет, что UUID-ссылка вычисляется через зарегистрированную формулу ЛИСТ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_TreeLeaveReference_Requires_List_Formula()
+        {
+            var evaluator = new FormulaAstEvaluator(new FormulaRegistry());
+
+            var result = evaluator.Evaluate($"[{Guid.NewGuid()}]", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.UnknownFunction);
+            result.Error.FunctionOrOperator.Should().Be("ЛИСТ");
+        }
+
+        /// <summary>
         /// Проверяет зарезервированный маршрут объектных функций до реализации СВОЙСТВО/АТРИБУТ.
         /// </summary>
         [Fact]
@@ -229,7 +245,10 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         /// <returns>Вычислитель AST формул.</returns>
         private static FormulaAstEvaluator CreateEvaluator()
         {
-            return new FormulaAstEvaluator(new FormulaRegistry());
+            var registry = new FormulaRegistry();
+            registry.RegisterProvider(new TreeLeaveFormulaProvider());
+
+            return new FormulaAstEvaluator(registry);
         }
 
         /// <summary>

@@ -1,12 +1,10 @@
 using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Expressions;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
-using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 {
@@ -201,28 +199,24 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
         /// <param name="treeLeaveReference">Выражение ссылки на лист.</param>
         /// <param name="context">Контекст вычисления формулы.</param>
         /// <returns>Результат со значением листа или ошибка поиска.</returns>
-        private static FormulaResult EvaluateTreeLeaveReference(
+        private FormulaResult EvaluateTreeLeaveReference(
             TreeLeaveReferenceFormulaExpression treeLeaveReference,
             FormulaExecutionContext context)
         {
-            var resolveResult = GetTreeLeaveResolver(context)
-                .ResolveByUuid(treeLeaveReference.Uuid);
+            var resolveResult = _registry.Resolve("ЛИСТ");
             if (resolveResult.IsResolved == false)
             {
                 return FormulaResult.Failure(CopyErrorWithSpan(resolveResult.Error!, treeLeaveReference.Span));
             }
 
-            return ConvertTreeLeaveToResult(resolveResult.TreeLeave!);
-        }
+            var arguments = new[]
+            {
+                FormulaResult.Success(0, SystemBaseType.INTEGER),
+                FormulaResult.Success(treeLeaveReference.Uuid.ToString(), SystemBaseType.STRING)
+            };
 
-        /// <summary>
-        /// Возвращает resolver листьев из контекста или создает resolver по текущему рабочему дереву.
-        /// </summary>
-        /// <param name="context">Контекст вычисления формулы.</param>
-        /// <returns>Resolver листьев рабочего дерева.</returns>
-        private static ITreeLeaveResolver GetTreeLeaveResolver(FormulaExecutionContext context)
-        {
-            return context.TreeLeaveResolver ?? new WorkingTreeTreeLeaveResolver(context.WorkingTree);
+            var result = resolveResult.Formula!.Evaluator(context, arguments);
+            return FormulaResultMaterializer.Materialize(result, context, treeLeaveReference.Span, "ЛИСТ");
         }
 
         /// <summary>
@@ -241,16 +235,6 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                 FunctionOrOperator = error.FunctionOrOperator,
                 Exception = error.Exception
             };
-        }
-
-        /// <summary>
-        /// Преобразует найденный лист дерева в результат формулы без дублирования доменной типизации.
-        /// </summary>
-        /// <param name="treeLeave">Найденный лист дерева.</param>
-        /// <returns>Результат формулы для листа дерева.</returns>
-        private static FormulaResult ConvertTreeLeaveToResult(TreeLeaveModel treeLeave)
-        {
-            return FormulaResult.FromTreeLeave(treeLeave);
         }
 
         /// <summary>
