@@ -153,6 +153,7 @@
     <ProjectReference Include="..\Philadelphus.Core.Domain.TablesExport\Philadelphus.Core.Domain.TablesExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.FormulaEngine\Philadelphus.Core.Domain.FormulaEngine.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Cache.Redis\Philadelphus.Infrastructure.Cache.Redis.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Cache\Philadelphus.Infrastructure.Cache.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.ImportExport.Phjson\Philadelphus.Infrastructure.ImportExport.Phjson.csproj" />

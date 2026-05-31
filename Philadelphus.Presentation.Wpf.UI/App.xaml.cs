@@ -4,6 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
@@ -206,6 +210,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
                     services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();
+                    RegisterFormulaEngine(services);
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
 
@@ -258,6 +263,32 @@ namespace Philadelphus.Presentation.Wpf.UI
             RegisterImportExportAdapters(services);
             RegisterExcelImportInfrastructure(services);
             RegisterExcelImportPresentation(services);
+        }
+
+        /// <summary>
+        /// Регистрирует ядро Formula Engine и все системные формулы этапа 1.
+        /// </summary>
+        /// <param name="services">Коллекция сервисов приложения.</param>
+        private static void RegisterFormulaEngine(IServiceCollection services)
+        {
+            services.AddSingleton<IFormulaProvider, ArithmeticFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, ComparisonFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, TextFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, ConditionalFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, TreeLeaveFormulaProvider>();
+
+            services.AddSingleton(serviceProvider =>
+            {
+                var registry = new FormulaRegistry();
+                foreach (var provider in serviceProvider.GetServices<IFormulaProvider>())
+                {
+                    registry.RegisterProvider(provider);
+                }
+
+                return registry;
+            });
+
+            services.AddSingleton<FormulaAstEvaluator>();
         }
 
         private static void RegisterImportExportCore(IServiceCollection services)
