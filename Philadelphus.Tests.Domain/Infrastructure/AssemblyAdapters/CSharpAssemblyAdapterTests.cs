@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Infrastructure.AssemblyAdapters;
 using Philadelphus.Infrastructure.AssemblyAdapters.CSharp;
@@ -43,10 +44,7 @@ namespace Philadelphus.Tests.Domain.Infrastructure.AssemblyAdapters
 
             var providerResult = adapter.CreateInstances<IFormulaProvider>(loadResult);
             var registry = new FormulaRegistry();
-            foreach (var provider in providerResult.Instances)
-            {
-                registry.RegisterProvider(provider);
-            }
+            registry.RegisterProvider(providerResult.Instances.OfType<TestExternalFormulaProvider>().Single());
 
             var evaluator = new FormulaAstEvaluator(registry);
             var result = evaluator.Evaluate("=TEST_PLUGIN_VALUE()", FormulaEngineTestContextFactory.Create());
@@ -55,6 +53,51 @@ namespace Philadelphus.Tests.Domain.Infrastructure.AssemblyAdapters
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(101L);
             result.ValueType.Should().Be(SystemBaseType.INTEGER);
+        }
+
+        [Fact]
+        public void CreateInstances_Detects_Duplicate_Formula_Name_Or_Alias_When_Registering_Plugin()
+        {
+            var adapter = new CSharpAssemblyAdapter();
+            var loadResult = adapter.Load(new AssemblyAdapterLoadRequest
+            {
+                Path = Assembly.GetExecutingAssembly().Location
+            });
+
+            var providerResult = adapter.CreateInstances<IFormulaProvider>(loadResult);
+            var registry = new FormulaRegistry();
+            registry.RegisterProvider(providerResult.Instances.OfType<TestExternalFormulaProvider>().Single());
+
+            var act = () => registry.RegisterProvider(
+                providerResult.Instances.OfType<TestConflictingExternalFormulaProvider>().Single());
+
+            act.Should().Throw<FormulaRegistrationException>();
+        }
+
+        [Fact]
+        public void Load_Returns_Error_For_Broken_Dll()
+        {
+            var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.dll");
+            File.WriteAllText(path, "not a real assembly");
+
+            try
+            {
+                var adapter = new CSharpAssemblyAdapter();
+
+                var result = adapter.Load(new AssemblyAdapterLoadRequest
+                {
+                    Path = path
+                });
+
+                result.IsSuccess.Should().BeFalse();
+                result.Errors.Should().ContainSingle();
+                result.Errors[0].SourcePath.Should().Be(path);
+                result.Errors[0].Exception.Should().NotBeNull();
+            }
+            finally
+            {
+                File.Delete(path);
+            }
         }
 
         [Fact]
@@ -71,6 +114,17 @@ namespace Philadelphus.Tests.Domain.Infrastructure.AssemblyAdapters
             result.Errors.Should().ContainSingle();
             result.Errors[0].Language.Should().Be(AssemblyAdapterLanguage.CSharp);
         }
+
+        [Fact]
+        public void Evaluate_Returns_UnknownFunction_For_Not_Loaded_Plugin_Formula()
+        {
+            var evaluator = new FormulaAstEvaluator(new FormulaRegistry());
+
+            var result = evaluator.Evaluate("=TEST_PLUGIN_VALUE()", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.UnknownFunction);
+        }
     }
 
     public sealed class TestExternalFormulaProvider : IFormulaProvider
@@ -80,8 +134,23 @@ namespace Philadelphus.Tests.Domain.Infrastructure.AssemblyAdapters
             yield return new FormulaDefinition
             {
                 Name = "TEST_PLUGIN_VALUE",
+                Aliases = ["TEST_PLUGIN_ALIAS"],
                 Description = "Test formula provider loaded from a C# assembly.",
                 Evaluator = (_, _) => FormulaResult.Success(101L, SystemBaseType.INTEGER)
+            };
+        }
+    }
+
+    public sealed class TestConflictingExternalFormulaProvider : IFormulaProvider
+    {
+        public IEnumerable<FormulaDefinition> GetFormulas()
+        {
+            yield return new FormulaDefinition
+            {
+                Name = "TEST_PLUGIN_ALIAS_CONFLICT",
+                Aliases = ["TEST_PLUGIN_VALUE"],
+                Description = "Test formula provider with conflicting alias.",
+                Evaluator = (_, _) => FormulaResult.Success(202L, SystemBaseType.INTEGER)
             };
         }
     }
