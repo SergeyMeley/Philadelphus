@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
@@ -46,10 +47,14 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
             var parserResult = FormulaParser.Parse(source);
             if (parserResult.IsSuccess == false)
             {
-                return FormulaResult.Failure(parserResult.Errors[0]);
+                var result = FormulaResult.Failure(parserResult.Errors[0]);
+                ReportFailure(result, context, FormulaDiagnosticKind.ParseError);
+                return result;
             }
 
-            return Evaluate(parserResult.Expression!, context);
+            var evaluationResult = EvaluateCore(parserResult.Expression!, context);
+            ReportFailure(evaluationResult, context, ResolveDiagnosticKind(evaluationResult));
+            return evaluationResult;
         }
 
         /// <summary>
@@ -74,6 +79,19 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
             ArgumentNullException.ThrowIfNull(expression);
             ArgumentNullException.ThrowIfNull(context);
 
+            var result = EvaluateCore(expression, context);
+            ReportFailure(result, context, ResolveDiagnosticKind(result));
+            return result;
+        }
+
+        /// <summary>
+        /// Вычисляет AST без отправки диагностики вызывающему приложению.
+        /// </summary>
+        /// <param name="expression">Выражение AST.</param>
+        /// <param name="context">Контекст вычисления формулы.</param>
+        /// <returns>Результат вычисления выражения.</returns>
+        private FormulaResult EvaluateCore(FormulaExpression expression, FormulaExecutionContext context)
+        {
             try
             {
                 var result = EvaluateExpression(expression, context);
@@ -87,6 +105,46 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                     expression.Span,
                     exception: exception));
             }
+        }
+
+        /// <summary>
+        /// Отправляет ошибку Formula Engine в диагностический приемник контекста.
+        /// </summary>
+        /// <param name="result">Результат вычисления.</param>
+        /// <param name="context">Контекст вычисления формулы.</param>
+        /// <param name="kind">Тип диагностического события.</param>
+        private static void ReportFailure(
+            FormulaResult result,
+            FormulaExecutionContext context,
+            FormulaDiagnosticKind kind)
+        {
+            if (result.Error is null || context.DiagnosticsReporter is null)
+            {
+                return;
+            }
+
+            context.DiagnosticsReporter.Report(new FormulaDiagnostic
+            {
+                Kind = kind,
+                Error = result.Error
+            });
+        }
+
+        /// <summary>
+        /// Определяет тип диагностического события по ошибке результата.
+        /// </summary>
+        /// <param name="result">Результат вычисления.</param>
+        /// <returns>Тип диагностического события.</returns>
+        private static FormulaDiagnosticKind ResolveDiagnosticKind(FormulaResult result)
+        {
+            if (result.Error?.Code == FormulaErrorCode.PluginLoadError)
+            {
+                return FormulaDiagnosticKind.PluginLoadError;
+            }
+
+            return result.Error?.Exception is null
+                ? FormulaDiagnosticKind.EvaluationError
+                : FormulaDiagnosticKind.UnexpectedException;
         }
 
         /// <summary>

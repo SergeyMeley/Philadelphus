@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
@@ -33,6 +34,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         /// Сервис уведомлений текущего приложения.
         /// </summary>
         public INotificationService? NotificationService { get; init; }
+
+        /// <summary>
+        /// Приемник диагностики Formula Engine для уведомлений и журнала приложения.
+        /// </summary>
+        public IFormulaDiagnosticsReporter? DiagnosticsReporter { get; init; }
 
         /// <summary>
         /// Дополнительные данные контекста для будущих сценариев.

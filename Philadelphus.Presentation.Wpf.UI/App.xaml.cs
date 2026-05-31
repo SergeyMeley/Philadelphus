@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
@@ -290,6 +291,7 @@ namespace Philadelphus.Presentation.Wpf.UI
             });
 
             services.AddSingleton<FormulaAstEvaluator>();
+            services.AddSingleton<IFormulaDiagnosticsReporter, FormulaDiagnosticsReporter>();
         }
 
         private static void RegisterImportExportCore(IServiceCollection services)

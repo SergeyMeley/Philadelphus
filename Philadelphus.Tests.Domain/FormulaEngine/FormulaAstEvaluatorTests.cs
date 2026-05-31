@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
@@ -63,6 +64,54 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             result.Value.Should().Be("40*5");
             result.ValueType.Should().Be(SystemBaseType.STRING);
             result.TreeLeave.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Проверяет отправку диагностики при ошибке разбора формулы.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Reports_Parse_Error_Diagnostics()
+        {
+            var evaluator = CreateEvaluator();
+            var reporter = new CapturingFormulaDiagnosticsReporter();
+            var context = new FormulaExecutionContext
+            {
+                DiagnosticsReporter = reporter
+            };
+
+            var result = evaluator.Evaluate("=1+", context);
+
+            result.IsSuccess.Should().BeFalse();
+            reporter.Diagnostics.Should().ContainSingle();
+            reporter.Diagnostics[0].Kind.Should().Be(FormulaDiagnosticKind.ParseError);
+            reporter.Diagnostics[0].Error.Code.Should().Be(FormulaErrorCode.ParseError);
+            reporter.Diagnostics[0].Error.Span.Should().NotBeNull();
+        }
+
+        /// <summary>
+        /// Проверяет отправку диагностики при ошибке вычисления формулы.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Reports_Evaluation_Error_Diagnostics()
+        {
+            var evaluator = CreateEvaluator();
+            var reporter = new CapturingFormulaDiagnosticsReporter();
+            var context = FormulaEngineTestContextFactory.Create();
+            context = new FormulaExecutionContext
+            {
+                SystemBaseWorkingTree = context.SystemBaseWorkingTree,
+                TreeLeaveResolver = context.TreeLeaveResolver,
+                RepositoryService = context.RepositoryService,
+                NotificationService = context.NotificationService,
+                DiagnosticsReporter = reporter
+            };
+
+            var result = evaluator.Evaluate("=UNKNOWN()", context);
+
+            result.IsSuccess.Should().BeFalse();
+            reporter.Diagnostics.Should().ContainSingle();
+            reporter.Diagnostics[0].Kind.Should().Be(FormulaDiagnosticKind.EvaluationError);
+            reporter.Diagnostics[0].Error.Code.Should().Be(FormulaErrorCode.UnknownFunction);
         }
 
         /// <summary>
@@ -580,6 +629,15 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 notificationService,
                 new EmptyPropertiesPolicy<TreeLeaveModel>());
         }
+
+        private sealed class CapturingFormulaDiagnosticsReporter : IFormulaDiagnosticsReporter
+        {
+            public List<FormulaDiagnostic> Diagnostics { get; } = new();
+
+            public void Report(FormulaDiagnostic diagnostic)
+            {
+                Diagnostics.Add(diagnostic);
+            }
+        }
     }
 }
-

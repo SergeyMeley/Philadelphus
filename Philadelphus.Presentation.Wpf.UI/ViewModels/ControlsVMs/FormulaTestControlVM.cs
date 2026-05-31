@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
@@ -30,6 +31,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Доменный сервис, создающий недостающие системные листья результатов.
         /// </summary>
         private readonly IPhiladelphusRepositoryService _repositoryService;
+
+        /// <summary>
+        /// Приемник диагностических сообщений Formula Engine.
+        /// </summary>
+        private readonly IFormulaDiagnosticsReporter _formulaDiagnosticsReporter;
 
         /// <summary>
         /// Текст формулы из поля ввода.
@@ -70,11 +76,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM,
             FormulaAstEvaluator formulaEvaluator,
             IPhiladelphusRepositoryService repositoryService,
+            IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             RepositoryExplorerControlVM repositoryExplorerControlVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _formulaEvaluator = formulaEvaluator ?? throw new ArgumentNullException(nameof(formulaEvaluator));
             _repositoryService = repositoryService ?? throw new ArgumentNullException(nameof(repositoryService));
+            _formulaDiagnosticsReporter = formulaDiagnosticsReporter ?? throw new ArgumentNullException(nameof(formulaDiagnosticsReporter));
             _repositoryExplorerControlVM = repositoryExplorerControlVM ?? throw new ArgumentNullException(nameof(repositoryExplorerControlVM));
         }
 
@@ -161,7 +169,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 TreeLeaveResolver = workingTree is null ? null : new WorkingTreeTreeLeaveResolver(workingTree),
                 SystemBaseWorkingTree = systemBaseWorkingTree,
                 RepositoryService = _repositoryService,
-                NotificationService = _notificationService
+                NotificationService = _notificationService,
+                DiagnosticsReporter = _formulaDiagnosticsReporter
             };
         }
 
@@ -203,9 +212,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 ResultTypeText = string.Empty;
                 ErrorText = result.Error.Message;
 
-                _notificationService.SendTextMessage<FormulaTestControlVM>(
-                    $"{errorCode}: {result.Error.Message}",
-                    criticalLevel: NotificationCriticalLevelModel.Warning);
                 return;
             }
 
