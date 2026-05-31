@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Expressions;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
+using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 {
@@ -204,19 +205,42 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
             TreeLeaveReferenceFormulaExpression treeLeaveReference,
             FormulaExecutionContext context)
         {
-            var treeLeave = context.WorkingTree?.ContentLeaves
-                .SingleOrDefault(x => x.Uuid == treeLeaveReference.Uuid);
-
-            if (treeLeave is null)
+            var resolveResult = GetTreeLeaveResolver(context)
+                .ResolveByUuid(treeLeaveReference.Uuid);
+            if (resolveResult.IsResolved == false)
             {
-                return FormulaResult.Failure(CreateError(
-                    FormulaErrorCode.TreeLeaveNotFound,
-                    $"Лист дерева '{treeLeaveReference.Uuid}' не найден.",
-                    treeLeaveReference.Span,
-                    "[]"));
+                return FormulaResult.Failure(CopyErrorWithSpan(resolveResult.Error!, treeLeaveReference.Span));
             }
 
-            return ConvertTreeLeaveToResult(treeLeave);
+            return ConvertTreeLeaveToResult(resolveResult.TreeLeave!);
+        }
+
+        /// <summary>
+        /// Возвращает resolver листьев из контекста или создает resolver по текущему рабочему дереву.
+        /// </summary>
+        /// <param name="context">Контекст вычисления формулы.</param>
+        /// <returns>Resolver листьев рабочего дерева.</returns>
+        private static ITreeLeaveResolver GetTreeLeaveResolver(FormulaExecutionContext context)
+        {
+            return context.TreeLeaveResolver ?? new WorkingTreeTreeLeaveResolver(context.WorkingTree);
+        }
+
+        /// <summary>
+        /// Копирует ошибку resolver'а и добавляет диапазон исходного выражения.
+        /// </summary>
+        /// <param name="error">Исходная ошибка поиска листа.</param>
+        /// <param name="span">Диапазон ссылки на лист в формуле.</param>
+        /// <returns>Ошибка формулы с диапазоном исходного выражения.</returns>
+        private static FormulaError CopyErrorWithSpan(FormulaError error, FormulaTextSpan span)
+        {
+            return new FormulaError
+            {
+                Code = error.Code,
+                Message = error.Message,
+                Span = span,
+                FunctionOrOperator = error.FunctionOrOperator,
+                Exception = error.Exception
+            };
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Execution
@@ -12,6 +13,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         /// Рабочее дерево, в контексте которого вычисляется формула.
         /// </summary>
         public WorkingTreeModel? WorkingTree { get; init; }
+
+        /// <summary>
+        /// Сервис поиска листьев для формул по UUID, наименованию и будущим пользовательским идентификаторам.
+        /// </summary>
+        public ITreeLeaveResolver? TreeLeaveResolver { get; init; }
 
         /// <summary>
         /// Системное рабочее дерево, из которого берутся предопределенные системные значения.

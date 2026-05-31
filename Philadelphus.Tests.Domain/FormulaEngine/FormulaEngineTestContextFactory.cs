@@ -3,6 +3,7 @@ using Moq;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Tests.Common.Fakes.Entities;
@@ -32,6 +33,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             return new FormulaExecutionContext
             {
                 SystemBaseWorkingTree = systemBaseWorkingTree,
+                TreeLeaveResolver = new WorkingTreeTreeLeaveResolver(systemBaseWorkingTree),
                 RepositoryService = repositoryService,
                 NotificationService = notificationService
             };
