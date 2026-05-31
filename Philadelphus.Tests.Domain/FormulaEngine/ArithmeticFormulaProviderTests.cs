@@ -1,10 +1,16 @@
 ﻿using FluentAssertions;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
+using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
+using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Tests.Common.Fakes.Entities;
+using Philadelphus.Tests.Common.Fakes.Services;
 
 namespace Philadelphus.Tests.Domain.FormulaEngine
 {
@@ -381,6 +387,23 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет, что пользовательский лист не передается в арифметику как число.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Returns_TypeMismatch_For_UserDefined_TreeLeave_Argument()
+        {
+            var treeLeave = CreateTreeLeave("Лист");
+            var evaluator = CreateEvaluatorWithTreeLeaves();
+
+            var result = evaluator.Evaluate(
+                $"=[{treeLeave.Uuid}]+1",
+                CreateContext(treeLeave.OwningWorkingTree));
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
         /// Проверяет регистрацию арифметических формул по именам и операторным псевдонимам.
         /// </summary>
         [Fact]
@@ -413,6 +436,17 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Создает вычислитель с арифметикой и ссылками на листья.
+        /// </summary>
+        /// <returns>Вычислитель формул.</returns>
+        private static FormulaAstEvaluator CreateEvaluatorWithTreeLeaves()
+        {
+            var registry = CreateRegistry();
+            registry.RegisterProvider(new TreeLeaveFormulaProvider());
+            return new FormulaAstEvaluator(registry);
+        }
+
+        /// <summary>
         /// Создает реестр с арифметическими формулами.
         /// </summary>
         /// <returns>Реестр формул.</returns>
@@ -421,6 +455,51 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var registry = new FormulaRegistry();
             registry.RegisterProvider(new ArithmeticFormulaProvider());
             return registry;
+        }
+
+        /// <summary>
+        /// Создает контекст вычисления с resolver'ом листьев.
+        /// </summary>
+        /// <param name="workingTree">Рабочее дерево для поиска листьев.</param>
+        /// <returns>Контекст вычисления формулы.</returns>
+        private static FormulaExecutionContext CreateContext(WorkingTreeModel workingTree)
+        {
+            return new FormulaExecutionContext
+            {
+                WorkingTree = workingTree,
+                TreeLeaveResolver = new WorkingTreeTreeLeaveResolver(workingTree)
+            };
+        }
+
+        /// <summary>
+        /// Создает обычный пользовательский лист с заданным наименованием.
+        /// </summary>
+        /// <param name="name">Наименование листа.</param>
+        /// <returns>Тестовый лист дерева.</returns>
+        private static TreeLeaveModel CreateTreeLeave(string name)
+        {
+            var notificationService = new FakeNotificationService();
+            var tree = new FakeWorkingTreeModel();
+            var root = new TreeRootModel(
+                Guid.NewGuid(),
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeRootModel>());
+            var node = new TreeNodeModel(
+                Guid.NewGuid(),
+                root,
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+            var treeLeave = new TreeLeaveModel(
+                Guid.NewGuid(),
+                node,
+                tree,
+                notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+
+            treeLeave.Name = name;
+            return treeLeave;
         }
     }
 }

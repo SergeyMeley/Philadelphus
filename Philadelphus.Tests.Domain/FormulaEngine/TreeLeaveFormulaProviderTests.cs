@@ -153,6 +153,22 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет, что метод поиска ЛИСТ должен быть целочисленным значением.
+        /// </summary>
+        [Fact]
+        public void Evaluate_List_Returns_TypeMismatch_For_Fractional_Method()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                "=ЛИСТ(0.5;\"value\")",
+                CreateContext(new FakeWorkingTreeModel()));
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
         /// Проверяет строгую типизацию значения поиска.
         /// </summary>
         [Fact]
