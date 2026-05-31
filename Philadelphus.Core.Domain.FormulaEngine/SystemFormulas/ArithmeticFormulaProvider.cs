@@ -245,7 +245,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 result += value;
             }
 
-            return Numeric(result);
+            return PreciseNumeric(result);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             var left = GetNumber(arguments[0]);
             var right = GetNumber(arguments[1]);
 
-            return Numeric(left - right);
+            return PreciseNumeric(left - right);
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 result *= value;
             }
 
-            return Numeric(result);
+            return PreciseNumeric(result);
         }
 
         /// <summary>
@@ -311,7 +311,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     "ЧАСТНОЕ"));
             }
 
-            return Numeric(left / right);
+            return PreciseNumeric(left / right);
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     "СТЕПЕНЬ"));
             }
 
-            return Numeric(result);
+            return PreciseNumeric(result);
         }
 
         /// <summary>
@@ -354,6 +354,21 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         private static FormulaResult Numeric(double value)
         {
             return FormulaResult.Success(value, SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Создает числовой результат с наиболее точным системным типом для базовой арифметики.
+        /// </summary>
+        /// <param name="value">Числовое значение результата.</param>
+        /// <returns>INTEGER для целых значений в диапазоне Int64, иначе NUMERIC.</returns>
+        private static FormulaResult PreciseNumeric(double value)
+        {
+            if (IsIntegerValue(value))
+            {
+                return FormulaResult.Success(Convert.ToInt64(value), SystemBaseType.INTEGER);
+            }
+
+            return Numeric(value);
         }
 
         /// <summary>
@@ -413,6 +428,19 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         private static bool IsValidNumber(double value)
         {
             return double.IsNaN(value) == false && double.IsInfinity(value) == false;
+        }
+
+        /// <summary>
+        /// Проверяет, можно ли представить число как целочисленный результат без потери смысла.
+        /// </summary>
+        /// <param name="value">Проверяемое число.</param>
+        /// <returns>true, если значение является целым числом в диапазоне Int64; иначе false.</returns>
+        private static bool IsIntegerValue(double value)
+        {
+            return IsValidNumber(value)
+                && Math.Truncate(value) == value
+                && value >= long.MinValue
+                && value <= long.MaxValue;
         }
 
         /// <summary>

@@ -24,8 +24,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("1+2*4+2^3", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(17d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(17L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("СУММ(2;3)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(5d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(5L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("СУММ(1;ПРОИЗВ(2;4);СТЕПЕНЬ(2;3))", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(17d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(17L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("ПРОИЗВ(2;3)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(6d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(6L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("ПРОИЗВ(2;3;4)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(24d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(24L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("2*3", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(6d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(6L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -142,8 +142,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("РАЗНОСТЬ(10;3)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(7d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(7L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -157,7 +157,22 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("ЧАСТНОЕ(10;2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(5d);
+            result.Value.Should().Be(5L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
+        }
+
+        /// <summary>
+        /// Проверяет, что дробный результат деления остается типом NUMERIC.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Quotient_Returns_Numeric_For_Fractional_Result()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("ЧАСТНОЕ(1;2)", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(0.5d);
             result.ValueType.Should().Be(SystemBaseType.NUMERIC);
         }
 
@@ -273,8 +288,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("СТЕПЕНЬ(3;2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(9d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(9L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
@@ -332,8 +347,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var result = evaluator.Evaluate("(1+2)*4", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(12d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.Value.Should().Be(12L);
+            result.ValueType.Should().Be(SystemBaseType.INTEGER);
         }
 
         /// <summary>
