@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Contracts;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -124,6 +125,63 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         public void FormulaErrorCode_Uses_Russian_Display_Name()
         {
             FormulaErrorCode.ParseError.GetDisplayName().Should().Be("#ОШИБКА_ПАРСИНГА");
+        }
+
+        /// <summary>
+        /// Проверяет, что metadata системных формул содержит достаточно данных для подсказок редактора.
+        /// </summary>
+        [Fact]
+        public void System_Formulas_Expose_Editor_Metadata()
+        {
+            var formulas = new IFormulaProvider[]
+                {
+                    new ArithmeticFormulaProvider(),
+                    new ComparisonFormulaProvider(),
+                    new TextFormulaProvider(),
+                    new ConditionalFormulaProvider(),
+                    new TreeLeaveFormulaProvider()
+                }
+                .SelectMany(provider => provider.GetFormulas())
+                .ToList();
+
+            formulas.Should().NotBeEmpty();
+            formulas.Should().OnlyContain(formula =>
+                string.IsNullOrWhiteSpace(formula.Category) == false
+                && formula.Examples.Count > 0);
+
+            formulas.Single(formula => formula.Name == "ЕСЛИ")
+                .Arguments
+                .Where(argument => argument.IsRequired == false)
+                .Select(argument => argument.DefaultValue)
+                .Should()
+                .Equal(true, false);
+
+            formulas.Single(formula => formula.Name == "СУММ")
+                .ResultType
+                .Should()
+                .Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет, что внешние формулы могут предоставлять такую же metadata редактора, как системные.
+        /// </summary>
+        [Fact]
+        public void External_Formulas_Can_Expose_Editor_Metadata()
+        {
+            var formula = new FormulaDefinition
+            {
+                Name = "PLUGIN_HELPER",
+                Aliases = ["PLUGIN_HELPER_ALIAS"],
+                Description = "Plugin formula used by editor metadata tests.",
+                Category = "Плагин",
+                ResultType = SystemBaseType.STRING,
+                Examples = ["=PLUGIN_HELPER()"],
+                Evaluator = (_, _) => FormulaResult.Success("ok", SystemBaseType.STRING)
+            };
+
+            formula.Category.Should().Be("Плагин");
+            formula.ResultType.Should().Be(SystemBaseType.STRING);
+            formula.Examples.Should().Contain("=PLUGIN_HELPER()");
         }
 
         /// <summary>

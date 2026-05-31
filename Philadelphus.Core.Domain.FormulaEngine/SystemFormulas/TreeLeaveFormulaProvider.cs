@@ -22,6 +22,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             {
                 Name = "ЛИСТ",
                 Description = "Ищет лист рабочего дерева по UUID, наименованию или зарезервированным идентификаторам.",
+                Category = "Листья дерева",
+                Examples = ["=ЛИСТ(0;\"9769db19-89a2-49ed-a3fd-f1e539a652b1\")", "=[9769db19-89a2-49ed-a3fd-f1e539a652b1]"],
                 Arguments =
                 [
                     new FormulaArgumentDefinition

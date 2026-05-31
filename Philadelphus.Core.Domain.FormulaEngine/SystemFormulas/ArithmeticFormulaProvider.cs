@@ -38,6 +38,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 Name = "СУММ",
                 Aliases = ["+"],
                 Description = "Складывает числовые значения.",
+                Category = "Арифметика",
+                ResultType = SystemBaseType.NUMERIC,
+                Examples = ["=СУММ(2;3)", "=1+2"],
                 Arguments =
                 [
                     new FormulaArgumentDefinition
@@ -62,6 +65,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 Name = "ПРОИЗВ",
                 Aliases = ["*"],
                 Description = "Умножает числовые значения.",
+                Category = "Арифметика",
+                ResultType = SystemBaseType.NUMERIC,
+                Examples = ["=ПРОИЗВ(2;3)", "=2*3"],
                 Arguments =
                 [
                     new FormulaArgumentDefinition
@@ -94,6 +100,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 Name = name,
                 Aliases = [alias],
                 Description = description,
+                Category = "Арифметика",
+                ResultType = SystemBaseType.NUMERIC,
+                Examples = [CreateBinaryExample(name, alias)],
                 Arguments =
                 [
                     new FormulaArgumentDefinition
@@ -129,6 +138,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
             {
                 Name = name,
                 Description = description,
+                Category = "Арифметика",
+                ResultType = SystemBaseType.FLOAT,
+                Examples = [CreateUnaryExample(name)],
                 Arguments =
                 [
                     new FormulaArgumentDefinition
@@ -139,6 +151,33 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     }
                 ],
                 Evaluator = (_, arguments) => EvaluateUnary(name, arguments, operation)
+            };
+        }
+
+        /// <summary>
+        /// Создает короткий арифметический пример для metadata редактора формул.
+        /// </summary>
+        private static string CreateBinaryExample(string name, string alias)
+        {
+            return alias switch
+            {
+                "-" => "=РАЗНОСТЬ(10;3)",
+                "/" => "=ЧАСТНОЕ(10;2)",
+                "^" => "=СТЕПЕНЬ(3;2)",
+                _ => $"={name}(2;1)"
+            };
+        }
+
+        /// <summary>
+        /// Создает короткий унарный арифметический пример для metadata редактора формул.
+        /// </summary>
+        private static string CreateUnaryExample(string name)
+        {
+            return name switch
+            {
+                "SIN" => "=SIN(0)",
+                "COS" => "=COS(0)",
+                _ => $"={name}(4)"
             };
         }
 

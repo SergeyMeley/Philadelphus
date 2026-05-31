@@ -1,3 +1,4 @@
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Contracts
@@ -21,6 +22,26 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Contracts
         /// Человекочитаемое описание формулы.
         /// </summary>
         public string? Description { get; init; }
+
+        /// <summary>
+        /// Категория формулы для группировки в редакторе и справке.
+        /// </summary>
+        public string? Category { get; init; }
+
+        /// <summary>
+        /// Ожидаемый тип результата, если он известен статически.
+        /// </summary>
+        public SystemBaseType? ResultType { get; init; }
+
+        /// <summary>
+        /// Пользовательские примеры для подсказок и справки редактора формул.
+        /// </summary>
+        public IReadOnlyList<string> Examples { get; init; } = Array.Empty<string>();
+
+        /// <summary>
+        /// Признак поддержки вызова формулы как объектного метода.
+        /// </summary>
+        public bool SupportsObjectCall { get; init; }
 
         /// <summary>
         /// Описание аргументов формулы.

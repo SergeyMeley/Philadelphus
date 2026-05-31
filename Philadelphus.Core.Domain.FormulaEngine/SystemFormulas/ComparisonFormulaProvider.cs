@@ -44,6 +44,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 Name = name,
                 Aliases = [alias],
                 Description = description,
+                Category = "Сравнение",
+                ResultType = SystemBaseType.BOOL,
+                Examples = [CreateComparisonExample(alias)],
                 Arguments =
                 [
                     new FormulaArgumentDefinition
@@ -58,6 +61,23 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     }
                 ],
                 Evaluator = (_, arguments) => EvaluateBinary(name, arguments, operation)
+            };
+        }
+
+        /// <summary>
+        /// Создает короткий пример сравнения для metadata редактора формул.
+        /// </summary>
+        private static string CreateComparisonExample(string alias)
+        {
+            return alias switch
+            {
+                "=" => "=10=(5*2)",
+                "<>" => "=\"Стол\"<>\"Стул\"",
+                ">" => "=3>2",
+                "<" => "=2<3",
+                ">=" => "=3>=3",
+                "<=" => "=2<=3",
+                _ => $"=1{alias}1"
             };
         }
 

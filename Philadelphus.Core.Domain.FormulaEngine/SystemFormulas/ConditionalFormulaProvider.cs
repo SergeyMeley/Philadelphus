@@ -22,6 +22,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 Name = "ЕСЛИ",
                 Aliases = ["?:"],
                 Description = "Возвращает одно из двух значений в зависимости от логического условия.",
+                Category = "Логика",
+                Examples = ["=ЕСЛИ(1=1;\"Да\";\"Нет\")", "=1=1?\"Да\":\"Нет\""],
                 Arguments =
                 [
                     new FormulaArgumentDefinition

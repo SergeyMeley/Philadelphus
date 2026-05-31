@@ -22,6 +22,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 Name = "СЦЕПИТЬ",
                 Aliases = ["&"],
                 Description = "Объединяет значения в строку.",
+                Category = "Текст",
+                ResultType = SystemBaseType.STRING,
+                Examples = ["=СЦЕПИТЬ(\"Hello\";\" \";\"World\")", "=\"A\"&1"],
                 Arguments =
                 [
                     new FormulaArgumentDefinition
