@@ -26,6 +26,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly ImportExportControlVM _importExportControlVM;
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
         private readonly ReportsControlVM _reportsControlVM;
+        private readonly FormulaTestControlVM _formulaTestControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
 
         /// <summary>
@@ -63,6 +64,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             get
             {
                 return _reportsControlVM;
+            }
+        }
+
+        /// <summary>
+        /// Модель представления тестового интерфейса Formula Engine.
+        /// </summary>
+        public FormulaTestControlVM FormulaTestControlVM
+        {
+            get
+            {
+                return _formulaTestControlVM;
             }
         }
         public string Title
@@ -138,6 +150,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _importExportControlVM = ActivatorUtilities.CreateInstance<ImportExportControlVM>(_serviceProvider, repositoryExplorerControlVM);
+            _formulaTestControlVM = ActivatorUtilities.CreateInstance<FormulaTestControlVM>(_serviceProvider, repositoryExplorerControlVM);
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _reportsControlVM = reportsControlVM;

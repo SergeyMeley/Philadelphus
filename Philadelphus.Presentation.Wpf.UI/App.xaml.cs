@@ -232,6 +232,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
                     services.AddTransient<ReportsControlVM>();
+                    services.AddTransient<FormulaTestControlVM>();
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
                     // ViewModel сущностей
