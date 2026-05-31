@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
@@ -21,7 +21,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"Hello\"&\" \"&\"World\"&\"!\"", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("\"Hello\"&\" \"&\"World\"&\"!\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Hello World!");
@@ -36,7 +36,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("2&3", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("2&3", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("23");
@@ -51,7 +51,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("СЦЕПИТЬ(\"A\";1;\"B\")", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("СЦЕПИТЬ(\"A\";1;\"B\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("A1B");
@@ -66,7 +66,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"Результат: \"&(1=1)", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("\"Результат: \"&(1=1)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Результат: Истина");
@@ -99,7 +99,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             });
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("\"x\"&ОБЪЕКТ()", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("\"x\"&ОБЪЕКТ()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -127,3 +127,4 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
     }
 }
+

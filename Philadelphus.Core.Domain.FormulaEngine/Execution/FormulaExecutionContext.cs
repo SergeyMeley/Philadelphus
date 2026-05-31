@@ -19,6 +19,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         public WorkingTreeModel? SystemBaseWorkingTree { get; init; }
 
         /// <summary>
+        /// Доменный сервис репозитория, через который формулы создают недостающие листья результата.
+        /// </summary>
+        public IPhiladelphusRepositoryService? RepositoryService { get; init; }
+
+        /// <summary>
         /// Сервис уведомлений текущего приложения.
         /// </summary>
         public INotificationService? NotificationService { get; init; }

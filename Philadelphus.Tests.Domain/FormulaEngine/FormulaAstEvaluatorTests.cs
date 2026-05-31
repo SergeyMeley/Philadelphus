@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
@@ -25,7 +25,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("42", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("42", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(42d);
@@ -40,7 +40,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"123\"", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("\"123\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("123");
@@ -59,7 +59,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 (_, arguments) => FormulaResult.Success(arguments.Count, SystemBaseType.INTEGER)));
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("ПАРА(1;\"x\")", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("ПАРА(1;\"x\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(2);
@@ -81,11 +81,36 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 "+"));
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("1+2", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("1+2", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(3d);
             result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Проверяет, что успешный результат формулы материализуется в системный лист и переиспользуется повторно.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Materializes_Result_To_SystemBase_Leave()
+        {
+            var registry = new FormulaRegistry();
+            registry.Register(CreateFormula(
+                "СЛОЖИТЬ",
+                (_, arguments) => FormulaResult.Success(
+                    (double)arguments[0].Value! + (double)arguments[1].Value!,
+                    SystemBaseType.NUMERIC),
+                "+"));
+            var evaluator = new FormulaAstEvaluator(registry);
+            var context = FormulaEngineTestContextFactory.Create();
+
+            var first = evaluator.Evaluate("1+2", context);
+            var second = evaluator.Evaluate("1+2", context);
+
+            first.IsSuccess.Should().BeTrue();
+            first.TreeLeave.Should().BeOfType<SystemBaseTreeLeaveModel>()
+                .Which.StringValue.Should().Be("3");
+            second.TreeLeave.Should().BeSameAs(first.TreeLeave);
         }
 
         /// <summary>
@@ -107,7 +132,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 })));
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("ИСТИНА()?1:ОШИБКА()", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("ИСТИНА()?1:ОШИБКА()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(1d);
@@ -121,7 +146,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1?\"Да\":\"Нет\"", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -135,7 +160,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("НЕТ()", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("НЕТ()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.UnknownFunction);
@@ -257,3 +282,4 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
     }
 }
+

@@ -73,7 +73,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         private static bool TryFormatText(FormulaResult argument, out string text)
         {
             text = string.Empty;
-            if (argument.TreeLeave is not null || argument.Value is null)
+            if (argument.Value is null)
             {
                 return false;
             }

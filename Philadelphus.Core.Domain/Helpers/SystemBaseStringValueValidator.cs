@@ -12,7 +12,7 @@ namespace Philadelphus.Core.Domain.Helpers
     /// При добавлении нового системного типа сюда нужно добавить и проверку, и текст ожидаемого формата.
     /// </remarks>
     /// <remarks>Implements requirements R-5.02, R-5.03, R-5.07, R-5.08 and R-5.09.</remarks>
-    internal static class SystemBaseStringValueValidator
+    public static class SystemBaseStringValueValidator
     {
         private const string DateTimeFormat = "yyyy-MM-dd'T'HH:mm:sszzz";
         private const string DateFormat = "yyyy-MM-dd";
@@ -124,6 +124,94 @@ namespace Philadelphus.Core.Domain.Helpers
                     if (SystemBaseFileValueValidator.IsSupportedReference(value))
                     {
                         typedValue = value;
+                        return true;
+                    }
+
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Форматирует типизированное значение в строку системного листа.
+        /// </summary>
+        /// <param name="type">Системный базовый тип значения.</param>
+        /// <param name="value">Типизированное значение.</param>
+        /// <param name="stringValue">Строковое значение для хранения в системном листе.</param>
+        /// <returns>true, если значение удалось представить строкой указанного системного типа; иначе false.</returns>
+        public static bool TryFormat(SystemBaseType type, object? value, out string? stringValue)
+        {
+            stringValue = null;
+
+            switch (type)
+            {
+                case SystemBaseType.STRING:
+                case SystemBaseType.OBJECT:
+                    stringValue = value?.ToString() ?? string.Empty;
+                    return true;
+                case SystemBaseType.INTEGER:
+                    if (value is IFormattable integerValue)
+                    {
+                        stringValue = integerValue.ToString(null, CultureInfo.InvariantCulture);
+                        return IsValid(type, stringValue, out _);
+                    }
+
+                    return false;
+                case SystemBaseType.NUMERIC:
+                case SystemBaseType.FLOAT:
+                    if (value is IFormattable numericValue)
+                    {
+                        stringValue = numericValue.ToString(null, CultureInfo.InvariantCulture);
+                        return IsValid(type, stringValue, out _);
+                    }
+
+                    return false;
+                case SystemBaseType.MONEY:
+                    if (value is IFormattable moneyValue)
+                    {
+                        stringValue = moneyValue.ToString(null, CultureInfo.InvariantCulture);
+                        return IsValid(type, stringValue, out _);
+                    }
+
+                    return false;
+                case SystemBaseType.BOOL:
+                    if (value is bool boolValue)
+                    {
+                        stringValue = boolValue ? "Истина" : "Ложь";
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.DATETIME:
+                    if (value is DateTimeOffset dateTimeValue)
+                    {
+                        stringValue = dateTimeValue.ToString(DateTimeFormat, CultureInfo.InvariantCulture);
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.DATE:
+                    if (value is DateOnly dateValue)
+                    {
+                        stringValue = dateValue.ToString(DateFormat, CultureInfo.InvariantCulture);
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.TIME:
+                    if (value is TimeOnly timeValue)
+                    {
+                        stringValue = timeValue.ToString(TimeFormat, CultureInfo.InvariantCulture);
+                        return true;
+                    }
+
+                    return false;
+                case SystemBaseType.FILE:
+                    if (value is string fileValue
+                        && SystemBaseFileValueValidator.IsSupportedReference(fileValue))
+                    {
+                        stringValue = fileValue;
                         return true;
                     }
 

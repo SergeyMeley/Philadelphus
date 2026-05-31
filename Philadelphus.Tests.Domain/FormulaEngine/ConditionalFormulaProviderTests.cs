@@ -1,14 +1,11 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
-using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
-using Philadelphus.Tests.Common.Fakes.Entities;
-using Philadelphus.Tests.Common.Fakes.Services;
 
 namespace Philadelphus.Tests.Domain.FormulaEngine
 {
@@ -25,7 +22,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1=1?\"Да\":\"Нет\"", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("1=1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Да");
@@ -40,7 +37,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1=2?\"Да\":\"Нет\"", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("1=2?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Нет");
@@ -55,7 +52,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1=1?\"Да\":ОШИБКА()", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("1=1?\"Да\":ОШИБКА()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Да");
@@ -69,7 +66,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=2;\"Да\";\"Нет\")", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("ЕСЛИ(1=2;\"Да\";\"Нет\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Нет");
@@ -83,9 +80,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         public void Evaluate_Named_If_Returns_Default_True_Value()
         {
             var evaluator = CreateEvaluator();
-            var context = CreateContextWithSystemBaseBooleanLeaves();
 
-            var result = evaluator.Evaluate("ЕСЛИ(10=(5*2))", context);
+            var result = evaluator.Evaluate("ЕСЛИ(10=(5*2))", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(true);
@@ -101,9 +97,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         public void Evaluate_Named_If_Returns_Default_False_Value()
         {
             var evaluator = CreateEvaluator();
-            var context = CreateContextWithSystemBaseBooleanLeaves();
 
-            var result = evaluator.Evaluate("ЕСЛИ(\"Стол\"=\"Стул\")", context);
+            var result = evaluator.Evaluate("ЕСЛИ(\"Стол\"=\"Стул\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(false);
@@ -120,7 +115,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=1;\"Да\";0)", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("ЕСЛИ(1=1;\"Да\";0)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Да");
@@ -134,9 +129,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         public void Evaluate_Named_If_Returns_Default_False_For_Missing_False_Branch()
         {
             var evaluator = CreateEvaluator();
-            var context = CreateContextWithSystemBaseBooleanLeaves();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=2;\"Да\")", context);
+            var result = evaluator.Evaluate("ЕСЛИ(1=2;\"Да\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(false);
@@ -167,7 +161,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1?\"Да\":\"Нет\"", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -195,54 +189,6 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
-        /// Создает контекст вычисления с системным рабочим деревом и предопределенными BOOL-листьями.
-        /// </summary>
-        /// <returns>Контекст вычисления формулы.</returns>
-        private static FormulaExecutionContext CreateContextWithSystemBaseBooleanLeaves()
-        {
-            return new FormulaExecutionContext
-            {
-                SystemBaseWorkingTree = CreateSystemBaseWorkingTree()
-            };
-        }
-
-        /// <summary>
-        /// Создает системное рабочее дерево с листами Истина и Ложь.
-        /// </summary>
-        /// <returns>Рабочее дерево с системными логическими значениями.</returns>
-        private static FakeWorkingTreeModel CreateSystemBaseWorkingTree()
-        {
-            var notificationService = new FakeNotificationService();
-            var tree = new FakeWorkingTreeModel();
-            var root = new TreeRootModel(
-                Guid.NewGuid(),
-                tree,
-                notificationService,
-                new EmptyPropertiesPolicy<TreeRootModel>());
-            var boolNode = new SystemBaseTreeNodeModel(
-                root,
-                tree,
-                SystemBaseType.BOOL,
-                notificationService,
-                new EmptyPropertiesPolicy<TreeNodeModel>());
-
-            _ = new SystemBaseTreeLeaveModel(
-                boolNode,
-                tree,
-                "Истина",
-                notificationService,
-                new EmptyPropertiesPolicy<TreeLeaveModel>());
-            _ = new SystemBaseTreeLeaveModel(
-                boolNode,
-                tree,
-                "Ложь",
-                notificationService,
-                new EmptyPropertiesPolicy<TreeLeaveModel>());
-
-            return tree;
-        }
-
-        /// <summary>
         /// Создает реестр с формулами, нужными для условных тестов.
         /// </summary>
         /// <returns>Реестр формул.</returns>
@@ -265,3 +211,4 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
     }
 }
+

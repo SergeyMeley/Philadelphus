@@ -60,7 +60,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 
             try
             {
-                return EvaluateExpression(expression, context);
+                var result = EvaluateExpression(expression, context);
+                return FormulaResultMaterializer.Materialize(result, context, expression.Span);
             }
             catch (Exception exception)
             {
@@ -130,7 +131,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                 return FormulaResult.Failure(arguments.Error);
             }
 
-            return resolveResult.Formula!.Evaluator(context, arguments.Values);
+            var result = resolveResult.Formula!.Evaluator(context, arguments.Values);
+            return FormulaResultMaterializer.Materialize(result, context, functionCall.Span, functionCall.Name);
         }
 
         /// <summary>
@@ -159,7 +161,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                 return right;
             }
 
-            return resolveResult.Formula!.Evaluator(context, new[] { left, right });
+            var result = resolveResult.Formula!.Evaluator(context, new[] { left, right });
+            return FormulaResultMaterializer.Materialize(result, context, binary.Span, binary.Operator);
         }
 
         /// <summary>
@@ -185,9 +188,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                     "?"));
             }
 
-            return EvaluateExpression(
+            var result = EvaluateExpression(
                 conditionValue ? conditional.WhenTrue : conditional.WhenFalse,
                 context);
+            return FormulaResultMaterializer.Materialize(result, context, conditional.Span, "?");
         }
 
         /// <summary>
