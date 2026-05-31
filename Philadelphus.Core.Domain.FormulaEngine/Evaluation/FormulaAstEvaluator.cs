@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Expressions;
@@ -253,11 +254,104 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                 return target;
             }
 
+            if (string.Equals(objectMethodCall.MethodName, "СВОЙСТВО", StringComparison.OrdinalIgnoreCase))
+            {
+                return EvaluatePropertyObjectMethod(objectMethodCall, target);
+            }
+
             return FormulaResult.Failure(CreateError(
                 FormulaErrorCode.NotImplemented,
                 $"Объектная функция '{objectMethodCall.MethodName}' будет реализована отдельной подзадачей.",
                 objectMethodCall.Span,
                 objectMethodCall.MethodName));
+        }
+
+        /// <summary>
+        /// Вычисляет объектную функцию СВОЙСТВО для результата, содержащего лист дерева.
+        /// </summary>
+        /// <param name="objectMethodCall">Выражение объектного вызова СВОЙСТВО.</param>
+        /// <param name="target">Вычисленный объект, от которого запрошено свойство.</param>
+        /// <returns>Значение свойства листа или диагностическая ошибка.</returns>
+        private static FormulaResult EvaluatePropertyObjectMethod(
+            ObjectMethodCallFormulaExpression objectMethodCall,
+            FormulaResult target)
+        {
+            if (objectMethodCall.Arguments.Count != 1)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentCount,
+                    "Объектная функция 'СВОЙСТВО' ожидает один аргумент.",
+                    objectMethodCall.Span,
+                    objectMethodCall.MethodName));
+            }
+
+            if (target.TreeLeave is null)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Объектная функция 'СВОЙСТВО' может вызываться только от листа дерева.",
+                    objectMethodCall.Target.Span,
+                    objectMethodCall.MethodName));
+            }
+
+            if (TryGetPropertyName(objectMethodCall.Arguments[0], out var propertyName) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Аргумент объектной функции 'СВОЙСТВО' должен быть именем свойства.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName));
+            }
+
+            return TryResolveTreeLeaveProperty(target.TreeLeave, propertyName, out var value)
+                ? FormulaResult.Success(value, SystemBaseType.STRING)
+                : FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.PropertyNotFound,
+                    $"Свойство '{propertyName}' не найдено в whitelist свойств листа дерева.",
+                    objectMethodCall.Arguments[0].Span,
+                    objectMethodCall.MethodName));
+        }
+
+        /// <summary>
+        /// Извлекает имя свойства из аргумента СВОЙСТВО без вычисления его как самостоятельной переменной.
+        /// </summary>
+        /// <param name="argument">AST-аргумент объектной функции.</param>
+        /// <param name="propertyName">Имя свойства.</param>
+        /// <returns>true, если аргумент задает имя свойства; иначе false.</returns>
+        private static bool TryGetPropertyName(FormulaExpression argument, out string propertyName)
+        {
+            propertyName = argument switch
+            {
+                IdentifierFormulaExpression identifier => identifier.Name,
+                LiteralFormulaExpression { Type: SystemBaseType.STRING, Value: string value } => value,
+                _ => string.Empty
+            };
+
+            return string.IsNullOrWhiteSpace(propertyName) == false;
+        }
+
+        /// <summary>
+        /// Возвращает разрешенное свойство листа дерева по явному whitelist.
+        /// </summary>
+        /// <param name="treeLeave">Лист дерева.</param>
+        /// <param name="propertyName">Запрошенное имя свойства.</param>
+        /// <param name="value">Строковое значение свойства.</param>
+        /// <returns>true, если свойство поддержано; иначе false.</returns>
+        private static bool TryResolveTreeLeaveProperty(
+            TreeLeaveModel treeLeave,
+            string propertyName,
+            out string? value)
+        {
+            value = propertyName switch
+            {
+                var name when string.Equals(name, nameof(TreeLeaveModel.Name), StringComparison.OrdinalIgnoreCase)
+                    => treeLeave.Name,
+                var name when string.Equals(name, nameof(TreeLeaveModel.AuditInfo.CreatedBy), StringComparison.OrdinalIgnoreCase)
+                    => treeLeave.AuditInfo.CreatedBy,
+                _ => null
+            };
+
+            return value is not null;
         }
 
         /// <summary>

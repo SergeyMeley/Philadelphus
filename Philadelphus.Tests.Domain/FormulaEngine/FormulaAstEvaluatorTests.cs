@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
+using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -221,22 +222,93 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
-        /// Проверяет зарезервированный маршрут объектных функций до реализации СВОЙСТВО/АТРИБУТ.
+        /// Проверяет получение свойства Name через объектную функцию СВОЙСТВО.
         /// </summary>
         [Fact]
-        public void Evaluate_Object_Method_Call_Returns_NotImplemented_For_Now()
+        public void Evaluate_Property_Object_Method_Returns_TreeLeave_Name()
+        {
+            var treeLeave = CreateTreeLeave();
+            treeLeave.Name = "Лист для формулы";
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"[{treeLeave.Uuid}].СВОЙСТВО(Name)",
+                CreateMaterializingContext(treeLeave));
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be("Лист для формулы");
+            result.ValueType.Should().Be(SystemBaseType.STRING);
+        }
+
+        /// <summary>
+        /// Проверяет получение свойства CreatedBy через mapping к AuditInfo.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Property_Object_Method_Returns_Audit_CreatedBy()
+        {
+            var treeLeave = CreateTreeLeave();
+            treeLeave.AuditInfo.CreatedBy = "formula-user";
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"[{treeLeave.Uuid}].СВОЙСТВО(CreatedBy)",
+                CreateMaterializingContext(treeLeave));
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be("formula-user");
+            result.ValueType.Should().Be(SystemBaseType.STRING);
+        }
+
+        /// <summary>
+        /// Проверяет ошибку для свойства вне whitelist.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Property_Object_Method_Returns_PropertyNotFound_For_Unknown_Property()
         {
             var treeLeave = CreateTreeLeave();
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate($"[{treeLeave.Uuid}].СВОЙСТВО(Name)", new FormulaExecutionContext
+            var result = evaluator.Evaluate($"[{treeLeave.Uuid}].СВОЙСТВО(Unknown)", new FormulaExecutionContext
+            {
+                WorkingTree = treeLeave.OwningWorkingTree
+            });
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.PropertyNotFound);
+            result.Error.FunctionOrOperator.Should().Be("СВОЙСТВО");
+        }
+
+        /// <summary>
+        /// Проверяет ошибку типа, если СВОЙСТВО вызвано не от листа дерева.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Property_Object_Method_Returns_TypeMismatch_For_Non_TreeLeave_Target()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("\"text\".СВОЙСТВО(Name)", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+        }
+
+        /// <summary>
+        /// Проверяет зарезервированный маршрут неизвестных объектных функций до реализации следующих подзадач.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Object_Method_Call_Returns_NotImplemented_For_Unknown_Method()
+        {
+            var treeLeave = CreateTreeLeave();
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate($"[{treeLeave.Uuid}].НЕИЗВЕСТНО()", new FormulaExecutionContext
             {
                 WorkingTree = treeLeave.OwningWorkingTree
             });
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.NotImplemented);
-            result.Error.FunctionOrOperator.Should().Be("СВОЙСТВО");
+            result.Error.FunctionOrOperator.Should().Be("НЕИЗВЕСТНО");
         }
 
         /// <summary>
@@ -249,6 +321,26 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             registry.RegisterProvider(new TreeLeaveFormulaProvider());
 
             return new FormulaAstEvaluator(registry);
+        }
+
+        /// <summary>
+        /// Создает контекст с рабочим деревом тестового листа и системным деревом для материализации результата.
+        /// </summary>
+        /// <param name="treeLeave">Лист, который должен быть доступен по UUID в формуле.</param>
+        /// <returns>Контекст вычисления формулы.</returns>
+        private static FormulaExecutionContext CreateMaterializingContext(TreeLeaveModel treeLeave)
+        {
+            var context = FormulaEngineTestContextFactory.Create();
+
+            return new FormulaExecutionContext
+            {
+                WorkingTree = treeLeave.OwningWorkingTree,
+                TreeLeaveResolver = new WorkingTreeTreeLeaveResolver(treeLeave.OwningWorkingTree),
+                SystemBaseWorkingTree = context.SystemBaseWorkingTree,
+                RepositoryService = context.RepositoryService,
+                NotificationService = context.NotificationService,
+                Items = context.Items
+            };
         }
 
         /// <summary>
