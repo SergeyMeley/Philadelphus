@@ -1,3 +1,4 @@
+using System.Globalization;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -7,6 +8,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Expressions;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
+using Philadelphus.Core.Domain.Helpers;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 {
@@ -41,7 +43,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 
             if (IsFormulaSource(source) == false)
             {
-                return FormulaResult.Success(source ?? string.Empty, SystemBaseType.STRING);
+                return EvaluatePlainValue(source);
             }
 
             var parserResult = FormulaParser.Parse(source);
@@ -66,6 +68,46 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
         {
             return string.IsNullOrEmpty(source) == false
                 && source.TrimStart().StartsWith("=", StringComparison.Ordinal);
+        }
+
+        private static FormulaResult EvaluatePlainValue(string? source)
+        {
+            var value = source ?? string.Empty;
+            var trimmedValue = value.Trim();
+
+            if (long.TryParse(trimmedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerValue))
+            {
+                return FormulaResult.Success(integerValue, SystemBaseType.INTEGER);
+            }
+
+            if (double.TryParse(trimmedValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var floatValue)
+                && double.IsNaN(floatValue) == false
+                && double.IsInfinity(floatValue) == false)
+            {
+                return FormulaResult.Success(floatValue, SystemBaseType.FLOAT);
+            }
+
+            if (SystemBaseStringValueValidator.TryParse(SystemBaseType.BOOL, trimmedValue, out var boolValue, out _))
+            {
+                return FormulaResult.Success(boolValue, SystemBaseType.BOOL);
+            }
+
+            if (SystemBaseStringValueValidator.TryParse(SystemBaseType.DATETIME, trimmedValue, out var dateTimeValue, out _))
+            {
+                return FormulaResult.Success(dateTimeValue, SystemBaseType.DATETIME);
+            }
+
+            if (SystemBaseStringValueValidator.TryParse(SystemBaseType.DATE, trimmedValue, out var dateValue, out _))
+            {
+                return FormulaResult.Success(dateValue, SystemBaseType.DATE);
+            }
+
+            if (SystemBaseStringValueValidator.TryParse(SystemBaseType.TIME, trimmedValue, out var timeValue, out _))
+            {
+                return FormulaResult.Success(timeValue, SystemBaseType.TIME);
+            }
+
+            return FormulaResult.Success(value, SystemBaseType.STRING);
         }
 
         /// <summary>

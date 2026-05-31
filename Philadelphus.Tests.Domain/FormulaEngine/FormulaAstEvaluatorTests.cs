@@ -51,10 +51,10 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
-        /// Проверяет, что ввод без маркера формулы считается обычной строкой.
+        /// Проверяет, что выражение без маркера формулы не вычисляется и остается строкой.
         /// </summary>
         [Fact]
-        public void Evaluate_Returns_String_Value_When_Source_Does_Not_Start_With_Formula_Marker()
+        public void Evaluate_Returns_String_Value_When_Plain_Source_Looks_Like_Expression()
         {
             var evaluator = CreateEvaluator();
 
@@ -64,6 +64,32 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             result.Value.Should().Be("40*5");
             result.ValueType.Should().Be(SystemBaseType.STRING);
             result.TreeLeave.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Проверяет, что обычное значение без маркера формулы получает наиболее подходящий системный тип.
+        /// </summary>
+        [Theory]
+        [InlineData("40", 40L, SystemBaseType.INTEGER)]
+        [InlineData("40.3", 40.3d, SystemBaseType.FLOAT)]
+        [InlineData("Истина", true, SystemBaseType.BOOL)]
+        [InlineData("2026-05-31", null, SystemBaseType.DATE)]
+        [InlineData("14:15:16", null, SystemBaseType.TIME)]
+        public void Evaluate_Returns_Typed_Plain_Value_When_Source_Does_Not_Start_With_Formula_Marker(
+            string source,
+            object? expectedValue,
+            SystemBaseType expectedType)
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(source, FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeTrue();
+            result.ValueType.Should().Be(expectedType);
+            if (expectedValue is not null)
+            {
+                result.Value.Should().Be(expectedValue);
+            }
         }
 
         /// <summary>
