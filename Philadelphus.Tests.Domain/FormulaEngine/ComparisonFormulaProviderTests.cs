@@ -21,7 +21,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("10=(5*2)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=10=(5*2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(true);
@@ -36,7 +36,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"Стол\"=\"Стул\"", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=\"Стол\"=\"Стул\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(false);
@@ -51,7 +51,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("3>2", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=3>2", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(true);
@@ -66,7 +66,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1<>2", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1<>2", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(true);
@@ -81,7 +81,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"1\"=1", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=\"1\"=1", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -95,7 +95,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("(1=1)>(1=2)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=(1=1)>(1=2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);

@@ -21,7 +21,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1+2*4+2^3", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1+2*4+2^3", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(17L);
@@ -36,7 +36,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("СУММ(2;3)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=СУММ(2;3)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(5L);
@@ -51,7 +51,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("СУММ(1;ПРОИЗВ(2;4);СТЕПЕНЬ(2;3))", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=СУММ(1;ПРОИЗВ(2;4);СТЕПЕНЬ(2;3))", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(17L);
@@ -66,7 +66,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("СУММ(1;\"2\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=СУММ(1;\"2\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -80,7 +80,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ПРОИЗВ(2;3)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ПРОИЗВ(2;3)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(6L);
@@ -95,7 +95,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ПРОИЗВ(2;3;4)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ПРОИЗВ(2;3;4)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(24L);
@@ -110,7 +110,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("2*3", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=2*3", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(6L);
@@ -125,7 +125,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ПРОИЗВ(2;\"3\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ПРОИЗВ(2;\"3\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -139,7 +139,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("РАЗНОСТЬ(10;3)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=РАЗНОСТЬ(10;3)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(7L);
@@ -154,7 +154,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЧАСТНОЕ(10;2)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЧАСТНОЕ(10;2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(5L);
@@ -169,7 +169,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЧАСТНОЕ(1;2)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЧАСТНОЕ(1;2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(0.5d);
@@ -184,7 +184,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЧАСТНОЕ(1;0)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЧАСТНОЕ(1;0)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.DivZero);
@@ -199,7 +199,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("РАЗНОСТЬ(10;3;1)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=РАЗНОСТЬ(10;3;1)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentCount);
@@ -213,7 +213,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЧАСТНОЕ(10;\"2\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЧАСТНОЕ(10;\"2\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -227,11 +227,11 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("SIN(0)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=SIN(0)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(0d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.ValueType.Should().Be(SystemBaseType.FLOAT);
         }
 
         /// <summary>
@@ -242,11 +242,11 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("COS(0)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=COS(0)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(1d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.ValueType.Should().Be(SystemBaseType.FLOAT);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("SIN(\"0\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=SIN(\"0\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -271,7 +271,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("COS(0;1)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=COS(0;1)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentCount);
@@ -285,7 +285,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("СТЕПЕНЬ(3;2)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=СТЕПЕНЬ(3;2)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(9L);
@@ -300,11 +300,11 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("КОРЕНЬ(4)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=КОРЕНЬ(4)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(2d);
-            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
+            result.ValueType.Should().Be(SystemBaseType.FLOAT);
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("КОРЕНЬ(РАЗНОСТЬ(0;1))", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=КОРЕНЬ(РАЗНОСТЬ(0;1))", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentValue);
@@ -330,7 +330,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("СТЕПЕНЬ(РАЗНОСТЬ(0;1);0.5)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=СТЕПЕНЬ(РАЗНОСТЬ(0;1);0.5)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.InvalidArgumentValue);
@@ -344,7 +344,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("(1+2)*4", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=(1+2)*4", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(12L);
@@ -359,7 +359,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1/0", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1/0", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.DivZero);
@@ -374,7 +374,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"123\"+1", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=\"123\"+1", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);

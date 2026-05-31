@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -43,7 +43,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                $"ЛИСТ(0;\"{treeLeave.Uuid}\")",
+                $"=ЛИСТ(0;\"{treeLeave.Uuid}\")",
                 CreateContext(treeLeave.OwningWorkingTree));
 
             result.IsSuccess.Should().BeTrue();
@@ -62,7 +62,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                "ЛИСТ(1;\"новый лист\")",
+                "=ЛИСТ(1;\"новый лист\")",
                 CreateContext(treeLeave.OwningWorkingTree));
 
             result.IsSuccess.Should().BeTrue();
@@ -79,7 +79,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                $"ЛИСТ(0;\"{Guid.NewGuid()}\")",
+                $"=ЛИСТ(0;\"{Guid.NewGuid()}\")",
                 CreateContext(new FakeWorkingTreeModel()));
 
             result.IsSuccess.Should().BeFalse();
@@ -95,7 +95,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                "ЛИСТ(2;\"CODE\")",
+                "=ЛИСТ(2;\"CODE\")",
                 CreateContext(new FakeWorkingTreeModel()));
 
             result.IsSuccess.Should().BeFalse();
@@ -112,7 +112,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                "ЛИСТ(3;\"alias\")",
+                "=ЛИСТ(3;\"alias\")",
                 CreateContext(new FakeWorkingTreeModel()));
 
             result.IsSuccess.Should().BeFalse();
@@ -129,7 +129,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                "ЛИСТ(0;\"not-uuid\")",
+                "=ЛИСТ(0;\"not-uuid\")",
                 CreateContext(new FakeWorkingTreeModel()));
 
             result.IsSuccess.Should().BeFalse();
@@ -145,7 +145,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                "ЛИСТ(\"0\";\"value\")",
+                "=ЛИСТ(\"0\";\"value\")",
                 CreateContext(new FakeWorkingTreeModel()));
 
             result.IsSuccess.Should().BeFalse();
@@ -161,7 +161,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                "ЛИСТ(1;123)",
+                "=ЛИСТ(1;123)",
                 CreateContext(new FakeWorkingTreeModel()));
 
             result.IsSuccess.Should().BeFalse();

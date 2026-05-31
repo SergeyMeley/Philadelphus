@@ -34,7 +34,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Текст формулы из поля ввода.
         /// </summary>
-        private string _formulaText = "СУММ(2;3)";
+        private string _formulaText = "=СУММ(2;3)";
 
         /// <summary>
         /// Отображаемое значение результата.

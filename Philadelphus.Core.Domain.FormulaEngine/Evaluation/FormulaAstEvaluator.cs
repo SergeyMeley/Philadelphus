@@ -38,6 +38,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
         {
             ArgumentNullException.ThrowIfNull(context);
 
+            if (IsFormulaSource(source) == false)
+            {
+                return FormulaResult.Success(source ?? string.Empty, SystemBaseType.STRING);
+            }
+
             var parserResult = FormulaParser.Parse(source);
             if (parserResult.IsSuccess == false)
             {
@@ -45,6 +50,17 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
             }
 
             return Evaluate(parserResult.Expression!, context);
+        }
+
+        /// <summary>
+        /// Проверяет, является ли пользовательский ввод формулой.
+        /// </summary>
+        /// <param name="source">Исходный пользовательский ввод.</param>
+        /// <returns>true, если ввод начинается с маркера формулы после начальных пробелов; иначе false.</returns>
+        private static bool IsFormulaSource(string? source)
+        {
+            return string.IsNullOrEmpty(source) == false
+                && source.TrimStart().StartsWith("=", StringComparison.Ordinal);
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1=1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1=1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Да");
@@ -37,7 +37,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1=2?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1=2?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Нет");
@@ -52,7 +52,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1=1?\"Да\":ОШИБКА()", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1=1?\"Да\":ОШИБКА()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Да");
@@ -66,7 +66,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=2;\"Да\";\"Нет\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЕСЛИ(1=2;\"Да\";\"Нет\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Нет");
@@ -81,7 +81,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(10=(5*2))", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЕСЛИ(10=(5*2))", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(true);
@@ -98,7 +98,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(\"Стол\"=\"Стул\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЕСЛИ(\"Стол\"=\"Стул\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(false);
@@ -115,7 +115,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=1;\"Да\";0)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЕСЛИ(1=1;\"Да\";0)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("Да");
@@ -130,7 +130,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=2;\"Да\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ЕСЛИ(1=2;\"Да\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(false);
@@ -147,7 +147,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("ЕСЛИ(1=1)", new FormulaExecutionContext());
+            var result = evaluator.Evaluate("=ЕСЛИ(1=1)", new FormulaExecutionContext());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TreeLeaveNotFound);
@@ -161,7 +161,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);

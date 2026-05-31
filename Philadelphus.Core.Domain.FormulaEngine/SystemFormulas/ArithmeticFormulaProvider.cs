@@ -213,7 +213,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                     formulaName));
             }
 
-            return Numeric(result);
+            return Float(result);
         }
 
         /// <summary>
@@ -354,6 +354,16 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         private static FormulaResult Numeric(double value)
         {
             return FormulaResult.Success(value, SystemBaseType.NUMERIC);
+        }
+
+        /// <summary>
+        /// Создает числовой результат формулы с дробной природой.
+        /// </summary>
+        /// <param name="value">Числовое значение результата.</param>
+        /// <returns>Результат с системным типом FLOAT.</returns>
+        private static FormulaResult Float(double value)
+        {
+            return FormulaResult.Success(value, SystemBaseType.FLOAT);
         }
 
         /// <summary>

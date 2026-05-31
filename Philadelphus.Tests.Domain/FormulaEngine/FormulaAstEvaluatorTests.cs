@@ -27,7 +27,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("42", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=42", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(42d);
@@ -42,11 +42,49 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"123\"", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=\"123\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be("123");
             result.ValueType.Should().Be(SystemBaseType.STRING);
+        }
+
+        /// <summary>
+        /// Проверяет, что ввод без маркера формулы считается обычной строкой.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Returns_String_Value_When_Source_Does_Not_Start_With_Formula_Marker()
+        {
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("40*5", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be("40*5");
+            result.ValueType.Should().Be(SystemBaseType.STRING);
+            result.TreeLeave.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Проверяет, что начальные пробелы перед маркером формулы не выключают вычисление формулы.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Allows_Leading_Whitespace_Before_Formula_Marker()
+        {
+            var registry = new FormulaRegistry();
+            registry.Register(CreateFormula(
+                "СЛОЖИТЬ",
+                (_, arguments) => FormulaResult.Success(
+                    (double)arguments[0].Value! + (double)arguments[1].Value!,
+                    SystemBaseType.NUMERIC),
+                "+"));
+            var evaluator = new FormulaAstEvaluator(registry);
+
+            var result = evaluator.Evaluate("  =1+2", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(3d);
+            result.ValueType.Should().Be(SystemBaseType.NUMERIC);
         }
 
         /// <summary>
@@ -61,7 +99,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 (_, arguments) => FormulaResult.Success(arguments.Count, SystemBaseType.INTEGER)));
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("ПАРА(1;\"x\")", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ПАРА(1;\"x\")", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(2);
@@ -83,7 +121,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 "+"));
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("1+2", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1+2", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(3d);
@@ -106,8 +144,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = new FormulaAstEvaluator(registry);
             var context = FormulaEngineTestContextFactory.Create();
 
-            var first = evaluator.Evaluate("1+2", context);
-            var second = evaluator.Evaluate("1+2", context);
+            var first = evaluator.Evaluate("=1+2", context);
+            var second = evaluator.Evaluate("=1+2", context);
 
             first.IsSuccess.Should().BeTrue();
             first.TreeLeave.Should().BeOfType<SystemBaseTreeLeaveModel>()
@@ -134,7 +172,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                 })));
             var evaluator = new FormulaAstEvaluator(registry);
 
-            var result = evaluator.Evaluate("ИСТИНА()?1:ОШИБКА()", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=ИСТИНА()?1:ОШИБКА()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(1d);
@@ -148,7 +186,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=1?\"Да\":\"Нет\"", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -162,7 +200,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("НЕТ()", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=НЕТ()", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.UnknownFunction);
@@ -178,7 +216,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var treeLeave = CreateTreeLeave();
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate($"[{treeLeave.Uuid}]", new FormulaExecutionContext
+            var result = evaluator.Evaluate($"=[{treeLeave.Uuid}]", new FormulaExecutionContext
             {
                 WorkingTree = treeLeave.OwningWorkingTree
             });
@@ -197,7 +235,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate($"[{Guid.NewGuid()}]", new FormulaExecutionContext
+            var result = evaluator.Evaluate($"=[{Guid.NewGuid()}]", new FormulaExecutionContext
             {
                 WorkingTree = new FakeWorkingTreeModel()
             });
@@ -214,7 +252,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = new FormulaAstEvaluator(new FormulaRegistry());
 
-            var result = evaluator.Evaluate($"[{Guid.NewGuid()}]", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate($"=[{Guid.NewGuid()}]", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.UnknownFunction);
@@ -232,7 +270,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                $"[{treeLeave.Uuid}].СВОЙСТВО(Name)",
+                $"=[{treeLeave.Uuid}].СВОЙСТВО(Name)",
                 CreateMaterializingContext(treeLeave));
 
             result.IsSuccess.Should().BeTrue();
@@ -251,7 +289,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var evaluator = CreateEvaluator();
 
             var result = evaluator.Evaluate(
-                $"[{treeLeave.Uuid}].СВОЙСТВО(CreatedBy)",
+                $"=[{treeLeave.Uuid}].СВОЙСТВО(CreatedBy)",
                 CreateMaterializingContext(treeLeave));
 
             result.IsSuccess.Should().BeTrue();
@@ -268,7 +306,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var treeLeave = CreateTreeLeave();
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate($"[{treeLeave.Uuid}].СВОЙСТВО(Unknown)", new FormulaExecutionContext
+            var result = evaluator.Evaluate($"=[{treeLeave.Uuid}].СВОЙСТВО(Unknown)", new FormulaExecutionContext
             {
                 WorkingTree = treeLeave.OwningWorkingTree
             });
@@ -286,7 +324,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate("\"text\".СВОЙСТВО(Name)", FormulaEngineTestContextFactory.Create());
+            var result = evaluator.Evaluate("=\"text\".СВОЙСТВО(Name)", FormulaEngineTestContextFactory.Create());
 
             result.IsSuccess.Should().BeFalse();
             result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
@@ -301,7 +339,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
             var treeLeave = CreateTreeLeave();
             var evaluator = CreateEvaluator();
 
-            var result = evaluator.Evaluate($"[{treeLeave.Uuid}].НЕИЗВЕСТНО()", new FormulaExecutionContext
+            var result = evaluator.Evaluate($"=[{treeLeave.Uuid}].НЕИЗВЕСТНО()", new FormulaExecutionContext
             {
                 WorkingTree = treeLeave.OwningWorkingTree
             });
