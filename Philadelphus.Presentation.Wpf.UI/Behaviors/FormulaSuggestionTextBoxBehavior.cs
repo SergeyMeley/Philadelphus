@@ -73,8 +73,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (sender is not TextBox textBox
-                || textBox.DataContext is not FormulaTestControlVM viewModel
-                || viewModel.IsFormulaSuggestionsOpen == false)
+                || textBox.DataContext is not FormulaTestControlVM viewModel)
+            {
+                return;
+            }
+
+            if (TryHandleFormulaNavigation(textBox, viewModel, e))
+            {
+                return;
+            }
+
+            if (viewModel.IsFormulaSuggestionsOpen == false)
             {
                 return;
             }
@@ -123,6 +132,34 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         private static void ScrollSelectedSuggestionIntoView(TextBox textBox, FormulaTestControlVM viewModel)
         {
             GetSuggestionsListBox(textBox)?.ScrollIntoView(viewModel.SelectedFormulaSuggestion);
+        }
+
+        private static bool TryHandleFormulaNavigation(
+            TextBox textBox,
+            FormulaTestControlVM viewModel,
+            KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control
+                && e.Key == Key.OemCloseBrackets
+                && viewModel.TryGetMatchingParenthesisCaretIndex(textBox.SelectionStart, out var matchingCaretIndex))
+            {
+                textBox.SelectionStart = matchingCaretIndex;
+                textBox.SelectionLength = 0;
+                e.Handled = true;
+                return true;
+            }
+
+            if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)
+                && e.Key == Key.Space
+                && viewModel.TryGetCurrentFormulaCallSelection(textBox.SelectionStart, out var selectionStart, out var selectionLength))
+            {
+                textBox.SelectionStart = selectionStart;
+                textBox.SelectionLength = selectionLength;
+                e.Handled = true;
+                return true;
+            }
+
+            return false;
         }
     }
 }
