@@ -70,6 +70,35 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Команда открытия редактора формул.
+        /// </summary>
+        public RelayCommand OpenFormulaEditorWindowCommand
+        {
+            get
+            {
+                FormulaEditorWindow? formulaEditorWindow = null;
+
+                return new RelayCommand(obj =>
+                {
+                    var formulaEditorVM = (FormulaTestControlVM)obj;
+
+                    if (formulaEditorWindow is { IsVisible: true })
+                    {
+                        formulaEditorWindow.Activate();
+                        return;
+                    }
+
+                    formulaEditorWindow = _serviceProvider.GetRequiredService<FormulaEditorWindow>();
+                    formulaEditorWindow.Owner = Application.Current?.MainWindow;
+                    formulaEditorWindow.DataContext = formulaEditorVM;
+                    formulaEditorWindow.Closed += (_, _) => formulaEditorWindow = null;
+                    formulaEditorWindow.Show();
+                },
+                obj => obj is FormulaTestControlVM);
+            }
+        }
+
         public RelayCommand OpenDataStoragesSettingsControlCommand
         {
             get

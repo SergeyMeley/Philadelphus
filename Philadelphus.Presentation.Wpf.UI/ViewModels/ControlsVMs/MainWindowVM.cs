@@ -165,6 +165,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда выполнения операции стартового окна.
         /// </summary>
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
+
+        /// <summary>
+        /// Команда открытия редактора формул.
+        /// </summary>
+        public RelayCommand OpenFormulaEditorWindowCommand => _applicationCommandsVM.OpenFormulaEditorWindowCommand;
+
         public RelayCommand OpenRepositoryMemberDetailsWindowCommand
         {
             get

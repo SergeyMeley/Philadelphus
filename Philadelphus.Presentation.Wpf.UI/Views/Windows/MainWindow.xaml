@@ -149,6 +149,13 @@
                         <RibbonButton Label="Удалить пресет" />
                     </RibbonGroup>-->
                 </RibbonTab>
+                <RibbonTab Header="Формулы">
+                    <RibbonGroup Header="Редактор">
+                        <RibbonButton Label="Редактор формул"
+                                      Command="{Binding OpenFormulaEditorWindowCommand}"
+                                      CommandParameter="{Binding FormulaTestControlVM}" />
+                    </RibbonGroup>
+                </RibbonTab>
                 <!--<RibbonTab Header="Вставка">
 
                 </RibbonTab>
@@ -280,9 +287,6 @@
                             </TabItem>
                             <TabItem Header="Отчеты">
                                 <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}"></ctrls:ReportProcessor>
-                            </TabItem>
-                            <TabItem Header="Формулы">
-                                <ctrls:FormulaTestControl DataContext="{Binding FormulaTestControlVM}"></ctrls:FormulaTestControl>
                             </TabItem>
                             <!--<TabItem Header="Настраиваемый отчет">
                                 <ctrls:CustomizableReport></ctrls:CustomizableReport>
