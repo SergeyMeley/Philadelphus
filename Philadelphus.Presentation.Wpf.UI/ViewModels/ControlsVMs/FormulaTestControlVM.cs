@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Editing;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
@@ -344,38 +345,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             matchingCaretIndex = caretIndex;
 
             var source = FormulaText ?? string.Empty;
-            if (IsFormulaInput(source) == false)
-            {
-                return false;
-            }
-
-            var tokenizerResult = FormulaTokenizer.Tokenize(source);
-            var parentheses = tokenizerResult.Tokens
-                .Where(token => token.Kind is FormulaTokenKind.OpenParenthesis or FormulaTokenKind.CloseParenthesis)
-                .ToArray();
-            var currentIndex = Array.FindIndex(
-                parentheses,
-                token => token.Span.Start == caretIndex || token.Span.Start + token.Span.Length == caretIndex);
-
-            if (currentIndex < 0)
-            {
-                return false;
-            }
-
-            var current = parentheses[currentIndex];
-            var pairIndex = current.Kind == FormulaTokenKind.OpenParenthesis
-                ? FindClosingParenthesis(parentheses, currentIndex)
-                : FindOpeningParenthesis(parentheses, currentIndex);
-
-            if (pairIndex < 0)
-            {
-                return false;
-            }
-
-            matchingCaretIndex = parentheses[pairIndex].Kind == FormulaTokenKind.OpenParenthesis
-                ? parentheses[pairIndex].Span.Start
-                : parentheses[pairIndex].Span.Start + parentheses[pairIndex].Span.Length;
-            return true;
+            return FormulaEditorNavigation.TryGetMatchingParenthesisCaretIndex(
+                source,
+                caretIndex,
+                out matchingCaretIndex);
         }
 
         /// <summary>
@@ -394,16 +367,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             selectionLength = 0;
 
             var source = FormulaText ?? string.Empty;
-            if (IsFormulaInput(source) == false
-                || TryGetActiveFormulaCallRange(source, caretIndex, out var activeCall) == false)
+            if (FormulaEditorNavigation.TryGetCurrentFormulaCallSelection(
+                    source,
+                    caretIndex,
+                    out var selection) == false)
             {
                 return false;
             }
 
-            selectionStart = activeCall.NameStartIndex;
-            selectionLength = activeCall.CloseParenthesisIndex >= 0
-                ? activeCall.CloseParenthesisIndex - activeCall.NameStartIndex + 1
-                : caretIndex - activeCall.NameStartIndex;
+            selectionStart = selection.Start;
+            selectionLength = selection.Length;
 
             return selectionLength > 0;
         }
@@ -809,55 +782,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
 
         /// <summary>
-        /// Находит диапазон открытого вызова функции, внутри которого находится курсор.
-        /// </summary>
-        private static bool TryGetActiveFormulaCallRange(
-            string source,
-            int caretIndex,
-            out ActiveFormulaCallRange activeCall)
-        {
-            activeCall = new ActiveFormulaCallRange(string.Empty, 0, 0, -1);
-            if (caretIndex < 0 || caretIndex > source.Length)
-            {
-                return false;
-            }
-
-            var stack = new Stack<ActiveFormulaCallRange>();
-            for (var index = 0; index < caretIndex; index++)
-            {
-                var current = source[index];
-                if (current == '(')
-                {
-                    var nameStartIndex = GetNameStartBeforeOpenParenthesis(source, index);
-                    var name = nameStartIndex >= 0
-                        ? source[nameStartIndex..index].Trim()
-                        : string.Empty;
-
-                    stack.Push(new ActiveFormulaCallRange(
-                        name,
-                        nameStartIndex,
-                        index,
-                        FindClosingParenthesisIndex(source, index)));
-                    continue;
-                }
-
-                if (current == ')' && stack.Count > 0)
-                {
-                    stack.Pop();
-                }
-            }
-
-            var matchedCall = stack.FirstOrDefault(call => string.IsNullOrWhiteSpace(call.Name) == false);
-            if (matchedCall is null)
-            {
-                return false;
-            }
-
-            activeCall = matchedCall;
-            return true;
-        }
-
-        /// <summary>
         /// Получает имя функции перед открывающей скобкой.
         /// </summary>
         private static string GetNameBeforeOpenParenthesis(string source, int openParenthesisIndex)
@@ -877,55 +801,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return start == end
                 ? string.Empty
                 : source[(start + 1)..(end + 1)];
-        }
-
-        /// <summary>
-        /// Получает начальную позицию имени функции перед открывающей скобкой.
-        /// </summary>
-        private static int GetNameStartBeforeOpenParenthesis(string source, int openParenthesisIndex)
-        {
-            var end = openParenthesisIndex - 1;
-            while (end >= 0 && char.IsWhiteSpace(source[end]))
-            {
-                end--;
-            }
-
-            var start = end;
-            while (start >= 0 && IsFormulaNameCharacter(source[start]))
-            {
-                start--;
-            }
-
-            return start == end ? -1 : start + 1;
-        }
-
-        /// <summary>
-        /// Ищет закрывающую скобку по позиции открывающей скобки в исходном тексте.
-        /// </summary>
-        private static int FindClosingParenthesisIndex(string source, int openParenthesisIndex)
-        {
-            var depth = 0;
-            for (var index = openParenthesisIndex; index < source.Length; index++)
-            {
-                if (source[index] == '(')
-                {
-                    depth++;
-                    continue;
-                }
-
-                if (source[index] != ')')
-                {
-                    continue;
-                }
-
-                depth--;
-                if (depth == 0)
-                {
-                    return index;
-                }
-            }
-
-            return -1;
         }
 
         /// <summary>
@@ -1204,16 +1079,4 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     /// <param name="ArgumentIndex">Индекс активного аргумента.</param>
     public sealed record ActiveFormulaCall(string Name, int ArgumentIndex);
 
-    /// <summary>
-    /// Диапазон текущего открытого вызова функции.
-    /// </summary>
-    /// <param name="Name">Имя функции.</param>
-    /// <param name="NameStartIndex">Начальная позиция имени функции.</param>
-    /// <param name="OpenParenthesisIndex">Позиция открывающей скобки.</param>
-    /// <param name="CloseParenthesisIndex">Позиция закрывающей скобки или -1, если она еще не введена.</param>
-    public sealed record ActiveFormulaCallRange(
-        string Name,
-        int NameStartIndex,
-        int OpenParenthesisIndex,
-        int CloseParenthesisIndex);
 }
