@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
@@ -207,6 +208,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IOptions<ApplicationSettingsConfig> options,
             IPhiladelphusRepositoryService service,
             FormulaAstEvaluator formulaEvaluator,
+            FormulaRegistry formulaRegistry,
             IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
@@ -219,6 +221,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(options.Value);
             ArgumentNullException.ThrowIfNull(service);
             ArgumentNullException.ThrowIfNull(formulaEvaluator);
+            ArgumentNullException.ThrowIfNull(formulaRegistry);
             ArgumentNullException.ThrowIfNull(formulaDiagnosticsReporter);
             ArgumentNullException.ThrowIfNull(extensionVMFactory);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
@@ -232,6 +235,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 this,
                 service,
                 formulaEvaluator,
+                formulaRegistry,
                 formulaDiagnosticsReporter,
                 notificationService,
                 applicationCommandsVM);

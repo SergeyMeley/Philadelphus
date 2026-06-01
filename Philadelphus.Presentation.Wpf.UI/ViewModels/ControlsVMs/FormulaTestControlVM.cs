@@ -21,7 +21,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     /// <summary>
     /// Модель представления встроенного тестового интерфейса Formula Engine.
     /// </summary>
-    public sealed class FormulaTestControlVM : ControlBaseVM
+    public sealed class FormulaTestControlVM : ControlBaseVM, IFormulaEditorIntelliSenseVM
     {
         /// <summary>
         /// Вычислитель формул, зарегистрированный в DI приложения.

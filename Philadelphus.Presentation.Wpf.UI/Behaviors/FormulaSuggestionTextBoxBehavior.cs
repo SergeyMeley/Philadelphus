@@ -73,7 +73,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (sender is not TextBox textBox
-                || textBox.DataContext is not FormulaTestControlVM viewModel)
+                || textBox.DataContext is not IFormulaEditorIntelliSenseVM viewModel)
             {
                 return;
             }
@@ -123,20 +123,20 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         private static void OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox textBox
-                && textBox.DataContext is FormulaTestControlVM viewModel)
+                && textBox.DataContext is IFormulaEditorIntelliSenseVM viewModel)
             {
                 viewModel.UpdateFormulaSuggestions(textBox.SelectionStart);
             }
         }
 
-        private static void ScrollSelectedSuggestionIntoView(TextBox textBox, FormulaTestControlVM viewModel)
+        private static void ScrollSelectedSuggestionIntoView(TextBox textBox, IFormulaEditorIntelliSenseVM viewModel)
         {
             GetSuggestionsListBox(textBox)?.ScrollIntoView(viewModel.SelectedFormulaSuggestion);
         }
 
         private static bool TryHandleFormulaNavigation(
             TextBox textBox,
-            FormulaTestControlVM viewModel,
+            IFormulaEditorIntelliSenseVM viewModel,
             KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control
