@@ -106,6 +106,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
                 OnPropertyChanged(nameof(ParentControlVisibility));
                 FormulaBarVM.SelectedFormulaAttribute = null;
+                FormulaBarVM.NotifySelectedRepositoryMemberChanged();
             }
         }
         //public List<InfrastructureTypes> InfrastructureTypes
@@ -798,6 +799,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             if (target.Model is IAttributeOwnerModel attributeOwner
                 && attributeOwner.Attributes?.Any(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal)) == true)
             {
+                var changedAttribute = attributeOwner.Attributes.First(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal));
+                FormulaBarVM.NotifyAttributeValueChanged(changedAttribute);
                 targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
             }
 

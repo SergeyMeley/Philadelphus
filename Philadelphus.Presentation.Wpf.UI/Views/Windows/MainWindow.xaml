@@ -155,6 +155,24 @@
                                       Command="{Binding OpenFormulaEditorWindowCommand}"
                                       CommandParameter="{Binding FormulaTestControlVM}" />
                     </RibbonGroup>
+                    <RibbonGroup Header="Пересчет"
+                                 DataContext="{Binding RepositoryExplorerVM.FormulaBarVM}">
+                        <StackPanel>
+                            <TextBlock Text="Пересчет формул" />
+                            <ComboBox ItemsSource="{Binding FormulaRecalculationModes}"
+                                      SelectedItem="{Binding SelectedFormulaRecalculationMode}"
+                                      DisplayMemberPath="DisplayName"
+                                      MinWidth="180" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RibbonButton Label="Пересчитать текущий"
+                                          ToolTip="Пересчитать все формулы для текущего выбранного элемента репозитория."
+                                          Command="{Binding RecalculateCurrentFormulaCommand}" />
+                            <RibbonButton Label="Пересчитать все"
+                                          ToolTip="Пересчитать все формулы для всех элементов репозитория."
+                                          Command="{Binding RecalculateAllFormulasCommand}" />
+                        </StackPanel>
+                    </RibbonGroup>
                 </RibbonTab>
                 <!--<RibbonTab Header="Вставка">
 

@@ -22,6 +22,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBox Grid.Row="0"
@@ -53,6 +54,16 @@
                     ToolTip="Отменить редактирование формулы" />
             <Button Grid.Row="0"
                     Grid.Column="3"
+                    Content="fx"
+                    Command="{Binding RecalculateCurrentFormulaCommand}"
+                    Height="25"
+                    Width="25"
+                    Margin="1"
+                    Background="Transparent"
+                    FontWeight="SemiBold"
+                    ToolTip="Пересчитать все формулы для текущего выбранного элемента репозитория." />
+            <Button Grid.Row="0"
+                    Grid.Column="4"
                     Content="{StaticResource imageOpen}"
                     Command="{Binding OpenFormulaEditorFromFormulaBarCommand}"
                     Height="25"
@@ -61,7 +72,7 @@
                     Background="Transparent"
                     ToolTip="Открыть редактор формул" />
             <Grid Grid.Row="0"
-                  Grid.Column="4"
+                  Grid.Column="5"
                   Height="25"
                   Margin="1"
                   Background="White">
@@ -177,7 +188,7 @@
                 </TextBox>
             </Grid>
             <Popup Grid.Row="0"
-                   Grid.Column="4"
+                   Grid.Column="5"
                    AllowsTransparency="True"
                    IsOpen="{Binding IsFormulaSuggestionsOpen}"
                    Placement="Bottom"

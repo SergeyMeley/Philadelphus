@@ -20,6 +20,7 @@ using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -54,6 +55,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private string _formulaSignatureText = string.Empty;
         private string _formulaActiveArgumentText = string.Empty;
         private bool _isFormulaHighlightOpen;
+        private FormulaRecalculationModeVM _selectedFormulaRecalculationMode;
+        private bool _isFormulaAttributeNotificationInProgress;
 
         public RepositoryFormulaBarVM(
             RepositoryExplorerControlVM repositoryExplorerVM,
@@ -79,6 +82,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _formulaDiagnosticsReporter = formulaDiagnosticsReporter;
             _notificationService = notificationService;
             _applicationCommandsVM = applicationCommandsVM;
+
+            FormulaRecalculationModes = new List<FormulaRecalculationModeVM>
+            {
+                new(FormulaRecalculationMode.Manual, "Вручную"),
+                new(FormulaRecalculationMode.Auto, "Авто"),
+                new(FormulaRecalculationMode.AutoCurrentElement, "Авто для текущего элемента")
+            };
+
+            _selectedFormulaRecalculationMode = FormulaRecalculationModes
+                .First(x => x.Value == FormulaRecalculationMode.AutoCurrentElement);
         }
 
         /// <summary>
@@ -89,8 +102,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             get => _selectedFormulaAttribute;
             set
             {
+                if (ReferenceEquals(_selectedFormulaAttribute, value))
+                {
+                    return;
+                }
+
+                if (_selectedFormulaAttribute != null)
+                {
+                    _selectedFormulaAttribute.PropertyChanged -= OnSelectedFormulaAttributePropertyChanged;
+                }
+
                 if (SetProperty(ref _selectedFormulaAttribute, value))
                 {
+                    if (value != null)
+                    {
+                        value.PropertyChanged += OnSelectedFormulaAttributePropertyChanged;
+                    }
+
                     if (_repositoryExplorerVM.SelectedRepositoryMember != null)
                     {
                         _repositoryExplorerVM.SelectedRepositoryMember.SelectedAttributeVM = value;
@@ -240,6 +268,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             private set => SetProperty(ref _isFormulaHighlightOpen, value);
         }
 
+        public IReadOnlyList<FormulaRecalculationModeVM> FormulaRecalculationModes { get; }
+
+        public FormulaRecalculationModeVM SelectedFormulaRecalculationMode
+        {
+            get => _selectedFormulaRecalculationMode;
+            set
+            {
+                if (value != null
+                    && SetProperty(ref _selectedFormulaRecalculationMode, value))
+                {
+                    if (value.Value == FormulaRecalculationMode.AutoCurrentElement)
+                    {
+                        RecalculateCurrentFormula();
+                    }
+
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
+        }
+
         /// <summary>
         /// Команда выбора атрибутной ячейки таблицы наследников для строки формул.
         /// </summary>
@@ -303,6 +351,46 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
                 },
                 _ => IsFormulaBarEnabled);
+            }
+        }
+
+        public RelayCommand RecalculateCurrentFormulaCommand
+        {
+            get
+            {
+                return new RelayCommand(_ => RecalculateCurrentFormula(), _ => CanRecalculateCurrentFormula());
+            }
+        }
+
+        public RelayCommand RecalculateAllFormulasCommand
+        {
+            get
+            {
+                return new RelayCommand(_ => RecalculateAllFormulas(), _ => _repositoryExplorerVM.IsRepositoryLoading == false);
+            }
+        }
+
+        public void NotifyAttributeValueChanged(ElementAttributeModel attribute)
+        {
+            if (_repositoryExplorerVM.IsRepositoryLoading)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false)
+            {
+                RecalculateFormulaAttribute(attribute, null, new HashSet<Guid>(), new HashSet<Guid>());
+                NotifyFormulaAttributeChanged(attribute);
+            }
+
+            RecalculateFormulasAfterChange(attribute);
+        }
+
+        public void NotifySelectedRepositoryMemberChanged()
+        {
+            if (SelectedFormulaRecalculationMode.Value == FormulaRecalculationMode.AutoCurrentElement)
+            {
+                RecalculateCurrentFormula();
             }
         }
 
@@ -416,6 +504,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             selectionLength = selection.Length;
 
             return selectionLength > 0;
+        }
+
+        private void OnSelectedFormulaAttributePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (_isFormulaAttributeNotificationInProgress
+                || sender is not ElementAttributeVM attributeVM)
+            {
+                return;
+            }
+
+            if (e.PropertyName is nameof(ElementAttributeVM.AssignedValue)
+                or nameof(ElementAttributeVM.FormulaValueText))
+            {
+                NotifyAttributeValueChanged(attributeVM.Model);
+            }
         }
 
         private void SelectAttributeFormulaCell(ElementAttributeVM? attributeVM)
@@ -606,7 +709,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaBarSelectionLength = 0;
             IsFormulaBarEditing = false;
             NotifyFormulaAttributeChanged(targetAttribute);
-            RecalculateDependentFormulas(targetAttribute);
+            RecalculateFormulasAfterChange(targetAttribute);
         }
 
         private bool TryApplyFormulaBarText(ElementAttributeModel targetAttribute, string text)
@@ -614,6 +717,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             if (string.IsNullOrWhiteSpace(text) == false
                 && text.TrimStart().StartsWith("=", StringComparison.Ordinal))
             {
+                return RecalculateFormulaAttribute(
+                    targetAttribute,
+                    text.Trim(),
+                    new HashSet<Guid>(),
+                    new HashSet<Guid>());
+                /*
                 var result = _formulaEvaluator.Evaluate(text, CreateFormulaExecutionContext(targetAttribute));
                 if (result.IsSuccess == false)
                 {
@@ -626,6 +735,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
 
                 return TryApplyFormulaResult(targetAttribute, result, text.Trim());
+                */
             }
 
             return TryApplyPlainFormulaBarText(targetAttribute, text);
@@ -765,13 +875,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             if (_selectedFormulaAttribute?.Model.Uuid == attribute.Uuid)
             {
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValue));
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValueText));
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.DisplayedValueText));
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.FormulaValueText));
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.IsValueOverridden));
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.ValueOverrideToolTip));
-                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.State));
+                _isFormulaAttributeNotificationInProgress = true;
+                try
+                {
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValue));
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValueText));
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.DisplayedValueText));
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.FormulaValueText));
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.IsValueOverridden));
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.ValueOverrideToolTip));
+                    _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.State));
+                }
+                finally
+                {
+                    _isFormulaAttributeNotificationInProgress = false;
+                }
             }
 
             if (attribute.Owner is IMainEntityModel owner)
@@ -783,6 +901,198 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
 
             _repositoryExplorerVM.NotifyRepositoryStateChanged();
+        }
+
+        private bool CanRecalculateCurrentFormula()
+        {
+            return _repositoryExplorerVM.IsRepositoryLoading == false
+                && GetCurrentAttributeOwner()?.Attributes
+                    .Any(x => string.IsNullOrWhiteSpace(x.ValueFormula) == false) == true;
+        }
+
+        private void RecalculateCurrentFormula()
+        {
+            if (_repositoryExplorerVM.IsRepositoryLoading)
+            {
+                return;
+            }
+
+            var owner = GetCurrentAttributeOwner();
+            if (owner == null)
+            {
+                return;
+            }
+
+            var recalculated = new HashSet<Guid>();
+            foreach (var attribute in owner.Attributes.Where(x => string.IsNullOrWhiteSpace(x.ValueFormula) == false).ToList())
+            {
+                RecalculateFormulaAttribute(attribute, null, new HashSet<Guid>(), recalculated);
+            }
+
+            _repositoryExplorerVM.NotifyFormulaPropertyListChanged();
+            _repositoryExplorerVM.RebuildChildCollectionTable();
+            _repositoryExplorerVM.NotifyRepositoryStateChanged();
+
+            if (_formulaBarTarget?.TargetAttribute != null)
+            {
+                _formulaBarOriginalText = FormatAttributeValue(_formulaBarTarget.TargetAttribute);
+                FormulaBarText = _formulaBarOriginalText;
+                FormulaBarCaretIndex = FormulaBarText.Length;
+                FormulaBarSelectionStart = FormulaBarCaretIndex;
+                FormulaBarSelectionLength = 0;
+            }
+        }
+
+        private IAttributeOwnerModel? GetCurrentAttributeOwner()
+        {
+            return _repositoryExplorerVM.SelectedRepositoryMember?.Model as IAttributeOwnerModel;
+        }
+
+        private void RecalculateAllFormulas()
+        {
+            var recalculated = new HashSet<Guid>();
+
+            foreach (var attribute in GetAllRepositoryFormulaAttributes())
+            {
+                RecalculateFormulaAttribute(attribute, null, new HashSet<Guid>(), recalculated);
+            }
+
+            _repositoryExplorerVM.NotifyFormulaPropertyListChanged();
+            _repositoryExplorerVM.RebuildChildCollectionTable();
+            _repositoryExplorerVM.NotifyRepositoryStateChanged();
+        }
+
+        private IEnumerable<ElementAttributeModel> GetAllRepositoryFormulaAttributes()
+        {
+            return GetAllRepositoryAttributeOwners()
+                .SelectMany(x => x.Attributes)
+                .Where(x => string.IsNullOrWhiteSpace(x.ValueFormula) == false)
+                .GroupBy(x => x.Uuid)
+                .Select(x => x.First())
+                .ToList();
+        }
+
+        private IEnumerable<IAttributeOwnerModel> GetAllRepositoryAttributeOwners()
+        {
+            var trees = _repositoryExplorerVM.PhiladelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees;
+
+            foreach (var tree in trees)
+            {
+                yield return tree;
+
+                if (tree.ContentRoot != null)
+                {
+                    yield return tree.ContentRoot;
+                }
+
+                foreach (var node in tree.ContentNodes)
+                {
+                    yield return node;
+                }
+
+                foreach (var leave in tree.ContentLeaves)
+                {
+                    yield return leave;
+                }
+            }
+        }
+
+        private void RecalculateFormulasAfterChange(ElementAttributeModel changedAttribute)
+        {
+            switch (SelectedFormulaRecalculationMode.Value)
+            {
+                case FormulaRecalculationMode.Manual:
+                    return;
+                case FormulaRecalculationMode.Auto:
+                    RecalculateAllFormulas();
+                    return;
+                case FormulaRecalculationMode.AutoCurrentElement:
+                    RecalculateDependentFormulas(changedAttribute);
+                    return;
+            }
+        }
+
+        private bool RecalculateFormulaAttribute(
+            ElementAttributeModel attribute,
+            string? formulaTextOverride,
+            ISet<Guid> stack,
+            ISet<Guid> recalculated)
+        {
+            var formulaText = formulaTextOverride ?? attribute.ValueFormula;
+            if (string.IsNullOrWhiteSpace(formulaText))
+            {
+                return true;
+            }
+
+            if (recalculated.Contains(attribute.Uuid))
+            {
+                return true;
+            }
+
+            if (stack.Add(attribute.Uuid) == false)
+            {
+                attribute.ValueFormula = formulaText;
+                attribute.ValueFormulaErrorCode = "#CYCLE!";
+                NotifyFormulaAttributeChanged(attribute);
+                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                    $"Обнаружена циклическая зависимость формулы атрибута '{attribute.Name}'.",
+                    NotificationCriticalLevelModel.Warning);
+                return false;
+            }
+
+            foreach (var dependency in GetReferencedFormulaAttributes(attribute, formulaText))
+            {
+                if (RecalculateFormulaAttribute(dependency, null, stack, recalculated) == false)
+                {
+                    attribute.ValueFormula = formulaText;
+                    attribute.ValueFormulaErrorCode = "#DEPENDENCY!";
+                    NotifyFormulaAttributeChanged(attribute);
+                    stack.Remove(attribute.Uuid);
+                    return true;
+                }
+            }
+
+            var result = _formulaEvaluator.Evaluate(formulaText, CreateFormulaExecutionContext(attribute));
+            if (result.IsSuccess == false)
+            {
+                attribute.ValueFormula = formulaText;
+                attribute.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
+                NotifyFormulaAttributeChanged(attribute);
+                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                    $"Формула сохранена, но не вычислена: {result.Error?.Message}",
+                    NotificationCriticalLevelModel.Warning);
+                stack.Remove(attribute.Uuid);
+                recalculated.Add(attribute.Uuid);
+                return true;
+            }
+
+            var isApplied = TryApplyFormulaResult(attribute, result, formulaText);
+            if (isApplied)
+            {
+                NotifyFormulaAttributeChanged(attribute);
+                recalculated.Add(attribute.Uuid);
+            }
+
+            stack.Remove(attribute.Uuid);
+            return isApplied;
+        }
+
+        private IEnumerable<ElementAttributeModel> GetReferencedFormulaAttributes(
+            ElementAttributeModel targetAttribute,
+            string formulaText)
+        {
+            if (targetAttribute.Owner is not IAttributeOwnerModel owner)
+            {
+                return Enumerable.Empty<ElementAttributeModel>();
+            }
+
+            return owner.Attributes
+                .Where(x => x.Uuid != targetAttribute.Uuid
+                    && string.IsNullOrWhiteSpace(x.ValueFormula) == false
+                    && FormulaReferencesAttribute(formulaText, x))
+                .GroupBy(x => x.Uuid)
+                .Select(x => x.First())
+                .ToList();
         }
 
         private void RecalculateDependentFormulas(ElementAttributeModel changedAttribute)
@@ -808,18 +1118,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 visited.Add(dependent.Uuid);
 
-                var result = _formulaEvaluator.Evaluate(
-                    dependent.ValueFormula,
-                    CreateFormulaExecutionContext(dependent));
-
-                if (result.IsSuccess == false)
-                {
-                    dependent.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
-                    NotifyFormulaAttributeChanged(dependent);
-                    continue;
-                }
-
-                if (TryApplyFormulaResult(dependent, result, dependent.ValueFormula))
+                if (RecalculateFormulaAttribute(dependent, null, new HashSet<Guid>(), new HashSet<Guid>()))
                 {
                     NotifyFormulaAttributeChanged(dependent);
                     RecalculateDependentFormulas(dependent, visited);
@@ -1556,4 +1855,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         string ColumnKey,
         int RowNumber,
         bool IsAttribute);
+
+    public enum FormulaRecalculationMode
+    {
+        Manual,
+        Auto,
+        AutoCurrentElement
+    }
+
+    public sealed record FormulaRecalculationModeVM(
+        FormulaRecalculationMode Value,
+        string DisplayName);
 }
