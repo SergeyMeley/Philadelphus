@@ -158,7 +158,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             if (sender is TextBox textBox)
             {
                 UpdateSelection(textBox);
-                SelectFormulaOperandAtCaret(textBox);
+                if (e.ClickCount >= 2)
+                {
+                    SelectFormulaOperandAtCaret(textBox);
+                }
             }
         }
 
