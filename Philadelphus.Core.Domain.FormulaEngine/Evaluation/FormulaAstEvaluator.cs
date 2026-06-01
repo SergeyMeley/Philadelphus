@@ -235,6 +235,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
         /// <returns>Результат вызова функции.</returns>
         private FormulaResult EvaluateFunctionCall(FunctionCallFormulaExpression functionCall, FormulaExecutionContext context)
         {
+            if (string.Equals(functionCall.Name, "АТРИБУТ", StringComparison.OrdinalIgnoreCase))
+            {
+                return EvaluateRelativeAttributeFunction(functionCall, context);
+            }
+
             var resolveResult = _registry.Resolve(functionCall.Name);
             if (resolveResult.IsResolved == false)
             {
@@ -249,6 +254,78 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
 
             var result = resolveResult.Formula!.Evaluator(context, arguments.Values);
             return FormulaResultMaterializer.Materialize(result, context, functionCall.Span, functionCall.Name);
+        }
+
+        private static FormulaResult EvaluateRelativeAttributeFunction(
+            FunctionCallFormulaExpression functionCall,
+            FormulaExecutionContext context)
+        {
+            if (functionCall.Arguments.Count != 1)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.InvalidArgumentCount,
+                    "Формула 'АТРИБУТ' ожидает один аргумент.",
+                    functionCall.Span,
+                    functionCall.Name));
+            }
+
+            if (context.CurrentAttributeOwner == null)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Формула 'АТРИБУТ' без указания листа требует текущий элемент в контексте вычисления.",
+                    functionCall.Span,
+                    functionCall.Name));
+            }
+
+            if (TryGetAttributeName(functionCall.Arguments[0], out var attributeName) == false)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    "Аргумент формулы 'АТРИБУТ' должен быть строковым названием атрибута.",
+                    functionCall.Arguments[0].Span,
+                    functionCall.Name));
+            }
+
+            var attributes = context.CurrentAttributeOwner.Attributes
+                .Where(x => string.Equals(x.Name, attributeName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (attributes.Count == 0)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.AttributeNotFound,
+                    $"Атрибут '{attributeName}' не найден у текущего элемента.",
+                    functionCall.Arguments[0].Span,
+                    functionCall.Name));
+            }
+
+            if (attributes.Count > 1)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.AttributeDuplicate,
+                    $"У текущего элемента найдено несколько атрибутов с названием '{attributeName}'.",
+                    functionCall.Arguments[0].Span,
+                    functionCall.Name));
+            }
+
+            var attribute = attributes[0];
+            if (attribute.IsCollectionValue)
+            {
+                return FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.TypeMismatch,
+                    $"Атрибут '{attributeName}' содержит коллекцию значений, а формула 'АТРИБУТ' ожидает одиночное значение.",
+                    functionCall.Arguments[0].Span,
+                    functionCall.Name));
+            }
+
+            return attribute.Value is null
+                ? FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.AttributeNotFound,
+                    $"Атрибут '{attributeName}' найден, но значение атрибута не задано.",
+                    functionCall.Arguments[0].Span,
+                    functionCall.Name))
+                : FormulaResult.FromTreeLeave(attribute.Value);
         }
 
         /// <summary>

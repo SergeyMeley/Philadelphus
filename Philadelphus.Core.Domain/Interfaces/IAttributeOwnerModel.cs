@@ -67,5 +67,15 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Пометить как требующий пересчета списка атрибутов
         /// </summary>
         internal void MarkAsNeedRecalculateAttributesList();
+
+        /// <summary>
+        /// Приостановить пересчет списка атрибутов на время загрузки из хранилища.
+        /// </summary>
+        internal void SuspendAttributesListRecalculation();
+
+        /// <summary>
+        /// Возобновить пересчет списка атрибутов после загрузки из хранилища.
+        /// </summary>
+        internal void ResumeAttributesListRecalculation();
     }
 }

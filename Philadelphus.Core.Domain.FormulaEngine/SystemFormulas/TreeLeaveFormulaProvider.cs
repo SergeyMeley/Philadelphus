@@ -41,6 +41,28 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
                 ],
                 Evaluator = (context, arguments) => Evaluate(context, arguments)
             };
+
+            yield return new FormulaDefinition
+            {
+                Name = "АТРИБУТ",
+                Description = "Возвращает значение атрибута текущего элемента по названию. Используется для относительных ссылок внутри формул атрибутов.",
+                Category = "Атрибуты",
+                ResultType = SystemBaseType.USER_DEFINED,
+                Examples = ["=АТРИБУТ(\"Цена\")"],
+                Arguments =
+                [
+                    new FormulaArgumentDefinition
+                    {
+                        Name = "название",
+                        Description = "Название атрибута текущего элемента.",
+                        ExpectedType = SystemBaseType.STRING
+                    }
+                ],
+                Evaluator = (_, _) => FormulaResult.Failure(CreateError(
+                    FormulaErrorCode.NotImplemented,
+                    "Формула 'АТРИБУТ' вычисляется напрямую в AST evaluator, чтобы сохранить относительный контекст.",
+                    "АТРИБУТ"))
+            };
         }
 
         /// <summary>

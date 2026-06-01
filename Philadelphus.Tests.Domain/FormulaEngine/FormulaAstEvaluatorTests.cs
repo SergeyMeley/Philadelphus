@@ -395,6 +395,36 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет получение значения атрибута текущего элемента по относительной ссылке.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Relative_Attribute_Function_Returns_Current_Owner_Attribute_Value()
+        {
+            var treeLeave = CreateTreeLeave();
+            var context = CreateMaterializingContext(treeLeave);
+            context = new FormulaExecutionContext
+            {
+                WorkingTree = context.WorkingTree,
+                TreeLeaveResolver = context.TreeLeaveResolver,
+                SystemBaseWorkingTree = context.SystemBaseWorkingTree,
+                CurrentAttributeOwner = treeLeave.ParentNode,
+                RepositoryService = context.RepositoryService,
+                NotificationService = context.NotificationService,
+                Items = context.Items
+            };
+            var value = CreateSystemBaseLeave(context, SystemBaseType.STRING, "Красный");
+            CreateInheritedAttribute(treeLeave, "Цвет", value);
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate("=АТРИБУТ(\"Цвет\")", context);
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be("Красный");
+            result.ValueType.Should().Be(SystemBaseType.STRING);
+            result.TreeLeave.Should().BeSameAs(value);
+        }
+
+        /// <summary>
         /// Проверяет ошибку, если атрибут с указанным названием не найден.
         /// </summary>
         [Fact]

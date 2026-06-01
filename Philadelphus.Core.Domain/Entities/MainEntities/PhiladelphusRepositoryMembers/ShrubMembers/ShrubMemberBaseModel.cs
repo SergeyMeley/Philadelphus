@@ -35,6 +35,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private object _lockObject = new();
         private int _version = 0;
         private int _cachedVersion = -1;
+        private int _attributesListRecalculationSuspendCount;
 
         #endregion
 
@@ -91,6 +92,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             get
             {
+                if (_attributesListRecalculationSuspendCount > 0)
+                {
+                    return _attributes.AsReadOnly();
+                }
+
                 if (_cachedVersion != _version)
                 {
                     lock (_lockObject)
@@ -271,6 +277,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         void IAttributeOwnerModel.MarkAsNeedRecalculateAttributesList()
         {
             _version++;
+            if (_attributesListRecalculationSuspendCount > 0)
+            {
+                return;
+            }
+
             if (this is IParentModel p)
             {
                 foreach (var c in p.Childs)
@@ -280,6 +291,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                         ao.MarkAsNeedRecalculateAttributesList();
                     }
                 }
+            }
+        }
+
+        void IAttributeOwnerModel.SuspendAttributesListRecalculation()
+        {
+            _attributesListRecalculationSuspendCount++;
+        }
+
+        void IAttributeOwnerModel.ResumeAttributesListRecalculation()
+        {
+            if (_attributesListRecalculationSuspendCount <= 0)
+            {
+                return;
+            }
+
+            _attributesListRecalculationSuspendCount--;
+            if (_attributesListRecalculationSuspendCount == 0)
+            {
+                ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
             }
         }
 

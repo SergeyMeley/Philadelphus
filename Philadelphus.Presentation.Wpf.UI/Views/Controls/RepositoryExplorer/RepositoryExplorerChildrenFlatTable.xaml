@@ -14,7 +14,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <local:FormulaBar Grid.Row="0" />
+        <local:FormulaBar Grid.Row="0"
+                          DataContext="{Binding FormulaBarVM}" />
         <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns, чтобы ViewModel
              оставалась независимой от WPF DataGrid и code-behind. -->
         <DataGrid x:Name="SelectedElementChildsDataGrid"
@@ -31,7 +32,9 @@
                   IsReadOnly="False"
                   SelectionUnit="Cell"
                   behaviors:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}"
-                  behaviors:DataGridFormulaCellSelectionBehavior.Command="{Binding SelectChildFormulaCellCommand}"
+                  behaviors:DataGridFormulaCellSelectionBehavior.Command="{Binding FormulaBarVM.SelectChildFormulaCellCommand}"
+                  behaviors:DataGridFormulaReferenceHighlightBehavior.IsActive="{Binding FormulaBarVM.IsFormulaReferenceSelectionActive}"
+                  behaviors:DataGridFormulaReferenceHighlightBehavior.AttributeColumnsOnly="True"
                   behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
                   ItemsSource="{Binding ChildCollectionTableRows}" />
         <StackPanel Grid.Row="2"

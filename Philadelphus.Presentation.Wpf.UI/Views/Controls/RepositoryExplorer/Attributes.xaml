@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer"
+             xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -18,14 +19,17 @@
             <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
             <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
         </StackPanel>
-        <local:FormulaBar Grid.Row="1" />
+        <local:FormulaBar Grid.Row="1"
+                          DataContext="{Binding FormulaBarVM}" />
         <DataGrid Name="SelectedElementAttributesDataGrid"
                   Grid.Row="2"
                   Height="auto"
                   ColumnWidth="*"
                   DataContext="{Binding SelectedRepositoryMember}"
                   ItemsSource="{Binding AttributesVMs}"
-                  SelectedItem="{Binding DataContext.SelectedFormulaAttribute, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}, Mode=TwoWay}"
+                  SelectedItem="{Binding DataContext.FormulaBarVM.SelectedFormulaAttribute, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}, Mode=TwoWay}"
+                  behaviors:DataGridFormulaReferenceHighlightBehavior.IsActive="{Binding DataContext.FormulaBarVM.IsFormulaReferenceSelectionActive, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}}"
+                  behaviors:DataGridFormulaReferenceHighlightBehavior.TargetColumnHeader="Значение"
                   SelectionMode="Single"
                   SelectionUnit="FullRow"
                   AutoGenerateColumns="false"

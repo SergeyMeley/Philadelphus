@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.FormulaEngine.Execution
@@ -24,6 +25,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         /// Системное рабочее дерево, из которого берутся предопределенные системные значения.
         /// </summary>
         public WorkingTreeModel? SystemBaseWorkingTree { get; init; }
+
+        /// <summary>
+        /// Текущий владелец атрибутов для относительных ссылок вида АТРИБУТ("Имя").
+        /// </summary>
+        public IAttributeOwnerModel? CurrentAttributeOwner { get; init; }
 
         /// <summary>
         /// Доменный сервис репозитория, через который формулы создают недостающие листья результата.

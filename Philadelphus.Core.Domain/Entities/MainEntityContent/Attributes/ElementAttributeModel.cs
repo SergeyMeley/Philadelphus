@@ -538,6 +538,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             return _sequence;
         }
 
+        /// <summary>
+        /// Загрузить формулу значения из хранилища без проверки политик записи.
+        /// </summary>
+        internal void LoadValueFormula(string? valueFormula)
+        {
+            _valueFormula = valueFormula ?? string.Empty;
+
+            if (_isOwn == false
+                && _inheritedAttributeFromParent != null
+                && IsParentOverrideForbidden() == false
+                && string.IsNullOrWhiteSpace(_valueFormula) == false)
+            {
+                _isValueOverridden = string.Equals(
+                    _valueFormula,
+                    _inheritedAttributeFromParent.ValueFormula,
+                    StringComparison.Ordinal) == false;
+            }
+        }
+
         protected override bool AddContentDetailed(IContentModel content)
         {
             throw new NotImplementedException();

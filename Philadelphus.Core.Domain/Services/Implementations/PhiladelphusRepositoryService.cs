@@ -1445,7 +1445,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             owners.AddRange(tree.ContentNodes ?? Enumerable.Empty<TreeNodeModel>());
             owners.AddRange(tree.ContentLeaves ?? Enumerable.Empty<TreeLeaveModel>());
 
-            var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodesByUuid, allShrubLeavesByUuid, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
+            owners.ForEach(x => x.SuspendAttributesListRecalculation());
+            try
+            {
+                var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodesByUuid, allShrubLeavesByUuid, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
+            }
+            finally
+            {
+                foreach (var owner in owners.AsEnumerable().Reverse())
+                {
+                    owner.ResumeAttributesListRecalculation();
+                }
+            }
 
             // Обновление статусов
             tree.ContentAttributes.ToList().ForEach(x => SetModelState(x, State.SavedOrLoaded));
