@@ -47,6 +47,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private int _formulaBarSelectionStart;
         private int _formulaBarSelectionLength;
         private int _formulaBarFocusRequestId;
+        private int _formulaValueCellFocusRequestId;
         private bool _isFormulaBarEditing;
         private bool _isFormulaBarEnabled;
         private bool _isFormulaSuggestionsOpen;
@@ -190,6 +191,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             private set => SetProperty(ref _formulaBarFocusRequestId, value);
         }
 
+        public int FormulaValueCellFocusRequestId
+        {
+            get => _formulaValueCellFocusRequestId;
+            private set => SetProperty(ref _formulaValueCellFocusRequestId, value);
+        }
+
         /// <summary>
         /// Признак активного редактирования строки формул.
         /// </summary>
@@ -330,6 +337,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     FormulaBarSelectionStart = FormulaBarCaretIndex;
                     FormulaBarSelectionLength = 0;
                     IsFormulaBarEditing = false;
+                    RequestFormulaValueCellFocus();
                 },
                 _ => IsFormulaBarEnabled);
             }
@@ -708,6 +716,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaBarSelectionStart = FormulaBarCaretIndex;
             FormulaBarSelectionLength = 0;
             IsFormulaBarEditing = false;
+            RequestFormulaValueCellFocus();
             NotifyFormulaAttributeChanged(targetAttribute);
             RecalculateFormulasAfterChange(targetAttribute);
         }
@@ -1185,6 +1194,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private void RequestFormulaBarFocus()
         {
             FormulaBarFocusRequestId++;
+        }
+
+        private void RequestFormulaValueCellFocus()
+        {
+            FormulaValueCellFocusRequestId++;
         }
 
         private static bool CanUseRelativeAttributeReference(
@@ -1815,7 +1829,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             return attribute.Value?.Uuid == null
                 ? string.Empty
-                : $"[{attribute.Value.Uuid}]";
+                : $"=[{attribute.Value.Uuid}]";
         }
 
         private static bool TryGetLeafUuidReference(string text, out Guid uuid)

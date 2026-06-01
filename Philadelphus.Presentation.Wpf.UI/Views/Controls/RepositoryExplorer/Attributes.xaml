@@ -30,6 +30,8 @@
                   SelectedItem="{Binding DataContext.FormulaBarVM.SelectedFormulaAttribute, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}, Mode=TwoWay}"
                   behaviors:DataGridFormulaReferenceHighlightBehavior.IsActive="{Binding DataContext.FormulaBarVM.IsFormulaReferenceSelectionActive, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}}"
                   behaviors:DataGridFormulaReferenceHighlightBehavior.TargetColumnHeader="Значение"
+                  behaviors:DataGridCellFocusRequestBehavior.FocusRequestId="{Binding DataContext.FormulaBarVM.FormulaValueCellFocusRequestId, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}, Mode=OneWay}"
+                  behaviors:DataGridCellFocusRequestBehavior.TargetColumnHeader="Значение"
                   SelectionMode="Single"
                   SelectionUnit="FullRow"
                   AutoGenerateColumns="false"

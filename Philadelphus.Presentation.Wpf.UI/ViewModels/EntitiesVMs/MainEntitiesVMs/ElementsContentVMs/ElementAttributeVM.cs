@@ -174,7 +174,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
                 return AssignedValue?.Uuid == null
                     ? string.Empty
-                    : $"[{AssignedValue.Uuid}]";
+                    : $"=[{AssignedValue.Uuid}]";
             }
             set
             {

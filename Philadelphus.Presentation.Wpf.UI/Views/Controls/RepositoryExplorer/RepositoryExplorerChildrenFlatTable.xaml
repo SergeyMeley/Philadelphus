@@ -35,6 +35,7 @@
                   behaviors:DataGridFormulaCellSelectionBehavior.Command="{Binding FormulaBarVM.SelectChildFormulaCellCommand}"
                   behaviors:DataGridFormulaReferenceHighlightBehavior.IsActive="{Binding FormulaBarVM.IsFormulaReferenceSelectionActive}"
                   behaviors:DataGridFormulaReferenceHighlightBehavior.AttributeColumnsOnly="True"
+                  behaviors:DataGridCellFocusRequestBehavior.FocusRequestId="{Binding FormulaBarVM.FormulaValueCellFocusRequestId, Mode=OneWay}"
                   behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
                   ItemsSource="{Binding ChildCollectionTableRows}" />
         <StackPanel Grid.Row="2"
