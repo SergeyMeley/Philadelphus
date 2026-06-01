@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="900">
@@ -24,12 +25,66 @@
                    Margin="0,0,8,8"
                    VerticalAlignment="Center"
                    Text="Формула"/>
-        <TextBox Grid.Row="0"
+        <TextBox x:Name="FormulaTextBox"
+                 Grid.Row="0"
                  Grid.Column="1"
                  Margin="0,0,8,8"
                  MinHeight="28"
                  VerticalContentAlignment="Center"
+                 behaviors:FormulaSuggestionTextBoxBehavior.IsEnabled="True"
+                 behaviors:FormulaSuggestionTextBoxBehavior.SuggestionsListBox="{Binding ElementName=FormulaSuggestionsListBox}"
                  Text="{Binding FormulaText, UpdateSourceTrigger=PropertyChanged}"/>
+        <Popup Grid.Row="0"
+               Grid.Column="1"
+               AllowsTransparency="True"
+               IsOpen="{Binding IsFormulaSuggestionsOpen}"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=FormulaTextBox}"
+               PopupAnimation="Fade"
+               StaysOpen="False">
+            <Border MinWidth="{Binding ActualWidth, ElementName=FormulaTextBox}"
+                    MaxWidth="520"
+                    MaxHeight="260"
+                    Background="White"
+                    BorderBrush="#8A8A8A"
+                    BorderThickness="1"
+                    Padding="2">
+                <ListBox x:Name="FormulaSuggestionsListBox"
+                         ItemsSource="{Binding FormulaSuggestions}"
+                         SelectedItem="{Binding SelectedFormulaSuggestion, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="4,3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="0"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding DisplayName}"/>
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="1"
+                                           Margin="12,0,0,0"
+                                           Foreground="Gray"
+                                           Text="{Binding Category}"/>
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="2"
+                                           Foreground="DimGray"
+                                           Text="{Binding Signature}"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Popup>
         <Button Grid.Row="0"
                 Grid.Column="2"
                 Margin="0,0,0,8"
