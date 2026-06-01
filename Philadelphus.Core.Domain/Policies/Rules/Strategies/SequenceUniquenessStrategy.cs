@@ -9,6 +9,12 @@ namespace Philadelphus.Core.Domain.Policies.Rules
     /// </summary>
     internal static class SequenceUniquenessStrategy
     {
+        public static ISequenceUniquenessStrategy<WorkingTreeModel> WorkingTree()
+        {
+            return new SequenceUniquenessStrategy<WorkingTreeModel>(
+                model => model.OwningShrub.ContentWorkingTrees.Select(ToSequencedItem));
+        }
+
         public static ISequenceUniquenessStrategy<TreeRootModel> TreeRoot()
         {
             // У рабочего дерева может быть только один корень, но правило оставлено общим,

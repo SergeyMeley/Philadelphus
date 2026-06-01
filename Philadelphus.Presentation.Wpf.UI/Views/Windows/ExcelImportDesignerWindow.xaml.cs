@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using Philadelphus.Core.Domain.ImportExport.Excel;
+using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services;
 using System;
@@ -68,6 +68,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private readonly IExcelImportSchemaBuilder _schemaBuilder;
         private readonly IExcelImportSchemaTemplateStorage _templateStorage;
         private readonly ExcelImportPipeline _importPipeline;
+        private readonly ExcelImportPresentationPipeline _presentationPipeline;
         private Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryModel? _repository;
         private IPhiladelphusRepositoryService? _repositoryService;
         private Action? _refreshRepositoryView;
@@ -103,7 +104,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             ExcelPreviewService previewService,
             IExcelImportSchemaBuilder schemaBuilder,
             IExcelImportSchemaTemplateStorage templateStorage,
-            ExcelImportPipeline importPipeline)
+            ExcelImportPipeline importPipeline,
+            ExcelImportPresentationPipeline presentationPipeline)
         {
             InitializeComponent();
             DataContext = this;
@@ -113,6 +115,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             _schemaBuilder = schemaBuilder;
             _templateStorage = templateStorage;
             _importPipeline = importPipeline;
+            _presentationPipeline = presentationPipeline;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -1313,10 +1316,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                     return;
                 }
 
-                var previewViewModel = _importPipeline.BuildRepositoryPreview(_schema!, isNewRoot ? null : rootName);
+                var previewViewModel = _presentationPipeline.BuildRepositoryPreview(_schema!, isNewRoot ? null : rootName);
                 RepositoryExplorerPreview.DataContext = previewViewModel;
                 RepositoryExplorerPreviewConfigurator.ConfigureAsReadonly(RepositoryExplorerPreview);
-                TxtPreviewSummary.Text = _importPipeline.BuildPreviewSummary(previewViewModel);
+                TxtPreviewSummary.Text = _presentationPipeline.BuildPreviewSummary(previewViewModel);
             }
             catch (Exception ex)
             {

@@ -1,28 +1,28 @@
-﻿using AutoMapper;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
-using Philadelphus.Core.Domain.ImportExport.Excel;
+using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
+using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
-using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.TablesExport.Factories;
 using Philadelphus.Infrastructure.Cache.Redis.Implementations;
 using Philadelphus.Infrastructure.Cache.RepositoryInterfaces;
+using Philadelphus.Infrastructure.ImportExport.Excel;
+using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Infrastructure.Messaging.Kafka;
-using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Mapping;
 using Philadelphus.Presentation.Wpf.UI.Services;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
@@ -35,20 +35,16 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
 using StackExchange.Redis;
-using System;
-using System.Configuration;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using System.Windows;
-using System.Windows.Shapes;
+using Philadelphus.Core.Domain.ImportExport.Contracts;
+using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
+using Philadelphus.Core.Domain.ImportExport.Services.Implementations;
 
 namespace Philadelphus.Presentation.Wpf.UI
 {
@@ -168,11 +164,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                         context.Configuration.GetSection(nameof(MessagingConfig)));
 
                     // Регистрация AutoMapper
-                    var profileAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(a => a.GetTypes()
-                            .Any(t => typeof(Profile).IsAssignableFrom(t) &&
-                                     t.Namespace?.StartsWith("Philadelphus.") == true))
-                        .ToArray();
+                    var profileAssemblies = GetPhiladelphusProfileAssemblies();
 
                     services.AddAutoMapper(cfg => 
                     {
@@ -219,6 +211,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
                     services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();
+                    RegisterFormulaEngine(services);
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
 
@@ -240,6 +233,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<StorageCreationControlVM>();
                     services.AddTransient<RepositoryCreationControlVM>();
                     services.AddTransient<ReportsControlVM>();
+                    services.AddTransient<FormulaTestControlVM>();
                     //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
                     //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
                     // ViewModel сущностей
@@ -250,6 +244,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Регистрация View
                     services.AddTransient<MainWindow>();
                     services.AddSingleton<LaunchWindow>();      // Не менять. Требуется для автоматического закрытия окна при открытии основного
+                    services.AddTransient<FormulaEditorWindow>();
                     services.AddTransient<AttributeValuesCollectionWindow>();
                     services.AddSingleton<SplashWindow>();
 
@@ -260,15 +255,58 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IInfrastructureRepositoryFactory, InfrastructureRepositoryFactory>();
 
                     // Импорт из Excel
-                    RegisterExcelImport(services);
+                    RegisterImportExport(services);
                 })
                 .Build();
         }
 
-        private void RegisterExcelImport(IServiceCollection services)
+        private void RegisterImportExport(IServiceCollection services)
         {
-            // Регистрация сервисов
-            // Слой Core
+            RegisterImportExportCore(services);
+            RegisterImportExportAdapters(services);
+            RegisterExcelImportInfrastructure(services);
+            RegisterExcelImportPresentation(services);
+        }
+
+        /// <summary>
+        /// Регистрирует ядро Formula Engine и все системные формулы этапа 1.
+        /// </summary>
+        /// <param name="services">Коллекция сервисов приложения.</param>
+        private static void RegisterFormulaEngine(IServiceCollection services)
+        {
+            services.AddSingleton<IFormulaProvider, ArithmeticFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, ComparisonFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, TextFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, ConditionalFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, TreeLeaveFormulaProvider>();
+
+            services.AddSingleton(serviceProvider =>
+            {
+                var registry = new FormulaRegistry();
+                foreach (var provider in serviceProvider.GetServices<IFormulaProvider>())
+                {
+                    registry.RegisterProvider(provider);
+                }
+
+                return registry;
+            });
+
+            services.AddSingleton<FormulaAstEvaluator>();
+            services.AddSingleton<IFormulaDiagnosticsReporter, FormulaDiagnosticsReporter>();
+        }
+
+        private static void RegisterImportExportCore(IServiceCollection services)
+        {
+            services.AddTransient<IImportExportService, ImportExportService>();
+        }
+
+        private static void RegisterImportExportAdapters(IServiceCollection services)
+        {
+            services.AddTransient<IImportExportAdapter, JsonImportExportAdapter>();
+        }
+
+        private static void RegisterExcelImportInfrastructure(IServiceCollection services)
+        {
             services.AddSingleton<ConversionService>();
             services.AddSingleton<ExcelPreviewService>();
             services.AddSingleton<IExcelDataTypeDetector, ExcelDataTypeDetector>();
@@ -279,23 +317,27 @@ namespace Philadelphus.Presentation.Wpf.UI
             services.AddSingleton<IExcelImportInheritanceResolver, ExcelImportInheritanceResolver>();
             services.AddSingleton<IExcelImportSettingsReader, ExcelImportSettingsReader>();
             services.AddSingleton<IExcelImportSchemaTemplateStorage, ExcelImportSchemaTemplateStorage>();
-            // Слой Presentation
+
+            services.AddTransient<IImportExportAdapter, ExcelImportExportAdapter>();
+            services.AddTransient<ExcelImportExportAdapter>();
             services.AddTransient<ExcelImportPipeline>();
-            services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
             services.AddTransient<ExcelImportSessionState>();
+        }
+
+        private static void RegisterExcelImportPresentation(IServiceCollection services)
+        {
+            services.AddTransient<ExcelImportPresentationPipeline>();
+            services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
+            services.AddTransient<ExcelImportPresentationSessionState>();
+
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<IMessageDialogService, MessageDialogService>();
 
-
-            // Регистрация ViewModel
-            // ViewModel окон
             services.AddTransient<ImportFromExcelVM>();
 
-            // Регистрация View
             services.AddTransient<ImportFromExcelWindow>();
             services.AddTransient<ExcelImportDesignerWindow>();
             services.AddTransient<ImportProgressWindow>();
-
         }
 
         protected override async void OnStartup(StartupEventArgs e)
@@ -347,5 +389,67 @@ namespace Philadelphus.Presentation.Wpf.UI
             base.OnExit(e);
         }
 
+        /// <summary>
+        /// Возвращает сборки Чубушника, содержащие профили AutoMapper.
+        /// </summary>
+        /// <returns>Сборки с профилями AutoMapper.</returns>
+        private static Assembly[] GetPhiladelphusProfileAssemblies()
+        {
+            var assembliesByName = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(assembly => IsPhiladelphusAssemblyName(assembly.GetName()))
+                .GroupBy(x => x.GetName().Name)
+                .ToDictionary(x => x.Key, x => x.First());
+
+            var referencesToLoad = new Queue<AssemblyName>(
+                Assembly.GetExecutingAssembly()
+                    .GetReferencedAssemblies()
+                    .Where(IsPhiladelphusAssemblyName));
+
+            while (referencesToLoad.Count > 0)
+            {
+                var assemblyName = referencesToLoad.Dequeue();
+                if (assemblyName.Name == null || assembliesByName.ContainsKey(assemblyName.Name))
+                {
+                    continue;
+                }
+
+                var assembly = Assembly.Load(assemblyName);
+                assembliesByName[assemblyName.Name] = assembly;
+
+                foreach (var referencedAssemblyName in assembly.GetReferencedAssemblies().Where(IsPhiladelphusAssemblyName))
+                {
+                    if (referencedAssemblyName.Name != null && assembliesByName.ContainsKey(referencedAssemblyName.Name) == false)
+                    {
+                        referencesToLoad.Enqueue(referencedAssemblyName);
+                    }
+                }
+            }
+
+            return assembliesByName.Values
+                .Where(ContainsAutoMapperProfile)
+                .ToArray();
+        }
+
+        private static bool IsPhiladelphusAssemblyName(AssemblyName assemblyName)
+        {
+            return assemblyName.Name?.StartsWith("Philadelphus.", StringComparison.Ordinal) == true;
+        }
+
+        private static bool ContainsAutoMapperProfile(Assembly assembly)
+        {
+            IEnumerable<Type> loadableTypes = default;
+            try
+            {
+                loadableTypes = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                loadableTypes = ex.Types.Where(type => type != null)!;
+            }
+
+            return loadableTypes
+                .Any(type => typeof(Profile).IsAssignableFrom(type)
+                    && type.Namespace?.StartsWith("Philadelphus.", StringComparison.Ordinal) == true);
+        }
     }
 }

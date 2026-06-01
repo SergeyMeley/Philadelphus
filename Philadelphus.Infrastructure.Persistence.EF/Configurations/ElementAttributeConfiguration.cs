@@ -93,6 +93,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
             builder.Property(x => x.ValueUuid)
                 .HasColumnName("value_uuid");
 
+            builder.Property(x => x.ValueFormula)
+                .HasColumnName("value_formula");
+
             builder.Property(x => x.IsCollectionValue)
                 .HasColumnName("is_collection_value").
                 IsRequired().

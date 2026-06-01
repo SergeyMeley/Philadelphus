@@ -1,35 +1,31 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
+using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Models.Tables;
 using Philadelphus.Presentation.Wpf.UI.Services.Tables;
+using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.OtherEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using PropertyTools.Wpf;
 using Serilog;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Shapes;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -109,6 +105,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
                 OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
                 OnPropertyChanged(nameof(ParentControlVisibility));
+                FormulaBarVM.SelectedFormulaAttribute = null;
+                FormulaBarVM.NotifySelectedRepositoryMemberChanged();
             }
         }
         //public List<InfrastructureTypes> InfrastructureTypes
@@ -152,14 +150,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public ExtensionsControlVM ExtensionsControlVM { get => _extensionsControlVM; }
 
         /// <summary>
-        /// Описание текущего фонового процесса.
+        /// Модель представления строки формул обозревателя репозитория.
         /// </summary>
-        public string CurrentProcess { get; private set; }
-
-        /// <summary>
-        /// Текстовое представление прогресса текущего фонового процесса.
-        /// </summary>
-        public string CurrentProgress { get; private set; }
+        public RepositoryFormulaBarVM FormulaBarVM { get; }
 
         private bool _isRepositoryLoading;
         public bool IsRepositoryLoading
@@ -215,6 +208,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             IPhiladelphusRepositoryService service,
+            FormulaAstEvaluator formulaEvaluator,
+            FormulaRegistry formulaRegistry,
+            IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
@@ -225,6 +221,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
             ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(formulaEvaluator);
+            ArgumentNullException.ThrowIfNull(formulaRegistry);
+            ArgumentNullException.ThrowIfNull(formulaDiagnosticsReporter);
             ArgumentNullException.ThrowIfNull(extensionVMFactory);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
@@ -233,6 +232,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
+            FormulaBarVM = new RepositoryFormulaBarVM(
+                this,
+                service,
+                formulaEvaluator,
+                formulaRegistry,
+                formulaDiagnosticsReporter,
+                notificationService,
+                applicationCommandsVM);
 
             if (loadOnStartup)
             {
@@ -458,135 +465,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand ExportToPhjsonCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var model = SelectedRepositoryMember.Model as TreeRootModel;
-                    var json = JsonImportExportHelper.GetJson(model.OwningWorkingTree);
-
-                    Clipboard.SetText(json);
-
-                    var path = string.Empty;
-
-                    var dialog = new OpenFolderDialog
-                    {
-                        Title = "Выберите директорию",
-                        Multiselect = false,
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        path = dialog.FolderName;
-                    }
-
-                    string file = System.IO.Path.Combine(path, $"philadelphus-export-{Guid.CreateVersion7()}.phjson");
-                    File.WriteAllText(file, json, Encoding.UTF8);
-
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = file,
-                        UseShellExecute = true
-                    });
-                },
-                ce =>
-                {
-                    return CanModifyRepository() && SelectedRepositoryMember is TreeRootVM;
-                });
-            }
-        }
-
-        public RelayCommand ImportFromPhjsonCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var dialog = new OpenFileDialog
-                    {
-                        Title = "Выберите файл",
-                        Multiselect = false,
-                        Filter = "PHJSON файлы (*.phjson)|*.phjson",
-                        FilterIndex = 1,
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        var file = dialog.FileName;
-
-                        _ = Task.Run(() =>
-                        {
-                            var json = File.ReadAllText(file);
-
-                            JsonImportExportHelper.ParseJson(json, _service, PhiladelphusRepositoryVM.Model, OnProcessChanged, OnProgressChanged);
-
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                var root = PhiladelphusRepositoryVM?.Model?.ContentShrub?.ContentWorkingTrees?.Last()?.ContentRoot;
-                                var rootVM = new TreeRootVM(root, _dataStoragesCollectionVM, _service);
-
-                                PhiladelphusRepositoryVM.Childs.Add(rootVM);
-                            });
-                        });
-                    }
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
-            }
-        }
-
-        public RelayCommand ConvertXlsxToPhjsonCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var window = _serviceProvider.GetRequiredService<ImportFromExcelWindow>();
-                    window.InitializeForConvert();
-                    window.ShowDialog();
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
-            }
-        }
-
-        public RelayCommand ImportTreeFromXlsxCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    if (PhiladelphusRepositoryVM.Model.ContentShrub == null)
-                    {
-                        MessageBox.Show("Активный репозиторий не содержит рабочего дерева для импорта.", "Импорт Excel", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
-                    window.Owner = Application.Current?.MainWindow;
-                    window.Initialize(
-                        PhiladelphusRepositoryVM.Model.ContentShrub,
-                        PhiladelphusRepositoryVM.Model,
-                        _service,
-                        () =>
-                        {
-                            UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryVM.Model);
-                        });
-                    window.ShowDialog();
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
-            }
-        }
-
         /// <summary>
         /// Перестраивает таблицу наследников, если после редактирования Sequence порядок строк стал устаревшим.
         /// </summary>
@@ -746,6 +624,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             NotifyRepositoryTreeChanged();
         }
 
+        /// <summary>
+        /// Добавляет корневой узел рабочего дерева в отображаемый репозиторий.
+        /// </summary>
+        /// <param name="treeRoot">Корневой узел рабочего дерева.</param>
+        /// <exception cref="ArgumentNullException">Если корневой узел не задан.</exception>
+        public void AddTreeRoot(TreeRootModel treeRoot)
+        {
+            ArgumentNullException.ThrowIfNull(treeRoot);
+
+            _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(treeRoot, _dataStoragesCollectionVM, _service));
+            NotifyRepositoryTreeChanged();
+        }
+
+        /// <summary>
+        /// Обновляет отображаемое дерево репозитория из текущей доменной модели.
+        /// </summary>
+        public void RefreshRepositoryView()
+        {
+            UpdateLoadedPhiladelphusRepository(_philadelphusRepositoryVM.Model);
+        }
+
         private int BeginRepositoryLoad()
         {
             IsRepositoryLoading = true;
@@ -774,7 +673,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
         }
 
-        private IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(Guid uuid)
+        internal IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(Guid uuid)
         {
             ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
@@ -854,7 +753,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Колонки строятся по текущему элементу и его видимым для наследников атрибутам,
         /// строки - по рекурсивному списку наследников. После перестроения флаг устаревшего порядка сбрасывается.
         /// </remarks>
-        private void RebuildChildCollectionTable()
+        internal void RebuildChildCollectionTable()
         {
             var children = GetSelectedRepositoryMemberChildren();
 
@@ -900,10 +799,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             if (target.Model is IAttributeOwnerModel attributeOwner
                 && attributeOwner.Attributes?.Any(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal)) == true)
             {
+                var changedAttribute = attributeOwner.Attributes.First(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal));
+                FormulaBarVM.NotifyAttributeValueChanged(changedAttribute);
                 targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
             }
 
-            if (columnKey == nameof(ISequencableModel.Sequence))
+            if (columnKey == nameof(IChildrenModel.SequencePath))
             {
                 _isChildCollectionTableOrderStale = true;
                 CommandManager.InvalidateRequerySuggested();
@@ -1030,29 +931,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return true;
         }
 
-        private void OnProcessChanged(string currentProcess)
-        {
-            ArgumentNullException.ThrowIfNull(currentProcess);
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                CurrentProcess = currentProcess;
-                OnPropertyChanged(nameof(CurrentProcess));
-            });
-        }
-
-        private void OnProgressChanged(int currentNumber, int totalCount)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(currentNumber);
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalCount);
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round(((double)currentNumber / (double)totalCount * 100), 1)} %)";
-                OnPropertyChanged(nameof(CurrentProgress));
-            });
-        }
-
         /// <summary>
         /// Освобождает ресурсы обозревателя репозитория.
         /// </summary>
@@ -1067,6 +945,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             Interlocked.Increment(ref _repositoryLoadVersion);
         }
 
+        internal void NotifyFormulaPropertyListChanged()
+        {
+            OnPropertyChanged(nameof(PropertyList));
+        }
+
+        internal void NotifyRepositoryStateChanged()
+        {
+            _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+        }
+
         #endregion
+
     }
 }

@@ -8,7 +8,6 @@
              xmlns:mainentities="clr-namespace:Philadelphus.Core.Domain.Entities.MainEntities;assembly=Philadelphus.Core.Domain"
              xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
              xmlns:detail="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids"
-             xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -120,35 +119,7 @@
                          Visibility="{Binding ParentControlVisibility}">
                         <TabControl>
                             <TabItem Header="Плоская таблица">
-                                <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns, чтобы ViewModel
-                                 оставалась независимой от WPF DataGrid и code-behind. -->
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"></RowDefinition>
-                                        <RowDefinition Height="auto"></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <DataGrid x:Name="SelectedElementChildsDataGrid" 
-                                              Grid.Row="0"
-                                              Margin="1"
-                                              MinHeight="50"
-                                              AutoGenerateColumns="False"
-                                              CanUserAddRows="False"
-                                              CanUserDeleteRows="False"
-                                              EnableRowVirtualization="True"
-                                              EnableColumnVirtualization="True"
-                                              HorizontalScrollBarVisibility="Auto"
-                                              VerticalScrollBarVisibility="Auto"
-                                              IsReadOnly="False"
-                                              behaviors:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}"
-                                              behaviors:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
-                                              ItemsSource="{Binding ChildCollectionTableRows}">
-                                    </DataGrid>
-                                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                                        <TextBlock Text="{Binding SelectedIndex,ElementName=SelectedElementChildsDataGrid,Converter={StaticResource selectedIndexConverter}}" FontSize="10"></TextBlock>
-                                        <TextBlock Text=" / " FontSize="10"></TextBlock>
-                                        <TextBlock Text="{Binding Items.Count,ElementName=SelectedElementChildsDataGrid}" FontSize="10"></TextBlock>
-                                    </StackPanel>
-                                </Grid>
+                                <local:RepositoryExplorerChildrenFlatTable />
                             </TabItem>
                             <TabItem Header="Перекрестная таблица значений" 
                                  Visibility="Collapsed">

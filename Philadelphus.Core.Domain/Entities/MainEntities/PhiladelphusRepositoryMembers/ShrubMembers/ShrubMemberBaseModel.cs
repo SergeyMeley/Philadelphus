@@ -30,11 +30,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private List<ElementAttributeModel> _attributes = new List<ElementAttributeModel>();
         private IReadOnlyList<ElementAttributeModel> _cachedAttributes;
 
-        private long _sequence;
+        protected long _sequence;
 
         private object _lockObject = new();
         private int _version = 0;
         private int _cachedVersion = -1;
+        private int _attributesListRecalculationSuspendCount;
 
         #endregion
 
@@ -45,7 +46,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Порядковый номер
         /// </summary>
-        [Display(Name = "№", Description = "Порядковый номер")]
+        [Display(Name = "[№]", Description = "Порядковый номер")]
         public long Sequence
         {
             get => GetValue(_sequence);
@@ -65,19 +66,19 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Кустарник рабочих деревьев
         /// </summary>
-        [Display(Name = "Кустарник", Description = "Владеющий кустарник")]
+        [Display(Name = "[Кустарник]", Description = "Владеющий кустарник")]
         public ShrubModel OwningShrub { get; }
 
         /// <summary>
         /// Содержимое
         /// </summary>
-        [Display(Name = "Содержимое", Description = "Содержимое")]
+        [Display(Name = "[Содержимое]", Description = "Содержимое")]
         public abstract ReadOnlyDictionary<Guid, IContentModel> Content { get; }
 
         /// <summary>
         /// Все содержимое (рекурсивно)
         /// </summary>
-        [Display(Name = "Все содержимое", Description = "Все содержимое")]
+        [Display(Name = "[Все содержимое]", Description = "Все содержимое")]
         public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
             get => throw new NotImplementedException(); 
@@ -86,11 +87,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Атрибуты (собственные и унаследованные)
         /// </summary>
-        [Display(Name = "Атрибуты", Description = "Атрибуты (собственные и унаследованные)")]
+        [Display(Name = "[Атрибуты]", Description = "Атрибуты (собственные и унаследованные)")]
         public IReadOnlyList<ElementAttributeModel> Attributes 
         {
             get
             {
+                if (_attributesListRecalculationSuspendCount > 0)
+                {
+                    return _attributes.AsReadOnly();
+                }
+
                 if (_cachedVersion != _version)
                 {
                     lock (_lockObject)
@@ -131,7 +137,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                                     }
                                     else
                                     {
-                                        newParentAttributes.Add(attribute.CloneForChild(this));
+                                        var inheritedAttribute = attribute.CloneForChild(this);
+                                        inheritedAttribute.AssignInheritedAutoSequence(
+                                            attributes
+                                                .Concat(oldParentAttributes)
+                                                .Concat(newParentAttributes)
+                                                .Select(x => x.Sequence));
+                                        newParentAttributes.Add(inheritedAttribute);
                                     }
                                 }
                             }
@@ -148,7 +160,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Собственные атрибуты
         /// </summary>
-        [Display(Name = "Собственные атрибуты", Description = "Собственные атрибуты")]
+        [Display(Name = "[Собственные атрибуты]", Description = "Собственные атрибуты")]
         public IReadOnlyList<ElementAttributeModel> PersonalAttributes 
         { 
             get => Attributes?.Where(x => x.IsOwn).ToList(); 
@@ -157,7 +169,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <summary>
         /// Унаследованные атрибуты
         /// </summary>
-        [Display(Name = "Унаследованные атрибуты", Description = "Унаследованные атрибуты")]
+        [Display(Name = "[Унаследованные атрибуты]", Description = "Унаследованные атрибуты")]
         public IReadOnlyList<ElementAttributeModel> ParentElementAttributes
         {
             get => Attributes?.Where(x => x.IsOwn == false).ToList();
@@ -265,6 +277,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         void IAttributeOwnerModel.MarkAsNeedRecalculateAttributesList()
         {
             _version++;
+            if (_attributesListRecalculationSuspendCount > 0)
+            {
+                return;
+            }
+
             if (this is IParentModel p)
             {
                 foreach (var c in p.Childs)
@@ -274,6 +291,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                         ao.MarkAsNeedRecalculateAttributesList();
                     }
                 }
+            }
+        }
+
+        void IAttributeOwnerModel.SuspendAttributesListRecalculation()
+        {
+            _attributesListRecalculationSuspendCount++;
+        }
+
+        void IAttributeOwnerModel.ResumeAttributesListRecalculation()
+        {
+            if (_attributesListRecalculationSuspendCount <= 0)
+            {
+                return;
+            }
+
+            _attributesListRecalculationSuspendCount--;
+            if (_attributesListRecalculationSuspendCount == 0)
+            {
+                ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
             }
         }
 
@@ -311,6 +347,25 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                 ((IAttributeOwnerModel)this).MarkAsNeedRecalculateAttributesList();
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Присвоить автоматически сгенерированный порядковый номер.
+        /// </summary>
+        /// <param name="existSequences">Занятые порядковые номера.</param>
+        /// <returns>Присвоенный порядковый номер.</returns>
+        public long AssignAutoSequence(IEnumerable<long>? existSequences = null)
+        {
+            foreach (var sequence in SequenceHelper.GetNewSequences(existSequences ?? Enumerable.Empty<long>()))
+            {
+                Sequence = sequence;
+                if (Sequence == sequence)
+                {
+                    return Sequence;
+                }
+            }
+
+            throw new InvalidOperationException("Не удалось присвоить свободный порядковый номер.");
         }
 
         /// <summary>

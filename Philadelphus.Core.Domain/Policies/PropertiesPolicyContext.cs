@@ -9,6 +9,7 @@ namespace Philadelphus.Core.Domain.Policies
     /// </summary>
     internal class PropertiesPolicyContext
     {
+        private readonly object _syncRoot = new();
         private readonly HashSet<(object, object, string)> _readingProps = new();
         private readonly HashSet<(object, string)> _writingProps = new();
 
@@ -21,7 +22,10 @@ namespace Philadelphus.Core.Domain.Policies
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool Enter(object model, object field, string prop)
         {
-            return _readingProps.Add((model, field, prop));
+            lock (_syncRoot)
+            {
+                return _readingProps.Add((model, field, prop));
+            }
         }
 
         /// <summary>
@@ -32,7 +36,10 @@ namespace Philadelphus.Core.Domain.Policies
         /// <param name="prop">Свойство.</param>
         public void Exit(object model, object field, string prop)
         {
-            _readingProps.Remove((model, field, prop));
+            lock (_syncRoot)
+            {
+                _readingProps.Remove((model, field, prop));
+            }
         }
 
         /// <summary>
@@ -44,7 +51,10 @@ namespace Philadelphus.Core.Domain.Policies
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool IsInProgress(object model, object field, string prop)
         {
-            return _readingProps.Contains((model, field, prop));
+            lock (_syncRoot)
+            {
+                return _readingProps.Contains((model, field, prop));
+            }
         }
 
         /// <summary>
@@ -55,7 +65,10 @@ namespace Philadelphus.Core.Domain.Policies
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool EnterWrite(object model, string prop)
         {
-            return _writingProps.Add((model, prop));
+            lock (_syncRoot)
+            {
+                return _writingProps.Add((model, prop));
+            }
         }
 
         /// <summary>
@@ -65,7 +78,10 @@ namespace Philadelphus.Core.Domain.Policies
         /// <param name="prop">Свойство.</param>
         public void ExitWrite(object model, string prop)
         {
-            _writingProps.Remove((model, prop));
+            lock (_syncRoot)
+            {
+                _writingProps.Remove((model, prop));
+            }
         }
 
         /// <summary>
@@ -76,7 +92,10 @@ namespace Philadelphus.Core.Domain.Policies
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
         public bool IsWriteInProgress(object model, string prop)
         {
-            return _writingProps.Contains((model, prop));
+            lock (_syncRoot)
+            {
+                return _writingProps.Contains((model, prop));
+            }
         }
     }
 }

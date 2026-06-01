@@ -312,6 +312,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.Shrub
                         .HasColumnType("bigint")
                         .HasColumnName("sequence");
 
+                    b.Property<string>("ValueFormula")
+                        .HasColumnType("text")
+                        .HasColumnName("value_formula");
+
                     b.Property<Guid?>("ValueTypeUuid")
                         .HasColumnType("uuid")
                         .HasColumnName("value_type_uuid");

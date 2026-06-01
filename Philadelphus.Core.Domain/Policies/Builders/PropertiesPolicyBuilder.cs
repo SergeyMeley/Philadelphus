@@ -21,6 +21,7 @@ namespace Philadelphus.Core.Domain.Policies.Builders
             {
                 new RequiredNamePropertiesRule<WorkingTreeModel>(notificationService),
                 new ValidNamePropertiesRule<WorkingTreeModel>(notificationService, NameUniquenessStrategy.WorkingTree()),
+                new SequencePropertiesRule<WorkingTreeModel>(notificationService, SequenceUniquenessStrategy.WorkingTree()),
             });
         }
 

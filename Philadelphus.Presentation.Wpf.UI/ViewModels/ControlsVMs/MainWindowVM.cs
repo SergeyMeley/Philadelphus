@@ -9,6 +9,7 @@ using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using System.Reflection;
@@ -22,8 +23,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         private readonly ExtensionsControlVM _extensionsControlVM;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
+        private readonly ImportExportControlVM _importExportControlVM;
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
         private readonly ReportsControlVM _reportsControlVM;
+        private readonly FormulaTestControlVM _formulaTestControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
 
         /// <summary>
@@ -42,6 +45,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return _repositoryExplorerControlVM;
             }
         }
+        public ImportExportControlVM ImportExportVM
+        {
+            get
+            {
+                return _importExportControlVM;
+            }
+        }
         public ApplicationSettingsControlVM ApplicationSettingsControlVM
         {
             get
@@ -54,6 +64,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             get
             {
                 return _reportsControlVM;
+            }
+        }
+
+        /// <summary>
+        /// Модель представления тестового интерфейса Formula Engine.
+        /// </summary>
+        public FormulaTestControlVM FormulaTestControlVM
+        {
+            get
+            {
+                return _formulaTestControlVM;
             }
         }
         public string Title
@@ -128,6 +149,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(mainWindowNotificationsVM);
 
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
+            _importExportControlVM = ActivatorUtilities.CreateInstance<ImportExportControlVM>(_serviceProvider, repositoryExplorerControlVM);
+            _formulaTestControlVM = ActivatorUtilities.CreateInstance<FormulaTestControlVM>(_serviceProvider, repositoryExplorerControlVM);
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _reportsControlVM = reportsControlVM;
@@ -142,6 +165,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда выполнения операции стартового окна.
         /// </summary>
         public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
+
+        /// <summary>
+        /// Команда открытия редактора формул.
+        /// </summary>
+        public RelayCommand OpenFormulaEditorWindowCommand => _applicationCommandsVM.OpenFormulaEditorWindowCommand;
+
         public RelayCommand OpenRepositoryMemberDetailsWindowCommand
         {
             get

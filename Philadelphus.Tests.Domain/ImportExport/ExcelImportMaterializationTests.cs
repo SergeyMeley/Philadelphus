@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 using FluentAssertions;
-using Philadelphus.Core.Domain.ImportExport.Excel;
+using Philadelphus.Infrastructure.ImportExport.Excel;
 using System.Text.Json.Nodes;
 
 namespace Philadelphus.Tests.Domain.ImportExport
@@ -14,10 +14,11 @@ namespace Philadelphus.Tests.Domain.ImportExport
 
             try
             {
+                var sourceReader = new ExcelImportSourceReader();
                 var service = new ConversionService(
                     new ExcelDataTypeDetector(),
-                    new ExcelImportSourceReader(),
-                    new ExcelImportInheritanceResolver());
+                    sourceReader,
+                    new ExcelImportProfileResolver(new ExcelImportSettingsReader(sourceReader)));
                 var schema = CreateSchema(filePath);
 
                 var json = service.ProcessSchema(schema);
@@ -39,6 +40,8 @@ namespace Philadelphus.Tests.Domain.ImportExport
                     .Single(x => x!["name"]!.GetValue<string>() == "ParentId")!
                     .AsObject();
                 parentIdDefinition["dataTypeNodeName"]!.GetValue<string>().Should().Be("ParentsNode");
+                parentIdDefinition["visibility"]!.GetValue<string>().Should().Be("Public");
+                parentIdDefinition["override"]!.GetValue<string>().Should().Be("Virtual");
 
                 var child1 = childNode["childLeaves"]!.AsArray()
                     .Single(x => x!["name"]!.GetValue<string>() == "Child 1")!
@@ -49,12 +52,12 @@ namespace Philadelphus.Tests.Domain.ImportExport
 
                 child1ParentReference["dataTypeNodeName"]!.GetValue<string>().Should().Be("ParentsNode");
                 child1ParentReference["valueLeaveName"]!.GetValue<string>().Should().Be("Parent A");
+                child1ParentReference["visibility"]!.GetValue<string>().Should().Be("Public");
+                child1ParentReference["override"]!.GetValue<string>().Should().Be("Virtual");
                 child1["attributes"]!.AsArray()
                     .Where(x => x!["name"]!.GetValue<string>() == "ParentId")
                     .Should().HaveCount(1);
 
-                json.Should().NotContain("\"override\"");
-                json.Should().NotContain("\"visibility\"");
                 json.Should().NotContain("\"isCollectionValue\"");
             }
             finally

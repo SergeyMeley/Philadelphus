@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
@@ -47,6 +48,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.DeclaringOwnerUuid, opt => opt.MapFrom(src => src.DeclaringOwner != null ? src.DeclaringOwner.Uuid : Guid.Empty))
                 .ForMember(dest => dest.ValueTypeUuid, opt => opt.Ignore())     // Сложная логика
                 .ForMember(dest => dest.ValueUuid, opt => opt.Ignore())         // Сложная логика
+                .ForMember(dest => dest.ValueFormula, opt => opt.MapFrom(src => src.ValueFormula))
+                .ForSourceMember(src => src.ValueFormulaErrorCode, opt => opt.DoNotValidate())
                 .ForMember(dest => dest.IsCollectionValue, opt => opt.MapFrom(src => src.IsCollectionValue))
                 .ForMember(dest => dest.ValuesUuids, opt => opt.Ignore())       // Сложная логика
                 .ForMember(dest => dest.VisibilityId, opt => opt.MapFrom(src => (int)src.Visibility))
@@ -93,6 +96,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                     var owningTree = ctx.Items["OwningWorkingTree"] as WorkingTreeModel;
                     var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
+                    var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<ElementAttributeModel>)] as IPropertiesPolicy<ElementAttributeModel>
+                        ?? AttributePolicyBuilder.CreateDefault(notificationService);
 
                     var result = new ElementAttributeModel(
                         src.Uuid,
@@ -101,7 +106,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         declaringOwner,
                         owningTree,
                         notificationService,
-                        AttributePolicyBuilder.CreateDefault(notificationService));
+                        propertiesPolicy);
 
                     return result;
                 })
@@ -115,6 +120,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                 .ForMember(dest => dest.ValueType, opt => opt.Ignore())     // Сложная логика
                 .ForMember(dest => dest.Value, opt => opt.Ignore())         // Сложная логика  
+                .ForMember(dest => dest.ValueFormula, opt => opt.Ignore())  // Загружается напрямую, без доменных политик
+                .ForMember(dest => dest.ValueFormulaErrorCode, opt => opt.Ignore())
                 .ForMember(dest => dest.IsCollectionValue, opt => opt.MapFrom(src => src.IsCollectionValue))
                 .ForMember(dest => dest.Values, opt => opt.Ignore())        // Сложная логика
                 .ForMember(dest => dest.Visibility, opt => opt.MapFrom(src => (VisibilityScope)src.VisibilityId))
@@ -161,6 +168,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             }
                         }
                     }
+
+                    dest.LoadValueFormula(src.ValueFormula);
                 });
         }
     }

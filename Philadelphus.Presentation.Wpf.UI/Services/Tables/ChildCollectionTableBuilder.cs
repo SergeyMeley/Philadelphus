@@ -62,13 +62,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                     typeof(IMainEntityModel),
                     nameof(IMainEntityModel.State)),
                 CreateColumn(
-                    nameof(ISequencableModel.Sequence),
+                    nameof(IChildrenModel.SequencePath),
                     1,
-                    child => child is ISequencableModel sequencable ? sequencable.Sequence : null,
-                    typeof(ISequencableModel),
-                    nameof(ISequencableModel.Sequence),
+                    child => NullIfEmpty(child.SequencePath),
+                    typeof(IChildrenModel),
+                    nameof(IChildrenModel.SequencePath),
                     isReadOnly: false,
-                    setterFactory: GetSequenceSetter),
+                    setterFactory: GetSequencePathSetter),
                 CreateColumn(
                     nameof(IMainEntityModel.Type),
                     2,
@@ -458,7 +458,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                 && leave.ParentNode.Uuid == node.Uuid;
         }
 
-        private static Func<object?, object?>? GetSequenceSetter(IChildrenModel child)
+        private static Func<object?, object?>? GetSequencePathSetter(IChildrenModel child)
         {
             if (child is not ISequencableModel sequencable
                 || IsWritableProperty(child, nameof(ISequencableModel.Sequence)) == false)
@@ -468,13 +468,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
 
             return value =>
             {
-                if (TryConvertToInt64(value, out var sequence) == false)
+                if (TryConvertSequencePathOwnPart(value, out var sequence) == false)
                 {
-                    return sequencable.Sequence;
+                    return NullIfEmpty(child.SequencePath);
                 }
 
                 sequencable.Sequence = sequence;
-                return sequencable.Sequence;
+                return NullIfEmpty(child.SequencePath);
             };
         }
 
@@ -558,6 +558,27 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
             return long.TryParse(value.ToString(), out result);
         }
 
+        private static bool TryConvertSequencePathOwnPart(object? value, out long result)
+        {
+            if (value is long longValue)
+            {
+                result = longValue;
+                return true;
+            }
+
+            var text = value?.ToString();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                result = 0;
+                return true;
+            }
+
+            var ownPart = text.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .LastOrDefault();
+
+            return long.TryParse(ownPart, out result);
+        }
+
         private static string? GetCustomCode(IChildrenModel child)
         {
             return child switch
@@ -582,6 +603,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                 return attribute.Values == null || attribute.Values.Count == 0
                     ? null
                     : string.Join("; ", attribute.Values.Select(x => x.Name).Where(x => string.IsNullOrWhiteSpace(x) == false));
+            }
+
+            if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false
+                && string.IsNullOrWhiteSpace(attribute.ValueFormulaErrorCode) == false)
+            {
+                return attribute.ValueFormulaErrorCode;
             }
 
             return attribute.Value;

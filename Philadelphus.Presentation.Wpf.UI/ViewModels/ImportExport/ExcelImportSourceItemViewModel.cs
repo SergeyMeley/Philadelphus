@@ -1,4 +1,4 @@
-using Philadelphus.Core.Domain.ImportExport.Excel;
+using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using System;
 

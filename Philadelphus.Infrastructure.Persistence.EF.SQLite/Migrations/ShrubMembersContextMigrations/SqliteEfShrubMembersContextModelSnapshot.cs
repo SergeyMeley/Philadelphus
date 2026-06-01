@@ -304,6 +304,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMemb
                         .HasColumnType("INTEGER")
                         .HasColumnName("sequence");
 
+                    b.Property<string>("ValueFormula")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("value_formula");
+
                     b.Property<Guid?>("ValueTypeUuid")
                         .HasColumnType("TEXT")
                         .HasColumnName("value_type_uuid");

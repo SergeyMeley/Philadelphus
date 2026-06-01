@@ -70,6 +70,59 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Команда открытия редактора формул.
+        /// </summary>
+        public RelayCommand OpenFormulaEditorWindowCommand
+        {
+            get
+            {
+                FormulaEditorWindow? formulaEditorWindow = null;
+
+                return new RelayCommand(obj =>
+                {
+                    var formulaEditorVM = CreateFormulaEditorVM(obj);
+                    if (formulaEditorVM == null)
+                    {
+                        return;
+                    }
+
+                    if (formulaEditorWindow is { IsVisible: true })
+                    {
+                        formulaEditorWindow.DataContext = formulaEditorVM;
+                        formulaEditorWindow.Activate();
+                        return;
+                    }
+
+                    formulaEditorWindow = _serviceProvider.GetRequiredService<FormulaEditorWindow>();
+                    formulaEditorWindow.Owner = Application.Current?.MainWindow;
+                    formulaEditorWindow.DataContext = formulaEditorVM;
+                    formulaEditorWindow.Closed += (_, _) => formulaEditorWindow = null;
+                    formulaEditorWindow.Show();
+                },
+                obj => obj is FormulaTestControlVM or FormulaEditorOpenRequest);
+            }
+        }
+
+        private FormulaTestControlVM? CreateFormulaEditorVM(object obj)
+        {
+            if (obj is FormulaTestControlVM formulaEditorVM)
+            {
+                return formulaEditorVM;
+            }
+
+            if (obj is FormulaEditorOpenRequest request)
+            {
+                var vm = ActivatorUtilities.CreateInstance<FormulaTestControlVM>(
+                    _serviceProvider,
+                    request.RepositoryExplorerControlVM);
+                vm.FormulaText = request.FormulaText ?? string.Empty;
+                return vm;
+            }
+
+            return null;
+        }
+
         public RelayCommand OpenDataStoragesSettingsControlCommand
         {
             get
@@ -83,4 +136,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             }
         }
     }
+
+    /// <summary>
+    /// Запрос открытия редактора формул из интерфейса репозитория.
+    /// </summary>
+    /// <param name="RepositoryExplorerControlVM">Обозреватель репозитория, задающий контекст формулы.</param>
+    /// <param name="FormulaText">Текущий текст формулы.</param>
+    public sealed record FormulaEditorOpenRequest(
+        RepositoryExplorerControlVM RepositoryExplorerControlVM,
+        string? FormulaText);
 }

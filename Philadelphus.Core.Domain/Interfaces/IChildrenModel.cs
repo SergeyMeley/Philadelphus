@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+using Philadelphus.Core.Domain.Helpers;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Philadelphus.Core.Domain.Interfaces
 {
@@ -16,6 +18,12 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// Все родители (рекурсивно)
         /// </summary>
         public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive { get; }
+
+        /// <summary>
+        /// Путь порядковых номеров от родителя к текущему наследнику.
+        /// </summary>
+        [Display(Name = "[№]", Description = "Путь порядковых номеров")]
+        public string SequencePath => SequencePathHelper.GetSequencePath(this);
 
         /// <summary>
         /// Сменить родителя

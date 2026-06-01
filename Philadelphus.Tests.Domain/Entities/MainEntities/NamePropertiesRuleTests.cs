@@ -241,6 +241,33 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void AssignAutoSequence_Should_Use_First_Free_Positive_Value()
+        {
+            var root = CreateRoot();
+            var firstNode = CreateNodeWithDefaultPolicy(root);
+            var secondNode = CreateNodeWithDefaultPolicy(root);
+
+            firstNode.AssignAutoSequence(root.ChildNodes.Select(x => x.Sequence));
+            secondNode.AssignAutoSequence(root.ChildNodes.Select(x => x.Sequence));
+
+            Assert.Equal(10, firstNode.Sequence);
+            Assert.Equal(20, secondNode.Sequence);
+        }
+
+        [Fact]
+        public void AssignAutoSequence_Should_Use_Interval_After_Manual_Max_Value()
+        {
+            var root = CreateRoot();
+            var firstNode = CreateNodeWithDefaultPolicy(root);
+            var secondNode = CreateNodeWithDefaultPolicy(root);
+
+            firstNode.Sequence = 77;
+            secondNode.AssignAutoSequence(root.ChildNodes.Select(x => x.Sequence));
+
+            Assert.Equal(90, secondNode.Sequence);
+        }
+
+        [Fact]
         public void AttributeSequence_Should_Block_Duplicate_Inherited_Attribute_Value()
         {
             var root = CreateRoot();
@@ -253,6 +280,19 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             ownAttribute.Sequence = 10;
 
             Assert.Equal(0, ownAttribute.Sequence);
+        }
+
+        [Fact]
+        public void InheritedAttribute_Should_Get_Owner_Local_Sequence()
+        {
+            var root = CreateRoot();
+            var node = CreateNode(root);
+            var rootAttribute = CreateOwnAttribute(root);
+            rootAttribute.Sequence = 7;
+
+            var inheritedAttribute = rootAttribute.CloneForChild(node);
+
+            Assert.Equal(10, inheritedAttribute.Sequence);
         }
 
         [Fact]

@@ -149,6 +149,31 @@
                         <RibbonButton Label="Удалить пресет" />
                     </RibbonGroup>-->
                 </RibbonTab>
+                <RibbonTab Header="Формулы">
+                    <RibbonGroup Header="Редактор">
+                        <RibbonButton Label="Редактор формул"
+                                      Command="{Binding OpenFormulaEditorWindowCommand}"
+                                      CommandParameter="{Binding FormulaTestControlVM}" />
+                    </RibbonGroup>
+                    <RibbonGroup Header="Пересчет"
+                                 DataContext="{Binding RepositoryExplorerVM.FormulaBarVM}">
+                        <StackPanel>
+                            <TextBlock Text="Пересчет формул" />
+                            <ComboBox ItemsSource="{Binding FormulaRecalculationModes}"
+                                      SelectedItem="{Binding SelectedFormulaRecalculationMode}"
+                                      DisplayMemberPath="DisplayName"
+                                      MinWidth="180" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RibbonButton Label="Пересчитать текущий"
+                                          ToolTip="Пересчитать все формулы для текущего выбранного элемента репозитория."
+                                          Command="{Binding RecalculateCurrentFormulaCommand}" />
+                            <RibbonButton Label="Пересчитать все"
+                                          ToolTip="Пересчитать все формулы для всех элементов репозитория."
+                                          Command="{Binding RecalculateAllFormulasCommand}" />
+                        </StackPanel>
+                    </RibbonGroup>
+                </RibbonTab>
                 <!--<RibbonTab Header="Вставка">
 
                 </RibbonTab>
@@ -156,19 +181,30 @@
 
                 </RibbonTab>-->
                 <RibbonTab Header="Данные">
-                    <RibbonGroup Header="Импорт">
-                        <RibbonButton Label="Импорт дерева из .phjson" Command="{Binding RepositoryExplorerVM.ImportFromPhjsonCommand}" />
-                        <RibbonButton Label="Импорт дерева из .xlsx" Command="{Binding RepositoryExplorerVM.ImportTreeFromXlsxCommand}" />
+                    <RibbonGroup Header="Импорт" ItemsSource="{Binding ImportExportVM.ImportOperations}">
+                        <RibbonGroup.ItemTemplate>
+                            <DataTemplate>
+                                <RibbonButton Label="{Binding Label}" Command="{Binding Command}" />
+                            </DataTemplate>
+                        </RibbonGroup.ItemTemplate>
                     </RibbonGroup>
-                    <RibbonGroup Header="Экспорт">
-                        <RibbonButton Label="Экспорт дерева в .phjson" Command="{Binding RepositoryExplorerVM.ExportToPhjsonCommand}" />
+                    <RibbonGroup Header="Экспорт" ItemsSource="{Binding ImportExportVM.ExportOperations}">
+                        <RibbonGroup.ItemTemplate>
+                            <DataTemplate>
+                                <RibbonButton Label="{Binding Label}" Command="{Binding Command}" />
+                            </DataTemplate>
+                        </RibbonGroup.ItemTemplate>
                     </RibbonGroup>
-                    <RibbonGroup Header="Конвертация">
-                        <RibbonButton Label="Конвертировать .xlsx в .phjson" Command="{Binding RepositoryExplorerVM.ConvertXlsxToPhjsonCommand}" />
+                    <RibbonGroup Header="Конвертация" ItemsSource="{Binding ImportExportVM.ConversionOperations}">
+                        <RibbonGroup.ItemTemplate>
+                            <DataTemplate>
+                                <RibbonButton Label="{Binding Label}" Command="{Binding Command}" />
+                            </DataTemplate>
+                        </RibbonGroup.ItemTemplate>
                     </RibbonGroup>
                     <RibbonGroup Header="Прогресс">
-                        <TextBlock Text="{Binding RepositoryExplorerVM.CurrentProcess}"></TextBlock>
-                        <TextBlock Text="{Binding RepositoryExplorerVM.CurrentProgress}"></TextBlock>
+                        <TextBlock Text="{Binding ImportExportVM.CurrentProcess}"></TextBlock>
+                        <TextBlock Text="{Binding ImportExportVM.CurrentProgress}"></TextBlock>
                     </RibbonGroup>
                 </RibbonTab>
                 <!--<RibbonTab Header="Вид">
