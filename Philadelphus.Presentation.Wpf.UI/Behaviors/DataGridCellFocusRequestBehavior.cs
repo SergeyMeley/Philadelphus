@@ -10,6 +10,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
     /// </summary>
     public static class DataGridCellFocusRequestBehavior
     {
+        /// <summary>
+        /// Идентификатор запроса фокуса. При изменении значения behavior повторно фокусирует ячейку.
+        /// </summary>
         public static readonly DependencyProperty FocusRequestIdProperty =
             DependencyProperty.RegisterAttached(
                 "FocusRequestId",
@@ -17,16 +20,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(DataGridCellFocusRequestBehavior),
                 new PropertyMetadata(0, OnFocusRequestIdChanged));
 
+        /// <summary>
+        /// Возвращает идентификатор последнего запроса фокуса.
+        /// </summary>
         public static int GetFocusRequestId(DependencyObject obj)
         {
             return (int)obj.GetValue(FocusRequestIdProperty);
         }
 
+        /// <summary>
+        /// Устанавливает идентификатор запроса фокуса.
+        /// </summary>
         public static void SetFocusRequestId(DependencyObject obj, int value)
         {
             obj.SetValue(FocusRequestIdProperty, value);
         }
 
+        /// <summary>
+        /// Заголовок колонки, в которую нужно вернуть фокус. Если не задан, используется текущая колонка.
+        /// </summary>
         public static readonly DependencyProperty TargetColumnHeaderProperty =
             DependencyProperty.RegisterAttached(
                 "TargetColumnHeader",
@@ -34,11 +46,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(DataGridCellFocusRequestBehavior),
                 new PropertyMetadata(string.Empty));
 
+        /// <summary>
+        /// Возвращает заголовок целевой колонки для фокуса.
+        /// </summary>
         public static string GetTargetColumnHeader(DependencyObject obj)
         {
             return (string)obj.GetValue(TargetColumnHeaderProperty);
         }
 
+        /// <summary>
+        /// Устанавливает заголовок целевой колонки для фокуса.
+        /// </summary>
         public static void SetTargetColumnHeader(DependencyObject obj, string value)
         {
             obj.SetValue(TargetColumnHeaderProperty, value);
@@ -79,6 +97,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             dataGrid.Focus();
             dataGrid.ScrollIntoView(item, column);
             dataGrid.CurrentCell = new DataGridCellInfo(item, column);
+
+            // В режиме FullRow нельзя вручную изменять SelectedCells: WPF выбрасывает InvalidOperationException.
             if (dataGrid.SelectionUnit == DataGridSelectionUnit.FullRow)
             {
                 dataGrid.SelectedItem = item;

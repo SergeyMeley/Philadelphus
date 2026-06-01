@@ -191,6 +191,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             private set => SetProperty(ref _formulaBarFocusRequestId, value);
         }
 
+        /// <summary>
+        /// Счетчик запросов возврата фокуса в ячейку значения атрибута после применения или отмены строки формул.
+        /// </summary>
         public int FormulaValueCellFocusRequestId
         {
             get => _formulaValueCellFocusRequestId;
@@ -235,48 +238,78 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Подсказки автодополнения для текущей позиции курсора в строке формул.
+        /// </summary>
         public ObservableCollection<FormulaSuggestionVM> FormulaSuggestions { get; } = new ObservableCollection<FormulaSuggestionVM>();
 
+        /// <summary>
+        /// Цветные сегменты подсветки формулы, синхронизированные с текстом строки формул.
+        /// </summary>
         public ObservableCollection<FormulaHighlightSegmentVM> FormulaHighlightSegments { get; } = new ObservableCollection<FormulaHighlightSegmentVM>();
 
+        /// <summary>
+        /// Признак отображения выпадающего списка подсказок.
+        /// </summary>
         public bool IsFormulaSuggestionsOpen
         {
             get => _isFormulaSuggestionsOpen;
             set => SetProperty(ref _isFormulaSuggestionsOpen, value);
         }
 
+        /// <summary>
+        /// Выбранная подсказка автодополнения.
+        /// </summary>
         public FormulaSuggestionVM? SelectedFormulaSuggestion
         {
             get => _selectedFormulaSuggestion;
             set => SetProperty(ref _selectedFormulaSuggestion, value);
         }
 
+        /// <summary>
+        /// Признак отображения подсказки сигнатуры активной функции.
+        /// </summary>
         public bool IsFormulaSignatureHelpOpen
         {
             get => _isFormulaSignatureHelpOpen;
             private set => SetProperty(ref _isFormulaSignatureHelpOpen, value);
         }
 
+        /// <summary>
+        /// Текст сигнатуры активной функции.
+        /// </summary>
         public string FormulaSignatureText
         {
             get => _formulaSignatureText;
             private set => SetProperty(ref _formulaSignatureText, value);
         }
 
+        /// <summary>
+        /// Описание активного аргумента функции.
+        /// </summary>
         public string FormulaActiveArgumentText
         {
             get => _formulaActiveArgumentText;
             private set => SetProperty(ref _formulaActiveArgumentText, value);
         }
 
+        /// <summary>
+        /// Признак отображения цветовой подсветки формулы.
+        /// </summary>
         public bool IsFormulaHighlightOpen
         {
             get => _isFormulaHighlightOpen;
             private set => SetProperty(ref _isFormulaHighlightOpen, value);
         }
 
+        /// <summary>
+        /// Доступные режимы пересчета формул репозитория.
+        /// </summary>
         public IReadOnlyList<FormulaRecalculationModeVM> FormulaRecalculationModes { get; }
 
+        /// <summary>
+        /// Выбранный режим пересчета формул.
+        /// </summary>
         public FormulaRecalculationModeVM SelectedFormulaRecalculationMode
         {
             get => _selectedFormulaRecalculationMode;
@@ -362,6 +395,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Команда пересчета всех формул текущего выбранного элемента репозитория.
+        /// </summary>
         public RelayCommand RecalculateCurrentFormulaCommand
         {
             get
@@ -370,6 +406,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Команда пересчета всех формул во всех элементах репозитория.
+        /// </summary>
         public RelayCommand RecalculateAllFormulasCommand
         {
             get
@@ -378,6 +417,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Обрабатывает изменение значения атрибута и запускает пересчет зависимых формул согласно выбранному режиму.
+        /// </summary>
         public void NotifyAttributeValueChanged(ElementAttributeModel attribute)
         {
             if (_repositoryExplorerVM.IsRepositoryLoading)
@@ -394,6 +436,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             RecalculateFormulasAfterChange(attribute);
         }
 
+        /// <summary>
+        /// Обрабатывает смену выбранного элемента репозитория для режима "Авто для текущего элемента".
+        /// </summary>
         public void NotifySelectedRepositoryMemberChanged()
         {
             if (SelectedFormulaRecalculationMode.Value == FormulaRecalculationMode.AutoCurrentElement)
@@ -402,6 +447,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Обновляет подсказки автодополнения и сигнатуру функции для текущей позиции курсора.
+        /// </summary>
         public void UpdateFormulaSuggestions(int caretIndex)
         {
             FormulaSuggestions.Clear();
@@ -443,6 +491,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IsFormulaSuggestionsOpen = FormulaSuggestions.Count > 0;
         }
 
+        /// <summary>
+        /// Перемещает выбор внутри списка подсказок автодополнения.
+        /// </summary>
         public void MoveFormulaSuggestionSelection(int offset)
         {
             if (FormulaSuggestions.Count == 0)
@@ -458,11 +509,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             SelectedFormulaSuggestion = FormulaSuggestions[nextIndex];
         }
 
+        /// <summary>
+        /// Закрывает список подсказок автодополнения.
+        /// </summary>
         public void CloseFormulaSuggestions()
         {
             IsFormulaSuggestionsOpen = false;
         }
 
+        /// <summary>
+        /// Вставляет выбранную подсказку в строку формул и возвращает новую позицию курсора.
+        /// </summary>
         public int ApplySelectedFormulaSuggestion(int caretIndex)
         {
             if (SelectedFormulaSuggestion is null
@@ -480,6 +537,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return prefixStart + completion.CaretOffset;
         }
 
+        /// <summary>
+        /// Ищет позицию парной скобки для навигации внутри формулы.
+        /// </summary>
         public bool TryGetMatchingParenthesisCaretIndex(int caretIndex, out int matchingCaretIndex)
         {
             matchingCaretIndex = caretIndex;
@@ -491,6 +551,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 out matchingCaretIndex);
         }
 
+        /// <summary>
+        /// Возвращает диапазон текущего вызова функции для выделения в строке формул.
+        /// </summary>
         public bool TryGetCurrentFormulaCallSelection(
             int caretIndex,
             out int selectionStart,
@@ -731,20 +794,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     text.Trim(),
                     new HashSet<Guid>(),
                     new HashSet<Guid>());
-                /*
-                var result = _formulaEvaluator.Evaluate(text, CreateFormulaExecutionContext(targetAttribute));
-                if (result.IsSuccess == false)
-                {
-                    targetAttribute.ValueFormula = text.Trim();
-                    targetAttribute.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
-                    _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
-                        $"Формула сохранена, но не вычислена: {result.Error?.Message}",
-                        NotificationCriticalLevelModel.Warning);
-                    return true;
-                }
-
-                return TryApplyFormulaResult(targetAttribute, result, text.Trim());
-                */
             }
 
             return TryApplyPlainFormulaBarText(targetAttribute, text);
@@ -919,6 +968,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     .Any(x => string.IsNullOrWhiteSpace(x.ValueFormula) == false) == true;
         }
 
+        /// <summary>
+        /// Пересчитывает все формулы владельца атрибутов, выбранного в обозревателе репозитория.
+        /// </summary>
         private void RecalculateCurrentFormula()
         {
             if (_repositoryExplorerVM.IsRepositoryLoading)
@@ -957,6 +1009,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return _repositoryExplorerVM.SelectedRepositoryMember?.Model as IAttributeOwnerModel;
         }
 
+        /// <summary>
+        /// Пересчитывает все формулы во всех деревьях, узлах и листьях репозитория.
+        /// </summary>
         private void RecalculateAllFormulas()
         {
             var recalculated = new HashSet<Guid>();
@@ -981,6 +1036,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 .ToList();
         }
 
+        /// <summary>
+        /// Перечисляет всех владельцев атрибутов, у которых потенциально могут храниться формулы.
+        /// </summary>
         private IEnumerable<IAttributeOwnerModel> GetAllRepositoryAttributeOwners()
         {
             var trees = _repositoryExplorerVM.PhiladelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees;
@@ -1021,6 +1079,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
+        /// <summary>
+        /// Рекурсивно пересчитывает формулу атрибута с предварительным пересчетом формульных зависимостей.
+        /// </summary>
         private bool RecalculateFormulaAttribute(
             ElementAttributeModel attribute,
             string? formulaTextOverride,
@@ -1049,6 +1110,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return false;
             }
 
+            // Сначала пересчитываем формулы, на которые ссылается текущая формула,
+            // чтобы результат не зависел от устаревших вычисленных значений.
             foreach (var dependency in GetReferencedFormulaAttributes(attribute, formulaText))
             {
                 if (RecalculateFormulaAttribute(dependency, null, stack, recalculated) == false)
@@ -1086,6 +1149,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return isApplied;
         }
 
+        /// <summary>
+        /// Находит формульные атрибуты того же владельца, на которые ссылается переданная формула.
+        /// </summary>
         private IEnumerable<ElementAttributeModel> GetReferencedFormulaAttributes(
             ElementAttributeModel targetAttribute,
             string formulaText)
@@ -1870,13 +1936,32 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         int RowNumber,
         bool IsAttribute);
 
+    /// <summary>
+    /// Режим пересчета формул репозитория.
+    /// </summary>
     public enum FormulaRecalculationMode
     {
+        /// <summary>
+        /// Формулы пересчитываются только по явной команде пользователя.
+        /// </summary>
         Manual,
+
+        /// <summary>
+        /// При изменении значения пересчитываются все формулы репозитория.
+        /// </summary>
         Auto,
+
+        /// <summary>
+        /// При изменении значения пересчитываются формулы текущего элемента и их зависимости.
+        /// </summary>
         AutoCurrentElement
     }
 
+    /// <summary>
+    /// Элемент выпадающего списка режимов пересчета формул.
+    /// </summary>
+    /// <param name="Value">Значение режима пересчета.</param>
+    /// <param name="DisplayName">Отображаемое наименование режима.</param>
     public sealed record FormulaRecalculationModeVM(
         FormulaRecalculationMode Value,
         string DisplayName);

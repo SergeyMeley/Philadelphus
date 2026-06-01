@@ -102,5 +102,13 @@ namespace Philadelphus.Tests.Domain.Fakes.Entities
         {
             throw new NotImplementedException();
         }
+
+        void IAttributeOwnerModel.SuspendAttributesListRecalculation()
+        {
+        }
+
+        void IAttributeOwnerModel.ResumeAttributesListRecalculation()
+        {
+        }
     }
 }
