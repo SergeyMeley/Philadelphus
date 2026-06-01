@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 {
@@ -84,6 +85,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new PropertyMetadata(false, OnTrackChanged));
 
+        public static readonly DependencyProperty FocusRequestIdProperty =
+            DependencyProperty.RegisterAttached(
+                "FocusRequestId",
+                typeof(int),
+                typeof(FormulaBarTextBoxBehavior),
+                new PropertyMetadata(0, OnFocusRequestIdChanged));
+
         public static bool GetTrack(DependencyObject obj)
         {
             return (bool)obj.GetValue(TrackProperty);
@@ -92,6 +100,16 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
         public static void SetTrack(DependencyObject obj, bool value)
         {
             obj.SetValue(TrackProperty, value);
+        }
+
+        public static int GetFocusRequestId(DependencyObject obj)
+        {
+            return (int)obj.GetValue(FocusRequestIdProperty);
+        }
+
+        public static void SetFocusRequestId(DependencyObject obj, int value)
+        {
+            obj.SetValue(FocusRequestIdProperty, value);
         }
 
         private static void OnTrackChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
@@ -203,6 +221,34 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             var maxLength = Math.Max(0, (textBox.Text?.Length ?? 0) - textBox.SelectionStart);
             textBox.SelectionLength = Math.Clamp(selectionLength, 0, maxLength);
+        }
+
+        private static void OnFocusRequestIdChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        {
+            if (dependencyObject is not TextBox textBox
+                || Equals(e.OldValue, e.NewValue))
+            {
+                return;
+            }
+
+            textBox.Dispatcher.BeginInvoke(
+                () =>
+                {
+                    if (textBox.IsEnabled == false)
+                    {
+                        return;
+                    }
+
+                    textBox.Focus();
+                    Keyboard.Focus(textBox);
+                    textBox.SelectionStart = Math.Clamp(GetSelectionStart(textBox), 0, textBox.Text?.Length ?? 0);
+                    textBox.SelectionLength = Math.Clamp(
+                        GetSelectionLength(textBox),
+                        0,
+                        Math.Max(0, (textBox.Text?.Length ?? 0) - textBox.SelectionStart));
+                    textBox.CaretIndex = Math.Clamp(GetCaretIndex(textBox), 0, textBox.Text?.Length ?? 0);
+                },
+                DispatcherPriority.Input);
         }
 
         private static void UpdateSelection(TextBox textBox)

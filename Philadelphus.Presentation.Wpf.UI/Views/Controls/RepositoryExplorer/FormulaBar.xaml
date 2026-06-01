@@ -151,6 +151,7 @@
                          behaviors:FormulaBarTextBoxBehavior.CaretIndex="{Binding FormulaBarCaretIndex, Mode=TwoWay}"
                          behaviors:FormulaBarTextBoxBehavior.SelectionStart="{Binding FormulaBarSelectionStart, Mode=TwoWay}"
                          behaviors:FormulaBarTextBoxBehavior.SelectionLength="{Binding FormulaBarSelectionLength, Mode=TwoWay}"
+                         behaviors:FormulaBarTextBoxBehavior.FocusRequestId="{Binding FormulaBarFocusRequestId, Mode=OneWay}"
                          BorderThickness="0"
                          Background="Transparent"
                          CaretBrush="Black"

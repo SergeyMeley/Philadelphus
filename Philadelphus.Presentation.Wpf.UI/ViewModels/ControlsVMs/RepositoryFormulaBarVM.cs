@@ -45,6 +45,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private int _formulaBarCaretIndex;
         private int _formulaBarSelectionStart;
         private int _formulaBarSelectionLength;
+        private int _formulaBarFocusRequestId;
         private bool _isFormulaBarEditing;
         private bool _isFormulaBarEnabled;
         private bool _isFormulaSuggestionsOpen;
@@ -150,6 +151,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             get => _formulaBarSelectionLength;
             set => SetProperty(ref _formulaBarSelectionLength, value);
+        }
+
+        /// <summary>
+        /// Счетчик запросов возврата фокуса в строку формул.
+        /// </summary>
+        public int FormulaBarFocusRequestId
+        {
+            get => _formulaBarFocusRequestId;
+            private set => SetProperty(ref _formulaBarFocusRequestId, value);
         }
 
         /// <summary>
@@ -828,6 +838,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             if (_formulaBarTarget.TargetAttribute.Uuid == referencedAttribute.Uuid)
             {
+                RequestFormulaBarFocus();
                 return true;
             }
 
@@ -836,6 +847,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
                     "Относительная ссылка АТРИБУТ доступна только для атрибутов одного и того же элемента.",
                     NotificationCriticalLevelModel.Warning);
+                RequestFormulaBarFocus();
                 return true;
             }
 
@@ -867,7 +879,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaBarCaretIndex = replacementStart + reference.Length;
             FormulaBarSelectionStart = FormulaBarCaretIndex;
             FormulaBarSelectionLength = 0;
+            RequestFormulaBarFocus();
             return true;
+        }
+
+        private void RequestFormulaBarFocus()
+        {
+            FormulaBarFocusRequestId++;
         }
 
         private static bool CanUseRelativeAttributeReference(
