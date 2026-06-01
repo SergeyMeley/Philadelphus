@@ -32,6 +32,11 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Att
         /// Уникальный идентификатор значения.
         /// </summary>
         public Guid? ValueUuid { get; set; }
+
+        /// <summary>
+        /// Формула одиночного значения.
+        /// </summary>
+        public string? ValueFormula { get; set; }
        
         /// <summary>
         /// Признак коллекции значений.

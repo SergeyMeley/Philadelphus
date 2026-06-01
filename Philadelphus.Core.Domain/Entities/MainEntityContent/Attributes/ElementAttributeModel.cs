@@ -37,6 +37,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private bool _isCollectionValue = false;
         private TreeNodeModel _valueType;
         private TreeLeaveModel _value;
+        private string _valueFormula = string.Empty;
+        private string _valueFormulaErrorCode = string.Empty;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private bool _isValueOverridden;    // Признак того, что одиночное значение унаследованного атрибута было переопределено локально.
         private bool _areValuesOverridden;  // Признак того, что коллекция значений унаследованного атрибута была переопределена локально.
@@ -102,6 +104,37 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                     _isValueOverridden = SameValue(value, inheritedValue) == false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Формула одиночного значения атрибута.
+        /// </summary>
+        public string ValueFormula
+        {
+            get => GetValue(GetEffectiveValueFormula());
+            set
+            {
+                value ??= string.Empty;
+
+                var inheritedFormula = _inheritedAttributeFromParent?.ValueFormula ?? string.Empty;
+                var alreadyLocalFormula = string.Equals(value, _valueFormula, StringComparison.Ordinal);
+                var formulaChanged = SetValue(ref _valueFormula, value);
+
+                if (_isOwn == false
+                    && (formulaChanged || alreadyLocalFormula))
+                {
+                    _isValueOverridden = string.Equals(value, inheritedFormula, StringComparison.Ordinal) == false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Код ошибки последнего вычисления формулы одиночного значения.
+        /// </summary>
+        public string ValueFormulaErrorCode
+        {
+            get => GetValue(GetEffectiveValueFormulaErrorCode());
+            set => SetValue(ref _valueFormulaErrorCode, value ?? string.Empty);
         }
 
         /// <summary>
@@ -484,6 +517,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _valueType = this._valueType,
                 _isCollectionValue = this._isCollectionValue,
                 _value = this._value,
+                _valueFormula = this._valueFormula,
+                _valueFormulaErrorCode = this._valueFormulaErrorCode,
                 _values = new List<TreeLeaveModel>(this._values),
                 _visibility = this._visibility,
                 _inheritedAttributeFromParent = this,
@@ -597,6 +632,36 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             }
 
             return _value;
+        }
+
+        /// <summary>
+        /// Получить актуальную формулу одиночного значения с учетом наследования.
+        /// </summary>
+        private string GetEffectiveValueFormula()
+        {
+            if (_isOwn == false
+                && (IsParentOverrideForbidden() || _isValueOverridden == false)
+                && _inheritedAttributeFromParent != null)
+            {
+                return _inheritedAttributeFromParent.ValueFormula;
+            }
+
+            return _valueFormula;
+        }
+
+        /// <summary>
+        /// Получить актуальный код ошибки формулы с учетом наследования.
+        /// </summary>
+        private string GetEffectiveValueFormulaErrorCode()
+        {
+            if (_isOwn == false
+                && (IsParentOverrideForbidden() || _isValueOverridden == false)
+                && _inheritedAttributeFromParent != null)
+            {
+                return _inheritedAttributeFromParent.ValueFormulaErrorCode;
+            }
+
+            return _valueFormulaErrorCode;
         }
 
         /// <summary>

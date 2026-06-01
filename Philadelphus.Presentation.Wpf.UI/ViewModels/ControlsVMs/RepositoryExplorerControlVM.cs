@@ -4,16 +4,24 @@ using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
+using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Models.Tables;
 using Philadelphus.Presentation.Wpf.UI.Services.Tables;
+using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
@@ -33,6 +41,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private bool _isDisposed;
 
         private readonly IPhiladelphusRepositoryService _service;
+        private readonly FormulaAstEvaluator _formulaEvaluator;
+        private readonly IFormulaDiagnosticsReporter _formulaDiagnosticsReporter;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -40,6 +50,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private int _repositoryLoadVersion;
 
         private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
+        private ElementAttributeVM? _selectedFormulaAttribute;
+        private FormulaBarTarget? _formulaBarTarget;
+        private string _formulaBarAddress = string.Empty;
+        private string _formulaBarText = string.Empty;
+        private string _formulaBarOriginalText = string.Empty;
+        private bool _isFormulaBarEnabled;
         private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
         private IReadOnlyList<ChildCollectionTableRow> _childCollectionTableRows = Array.Empty<ChildCollectionTableRow>();
 
@@ -99,6 +115,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
                 OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
                 OnPropertyChanged(nameof(ParentControlVisibility));
+                SelectedFormulaAttribute = null;
             }
         }
         //public List<InfrastructureTypes> InfrastructureTypes
@@ -132,6 +149,59 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         public IReadOnlyList<ChildCollectionTableRow> ChildCollectionTableRows
         {
             get => _childCollectionTableRows;
+        }
+
+        /// <summary>
+        /// Атрибут, выбранный для редактирования через строку формул во вкладке "Атрибуты".
+        /// </summary>
+        public ElementAttributeVM? SelectedFormulaAttribute
+        {
+            get => _selectedFormulaAttribute;
+            set
+            {
+                if (SetProperty(ref _selectedFormulaAttribute, value))
+                {
+                    if (_selectedRepositoryMember != null)
+                    {
+                        _selectedRepositoryMember.SelectedAttributeVM = value;
+                    }
+
+                    SelectAttributeFormulaCell(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Адрес активной ячейки строки формул.
+        /// </summary>
+        public string FormulaBarAddress
+        {
+            get => _formulaBarAddress;
+            private set => SetProperty(ref _formulaBarAddress, value);
+        }
+
+        /// <summary>
+        /// Текст строки формул.
+        /// </summary>
+        public string FormulaBarText
+        {
+            get => _formulaBarText;
+            set => SetProperty(ref _formulaBarText, value);
+        }
+
+        /// <summary>
+        /// Признак доступности строки формул для выбранной ячейки.
+        /// </summary>
+        public bool IsFormulaBarEnabled
+        {
+            get => _isFormulaBarEnabled;
+            private set
+            {
+                if (SetProperty(ref _isFormulaBarEnabled, value))
+                {
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
         private ExtensionsControlVM _extensionsControlVM;
@@ -195,6 +265,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             IOptions<ApplicationSettingsConfig> options,
             IPhiladelphusRepositoryService service,
+            FormulaAstEvaluator formulaEvaluator,
+            IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
@@ -205,11 +277,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
             ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(formulaEvaluator);
+            ArgumentNullException.ThrowIfNull(formulaDiagnosticsReporter);
             ArgumentNullException.ThrowIfNull(extensionVMFactory);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
 
             _service = service;
+            _formulaEvaluator = formulaEvaluator;
+            _formulaDiagnosticsReporter = formulaDiagnosticsReporter;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -455,6 +531,64 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     RebuildChildCollectionTable();
                 },
                 _ => _isChildCollectionTableOrderStale && IsRepositoryLoading == false);
+            }
+        }
+
+        /// <summary>
+        /// Команда выбора атрибутной ячейки таблицы наследников для строки формул.
+        /// </summary>
+        public RelayCommand SelectChildFormulaCellCommand
+        {
+            get
+            {
+                return new RelayCommand(obj =>
+                {
+                    if (obj is ChildFormulaCellSelection selection)
+                    {
+                        SelectChildFormulaCell(selection);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Команда применения текста строки формул к активной ячейке.
+        /// </summary>
+        public RelayCommand ApplyFormulaBarCommand
+        {
+            get
+            {
+                return new RelayCommand(_ => ApplyFormulaBar(), _ => CanApplyFormulaBar());
+            }
+        }
+
+        /// <summary>
+        /// Команда отмены редактирования строки формул.
+        /// </summary>
+        public RelayCommand CancelFormulaBarCommand
+        {
+            get
+            {
+                return new RelayCommand(_ => FormulaBarText = _formulaBarOriginalText, _ => IsFormulaBarEnabled);
+            }
+        }
+
+        /// <summary>
+        /// Команда открытия отдельного редактора формул с текущим текстом строки формул.
+        /// </summary>
+        public RelayCommand OpenFormulaEditorFromFormulaBarCommand
+        {
+            get
+            {
+                return new RelayCommand(_ =>
+                {
+                    var request = new FormulaEditorOpenRequest(this, FormulaBarText);
+                    if (_applicationCommandsVM.OpenFormulaEditorWindowCommand.CanExecute(request))
+                    {
+                        _applicationCommandsVM.OpenFormulaEditorWindowCommand.Execute(request);
+                    }
+                },
+                _ => IsFormulaBarEnabled);
             }
         }
 
@@ -719,6 +853,388 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return IsRepositoryLoading == false;
         }
 
+        private void SelectAttributeFormulaCell(ElementAttributeVM? attributeVM)
+        {
+            if (attributeVM == null)
+            {
+                ClearFormulaBarTarget();
+                return;
+            }
+
+            var target = ResolveFormulaBarTarget(
+                attributeVM.Model,
+                $"{attributeVM.Name}",
+                requireTargetInsideSelectedBranch: false);
+
+            SetFormulaBarTarget(target);
+        }
+
+        private void SelectChildFormulaCell(ChildFormulaCellSelection selection)
+        {
+            if (selection.IsAttribute == false
+                || selection.SourceUuid == Guid.Empty
+                || string.IsNullOrWhiteSpace(selection.ColumnKey))
+            {
+                ClearFormulaBarTarget();
+                return;
+            }
+
+            var child = FindRepositoryMemberByUuid(selection.SourceUuid)?.Model as IAttributeOwnerModel;
+            var attribute = child?.Attributes.FirstOrDefault(x =>
+                string.Equals(x.Name, selection.ColumnKey, StringComparison.Ordinal));
+
+            if (attribute == null)
+            {
+                ClearFormulaBarTarget();
+                return;
+            }
+
+            var target = ResolveFormulaBarTarget(
+                attribute,
+                $"{attribute.Name} {selection.RowNumber}",
+                requireTargetInsideSelectedBranch: true);
+
+            SetFormulaBarTarget(target);
+        }
+
+        private FormulaBarTarget? ResolveFormulaBarTarget(
+            ElementAttributeModel sourceAttribute,
+            string address,
+            bool requireTargetInsideSelectedBranch)
+        {
+            if (sourceAttribute.IsCollectionValue)
+            {
+                return CreateBlockedFormulaTarget(address, "Формулы для коллекционных значений атрибутов пока не поддерживаются.");
+            }
+
+            var targetAttribute = ResolveWritableAttribute(sourceAttribute);
+            if (requireTargetInsideSelectedBranch
+                && IsAttributeOwnerInsideSelectedBranch(targetAttribute.Owner) == false)
+            {
+                return CreateBlockedFormulaTarget(
+                    address,
+                    "Редактирование формулы ограничено узлом выше текущего контекста таблицы наследников.");
+            }
+
+            return new FormulaBarTarget(address, sourceAttribute, targetAttribute, Enabled: true, BlockReason: null);
+        }
+
+        private static ElementAttributeModel ResolveWritableAttribute(ElementAttributeModel attribute)
+        {
+            var current = attribute;
+            while (current.IsOwn == false
+                && current.InheritedAttributeFromParent?.Override == OverrideType.Sealed)
+            {
+                current = current.InheritedAttributeFromParent;
+            }
+
+            return current;
+        }
+
+        private FormulaBarTarget CreateBlockedFormulaTarget(string address, string reason)
+        {
+            return new FormulaBarTarget(address, null, null, Enabled: false, BlockReason: reason);
+        }
+
+        private bool IsAttributeOwnerInsideSelectedBranch(IOwnerModel owner)
+        {
+            if (owner is not IMainEntityModel ownerEntity
+                || _selectedRepositoryMember?.Model is not IMainEntityModel selectedEntity)
+            {
+                return false;
+            }
+
+            if (ownerEntity.Uuid == selectedEntity.Uuid)
+            {
+                return true;
+            }
+
+            if (owner is not IChildrenModel child)
+            {
+                return false;
+            }
+
+            var parent = child.Parent;
+            while (parent is IMainEntityModel parentEntity)
+            {
+                if (parentEntity.Uuid == selectedEntity.Uuid)
+                {
+                    return true;
+                }
+
+                parent = parent is IChildrenModel parentChild
+                    ? parentChild.Parent
+                    : null;
+            }
+
+            return false;
+        }
+
+        private void SetFormulaBarTarget(FormulaBarTarget? target)
+        {
+            _formulaBarTarget = target;
+            FormulaBarAddress = target?.Address ?? string.Empty;
+            _formulaBarOriginalText = FormatAttributeValue(target?.SourceAttribute ?? target?.TargetAttribute);
+            FormulaBarText = _formulaBarOriginalText;
+            IsFormulaBarEnabled = target?.Enabled == true;
+
+            if (target is { Enabled: false }
+                && string.IsNullOrWhiteSpace(target.BlockReason) == false)
+            {
+                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                    target.BlockReason,
+                    NotificationCriticalLevelModel.Warning);
+            }
+        }
+
+        private void ClearFormulaBarTarget()
+        {
+            _formulaBarTarget = null;
+            FormulaBarAddress = string.Empty;
+            _formulaBarOriginalText = string.Empty;
+            FormulaBarText = string.Empty;
+            IsFormulaBarEnabled = false;
+        }
+
+        private bool CanApplyFormulaBar()
+        {
+            return IsFormulaBarEnabled
+                && IsRepositoryLoading == false
+                && _formulaBarTarget?.TargetAttribute != null;
+        }
+
+        private void ApplyFormulaBar()
+        {
+            if (_formulaBarTarget?.TargetAttribute == null)
+            {
+                return;
+            }
+
+            var targetAttribute = _formulaBarTarget.TargetAttribute;
+            if (TryApplyFormulaBarText(targetAttribute, FormulaBarText) == false)
+            {
+                return;
+            }
+
+            _formulaBarOriginalText = FormatAttributeValue(targetAttribute);
+            FormulaBarText = _formulaBarOriginalText;
+            NotifyFormulaAttributeChanged(targetAttribute);
+        }
+
+        private bool TryApplyFormulaBarText(ElementAttributeModel targetAttribute, string text)
+        {
+            if (string.IsNullOrWhiteSpace(text) == false
+                && text.TrimStart().StartsWith("=", StringComparison.Ordinal))
+            {
+                var result = _formulaEvaluator.Evaluate(text, CreateFormulaExecutionContext());
+                if (result.IsSuccess == false)
+                {
+                    targetAttribute.ValueFormula = text.Trim();
+                    targetAttribute.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
+                    _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                        $"Формула сохранена, но не вычислена: {result.Error?.Message}",
+                        NotificationCriticalLevelModel.Warning);
+                    return true;
+                }
+
+                return TryApplyFormulaResult(targetAttribute, result, text.Trim());
+            }
+
+            return TryApplyPlainFormulaBarText(targetAttribute, text);
+        }
+
+        private bool TryApplyFormulaResult(ElementAttributeModel targetAttribute, FormulaResult result, string formulaText)
+        {
+            if (result.TreeLeave != null)
+            {
+                if (IsTreeLeaveCompatible(targetAttribute, result.TreeLeave) == false)
+                {
+                    SendFormulaTypeMismatch(targetAttribute, result.TreeLeave.ParentNode.Name);
+                    return false;
+                }
+
+                targetAttribute.Value = result.TreeLeave;
+                targetAttribute.ValueFormula = formulaText;
+                targetAttribute.ValueFormulaErrorCode = string.Empty;
+                return true;
+            }
+
+            if (targetAttribute.ValueType is not SystemBaseTreeNodeModel systemBaseNode)
+            {
+                SendFormulaTypeMismatch(targetAttribute, result.ValueType.ToString());
+                return false;
+            }
+
+            if (IsSystemBaseResultCompatible(systemBaseNode.SystemBaseType, result.ValueType) == false
+                || SystemBaseStringValueValidator.TryFormat(systemBaseNode.SystemBaseType, result.Value, out var stringValue) == false)
+            {
+                SendFormulaTypeMismatch(targetAttribute, result.ValueType.ToString());
+                return false;
+            }
+
+            if (targetAttribute.TrySetSystemBaseValueFromString(stringValue) == false)
+            {
+                return false;
+            }
+
+            targetAttribute.ValueFormula = formulaText;
+            targetAttribute.ValueFormulaErrorCode = string.Empty;
+            return true;
+        }
+
+        private bool TryApplyPlainFormulaBarText(ElementAttributeModel targetAttribute, string text)
+        {
+            var trimmedText = text.Trim();
+            if (TryGetLeafUuidReference(trimmedText, out var valueUuid)
+                && targetAttribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
+            {
+                targetAttribute.Value = referencedValue;
+                targetAttribute.ValueFormula = string.Empty;
+                targetAttribute.ValueFormulaErrorCode = string.Empty;
+                return true;
+            }
+
+            if (targetAttribute.ValueType is SystemBaseTreeNodeModel)
+            {
+                if (targetAttribute.TrySetSystemBaseValueFromString(text) == false)
+                {
+                    return false;
+                }
+
+                targetAttribute.ValueFormula = string.Empty;
+                targetAttribute.ValueFormulaErrorCode = string.Empty;
+                return true;
+            }
+
+            var value = targetAttribute.ValuesList?.FirstOrDefault(x =>
+                string.Equals(x.Name, text, StringComparison.Ordinal));
+            if (value == null)
+            {
+                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                    $"Значение '{text}' не найдено среди допустимых значений атрибута '{targetAttribute.Name}'.",
+                    NotificationCriticalLevelModel.Warning);
+                return false;
+            }
+
+            targetAttribute.Value = value;
+            targetAttribute.ValueFormula = string.Empty;
+            targetAttribute.ValueFormulaErrorCode = string.Empty;
+            return true;
+        }
+
+        private FormulaExecutionContext CreateFormulaExecutionContext()
+        {
+            var workingTree = ResolveWorkingTree();
+            var systemBaseWorkingTree = _philadelphusRepositoryVM.Model.ContentShrub.SystemBaseWorkingTree;
+
+            return new FormulaExecutionContext
+            {
+                WorkingTree = workingTree,
+                TreeLeaveResolver = workingTree is null ? null : new WorkingTreeTreeLeaveResolver(workingTree),
+                SystemBaseWorkingTree = systemBaseWorkingTree,
+                RepositoryService = _service,
+                NotificationService = _notificationService,
+                DiagnosticsReporter = _formulaDiagnosticsReporter
+            };
+        }
+
+        private WorkingTreeModel? ResolveWorkingTree()
+        {
+            if (_selectedRepositoryMember?.Model is IWorkingTreeMemberModel selectedMember)
+            {
+                return selectedMember.OwningWorkingTree;
+            }
+
+            var systemBaseWorkingTree = _philadelphusRepositoryVM.Model.ContentShrub.SystemBaseWorkingTree;
+            return _philadelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees
+                .FirstOrDefault(x => x.Uuid != systemBaseWorkingTree?.Uuid);
+        }
+
+        private static bool IsTreeLeaveCompatible(ElementAttributeModel attribute, TreeLeaveModel value)
+        {
+            return attribute.ValueType?.Uuid == value.ParentNode.Uuid;
+        }
+
+        private static bool IsSystemBaseResultCompatible(SystemBaseType expectedType, SystemBaseType actualType)
+        {
+            return expectedType == actualType
+                || expectedType == SystemBaseType.OBJECT
+                || expectedType == SystemBaseType.NUMERIC && actualType is SystemBaseType.INTEGER or SystemBaseType.FLOAT;
+        }
+
+        private void SendFormulaTypeMismatch(ElementAttributeModel attribute, string actualType)
+        {
+            _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                $"Тип результата формулы '{actualType}' не соответствует типу данных атрибута '{attribute.Name}' ({attribute.ValueType?.Name}).",
+                NotificationCriticalLevelModel.Warning);
+        }
+
+        private void NotifyFormulaAttributeChanged(ElementAttributeModel attribute)
+        {
+            OnPropertyChanged(nameof(PropertyList));
+            RebuildChildCollectionTable();
+
+            if (_selectedFormulaAttribute?.Model.Uuid == attribute.Uuid)
+            {
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValue));
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValueText));
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.DisplayedValueText));
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.FormulaValueText));
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.IsValueOverridden));
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.ValueOverrideToolTip));
+                _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.State));
+            }
+
+            if (attribute.Owner is IMainEntityModel owner)
+            {
+                if (FindRepositoryMemberByUuid(owner.Uuid) is ViewModelBase ownerVM)
+                {
+                    ownerVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
+                }
+            }
+
+            _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+        }
+
+        private static string FormatAttributeValue(ElementAttributeModel? attribute)
+        {
+            if (attribute == null)
+            {
+                return string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false)
+            {
+                return attribute.ValueFormula;
+            }
+
+            if (attribute.IsCollectionValue)
+            {
+                return string.Join("; ", attribute.Values.Select(x => x.Name));
+            }
+
+            return attribute.Value?.Uuid == null
+                ? string.Empty
+                : $"[{attribute.Value.Uuid}]";
+        }
+
+        private static bool TryGetLeafUuidReference(string text, out Guid uuid)
+        {
+            uuid = Guid.Empty;
+
+            return text.Length == 38
+                && text.StartsWith("[", StringComparison.Ordinal)
+                && text.EndsWith("]", StringComparison.Ordinal)
+                && Guid.TryParse(text[1..^1], out uuid);
+        }
+
+        private static string FormatFormulaErrorCode(FormulaResult result)
+        {
+            return result.Error == null
+                ? "#ERROR!"
+                : $"#{result.Error.Code}!";
+        }
+
         /// <summary>
         /// Перестраивает таблицу наследников для текущего выбранного элемента.
         /// </summary>
@@ -917,5 +1433,25 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
 
         #endregion
+
+        private sealed record FormulaBarTarget(
+            string Address,
+            ElementAttributeModel? SourceAttribute,
+            ElementAttributeModel? TargetAttribute,
+            bool Enabled,
+            string? BlockReason);
     }
+
+    /// <summary>
+    /// Описывает выбранную атрибутную ячейку плоской таблицы наследников.
+    /// </summary>
+    /// <param name="SourceUuid">Uuid элемента строки.</param>
+    /// <param name="ColumnKey">Логический ключ колонки.</param>
+    /// <param name="RowNumber">Порядковый номер строки в таблице.</param>
+    /// <param name="IsAttribute">Признак атрибутной колонки.</param>
+    public sealed record ChildFormulaCellSelection(
+        Guid SourceUuid,
+        string ColumnKey,
+        int RowNumber,
+        bool IsAttribute);
 }

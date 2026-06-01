@@ -9,6 +9,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
@@ -17,13 +18,16 @@
             <Button Content="{StaticResource imageRemove}" Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" Margin="1" Height="25" Width="25" Background="Transparent" />
             <Button Content="{StaticResource imageList}" Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip="Открыть настройки списка" Margin="1" Height="25" Width="25" Background="Transparent" />
         </StackPanel>
+        <local:FormulaBar Grid.Row="1" />
         <DataGrid Name="SelectedElementAttributesDataGrid"
-                  Grid.Row="1"
+                  Grid.Row="2"
                   Height="auto"
                   ColumnWidth="*"
                   DataContext="{Binding SelectedRepositoryMember}"
                   ItemsSource="{Binding AttributesVMs}"
-                  SelectedItem="{Binding SelectedAttributeVM}"
+                  SelectedItem="{Binding DataContext.SelectedFormulaAttribute, RelativeSource={RelativeSource AncestorType={x:Type local:RepositoryExplorer}}, Mode=TwoWay}"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
                   AutoGenerateColumns="false"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
@@ -74,19 +78,16 @@
                     </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding ValuesList}"
-                                      SelectedItem="{Binding AssignedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Text="{Binding AssignedValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                      DisplayMemberPath="Name"
-                                      IsEditable="True"
-                                      IsTextSearchEnabled="False" />
+                            <TextBlock Text="{Binding DisplayedValueText, Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       Margin="2,0,2,0" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <ComboBox ItemsSource="{Binding ValuesList}"
                                       SelectedItem="{Binding AssignedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Text="{Binding AssignedValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      Text="{Binding FormulaValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                       DisplayMemberPath="Name"
                                       IsEditable="True"
                                       IsTextSearchEnabled="False" />
@@ -133,7 +134,7 @@
                 <DataGridTextColumn Header="Владелец" Binding="{Binding DeclaringOwner.Name}" IsReadOnly="True"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding SelectedIndex,ElementName=SelectedElementAttributesDataGrid,Converter={StaticResource selectedIndexConverter}}" FontSize="10"></TextBlock>
             <TextBlock Text=" / " FontSize="10"></TextBlock>
             <TextBlock Text="{Binding Items.Count,ElementName=SelectedElementAttributesDataGrid}" FontSize="10"></TextBlock>

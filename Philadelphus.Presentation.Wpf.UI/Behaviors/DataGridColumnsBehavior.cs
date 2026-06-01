@@ -41,6 +41,40 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             obj.SetValue(ColumnsSourceProperty, value);
         }
 
+        public static readonly DependencyProperty ColumnKeyProperty =
+            DependencyProperty.RegisterAttached(
+                "ColumnKey",
+                typeof(string),
+                typeof(DataGridColumnsBehavior),
+                new PropertyMetadata(string.Empty));
+
+        public static string GetColumnKey(DependencyObject obj)
+        {
+            return (string)obj.GetValue(ColumnKeyProperty);
+        }
+
+        public static void SetColumnKey(DependencyObject obj, string value)
+        {
+            obj.SetValue(ColumnKeyProperty, value);
+        }
+
+        public static readonly DependencyProperty IsAttributeColumnProperty =
+            DependencyProperty.RegisterAttached(
+                "IsAttributeColumn",
+                typeof(bool),
+                typeof(DataGridColumnsBehavior),
+                new PropertyMetadata(false));
+
+        public static bool GetIsAttributeColumn(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(IsAttributeColumnProperty);
+        }
+
+        public static void SetIsAttributeColumn(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsAttributeColumnProperty, value);
+        }
+
         private static void OnColumnsSourceChanged(
             DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs e)
@@ -67,11 +101,15 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 
             foreach (var column in columnsSource.OfType<ChildCollectionTableColumn>().OrderBy(x => x.Order))
             {
-                dataGrid.Columns.Add(column.Key == nameof(IMainEntityModel.State)
+                var dataGridColumn = column.Key == nameof(IMainEntityModel.State)
                     ? CreateStateColumn(column)
                     : column.HasValueOptions
                     ? CreateComboBoxColumn(column)
-                    : CreateTextColumn(column));
+                    : CreateTextColumn(column);
+
+                SetColumnKey(dataGridColumn, column.Key);
+                SetIsAttributeColumn(dataGridColumn, column.IsAttribute);
+                dataGrid.Columns.Add(dataGridColumn);
             }
         }
 

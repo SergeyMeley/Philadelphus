@@ -103,11 +103,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 if (IsCollectionValue == false)
                 {
+                    _model.ValueFormula = string.Empty;
+                    _model.ValueFormulaErrorCode = string.Empty;
                     _model.Value = value;
                 }
                 OnPropertyChanged(nameof(State));
                 OnPropertyChanged(nameof(AssignedValue));
                 OnPropertyChanged(nameof(AssignedValueText));
+                OnPropertyChanged(nameof(DisplayedValueText));
+                OnPropertyChanged(nameof(FormulaValueText));
                 OnPropertyChanged(nameof(IsValueOverridden));
                 OnPropertyChanged(nameof(ValueOverrideToolTip));
             }
@@ -125,13 +129,82 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 if (_model.TrySetSystemBaseValueFromString(value))
                 {
+                    _model.ValueFormula = string.Empty;
+                    _model.ValueFormulaErrorCode = string.Empty;
                     OnPropertyChanged(nameof(State));
                     OnPropertyChanged(nameof(AssignedValue));
                     OnPropertyChanged(nameof(AssignedValueText));
+                    OnPropertyChanged(nameof(DisplayedValueText));
+                    OnPropertyChanged(nameof(FormulaValueText));
                     OnPropertyChanged(nameof(ValuesList));
                     OnPropertyChanged(nameof(IsValueOverridden));
                     OnPropertyChanged(nameof(ValueOverrideToolTip));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Значение ячейки в режиме просмотра: результат формулы или код ошибки.
+        /// </summary>
+        public string DisplayedValueText
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_model.ValueFormula) == false
+                    && string.IsNullOrWhiteSpace(_model.ValueFormulaErrorCode) == false)
+                {
+                    return _model.ValueFormulaErrorCode;
+                }
+
+                return AssignedValueText;
+            }
+        }
+
+        /// <summary>
+        /// Значение ячейки в режиме редактирования: формула или ссылка на лист.
+        /// </summary>
+        public string FormulaValueText
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_model.ValueFormula) == false)
+                {
+                    return _model.ValueFormula;
+                }
+
+                return AssignedValue?.Uuid == null
+                    ? string.Empty
+                    : $"[{AssignedValue.Uuid}]";
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    AssignedValue = null;
+                    return;
+                }
+
+                var trimmedValue = value.Trim();
+                if (trimmedValue.StartsWith("=", StringComparison.Ordinal))
+                {
+                    _model.ValueFormula = trimmedValue;
+                    _model.ValueFormulaErrorCode = string.Empty;
+                    OnPropertyChanged(nameof(State));
+                    OnPropertyChanged(nameof(DisplayedValueText));
+                    OnPropertyChanged(nameof(FormulaValueText));
+                    OnPropertyChanged(nameof(IsValueOverridden));
+                    OnPropertyChanged(nameof(ValueOverrideToolTip));
+                    return;
+                }
+
+                if (TryGetLeafUuidReference(trimmedValue, out var valueUuid)
+                    && ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
+                {
+                    AssignedValue = referencedValue;
+                    return;
+                }
+
+                AssignedValueText = trimmedValue;
             }
         }
 
@@ -379,6 +452,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             return names is { Length: > 0 }
                 ? string.Join("; ", names)
                 : "<не задано>";
+        }
+
+        private static bool TryGetLeafUuidReference(string text, out Guid uuid)
+        {
+            uuid = Guid.Empty;
+
+            return text.Length == 38
+                && text.StartsWith("[", StringComparison.Ordinal)
+                && text.EndsWith("]", StringComparison.Ordinal)
+                && Guid.TryParse(text[1..^1], out uuid);
         }
 
         #endregion

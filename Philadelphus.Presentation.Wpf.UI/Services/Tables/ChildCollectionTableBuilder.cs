@@ -605,6 +605,12 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
                     : string.Join("; ", attribute.Values.Select(x => x.Name).Where(x => string.IsNullOrWhiteSpace(x) == false));
             }
 
+            if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false
+                && string.IsNullOrWhiteSpace(attribute.ValueFormulaErrorCode) == false)
+            {
+                return attribute.ValueFormulaErrorCode;
+            }
+
             return attribute.Value;
         }
 

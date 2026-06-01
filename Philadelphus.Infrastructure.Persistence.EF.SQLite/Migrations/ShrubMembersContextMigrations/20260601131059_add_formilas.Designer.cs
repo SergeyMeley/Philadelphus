@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
 
@@ -10,9 +11,11 @@ using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
 namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMembersContextMigrations
 {
     [DbContext(typeof(SqliteEfShrubMembersContext))]
-    partial class SqliteEfShrubMembersContextModelSnapshot : ModelSnapshot
+    [Migration("20260601131059_add_formilas")]
+    partial class add_formilas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.14");
