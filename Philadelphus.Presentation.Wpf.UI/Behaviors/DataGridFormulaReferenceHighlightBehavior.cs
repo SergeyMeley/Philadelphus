@@ -11,6 +11,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
     /// </summary>
     public static class DataGridFormulaReferenceHighlightBehavior
     {
+        /// <summary>
+        /// Палитра границ для последовательных ссылок на ячейки в редактируемой формуле.
+        /// </summary>
         private static readonly Brush[] ReferenceBrushes =
         [
             Brushes.DodgerBlue,
@@ -21,6 +24,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             Brushes.Teal,
         ];
 
+        /// <summary>
+        /// Признак активного режима выбора ссылок на ячейки.
+        /// </summary>
         public static readonly DependencyProperty IsActiveProperty =
             DependencyProperty.RegisterAttached(
                 "IsActive",
@@ -28,16 +34,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(DataGridFormulaReferenceHighlightBehavior),
                 new PropertyMetadata(false, OnIsActiveChanged));
 
+        /// <summary>
+        /// Возвращает признак активного режима выбора ссылок.
+        /// </summary>
         public static bool GetIsActive(DependencyObject obj)
         {
             return (bool)obj.GetValue(IsActiveProperty);
         }
 
+        /// <summary>
+        /// Устанавливает признак активного режима выбора ссылок.
+        /// </summary>
         public static void SetIsActive(DependencyObject obj, bool value)
         {
             obj.SetValue(IsActiveProperty, value);
         }
 
+        /// <summary>
+        /// Признак ограничения выбора только атрибутными колонками.
+        /// </summary>
         public static readonly DependencyProperty AttributeColumnsOnlyProperty =
             DependencyProperty.RegisterAttached(
                 "AttributeColumnsOnly",
@@ -45,16 +60,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(DataGridFormulaReferenceHighlightBehavior),
                 new PropertyMetadata(false));
 
+        /// <summary>
+        /// Возвращает признак ограничения выбора только атрибутными колонками.
+        /// </summary>
         public static bool GetAttributeColumnsOnly(DependencyObject obj)
         {
             return (bool)obj.GetValue(AttributeColumnsOnlyProperty);
         }
 
+        /// <summary>
+        /// Устанавливает признак ограничения выбора только атрибутными колонками.
+        /// </summary>
         public static void SetAttributeColumnsOnly(DependencyObject obj, bool value)
         {
             obj.SetValue(AttributeColumnsOnlyProperty, value);
         }
 
+        /// <summary>
+        /// Заголовок единственной колонки, в которой разрешена подсветка.
+        /// </summary>
         public static readonly DependencyProperty TargetColumnHeaderProperty =
             DependencyProperty.RegisterAttached(
                 "TargetColumnHeader",
@@ -62,11 +86,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(DataGridFormulaReferenceHighlightBehavior),
                 new PropertyMetadata(string.Empty));
 
+        /// <summary>
+        /// Возвращает заголовок колонки, в которой разрешена подсветка.
+        /// </summary>
         public static string GetTargetColumnHeader(DependencyObject obj)
         {
             return (string)obj.GetValue(TargetColumnHeaderProperty);
         }
 
+        /// <summary>
+        /// Устанавливает заголовок колонки, в которой разрешена подсветка.
+        /// </summary>
         public static void SetTargetColumnHeader(DependencyObject obj, string value)
         {
             obj.SetValue(TargetColumnHeaderProperty, value);

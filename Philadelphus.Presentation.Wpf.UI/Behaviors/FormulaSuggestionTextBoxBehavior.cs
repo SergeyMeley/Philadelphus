@@ -30,21 +30,33 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaSuggestionTextBoxBehavior),
                 new PropertyMetadata(null));
 
+        /// <summary>
+        /// Возвращает признак подключения поведения автодополнения.
+        /// </summary>
         public static bool GetIsEnabled(DependencyObject obj)
         {
             return (bool)obj.GetValue(IsEnabledProperty);
         }
 
+        /// <summary>
+        /// Устанавливает признак подключения поведения автодополнения.
+        /// </summary>
         public static void SetIsEnabled(DependencyObject obj, bool value)
         {
             obj.SetValue(IsEnabledProperty, value);
         }
 
+        /// <summary>
+        /// Возвращает ListBox с предложениями автодополнения.
+        /// </summary>
         public static ListBox? GetSuggestionsListBox(DependencyObject obj)
         {
             return (ListBox?)obj.GetValue(SuggestionsListBoxProperty);
         }
 
+        /// <summary>
+        /// Устанавливает ListBox с предложениями автодополнения.
+        /// </summary>
         public static void SetSuggestionsListBox(DependencyObject obj, ListBox? value)
         {
             obj.SetValue(SuggestionsListBoxProperty, value);
@@ -139,6 +151,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             IFormulaEditorIntelliSenseVM viewModel,
             KeyEventArgs e)
         {
+            // Ctrl+] переносит каретку к парной скобке, как в редакторе формул.
             if (Keyboard.Modifiers == ModifierKeys.Control
                 && e.Key == Key.OemCloseBrackets
                 && viewModel.TryGetMatchingParenthesisCaretIndex(textBox.SelectionStart, out var matchingCaretIndex))
@@ -149,6 +162,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 return true;
             }
 
+            // Ctrl+Shift+Space выделяет текущий вызов функции для быстрой замены или просмотра.
             if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)
                 && e.Key == Key.Space
                 && viewModel.TryGetCurrentFormulaCallSelection(textBox.SelectionStart, out var selectionStart, out var selectionLength))

@@ -155,7 +155,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         }
 
         /// <summary>
-        /// Создает короткий арифметический пример для metadata редактора формул.
+        /// Создает короткий арифметический пример для метаданных редактора формул.
         /// </summary>
         private static string CreateBinaryExample(string name, string alias)
         {
@@ -169,7 +169,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         }
 
         /// <summary>
-        /// Создает короткий унарный арифметический пример для metadata редактора формул.
+        /// Создает короткий унарный арифметический пример для метаданных редактора формул.
         /// </summary>
         private static string CreateUnaryExample(string name)
         {

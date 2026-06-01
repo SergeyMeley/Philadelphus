@@ -256,6 +256,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
             return FormulaResultMaterializer.Materialize(result, context, functionCall.Span, functionCall.Name);
         }
 
+        /// <summary>
+        /// Вычисляет относительную функцию АТРИБУТ("Имя") для текущего владельца атрибутов из контекста.
+        /// </summary>
+        /// <param name="functionCall">Вызов функции АТРИБУТ.</param>
+        /// <param name="context">Контекст вычисления с текущим владельцем атрибутов.</param>
+        /// <returns>Значение найденного атрибута или диагностическая ошибка.</returns>
         private static FormulaResult EvaluateRelativeAttributeFunction(
             FunctionCallFormulaExpression functionCall,
             FormulaExecutionContext context)
@@ -287,6 +293,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Evaluation
                     functionCall.Name));
             }
 
+            // Относительная ссылка намеренно ищет атрибут по текущему элементу,
+            // чтобы формула зависела от атрибута, а не от текущего вычисленного листа.
             var attributes = context.CurrentAttributeOwner.Attributes
                 .Where(x => string.Equals(x.Name, attributeName, StringComparison.OrdinalIgnoreCase))
                 .ToList();

@@ -1,7 +1,7 @@
 namespace Philadelphus.Core.Domain.FormulaEngine.Registry
 {
     /// <summary>
-    /// Исключение регистрации формулы с некорректными или неоднозначными metadata.
+    /// Исключение регистрации формулы с некорректными или неоднозначными метаданными.
     /// </summary>
     public sealed class FormulaRegistrationException : Exception
     {

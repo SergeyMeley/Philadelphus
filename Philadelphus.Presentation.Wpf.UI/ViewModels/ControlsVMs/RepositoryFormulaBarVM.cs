@@ -59,6 +59,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private FormulaRecalculationModeVM _selectedFormulaRecalculationMode;
         private bool _isFormulaAttributeNotificationInProgress;
 
+        /// <summary>
+        /// Инициализирует модель представления строки формул обозревателя репозитория.
+        /// </summary>
+        /// <param name="repositoryExplorerVM">Модель представления обозревателя репозитория.</param>
+        /// <param name="service">Доменный сервис репозитория.</param>
+        /// <param name="formulaEvaluator">Вычислитель формул.</param>
+        /// <param name="formulaRegistry">Реестр доступных формул.</param>
+        /// <param name="formulaDiagnosticsReporter">Приемник диагностических сообщений Formula Engine.</param>
+        /// <param name="notificationService">Сервис пользовательских уведомлений.</param>
+        /// <param name="applicationCommandsVM">Команды приложения, включая открытие редактора формул.</param>
         public RepositoryFormulaBarVM(
             RepositoryExplorerControlVM repositoryExplorerVM,
             IPhiladelphusRepositoryService service,
@@ -1182,6 +1192,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return;
             }
 
+            // Для режима "Авто для текущего элемента" пересчитываем только формулы того же владельца,
+            // которые прямо или транзитивно ссылаются на измененный атрибут.
             var dependents = owner.Attributes
                 .Where(x => x.Uuid != changedAttribute.Uuid
                     && visited.Contains(x.Uuid) == false
@@ -1236,6 +1248,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             var replacementStart = Math.Clamp(FormulaBarSelectionStart, 0, text.Length);
             var replacementLength = Math.Clamp(FormulaBarSelectionLength, 0, text.Length - replacementStart);
 
+            // Если пользователь уже выделил часть формулы, заменяем именно выделение.
+            // Иначе пытаемся заменить ссылку/операнд под кареткой, чтобы новые клики по ячейкам не слипались.
             if (replacementLength == 0
                 && TryFindAttributeReferenceAtCaret(text, caretIndex, out var referenceStart, out var referenceLength))
             {
@@ -1543,6 +1557,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return;
             }
 
+            // Подсветка строится поверх тех же токенов и ошибок, что использует движок формул,
+            // чтобы строка формул не расходилась с реальным парсером.
             var tokenizerResult = FormulaTokenizer.Tokenize(source);
             var parserResult = FormulaParser.Parse(tokenizerResult.Tokens);
             var errorSpans = tokenizerResult.Errors

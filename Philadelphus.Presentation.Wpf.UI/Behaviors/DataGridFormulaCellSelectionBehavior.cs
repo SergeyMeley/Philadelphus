@@ -12,6 +12,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
     /// </summary>
     public static class DataGridFormulaCellSelectionBehavior
     {
+        /// <summary>
+        /// Команда, получающая сведения о выбранной атрибутной ячейке таблицы наследников.
+        /// </summary>
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.RegisterAttached(
                 "Command",
@@ -19,11 +22,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(DataGridFormulaCellSelectionBehavior),
                 new PropertyMetadata(null, OnCommandChanged));
 
+        /// <summary>
+        /// Возвращает команду обработки выбора атрибутной ячейки.
+        /// </summary>
         public static ICommand? GetCommand(DependencyObject obj)
         {
             return (ICommand?)obj.GetValue(CommandProperty);
         }
 
+        /// <summary>
+        /// Устанавливает команду обработки выбора атрибутной ячейки.
+        /// </summary>
         public static void SetCommand(DependencyObject obj, ICommand? value)
         {
             obj.SetValue(CommandProperty, value);
@@ -76,6 +85,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 return;
             }
 
+            // DataGrid не всегда успевает обновить CurrentCell до SelectedCellsChanged,
+            // поэтому при клике выставляем текущую ячейку вручную и сразу отправляем selection во VM.
             dataGrid.Focus();
             dataGrid.CurrentCell = new DataGridCellInfo(cell.DataContext, cell.Column);
             dataGrid.SelectedCells.Clear();

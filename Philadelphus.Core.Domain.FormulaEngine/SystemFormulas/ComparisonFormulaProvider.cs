@@ -65,7 +65,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.SystemFormulas
         }
 
         /// <summary>
-        /// Создает короткий пример сравнения для metadata редактора формул.
+        /// Создает короткий пример сравнения для метаданных редактора формул.
         /// </summary>
         private static string CreateComparisonExample(string alias)
         {

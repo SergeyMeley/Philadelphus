@@ -4,7 +4,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Execution;
 namespace Philadelphus.Core.Domain.FormulaEngine.Contracts
 {
     /// <summary>
-    /// Описание формулы: metadata и делегат вычисления.
+    /// Описание формулы: метаданные и делегат вычисления.
     /// </summary>
     public sealed class FormulaDefinition
     {

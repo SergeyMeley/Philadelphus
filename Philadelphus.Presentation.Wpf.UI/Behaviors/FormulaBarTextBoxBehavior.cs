@@ -10,6 +10,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
     /// </summary>
     public static class FormulaBarTextBoxBehavior
     {
+        /// <summary>
+        /// Признак активного редактирования строки формул.
+        /// </summary>
         public static readonly DependencyProperty IsEditingProperty =
             DependencyProperty.RegisterAttached(
                 "IsEditing",
@@ -17,16 +20,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
+        /// <summary>
+        /// Возвращает признак активного редактирования строки формул.
+        /// </summary>
         public static bool GetIsEditing(DependencyObject obj)
         {
             return (bool)obj.GetValue(IsEditingProperty);
         }
 
+        /// <summary>
+        /// Устанавливает признак активного редактирования строки формул.
+        /// </summary>
         public static void SetIsEditing(DependencyObject obj, bool value)
         {
             obj.SetValue(IsEditingProperty, value);
         }
 
+        /// <summary>
+        /// Позиция каретки в строке формул.
+        /// </summary>
         public static readonly DependencyProperty CaretIndexProperty =
             DependencyProperty.RegisterAttached(
                 "CaretIndex",
@@ -34,16 +46,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnCaretIndexChanged));
 
+        /// <summary>
+        /// Возвращает позицию каретки в строке формул.
+        /// </summary>
         public static int GetCaretIndex(DependencyObject obj)
         {
             return (int)obj.GetValue(CaretIndexProperty);
         }
 
+        /// <summary>
+        /// Устанавливает позицию каретки в строке формул.
+        /// </summary>
         public static void SetCaretIndex(DependencyObject obj, int value)
         {
             obj.SetValue(CaretIndexProperty, value);
         }
 
+        /// <summary>
+        /// Начало выделения в строке формул.
+        /// </summary>
         public static readonly DependencyProperty SelectionStartProperty =
             DependencyProperty.RegisterAttached(
                 "SelectionStart",
@@ -51,16 +72,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectionStartChanged));
 
+        /// <summary>
+        /// Возвращает начало выделения в строке формул.
+        /// </summary>
         public static int GetSelectionStart(DependencyObject obj)
         {
             return (int)obj.GetValue(SelectionStartProperty);
         }
 
+        /// <summary>
+        /// Устанавливает начало выделения в строке формул.
+        /// </summary>
         public static void SetSelectionStart(DependencyObject obj, int value)
         {
             obj.SetValue(SelectionStartProperty, value);
         }
 
+        /// <summary>
+        /// Длина выделения в строке формул.
+        /// </summary>
         public static readonly DependencyProperty SelectionLengthProperty =
             DependencyProperty.RegisterAttached(
                 "SelectionLength",
@@ -68,16 +98,25 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectionLengthChanged));
 
+        /// <summary>
+        /// Возвращает длину выделения в строке формул.
+        /// </summary>
         public static int GetSelectionLength(DependencyObject obj)
         {
             return (int)obj.GetValue(SelectionLengthProperty);
         }
 
+        /// <summary>
+        /// Устанавливает длину выделения в строке формул.
+        /// </summary>
         public static void SetSelectionLength(DependencyObject obj, int value)
         {
             obj.SetValue(SelectionLengthProperty, value);
         }
 
+        /// <summary>
+        /// Признак подключения behavior к TextBox строки формул.
+        /// </summary>
         public static readonly DependencyProperty TrackProperty =
             DependencyProperty.RegisterAttached(
                 "Track",
@@ -85,6 +124,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new PropertyMetadata(false, OnTrackChanged));
 
+        /// <summary>
+        /// Идентификатор запроса возврата фокуса в строку формул.
+        /// </summary>
         public static readonly DependencyProperty FocusRequestIdProperty =
             DependencyProperty.RegisterAttached(
                 "FocusRequestId",
@@ -92,21 +134,33 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 typeof(FormulaBarTextBoxBehavior),
                 new PropertyMetadata(0, OnFocusRequestIdChanged));
 
+        /// <summary>
+        /// Возвращает признак подключения behavior к TextBox строки формул.
+        /// </summary>
         public static bool GetTrack(DependencyObject obj)
         {
             return (bool)obj.GetValue(TrackProperty);
         }
 
+        /// <summary>
+        /// Устанавливает признак подключения behavior к TextBox строки формул.
+        /// </summary>
         public static void SetTrack(DependencyObject obj, bool value)
         {
             obj.SetValue(TrackProperty, value);
         }
 
+        /// <summary>
+        /// Возвращает идентификатор запроса возврата фокуса.
+        /// </summary>
         public static int GetFocusRequestId(DependencyObject obj)
         {
             return (int)obj.GetValue(FocusRequestIdProperty);
         }
 
+        /// <summary>
+        /// Устанавливает идентификатор запроса возврата фокуса.
+        /// </summary>
         public static void SetFocusRequestId(DependencyObject obj, int value)
         {
             obj.SetValue(FocusRequestIdProperty, value);
@@ -337,11 +391,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
             var tokenStart = Math.Clamp(caretIndex, 0, text.Length);
             var tokenEnd = tokenStart;
 
+            // Двойной клик после операнда должен выделять сам операнд, а не пустое место справа от него.
             while (tokenStart > 0 && char.IsWhiteSpace(text[tokenStart - 1]))
             {
                 tokenStart--;
             }
 
+            // Строковые литералы могут содержать разделители, поэтому ищем открывающую кавычку отдельно.
             if (tokenStart > 0 && text[tokenStart - 1] == '"')
             {
                 return TryFindStringLiteralBeforeCaret(text, tokenStart, out operandStart, out operandLength);
@@ -424,6 +480,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Behaviors
                 var current = text[i];
                 if (current == '"')
                 {
+                    // В формулах двойная кавычка внутри строки экранируется парой кавычек.
                     if (isInString && i + 1 < text.Length && text[i + 1] == '"')
                     {
                         i++;
