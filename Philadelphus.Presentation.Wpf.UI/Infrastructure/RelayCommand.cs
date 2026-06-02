@@ -1,11 +1,12 @@
-﻿using System.Windows.Input;
+﻿using Philadelphus.Presentation.Infrastructure;
+using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
 {
     /// <summary>
     /// Команда выполнения операции RelayCommand.
     /// </summary>
-    public class RelayCommand : ICommand
+    public class RelayCommand : IRelayCommand
     {
         private Action<object> execute;
         private Func<object, bool> canExecute;
@@ -48,5 +49,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
         {
             this.execute(parameter);
         }
+
+        public void RaiseCanExecuteChanged()
+            => CommandManager.InvalidateRequerySuggested();
     }
 }
