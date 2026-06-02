@@ -33,6 +33,7 @@
     <ProjectReference Include="..\Philadelphus.Infrastructure.AssemblyAdapters.CSharp\Philadelphus.Infrastructure.AssemblyAdapters.CSharp.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.AssemblyAdapters.Python\Philadelphus.Infrastructure.AssemblyAdapters.Python.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.AssemblyAdapters.JavaScript\Philadelphus.Infrastructure.AssemblyAdapters.JavaScript.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

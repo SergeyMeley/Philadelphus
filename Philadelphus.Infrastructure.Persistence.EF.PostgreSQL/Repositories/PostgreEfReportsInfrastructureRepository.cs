@@ -197,29 +197,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            string sql;
-            if (report.Type == "Function")
-            {
-                var paramNames = report.Parameters.Select(k => $"@{k.Name}") ?? Enumerable.Empty<string>();
-                var paramList = string.Join(", ", paramNames);
-                sql = $"SELECT * FROM \"{report.Schema}\".\"{report.Name}\"({paramList})";
-            }
-            else if (report.Type == "View" || report.Type == "MaterializedView")
-            {
-                sql = $"SELECT * FROM \"{report.Schema}\".\"{report.Name}\"";
-            }
-            else
-            {
-                throw new ArgumentException("Некорректный тип отчета.");
-            }
-
-            using var cmd = new NpgsqlCommand(sql, connection);
+            var reportSql = PostgreReportSqlBuilder.BuildExecuteReportSql(report);
+            using var cmd = new NpgsqlCommand(reportSql.CommandText, connection);
             if (report.Parameters != null)
             {
-                foreach (var param in report.Parameters)
+                for (var index = 0; index < reportSql.ParameterNames.Count; index++)
                 {
-                    var paramPair = new KeyValuePair<string, object>(param.Name, param.Value);
-                    cmd.Parameters.Add(CreateParameter(paramPair, report));
+                    cmd.Parameters.Add(CreateParameter(reportSql.ParameterNames[index], report.Parameters[index]));
                 }
             }
 
@@ -242,9 +226,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var concurrently = await HasValidUniqueIndexAsync(report.Schema, report.Name, connection) ? "CONCURRENTLY " : string.Empty;
+            var concurrently = await HasValidUniqueIndexAsync(report.Schema, report.Name, connection);
 
-            var sql = $"REFRESH MATERIALIZED VIEW { concurrently }\"{report.Schema}\".\"{report.Name}\"";
+            var sql = PostgreReportSqlBuilder.BuildRefreshMaterializedViewSql(report, concurrently);
             using var cmd = new NpgsqlCommand(sql, connection);
             await cmd.ExecuteNonQueryAsync();
         }
@@ -281,14 +265,13 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
             return result;
         }
 
-        private NpgsqlParameter CreateParameter(KeyValuePair<string, object> param, ReportInfo report)
+        private NpgsqlParameter CreateParameter(string parameterName, ReportParameter param)
         {
-            var paramMeta = report.Parameters?.FirstOrDefault(p => p.Name == param.Key);
-            var paramType = paramMeta?.Type ?? param.Value?.GetType();
+            var paramType = param.Type ?? param.Value?.GetType();
 
             object convertedValue = PostgresTypeMapper.ConvertValue(param.Value, paramType);
 
-            var pgParam = new NpgsqlParameter($"@{param.Key}", convertedValue ?? DBNull.Value);
+            var pgParam = new NpgsqlParameter(parameterName, convertedValue ?? DBNull.Value);
 
             if (paramType != null)
             {
