@@ -3,17 +3,6 @@ using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services
 {
-    public interface IFileDialogService
-    {
-        string? OpenExcelFile();
-
-        string? SavePhjsonFile(string defaultFileName);
-
-        string? OpenImportSchemaFile();
-
-        string? SaveImportSchemaFile(string defaultFileName);
-    }
-
     public class FileDialogService : IFileDialogService
     {
         public string? OpenExcelFile()
@@ -59,15 +48,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
 
             return dialog.ShowDialog() == true ? dialog.FileName : null;
         }
-    }
-
-    public interface IMessageDialogService
-    {
-        void ShowInformation(string message, string title);
-
-        void ShowWarning(string message, string title);
-
-        void ShowError(string message, string title);
     }
 
     public class MessageDialogService : IMessageDialogService
