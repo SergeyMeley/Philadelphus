@@ -11,8 +11,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Presentation.Services.Interfaces;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
@@ -24,7 +24,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         private readonly ObservableCollection<NotificationVM> _currentMessageLogAllNotifications = new ObservableCollection<NotificationVM>();
         private readonly ObservableCollection<NotificationVM> _currentMessageLogFilteredNotifications = new ObservableCollection<NotificationVM>();
         private readonly ConcurrentQueue<Notification> _pendingNotifications = new ConcurrentQueue<Notification>();
-        private readonly DispatcherTimer _pendingNotificationsFlushTimer;
+        private readonly CancellationTokenSource _flushTimerCts = new();
 
         private bool _isOkMessagesVisible = true;
         private bool _isInfoMessagesVisible = true;
@@ -164,12 +164,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             ApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
-            _pendingNotificationsFlushTimer = new DispatcherTimer(DispatcherPriority.Background)
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            _pendingNotificationsFlushTimer.Tick += PendingNotificationsFlushTimerOnTick;
-            _pendingNotificationsFlushTimer.Start();
+            _ = RunFlushTimerAsync(_flushTimerCts.Token);
 
             CopyNotificationsHistory();
         }
@@ -177,7 +172,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         internal bool CopyNotificationsHistory()
         {
             var history = _notificationService.NotificationsHistory.ToList();
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            _serviceProvider.GetRequiredService<IDispatcherService>().BeginInvoke(() =>
             {
                 foreach (var item in history)
                 {
@@ -185,7 +180,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
                 }
 
                 FilterVisibleNotifications();
-            }), DispatcherPriority.Background);
+            });
 
             return true;
         }
@@ -238,11 +233,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             return true;
         }
 
-        private void PendingNotificationsFlushTimerOnTick(object? sender, EventArgs e)
+        private async Task RunFlushTimerAsync(CancellationToken ct)
         {
-            if (_pendingNotifications.IsEmpty)
-                return;
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            try
+            {
+                while (await timer.WaitForNextTickAsync(ct).ConfigureAwait(false))
+                {
+                    if (!_pendingNotifications.IsEmpty)
+                        _serviceProvider.GetRequiredService<IDispatcherService>().Invoke(FlushPendingNotifications);
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
 
+        private void FlushPendingNotifications()
+        {
             var addedAny = false;
             while (_pendingNotifications.TryDequeue(out var notification))
             {
@@ -254,9 +260,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
             }
 
             if (addedAny)
-            {
                 FilterVisibleNotifications();
-            }
         }
 
         public RelayCommand ClearMessageLogCommand
@@ -326,8 +330,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         /// </summary>
         public void Dispose()
         {
-            _pendingNotificationsFlushTimer.Stop();
-            _pendingNotificationsFlushTimer.Tick -= PendingNotificationsFlushTimerOnTick;
+            _flushTimerCts.Cancel();
+            _flushTimerCts.Dispose();
 
             if (_isSubscribedNotificationsHistoryUpdate)
             {

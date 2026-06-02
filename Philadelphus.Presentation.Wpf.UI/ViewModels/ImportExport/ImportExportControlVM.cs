@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
@@ -356,7 +357,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         {
             ArgumentNullException.ThrowIfNull(currentProcess);
 
-            Application.Current.Dispatcher.Invoke(() =>
+            _serviceProvider.GetRequiredService<IDispatcherService>().Invoke(() =>
             {
                 CurrentProcess = currentProcess;
                 OnPropertyChanged(nameof(CurrentProcess));
@@ -368,7 +369,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             ArgumentOutOfRangeException.ThrowIfNegative(currentNumber);
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalCount);
 
-            Application.Current.Dispatcher.Invoke(() =>
+            _serviceProvider.GetRequiredService<IDispatcherService>().Invoke(() =>
             {
                 CurrentProgress = $"{currentNumber} / {totalCount} ({Math.Round((double)currentNumber / totalCount * 100, 1)} %)";
                 OnPropertyChanged(nameof(CurrentProgress));
