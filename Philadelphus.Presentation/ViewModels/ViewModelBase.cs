@@ -9,11 +9,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        protected internal virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        protected internal virtual void OnPropertyChangedRecursive(HashSet<object> visited = null)
+        public virtual void OnPropertyChangedRecursive(HashSet<object> visited = null)
         {
             visited ??= new HashSet<object>();
 
