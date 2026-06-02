@@ -24,7 +24,6 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -61,30 +60,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public Visibility SystemBaseLeaveControlVisibility
-        {
-            get
-            {
-                if (SelectedRepositoryMember?.Model is SystemBaseTreeLeaveModel)
-                {
-                    return Visibility.Visible;
-                }
-                return Visibility.Collapsed;
-            }
-        }
+        public bool IsSystemBaseLeaveControlVisible
+            => SelectedRepositoryMember?.Model is SystemBaseTreeLeaveModel;
 
-        public Visibility ParentControlVisibility
-        {
-            get
-            {
-                if (SelectedRepositoryMember is TreeRootVM 
-                    || SelectedRepositoryMember is TreeNodeVM)
-                {
-                    return Visibility.Visible;
-                }
-                return Visibility.Collapsed;
-            }
-        }
+        public bool IsParentControlVisible
+            => SelectedRepositoryMember is TreeRootVM or TreeNodeVM;
 
         /// <summary>
         /// Имя открытого репозитория Чубушника.
@@ -103,8 +83,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 RebuildChildCollectionTable();
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
-                OnPropertyChanged(nameof(SystemBaseLeaveControlVisibility));
-                OnPropertyChanged(nameof(ParentControlVisibility));
+                OnPropertyChanged(nameof(IsSystemBaseLeaveControlVisible));
+                OnPropertyChanged(nameof(IsParentControlVisible));
                 FormulaBarVM.SelectedFormulaAttribute = null;
                 FormulaBarVM.NotifySelectedRepositoryMemberChanged();
             }
@@ -166,7 +146,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 _isRepositoryLoading = value;
                 OnPropertyChanged(nameof(IsRepositoryLoading));
                 OnPropertyChanged(nameof(IsRepositoryContentEnabled));
-                OnPropertyChanged(nameof(RepositoryLoadingVisibility));
+                OnPropertyChanged(nameof(IsRepositoryLoadingVisible));
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -176,12 +156,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// </summary>
         public bool IsRepositoryContentEnabled => IsRepositoryLoading == false;
 
-        /// <summary>
-        /// Видимость индикатора загрузки репозитория.
-        /// </summary>
-        public Visibility RepositoryLoadingVisibility => IsRepositoryLoading
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        public bool IsRepositoryLoadingVisible => IsRepositoryLoading;
 
         #endregion
 

@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI"
              xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters">
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
         <converters:MainEntityToIconConverter x:Key="mainEntityToIconConverter" />
         <converters:SelectedIndexConverter x:Key="selectedIndexConverter" />
         <converters:RepresentationToDataGridVisibilityConverter x:Key="representationToDataGridVisibilityConverter" />

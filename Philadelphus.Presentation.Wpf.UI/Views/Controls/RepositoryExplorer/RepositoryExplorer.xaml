@@ -94,7 +94,7 @@
                     </StackPanel>
                 </DockPanel>
                 <TabControl Grid.Row="1" SelectedIndex="0">
-                    <TabItem Header="Значение" Visibility="{Binding SystemBaseLeaveControlVisibility}">
+                    <TabItem Header="Значение" Visibility="{Binding IsSystemBaseLeaveControlVisible, Converter={StaticResource booleanToVisibilityConverter}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto" MinWidth="100"></ColumnDefinition>
@@ -115,8 +115,8 @@
                     <TabItem Header="Атрибуты">
                         <local:Attributes></local:Attributes>
                     </TabItem>
-                    <TabItem Header="Наследники" 
-                         Visibility="{Binding ParentControlVisibility}">
+                    <TabItem Header="Наследники"
+                         Visibility="{Binding IsParentControlVisible, Converter={StaticResource booleanToVisibilityConverter}}">
                         <TabControl>
                             <TabItem Header="Плоская таблица">
                                 <local:RepositoryExplorerChildrenFlatTable />
@@ -183,6 +183,6 @@
                      Height="4"
                      Margin="1,0,1,1"
                      IsIndeterminate="True"
-                     Visibility="{Binding RepositoryLoadingVisibility}" />
+                     Visibility="{Binding IsRepositoryLoadingVisible, Converter={StaticResource booleanToVisibilityConverter}}" />
     </Grid>
 </UserControl>
