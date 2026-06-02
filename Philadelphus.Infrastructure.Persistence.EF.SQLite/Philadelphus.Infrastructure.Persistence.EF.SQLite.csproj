@@ -22,4 +22,10 @@
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF\Philadelphus.Infrastructure.Persistence.EF.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Philadelphus.Tests.Domain</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

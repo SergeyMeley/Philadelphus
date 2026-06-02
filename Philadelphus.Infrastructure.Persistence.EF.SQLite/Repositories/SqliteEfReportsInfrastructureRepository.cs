@@ -93,7 +93,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
             string sql;
             if (report.Type == "View" || report.Type == "MaterializedView")
             {
-                sql = $"SELECT * FROM \"{report.Name}\"";
+                sql = SqliteReportSqlBuilder.BuildExecuteReportSql(report);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
                 _logger?.Information($"Пересоздание таблицы '{report.Name}' с SQL: {cleanSql}");
 
                 // Пересоздать таблицу: сначала удалить, потом создать заново
-                using (var deleteCmd = new SqliteCommand($"DROP TABLE IF EXISTS \"{report.Name}\"", connection))
+                using (var deleteCmd = new SqliteCommand(SqliteReportSqlBuilder.BuildDropTableSql(report), connection))
                 {
                     await deleteCmd.ExecuteNonQueryAsync();
                 }
@@ -334,7 +334,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
             
             foreach (var attachment in attachments)
             {
-                var parts = attachment.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                var parts = attachment.Split(new[] { '=' }, 2, StringSplitOptions.None);
                 if (parts.Length != 2)
                     continue;
 
@@ -352,7 +352,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
                 {
                     _logger?.Information($"Прикрепление БД '{alias}' по пути '{path}'");
                     using var attachCmd = new SqliteCommand(
-                        $"ATTACH DATABASE '{path}' AS {alias};", connection);
+                        SqliteReportSqlBuilder.BuildAttachDatabaseSql(alias), connection);
+                    attachCmd.Parameters.AddWithValue(SqliteReportSqlBuilder.AttachDatabasePathParameterName, path);
                     await attachCmd.ExecuteNonQueryAsync();
                 }
                 else
