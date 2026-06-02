@@ -24,6 +24,7 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
@@ -214,6 +215,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                     RegisterFormulaEngine(services);
                     // Слой Presentation
                     services.AddSingleton<IConfigurationService, ConfigurationService>();
+                    services.AddSingleton<IDialogService, WpfDialogService>();
+                    services.AddSingleton<IDispatcherService, WpfDispatcherService>();
+                    services.AddSingleton<WpfWindowService>();
+                    services.AddSingleton<IWindowService>(sp => sp.GetRequiredService<WpfWindowService>());
 
                     // Регистрация ViewModel
                     // Общие ViewModel
