@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
-using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
@@ -10,7 +10,6 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using System.IO;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -138,14 +137,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (string.IsNullOrEmpty(Name)
                         || _dataStoragesCollectionVM.SelectedDataStorageVM == null)
                     {
-                        MessageBox.Show($"Некорректно заполнены параметры, операция не выполнена.");
+                        _notificationService.SendModalWindow<RepositoryCreationControlVM>(
+                            "Некорректно заполнены параметры, операция не выполнена.", 
+                            NotificationCriticalLevelModel.Warning);
                         return;
                     }
 
                     var existsRepository = _repositoryCollectionVM.PhiladelphusRepositoriesVMs.FirstOrDefault(x => x.Name == _name);
                     if (existsRepository != null)
                     {
-                        MessageBox.Show($"Репозиторий '{existsRepository?.Name}' [{existsRepository?.Uuid}] уже существует в хранилище '{existsRepository?.OwnDataStorageName}' [{existsRepository?.OwnDataStorageUuid}], операция не выполнена. Откройте репозиторий из списка доступных.");
+                        _notificationService.SendModalWindow<RepositoryCreationControlVM>(
+                            $"Репозиторий '{existsRepository?.Name}' [{existsRepository?.Uuid}] уже существует в хранилище '{existsRepository?.OwnDataStorageName}' [{existsRepository?.OwnDataStorageUuid}], операция не выполнена. Откройте репозиторий из списка доступных.",
+                            NotificationCriticalLevelModel.Warning);
                         return;
                     }
 

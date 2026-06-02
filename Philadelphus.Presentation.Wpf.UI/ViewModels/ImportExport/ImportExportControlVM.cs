@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -233,11 +234,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         {
             if (_repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model.ContentShrub == null)
             {
-                MessageBox.Show(
+                _serviceProvider.GetRequiredService<INotificationService>().SendModalWindow<ImportExportControlVM>(
                     "Активный репозиторий не содержит рабочего дерева для импорта.",
-                    "Импорт Excel",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                    NotificationCriticalLevelModel.Warning);
                 return;
             }
 

@@ -1,16 +1,15 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
-using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Serilog;
 using System.IO;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -118,12 +117,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     if (string.IsNullOrEmpty(Name)
                         || SelectedConnectionStringsContainer == null)
                     {
-                        MessageBox.Show($"Некорректно заполнены параметры, операция не выполнена.");
+                        _notificationService.SendModalWindow<StorageCreationControlVM>(
+                            "Некорректно заполнены параметры, операция не выполнена.", 
+                            NotificationCriticalLevelModel.Warning);
                         return;
                     }
                     if (_dataStoragesCollectionConfig.Value.DataStorages.Any(x => x.Name == Name))
                     {
-                        MessageBox.Show($"Хранилище '{Name}' уже существует, операция не выполнена.");
+                        _notificationService.SendModalWindow<StorageCreationControlVM>(
+                            $"Хранилище '{Name}' уже существует, операция не выполнена.", 
+                            NotificationCriticalLevelModel.Warning);
                         return;
                     }
 

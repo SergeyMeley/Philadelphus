@@ -26,8 +26,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Shapes;
+using Philadelphus.Core.Domain.Entities.Enums;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -190,7 +189,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Не удалось открыть файл: {ex.Message}");
+                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
+                            $"Не удалось открыть файл: {ex.Message}");
                     }
                 });
             }
@@ -218,13 +218,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     {
                         var originPath = SelectedConfigFile.FileInfo.DirectoryName;
                         _configurationService.MoveConfigFile(SelectedConfigFile.FileInfo, new DirectoryInfo(path));
-                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' перемещен\r\nиз\r\n'{originPath}'\r\nв\r\n'{SelectedConfigFile.FileInfo.DirectoryName}'");
+                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
+                            $"Настроечный файл '{SelectedConfigFile.ConfigName}' перемещен\r\nиз\r\n'{originPath}'\r\nв\r\n'{SelectedConfigFile.FileInfo.DirectoryName}'",
+                            NotificationCriticalLevelModel.Info);
                     }
                     catch (Exception)
                     {
-                        MessageBox.Show("Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
+                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
+                            "Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
                     }
-                    
+
                     SelectedConfigFile.OnPropertyChanged(nameof(SelectedConfigFile.FilePath));
                 });
             }
@@ -257,11 +260,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         var originPath = SelectedConfigFile.FileInfo.FullName;
 
                         _configurationService.SelectAnotherConfigFile(SelectedConfigFile, new FileInfo(path));
-                        MessageBox.Show($"Настроечный файл '{SelectedConfigFile.ConfigName}' заменен\r\nс\r\n'{originPath}'\r\nна\r\n'{SelectedConfigFile.FilePath}'");
+                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
+                            $"Настроечный файл '{SelectedConfigFile.ConfigName}' заменен\r\nс\r\n'{originPath}'\r\nна\r\n'{SelectedConfigFile.FilePath}'",
+                            NotificationCriticalLevelModel.Info);
                     }
                     catch (Exception)
                     {
-                        MessageBox.Show("Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
+                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
+                            "Ошибка перемещения файла, действие не выполнено. Обратитесь к разработчику.");
                     }
 
                     SelectedConfigFile.OnPropertyChanged(nameof(SelectedConfigFile.FilePath));
@@ -340,9 +346,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     }
                     else
                     {
-                        var message = "Путь к конфигурационному файлу 'ConnectionStringsCollectionConfig' не найден, изменения не сохранены";
-                        _logger.Error(message);
-                        MessageBox.Show(message);
+                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
+                            "Путь к конфигурационному файлу 'ConnectionStringsCollectionConfig' не найден, изменения не сохранены");
                     }
                 });
             }

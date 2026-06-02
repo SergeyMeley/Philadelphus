@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Services.Interfaces;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs
 {
@@ -58,32 +54,30 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsV
         {
             ArgumentNullException.ThrowIfNull(notification);
 
-            MessageBoxImage image;
+            var dialog = _serviceProvider.GetRequiredService<IDialogService>();
+            var title = notification.CriticalLevel.ToString();
+
             switch (notification.CriticalLevel)
             {
                 case NotificationCriticalLevelModel.Ok:
-                    image = MessageBoxImage.None;
+                    dialog.ShowInformation(notification.Text, title); 
                     break;
                 case NotificationCriticalLevelModel.Info:
-                    image = MessageBoxImage.Information;
+                    dialog.ShowInformation(notification.Text, title);
                     break;
                 case NotificationCriticalLevelModel.Warning:
-                    image = MessageBoxImage.Warning;
+                    dialog.ShowWarning(notification.Text, title);
                     break;
                 case NotificationCriticalLevelModel.Error:
-                    image = MessageBoxImage.Error;
+                    dialog.ShowError(notification.Text, title);
                     break;
                 case NotificationCriticalLevelModel.Alarm:
-                    image = MessageBoxImage.Error;
+                    dialog.ShowError(notification.Text, title);
                     break;
                 default:
-                    image = MessageBoxImage.Error;
+                    dialog.ShowError(notification.Text, title);
                     break;
             }
-            MessageBox.Show(
-                messageBoxText: notification.Text,
-                caption: notification.CriticalLevel.ToString(),
-                MessageBoxButton.OK, icon: image);
             return true;
         }
 

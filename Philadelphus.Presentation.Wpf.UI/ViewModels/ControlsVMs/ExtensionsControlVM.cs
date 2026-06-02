@@ -210,7 +210,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             catch (Exception ex)
             {
                 StatusMessage = $"Ошибка при запуске: {ex.Message}";
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка запуска", MessageBoxButton.OK, MessageBoxImage.Error);
+                _notificationService.SendModalWindow<ExtensionsControlVM>(
+                    $"Ошибка: {ex.Message}");
             }
             finally
             {
@@ -235,7 +236,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             catch (Exception ex)
             {
                 StatusMessage = $"Ошибка при останове: {ex.Message}";
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка останова", MessageBoxButton.OK, MessageBoxImage.Error);
+                _notificationService.SendModalWindow<ExtensionsControlVM>(
+                    $"Ошибка: {ex.Message}");
             }
             finally
             {
@@ -260,7 +262,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             catch (Exception ex)
             {
                 StatusMessage = $"Ошибка при выполнении: {ex.Message}";
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка выполнения", MessageBoxButton.OK, MessageBoxImage.Error);
+                _notificationService.SendModalWindow<ExtensionsControlVM>(
+                    $"Ошибка: {ex.Message}");
             }
             finally
             {
