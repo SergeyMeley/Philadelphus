@@ -3,7 +3,6 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs
 {
@@ -62,7 +61,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         /// <summary>
         /// Дочерние элементы.
         /// </summary>
-        public CompositeCollection Childs { get; }
+        public ObservableCollection<TreeNodeVM> Childs => _childNodes;
 
         #endregion
 
@@ -97,12 +96,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 _childLeaves.Add(new TreeLeaveVM(this, item, dataStoragesCollectionVM, _service));
             }
-
-            Childs = new CompositeCollection()
-            {
-                new CollectionContainer { Collection = _childNodes },
-                new CollectionContainer { Collection = _childLeaves },
-            };
         }
 
         #endregion

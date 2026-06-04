@@ -6,7 +6,6 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Serilog;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {

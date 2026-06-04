@@ -3,7 +3,6 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs
 {
@@ -47,7 +46,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         /// <summary>
         /// Дочерние элементы.
         /// </summary>
-        public CompositeCollection Childs { get; }
+        public ObservableCollection<TreeNodeVM> Childs => _childNodes;
 
         #endregion
 
@@ -81,10 +80,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                     }
                 }
             }
-            Childs = new CompositeCollection()
-            {
-                new CollectionContainer { Collection = _childNodes },
-            };
         }
 
         #endregion

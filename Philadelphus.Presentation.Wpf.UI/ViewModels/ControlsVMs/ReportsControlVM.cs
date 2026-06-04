@@ -19,8 +19,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Windows.Data;
-using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -46,17 +44,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             get
             {
                 return _dataStoragesCollectionVM.DataStoragesVMs.Where(x => x.Model.HasReportsInfrastructureRepository);
-            }
-        }
-        public CompositeCollection DisplayedDataStoragesVMs 
-        { 
-            get
-            {
-                return new CompositeCollection()
-            {
-                new CollectionContainer { Collection = new[] { new { Name = "не выбрано" } } },
-                new CollectionContainer { Collection = DataStoragesVMs },
-            }; ;
             }
         }
         public DataStorageVM SelectedDataStorageVM
