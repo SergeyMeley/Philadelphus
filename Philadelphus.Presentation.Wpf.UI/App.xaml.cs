@@ -352,6 +352,11 @@ namespace Philadelphus.Presentation.Wpf.UI
                 Log.Information("Запуск Host...");
                 await _host.StartAsync();
 
+                var windowService = _host.Services.GetRequiredService<WpfWindowService>();
+                windowService.Register<MainWindowVM, MainWindow>();
+                windowService.Register<LaunchWindowVM, LaunchWindow>();
+                windowService.Register<FormulaTestControlVM, FormulaEditorWindow>();
+
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Искусственная задержка запуска 2 сек.");
                 Log.Information("Startup завершён. Переключение на File-only logging...");
