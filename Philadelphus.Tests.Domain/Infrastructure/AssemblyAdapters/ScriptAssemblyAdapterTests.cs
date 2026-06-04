@@ -6,7 +6,7 @@ using Philadelphus.Infrastructure.AssemblyAdapters.Python;
 namespace Philadelphus.Tests.Domain.Infrastructure.AssemblyAdapters
 {
     /// <summary>
-    /// Tests for reserved script adapter contracts.
+    /// Тесты контрактов зарезервированных скриптовых адаптеров.
     /// </summary>
     public class ScriptAssemblyAdapterTests
     {

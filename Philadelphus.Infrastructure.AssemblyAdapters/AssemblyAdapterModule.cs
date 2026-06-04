@@ -1,7 +1,7 @@
 namespace Philadelphus.Infrastructure.AssemblyAdapters
 {
     /// <summary>
-    /// A loaded external module, represented without binding the common contract to one runtime.
+    /// Загруженный внешний модуль без привязки общего контракта к конкретной среде выполнения.
     /// </summary>
     public sealed class AssemblyAdapterModule
     {

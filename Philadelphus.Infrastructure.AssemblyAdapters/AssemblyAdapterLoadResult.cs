@@ -1,7 +1,7 @@
 namespace Philadelphus.Infrastructure.AssemblyAdapters
 {
     /// <summary>
-    /// Result of loading external modules. Errors do not prevent other modules from loading.
+    /// Результат загрузки внешних модулей. Ошибки не прерывают загрузку остальных модулей.
     /// </summary>
     public sealed class AssemblyAdapterLoadResult
     {

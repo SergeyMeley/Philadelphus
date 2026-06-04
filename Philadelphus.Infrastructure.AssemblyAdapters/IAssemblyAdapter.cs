@@ -1,7 +1,7 @@
 namespace Philadelphus.Infrastructure.AssemblyAdapters
 {
     /// <summary>
-    /// Loads external code modules for one runtime family.
+    /// Загружает внешние модули кода для одного семейства среды выполнения.
     /// </summary>
     public interface IAssemblyAdapter
     {

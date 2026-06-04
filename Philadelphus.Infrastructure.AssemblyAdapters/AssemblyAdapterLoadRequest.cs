@@ -8,5 +8,10 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters
         public required string Path { get; init; }
 
         public bool Recursive { get; init; }
+
+        /// <summary>
+        /// SHA-256-хэши файлов, разрешенных к загрузке исполняемыми адаптерами.
+        /// </summary>
+        public IReadOnlyCollection<string> AllowedSha256Hashes { get; init; } = [];
     }
 }

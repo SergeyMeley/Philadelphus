@@ -1,10 +1,11 @@
 using System.Reflection;
+using System.Security.Cryptography;
 using Philadelphus.Infrastructure.AssemblyAdapters;
 
 namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
 {
     /// <summary>
-    /// Loads trusted .NET assemblies and discovers exported types through reflection.
+    /// Загружает доверенные .NET-сборки и находит экспортируемые типы через reflection.
     /// </summary>
     public sealed class CSharpAssemblyAdapter : IAssemblyAdapter
     {
@@ -19,9 +20,15 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
 
             var modules = new List<AssemblyAdapterModule>();
             var errors = new List<AssemblyAdapterLoadError>();
+            var allowedSha256Hashes = NormalizeAllowedSha256Hashes(request, errors);
 
             foreach (var path in ResolveAssemblyFiles(request))
             {
+                if (IsAssemblyHashAllowed(path, allowedSha256Hashes, errors) == false)
+                {
+                    continue;
+                }
+
                 try
                 {
                     var assembly = Assembly.LoadFrom(path);
@@ -34,11 +41,95 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
                 }
                 catch (Exception ex)
                 {
-                    errors.Add(CreateError(path, $"Failed to load C# assembly '{path}'.", ex));
+                    errors.Add(CreateError(path, $"Не удалось загрузить C#-сборку '{path}'.", ex));
                 }
             }
 
             return new AssemblyAdapterLoadResult(modules, errors);
+        }
+
+        private HashSet<string> NormalizeAllowedSha256Hashes(
+            AssemblyAdapterLoadRequest request,
+            List<AssemblyAdapterLoadError> errors)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var hash in request.AllowedSha256Hashes)
+            {
+                var normalizedHash = NormalizeSha256Hash(hash);
+                if (normalizedHash is null)
+                {
+                    errors.Add(CreateError(
+                        request.Path,
+                        $"Список разрешенных SHA-256 для C#-сборок содержит недопустимое значение '{hash}'."));
+                    continue;
+                }
+
+                result.Add(normalizedHash);
+            }
+
+            return result;
+        }
+
+        private bool IsAssemblyHashAllowed(
+            string path,
+            HashSet<string> allowedSha256Hashes,
+            List<AssemblyAdapterLoadError> errors)
+        {
+            if (allowedSha256Hashes.Count == 0)
+            {
+                errors.Add(CreateError(
+                    path,
+                    "Для загрузки C#-сборки требуется явный список разрешенных SHA-256."));
+                return false;
+            }
+
+            string actualHash;
+            try
+            {
+                actualHash = ComputeSha256Hash(path);
+            }
+            catch (Exception ex)
+            {
+                errors.Add(CreateError(path, $"Не удалось вычислить SHA-256-хэш C#-сборки '{path}'.", ex));
+                return false;
+            }
+
+            if (allowedSha256Hashes.Contains(actualHash))
+            {
+                return true;
+            }
+
+            errors.Add(CreateError(
+                path,
+                $"C#-сборка '{path}' отсутствует в списке разрешенных SHA-256."));
+            return false;
+        }
+
+        private static string? NormalizeSha256Hash(string hash)
+        {
+            if (string.IsNullOrWhiteSpace(hash))
+            {
+                return null;
+            }
+
+            var normalizedHash = hash.Trim();
+            const string Prefix = "sha256:";
+            if (normalizedHash.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedHash = normalizedHash[Prefix.Length..];
+            }
+
+            return normalizedHash.Length == 64 && normalizedHash.All(Uri.IsHexDigit)
+                ? normalizedHash.ToLowerInvariant()
+                : null;
+        }
+
+        private static string ComputeSha256Hash(string path)
+        {
+            using var file = File.OpenRead(path);
+            var hash = SHA256.HashData(file);
+            return Convert.ToHexString(hash).ToLowerInvariant();
         }
 
         public CSharpAssemblyInstanceLoadResult<TContract> CreateInstances<TContract>(
@@ -54,7 +145,7 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
             {
                 if (module.LoadedArtifact is not Assembly assembly)
                 {
-                    errors.Add(CreateError(module.SourcePath, "Loaded C# module does not contain a reflection assembly."));
+                    errors.Add(CreateError(module.SourcePath, "Загруженный C#-модуль не содержит reflection-сборку."));
                     continue;
                 }
 
@@ -76,7 +167,7 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
                     {
                         errors.Add(CreateError(
                             module.SourcePath,
-                            $"Failed to create '{typeof(TContract).FullName}' instance from type '{type.FullName}'.",
+                            $"Не удалось создать экземпляр '{typeof(TContract).FullName}' из типа '{type.FullName}'.",
                             ex));
                     }
                 }
@@ -126,12 +217,12 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
             }
             catch (ReflectionTypeLoadException ex)
             {
-                errors.Add(CreateError(sourcePath, $"Some types from '{sourcePath}' could not be loaded.", ex));
+                errors.Add(CreateError(sourcePath, $"Не удалось загрузить часть типов из '{sourcePath}'.", ex));
                 return ex.Types.Where(type => type is not null)!;
             }
             catch (Exception ex)
             {
-                errors.Add(CreateError(sourcePath, $"Types from '{sourcePath}' could not be inspected.", ex));
+                errors.Add(CreateError(sourcePath, $"Не удалось проанализировать типы из '{sourcePath}'.", ex));
                 return [];
             }
         }

@@ -3,7 +3,7 @@ using Philadelphus.Infrastructure.AssemblyAdapters;
 namespace Philadelphus.Infrastructure.AssemblyAdapters.JavaScript
 {
     /// <summary>
-    /// Reserved JavaScript script adapter. Runtime execution is intentionally not implemented in stage 1.
+    /// Зарезервированный адаптер JavaScript-скриптов. Выполнение в среде JavaScript намеренно не реализовано на первом этапе.
     /// </summary>
     public sealed class JavaScriptAssemblyAdapter : IAssemblyAdapter
     {
@@ -23,7 +23,7 @@ namespace Philadelphus.Infrastructure.AssemblyAdapters.JavaScript
                     {
                         Language = Language,
                         SourcePath = Path.GetFullPath(request.Path),
-                        Message = "JavaScript runtime adapters are reserved for a future stage and are not loaded in stage 1."
+                        Message = "Адаптеры среды JavaScript зарезервированы для будущего этапа и не загружаются на первом этапе."
                     }
                 ]);
         }

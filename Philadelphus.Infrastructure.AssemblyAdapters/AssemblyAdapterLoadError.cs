@@ -1,7 +1,7 @@
 namespace Philadelphus.Infrastructure.AssemblyAdapters
 {
     /// <summary>
-    /// Non-fatal load error reported by an adapter.
+    /// Некритичная ошибка загрузки, возвращенная адаптером.
     /// </summary>
     public sealed class AssemblyAdapterLoadError
     {

@@ -3,7 +3,7 @@ using Philadelphus.Infrastructure.AssemblyAdapters;
 namespace Philadelphus.Infrastructure.AssemblyAdapters.CSharp
 {
     /// <summary>
-    /// Result of creating typed instances from loaded C# assemblies.
+    /// Результат создания типизированных экземпляров из загруженных C#-сборок.
     /// </summary>
     public sealed class CSharpAssemblyInstanceLoadResult<TContract>
         where TContract : class

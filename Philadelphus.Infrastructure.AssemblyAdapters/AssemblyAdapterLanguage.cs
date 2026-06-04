@@ -1,7 +1,7 @@
 namespace Philadelphus.Infrastructure.AssemblyAdapters
 {
     /// <summary>
-    /// Runtime family handled by an assembly/script adapter.
+    /// Семейство среды выполнения, поддерживаемое адаптером сборок или скриптов.
     /// </summary>
     public enum AssemblyAdapterLanguage
     {
