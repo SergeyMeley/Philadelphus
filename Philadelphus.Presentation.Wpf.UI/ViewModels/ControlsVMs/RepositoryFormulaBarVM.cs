@@ -16,6 +16,7 @@ using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
@@ -58,12 +59,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private FormulaRecalculationModeVM _selectedFormulaRecalculationMode;
         private bool _isFormulaAttributeNotificationInProgress;
 
-        private RelayCommand? _selectChildFormulaCellCommand;
-        private RelayCommand? _applyFormulaBarCommand;
-        private RelayCommand? _cancelFormulaBarCommand;
-        private RelayCommand? _openFormulaEditorFromFormulaBarCommand;
-        private RelayCommand? _recalculateCurrentFormulaCommand;
-        private RelayCommand? _recalculateAllFormulasCommand;
+        private IRelayCommand? _selectChildFormulaCellCommand;
+        private IRelayCommand? _applyFormulaBarCommand;
+        private IRelayCommand? _cancelFormulaBarCommand;
+        private IRelayCommand? _openFormulaEditorFromFormulaBarCommand;
+        private IRelayCommand? _recalculateCurrentFormulaCommand;
+        private IRelayCommand? _recalculateAllFormulasCommand;
 
         /// <summary>
         /// Инициализирует модель представления строки формул обозревателя репозитория.
@@ -350,7 +351,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда выбора атрибутной ячейки таблицы наследников для строки формул.
         /// </summary>
-        public RelayCommand SelectChildFormulaCellCommand =>
+        public IRelayCommand SelectChildFormulaCellCommand =>
             _selectChildFormulaCellCommand ??= new RelayCommand(
                 obj =>
                 {
@@ -363,7 +364,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда применения текста строки формул к активной ячейке.
         /// </summary>
-        public RelayCommand ApplyFormulaBarCommand =>
+        public IRelayCommand ApplyFormulaBarCommand =>
             _applyFormulaBarCommand ??= new RelayCommand(
                 _ =>
                 {
@@ -377,7 +378,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда отмены редактирования строки формул.
         /// </summary>
-        public RelayCommand CancelFormulaBarCommand =>
+        public IRelayCommand CancelFormulaBarCommand =>
             _cancelFormulaBarCommand ??= new RelayCommand(
                 _ =>
                 {
@@ -396,7 +397,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда открытия отдельного редактора формул с текущим текстом строки формул.
         /// </summary>
-        public RelayCommand OpenFormulaEditorFromFormulaBarCommand =>
+        public IRelayCommand OpenFormulaEditorFromFormulaBarCommand =>
             _openFormulaEditorFromFormulaBarCommand ??= new RelayCommand(
                 _ =>
                 {
@@ -414,7 +415,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда пересчета всех формул текущего выбранного элемента репозитория.
         /// </summary>
-        public RelayCommand RecalculateCurrentFormulaCommand =>
+        public IRelayCommand RecalculateCurrentFormulaCommand =>
             _recalculateCurrentFormulaCommand ??= new RelayCommand(
                 _ =>
                 {
@@ -428,7 +429,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда пересчета всех формул во всех элементах репозитория.
         /// </summary>
-        public RelayCommand RecalculateAllFormulasCommand =>
+        public IRelayCommand RecalculateAllFormulasCommand =>
             _recalculateAllFormulasCommand ??= new RelayCommand(
                 _ =>
                 {
@@ -474,6 +475,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 RecalculateCurrentFormula();
             }
+
+            _recalculateCurrentFormulaCommand?.RaiseCanExecuteChanged();
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -139,7 +140,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда выполнения операции главного окна.
         /// </summary>
-        public RelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;
+        public IRelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;
         public RelayCommand OpenMainWindowWithHeaderCommand
         {
             get

@@ -39,7 +39,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
         /// </summary>
         /// <param name="parameter">Дополнительный параметр преобразования.</param>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
-        public bool CanExecute(object parameter) => !_isExecuting && (_canExecute?.Invoke(parameter) ?? true);
+        public bool CanExecute(object parameter) => _isExecuting == false && (_canExecute?.Invoke(parameter) ?? true);
 
         /// <summary>
         /// Выполняет операцию Execute.

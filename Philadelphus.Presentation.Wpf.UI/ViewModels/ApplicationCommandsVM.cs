@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
@@ -14,10 +15,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         private readonly IServiceProvider _serviceProvider;
         private readonly IWindowService _windowService;
 
-        private RelayCommand? _openMainWindowCommand;
-        private RelayCommand? _openLaunchWindowCommand;
-        private RelayCommand? _openFormulaEditorWindowCommand;
-        private RelayCommand? _openDataStoragesSettingsControlCommand;
+        private IRelayCommand? _openMainWindowCommand;
+        private IRelayCommand? _openLaunchWindowCommand;
+        private IRelayCommand? _openFormulaEditorWindowCommand;
+        private IRelayCommand? _openDataStoragesSettingsControlCommand;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ApplicationCommandsVM" />.
@@ -36,7 +37,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             _windowService = windowService;
         }
 
-        public RelayCommand OpenMainWindowCommand => _openMainWindowCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenMainWindowCommand => _openMainWindowCommand ??= new RelayCommand(obj =>
         {
             var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
             var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
@@ -57,7 +58,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             _windowService.Hide(launchVM);
         });
 
-        public RelayCommand OpenLaunchWindowCommand => _openLaunchWindowCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenLaunchWindowCommand => _openLaunchWindowCommand ??= new RelayCommand(obj =>
         {
             var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
             _windowService.Show(launchVM);
@@ -66,7 +67,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         /// <summary>
         /// Команда открытия редактора формул.
         /// </summary>
-        public RelayCommand OpenFormulaEditorWindowCommand => _openFormulaEditorWindowCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenFormulaEditorWindowCommand => _openFormulaEditorWindowCommand ??= new RelayCommand(obj =>
         {
             var formulaEditorVM = CreateFormulaEditorVM(obj);
             if (formulaEditorVM == null)
@@ -78,7 +79,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         },
         obj => obj is FormulaTestControlVM or FormulaEditorOpenRequest);
 
-        public RelayCommand OpenDataStoragesSettingsControlCommand => _openDataStoragesSettingsControlCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenDataStoragesSettingsControlCommand => _openDataStoragesSettingsControlCommand ??= new RelayCommand(obj =>
         {
             var qwe = obj.GetType();
             var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();

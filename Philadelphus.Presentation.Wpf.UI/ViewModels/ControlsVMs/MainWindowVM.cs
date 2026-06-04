@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
@@ -164,12 +165,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда выполнения операции стартового окна.
         /// </summary>
-        public RelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
+        public IRelayCommand OpenLaunchWindowCommand => _applicationCommandsVM.OpenLaunchWindowCommand;
 
         /// <summary>
         /// Команда открытия редактора формул.
         /// </summary>
-        public RelayCommand OpenFormulaEditorWindowCommand => _applicationCommandsVM.OpenFormulaEditorWindowCommand;
+        public IRelayCommand OpenFormulaEditorWindowCommand => _applicationCommandsVM.OpenFormulaEditorWindowCommand;
 
         public RelayCommand OpenRepositoryMemberDetailsWindowCommand
         {
