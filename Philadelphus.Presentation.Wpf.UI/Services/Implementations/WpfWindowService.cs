@@ -25,7 +25,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
         public void Show<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
         {
             var window = CreateWindow(viewModel);
+            window.Topmost = true;
             window.Show();
+            window.Activate();
+            window.Topmost = false;
         }
 
         public bool? ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
@@ -44,6 +47,34 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
                     return;
                 }
             }
+        }
+
+        public void Hide<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.DataContext == viewModel)
+                {
+                    window.Hide();
+                    return;
+                }
+            }
+        }
+
+        public void ShowOrActivate<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.DataContext is TViewModel)
+                {
+                    window.DataContext = viewModel;
+                    window.Activate();
+                    return;
+                }
+            }
+            var newWindow = CreateWindow(viewModel);
+            newWindow.Owner = Application.Current.MainWindow;
+            newWindow.Show();
         }
 
         private Window CreateWindow<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase

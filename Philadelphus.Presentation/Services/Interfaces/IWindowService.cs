@@ -11,5 +11,7 @@ namespace Philadelphus.Presentation.Services.Interfaces
         void Show<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
         bool? ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
         void Close<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
+        void Hide<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
+        void ShowOrActivate<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
     }
 }

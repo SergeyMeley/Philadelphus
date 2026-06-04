@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
@@ -13,96 +12,78 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
     public class ApplicationCommandsVM
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IWindowService _windowService;
+
+        private RelayCommand? _openMainWindowCommand;
+        private RelayCommand? _openLaunchWindowCommand;
+        private RelayCommand? _openFormulaEditorWindowCommand;
+        private RelayCommand? _openDataStoragesSettingsControlCommand;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ApplicationCommandsVM" />.
         /// </summary>
         /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
+        /// <param name="windowService">Сервис управления окнами приложения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationCommandsVM(
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IWindowService windowService)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(windowService);
 
             _serviceProvider = serviceProvider;
+            _windowService = windowService;
         }
-        public RelayCommand OpenMainWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
-                    var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
-                    if (currentRepositoryVM != null)
-                    {
-                        var headerVM = launchVM.RepositoryHeadersCollectionVM.PhiladelphusRepositoryHeadersVMs.FirstOrDefault(x => x.Uuid == currentRepositoryVM.Uuid);
-                        if (headerVM == null)
-                        {
-                            headerVM = launchVM.RepositoryHeadersCollectionVM.AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(currentRepositoryVM);
-                        }
-                        headerVM.LastOpening = DateTime.UtcNow;
-                    }
 
-                    var appVM = _serviceProvider.GetRequiredService<ApplicationVM>();
-                    var repositoryExplorerControlVM = _serviceProvider.GetRequiredService<IRepositoryExplorerControlVMFactory>().Create(currentRepositoryVM);
-                    var mainWindowVM = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(repositoryExplorerControlVM);
-                    var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-                    mainWindow.DataContext = mainWindowVM;
-                    mainWindow.Topmost = true;
-                    mainWindow.Show();
-                    mainWindow.Activate();
-                    mainWindow.Topmost = false;
-                    var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
-                    launchWindow.Hide();
-                });
-            }
-        }
-        public RelayCommand OpenLaunchWindowCommand
+        public RelayCommand OpenMainWindowCommand => _openMainWindowCommand ??= new RelayCommand(obj =>
         {
-            get
+            var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
+            var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
+            if (currentRepositoryVM != null)
             {
-                return new RelayCommand(obj =>
+                var headerVM = launchVM.RepositoryHeadersCollectionVM.PhiladelphusRepositoryHeadersVMs.FirstOrDefault(x => x.Uuid == currentRepositoryVM.Uuid);
+                if (headerVM == null)
                 {
-                    var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
-                    launchWindow.Show();
-                });
+                    headerVM = launchVM.RepositoryHeadersCollectionVM.AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(currentRepositoryVM);
+                }
+                headerVM.LastOpening = DateTime.UtcNow;
             }
-        }
+
+            var appVM = _serviceProvider.GetRequiredService<ApplicationVM>();
+            var repositoryExplorerControlVM = _serviceProvider.GetRequiredService<IRepositoryExplorerControlVMFactory>().Create(currentRepositoryVM);
+            var mainWindowVM = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(repositoryExplorerControlVM);
+            _windowService.Show(mainWindowVM);
+            _windowService.Hide(launchVM);
+        });
+
+        public RelayCommand OpenLaunchWindowCommand => _openLaunchWindowCommand ??= new RelayCommand(obj =>
+        {
+            var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
+            _windowService.Show(launchVM);
+        });
 
         /// <summary>
         /// Команда открытия редактора формул.
         /// </summary>
-        public RelayCommand OpenFormulaEditorWindowCommand
+        public RelayCommand OpenFormulaEditorWindowCommand => _openFormulaEditorWindowCommand ??= new RelayCommand(obj =>
         {
-            get
+            var formulaEditorVM = CreateFormulaEditorVM(obj);
+            if (formulaEditorVM == null)
             {
-                FormulaEditorWindow? formulaEditorWindow = null;
-
-                return new RelayCommand(obj =>
-                {
-                    var formulaEditorVM = CreateFormulaEditorVM(obj);
-                    if (formulaEditorVM == null)
-                    {
-                        return;
-                    }
-
-                    if (formulaEditorWindow is { IsVisible: true })
-                    {
-                        formulaEditorWindow.DataContext = formulaEditorVM;
-                        formulaEditorWindow.Activate();
-                        return;
-                    }
-
-                    formulaEditorWindow = _serviceProvider.GetRequiredService<FormulaEditorWindow>();
-                    formulaEditorWindow.Owner = Application.Current?.MainWindow;
-                    formulaEditorWindow.DataContext = formulaEditorVM;
-                    formulaEditorWindow.Closed += (_, _) => formulaEditorWindow = null;
-                    formulaEditorWindow.Show();
-                },
-                obj => obj is FormulaTestControlVM or FormulaEditorOpenRequest);
+                return;
             }
-        }
+
+            _windowService.ShowOrActivate(formulaEditorVM);
+        },
+        obj => obj is FormulaTestControlVM or FormulaEditorOpenRequest);
+
+        public RelayCommand OpenDataStoragesSettingsControlCommand => _openDataStoragesSettingsControlCommand ??= new RelayCommand(obj =>
+        {
+            var qwe = obj.GetType();
+            var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
+            _windowService.Show(launchVM);
+        });
 
         private FormulaTestControlVM? CreateFormulaEditorVM(object obj)
         {
@@ -121,19 +102,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             }
 
             return null;
-        }
-
-        public RelayCommand OpenDataStoragesSettingsControlCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
-                {
-                    var qwe = obj.GetType();
-                    var launchWindow = _serviceProvider.GetRequiredService<LaunchWindow>();
-                    launchWindow.Show();
-                });
-            }
         }
     }
 
