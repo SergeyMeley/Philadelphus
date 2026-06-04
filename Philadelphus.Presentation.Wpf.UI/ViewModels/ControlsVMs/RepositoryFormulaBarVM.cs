@@ -21,7 +21,6 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System.ComponentModel;
-using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -58,6 +57,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private bool _isFormulaHighlightOpen;
         private FormulaRecalculationModeVM _selectedFormulaRecalculationMode;
         private bool _isFormulaAttributeNotificationInProgress;
+
+        private RelayCommand? _selectChildFormulaCellCommand;
+        private RelayCommand? _applyFormulaBarCommand;
+        private RelayCommand? _cancelFormulaBarCommand;
+        private RelayCommand? _openFormulaEditorFromFormulaBarCommand;
+        private RelayCommand? _recalculateCurrentFormulaCommand;
+        private RelayCommand? _recalculateAllFormulasCommand;
 
         /// <summary>
         /// Инициализирует модель представления строки формул обозревателя репозитория.
@@ -243,7 +249,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 if (SetProperty(ref _isFormulaBarEnabled, value))
                 {
                     OnPropertyChanged(nameof(IsFormulaReferenceSelectionActive));
-                    CommandManager.InvalidateRequerySuggested();
+                    _applyFormulaBarCommand?.RaiseCanExecuteChanged();
+                    _cancelFormulaBarCommand?.RaiseCanExecuteChanged();
+                    _openFormulaEditorFromFormulaBarCommand?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -333,7 +341,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         RecalculateCurrentFormula();
                     }
 
-                    CommandManager.InvalidateRequerySuggested();
+                    _recalculateCurrentFormulaCommand?.RaiseCanExecuteChanged();
+                    _recalculateAllFormulasCommand?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -341,39 +350,36 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда выбора атрибутной ячейки таблицы наследников для строки формул.
         /// </summary>
-        public RelayCommand SelectChildFormulaCellCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+        public RelayCommand SelectChildFormulaCellCommand =>
+            _selectChildFormulaCellCommand ??= new RelayCommand(
+                obj =>
                 {
                     if (obj is ChildFormulaCellSelection selection)
                     {
                         SelectChildFormulaCell(selection);
                     }
                 });
-            }
-        }
 
         /// <summary>
         /// Команда применения текста строки формул к активной ячейке.
         /// </summary>
-        public RelayCommand ApplyFormulaBarCommand
-        {
-            get
-            {
-                return new RelayCommand(_ => ApplyFormulaBar(), _ => CanApplyFormulaBar());
-            }
-        }
+        public RelayCommand ApplyFormulaBarCommand =>
+            _applyFormulaBarCommand ??= new RelayCommand(
+                _ =>
+                {
+                    ApplyFormulaBar();
+                },
+                _ =>
+                {
+                    return CanApplyFormulaBar();
+                });
 
         /// <summary>
         /// Команда отмены редактирования строки формул.
         /// </summary>
-        public RelayCommand CancelFormulaBarCommand
-        {
-            get
-            {
-                return new RelayCommand(_ =>
+        public RelayCommand CancelFormulaBarCommand =>
+            _cancelFormulaBarCommand ??= new RelayCommand(
+                _ =>
                 {
                     FormulaBarText = _formulaBarOriginalText;
                     FormulaBarCaretIndex = FormulaBarText.Length;
@@ -382,18 +388,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     IsFormulaBarEditing = false;
                     RequestFormulaValueCellFocus();
                 },
-                _ => IsFormulaBarEnabled);
-            }
-        }
+                _ =>
+                {
+                    return IsFormulaBarEnabled;
+                });
 
         /// <summary>
         /// Команда открытия отдельного редактора формул с текущим текстом строки формул.
         /// </summary>
-        public RelayCommand OpenFormulaEditorFromFormulaBarCommand
-        {
-            get
-            {
-                return new RelayCommand(_ =>
+        public RelayCommand OpenFormulaEditorFromFormulaBarCommand =>
+            _openFormulaEditorFromFormulaBarCommand ??= new RelayCommand(
+                _ =>
                 {
                     var request = new FormulaEditorOpenRequest(_repositoryExplorerVM, FormulaBarText);
                     if (_applicationCommandsVM.OpenFormulaEditorWindowCommand.CanExecute(request))
@@ -401,30 +406,44 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                         _applicationCommandsVM.OpenFormulaEditorWindowCommand.Execute(request);
                     }
                 },
-                _ => IsFormulaBarEnabled);
-            }
-        }
+                _ =>
+                {
+                    return IsFormulaBarEnabled;
+                });
 
         /// <summary>
         /// Команда пересчета всех формул текущего выбранного элемента репозитория.
         /// </summary>
-        public RelayCommand RecalculateCurrentFormulaCommand
-        {
-            get
-            {
-                return new RelayCommand(_ => RecalculateCurrentFormula(), _ => CanRecalculateCurrentFormula());
-            }
-        }
+        public RelayCommand RecalculateCurrentFormulaCommand =>
+            _recalculateCurrentFormulaCommand ??= new RelayCommand(
+                _ =>
+                {
+                    RecalculateCurrentFormula();
+                },
+                _ =>
+                {
+                    return CanRecalculateCurrentFormula();
+                });
 
         /// <summary>
         /// Команда пересчета всех формул во всех элементах репозитория.
         /// </summary>
-        public RelayCommand RecalculateAllFormulasCommand
+        public RelayCommand RecalculateAllFormulasCommand =>
+            _recalculateAllFormulasCommand ??= new RelayCommand(
+                _ =>
+                {
+                    RecalculateAllFormulas();
+                },
+                _ =>
+                {
+                    return _repositoryExplorerVM.IsRepositoryLoading == false;
+                });
+
+        internal void RaiseLoadingDependentCommandsCanExecuteChanged()
         {
-            get
-            {
-                return new RelayCommand(_ => RecalculateAllFormulas(), _ => _repositoryExplorerVM.IsRepositoryLoading == false);
-            }
+            _applyFormulaBarCommand?.RaiseCanExecuteChanged();
+            _recalculateCurrentFormulaCommand?.RaiseCanExecuteChanged();
+            _recalculateAllFormulasCommand?.RaiseCanExecuteChanged();
         }
 
         /// <summary>

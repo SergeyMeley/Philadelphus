@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -11,7 +12,6 @@ using Serilog;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -273,13 +273,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private void ExecuteOpenMainWindow(object parameter)
         {
-            if (SelectedExtension?.Window is Window window)
-            {
-                if (window.IsVisible == false)
-                    window.Show();
-                else
-                    window.Hide();
-            }
+            _serviceProvider.GetRequiredService<IWindowService>().ToggleVisibility(SelectedExtension?.Window);
         }
 
         private bool CanExecuteMainMethod()

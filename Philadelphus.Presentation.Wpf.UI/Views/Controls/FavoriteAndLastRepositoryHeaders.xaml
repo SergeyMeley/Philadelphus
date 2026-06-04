@@ -20,13 +20,13 @@
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0" Header="Избранные">
             <lbs:RepositoryHeadersListBox 
-                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoritePhiladelphusRepositoryHeadersVMs.View}"
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoritePhiladelphusRepositoryHeadersVMs}"
                 RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}">
             </lbs:RepositoryHeadersListBox>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Недавние">
             <lbs:RepositoryHeadersListBox 
-                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastPhiladelphusRepositoryHeadersVMs.View}" 
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastPhiladelphusRepositoryHeadersVMs}"
                 RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}">
             </lbs:RepositoryHeadersListBox>
         </GroupBox>

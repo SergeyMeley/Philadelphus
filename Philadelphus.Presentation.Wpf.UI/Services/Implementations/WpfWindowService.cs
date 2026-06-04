@@ -77,6 +77,17 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
             newWindow.Show();
         }
 
+        public void ToggleVisibility(object? platformWindow)
+        {
+            if (platformWindow is Window window)
+            {
+                if (window.IsVisible)
+                    window.Hide();
+                else
+                    window.Show();
+            }
+        }
+
         private Window CreateWindow<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
         {
             if (!_registry.TryGetValue(typeof(TViewModel), out var windowType))

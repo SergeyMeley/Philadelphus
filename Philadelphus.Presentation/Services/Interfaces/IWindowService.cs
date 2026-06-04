@@ -13,5 +13,6 @@ namespace Philadelphus.Presentation.Services.Interfaces
         void Close<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
         void Hide<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
         void ShowOrActivate<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase;
+        void ToggleVisibility(object? platformWindow);
     }
 }

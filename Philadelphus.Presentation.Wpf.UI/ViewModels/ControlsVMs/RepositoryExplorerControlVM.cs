@@ -24,7 +24,6 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
-using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -51,6 +50,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         // Sequence редактируется прямо в таблице. Пересортировку откладываем до ухода фокуса,
         // чтобы строка не меняла позицию во время ввода значения.
         private bool _isChildCollectionTableOrderStale;
+
+        private AsyncRelayCommand? _getWorkCommand;
+        private RelayCommand? _saveCommand;
+        private RelayCommand? _createRootCommand;
+        private RelayCommand? _createNodeCommand;
+        private RelayCommand? _createLeaveCommand;
+        private RelayCommand? _createAttributeCommand;
+        private RelayCommand? _softDeleteRepositoryMemberCommand;
+        private RelayCommand? _softDeleteRepositoryMemberAttributeCommand;
+        private RelayCommand? _openModifyAttributesListWindowCommand;
+        private RelayCommand? _addAttributeValueCommand;
+        private RelayCommand? _removeAttributeValueCommand;
+        private RelayCommand? _protectCommand;
+        private RelayCommand? _rebuildChildCollectionTableIfOrderStaleCommand;
 
         public PhiladelphusRepositoryVM PhiladelphusRepositoryVM 
         { 
@@ -147,7 +160,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 OnPropertyChanged(nameof(IsRepositoryLoading));
                 OnPropertyChanged(nameof(IsRepositoryContentEnabled));
                 OnPropertyChanged(nameof(IsRepositoryLoadingVisible));
-                CommandManager.InvalidateRequerySuggested();
+                RaiseRepositoryCommandsCanExecuteChanged();
+                FormulaBarVM.RaiseLoadingDependentCommandsCanExecuteChanged();
             }
         }
 
@@ -229,19 +243,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         #endregion
 
         #region [Commands]
-        public AsyncRelayCommand GetWorkCommand
-        {
-            get
-            {
-                return new AsyncRelayCommand(ExecuteGetWorkAsync, _ => IsRepositoryLoading == false); ;
-            }
-        }
 
-        public RelayCommand SaveCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+        public AsyncRelayCommand GetWorkCommand =>
+            _getWorkCommand ??= new AsyncRelayCommand(
+                ExecuteGetWorkAsync,
+                _ => IsRepositoryLoading == false);
+
+        public RelayCommand SaveCommand =>
+            _saveCommand ??= new RelayCommand(
+                obj =>
                 {
                     var repo = _philadelphusRepositoryVM.Model;
                     _service.SaveChanges(ref repo, SaveMode.WithContentAndMembers);
@@ -253,13 +263,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
-        public RelayCommand CreateRootCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+
+        public RelayCommand CreateRootCommand =>
+            _createRootCommand ??= new RelayCommand(
+                obj =>
                 {
                     var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
                     var result = _service.CreateTreeRoot(tree);
@@ -270,13 +277,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
-        public RelayCommand CreateNodeCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+
+        public RelayCommand CreateNodeCommand =>
+            _createNodeCommand ??= new RelayCommand(
+                obj =>
                 {
                     if (_selectedRepositoryMember == null)
                         return;
@@ -291,13 +295,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
-        public RelayCommand CreateLeaveCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+
+        public RelayCommand CreateLeaveCommand =>
+            _createLeaveCommand ??= new RelayCommand(
+                obj =>
                 {
                     if (_selectedRepositoryMember == null)
                         return;
@@ -316,32 +317,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
-        public RelayCommand CreateAttributeCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+
+        public RelayCommand CreateAttributeCommand =>
+            _createAttributeCommand ??= new RelayCommand(
+                obj =>
                 {
                     if (_selectedRepositoryMember == null)
                         return;
                     _selectedRepositoryMember.AddAttribute();
                     RebuildChildCollectionTable();
-                    
+
                     _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
                 },
                 ce =>
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
-        public RelayCommand SoftDeleteRepositoryMemberCommand
-        {
-            get 
-            {
-                return new RelayCommand(obj =>
+
+        public RelayCommand SoftDeleteRepositoryMemberCommand =>
+            _softDeleteRepositoryMemberCommand ??= new RelayCommand(
+                obj =>
                 {
                     if (_selectedRepositoryMember.Model is IContentModel c)
                     {
@@ -355,13 +350,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     return CanModifyRepository()
                         && _selectedRepositoryMember?.Model is IContentModel;
                 });
-            }
-        }
-        public RelayCommand SoftDeleteRepositoryMemberAttributeCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+
+        public RelayCommand SoftDeleteRepositoryMemberAttributeCommand =>
+            _softDeleteRepositoryMemberAttributeCommand ??= new RelayCommand(
+                obj =>
                 {
                     if (_selectedRepositoryMember?.SelectedAttributeVM?.Model is IContentModel c)
                     {
@@ -373,14 +365,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
 
-        public RelayCommand OpenModifyAttributesListWindowCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+        public RelayCommand OpenModifyAttributesListWindowCommand =>
+            _openModifyAttributesListWindowCommand ??= new RelayCommand(
+                obj =>
                 {
                     var window = _serviceProvider.GetRequiredService<AttributeValuesCollectionWindow>();
                     window.DataContext = this;
@@ -391,14 +379,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     return CanModifyRepository()
                         && (_selectedRepositoryMember?.SelectedAttributeVM?.IsCollectionValue ?? false);
                 });
-            }
-        }
 
-        public RelayCommand AddAttributeValueCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+        public RelayCommand AddAttributeValueCommand =>
+            _addAttributeValueCommand ??= new RelayCommand(
+                obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
                     RebuildChildCollectionTable();
@@ -407,14 +391,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
 
-        public RelayCommand RemoveAttributeValueCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+        public RelayCommand RemoveAttributeValueCommand =>
+            _removeAttributeValueCommand ??= new RelayCommand(
+                obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
                     RebuildChildCollectionTable();
@@ -423,31 +403,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
-            }
-        }
 
-        public RelayCommand ProtectCommand
-        {
-            get
-            {
-                return new RelayCommand(obj =>
+        public RelayCommand ProtectCommand =>
+            _protectCommand ??= new RelayCommand(
+                obj =>
                 {
                 },
                 ce =>
                 {
                     return false;
                 });
-            }
-        }
 
         /// <summary>
         /// Перестраивает таблицу наследников, если после редактирования Sequence порядок строк стал устаревшим.
         /// </summary>
-        public RelayCommand RebuildChildCollectionTableIfOrderStaleCommand
-        {
-            get
-            {
-                return new RelayCommand(_ =>
+        public RelayCommand RebuildChildCollectionTableIfOrderStaleCommand =>
+            _rebuildChildCollectionTableIfOrderStaleCommand ??= new RelayCommand(
+                _ =>
                 {
                     if (_isChildCollectionTableOrderStale == false)
                     {
@@ -456,9 +428,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
                     RebuildChildCollectionTable();
                 },
-                _ => _isChildCollectionTableOrderStale && IsRepositoryLoading == false);
-            }
-        }
+                _ =>
+                {
+                    return _isChildCollectionTableOrderStale && IsRepositoryLoading == false;
+                });
 
         #endregion
 
@@ -744,7 +717,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             OnPropertyChanged(nameof(ChildCollectionTableColumns));
             OnPropertyChanged(nameof(ChildCollectionTableRows));
             _isChildCollectionTableOrderStale = false;
-            CommandManager.InvalidateRequerySuggested();
+            _rebuildChildCollectionTableIfOrderStaleCommand?.RaiseCanExecuteChanged();
+            _openModifyAttributesListWindowCommand?.RaiseCanExecuteChanged();
         }
 
         /// <summary>
@@ -782,7 +756,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             if (columnKey == nameof(IChildrenModel.SequencePath))
             {
                 _isChildCollectionTableOrderStale = true;
-                CommandManager.InvalidateRequerySuggested();
+                _rebuildChildCollectionTableIfOrderStaleCommand?.RaiseCanExecuteChanged();
                 NotifyChildParentCollectionChanged(target);
             }
         }
@@ -904,6 +878,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 }
             }
             return true;
+        }
+
+        private void RaiseRepositoryCommandsCanExecuteChanged()
+        {
+            _getWorkCommand?.RaiseCanExecuteChanged();
+            _saveCommand?.RaiseCanExecuteChanged();
+            _createRootCommand?.RaiseCanExecuteChanged();
+            _createNodeCommand?.RaiseCanExecuteChanged();
+            _createLeaveCommand?.RaiseCanExecuteChanged();
+            _createAttributeCommand?.RaiseCanExecuteChanged();
+            _softDeleteRepositoryMemberCommand?.RaiseCanExecuteChanged();
+            _softDeleteRepositoryMemberAttributeCommand?.RaiseCanExecuteChanged();
+            _openModifyAttributesListWindowCommand?.RaiseCanExecuteChanged();
+            _addAttributeValueCommand?.RaiseCanExecuteChanged();
+            _removeAttributeValueCommand?.RaiseCanExecuteChanged();
+            _rebuildChildCollectionTableIfOrderStaleCommand?.RaiseCanExecuteChanged();
         }
 
         /// <summary>

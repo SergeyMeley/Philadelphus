@@ -8,7 +8,6 @@ using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Serilog;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
@@ -44,14 +43,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         }
 
         /// <summary>
-        /// Заголовок репозитория Чубушника.
+        /// Избранные заголовки репозиториев (IsFavorite == true).
         /// </summary>
-        public CollectionViewSource FavoritePhiladelphusRepositoryHeadersVMs { get; }
-       
+        public ObservableCollection<PhiladelphusRepositoryHeaderVM> FavoritePhiladelphusRepositoryHeadersVMs { get; }
+            = new ObservableCollection<PhiladelphusRepositoryHeaderVM>();
+
         /// <summary>
-        /// Заголовок репозитория Чубушника.
+        /// Недавно открытые заголовки репозиториев (за последние 90 дней).
         /// </summary>
-        public CollectionViewSource LastPhiladelphusRepositoryHeadersVMs { get; }
+        public ObservableCollection<PhiladelphusRepositoryHeaderVM> LastPhiladelphusRepositoryHeadersVMs { get; }
+            = new ObservableCollection<PhiladelphusRepositoryHeaderVM>();
 
         private PhiladelphusRepositoryHeaderVM _selectedPhiladelphusRepositoryHeaderVM;
         public PhiladelphusRepositoryHeaderVM SelectedPhiladelphusRepositoryHeaderVM 
@@ -77,11 +78,10 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 return new Action(() =>
                 {
+                    RefreshFilteredCollections();
                     OnPropertyChanged(nameof(PhiladelphusRepositoryHeadersVMs));
                     OnPropertyChanged(nameof(FavoritePhiladelphusRepositoryHeadersVMs));
                     OnPropertyChanged(nameof(LastPhiladelphusRepositoryHeadersVMs));
-                    FavoritePhiladelphusRepositoryHeadersVMs.View.Refresh();
-                    LastPhiladelphusRepositoryHeadersVMs.View.Refresh();
                 });
             }
         }
@@ -130,38 +130,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
 
             _PhiladelphusRepositoryHeadersVMs = new ObservableCollection<PhiladelphusRepositoryHeaderVM>();
             LoadPhiladelphusRepositoryHeadersVMs(philadelphusRepositoryHeadersCollectionConfig);
+            RefreshFilteredCollections();
 
-            FavoritePhiladelphusRepositoryHeadersVMs = new CollectionViewSource { Source = PhiladelphusRepositoryHeadersVMs };
-            FavoritePhiladelphusRepositoryHeadersVMs.Filter += (s, e) =>
-            {
-                var item = e.Item as PhiladelphusRepositoryHeaderVM;
-                if (item == null) 
-                { 
-                    e.Accepted = false; 
-                    return; 
-                }
-                e.Accepted = item.IsFavorite;
-            };
-
-            LastPhiladelphusRepositoryHeadersVMs = new CollectionViewSource { Source = PhiladelphusRepositoryHeadersVMs };
-            LastPhiladelphusRepositoryHeadersVMs.Filter += (s, e) =>
-            {
-                var item = e.Item as PhiladelphusRepositoryHeaderVM;
-                if (item == null)
-                {
-                    e.Accepted = false;
-                    return;
-                }
-                e.Accepted = DateTime.UtcNow - item.LastOpening <= TimeSpan.FromDays(90);
-            };
-
-            PhiladelphusRepositoryHeadersVMs.CollectionChanged += (s, e) =>
-            {
-                FavoritePhiladelphusRepositoryHeadersVMs.View.Refresh();
-                LastPhiladelphusRepositoryHeadersVMs.View.Refresh();
-            };
+            PhiladelphusRepositoryHeadersVMs.CollectionChanged += (s, e) => RefreshFilteredCollections();
         }
     
+        private void RefreshFilteredCollections()
+        {
+            FavoritePhiladelphusRepositoryHeadersVMs.Clear();
+            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => x.IsFavorite))
+            {
+                FavoritePhiladelphusRepositoryHeadersVMs.Add(item);
+            }
+
+            var threshold = TimeSpan.FromDays(90);
+            LastPhiladelphusRepositoryHeadersVMs.Clear();
+            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => DateTime.UtcNow - x.LastOpening <= threshold))
+            {
+                LastPhiladelphusRepositoryHeadersVMs.Add(item);
+            }
+        }
+
         /// <summary>
         /// Выполняет операцию репозитория Чубушника.
         /// </summary>

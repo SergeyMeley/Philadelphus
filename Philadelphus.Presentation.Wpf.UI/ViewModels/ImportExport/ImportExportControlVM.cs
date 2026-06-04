@@ -11,7 +11,6 @@ using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.Re
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 {
@@ -242,7 +241,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             }
 
             var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
-            window.Owner = Application.Current?.MainWindow;
             window.Initialize(
                 _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model.ContentShrub,
                 _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model,

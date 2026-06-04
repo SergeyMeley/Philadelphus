@@ -6,7 +6,6 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs
 {
@@ -18,6 +17,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         #region [ Props ]
 
         private readonly IPhiladelphusRepositoryService _service;
+        private readonly INotificationService? _notificationService;
 
         private readonly ElementAttributeModel _model;
         private ObservableCollection<TreeLeaveModel> _assignedValues = new ObservableCollection<TreeLeaveModel>();
@@ -273,7 +273,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             {
                 if (_model.State != State.Initialized)
                 {
-                    MessageBox.Show("На данный момент переопределение области видимости невозможно");
+                    _notificationService?.SendModalWindow<ElementAttributeVM>(
+                        "На данный момент переопределение области видимости невозможно");
                     return;
                 }
 
@@ -329,7 +330,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         public ElementAttributeVM(
             ElementAttributeModel elementAttribute,
             DataStoragesCollectionVM dataStoragesCollectionVM,
-            IPhiladelphusRepositoryService service) 
+            IPhiladelphusRepositoryService service,
+            INotificationService? notificationService = null)
             : base(elementAttribute, dataStoragesCollectionVM, service)
         {
             ArgumentNullException.ThrowIfNull(elementAttribute);
@@ -337,6 +339,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             ArgumentNullException.ThrowIfNull(service);
 
             _service = service;
+            _notificationService = notificationService;
 
             _model = elementAttribute;
 
