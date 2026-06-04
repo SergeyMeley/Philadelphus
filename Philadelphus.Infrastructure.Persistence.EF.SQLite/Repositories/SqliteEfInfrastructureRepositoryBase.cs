@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Philadelphus.Infrastructure.Persistence.EF.Repositories;
 using Serilog;
 
@@ -17,11 +16,6 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
             : base(logger, connectionString)
         {
         }
-        protected override bool IsDuplicateTableException(Exception ex)
-        {
-            return ex is SqliteException sqliteEx && sqliteEx.SqliteErrorCode == 1;
-        }
-
         //public override bool CheckAvailability()
         //{
         //    var sw = new Stopwatch();

@@ -1,10 +1,14 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Philadelphus.Infrastructure.Persistence.EF.SQLite.Contexts;
 
 #nullable disable
 
 namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.ShrubMembersContextMigrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(SqliteEfShrubMembersContext))]
+    [Migration("20260522090000_AddTreeLeaveStringValue")]
     public partial class AddTreeLeaveStringValue : Migration
     {
         /// <inheritdoc />

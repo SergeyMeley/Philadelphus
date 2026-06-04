@@ -81,30 +81,16 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
 
         protected virtual void InitDb()
         {
-            if (CheckAvailability() == false)
-                _context.Database.EnsureCreated();
-
-            if (CheckAvailability())
+            try
             {
-                if (_context.Database.GetPendingMigrations().ToList().Any())
-                {
-                    try
-                    {
-                        _context.Database.Migrate();
-                    }
-                    catch (Exception ex) when (IsDuplicateTableException(ex))
-                    {
-                        // Пропускаем ошибку дублирования таблицы
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
+                _context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Не удалось применить миграции для репозитория БД '{GetType().Name}'.");
+                throw;
             }
         }
-
-        protected abstract bool IsDuplicateTableException(Exception ex);
 
         private TResult ExecuteWithContext<TEntity, TResult>(
             Func<TContext, DbSet<TEntity>, TResult> action)
