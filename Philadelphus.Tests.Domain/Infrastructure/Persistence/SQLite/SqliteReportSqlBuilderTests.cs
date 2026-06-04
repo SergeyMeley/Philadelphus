@@ -36,6 +36,119 @@ namespace Philadelphus.Tests.Domain.Infrastructure.Persistence.SQLite
         }
 
         [Fact]
+        public void BuildRecreateMaterializedViewSql_Rewrites_CreateTableAsSelect()
+        {
+            var report = new ReportInfo
+            {
+                Name = "report_sales",
+                Type = "MaterializedView"
+            };
+
+            var result = SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(
+                report,
+                "CREATE TABLE report_sales AS SELECT id, amount FROM source_sales;");
+
+            result.Should().Be("CREATE TABLE \"report_sales\" AS SELECT id, amount FROM source_sales");
+        }
+
+        [Fact]
+        public void BuildRecreateMaterializedViewSql_Allows_With_Query()
+        {
+            var report = new ReportInfo
+            {
+                Name = "report_sales",
+                Type = "MaterializedView"
+            };
+
+            var result = SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(
+                report,
+                "CREATE TABLE report_sales AS WITH source AS (SELECT 1 AS id) SELECT id FROM source");
+
+            result.Should().Be("CREATE TABLE \"report_sales\" AS WITH source AS (SELECT 1 AS id) SELECT id FROM source");
+        }
+
+        [Fact]
+        public async Task BuildRecreateMaterializedViewSql_Can_Create_Table_From_Select()
+        {
+            var report = new ReportInfo
+            {
+                Name = "report_sales",
+                Type = "MaterializedView"
+            };
+
+            await using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+            await using (var seedCommand = new SqliteCommand(
+                "CREATE TABLE source_sales (id INTEGER); INSERT INTO source_sales VALUES (42);",
+                connection))
+            {
+                await seedCommand.ExecuteNonQueryAsync();
+            }
+
+            var recreateSql = SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(
+                report,
+                "CREATE TABLE report_sales AS SELECT id FROM source_sales;");
+
+            await using (var recreateCommand = new SqliteCommand(recreateSql, connection))
+            {
+                await recreateCommand.ExecuteNonQueryAsync();
+            }
+
+            await using var readCommand = new SqliteCommand("SELECT id FROM report_sales;", connection);
+            var result = await readCommand.ExecuteScalarAsync();
+
+            result.Should().Be(42L);
+        }
+
+        [Fact]
+        public void BuildRecreateMaterializedViewSql_Rejects_Multiple_Statements()
+        {
+            var report = new ReportInfo
+            {
+                Name = "report_sales",
+                Type = "MaterializedView"
+            };
+
+            var act = () => SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(
+                report,
+                "CREATE TABLE report_sales AS SELECT 1; DROP TABLE users;");
+
+            act.Should().Throw<InvalidOperationException>();
+        }
+
+        [Fact]
+        public void BuildRecreateMaterializedViewSql_Rejects_Non_Select_CreationSql()
+        {
+            var report = new ReportInfo
+            {
+                Name = "report_sales",
+                Type = "MaterializedView"
+            };
+
+            var act = () => SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(
+                report,
+                "CREATE TABLE report_sales AS DELETE FROM users");
+
+            act.Should().Throw<InvalidOperationException>();
+        }
+
+        [Fact]
+        public void BuildRecreateMaterializedViewSql_Rejects_Target_Table_Mismatch()
+        {
+            var report = new ReportInfo
+            {
+                Name = "report_sales",
+                Type = "MaterializedView"
+            };
+
+            var act = () => SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(
+                report,
+                "CREATE TABLE other_report AS SELECT 1");
+
+            act.Should().Throw<InvalidOperationException>();
+        }
+
+        [Fact]
         public void BuildAttachDatabaseSql_Escapes_Alias_And_Uses_Path_Parameter()
         {
             var result = SqliteReportSqlBuilder.BuildAttachDatabaseSql("other\"; DETACH DATABASE main; --");

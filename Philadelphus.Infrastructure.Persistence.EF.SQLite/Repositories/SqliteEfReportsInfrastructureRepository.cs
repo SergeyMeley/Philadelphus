@@ -194,8 +194,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
 
                 // Очистить SQL от комментариев перед выполнением
                 var cleanSql = RemoveComments(creationSql);
+                var recreateSql = SqliteReportSqlBuilder.BuildRecreateMaterializedViewSql(report, cleanSql);
 
-                _logger?.Information($"Пересоздание таблицы '{report.Name}' с SQL: {cleanSql}");
+                _logger?.Information($"Пересоздание таблицы '{report.Name}' с SQL: {recreateSql}");
 
                 // Пересоздать таблицу: сначала удалить, потом создать заново
                 using (var deleteCmd = new SqliteCommand(SqliteReportSqlBuilder.BuildDropTableSql(report), connection))
@@ -203,7 +204,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
                     await deleteCmd.ExecuteNonQueryAsync();
                 }
 
-                using (var recreateCmd = new SqliteCommand(cleanSql, connection))
+                using (var recreateCmd = new SqliteCommand(recreateSql, connection))
                 {
                     await recreateCmd.ExecuteNonQueryAsync();
                 }
