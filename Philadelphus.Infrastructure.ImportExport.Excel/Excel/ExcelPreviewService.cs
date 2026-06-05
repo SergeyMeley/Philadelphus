@@ -26,7 +26,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         public ExcelPreviewWorkbookInfo GetWorkbookPreview(string filePath)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
 
             var result = new ExcelPreviewWorkbookInfo
             {
@@ -44,13 +44,14 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                     })
                     .ToList()
             };
+            ExcelImportLimits.ValidateSourceCount(result.Worksheets.Count + result.Tables.Count + result.NamedRanges.Count);
 
             return result;
         }
 
         public ExcelPreviewTable GetPreview(string filePath, ExcelImportSourceSelection selection, int maxRows = 30)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             var range = _sourceReader.ResolveRange(workbook, selection);
 
             if (range == null)
@@ -61,7 +62,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         public ExcelImportProfile BuildImportProfile(string filePath, ExcelImportSourceSelection selection)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             var range = _sourceReader.ResolveRange(workbook, selection);
 
             if (range == null)
@@ -134,6 +135,8 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         private static ExcelPreviewSourceInfo CreateSourceInfo(string name, ExcelPreviewSourceType sourceType, string worksheetName, IXLRange? range)
         {
+            ExcelImportLimits.ValidateRange(range, name);
+
             var firstRow = range?.FirstRowUsed();
             var lastRow = range?.LastRowUsed();
             var firstColumn = range?.FirstColumnUsed();
@@ -159,6 +162,8 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         private static ExcelPreviewTable BuildPreviewTable(string sourceName, ExcelPreviewSourceType sourceType, IXLRange range, int maxRows)
         {
+            ExcelImportLimits.ValidateRange(range, sourceName);
+
             var firstRow = range.FirstRowUsed();
             var lastRow = range.LastRowUsed();
             var firstColumn = range.FirstColumnUsed();

@@ -22,18 +22,22 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         public IReadOnlyList<IXLWorksheet> GetImportableWorksheets(XLWorkbook workbook)
         {
-            return workbook.Worksheets
+            var worksheets = workbook.Worksheets
                 .Where(worksheet => IsSettingsWorksheet(worksheet.Name) == false)
                 .ToList();
+            ExcelImportLimits.ValidateSourceCount(worksheets.Count);
+            return worksheets;
         }
 
         public IReadOnlyList<IXLTable> GetImportableTables(XLWorkbook workbook)
         {
-            return GetImportableWorksheets(workbook)
+            var tables = GetImportableWorksheets(workbook)
                 .SelectMany(worksheet => worksheet.Tables)
                 .GroupBy(table => table.Name, StringComparer.OrdinalIgnoreCase)
                 .Select(group => group.First())
                 .ToList();
+            ExcelImportLimits.ValidateSourceCount(tables.Count);
+            return tables;
         }
 
         public IReadOnlyList<ExcelImportSourceSelection> GetDefaultSourceSelections(XLWorkbook workbook)
@@ -76,6 +80,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                     SourceType = ExcelPreviewSourceType.Worksheet
                 }));
 
+            ExcelImportLimits.ValidateSourceCount(result.Count);
             return result;
         }
 
@@ -111,12 +116,14 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 .SelectMany(worksheet => worksheet.DefinedNames)
                 .ToList();
 
-            return workbookRanges
+            var ranges = workbookRanges
                 .Concat(worksheetRanges)
                 .Where(range => range.IsValid && IsUserNamedRange(range.Name) && IsTabularNamedRange(range))
                 .GroupBy(range => range.Name, StringComparer.OrdinalIgnoreCase)
                 .Select(group => group.First())
                 .ToList();
+            ExcelImportLimits.ValidateSourceCount(ranges.Count);
+            return ranges;
         }
 
         private static bool IsUserNamedRange(string name)

@@ -36,10 +36,11 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             if (result.HasErrors)
                 return result;
 
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             var range = _sourceReader.ResolveRange(workbook, profile.SourceSelection);
             if (range == null)
                 throw new InvalidOperationException("Не удалось определить диапазон данных для проверки импорта.");
+            ExcelImportLimits.ValidateRange(range, profile.SourceSelection.SourceName);
 
             foreach (var column in profile.Columns.Where(x => x.Role == ExcelImportColumnRole.Attribute))
             {
@@ -272,7 +273,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         private void ValidateRelationMatches(string filePath, IReadOnlyCollection<ExcelImportProfile> profiles, ExcelImportValidationResult result)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             var profilesBySource = profiles.ToDictionary(x => x.SourceSelection.SourceName, StringComparer.OrdinalIgnoreCase);
 
             foreach (var profile in profiles.Where(x => x.Relation.HasParent))
@@ -284,6 +285,8 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 var childRange = _sourceReader.ResolveRange(workbook, profile.SourceSelection);
                 if (parentRange == null || childRange == null)
                     continue;
+                ExcelImportLimits.ValidateRange(parentRange, parentProfile.SourceSelection.SourceName);
+                ExcelImportLimits.ValidateRange(childRange, profile.SourceSelection.SourceName);
 
                 var parentKeyColumn = parentProfile.Columns.FirstOrDefault(x =>
                     string.Equals(x.HeaderName, profile.Relation.ParentKeyColumnName, StringComparison.OrdinalIgnoreCase));
@@ -482,7 +485,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         private void ValidateRootScopeConflicts(string filePath, IEnumerable<ExcelImportProfile> profiles, ExcelImportValidationResult result)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
 
             var rootScopedColumns = profiles
                 .SelectMany(profile => profile.Columns
@@ -524,7 +527,13 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
         private ExcelImportInheritanceInfo? ResolveInheritanceSafely(XLWorkbook workbook, ExcelImportProfile profile, ExcelImportColumnProfile column)
         {
             var range = _sourceReader.ResolveRange(workbook, profile.SourceSelection);
-            return range == null ? null : _inheritanceResolver.Resolve(range, column);
+            if (range == null)
+            {
+                return null;
+            }
+
+            ExcelImportLimits.ValidateRange(range, profile.SourceSelection.SourceName);
+            return _inheritanceResolver.Resolve(range, column);
         }
 
         private static bool RowHasImportableData(IXLRangeRow row, IEnumerable<ExcelImportColumnProfile> columns)

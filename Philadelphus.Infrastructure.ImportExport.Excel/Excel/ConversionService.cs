@@ -75,20 +75,21 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         public string ProcessFile(string filePath, bool createNewRoot, string rootNameInput, IReadOnlyCollection<ExcelImportProfile>? importProfiles)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             var schema = BuildSchemaFromProfiles(filePath, createNewRoot, rootNameInput, workbook, importProfiles);
             return ProcessSchema(workbook, schema);
         }
 
         public string ProcessSchema(ExcelImportSchema schema)
         {
-            using var workbook = new XLWorkbook(schema.SourceFilePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(schema.SourceFilePath);
             return ProcessSchema(workbook, ExcelImportSchemaNormalizer.GetCanonicalExecutionSchema(schema));
         }
 
         private string ProcessSchema(XLWorkbook workbook, ExcelImportSchema schema)
         {
             ExcelImportSchemaNormalizer.NormalizeForExecution(schema);
+            ExcelImportLimits.ValidateSourceCount(schema.Entities.Count);
 
             var projector = new ExcelImportSourceProjector(_sourceReader);
             var graphBuilder = new ExcelImportRelationGraphBuilder();
@@ -120,12 +121,14 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             var profiles = importProfiles?.Count > 0
                 ? importProfiles.ToList()
                 : BuildDefaultProfiles(workbook);
+            ExcelImportLimits.ValidateSourceCount(profiles.Count);
 
             foreach (var profile in profiles)
             {
                 var range = _sourceReader.ResolveRange(workbook, profile.SourceSelection);
                 if (range == null)
                     throw new InvalidOperationException($"Не удалось найти источник «{profile.SourceSelection.SourceName}» в Excel-файле.");
+                ExcelImportLimits.ValidateRange(range, profile.SourceSelection.SourceName);
 
                 var resolvedProfile = ResolveExecutionProfile(filePath, profile, BuildColumnProfiles(range, profile));
                 var columns = resolvedProfile.Columns;
@@ -245,6 +248,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             var firstColumnNumber = firstColumn.ColumnNumber();
             var lastColumnNumber = lastColumn.ColumnNumber();
             var columnCount = lastColumnNumber - firstColumnNumber + 1;
+            ExcelImportLimits.ValidateRange(range, string.Empty);
             var rows = range.RowsUsed().ToList();
             var markerRoles = ExcelImportRangeHelper.DetectMarkerRoles(rows, columnCount);
             var dataStartRowOffset = markerRoles.Count > 0 ? 2 : 1;

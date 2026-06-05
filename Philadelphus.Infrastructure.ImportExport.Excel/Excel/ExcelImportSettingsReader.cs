@@ -19,7 +19,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         public ExcelImportSettingsDocument Read(string filePath)
         {
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             return Read(workbook);
         }
 
@@ -36,6 +36,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             var usedRange = settingsWorksheet.RangeUsed();
             if (usedRange == null)
                 return new ExcelImportSettingsDocument();
+            ExcelImportLimits.ValidateRange(usedRange, settingsWorksheet.Name);
 
             var rows = usedRange.RowsUsed().ToList();
             if (rows.Count <= 1)

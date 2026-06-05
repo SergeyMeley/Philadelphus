@@ -28,7 +28,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 RootName = rootName
             };
 
-            using var workbook = new XLWorkbook(filePath);
+            using var workbook = ExcelImportLimits.OpenWorkbook(filePath);
             var sourceSelections = _sourceReader.GetDefaultSourceSelections(workbook);
             var previewSources = workbookPreview.Tables
                 .Concat(workbookPreview.NamedRanges)

@@ -20,6 +20,8 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
         public static List<IXLRangeRow> GetDataRows(IXLRange range, int dataStartRowOffset)
         {
+            ExcelImportLimits.ValidateRange(range, string.Empty);
+
             return range.RowsUsed()
                 .Skip(NormalizeDataStartRowOffset(dataStartRowOffset))
                 .ToList();
