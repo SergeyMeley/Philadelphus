@@ -16,6 +16,7 @@ using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -36,7 +37,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly FormulaRegistry _formulaRegistry;
         private readonly IFormulaDiagnosticsReporter _formulaDiagnosticsReporter;
         private readonly INotificationService _notificationService;
-        private readonly ApplicationCommandsVM _applicationCommandsVM;
+        private readonly IApplicationCommandsVM _applicationCommandsVM;
 
         private ElementAttributeVM? _selectedFormulaAttribute;
         private FormulaBarTarget? _formulaBarTarget;
@@ -83,7 +84,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaRegistry formulaRegistry,
             IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             INotificationService notificationService,
-            ApplicationCommandsVM applicationCommandsVM)
+            IApplicationCommandsVM applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
             ArgumentNullException.ThrowIfNull(service);

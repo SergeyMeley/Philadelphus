@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
@@ -33,7 +34,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команды приложения.
         /// </summary>
-        public ApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
+        public IApplicationCommandsVM ApplicationCommandsVM { get => _applicationCommandsVM; }
       
         /// <summary>
         /// Расширение.

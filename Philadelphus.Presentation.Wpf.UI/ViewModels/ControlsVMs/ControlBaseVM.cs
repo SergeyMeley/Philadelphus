@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Services.Interfaces;
 using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
@@ -13,7 +14,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         protected readonly IMapper _mapper;
         protected readonly ILogger _logger;
         protected readonly INotificationService _notificationService;
-        protected readonly ApplicationCommandsVM _applicationCommandsVM;
+        protected readonly IApplicationCommandsVM _applicationCommandsVM;
        
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ControlBaseVM" />.
@@ -29,7 +30,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
-            ApplicationCommandsVM applicationCommandsVM)
+            IApplicationCommandsVM applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(mapper);

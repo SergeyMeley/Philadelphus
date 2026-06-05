@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
@@ -10,7 +11,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
     /// <summary>
     /// Модель представления для команд приложения.
     /// </summary>
-    public class ApplicationCommandsVM
+    public class ApplicationCommandsVM : IApplicationCommandsVM
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IWindowService _windowService;
