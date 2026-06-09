@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
-using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
+using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {
@@ -15,6 +15,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IWindowService _windowService;
+        private readonly IRelayCommandFactory _commandFactory;
 
         private IRelayCommand? _openMainWindowCommand;
         private IRelayCommand? _openLaunchWindowCommand;
@@ -26,19 +27,23 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         /// </summary>
         /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
         /// <param name="windowService">Сервис управления окнами приложения.</param>
+        /// <param name="commandFactory">Фабрика команд приложения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationCommandsVM(
             IServiceProvider serviceProvider,
-            IWindowService windowService)
+            IWindowService windowService,
+            IRelayCommandFactory commandFactory)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(windowService);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _serviceProvider = serviceProvider;
             _windowService = windowService;
+            _commandFactory = commandFactory;
         }
 
-        public IRelayCommand OpenMainWindowCommand => _openMainWindowCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenMainWindowCommand => _openMainWindowCommand ??= _commandFactory.Create(obj =>
         {
             var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
             var currentRepositoryVM = launchVM.RepositoryCollectionVM.CurrentRepositoryVM;
@@ -59,7 +64,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             _windowService.Hide(launchVM);
         });
 
-        public IRelayCommand OpenLaunchWindowCommand => _openLaunchWindowCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenLaunchWindowCommand => _openLaunchWindowCommand ??= _commandFactory.Create(obj =>
         {
             var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();
             _windowService.Show(launchVM);
@@ -68,7 +73,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         /// <summary>
         /// Команда открытия редактора формул.
         /// </summary>
-        public IRelayCommand OpenFormulaEditorWindowCommand => _openFormulaEditorWindowCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenFormulaEditorWindowCommand => _openFormulaEditorWindowCommand ??= _commandFactory.Create(obj =>
         {
             var formulaEditorVM = CreateFormulaEditorVM(obj);
             if (formulaEditorVM == null)
@@ -80,7 +85,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
         },
         obj => obj is FormulaTestControlVM or FormulaEditorOpenRequest);
 
-        public IRelayCommand OpenDataStoragesSettingsControlCommand => _openDataStoragesSettingsControlCommand ??= new RelayCommand(obj =>
+        public IRelayCommand OpenDataStoragesSettingsControlCommand => _openDataStoragesSettingsControlCommand ??= _commandFactory.Create(obj =>
         {
             var qwe = obj.GetType();
             var launchVM = _serviceProvider.GetRequiredService<LaunchWindowVM>();

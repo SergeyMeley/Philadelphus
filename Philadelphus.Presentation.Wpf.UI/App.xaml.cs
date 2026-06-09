@@ -25,6 +25,7 @@ using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Implementations;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
@@ -33,6 +34,7 @@ using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
@@ -221,6 +223,10 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<IDispatcherService, WpfDispatcherService>();
                     services.AddSingleton<WpfWindowService>();
                     services.AddSingleton<IWindowService>(sp => sp.GetRequiredService<WpfWindowService>());
+
+                    // Фабрики команд (WPF-реализация на CommandManager)
+                    services.AddSingleton<IRelayCommandFactory, RelayCommandFactory>();
+                    services.AddSingleton<IAsyncRelayCommandFactory, AsyncRelayCommandFactory>();
 
                     // Регистрация ViewModel
                     // Общие ViewModel
