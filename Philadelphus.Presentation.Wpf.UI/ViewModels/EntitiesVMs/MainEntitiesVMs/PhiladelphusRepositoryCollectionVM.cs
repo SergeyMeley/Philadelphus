@@ -25,6 +25,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly IPhiladelphusRepositoryCollectionService _collectionService;
         private readonly IPhiladelphusRepositoryService _service;
         private readonly IFileDialogService? _fileDialogService;
+        private readonly IRelayCommandFactory _commandFactory;
 
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
 
@@ -43,16 +44,18 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         /// <param name="service">Доменный сервис.</param>
         /// <param name="dataStoragesSettings">Параметр dataStoragesSettings.</param>
         /// <param name="options">Параметры конфигурации приложения.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public PhiladelphusRepositoryCollectionVM(
             IServiceProvider serviceProvider,
             ILogger logger,
             INotificationService notificationService,
-            IPhiladelphusRepositoryCollectionService collectionService, 
+            IPhiladelphusRepositoryCollectionService collectionService,
             IPhiladelphusRepositoryService service,
             DataStoragesCollectionVM dataStoragesSettings,
             IOptions<ApplicationSettingsConfig> options,
-            IFileDialogService fileDialogService)
+            IFileDialogService fileDialogService,
+            IRelayCommandFactory commandFactory)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(logger);
@@ -63,6 +66,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             ArgumentNullException.ThrowIfNull(dataStoragesSettings);
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -70,6 +74,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _collectionService = collectionService;
             _service = service;
             _fileDialogService = fileDialogService;
+            _commandFactory = commandFactory;
 
             _dataStoragesSettingsVM = dataStoragesSettings;
 
@@ -143,22 +148,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
         }
 
-        public RelayCommand AddExistRepository
+        public IRelayCommand AddExistRepository
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     _collectionService.AddExistPhiladelphusRepository(new DirectoryInfo(""));
                 });
             }
         }
 
-        public RelayCommand CreateNewRepository
+        public IRelayCommand CreateNewRepository
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     var builder = new DataStorageBuilder();
                     var repository = _collectionService.CreateNewPhiladelphusRepository(builder.Build());

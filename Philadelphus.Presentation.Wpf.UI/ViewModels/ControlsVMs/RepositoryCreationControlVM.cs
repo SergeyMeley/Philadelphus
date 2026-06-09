@@ -29,6 +29,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
         private readonly PhiladelphusRepositoryCollectionVM _repositoryCollectionVM;
         private readonly PhiladelphusRepositoryHeadersCollectionVM _repositoryHeadersCollectionVM;
+        private readonly IRelayCommandFactory _commandFactory;
 
         private string _name;
         private string _description;
@@ -86,6 +87,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="options">Параметры конфигурации приложения.</param>
         /// <param name="headersCollectionConfig">Параметр headersCollectionConfig.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryCreationControlVM(
             IServiceProvider serviceProvider,
@@ -95,13 +97,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IPhiladelphusRepositoryCollectionService collectionService,
             IPhiladelphusRepositoryService repositoryService,
             IConfigurationService configurationService,
-            PhiladelphusRepositoryCollectionVM repositoryCollectionVM, 
+            PhiladelphusRepositoryCollectionVM repositoryCollectionVM,
             PhiladelphusRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
-            DataStoragesCollectionVM dataStoragesSettingsVM, 
+            DataStoragesCollectionVM dataStoragesSettingsVM,
             IOptions<ApplicationSettingsConfig> options,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> headersCollectionConfig,
             IApplicationCommandsVM applicationCommandsVM,
-            IFileDialogService fileDialogService)
+            IFileDialogService fileDialogService,
+            IRelayCommandFactory commandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(collectionService);
@@ -115,12 +118,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(options.Value);
             ArgumentNullException.ThrowIfNull(headersCollectionConfig);
             ArgumentNullException.ThrowIfNull(headersCollectionConfig.Value);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _collectionService = collectionService;
             _repositoryService = repositoryService;
             _fileDialogService = fileDialogService;
             _configurationService = configurationService;
             _headersCollectionConfig = headersCollectionConfig;
+            _commandFactory = commandFactory;
 
             _dataStoragesCollectionVM = dataStoragesSettingsVM;
             _repositoryCollectionVM = repositoryCollectionVM;
@@ -134,11 +139,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
             Name = "Новый репозиторий";
         }
-        public RelayCommand CreateAndSaveRepositoryCommand
+        public IRelayCommand CreateAndSaveRepositoryCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     if (string.IsNullOrEmpty(Name)
                         || _dataStoragesCollectionVM.SelectedDataStorageVM == null)

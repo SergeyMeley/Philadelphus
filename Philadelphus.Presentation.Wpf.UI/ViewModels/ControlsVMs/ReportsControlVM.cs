@@ -27,6 +27,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly ITablesExportService _jsonExportService;
         private readonly ITablesExportService _xmlExportService;
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
+        private readonly IRelayCommandFactory _commandFactory;
 
         private DataStorageVM _selectedDataStorageVM;
         private ReportInfoModel _selectedReportInfo;
@@ -111,34 +112,38 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="tablesExportServiceFactory">Параметр tablesExportServiceFactory.</param>
         /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ReportsControlVM(
-            IServiceProvider serviceProvider, 
-            IMapper mapper, 
-            ILogger logger, 
+            IServiceProvider serviceProvider,
+            IMapper mapper,
+            ILogger logger,
             INotificationService notificationService,
             IReportService reportService,
             ITablesExportServiceFactory tablesExportServiceFactory,
             DataStoragesCollectionVM dataStoragesCollectionVM,
-            IApplicationCommandsVM applicationCommandsVM) 
+            IApplicationCommandsVM applicationCommandsVM,
+            IRelayCommandFactory commandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(reportService);
             ArgumentNullException.ThrowIfNull(tablesExportServiceFactory);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _reportService = reportService;
             _xlsxExportService = tablesExportServiceFactory.Create(TablesExportFormat.Xlsx);
             _jsonExportService = tablesExportServiceFactory.Create(TablesExportFormat.Json);
             _xmlExportService = tablesExportServiceFactory.Create(TablesExportFormat.Xml);
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
+            _commandFactory = commandFactory;
         }
 
-        public RelayCommand ExecuteReportCommand
+        public IRelayCommand ExecuteReportCommand
         {
             get
             {
-                return new RelayCommand(
+                return _commandFactory.Create(
                     async obj =>
                     {
                         await ExecuteReportAsync();
@@ -149,11 +154,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     });
             }
         }
-        public RelayCommand ExportToXlsxCommand
+        public IRelayCommand ExportToXlsxCommand
         {
             get
             {
-                return new RelayCommand(
+                return _commandFactory.Create(
                     async obj =>
                     {
                         ExportTableAsync(_xlsxExportService);
@@ -165,11 +170,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand ExportToJsonCommand
+        public IRelayCommand ExportToJsonCommand
         {
             get
             {
-                return new RelayCommand(
+                return _commandFactory.Create(
                     async obj =>
                     {
                         ExportTableAsync(_jsonExportService);
@@ -181,11 +186,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand ExportToXmlCommand
+        public IRelayCommand ExportToXmlCommand
         {
             get
             {
-                return new RelayCommand(
+                return _commandFactory.Create(
                     async obj =>
                     {
                         ExportTableAsync(_xmlExportService);

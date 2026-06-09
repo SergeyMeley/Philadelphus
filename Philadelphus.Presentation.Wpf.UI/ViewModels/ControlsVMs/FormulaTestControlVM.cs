@@ -41,6 +41,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
 
         /// <summary>
+        /// Фабрика синхронных команд.
+        /// </summary>
+        private readonly IRelayCommandFactory _commandFactory;
+
+        /// <summary>
         /// Доменный сервис, создающий недостающие системные листья результатов.
         /// </summary>
         private readonly IPhiladelphusRepositoryService _repositoryService;
@@ -111,6 +116,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="formulaEvaluator">Вычислитель формул.</param>
         /// <param name="repositoryService">Доменный сервис репозитория.</param>
         /// <param name="repositoryExplorerControlVM">Обозреватель текущего репозитория.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         public FormulaTestControlVM(
             IServiceProvider serviceProvider,
             IMapper mapper,
@@ -121,7 +127,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaRegistry formulaRegistry,
             IPhiladelphusRepositoryService repositoryService,
             IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
-            RepositoryExplorerControlVM repositoryExplorerControlVM)
+            RepositoryExplorerControlVM repositoryExplorerControlVM,
+            IRelayCommandFactory commandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             _formulaEvaluator = formulaEvaluator ?? throw new ArgumentNullException(nameof(formulaEvaluator));
@@ -129,6 +136,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _repositoryService = repositoryService ?? throw new ArgumentNullException(nameof(repositoryService));
             _formulaDiagnosticsReporter = formulaDiagnosticsReporter ?? throw new ArgumentNullException(nameof(formulaDiagnosticsReporter));
             _repositoryExplorerControlVM = repositoryExplorerControlVM ?? throw new ArgumentNullException(nameof(repositoryExplorerControlVM));
+            _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
         }
 
         /// <summary>
@@ -240,7 +248,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда вычисления текущей формулы.
         /// </summary>
-        public RelayCommand EvaluateFormulaCommand => new RelayCommand(_ => EvaluateFormula());
+        public IRelayCommand EvaluateFormulaCommand => _commandFactory.Create(_ => EvaluateFormula());
 
         /// <summary>
         /// Обновляет предложения автодополнения по текущей позиции курсора.
