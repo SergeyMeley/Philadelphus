@@ -4,8 +4,9 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.ExtensionSystem.Infrastructure;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
@@ -13,7 +14,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
-using Philadelphus.Presentation.ViewModels.ControlsVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -24,6 +24,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         private readonly IExtensionManager _extensionManager;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
+        private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private ExtensionInstanceVM _selectedExtension;
         private string _statusMessage;
         private bool _isExecuting;
@@ -102,6 +104,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="extensionManager">Параметр extensionManager.</param>
         /// <param name="repositoryExplorerControlVM">Параметр repositoryExplorerControlVM.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
+        /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ExtensionsControlVM(
             IServiceProvider serviceProvider,
@@ -110,20 +114,26 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             IExtensionManager extensionManager,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
-            ApplicationCommandsVM applicationCommandsVM)
+            ApplicationCommandsVM applicationCommandsVM,
+            IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(extensionManager);
+            ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
 
             _extensionManager = extensionManager;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
+            _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
 
             RecentOperations = new ObservableCollection<OperationLog>();
 
-            StartExtensionCommand = new AsyncRelayCommand(ExecuteStartExtension, _ => SelectedExtension != null && SelectedExtension.State != ExtensionState.Running);
-            StopExtensionCommand = new AsyncRelayCommand(ExecuteStopExtension, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
-            ExecuteExtensionCommand = new AsyncRelayCommand(ExecuteMainMethod, _ => CanExecuteMainMethod());
-            OpenMainWindowCommand = new RelayCommand(ExecuteOpenMainWindow, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
+            StartExtensionCommand = _asyncCommandFactory.Create(ExecuteStartExtension, _ => SelectedExtension != null && SelectedExtension.State != ExtensionState.Running);
+            StopExtensionCommand = _asyncCommandFactory.Create(ExecuteStopExtension, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
+            ExecuteExtensionCommand = _asyncCommandFactory.Create(ExecuteMainMethod, _ => CanExecuteMainMethod());
+            OpenMainWindowCommand = _commandFactory.Create(ExecuteOpenMainWindow, _ => SelectedExtension != null && SelectedExtension.State == ExtensionState.Running);
         }
 
         /// <summary>

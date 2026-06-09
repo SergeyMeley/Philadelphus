@@ -5,10 +5,10 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
@@ -30,6 +30,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly ReportsControlVM _reportsControlVM;
         private readonly FormulaTestControlVM _formulaTestControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
+        private readonly IRelayCommandFactory _commandFactory;
 
         /// <summary>
         /// Команды приложения.
@@ -127,6 +128,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="applicationSettingsControlVM">Параметр applicationSettingsControlVM.</param>
         /// <param name="reportsControlVM">Параметр reportsControlVM.</param>
         /// <param name="mainWindowNotificationsVM">Параметр mainWindowNotificationsVM.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public MainWindowVM(
             IServiceProvider serviceProvider,
@@ -139,7 +141,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IExtensionsControlVMFactory extensionVMFactory,
             ApplicationSettingsControlVM applicationSettingsControlVM,
             ReportsControlVM reportsControlVM,
-            MainWindowNotificationsVM mainWindowNotificationsVM)
+            MainWindowNotificationsVM mainWindowNotificationsVM,
+            IRelayCommandFactory commandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -149,6 +152,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(applicationSettingsControlVM);
             ArgumentNullException.ThrowIfNull(reportsControlVM);
             ArgumentNullException.ThrowIfNull(mainWindowNotificationsVM);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _importExportControlVM = ActivatorUtilities.CreateInstance<ImportExportControlVM>(_serviceProvider, repositoryExplorerControlVM);
@@ -157,6 +161,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _reportsControlVM = reportsControlVM;
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
+            _commandFactory = commandFactory;
 
             _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
@@ -173,11 +178,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// </summary>
         public IRelayCommand OpenFormulaEditorWindowCommand => _applicationCommandsVM.OpenFormulaEditorWindowCommand;
 
-        public RelayCommand OpenRepositoryMemberDetailsWindowCommand
+        public IRelayCommand OpenRepositoryMemberDetailsWindowCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     var vm = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(RepositoryExplorerVM);
                     var window = new DetailsWindow(vm.SelectedElementVM);

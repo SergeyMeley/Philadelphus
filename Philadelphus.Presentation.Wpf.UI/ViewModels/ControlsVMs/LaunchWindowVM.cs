@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
@@ -19,6 +19,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     /// </summary>
     public class LaunchWindowVM : ControlBaseVM
     {
+        private readonly IRelayCommandFactory _commandFactory;
+
         /// <summary>
         /// Стартовое окно.
         /// </summary>
@@ -39,6 +41,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         }
 
         private readonly ApplicationSettingsControlVM _applicationSettingsControlVM;
+
         /// <summary>
         /// Настройки приложения.
         /// </summary>
@@ -100,6 +103,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="repositoryCreationControlVM">Параметр repositoryCreationControlVM.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <param name="applicationSettingsControlVM">Параметр applicationSettingsControlVM.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public LaunchWindowVM(
             IServiceProvider serviceProvider,
@@ -112,7 +116,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             StorageCreationControlVM storageCreationControlVM,
             RepositoryCreationControlVM repositoryCreationControlVM,
             ApplicationCommandsVM applicationCommandsVM,
-            ApplicationSettingsControlVM applicationSettingsControlVM)
+            ApplicationSettingsControlVM applicationSettingsControlVM,
+            IRelayCommandFactory commandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
@@ -121,7 +126,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(storageCreationControlVM);
             ArgumentNullException.ThrowIfNull(repositoryCreationControlVM);
             ArgumentNullException.ThrowIfNull(applicationSettingsControlVM);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
+            _commandFactory = commandFactory;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;
@@ -140,11 +147,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда выполнения операции главного окна.
         /// </summary>
         public IRelayCommand OpenMainWindowCommand => _applicationCommandsVM.OpenMainWindowCommand;
-        public RelayCommand OpenMainWindowWithHeaderCommand
+        public IRelayCommand OpenMainWindowWithHeaderCommand
         {
             get
             {
-                return new RelayCommand(
+                return _commandFactory.Create(
                     obj =>
                 {
                     var headerVM = RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM;
@@ -166,22 +173,22 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 
             }
         }
-        public RelayCommand OpenDataStoragesSettingsControlCommand
+        public IRelayCommand OpenDataStoragesSettingsControlCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowStoragesTabControl);
                 });
             }
         }
 
-        public RelayCommand OpenConnectionStringsSettingsControlCommand
+        public IRelayCommand OpenConnectionStringsSettingsControlCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowSettingsTabControl);
                     _applicationSettingsControlVM.SelectedApplicationSettingsTabItemVM = _applicationSettingsControlVM.ApplicationSettingsTabItemsVMs.Find(x => x.Content is ConnectionStringsTabControl);
