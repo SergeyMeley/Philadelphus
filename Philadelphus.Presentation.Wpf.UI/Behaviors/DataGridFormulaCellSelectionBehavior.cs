@@ -1,4 +1,4 @@
-using Philadelphus.Presentation.Wpf.UI.Models.Tables;
+using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using System.Windows;
 using System.Windows.Controls;

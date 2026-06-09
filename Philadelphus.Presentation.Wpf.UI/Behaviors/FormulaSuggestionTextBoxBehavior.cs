@@ -1,7 +1,7 @@
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.Behaviors
 {

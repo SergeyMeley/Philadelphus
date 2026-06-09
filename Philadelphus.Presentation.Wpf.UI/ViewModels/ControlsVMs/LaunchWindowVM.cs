@@ -1,17 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using System.Reflection;
+using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {

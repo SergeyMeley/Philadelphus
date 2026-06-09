@@ -1,10 +1,10 @@
-using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Models.Tables;
+using Philadelphus.Presentation.Models.Tables;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 

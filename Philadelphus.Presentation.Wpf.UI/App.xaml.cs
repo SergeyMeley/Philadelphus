@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,6 +9,9 @@ using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
+using Philadelphus.Core.Domain.ImportExport.Contracts;
+using Philadelphus.Core.Domain.ImportExport.Services.Implementations;
+using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
@@ -21,17 +24,19 @@ using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Presentation.Services.Implementations;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Implementations;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services;
-using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
-using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.TabItemsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
@@ -43,9 +48,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
-using Philadelphus.Core.Domain.ImportExport.Contracts;
-using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
-using Philadelphus.Core.Domain.ImportExport.Services.Implementations;
 
 namespace Philadelphus.Presentation.Wpf.UI
 {
@@ -224,6 +226,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     // Общие ViewModel
                     services.AddSingleton<ApplicationVM>();
                     services.AddSingleton<ApplicationCommandsVM>();
+                    services.AddSingleton<IApplicationCommandsVM>(sp => sp.GetRequiredService<ApplicationCommandsVM>());
                     services.AddTransient<MainWindowNotificationsVM>();
                     services.AddTransient<MessageLogControlVM>();
                     services.AddTransient<PopUpNotificationsControlVM>();

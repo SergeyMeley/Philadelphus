@@ -1,6 +1,7 @@
 ﻿using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using System.Collections;
 
+using Philadelphus.Presentation.ViewModels;
 namespace Philadelphus.Presentation.Wpf.UI.Models.Entities
 {
     /// <summary>

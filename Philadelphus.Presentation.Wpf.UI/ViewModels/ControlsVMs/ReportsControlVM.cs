@@ -1,24 +1,19 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Bibliography;
-using Microsoft.EntityFrameworkCore;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Reports.Models;
 using Philadelphus.Core.Domain.Reports.Services;
-using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Core.Domain.TablesExport.Enums;
 using Philadelphus.Core.Domain.TablesExport.Factories;
 using Philadelphus.Core.Domain.TablesExport.Models;
 using Philadelphus.Core.Domain.TablesExport.Services;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Serilog;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -125,7 +120,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IReportService reportService,
             ITablesExportServiceFactory tablesExportServiceFactory,
             DataStoragesCollectionVM dataStoragesCollectionVM,
-            ApplicationCommandsVM applicationCommandsVM) 
+            IApplicationCommandsVM applicationCommandsVM) 
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(reportService);

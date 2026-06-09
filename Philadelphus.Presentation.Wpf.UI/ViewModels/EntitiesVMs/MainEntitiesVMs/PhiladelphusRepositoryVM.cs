@@ -1,11 +1,10 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
@@ -99,15 +98,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         public PhiladelphusRepositoryVM(
             PhiladelphusRepositoryModel repositoryModel,
             DataStoragesCollectionVM dataStoragesCollectionVM,
-            IPhiladelphusRepositoryService service)
-            : base(repositoryModel, dataStoragesCollectionVM, service)
+            IPhiladelphusRepositoryService service,
+            IFileDialogService fileDialogService)
+            : base(repositoryModel, dataStoragesCollectionVM, service, fileDialogService)
         {
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub);
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub.ContentWorkingTrees);
 
             foreach (var item in repositoryModel.ContentShrub.ContentWorkingTrees.Select(x => x.ContentRoot))
             {
-                Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service));
+                Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service, _fileDialogService));
             }
         }
     }

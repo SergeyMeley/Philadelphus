@@ -2,6 +2,7 @@ using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using System.Windows;
 
+using Philadelphus.Presentation.ViewModels;
 namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 {
     /// <summary>

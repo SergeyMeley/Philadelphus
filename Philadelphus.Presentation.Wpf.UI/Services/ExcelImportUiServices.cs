@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using Philadelphus.Presentation.Services.Interfaces;
 using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services
@@ -44,6 +45,18 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             {
                 Filter = "Import Schema|*.phimportschema.json|JSON|*.json",
                 FileName = defaultFileName
+            };
+
+            return dialog.ShowDialog() == true ? dialog.FileName : null;
+        }
+
+        public string? BrowseLocalFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Multiselect = false,
             };
 
             return dialog.ShowDialog() == true ? dialog.FileName : null;

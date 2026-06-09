@@ -1,4 +1,4 @@
-using Philadelphus.Presentation.Wpf.UI.ViewModels;
+﻿using Philadelphus.Presentation.ViewModels;
 
 namespace Philadelphus.Presentation.Services.Interfaces
 {

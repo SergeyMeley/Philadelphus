@@ -1,7 +1,9 @@
-namespace Philadelphus.Presentation.Wpf.UI.Services
+﻿namespace Philadelphus.Presentation.Services.Interfaces
 {
     public interface IFileDialogService
     {
+        string? BrowseLocalFile();
+
         string? OpenExcelFile();
 
         string? SavePhjsonFile(string defaultFileName);

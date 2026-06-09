@@ -1,4 +1,4 @@
-namespace Philadelphus.Presentation.Wpf.UI.Services
+﻿namespace Philadelphus.Presentation.Services.Interfaces
 {
     public interface IMessageDialogService
     {

@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.Models.Entities.Enums;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -21,6 +24,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
         private readonly INotificationService _notificationService;
         private readonly IPhiladelphusRepositoryCollectionService _collectionService;
         private readonly IPhiladelphusRepositoryService _service;
+        private readonly IFileDialogService? _fileDialogService;
 
         private DataStoragesCollectionVM _dataStoragesSettingsVM;
 
@@ -47,13 +51,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             IPhiladelphusRepositoryCollectionService collectionService, 
             IPhiladelphusRepositoryService service,
             DataStoragesCollectionVM dataStoragesSettings,
-            IOptions<ApplicationSettingsConfig> options)
+            IOptions<ApplicationSettingsConfig> options,
+            IFileDialogService fileDialogService)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(notificationService);
             ArgumentNullException.ThrowIfNull(collectionService);
             ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(fileDialogService);
             ArgumentNullException.ThrowIfNull(dataStoragesSettings);
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
@@ -63,6 +69,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _notificationService = notificationService;
             _collectionService = collectionService;
             _service = service;
+            _fileDialogService = fileDialogService;
 
             _dataStoragesSettingsVM = dataStoragesSettings;
 
@@ -155,7 +162,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 {
                     var builder = new DataStorageBuilder();
                     var repository = _collectionService.CreateNewPhiladelphusRepository(builder.Build());
-                    var repositorVM = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service);
+                    var repositorVM = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service, _fileDialogService);
                     PhiladelphusRepositoriesVMs.Add(repositorVM);
                      
                 });
@@ -169,7 +176,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
                 return false;
             foreach (var item in repositories)
             {
-                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _dataStoragesSettingsVM, _service));
+                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _dataStoragesSettingsVM, _service, _fileDialogService));
             }
             return true;
         }
@@ -196,7 +203,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             var repository = repositories.FirstOrDefault(x => x.Uuid == uuid);
             if (repository == null)
                 return null;
-            var result = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service);
+            var result = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service, _fileDialogService);
             _PhiladelphusRepositoriesVMs.Add(result);
             return result;
         }

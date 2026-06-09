@@ -1,12 +1,14 @@
-﻿using AutoMapper;
+﻿using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
-using Philadelphus.Presentation.Wpf.UI.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using System.IO;
@@ -20,6 +22,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
     {
         private readonly IPhiladelphusRepositoryCollectionService _collectionService;
         private readonly IPhiladelphusRepositoryService _repositoryService;
+        private readonly IFileDialogService? _fileDialogService;
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _headersCollectionConfig;
         private readonly FileInfo _configFile;
@@ -97,11 +100,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             DataStoragesCollectionVM dataStoragesSettingsVM, 
             IOptions<ApplicationSettingsConfig> options,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> headersCollectionConfig,
-            ApplicationCommandsVM applicationCommandsVM)
+            IApplicationCommandsVM applicationCommandsVM,
+            IFileDialogService fileDialogService)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(collectionService);
             ArgumentNullException.ThrowIfNull(repositoryService);
+            ArgumentNullException.ThrowIfNull(fileDialogService);
             ArgumentNullException.ThrowIfNull(configurationService);
             ArgumentNullException.ThrowIfNull(repositoryCollectionVM);
             ArgumentNullException.ThrowIfNull(repositoryHeadersCollectionVM);
@@ -113,6 +118,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             _collectionService = collectionService;
             _repositoryService = repositoryService;
+            _fileDialogService = fileDialogService;
             _configurationService = configurationService;
             _headersCollectionConfig = headersCollectionConfig;
 
@@ -157,7 +163,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     model.Description = Description;
                     _collectionService.SaveChanges(ref model);
 
-                    var vm = new PhiladelphusRepositoryVM(model, _dataStoragesCollectionVM, _repositoryService);
+                    var vm = new PhiladelphusRepositoryVM(model, _dataStoragesCollectionVM, _repositoryService, _fileDialogService);
                     
                     _repositoryCollectionVM.PhiladelphusRepositoriesVMs.Add(vm);
                     _repositoryCollectionVM.CurrentRepositoryVM = vm;
@@ -170,6 +176,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <summary>
         /// Команда выполнения операции хранилища данных.
         /// </summary>
-        public RelayCommand OpenDataStoragesSettingsControlCommand { get; set; }
+        public IRelayCommand OpenDataStoragesSettingsControlCommand { get; set; }
     }
 }

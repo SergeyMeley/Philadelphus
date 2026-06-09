@@ -1,23 +1,28 @@
+using Philadelphus.Presentation.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services
 {
     public class ExcelImportRepositoryPreviewBuilder
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IFileDialogService _fileDialogService;
 
-        public ExcelImportRepositoryPreviewBuilder(IServiceProvider serviceProvider)
+        public ExcelImportRepositoryPreviewBuilder(
+            IServiceProvider serviceProvider,
+            IFileDialogService fileDialogService)
         {
             _serviceProvider = serviceProvider;
+            _fileDialogService = fileDialogService;
         }
 
         public RepositoryExplorerControlVM Build(
@@ -40,13 +45,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
                 previewTargetRoot.Name = targetExistingRootName;
             }
 
-            var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService);
+            var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService, _fileDialogService);
             previewRepositoryVm.Childs.Clear();
 
             var rootForPreview = previewTargetRoot ?? previewTree.ContentRoot;
             if (rootForPreview != null && rootForPreview.IsSystemBase == false)
             {
-                previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService));
+                previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService, _fileDialogService));
             }
 
             var previewExplorerVm = ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(

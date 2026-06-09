@@ -1,6 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Wpf.UI.Converters;
-using Philadelphus.Presentation.Wpf.UI.Models.Tables;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;

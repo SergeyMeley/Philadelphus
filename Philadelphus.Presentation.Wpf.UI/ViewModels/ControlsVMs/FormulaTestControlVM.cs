@@ -1,20 +1,22 @@
-using AutoMapper;
-using System.Collections.ObjectModel;
+﻿using AutoMapper;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
-using Philadelphus.Core.Domain.FormulaEngine.Execution;
-using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
+using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Editing;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
+using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
+using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Serilog;
+using System.Collections.ObjectModel;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -114,7 +116,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
-            ApplicationCommandsVM applicationCommandsVM,
+            IApplicationCommandsVM applicationCommandsVM,
             FormulaAstEvaluator formulaEvaluator,
             FormulaRegistry formulaRegistry,
             IPhiladelphusRepositoryService repositoryService,
@@ -946,137 +948,4 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             return result.Value?.ToString() ?? string.Empty;
         }
     }
-
-    /// <summary>
-    /// Предложение автодополнения редактора формул.
-    /// </summary>
-    public sealed class FormulaSuggestionVM
-    {
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="FormulaSuggestionVM" />.
-        /// </summary>
-        /// <param name="displayName">Отображаемое имя предложения.</param>
-        /// <param name="insertName">Имя, подставляемое в формулу.</param>
-        /// <param name="formula">Описание формулы.</param>
-        /// <param name="useTemplate">Признак подстановки шаблона вызова функции.</param>
-        public FormulaSuggestionVM(
-            string displayName,
-            string insertName,
-            FormulaDefinition formula,
-            bool useTemplate)
-        {
-            DisplayName = displayName;
-            InsertName = insertName;
-            Formula = formula;
-            UseTemplate = useTemplate;
-        }
-
-        /// <summary>
-        /// Отображаемое имя предложения.
-        /// </summary>
-        public string DisplayName { get; }
-
-        /// <summary>
-        /// Имя, подставляемое в формулу.
-        /// </summary>
-        public string InsertName { get; }
-
-        /// <summary>
-        /// Описание формулы.
-        /// </summary>
-        public FormulaDefinition Formula { get; }
-
-        /// <summary>
-        /// Признак подстановки шаблона вызова функции.
-        /// </summary>
-        public bool UseTemplate { get; }
-
-        /// <summary>
-        /// Категория формулы.
-        /// </summary>
-        public string Category => Formula.Category ?? "Формулы";
-
-        /// <summary>
-        /// Описание формулы.
-        /// </summary>
-        public string Description => Formula.Description ?? string.Empty;
-
-        /// <summary>
-        /// Сигнатура для отображения в списке предложений.
-        /// </summary>
-        public string Signature
-        {
-            get
-            {
-                var arguments = Formula.Arguments.Count == 0
-                    ? string.Empty
-                    : string.Join("; ", Formula.Arguments.Select(argument => argument.Name));
-
-                return $"{Formula.Name}({arguments})";
-            }
-        }
-
-        /// <summary>
-        /// Создает текст подстановки и новую позицию курсора.
-        /// </summary>
-        /// <returns>Результат подстановки.</returns>
-        public FormulaCompletionResult CreateCompletion()
-        {
-            if (UseTemplate == false)
-            {
-                return new FormulaCompletionResult(InsertName, InsertName.Length);
-            }
-
-            if (Formula.Arguments.Count <= 1)
-            {
-                return new FormulaCompletionResult($"{InsertName}()", InsertName.Length + 1);
-            }
-
-            var separators = string.Join(string.Empty, Enumerable.Repeat("; ", Formula.Arguments.Count - 1));
-            return new FormulaCompletionResult($"{InsertName}({separators})", InsertName.Length + 1);
-        }
-    }
-
-    /// <summary>
-    /// Результат подстановки предложения автодополнения.
-    /// </summary>
-    /// <param name="Text">Текст подстановки.</param>
-    /// <param name="CaretOffset">Позиция курсора относительно начала подстановки.</param>
-    public sealed record FormulaCompletionResult(string Text, int CaretOffset);
-
-    /// <summary>
-    /// Сегмент визуальной подсветки формулы.
-    /// </summary>
-    /// <param name="Text">Текст сегмента.</param>
-    /// <param name="Kind">Тип визуальной подсветки.</param>
-    /// <param name="IsMatchingParenthesis">Признак парной скобки рядом с курсором.</param>
-    public sealed record FormulaHighlightSegmentVM(
-        string Text,
-        FormulaHighlightKind Kind,
-        bool IsMatchingParenthesis);
-
-    /// <summary>
-    /// Тип визуальной подсветки сегмента формулы.
-    /// </summary>
-    public enum FormulaHighlightKind
-    {
-        Default,
-        Function,
-        Identifier,
-        Number,
-        String,
-        TreeLeaveReference,
-        Parenthesis,
-        Punctuation,
-        Operator,
-        Error
-    }
-
-    /// <summary>
-    /// Текущий открытый вызов функции в тексте формулы.
-    /// </summary>
-    /// <param name="Name">Имя функции.</param>
-    /// <param name="ArgumentIndex">Индекс активного аргумента.</param>
-    public sealed record ActiveFormulaCall(string Name, int ArgumentIndex);
-
 }

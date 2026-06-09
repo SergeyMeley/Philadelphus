@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Philadelphus.Core.Domain.Configurations;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.SettingsContainersVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,11 +1,6 @@
-﻿using Confluent.Kafka;
-using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
-using Philadelphus.Core.Domain.Services.Implementations;
-using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs.NotificationsVMs;
-using Serilog;
-using System.Collections.ObjectModel;
+﻿using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels;
+using Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels
 {

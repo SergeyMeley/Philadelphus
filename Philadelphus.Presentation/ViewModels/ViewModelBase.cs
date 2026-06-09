@@ -1,7 +1,7 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels
+namespace Philadelphus.Presentation.ViewModels
 {
     /// <summary>
     /// Представляет объект ViewModelBase.

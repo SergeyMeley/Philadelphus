@@ -1,13 +1,13 @@
-using Philadelphus.Infrastructure.ImportExport.Excel;
+﻿using Philadelphus.Infrastructure.ImportExport.Excel;
+using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels;
+using Philadelphus.Presentation.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services;
-using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
@@ -20,7 +20,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
         private string _filePathDisplay = "Файл не выбран";
         private string _rootName = string.Empty;
-        private ExcelImportSourceItemViewModel? _selectedSourceItem;
+        private ExcelImportSourceItemVM? _selectedSourceItem;
         private DataView? _previewView;
         private bool _useAllWorksheets = true;
         private bool _isBusy;
@@ -38,7 +38,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             MainActionCommand = new AsyncRelayCommand(_ => ExecuteMainActionAsync());
         }
 
-        public ObservableCollection<ExcelImportSourceItemViewModel> SourceItems { get; } = new();
+        public ObservableCollection<ExcelImportSourceItemVM> SourceItems { get; } = new();
 
         public ICommand SelectFileCommand { get; }
 
@@ -73,7 +73,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
         public bool CanChooseIndividualSheets => UseAllWorksheets == false;
 
-        public ExcelImportSourceItemViewModel? SelectedSourceItem
+        public ExcelImportSourceItemVM? SelectedSourceItem
         {
             get => _selectedSourceItem;
             set
@@ -157,13 +157,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                         SourceType = sheet.SourceType
                     };
 
-                SourceItems.Add(new ExcelImportSourceItemViewModel(sheet, source, OnSourceItemIncludedChanged));
+                SourceItems.Add(new ExcelImportSourceItemVM(sheet, source, OnSourceItemIncludedChanged));
             }
 
             ApplyUseAllWorksheets();
         }
 
-        private void OnSourceItemIncludedChanged(ExcelImportSourceItemViewModel item, bool isIncluded)
+        private void OnSourceItemIncludedChanged(ExcelImportSourceItemVM item, bool isIncluded)
         {
             if (UseAllWorksheets)
                 return;
@@ -195,7 +195,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             }
         }
 
-        private void SelectCurrentSheet(ExcelImportSourceItemViewModel? item)
+        private void SelectCurrentSheet(ExcelImportSourceItemVM? item)
         {
             if (item == null)
             {
