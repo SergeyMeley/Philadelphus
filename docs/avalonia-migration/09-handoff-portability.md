@@ -5,18 +5,15 @@
 
 ## 1. Текущее состояние
 
-- Ветка: `feature/#65575392-avalonia`, HEAD: `67a016cb`.
+- Ветка: `feature/#65575392-avalonia`, HEAD: `56be8c79`. **Сборка `dotnet build Philadelphus.sln` — зелёная (подтверждено).**
 - Цель этапа 3 (по `04-roadmap.md`): перенос ViewModels/сервисов/логики в общий проект
   `Philadelphus.Presentation` (net10.0, без WPF), чтобы затем поднять Avalonia-клиент.
-- Коммиты серии (поверх дособственного `d66c69d1`):
-  - `fc6c70c3` — актуализация namespace-ссылок WPF на перенесённые типы;
-  - `ca88f4dc` — перенос ConfigurationService;
-  - `1ceec262` — вынос логики конвертеров;
-  - `2f29e148` — перенос MainEntityBaseVM;
-  - `140fdde7` — вынос Formula-типов;
-  - `67a016cb` — исправления переноса (кластер дерева, INodeParent/ILeaveParent, InternalsVisibleTo→public).
-- В рабочем дереве (НЕ закоммичено): фича `IFileDialogService.BrowseLocalFile` (file-picker)
-  и восстановленные `TreeRootVM.cs`/`ILeaveParent.cs` (см. п.2).
+- Вся работа Этапа 3.1 СКВОШНУТА в один коммит `56be8c79`
+  («Этап 3.1: перенос ViewModels и инфраструктуры в Philadelphus.Presentation») поверх `66dce630`.
+  Включает: namespace-актуализацию, перенос ConfigurationService, вынос логики конвертеров,
+  кластер сущностей/дерева (MainEntityBaseVM/ElementAttributeVM/IMainEntityVM/Tree*/INodeParent/ILeaveParent),
+  Formula-типы, и фичу file-picker (`IFileDialogService.BrowseLocalFile`).
+- Рабочее дерево ЧИСТОЕ (всё закоммичено); пустых/битых файлов нет, `TreeRootVM.cs`/`ILeaveParent.cs` целые.
 
 ### Уже в shared `Philadelphus.Presentation` (готово и проверено статикой)
 - Базовое: `ViewModelBase`; `Infrastructure` (RelayCommand/AsyncRelayCommand + интерфейсы IRelayCommand/IAsyncRelayCommand);
@@ -37,13 +34,12 @@
    (file-watcher/Roslyn/сборка) или из-за кэша virtiofs файлы иногда читаются с NUL-байтами сразу
    после записи. Дисциплина: на время правок ЗАКРЫВАТЬ Visual Studio; при появлении NUL —
    перезапустить сессию Cowork (после рестарта видно реальное состояние диска, правки обычно целы).
-2. **В коммите `67a016cb` файлы `TreeRootVM.cs` (shared) и `ILeaveParent.cs` закоммичены ПУСТЫМИ (0 байт).**
-   В рабочем дереве они восстановлены корректно. ОБЯЗАТЕЛЬНО перекоммитить рабочее дерево — иначе
-   чистый checkout `67a016cb` даст битые (пустые) файлы.
-3. **git-операции записи (reset/checkout/commit/clean) выполнять на Windows**, не через монтирование:
+2. **git-операции записи (reset/checkout/commit/clean) выполнять на Windows**, не через монтирование:
    индекс несколько раз повреждался (`fatal: Could not reset index file`). Чтение (status/show/log) — ок.
-4. **Сборка/тесты — только на Windows** (в песочнице нет .NET SDK; WPF таргетит net10.0-windows).
+3. **Сборка/тесты — только на Windows** (в песочнице нет .NET SDK; WPF таргетит net10.0-windows).
    Контрольная точка после каждого батча: `dotnet build Philadelphus.sln`.
+4. *(Исторически)* в прежнем коммите `67a016cb` `TreeRootVM.cs`/`ILeaveParent.cs` были закоммичены пустыми
+   из-за артефакта монтирования — после сквоша в `56be8c79` это исправлено (файлы целые).
 
 ## 3. Последняя фича: IFileDialogService.BrowseLocalFile (file-picker)
 
@@ -119,12 +115,10 @@
 
 ## 6. Следующие шаги (предлагаемый порядок)
 
-1. Перекоммитить рабочее дерево (исправляет пустые TreeRootVM/ILeaveParent + добавляет file-picker), собрать.
-2. Провести полный транзитивный анализ кандидатов «ревизия/да» из таблицы 5.1/5.2, обновить решения.
-3. Ввести фабрику команд (`IRelayCommandFactory`) — снимает главный блокер ~9 VM.
-4. Довести навигацию через IWindowService (убрать прямые ссылки на Views).
-5. Точечно абстрагировать оставшиеся Microsoft.Win32 (ApplicationSettingsControlVM, ImportExportControlVM) через IFileDialogService.
-6. Закрыть Этап 3 (+ создать Philadelphus.Tests.Presentation, 1–2 unit-теста). Затем Этап 4 — Avalonia bootstrap.
+1. ✅ Сборка `56be8c79` зелёная (подтверждено). Baseline установлен.
+2. **Очистка хабовых ViewModels от WPF** по детальному плану в разделе 8 (A→B→C→D).
+3. Параллельно — транзитивный анализ кандидатов «ревизия/да» из таблицы 5.1/5.2.
+4. Закрыть Этап 3 (+ создать Philadelphus.Tests.Presentation, 1–2 unit-теста). Затем Этап 4 — Avalonia bootstrap.
 
 ## 7. Рабочие правила (подтверждены пользователем)
 - Файлы переносятся один-в-один (кроме актуализации namespace); изменения содержимого — отдельным коммитом.
@@ -135,3 +129,60 @@
   правилу, alias-using в конце), одна пустая строка перед `namespace`.
 - `ModalWindowNotificationsControlVM` использует `IDialogService` напрямую — это правильно.
 - Не делать `git reset`; если нужно откатить — оформлять как новую правку.
+
+
+## 8. План очистки ViewModels от WPF (детально)
+
+Анализ фактического WPF-API в хабовых VM показал: поверхность УЗКАЯ. `System.Windows.Input` — это
+`ICommand` из BCL (в shared компилируется), `Visibility` в VM фактически нет. Реальные блокеры — 4 штуки,
+под каждый есть чистая абстракция. Порядок: A → B → C → D.
+
+### A. Фабрика команд (главный разблокировщик, ~9 VM)
+Блокер: VM создают `new RelayCommand(...)` из `Wpf.UI.Infrastructure` (на `CommandManager.RequerySuggested` — WPF-only).
+```csharp
+// shared: Philadelphus.Presentation/Infrastructure/
+public interface IRelayCommandFactory {
+    IRelayCommand Create(Action<object?> execute, Predicate<object?>? canExecute = null);
+}
+public interface IAsyncRelayCommandFactory {
+    IAsyncRelayCommand Create(Func<object?, Task> execute, Predicate<object?>? canExecute = null);
+}
+```
+- WPF-реализация фабрики создаёт текущий WPF `RelayCommand`/`AsyncRelayCommand` (с CommandManager) — поведение не меняется.
+- Avalonia-реализация (позже) — на shared `RelayCommand` (без CommandManager).
+- В VM: `new RelayCommand(...)` → `_commandFactory.Create(...)`, фабрика инъектируется обязательным ctor-параметром (DI), `ArgumentNullException.ThrowIfNull`.
+- Зарегистрировать фабрики в `App.xaml.cs`.
+- Разблокирует: ApplicationCommandsVM, RepositoryFormulaBarVM, ExtensionsControlVM, MainWindowVM, LaunchWindowVM,
+  ApplicationSettingsControlVM, ImportExportControlVM, ImportFromExcelVM, RepositoryExplorerControlVM.
+
+### B. Открытие окон через `IWindowService` (уже есть в shared)
+`IWindowService` (Show<TVM>/ShowDialog<TVM>/Close/Hide/ShowOrActivate + реестр VM→Window) уже в shared.
+Заменить прямое создание окон:
+- `MainWindowVM:183` `new DetailsWindow(elementVM); .Show()` → `_windowService.Show(elementVM)` (+ регистрация ElementVM→DetailsWindow в WpfWindowService).
+- `RepositoryExplorerControlVM:380` `GetRequiredService<AttributeValuesCollectionWindow>().Show()` → `_windowService.Show(attrValuesVM)`.
+- `ImportExportControlVM:245` `GetRequiredService<ExcelImportDesignerWindow>().ShowDialog()` → `_windowService.ShowDialog(designerVM)`.
+- `ApplicationWindowsVM` — по его TODO «Удалить и брать окна из DI»: убрать класс, окна вести через IWindowService.
+
+### C. Файловые диалоги через `IFileDialogService` (паттерн готов — `BrowseLocalFile`)
+Добавить общие методы:
+```csharp
+string? OpenFile(string? filter = null);
+string? SaveFile(string? filter = null, string? defaultName = null);
+```
+Реализовать в WPF `FileDialogService` (Open/SaveFileDialog). Заменить `Microsoft.Win32` в:
+- `ApplicationSettingsControlVM` (OpenFileDialog, ~стр.235);
+- `ImportExportControlVM` (Save/Open, стр.175/209/265/276).
+
+### D. Структурный рефакторинг `LaunchWindowVM` (сложнее, после A–C)
+Анти-MVVM: VM создаёт View-контролы и проверяет их тип:
+```csharp
+tab.Content = new LaunchWindowMainTabControl() { DataContext = this };   // VM создаёт View
+... x.Content is LaunchWindowStoragesTabControl ...                       // проверка типа View
+```
+Сделать `Content` вкладок — VM (а не UserControl), маппинг VM→контрол — через XAML `DataTemplate`.
+Тогда `LaunchWindowVM` перестаёт знать о View. Правка затрагивает View+VM.
+
+### Итог
+После A–D хабовые VM становятся WPF-free и переносятся в shared один-в-один (+ актуализация namespace).
+Рекомендуемый старт: **A (фабрика команд)** — добавить интерфейсы/WPF-реализацию/регистрацию, заменить
+`new RelayCommand` в одном VM как образец, проверить сборку, затем прокатить по остальным.
