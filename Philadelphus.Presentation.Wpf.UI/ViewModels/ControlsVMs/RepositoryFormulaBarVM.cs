@@ -15,11 +15,11 @@ using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
@@ -39,6 +39,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly IFormulaDiagnosticsReporter _formulaDiagnosticsReporter;
         private readonly INotificationService _notificationService;
         private readonly IApplicationCommandsVM _applicationCommandsVM;
+        private readonly IRelayCommandFactory _commandFactory;
 
         private ElementAttributeVM? _selectedFormulaAttribute;
         private FormulaBarTarget? _formulaBarTarget;
@@ -78,6 +79,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="formulaDiagnosticsReporter">Приемник диагностических сообщений Formula Engine.</param>
         /// <param name="notificationService">Сервис пользовательских уведомлений.</param>
         /// <param name="applicationCommandsVM">Команды приложения, включая открытие редактора формул.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         public RepositoryFormulaBarVM(
             RepositoryExplorerControlVM repositoryExplorerVM,
             IPhiladelphusRepositoryService service,
@@ -85,7 +87,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaRegistry formulaRegistry,
             IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             INotificationService notificationService,
-            IApplicationCommandsVM applicationCommandsVM)
+            IApplicationCommandsVM applicationCommandsVM,
+            IRelayCommandFactory commandFactory)
         {
             ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
             ArgumentNullException.ThrowIfNull(service);
@@ -94,6 +97,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(formulaDiagnosticsReporter);
             ArgumentNullException.ThrowIfNull(notificationService);
             ArgumentNullException.ThrowIfNull(applicationCommandsVM);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _repositoryExplorerVM = repositoryExplorerVM;
             _service = service;
@@ -102,6 +106,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _formulaDiagnosticsReporter = formulaDiagnosticsReporter;
             _notificationService = notificationService;
             _applicationCommandsVM = applicationCommandsVM;
+            _commandFactory = commandFactory;
 
             FormulaRecalculationModes = new List<FormulaRecalculationModeVM>
             {
@@ -354,7 +359,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда выбора атрибутной ячейки таблицы наследников для строки формул.
         /// </summary>
         public IRelayCommand SelectChildFormulaCellCommand =>
-            _selectChildFormulaCellCommand ??= new RelayCommand(
+            _selectChildFormulaCellCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     if (obj is ChildFormulaCellSelection selection)
@@ -367,7 +372,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда применения текста строки формул к активной ячейке.
         /// </summary>
         public IRelayCommand ApplyFormulaBarCommand =>
-            _applyFormulaBarCommand ??= new RelayCommand(
+            _applyFormulaBarCommand ??= _commandFactory.Create(
                 _ =>
                 {
                     ApplyFormulaBar();
@@ -381,7 +386,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда отмены редактирования строки формул.
         /// </summary>
         public IRelayCommand CancelFormulaBarCommand =>
-            _cancelFormulaBarCommand ??= new RelayCommand(
+            _cancelFormulaBarCommand ??= _commandFactory.Create(
                 _ =>
                 {
                     FormulaBarText = _formulaBarOriginalText;
@@ -400,7 +405,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда открытия отдельного редактора формул с текущим текстом строки формул.
         /// </summary>
         public IRelayCommand OpenFormulaEditorFromFormulaBarCommand =>
-            _openFormulaEditorFromFormulaBarCommand ??= new RelayCommand(
+            _openFormulaEditorFromFormulaBarCommand ??= _commandFactory.Create(
                 _ =>
                 {
                     var request = new FormulaEditorOpenRequest(_repositoryExplorerVM, FormulaBarText);
@@ -418,7 +423,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда пересчета всех формул текущего выбранного элемента репозитория.
         /// </summary>
         public IRelayCommand RecalculateCurrentFormulaCommand =>
-            _recalculateCurrentFormulaCommand ??= new RelayCommand(
+            _recalculateCurrentFormulaCommand ??= _commandFactory.Create(
                 _ =>
                 {
                     RecalculateCurrentFormula();
@@ -432,7 +437,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Команда пересчета всех формул во всех элементах репозитория.
         /// </summary>
         public IRelayCommand RecalculateAllFormulasCommand =>
-            _recalculateAllFormulasCommand ??= new RelayCommand(
+            _recalculateAllFormulasCommand ??= _commandFactory.Create(
                 _ =>
                 {
                     RecalculateAllFormulas();

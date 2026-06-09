@@ -11,6 +11,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
@@ -19,7 +20,6 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services.Tables;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
@@ -40,6 +40,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
         private readonly IPhiladelphusRepositoryService _service;
         private readonly IFileDialogService _fileDialogService;
+        private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -193,6 +195,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <param name="PhiladelphusRepositoryVM">Модель представления репозитория Чубушника.</param>
         /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
+        /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
             IServiceProvider serviceProvider,
@@ -209,6 +213,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IFileDialogService fileDialogService,
+            IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -222,9 +228,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(extensionVMFactory);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
+            ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
 
             _service = service;
             _fileDialogService = fileDialogService;
+            _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -235,7 +245,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 formulaRegistry,
                 formulaDiagnosticsReporter,
                 notificationService,
-                applicationCommandsVM);
+                applicationCommandsVM,
+                commandFactory);
 
             if (loadOnStartup)
             {
@@ -252,12 +263,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         #region [Commands]
 
         public IAsyncRelayCommand GetWorkCommand =>
-            _getWorkCommand ??= new AsyncRelayCommand(
+            _getWorkCommand ??= _asyncCommandFactory.Create(
                 ExecuteGetWorkAsync,
                 _ => IsRepositoryLoading == false);
 
         public IRelayCommand SaveCommand =>
-            _saveCommand ??= new RelayCommand(
+            _saveCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     var repo = _philadelphusRepositoryVM.Model;
@@ -272,7 +283,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand CreateRootCommand =>
-            _createRootCommand ??= new RelayCommand(
+            _createRootCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
@@ -286,7 +297,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand CreateNodeCommand =>
-            _createNodeCommand ??= new RelayCommand(
+            _createNodeCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     if (_selectedRepositoryMember == null)
@@ -304,7 +315,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand CreateLeaveCommand =>
-            _createLeaveCommand ??= new RelayCommand(
+            _createLeaveCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     if (_selectedRepositoryMember == null)
@@ -326,7 +337,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand CreateAttributeCommand =>
-            _createAttributeCommand ??= new RelayCommand(
+            _createAttributeCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     if (_selectedRepositoryMember == null)
@@ -342,7 +353,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand SoftDeleteRepositoryMemberCommand =>
-            _softDeleteRepositoryMemberCommand ??= new RelayCommand(
+            _softDeleteRepositoryMemberCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     if (_selectedRepositoryMember.Model is IContentModel c)
@@ -359,7 +370,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand SoftDeleteRepositoryMemberAttributeCommand =>
-            _softDeleteRepositoryMemberAttributeCommand ??= new RelayCommand(
+            _softDeleteRepositoryMemberAttributeCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     if (_selectedRepositoryMember?.SelectedAttributeVM?.Model is IContentModel c)
@@ -374,7 +385,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand OpenModifyAttributesListWindowCommand =>
-            _openModifyAttributesListWindowCommand ??= new RelayCommand(
+            _openModifyAttributesListWindowCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     var window = _serviceProvider.GetRequiredService<AttributeValuesCollectionWindow>();
@@ -388,7 +399,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand AddAttributeValueCommand =>
-            _addAttributeValueCommand ??= new RelayCommand(
+            _addAttributeValueCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
@@ -400,7 +411,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand RemoveAttributeValueCommand =>
-            _removeAttributeValueCommand ??= new RelayCommand(
+            _removeAttributeValueCommand ??= _commandFactory.Create(
                 obj =>
                 {
                     SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
@@ -412,7 +423,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
 
         public IRelayCommand ProtectCommand =>
-            _protectCommand ??= new RelayCommand(
+            _protectCommand ??= _commandFactory.Create(
                 obj =>
                 {
                 },
@@ -425,7 +436,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// Перестраивает таблицу наследников, если после редактирования Sequence порядок строк стал устаревшим.
         /// </summary>
         public IRelayCommand RebuildChildCollectionTableIfOrderStaleCommand =>
-            _rebuildChildCollectionTableIfOrderStaleCommand ??= new RelayCommand(
+            _rebuildChildCollectionTableIfOrderStaleCommand ??= _commandFactory.Create(
                 _ =>
                 {
                     if (_isChildCollectionTableOrderStale == false)
