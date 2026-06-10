@@ -17,11 +17,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
     /// Заменяет логику code-behind окна ExcelImportDesignerWindow (см. docs/avalonia-migration/10).
     /// </summary>
     /// <remarks>
-    /// Фаза 1, группы 1-2 (файл/схема/листы + поля выбранного листа). Редактор связей (группа 3),
-    /// действия предпросмотр/импорт/шаблоны/закрытие (группа 4) и диаграмма — следующими порциями.
+    /// Фаза 1, группы 1-3 (файл/схема/листы, поля выбранного листа, редактор связей).
+    /// Действия предпросмотр/импорт/шаблоны/закрытие (группа 4) и диаграмма — следующими порциями.
     /// </remarks>
     public class ExcelImportDesignerVM : ViewModelBase
     {
+        private const string NoParentRelationOption = "(Нет родителя)";
+
         private readonly ExcelImportPresentationSessionState _session;
         private readonly IExcelImportSchemaTemplateStorage _templateStorage;
         private readonly IFileDialogService _fileDialogService;
@@ -48,6 +50,17 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private string _sheetPreviewInfo = "Лист не выбран.";
         private DataView? _sheetPreview;
         private bool _isUpdatingSheetControls;
+
+        private ExcelImportRelationSchema? _selectedRelation;
+        private IReadOnlyList<string> _relationChildSheets = Array.Empty<string>();
+        private string? _selectedRelationChildSheet;
+        private IReadOnlyList<string> _relationParentSheets = Array.Empty<string>();
+        private string? _selectedRelationParentSheet;
+        private IReadOnlyList<string> _relationParentKeys = Array.Empty<string>();
+        private string? _selectedRelationParentKey;
+        private IReadOnlyList<string> _relationChildKeys = Array.Empty<string>();
+        private string? _selectedRelationChildKey;
+        private bool _isUpdatingRelationControls;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ExcelImportDesignerVM" />.
@@ -81,6 +94,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             _serviceProvider = serviceProvider;
 
             SelectFileCommand = _commandFactory.Create(_ => SelectFile());
+            AddRelationCommand = _commandFactory.Create(_ => AddRelation());
+            RemoveRelationCommand = _commandFactory.Create(_ => RemoveRelation());
         }
 
         /// <summary>
@@ -115,6 +130,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// Команда выбора Excel-файла.
         /// </summary>
         public ICommand SelectFileCommand { get; }
+
+        /// <summary>
+        /// Команда добавления (настройки) связи.
+        /// </summary>
+        public ICommand AddRelationCommand { get; }
+
+        /// <summary>
+        /// Команда удаления связи выбранного дочернего листа.
+        /// </summary>
+        public ICommand RemoveRelationCommand { get; }
 
         /// <summary>
         /// Отображаемое имя выбранного Excel-файла.
@@ -254,6 +279,140 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         }
 
         /// <summary>
+        /// Связи текущей схемы импорта.
+        /// </summary>
+        public IReadOnlyList<ExcelImportRelationSchema> Relations
+            => _session.Schema?.Relations ?? (IReadOnlyList<ExcelImportRelationSchema>)Array.Empty<ExcelImportRelationSchema>();
+
+        /// <summary>
+        /// Выбранная связь.
+        /// </summary>
+        public ExcelImportRelationSchema? SelectedRelation
+        {
+            get => _selectedRelation;
+            set
+            {
+                if (SetProperty(ref _selectedRelation, value) && _isUpdatingRelationControls == false)
+                {
+                    BindRelationEditor(value?.ChildSourceName);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Доступные дочерние листы для настройки связи.
+        /// </summary>
+        public IReadOnlyList<string> RelationChildSheets
+        {
+            get => _relationChildSheets;
+            private set => SetProperty(ref _relationChildSheets, value);
+        }
+
+        /// <summary>
+        /// Выбранный дочерний лист связи.
+        /// </summary>
+        public string? SelectedRelationChildSheet
+        {
+            get => _selectedRelationChildSheet;
+            set
+            {
+                if (SetProperty(ref _selectedRelationChildSheet, value) && _isUpdatingRelationControls == false)
+                {
+                    BindRelationEditor(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Доступные родительские листы для выбранного дочернего листа.
+        /// </summary>
+        public IReadOnlyList<string> RelationParentSheets
+        {
+            get => _relationParentSheets;
+            private set => SetProperty(ref _relationParentSheets, value);
+        }
+
+        /// <summary>
+        /// Выбранный родительский лист связи.
+        /// </summary>
+        public string? SelectedRelationParentSheet
+        {
+            get => _selectedRelationParentSheet;
+            set
+            {
+                if (SetProperty(ref _selectedRelationParentSheet, value) && _isUpdatingRelationControls == false)
+                {
+                    var childSheet = _session.GetSheet(_selectedRelationChildSheet);
+                    if (childSheet == null)
+                        return;
+
+                    if (TryApplyRelationParent(childSheet, value, selectChildSheet: false) == false)
+                    {
+                        BindRelationEditor(childSheet.SourceName);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Доступные ключевые колонки родителя.
+        /// </summary>
+        public IReadOnlyList<string> RelationParentKeys
+        {
+            get => _relationParentKeys;
+            private set => SetProperty(ref _relationParentKeys, value);
+        }
+
+        /// <summary>
+        /// Выбранная ключевая колонка родителя.
+        /// </summary>
+        public string? SelectedRelationParentKey
+        {
+            get => _selectedRelationParentKey;
+            set
+            {
+                if (SetProperty(ref _selectedRelationParentKey, value) && _isUpdatingRelationControls == false)
+                {
+                    var childSheet = _session.GetSheet(_selectedRelationChildSheet);
+                    if (childSheet == null)
+                        return;
+
+                    ExcelImportProfileEditorHelper.SetRelationParentKey(childSheet, value);
+                    RefreshRelationUi(childSheet, bindEditor: false, selectChildSheet: false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Доступные ключевые колонки дочернего листа.
+        /// </summary>
+        public IReadOnlyList<string> RelationChildKeys
+        {
+            get => _relationChildKeys;
+            private set => SetProperty(ref _relationChildKeys, value);
+        }
+
+        /// <summary>
+        /// Выбранная ключевая колонка дочернего листа.
+        /// </summary>
+        public string? SelectedRelationChildKey
+        {
+            get => _selectedRelationChildKey;
+            set
+            {
+                if (SetProperty(ref _selectedRelationChildKey, value) && _isUpdatingRelationControls == false)
+                {
+                    var childSheet = _session.GetSheet(_selectedRelationChildSheet);
+                    if (childSheet == null)
+                        return;
+
+                    ExcelImportProfileEditorHelper.SetRelationChildKey(childSheet, value);
+                    RefreshRelationUi(childSheet, bindEditor: false, selectChildSheet: false);
+                }
+            }
+        }
+
+        /// <summary>
         /// Задаёт рантайм-контекст конструктора импорта.
         /// </summary>
         /// <param name="shrub">Рабочее дерево активного репозитория (резерв для будущих сценариев).</param>
@@ -289,6 +448,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             BindCurrentSheet();
         }
 
+        /// <summary>
+        /// Обрабатывает изменение признака включения листа в импорт.
+        /// </summary>
+        public void OnSheetEnabledChanged()
+        {
+            RefreshRelationViews();
+        }
+
         private void SelectFile()
         {
             var filePath = _fileDialogService.OpenExcelFile();
@@ -301,6 +468,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 _session.LoadWorkbook(filePath, RootName);
                 FilePathDisplay = Path.GetFileName(filePath);
                 OnPropertyChanged(nameof(Sheets));
+                RefreshRelationViews();
                 SelectedSheet = Sheets.FirstOrDefault();
             }
             catch (Exception ex)
@@ -356,10 +524,152 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             sheet.Profile.EntityKind = ExcelImportEntityKind.Node;
         }
 
+        private void RefreshRelationViews()
+        {
+            if (_session.Schema == null)
+                return;
+
+            ExcelImportSchemaNormalizer.RefreshRelationProjection(_session.Schema);
+            OnPropertyChanged(nameof(Relations));
+        }
+
         private void BindRelationEditor(string? childSourceName)
         {
-            // TODO (Фаза1/п2-группа3): редактор связей (child/parent sheet + ключи) через
-            // ExcelImportProfileEditorHelper.BuildParentSourceOptions/BuildHeaderOptions и т.д.
+            _isUpdatingRelationControls = true;
+            try
+            {
+                var schema = _session.Schema;
+                if (schema == null)
+                    return;
+
+                RelationChildSheets = schema.Sheets.Select(x => x.SourceName).ToList();
+                SelectedRelationChildSheet = string.IsNullOrWhiteSpace(childSourceName) ? null : childSourceName;
+
+                var childSheet = _session.GetSheet(childSourceName);
+                if (childSheet == null)
+                {
+                    RelationParentSheets = Array.Empty<string>();
+                    RelationParentKeys = Array.Empty<string>();
+                    RelationChildKeys = Array.Empty<string>();
+                    SelectedRelationParentSheet = null;
+                    SelectedRelationParentKey = null;
+                    SelectedRelationChildKey = null;
+                    return;
+                }
+
+                var parentOptions = ExcelImportProfileEditorHelper.BuildParentSourceOptions(
+                    schema.Sheets.Select(x => x.SourceName),
+                    childSheet.SourceName,
+                    NoParentRelationOption);
+                RelationParentSheets = parentOptions;
+                SelectedRelationParentSheet = ExcelImportProfileEditorHelper.GetSelectedParentOption(
+                    childSheet.Profile.Relation.ParentSourceName,
+                    parentOptions,
+                    NoParentRelationOption);
+
+                RelationChildKeys = ExcelImportProfileEditorHelper.BuildHeaderOptions(childSheet.Profile.Columns, sort: false);
+                SelectedRelationChildKey = string.IsNullOrWhiteSpace(childSheet.Profile.Relation.ChildKeyColumnName)
+                    ? null
+                    : childSheet.Profile.Relation.ChildKeyColumnName;
+
+                RefreshRelationParentKeyOptions(childSheet);
+            }
+            finally
+            {
+                _isUpdatingRelationControls = false;
+            }
+        }
+
+        private void RefreshRelationParentKeyOptions(ExcelImportSheetSchema childSheet)
+        {
+            var parentSheet = _session.GetSheet(childSheet.Profile.Relation.ParentSourceName);
+            if (parentSheet == null)
+            {
+                RelationParentKeys = Array.Empty<string>();
+                SelectedRelationParentKey = null;
+                return;
+            }
+
+            RelationParentKeys = ExcelImportProfileEditorHelper.BuildHeaderOptions(parentSheet.Profile.Columns, sort: false);
+            SelectedRelationParentKey = string.IsNullOrWhiteSpace(childSheet.Profile.Relation.ParentKeyColumnName)
+                ? null
+                : childSheet.Profile.Relation.ParentKeyColumnName;
+        }
+
+        private void RefreshRelationUi(ExcelImportSheetSchema? childSheet, bool bindEditor, bool selectChildSheet)
+        {
+            RefreshRelationViews();
+
+            var selectionChanged = false;
+            if (childSheet != null && selectChildSheet && ReferenceEquals(SelectedSheet, childSheet) == false)
+            {
+                SelectedSheet = childSheet;
+                selectionChanged = true;
+            }
+
+            if (childSheet != null && bindEditor && selectionChanged == false)
+            {
+                BindRelationEditor(childSheet.SourceName);
+            }
+
+            ClearPreviewResult();
+        }
+
+        private bool TryApplyRelationParent(ExcelImportSheetSchema childSheet, string? parentSourceName, bool selectChildSheet)
+        {
+            var schema = _session.Schema;
+            if (schema == null)
+                return false;
+
+            if (ExcelImportProfileEditorHelper.TrySetRelationParent(
+                    schema.Sheets,
+                    childSheet,
+                    parentSourceName,
+                    NoParentRelationOption,
+                    out var errorMessage) == false)
+            {
+                _messageDialogService.ShowWarning(errorMessage, "Связи");
+                return false;
+            }
+
+            RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet);
+            return true;
+        }
+
+        private void ClearSheetRelation(ExcelImportSheetSchema childSheet)
+        {
+            ExcelImportProfileEditorHelper.ClearRelation(childSheet);
+            RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet: false);
+        }
+
+        private void AddRelation()
+        {
+            var schema = _session.Schema;
+            if (schema == null)
+                return;
+
+            var targetSheet = schema.Sheets.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Profile.Relation.ParentSourceName));
+            if (targetSheet == null)
+            {
+                _messageDialogService.ShowInformation("Все листы уже имеют настроенную связь или книга не загружена.", "Связи");
+                return;
+            }
+
+            BindRelationEditor(targetSheet.SourceName);
+        }
+
+        private void RemoveRelation()
+        {
+            var childSheet = _session.GetSheet(_selectedRelationChildSheet);
+            if (childSheet == null)
+                return;
+
+            ClearSheetRelation(childSheet);
+        }
+
+        private void ClearPreviewResult()
+        {
+            // TODO (Фаза1/п2-группа4): сброс предпросмотра репозитория (RepositoryPreviewVM + PreviewSummary).
         }
     }
 }
