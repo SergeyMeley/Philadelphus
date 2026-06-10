@@ -8,6 +8,6 @@
         mc:Ignorable="d"
         Title="DetailsWindow">
     <Grid>
-        <detail:UniversalDetails></detail:UniversalDetails>
+        <detail:UniversalDetails DataContext="{Binding Content}"></detail:UniversalDetails>
     </Grid>
 </Window>

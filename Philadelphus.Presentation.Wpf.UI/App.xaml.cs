@@ -260,6 +260,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<LaunchWindow>();      // Не менять. Требуется для автоматического закрытия окна при открытии основного
                     services.AddTransient<FormulaEditorWindow>();
                     services.AddTransient<AttributeValuesCollectionWindow>();
+                    services.AddTransient<DetailsWindow>();
                     services.AddSingleton<SplashWindow>();
 
                     // Регистрация фабрик
@@ -366,6 +367,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                 windowService.Register<LaunchWindowVM, LaunchWindow>();
                 windowService.Register<FormulaTestControlVM, FormulaEditorWindow>();
                 windowService.Register<RepositoryExplorerControlVM, AttributeValuesCollectionWindow>();
+                windowService.Register<DetailsWindowVM, DetailsWindow>();
 
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Искусственная задержка запуска 2 сек.");

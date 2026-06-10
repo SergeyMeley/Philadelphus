@@ -10,11 +10,11 @@ using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using System.Reflection;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
+using IWindowService = Philadelphus.Presentation.Services.Interfaces.IWindowService;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 {
@@ -31,6 +31,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly FormulaTestControlVM _formulaTestControlVM;
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IWindowService _windowService;
 
         /// <summary>
         /// Команды приложения.
@@ -142,7 +143,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationSettingsControlVM applicationSettingsControlVM,
             ReportsControlVM reportsControlVM,
             MainWindowNotificationsVM mainWindowNotificationsVM,
-            IRelayCommandFactory commandFactory)
+            IRelayCommandFactory commandFactory,
+            IWindowService windowService)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -153,6 +155,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(reportsControlVM);
             ArgumentNullException.ThrowIfNull(mainWindowNotificationsVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(windowService);
 
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _importExportControlVM = ActivatorUtilities.CreateInstance<ImportExportControlVM>(_serviceProvider, repositoryExplorerControlVM);
@@ -162,6 +165,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _reportsControlVM = reportsControlVM;
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
             _commandFactory = commandFactory;
+            _windowService = windowService;
 
             _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);
@@ -185,8 +189,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return _commandFactory.Create(obj =>
                 {
                     var vm = _serviceProvider.GetRequiredService<IMainWindowVMFactory>().Create(RepositoryExplorerVM);
-                    var window = new DetailsWindow(vm.SelectedElementVM);
-                    window.Show();
+                    if (vm.SelectedElementVM is null)
+                    {
+                        return;
+                    }
+
+                    _windowService.Show(new DetailsWindowVM(vm.SelectedElementVM));
                 });
             }
         }
