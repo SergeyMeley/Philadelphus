@@ -49,9 +49,37 @@
 `CmbExistingRoots/SheetKeyColumn/SheetEntityKind/RelationChildSheet/RelationParentSheet/RelationParentKey/RelationChildKey`,
 `ChkCreateNewRoot`, `Btn*`, `DiagramCanvas/DiagramScrollViewer/DiagramCanvasScaleTransform`.
 
+## 3.1. ⚠️ Транзитивный блокер размещения VM (найдено при глубоком чтении)
+
+`ExcelImportPresentationPipeline.BuildRepositoryPreview(...)` **возвращает `RepositoryExplorerControlVM`**.
+Сам pipeline лежит в WPF (`Philadelphus.Presentation.Wpf.UI/Services/ExcelImportPresentationPipeline.cs`)
+и ссылается на `RepositoryExplorerControlVM` (WPF). Поэтому превью дизайнера транзитивно зависит от
+WPF-резидентного хаба-эксплорера — и `ExcelImportDesignerVM` **пока нельзя положить в shared**
+(shared не может ссылаться на WPF). Это ровно случай из §5 хендоффа.
+
+**Решение (Вариант A):** делаем MVVM-рефакторинг, но `ExcelImportDesignerVM` размещаем в **WPF-проекте**
+(`Philadelphus.Presentation.Wpf.UI/ViewModels/ImportExport/`). Переезд в shared — позже, когда
+`RepositoryExplorerControlVM` + `ExcelImportPresentationPipeline` станут портабельными. Несмотря на
+размещение в WPF, VM сразу пишем «портабельно»: сервисы — через shared-абстракции (см. 3.2), прямые
+ссылки на WPF-типы держим минимально (только реально блокирующие: presentation-pipeline и
+`ImportProgressWindow`).
+
+## 3.2. View-завязки, найденные сверх поверхностной классификации, и их абстракции
+
+- `MessageBox.Show` → `IMessageDialogService` (ShowInformation/Warning/Error).
+- `OpenFileDialog`/`SaveFileDialog` → `IFileDialogService` (`OpenExcelFile`, `OpenImportSchemaFile`,
+  `SaveImportSchemaFile` — уже есть под эти сценарии).
+- `Dispatcher.Invoke` (фон импорта) → `IDispatcherService`.
+- `Close()` окна (после импорта и по кнопке) + флаг `CompletedImport` → `IWindowService.Close(this)`.
+- Превью: `RepositoryExplorerPreview.DataContext = previewVM` + `ConfigureAsReadonly(control)` →
+  свойство VM `RepositoryPreviewVM` (биндинг DataContext дочернего контрола) + readonly через XAML/behavior.
+  **Тип превью — `RepositoryExplorerControlVM`** (см. 3.1, это и есть блокер shared).
+- `ImportProgressWindow` (Initialize/Show/UpdateStatus/Complete/Fail + `Task.Run`) → пока используем
+  напрямую (WPF-блокер); позже — абстракция прогресса `IImportProgressReporter`.
+
 ## 4. Целевая архитектура
 
-- Новый **`ExcelImportDesignerVM`** (в `Philadelphus.Presentation`, shared): держит состояние, свойства
+- Новый **`ExcelImportDesignerVM`** (пока в WPF, см. 3.1; позже shared): держит состояние, свойства
   (наблюдаемые коллекции листов/связей/колонок, выбранные элементы, тексты), команды
   (`SelectFile`, `Add/RemoveRelation`, `RefreshPreview`, `Import`, `Load/SaveTemplate`, `Close`),
   делегирует в Infrastructure-сервисы (те же, что в окне) + `IFileDialogService`/`IMessageDialogService`.
@@ -68,7 +96,7 @@
 
 ## 5. Фазы (каждая — отдельный коммит, отдельная контрольная сборка)
 
-**Фаза 1 — каркас VM (без подключения).** Создать `ExcelImportDesignerVM` в shared: состояние,
+**Фаза 1 — каркас VM (без подключения).** Создать `ExcelImportDesignerVM` в WPF-проекте (см. 3.1): состояние,
 свойства, команды; перенести非-визуальные методы (оркестрация + диалоги) с делегированием в
 Infrastructure-сервисы (через обязательные ctor-параметры, `ArgumentNullException.ThrowIfNull`).
 XAML/окно пока не трогаем. Результат: shared компилируется, VM ещё не используется.
