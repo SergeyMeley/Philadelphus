@@ -4,11 +4,11 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.ImportExport;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Collections.ObjectModel;
@@ -25,6 +25,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private readonly IImportExportService _importExportService;
         private readonly IPhiladelphusRepositoryService _repositoryService;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
+        private readonly IRelayCommandFactory _commandFactory;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ImportExportControlVM" />.
@@ -33,21 +34,25 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// <param name="importExportService">Сервис импорта-экспорта.</param>
         /// <param name="repositoryService">Доменный сервис репозитория.</param>
         /// <param name="repositoryExplorerControlVM">Модель представления обозревателя репозитория.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         public ImportExportControlVM(
             IServiceProvider serviceProvider,
             IImportExportService importExportService,
             IPhiladelphusRepositoryService repositoryService,
-            RepositoryExplorerControlVM repositoryExplorerControlVM)
+            RepositoryExplorerControlVM repositoryExplorerControlVM,
+            IRelayCommandFactory commandFactory)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(importExportService);
             ArgumentNullException.ThrowIfNull(repositoryService);
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
             _serviceProvider = serviceProvider;
             _importExportService = importExportService;
             _repositoryService = repositoryService;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
+            _commandFactory = commandFactory;
 
             RefreshAdapters();
         }
@@ -85,7 +90,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// <summary>
         /// Команда обновления списка доступных адаптеров.
         /// </summary>
-        public RelayCommand RefreshAdaptersCommand => new(_ => RefreshAdapters());
+        public IRelayCommand RefreshAdaptersCommand => _commandFactory.Create(_ => RefreshAdapters());
 
         private void RefreshAdapters()
         {
@@ -123,7 +128,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
             ImportOperations.Add(new ImportExportOperationVM(
                 $"Импорт из {adapter.FileFormat}",
-                new RelayCommand(
+                _commandFactory.Create(
                     _ => ImportFromFile(adapter.FileFormat, adapter.AdapterName),
                     _ => CanImportToRepository())));
         }
@@ -137,7 +142,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
             ExportOperations.Add(new ImportExportOperationVM(
                 $"Экспорт в {adapter.FileFormat}",
-                new RelayCommand(
+                _commandFactory.Create(
                     _ => ExportToFile(adapter.FileFormat, adapter.AdapterName),
                     _ => CanExportSelectedWorkingTree())));
         }
@@ -153,7 +158,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
             ConversionOperations.Add(new ImportExportOperationVM(
                 $"Конвертировать {sourceAdapter.FileFormat} в {targetAdapter.FileFormat}",
-                new RelayCommand(
+                _commandFactory.Create(
                     _ => ConvertFile(
                         sourceAdapter.FileFormat,
                         sourceAdapter.AdapterName,

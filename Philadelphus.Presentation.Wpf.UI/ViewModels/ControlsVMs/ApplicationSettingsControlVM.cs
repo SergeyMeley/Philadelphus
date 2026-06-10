@@ -7,11 +7,11 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.SettingsContainersVMs;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Serilog;
 using System.Collections.ObjectModel;
@@ -30,7 +30,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
-        
+        private readonly IRelayCommandFactory _commandFactory;
+
         /// <summary>
         /// Настройки приложения.
         /// </summary>
@@ -103,6 +104,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <param name="appConfig">Параметр appConfig.</param>
         /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
+        /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
             IMapper mapper,
@@ -111,7 +113,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IConfigurationService configurationService,
             ApplicationCommandsVM applicationCommandsVM,
             IOptions<ApplicationSettingsConfig> appConfig,
-            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig)
+            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
+            IRelayCommandFactory commandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(configurationService);
@@ -121,10 +124,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value.ConnectionStringsContainers);
+            ArgumentNullException.ThrowIfNull(commandFactory);
 
-            _configurationService = configurationService; 
+            _configurationService = configurationService;
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
+            _commandFactory = commandFactory;
 
             Dictionary<string, Type> existingTypes = new()
                 {
@@ -165,11 +170,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             InitializeTabs();
         }
-        public RelayCommand OpenConfigCommand
+        public IRelayCommand OpenConfigCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     try
                     {
@@ -187,11 +192,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
-        public RelayCommand MoveConfigCommand
+        public IRelayCommand MoveConfigCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     var path = string.Empty;
                     var dialog = new OpenFolderDialog
@@ -225,11 +230,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand SelectAnotherConfigCommand
+        public IRelayCommand SelectAnotherConfigCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     var path = string.Empty;
                     var dialog = new OpenFileDialog
@@ -267,11 +272,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 });
             }
         }
-        public RelayCommand CreateAndSaveNewConnectionStringsContainerCommand
+        public IRelayCommand CreateAndSaveNewConnectionStringsContainerCommand
         {
             get
             {
-                return new RelayCommand(
+                return _commandFactory.Create(
                     obj =>
                     {
                         var vm = new ConnectionStringsContainerVM()
@@ -293,11 +298,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                     });
             }
         }
-        public RelayCommand SaveConnectionStringsContainersCommand
+        public IRelayCommand SaveConnectionStringsContainersCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
                 {
                     // Изменение существующих строк подключения
                     for (int i = 0; i < _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Count; i++)
@@ -345,11 +350,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             }
         }
 
-        public RelayCommand DeleteConnectionStringsContainersCommand
+        public IRelayCommand DeleteConnectionStringsContainersCommand
         {
             get
             {
-                return new RelayCommand(obj =>
+                return _commandFactory.Create(obj =>
         {
                     SelectedConnectionStringsContainerVM.ForDelete = true;
                 });

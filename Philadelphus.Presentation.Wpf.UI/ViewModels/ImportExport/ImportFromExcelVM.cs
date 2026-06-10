@@ -1,8 +1,8 @@
 ﻿using Philadelphus.Infrastructure.ImportExport.Excel;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ImportExport;
-using Philadelphus.Presentation.Wpf.UI.Infrastructure;
 using Philadelphus.Presentation.Wpf.UI.Services;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -17,6 +17,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private readonly ExcelImportPresentationSessionState _session;
         private readonly IFileDialogService _fileDialogService;
         private readonly IMessageDialogService _messageDialogService;
+        private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
 
         private string _filePathDisplay = "Файл не выбран";
         private string _rootName = string.Empty;
@@ -28,14 +30,21 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         public ImportFromExcelVM(
             ExcelImportPresentationSessionState session,
             IFileDialogService fileDialogService,
-            IMessageDialogService messageDialogService)
+            IMessageDialogService messageDialogService,
+            IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory)
         {
+            ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
+
             _session = session;
             _fileDialogService = fileDialogService;
             _messageDialogService = messageDialogService;
+            _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
 
-            SelectFileCommand = new RelayCommand(_ => SelectFile());
-            MainActionCommand = new AsyncRelayCommand(_ => ExecuteMainActionAsync());
+            SelectFileCommand = _commandFactory.Create(_ => SelectFile());
+            MainActionCommand = _asyncCommandFactory.Create(_ => ExecuteMainActionAsync());
         }
 
         public ObservableCollection<ExcelImportSourceItemVM> SourceItems { get; } = new();
