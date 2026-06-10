@@ -1,4 +1,5 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
@@ -6,6 +7,8 @@ using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.Services;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Data;
 using System.IO;
 using System.Windows.Input;
@@ -17,8 +20,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
     /// Заменяет логику code-behind окна ExcelImportDesignerWindow (см. docs/avalonia-migration/10).
     /// </summary>
     /// <remarks>
-    /// Фаза 1, группы 1-3 (файл/схема/листы, поля выбранного листа, редактор связей).
-    /// Действия предпросмотр/импорт/шаблоны/закрытие (группа 4) и диаграмма — следующими порциями.
+    /// Фаза 1 завершена (файл/схема/листы, поля листа, редактор связей, действия:
+    /// предпросмотр/импорт/шаблоны/закрытие). Диаграмма (рисование + drag/zoom) остаётся во View
+    /// и выносится в Фазе 3.
     /// </remarks>
     public class ExcelImportDesignerVM : ViewModelBase
     {
@@ -62,6 +66,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private string? _selectedRelationChildKey;
         private bool _isUpdatingRelationControls;
 
+        private RepositoryExplorerControlVM? _repositoryPreviewVM;
+        private string _previewSummary = "Предпросмотр результата еще не построен.";
+
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ExcelImportDesignerVM" />.
         /// </summary>
@@ -96,6 +103,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             SelectFileCommand = _commandFactory.Create(_ => SelectFile());
             AddRelationCommand = _commandFactory.Create(_ => AddRelation());
             RemoveRelationCommand = _commandFactory.Create(_ => RemoveRelation());
+            RefreshPreviewCommand = _commandFactory.Create(_ => RefreshPreview());
+            ImportCommand = _commandFactory.Create(_ => Import());
+            LoadTemplateCommand = _commandFactory.Create(_ => LoadTemplate());
+            SaveTemplateCommand = _commandFactory.Create(_ => SaveTemplate());
+            CloseCommand = _commandFactory.Create(_ => Close());
         }
 
         /// <summary>
@@ -140,6 +152,31 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// Команда удаления связи выбранного дочернего листа.
         /// </summary>
         public ICommand RemoveRelationCommand { get; }
+
+        /// <summary>
+        /// Команда построения предпросмотра результата импорта.
+        /// </summary>
+        public ICommand RefreshPreviewCommand { get; }
+
+        /// <summary>
+        /// Команда выполнения импорта в репозиторий.
+        /// </summary>
+        public ICommand ImportCommand { get; }
+
+        /// <summary>
+        /// Команда загрузки шаблона схемы импорта.
+        /// </summary>
+        public ICommand LoadTemplateCommand { get; }
+
+        /// <summary>
+        /// Команда сохранения шаблона схемы импорта.
+        /// </summary>
+        public ICommand SaveTemplateCommand { get; }
+
+        /// <summary>
+        /// Команда закрытия окна конструктора.
+        /// </summary>
+        public ICommand CloseCommand { get; }
 
         /// <summary>
         /// Отображаемое имя выбранного Excel-файла.
@@ -413,6 +450,24 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         }
 
         /// <summary>
+        /// Модель предпросмотра результирующего репозитория.
+        /// </summary>
+        public RepositoryExplorerControlVM? RepositoryPreviewVM
+        {
+            get => _repositoryPreviewVM;
+            private set => SetProperty(ref _repositoryPreviewVM, value);
+        }
+
+        /// <summary>
+        /// Краткая сводка предпросмотра результата.
+        /// </summary>
+        public string PreviewSummary
+        {
+            get => _previewSummary;
+            private set => SetProperty(ref _previewSummary, value);
+        }
+
+        /// <summary>
         /// Задаёт рантайм-контекст конструктора импорта.
         /// </summary>
         /// <param name="shrub">Рабочее дерево активного репозитория (резерв для будущих сценариев).</param>
@@ -466,15 +521,30 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             {
                 RootName = Path.GetFileNameWithoutExtension(filePath);
                 _session.LoadWorkbook(filePath, RootName);
-                FilePathDisplay = Path.GetFileName(filePath);
-                OnPropertyChanged(nameof(Sheets));
-                RefreshRelationViews();
-                SelectedSheet = Sheets.FirstOrDefault();
+                ApplyLoadedSchema();
             }
             catch (Exception ex)
             {
                 _messageDialogService.ShowError($"Не удалось загрузить книгу: {ex.Message}", "Ошибка");
             }
+        }
+
+        private void ApplyLoadedSchema()
+        {
+            var schema = _session.Schema;
+            if (schema == null)
+                return;
+
+            schema.CreateNewRoot = true;
+            RootName = schema.RootName;
+            FilePathDisplay = string.IsNullOrWhiteSpace(_session.SelectedFilePath)
+                ? "Файл не выбран"
+                : Path.GetFileName(_session.SelectedFilePath);
+
+            OnPropertyChanged(nameof(Sheets));
+            RefreshRelationViews();
+            SelectedSheet = Sheets.FirstOrDefault();
+            ClearPreviewResult();
         }
 
         private void BindCurrentSheet()
@@ -526,10 +596,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
 
         private void RefreshRelationViews()
         {
-            if (_session.Schema == null)
+            var schema = _session.Schema;
+            if (schema == null)
                 return;
 
-            ExcelImportSchemaNormalizer.RefreshRelationProjection(_session.Schema);
+            ExcelImportSchemaNormalizer.RefreshRelationProjection(schema);
             OnPropertyChanged(nameof(Relations));
         }
 
@@ -667,9 +738,201 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             ClearSheetRelation(childSheet);
         }
 
+        private void RefreshPreview()
+        {
+            try
+            {
+                if (TryGetImportRootName(out var rootName) == false)
+                    return;
+
+                if (TrySyncSchemaForExecution(rootName) == false)
+                    return;
+
+                var profiles = _session.GetProfilesForExecution();
+                var validationResult = _session.Validate();
+                if (validationResult.HasErrors)
+                {
+                    _messageDialogService.ShowWarning(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
+                    return;
+                }
+
+                if (profiles.Count == 0)
+                {
+                    _messageDialogService.ShowWarning("Не выбраны источники Excel для предпросмотра импорта.", "Ошибка");
+                    return;
+                }
+
+                var previewVm = _session.BuildRepositoryPreview(null);
+                RepositoryPreviewVM = previewVm;
+                PreviewSummary = _session.BuildPreviewSummary(previewVm);
+            }
+            catch (Exception ex)
+            {
+                _messageDialogService.ShowError($"Не удалось построить предпросмотр: {ex.Message}", "Ошибка");
+            }
+        }
+
+        private void Import()
+        {
+            if (_repository == null || _repositoryService == null)
+            {
+                _messageDialogService.ShowError("Не инициализирован контекст активного репозитория.", "Ошибка");
+                return;
+            }
+
+            try
+            {
+                if (TryGetImportRootName(out var rootName) == false)
+                    return;
+
+                if (TrySyncSchemaForExecution(rootName) == false)
+                    return;
+
+                var profiles = _session.GetProfilesForExecution();
+                if (profiles.Count == 0)
+                {
+                    _messageDialogService.ShowWarning("Не выбраны источники Excel для импорта.", "Ошибка");
+                    return;
+                }
+
+                var validationResult = _session.Validate();
+                if (validationResult.HasErrors)
+                {
+                    _messageDialogService.ShowWarning(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
+                    return;
+                }
+
+                var progressWindow = _serviceProvider.GetRequiredService<ImportProgressWindow>();
+                progressWindow.Initialize("Импорт дерева", "Подготовка операции...");
+                progressWindow.Show();
+
+                var repository = _repository;
+                var repositoryService = _repositoryService;
+                var refreshRepositoryView = _refreshRepositoryView;
+
+                CompletedImport = true;
+                _windowService.Close(this);
+
+                IProgress<string> statusProgress = new Progress<string>(status => progressWindow.UpdateStatus(status));
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        statusProgress.Report("Чтение Excel и формирование PHJSON...");
+                        statusProgress.Report("Импорт дерева в Чубушник...");
+                        _session.ImportToRepository(repository, repositoryService, null);
+                        _dispatcherService.Invoke(() =>
+                        {
+                            refreshRepositoryView?.Invoke();
+                            progressWindow.Complete("Импорт завершен. Сохраните репозиторий для записи в хранилище.");
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _dispatcherService.Invoke(() => progressWindow.Fail($"Ошибка импорта: {ex.Message}"));
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _messageDialogService.ShowError($"Не удалось выполнить импорт: {ex.Message}", "Ошибка");
+            }
+        }
+
+        private void LoadTemplate()
+        {
+            var filePath = _fileDialogService.OpenImportSchemaFile();
+            if (string.IsNullOrWhiteSpace(filePath))
+                return;
+
+            var loadedSchema = _templateStorage.Load(filePath);
+            var schemaFilePath = string.IsNullOrWhiteSpace(_session.SelectedFilePath)
+                ? loadedSchema.SourceFilePath
+                : _session.SelectedFilePath;
+
+            if (string.IsNullOrWhiteSpace(schemaFilePath) || File.Exists(schemaFilePath) == false)
+            {
+                _messageDialogService.ShowWarning(
+                    "Для загруженного шаблона не найден Excel-файл. Сначала выберите книгу вручную.",
+                    "Шаблон импорта");
+                _session.UseSchema(loadedSchema);
+                ApplyLoadedSchema();
+                return;
+            }
+
+            loadedSchema.SourceFilePath = schemaFilePath;
+            loadedSchema.RootName = string.IsNullOrWhiteSpace(loadedSchema.RootName)
+                ? Path.GetFileNameWithoutExtension(schemaFilePath)
+                : loadedSchema.RootName;
+            _session.UseSchema(loadedSchema);
+            ApplyLoadedSchema();
+        }
+
+        private void SaveTemplate()
+        {
+            var schema = _session.Schema;
+            if (schema == null)
+            {
+                _messageDialogService.ShowInformation("Сначала выберите Excel-файл и настройте схему импорта.", "Шаблон импорта");
+                return;
+            }
+
+            ExcelImportSchemaNormalizer.RefreshRelationProjection(schema);
+            _session.SyncRootSettings(createNewRoot: true, RootName?.Trim() ?? string.Empty);
+
+            var defaultFileName = $"{schema.Name}.phimportschema.json";
+            var savePath = _fileDialogService.SaveImportSchemaFile(defaultFileName);
+            if (string.IsNullOrWhiteSpace(savePath))
+                return;
+
+            _templateStorage.Save(savePath, schema);
+            _messageDialogService.ShowInformation("Шаблон схемы импорта сохранен.", "Шаблон импорта");
+        }
+
+        private void Close()
+        {
+            _windowService.Close(this);
+        }
+
+        private bool TryGetImportRootName(out string rootName)
+        {
+            rootName = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(_session.SelectedFilePath))
+            {
+                _messageDialogService.ShowWarning("Сначала выберите файл Excel.", "Ошибка");
+                return false;
+            }
+
+            rootName = RootName?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(rootName))
+            {
+                _messageDialogService.ShowWarning("Укажите наименование корня.", "Ошибка");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool TrySyncSchemaForExecution(string rootName)
+        {
+            var schema = _session.Schema;
+            if (schema == null)
+            {
+                _messageDialogService.ShowWarning("Сначала выберите Excel-файл и настройте схему импорта.", "Ошибка");
+                return false;
+            }
+
+            _session.SyncRootSettings(createNewRoot: true, rootName);
+            ExcelImportSchemaNormalizer.NormalizeForExecution(schema);
+            RefreshRelationViews();
+            return true;
+        }
+
         private void ClearPreviewResult()
         {
-            // TODO (Фаза1/п2-группа4): сброс предпросмотра репозитория (RepositoryPreviewVM + PreviewSummary).
+            RepositoryPreviewVM = null;
+            PreviewSummary = "Предпросмотр результата еще не построен.";
         }
     }
 }
