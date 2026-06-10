@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -7,7 +6,6 @@ using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
-using Philadelphus.Presentation.Wpf.UI.Models.Entities.Enums;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -79,7 +77,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             _dataStoragesSettingsVM = dataStoragesSettings;
 
             InitRepositoriesVMsCollection();
-            PropertyGridRepresentation = PropertyGridRepresentations.DataGrid;
         }
         private static PhiladelphusRepositoryVM _currentRepositoryVM;
         public PhiladelphusRepositoryVM CurrentRepositoryVM
@@ -110,33 +107,6 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             //}
         }
 
-
-        public List<string> PropertyGridRepresentationsCollection
-        {
-            get
-            {
-                var list = new List<string>();
-                foreach (var item in Enum.GetNames(typeof(PropertyGridRepresentations)))
-                {
-                    list.Add(item);
-                }
-                return list;
-            }
-        }
-
-        private PropertyGridRepresentations _propertyGridRepresentation;
-        public PropertyGridRepresentations PropertyGridRepresentation
-        {
-            get
-            {
-                return _propertyGridRepresentation;
-            }
-            set
-            {
-                _propertyGridRepresentation = value;
-                OnPropertyChanged(nameof(PropertyGridRepresentation));
-            }
-        }
         public Dictionary<string, string>? PropertyList
         {
             get

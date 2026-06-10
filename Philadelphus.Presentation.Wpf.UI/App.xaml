@@ -7,8 +7,6 @@
         <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
         <converters:MainEntityToIconConverter x:Key="mainEntityToIconConverter" />
         <converters:SelectedIndexConverter x:Key="selectedIndexConverter" />
-        <converters:RepresentationToDataGridVisibilityConverter x:Key="representationToDataGridVisibilityConverter" />
-        <converters:RepresentationToStandardGridVisibilityConverter x:Key="representationToStandardGridVisibilityConverter" />
         <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
         <converters:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
         <converters:StateToColorConverter x:Key="stateToColorConverter" />
