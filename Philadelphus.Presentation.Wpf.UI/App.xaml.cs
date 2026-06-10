@@ -267,6 +267,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
                     services.AddTransient<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
                     services.AddTransient<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
+                    services.AddTransient<IExcelImportDesignerVMFactory, ExcelImportDesignerVMFactory>();
                     services.AddTransient<IInfrastructureRepositoryFactory, InfrastructureRepositoryFactory>();
 
                     // Импорт из Excel

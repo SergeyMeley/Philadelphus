@@ -707,10 +707,47 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             return true;
         }
 
-        private void ClearSheetRelation(ExcelImportSheetSchema childSheet)
+        /// <summary>
+        /// Удаляет связь дочернего листа с родителем (используется диаграммой).
+        /// </summary>
+        public void ClearSheetRelation(ExcelImportSheetSchema childSheet)
         {
+            ArgumentNullException.ThrowIfNull(childSheet);
+
             ExcelImportProfileEditorHelper.ClearRelation(childSheet);
             RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet: false);
+        }
+
+        /// <summary>
+        /// Применяет связь по перетянутым колонкам (используется диаграммой при drag-drop).
+        /// </summary>
+        public bool ApplyRelationFromColumns(
+            ExcelImportSheetSchema childSheet,
+            string parentSourceName,
+            string parentKeyColumnName,
+            string childKeyColumnName,
+            bool selectChildSheet)
+        {
+            ArgumentNullException.ThrowIfNull(childSheet);
+
+            var schema = _session.Schema;
+            if (schema == null)
+                return false;
+
+            if (ExcelImportProfileEditorHelper.TrySetRelationColumns(
+                    schema.Sheets,
+                    childSheet,
+                    parentSourceName,
+                    parentKeyColumnName,
+                    childKeyColumnName,
+                    out var errorMessage) == false)
+            {
+                _messageDialogService.ShowWarning(errorMessage, "Связи");
+                return false;
+            }
+
+            RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet);
+            return true;
         }
 
         private void AddRelation()
