@@ -61,6 +61,80 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
 
             return dialog.ShowDialog() == true ? dialog.FileName : null;
         }
+
+        public string? OpenFile(string? filter = null, string? defaultExtension = null, string? title = null, string? initialDirectory = null)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Multiselect = false
+            };
+
+            ApplyCommonOptions(dialog, filter, defaultExtension, title, initialDirectory);
+
+            return dialog.ShowDialog() == true ? dialog.FileName : null;
+        }
+
+        public string? SaveFile(string? filter = null, string? defaultExtension = null, string? title = null, string? initialDirectory = null)
+        {
+            var dialog = new SaveFileDialog
+            {
+                AddExtension = true
+            };
+
+            ApplyCommonOptions(dialog, filter, defaultExtension, title, initialDirectory);
+
+            return dialog.ShowDialog() == true ? dialog.FileName : null;
+        }
+
+        public string? BrowseFolder(string? title = null, string? initialDirectory = null)
+        {
+            var dialog = new OpenFolderDialog
+            {
+                Multiselect = false
+            };
+
+            if (string.IsNullOrEmpty(title) == false)
+            {
+                dialog.Title = title;
+            }
+
+            if (string.IsNullOrEmpty(initialDirectory) == false)
+            {
+                dialog.InitialDirectory = initialDirectory;
+                dialog.DefaultDirectory = initialDirectory;
+            }
+
+            return dialog.ShowDialog() == true ? dialog.FolderName : null;
+        }
+
+        private static void ApplyCommonOptions(
+            FileDialog dialog,
+            string? filter,
+            string? defaultExtension,
+            string? title,
+            string? initialDirectory)
+        {
+            if (string.IsNullOrEmpty(filter) == false)
+            {
+                dialog.Filter = filter;
+            }
+
+            if (string.IsNullOrEmpty(defaultExtension) == false)
+            {
+                dialog.DefaultExt = defaultExtension;
+            }
+
+            if (string.IsNullOrEmpty(title) == false)
+            {
+                dialog.Title = title;
+            }
+
+            if (string.IsNullOrEmpty(initialDirectory) == false)
+            {
+                dialog.InitialDirectory = initialDirectory;
+                dialog.DefaultDirectory = initialDirectory;
+            }
+        }
     }
 
     public class MessageDialogService : IMessageDialogService

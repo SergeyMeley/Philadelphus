@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Win32;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -31,6 +30,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IFileDialogService _fileDialogService;
 
         /// <summary>
         /// Настройки приложения.
@@ -105,6 +105,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         /// <param name="appConfig">Параметр appConfig.</param>
         /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
+        /// <param name="fileDialogService">Сервис файловых диалогов.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ApplicationSettingsControlVM(IServiceProvider serviceProvider,
             IMapper mapper,
@@ -114,7 +115,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ApplicationCommandsVM applicationCommandsVM,
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
-            IRelayCommandFactory commandFactory)
+            IRelayCommandFactory commandFactory,
+            IFileDialogService fileDialogService)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(configurationService);
@@ -125,11 +127,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value.ConnectionStringsContainers);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(fileDialogService);
 
             _configurationService = configurationService;
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _commandFactory = commandFactory;
+            _fileDialogService = fileDialogService;
 
             Dictionary<string, Type> existingTypes = new()
                 {
@@ -199,17 +203,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return _commandFactory.Create(obj =>
                 {
                     var path = string.Empty;
-                    var dialog = new OpenFolderDialog
-                    {
-                        Title = "Выберите директорию",
-                        Multiselect = false,
-                        InitialDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
-                        DefaultDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
-                    };
+                    var selectedFolder = _fileDialogService.BrowseFolder(
+                        "Выберите директорию",
+                        SelectedConfigFile.FileInfo.Directory.FullName);
 
-                    if (dialog.ShowDialog() == true)
+                    if (selectedFolder != null)
                     {
-                        path = dialog.FolderName;
+                        path = selectedFolder;
                     }
                     try
                     {
@@ -237,20 +237,16 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
                 return _commandFactory.Create(obj =>
                 {
                     var path = string.Empty;
-                    var dialog = new OpenFileDialog
-                    {
-                        Title = "Выберите директорию",
-                        Multiselect = false,
-                        Filter = "JSON файлы (*.json)|*.json|" +
-                                    "Все файлы (*.*)|*.*",
-                        FilterIndex = 1,
-                        InitialDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
-                        DefaultDirectory = SelectedConfigFile.FileInfo.Directory.FullName,
-                    };
+                    var selectedFile = _fileDialogService.OpenFile(
+                        "JSON файлы (*.json)|*.json|" +
+                            "Все файлы (*.*)|*.*",
+                        null,
+                        "Выберите директорию",
+                        SelectedConfigFile.FileInfo.Directory.FullName);
 
-                    if (dialog.ShowDialog() == true)
+                    if (selectedFile != null)
                     {
-                        path = dialog.FileName;
+                        path = selectedFile;
                     }
                     try
                     {

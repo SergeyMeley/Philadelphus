@@ -22,9 +22,13 @@
 
   <ItemGroup>
     <Compile Remove="Interfaces\**" />
+    <Compile Remove="ViewModels\SupportiveVMs\**" />
     <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="ViewModels\SupportiveVMs\**" />
     <None Remove="Interfaces\**" />
+    <None Remove="ViewModels\SupportiveVMs\**" />
     <Page Remove="Interfaces\**" />
+    <Page Remove="ViewModels\SupportiveVMs\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -232,10 +236,6 @@
     <Resource Include="Icons\without_a_license\Flaticon_icon_up.png" />
     <Resource Include="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
     <Resource Include="Icons\without_a_license\icons8_icon_repository.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\SupportiveVMs\" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
@@ -26,6 +25,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private readonly IPhiladelphusRepositoryService _repositoryService;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IFileDialogService _fileDialogService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ImportExportControlVM" />.
@@ -35,24 +35,28 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// <param name="repositoryService">Доменный сервис репозитория.</param>
         /// <param name="repositoryExplorerControlVM">Модель представления обозревателя репозитория.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
+        /// <param name="fileDialogService">Сервис файловых диалогов.</param>
         public ImportExportControlVM(
             IServiceProvider serviceProvider,
             IImportExportService importExportService,
             IPhiladelphusRepositoryService repositoryService,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
-            IRelayCommandFactory commandFactory)
+            IRelayCommandFactory commandFactory,
+            IFileDialogService fileDialogService)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(importExportService);
             ArgumentNullException.ThrowIfNull(repositoryService);
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(fileDialogService);
 
             _serviceProvider = serviceProvider;
             _importExportService = importExportService;
             _repositoryService = repositoryService;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _commandFactory = commandFactory;
+            _fileDialogService = fileDialogService;
 
             RefreshAdapters();
         }
@@ -177,14 +181,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 return;
             }
 
-            var saveFileDialog = new SaveFileDialog
-            {
-                Filter = BuildFileDialogFilter(fileFormat),
-                DefaultExt = NormalizeFileFormat(fileFormat),
-                AddExtension = true
-            };
+            var savedFilePath = _fileDialogService.SaveFile(
+                BuildFileDialogFilter(fileFormat),
+                NormalizeFileFormat(fileFormat));
 
-            if (saveFileDialog.ShowDialog() != true)
+            if (savedFilePath == null)
             {
                 return;
             }
@@ -193,9 +194,9 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 fileFormat,
                 adapterName,
                 treeRoot.OwningWorkingTree,
-                saveFileDialog.FileName);
+                savedFilePath);
 
-            OpenFile(saveFileDialog.FileName);
+            OpenFile(savedFilePath);
         }
 
         private void ImportFromFile(string fileFormat, string adapterName)
@@ -211,13 +212,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 return;
             }
 
-            var openFileDialog = new OpenFileDialog
-            {
-                Filter = BuildFileDialogFilter(fileFormat),
-                DefaultExt = NormalizeFileFormat(fileFormat)
-            };
+            var importFilePath = _fileDialogService.OpenFile(
+                BuildFileDialogFilter(fileFormat),
+                NormalizeFileFormat(fileFormat));
 
-            if (openFileDialog.ShowDialog() != true)
+            if (importFilePath == null)
             {
                 return;
             }
@@ -225,7 +224,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             var importedTree = _importExportService.ImportFromFile(
                 fileFormat,
                 adapterName,
-                openFileDialog.FileName,
+                importFilePath,
                 _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model,
                 _repositoryService,
                 OnProcessChanged,
@@ -267,25 +266,20 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             ArgumentException.ThrowIfNullOrWhiteSpace(targetFileFormat);
             ArgumentException.ThrowIfNullOrWhiteSpace(targetAdapterName);
 
-            var openFileDialog = new OpenFileDialog
-            {
-                Filter = BuildFileDialogFilter(sourceFileFormat),
-                DefaultExt = NormalizeFileFormat(sourceFileFormat)
-            };
+            var sourceFilePath = _fileDialogService.OpenFile(
+                BuildFileDialogFilter(sourceFileFormat),
+                NormalizeFileFormat(sourceFileFormat));
 
-            if (openFileDialog.ShowDialog() != true)
+            if (sourceFilePath == null)
             {
                 return;
             }
 
-            var saveFileDialog = new SaveFileDialog
-            {
-                Filter = BuildFileDialogFilter(targetFileFormat),
-                DefaultExt = NormalizeFileFormat(targetFileFormat),
-                AddExtension = true
-            };
+            var targetFilePath = _fileDialogService.SaveFile(
+                BuildFileDialogFilter(targetFileFormat),
+                NormalizeFileFormat(targetFileFormat));
 
-            if (saveFileDialog.ShowDialog() != true)
+            if (targetFilePath == null)
             {
                 return;
             }
@@ -293,12 +287,12 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             _importExportService.ConvertFile(
                 sourceFileFormat,
                 sourceAdapterName,
-                openFileDialog.FileName,
+                sourceFilePath,
                 targetFileFormat,
                 targetAdapterName,
-                saveFileDialog.FileName);
+                targetFilePath);
 
-            OpenFile(saveFileDialog.FileName);
+            OpenFile(targetFilePath);
         }
 
         private bool CanImportToRepository()
