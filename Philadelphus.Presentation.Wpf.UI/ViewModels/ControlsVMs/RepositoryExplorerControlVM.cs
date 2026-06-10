@@ -22,7 +22,6 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repositor
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services.Tables;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using IAsyncRelayCommand = Philadelphus.Presentation.Infrastructure.IAsyncRelayCommand;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
@@ -42,6 +41,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         private readonly IFileDialogService _fileDialogService;
         private readonly IRelayCommandFactory _commandFactory;
         private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
+        private readonly IWindowService _windowService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -215,6 +215,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             IFileDialogService fileDialogService,
             IRelayCommandFactory commandFactory,
             IAsyncRelayCommandFactory asyncCommandFactory,
+            IWindowService windowService,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -230,11 +231,13 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
             ArgumentNullException.ThrowIfNull(asyncCommandFactory);
+            ArgumentNullException.ThrowIfNull(windowService);
 
             _service = service;
             _fileDialogService = fileDialogService;
             _commandFactory = commandFactory;
             _asyncCommandFactory = asyncCommandFactory;
+            _windowService = windowService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -388,9 +391,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             _openModifyAttributesListWindowCommand ??= _commandFactory.Create(
                 obj =>
                 {
-                    var window = _serviceProvider.GetRequiredService<AttributeValuesCollectionWindow>();
-                    window.DataContext = this;
-                    window.Show();
+                    _windowService.Show(this);
                 },
                 ce =>
                 {
