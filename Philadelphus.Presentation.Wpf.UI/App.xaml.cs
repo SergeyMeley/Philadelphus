@@ -238,7 +238,6 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<PopUpNotificationsControlVM>();
                     services.AddTransient<ModalWindowNotificationsControlVM>();
                     // ViewModel окон
-                    services.AddTransient<ApplicationWindowsVM>();
                     services.AddTransient<LaunchWindowVM>();
                     // ViewModel контролов
                     services.AddSingleton<ApplicationSettingsControlVM>();
