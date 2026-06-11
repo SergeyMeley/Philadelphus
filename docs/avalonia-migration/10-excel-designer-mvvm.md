@@ -149,7 +149,8 @@ Combined-план: (1) `IExcelImportDesignerVMFactory` + DI ✅; (2) `DataContex
 - [x] Фаза 1 — `ExcelImportDesignerVM`: логика перенесена (группы 1-4: файл/схема/листы,
       поля листа, редактор связей, действия предпросмотр/импорт/шаблоны/закрытие). Размещён в WPF.
       Осталось при подключении: `IExcelImportDesignerVMFactory` + DI-регистрация (Фаза 2/4).
-- [ ] Фаза 2 — XAML на VM (DataContext=VM, биндинги/команды), удалить перенесённый code-behind
-- [ ] Решение по диаграмме (раздел 6)
-- [ ] Фаза 3 — диаграмма, удалить остаток code-behind
-- [ ] Фаза 4 — открытие через IWindowService, очистить ImportExportControlVM
+- [x] Фаза 2 — XAML на VM (DataContext=VM, биндинги/команды); не-диаграммный code-behind удалён,
+      диаграмма временно осталась в code-behind, читая состояние из VM
+- [x] Решение по диаграмме (раздел 6) — AttachedBehavior
+- [ ] Фаза 3 — диаграмма → DiagramBehavior, удалить остаток code-behind
+- [x] Фаза 4 — открытие дизайнера через IWindowService; из ImportExportControlVM убрана ссылка на Views.Windows

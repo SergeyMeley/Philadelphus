@@ -369,6 +369,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                 windowService.Register<FormulaTestControlVM, FormulaEditorWindow>();
                 windowService.Register<RepositoryExplorerControlVM, AttributeValuesCollectionWindow>();
                 windowService.Register<DetailsWindowVM, DetailsWindow>();
+                windowService.Register<ExcelImportDesignerVM, ExcelImportDesignerWindow>();
 
                 // 2. Переконфигурация: только File (закрыть Console)
                 Log.Information("Искусственная задержка запуска 2 сек.");

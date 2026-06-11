@@ -10,7 +10,6 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repositor
 using Philadelphus.Presentation.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -27,6 +26,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         private readonly IRelayCommandFactory _commandFactory;
         private readonly IFileDialogService _fileDialogService;
+        private readonly IWindowService _windowService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ImportExportControlVM" />.
@@ -37,13 +37,15 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         /// <param name="repositoryExplorerControlVM">Модель представления обозревателя репозитория.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <param name="fileDialogService">Сервис файловых диалогов.</param>
+        /// <param name="windowService">Сервис управления окнами.</param>
         public ImportExportControlVM(
             IServiceProvider serviceProvider,
             IImportExportService importExportService,
             IPhiladelphusRepositoryService repositoryService,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IRelayCommandFactory commandFactory,
-            IFileDialogService fileDialogService)
+            IFileDialogService fileDialogService,
+            IWindowService windowService)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
             ArgumentNullException.ThrowIfNull(importExportService);
@@ -51,6 +53,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
             ArgumentNullException.ThrowIfNull(fileDialogService);
+            ArgumentNullException.ThrowIfNull(windowService);
 
             _serviceProvider = serviceProvider;
             _importExportService = importExportService;
@@ -58,6 +61,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _commandFactory = commandFactory;
             _fileDialogService = fileDialogService;
+            _windowService = windowService;
 
             RefreshAdapters();
         }
@@ -253,9 +257,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 _repositoryService,
                 _repositoryExplorerControlVM.RefreshRepositoryView);
 
-            var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
-            window.DataContext = designerVm;
-            window.ShowDialog();
+            _windowService.ShowDialog(designerVm);
         }
 
         private void ConvertFile(
