@@ -52,6 +52,20 @@ namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
 
         public void Hide<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
         {
+            // Сначала ищем по зарегистрированному типу окна (как Show/CreateWindow): VM может быть
+            // transient, и переданный экземпляр не обязан совпадать по ссылке с DataContext окна.
+            if (_registry.TryGetValue(typeof(TViewModel), out var windowType))
+            {
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (windowType.IsInstanceOfType(window))
+                    {
+                        window.Hide();
+                        return;
+                    }
+                }
+            }
+
             foreach (Window window in Application.Current.Windows)
             {
                 if (window.DataContext == viewModel)
