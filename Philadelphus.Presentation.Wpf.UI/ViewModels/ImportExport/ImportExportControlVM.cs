@@ -8,6 +8,7 @@ using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.ImportExport;
+using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Collections.ObjectModel;
@@ -246,12 +247,14 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 return;
             }
 
-            var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
-            window.Initialize(
+            var designerVm = _serviceProvider.GetRequiredService<IExcelImportDesignerVMFactory>().Create(
                 _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model.ContentShrub,
                 _repositoryExplorerControlVM.PhiladelphusRepositoryVM.Model,
                 _repositoryService,
                 _repositoryExplorerControlVM.RefreshRepositoryView);
+
+            var window = _serviceProvider.GetRequiredService<ExcelImportDesignerWindow>();
+            window.DataContext = designerVm;
             window.ShowDialog();
         }
 

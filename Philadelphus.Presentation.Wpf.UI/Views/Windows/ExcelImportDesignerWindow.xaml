@@ -1,4 +1,4 @@
-<Window x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.ExcelImportDesignerWindow"
+﻿<Window x:Class="Philadelphus.Presentation.Wpf.UI.Views.Windows.ExcelImportDesignerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -42,35 +42,21 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Выбрать Excel файл" Click="BtnSelectFile_Click" Padding="10,5" Margin="0,0,12,0"/>
-            <Button Grid.Column="1" Content="Загрузить шаблон" Click="BtnLoadTemplate_Click" Padding="10,5" Margin="0,0,8,0"/>
-            <Button Grid.Column="2" Content="Сохранить шаблон" Click="BtnSaveTemplate_Click" Padding="10,5" Margin="0,0,12,0"/>
-            <TextBlock x:Name="TxtFilePath" Grid.Column="3" Text="Файл не выбран" VerticalAlignment="Center" Foreground="Gray"/>
+            <Button Grid.Column="0" Content="Выбрать Excel файл" Command="{Binding SelectFileCommand}" Padding="10,5" Margin="0,0,12,0"/>
+            <Button Grid.Column="1" Content="Загрузить шаблон" Command="{Binding LoadTemplateCommand}" Padding="10,5" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" Content="Сохранить шаблон" Command="{Binding SaveTemplateCommand}" Padding="10,5" Margin="0,0,12,0"/>
+            <TextBlock Grid.Column="3" Text="{Binding FilePathDisplay}" VerticalAlignment="Center" Foreground="Gray"/>
         </Grid>
 
         <GroupBox Grid.Row="2" Header="Параметры нового корня" Padding="10" Margin="0,0,0,16">
             <StackPanel>
-                <CheckBox x:Name="ChkCreateNewRoot" Content="Создать новый корень" Margin="0,0,0,10"
-                          Visibility="Collapsed"
-                          IsEnabled="False"
-                          Checked="ChkCreateNewRoot_Checked" Unchecked="ChkCreateNewRoot_Unchecked"/>
-
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="170"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="Наименование корня:" VerticalAlignment="Center"/>
-                    <TextBox x:Name="TxtRootName" Grid.Column="1" Margin="5,0,0,0"/>
-                </Grid>
-
-                <Grid Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="170"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Существующие корни:" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="CmbExistingRoots" Grid.Column="1" Margin="5,0,0,0"/>
+                    <TextBox Grid.Column="1" Margin="5,0,0,0" Text="{Binding RootName, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </StackPanel>
         </GroupBox>
@@ -85,8 +71,8 @@
                     </Grid.ColumnDefinitions>
 
                     <GroupBox Grid.Column="0" Header="Листы книги" Padding="8">
-                        <ListBox x:Name="LstSchemaSheets"
-                                 SelectionChanged="LstSchemaSheets_SelectionChanged"
+                        <ListBox ItemsSource="{Binding Sheets}"
+                                 SelectedItem="{Binding SelectedSheet}"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -131,17 +117,18 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Имя сущности:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBox x:Name="TxtSheetDisplayName" Grid.Row="0" Grid.Column="1" TextChanged="TxtSheetDisplayName_TextChanged"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentSheetDisplayName, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                <ComboBox x:Name="CmbSheetKeyColumn" Visibility="Collapsed" SelectionChanged="CmbSheetKeyColumn_SelectionChanged"/>
-                                <TextBlock x:Name="TxtCurrentSheetSource" Visibility="Collapsed"/>
-                                <ComboBox x:Name="CmbSheetEntityKind"
-                                          Visibility="Collapsed"
+                                <ComboBox Visibility="Collapsed"
+                                          ItemsSource="{Binding SheetKeyColumns}"
+                                          SelectedItem="{Binding SelectedSheetKeyColumn}"/>
+                                <TextBlock Visibility="Collapsed" Text="{Binding CurrentSheetSource}"/>
+                                <ComboBox Visibility="Collapsed"
                                           ItemsSource="{Binding AvailableEntityKinds}"
                                           DisplayMemberPath="DisplayName"
                                           SelectedValuePath="Value"
-                                          IsEnabled="False"
-                                          SelectionChanged="CmbSheetEntityKind_SelectionChanged"/>
+                                          SelectedValue="{Binding SelectedSheetEntityKind}"
+                                          IsEnabled="False"/>
                             </Grid>
                         </GroupBox>
 
@@ -151,9 +138,9 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock x:Name="TxtSheetPreviewInfo" Grid.Row="0" Foreground="DimGray" Margin="0,0,0,8"/>
-                                <DataGrid x:Name="DgSheetPreview"
-                                          Grid.Row="1"
+                                <TextBlock Grid.Row="0" Foreground="DimGray" Margin="0,0,0,8" Text="{Binding SheetPreviewInfo}"/>
+                                <DataGrid Grid.Row="1"
+                                          ItemsSource="{Binding SheetPreview}"
                                           AutoGenerateColumns="True"
                                           IsReadOnly="True"
                                           CanUserAddRows="False"
@@ -164,7 +151,7 @@
                         </GroupBox>
 
                         <GroupBox Grid.Row="4" Header="Колонки листа" Padding="8">
-                            <DataGrid x:Name="DgSheetColumns"
+                            <DataGrid ItemsSource="{Binding SheetColumns}"
                                       AutoGenerateColumns="False"
                                       CanUserAddRows="False"
                                       CanUserDeleteRows="False"
@@ -245,12 +232,12 @@
                     </Grid.ColumnDefinitions>
 
                     <GroupBox Grid.Column="0" Header="Сводка связей" Padding="8">
-                        <DataGrid x:Name="DgRelations"
+                        <DataGrid ItemsSource="{Binding Relations}"
+                                  SelectedItem="{Binding SelectedRelation}"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
-                                  IsReadOnly="True"
-                                  SelectionChanged="DgRelations_SelectionChanged">
+                                  IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Родитель" Binding="{Binding ParentSourceName}" Width="2*"/>
                                 <DataGridTextColumn Header="Ребенок" Binding="{Binding ChildSourceName}" Width="2*"/>
@@ -277,20 +264,28 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Дочерний лист:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                            <ComboBox x:Name="CmbRelationChildSheet" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" SelectionChanged="CmbRelationChildSheet_SelectionChanged"/>
+                            <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"
+                                      ItemsSource="{Binding RelationChildSheets}"
+                                      SelectedItem="{Binding SelectedRelationChildSheet}"/>
 
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Родительский лист:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                            <ComboBox x:Name="CmbRelationParentSheet" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" SelectionChanged="CmbRelationParentSheet_SelectionChanged"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,8"
+                                      ItemsSource="{Binding RelationParentSheets}"
+                                      SelectedItem="{Binding SelectedRelationParentSheet}"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Ключ у родителя:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                            <ComboBox x:Name="CmbRelationParentKey" Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" SelectionChanged="CmbRelationParentKey_SelectionChanged"/>
+                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,8"
+                                      ItemsSource="{Binding RelationParentKeys}"
+                                      SelectedItem="{Binding SelectedRelationParentKey}"/>
 
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Ключ у ребенка:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                            <ComboBox x:Name="CmbRelationChildKey" Grid.Row="3" Grid.Column="1" Margin="0,0,0,8" SelectionChanged="CmbRelationChildKey_SelectionChanged"/>
+                            <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,8"
+                                      ItemsSource="{Binding RelationChildKeys}"
+                                      SelectedItem="{Binding SelectedRelationChildKey}"/>
 
                             <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal">
-                                <Button Content="Добавить связь" Click="BtnAddRelation_Click" Padding="10,5" Margin="0,0,8,0"/>
-                                <Button Content="Удалить связь" Click="BtnRemoveRelation_Click" Padding="10,5"/>
+                                <Button Content="Добавить связь" Command="{Binding AddRelationCommand}" Padding="10,5" Margin="0,0,8,0"/>
+                                <Button Content="Удалить связь" Command="{Binding RemoveRelationCommand}" Padding="10,5"/>
                             </StackPanel>
 
                             <TextBlock Grid.Row="6"
@@ -313,21 +308,21 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button Content="Обновить предпросмотр" Click="BtnRefreshPreview_Click" Padding="10,5"/>
+                        <Button Content="Обновить предпросмотр" Command="{Binding RefreshPreviewCommand}" Padding="10,5"/>
                     </StackPanel>
 
-                    <TextBlock x:Name="TxtPreviewSummary" Grid.Row="1" Margin="0,12,0,0" TextWrapping="Wrap"/>
+                    <TextBlock Grid.Row="1" Margin="0,12,0,0" TextWrapping="Wrap" Text="{Binding PreviewSummary}"/>
 
                     <Border Grid.Row="3" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
-                        <repo:RepositoryExplorer x:Name="RepositoryExplorerPreview"/>
+                        <repo:RepositoryExplorer DataContext="{Binding RepositoryPreviewVM}"/>
                     </Border>
                 </Grid>
             </TabItem>
         </TabControl>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="Импортировать" Width="160" Height="36" Margin="0,0,8,0" Click="BtnImport_Click"/>
-            <Button Content="Закрыть" Width="120" Height="36" Click="BtnClose_Click"/>
+            <Button Content="Импортировать" Width="160" Height="36" Margin="0,0,8,0" Command="{Binding ImportCommand}"/>
+            <Button Content="Закрыть" Width="120" Height="36" Command="{Binding CloseCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

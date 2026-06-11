@@ -1,25 +1,21 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
-using Philadelphus.Infrastructure.ImportExport.Excel;
-using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Services;
-using System;
-using System.Collections.Generic;
+﻿using Philadelphus.Infrastructure.ImportExport.Excel;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using IOPath = System.IO.Path;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 {
+    /// <summary>
+    /// Окно конструктора импорта из Excel. Логика и состояние — в <see cref="ExcelImportDesignerVM" />
+    /// (DataContext). В code-behind осталась только визуализация диаграммы связей и мосты событий,
+    /// не выражаемых биндингом. Диаграмма выносится в behavior на Фазе 3 (см. docs/avalonia-migration/10).
+    /// </summary>
     public partial class ExcelImportDesignerWindow : Window
     {
-        private const string NoParentRelationOption = "(Нет родителя)";
         private const double DiagramCardWidth = 280;
         private const double DiagramCardMinHeight = 210;
         private const double DiagramCardMaxWidth = 520;
@@ -31,8 +27,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         private const double DiagramZoomMax = 2.5;
         private const double DiagramZoomStep = 1.1;
 
-        // Card movement and relation creation are intentionally separate gestures:
-        // dragging the card moves the diagram, dragging a column creates a parent-column -> child-column link.
         private enum DiagramDragMode
         {
             None,
@@ -62,464 +56,90 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             public required Polygon ArrowHead { get; init; }
         }
 
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ConversionService _conversionService;
-        private readonly ExcelPreviewService _previewService;
-        private readonly IExcelImportSchemaBuilder _schemaBuilder;
-        private readonly IExcelImportSchemaTemplateStorage _templateStorage;
-        private readonly ExcelImportPipeline _importPipeline;
-        private readonly ExcelImportPresentationPipeline _presentationPipeline;
-        private Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryModel? _repository;
-        private IPhiladelphusRepositoryService? _repositoryService;
-        private Action? _refreshRepositoryView;
-        private string _selectedFilePath = string.Empty;
-        private ExcelPreviewWorkbookInfo? _workbookPreview;
-        private ExcelImportSchema? _schema;
-        private ExcelImportSheetSchema? _currentSheet;
-        private bool _isUpdatingSheetControls;
-        private bool _isUpdatingRelationControls;
+        private readonly Dictionary<string, FrameworkElement> _diagramColumnElements = new(StringComparer.OrdinalIgnoreCase);
+        private readonly List<DiagramRelationVisual> _diagramRelationVisuals = new();
         private ExcelImportSheetSchema? _draggedSheet;
         private ExcelImportColumnProfile? _draggedColumn;
         private Border? _draggedBorder;
         private DiagramDragMode _diagramDragMode = DiagramDragMode.None;
         private Line? _relationPreviewLine;
-        private readonly Dictionary<string, FrameworkElement> _diagramColumnElements = new(StringComparer.OrdinalIgnoreCase);
-        private readonly List<DiagramRelationVisual> _diagramRelationVisuals = new();
         private bool _diagramInitialLayoutPending;
         private double _diagramZoom = 1.0;
         private Point _dragStartPoint;
         private double _dragStartLeft;
         private double _dragStartTop;
 
-        internal bool CompletedImport { get; private set; }
+        private ExcelImportDesignerVM? _vm;
 
-        public Array AvailableColumnRoles => Enum.GetValues(typeof(ExcelImportColumnRole));
-        public List<ExcelImportDefinitionScopeItem> AvailableDefinitionScopes { get; } = ExcelImportDisplayOptionsHelper.CreateDefinitionScopeItems();
-        public List<ExcelImportValueModeItem> AvailableValueModes { get; } = ExcelImportDisplayOptionsHelper.CreateValueModeItems();
-        public List<ExcelImportEntityKindItem> AvailableEntityKinds { get; } = ExcelImportDisplayOptionsHelper.CreateEntityKindItems();
-
-        public ExcelImportDesignerWindow(
-            IServiceProvider serviceProvider,
-            ConversionService conversionService,
-            ExcelPreviewService previewService,
-            IExcelImportSchemaBuilder schemaBuilder,
-            IExcelImportSchemaTemplateStorage templateStorage,
-            ExcelImportPipeline importPipeline,
-            ExcelImportPresentationPipeline presentationPipeline)
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="ExcelImportDesignerWindow" />.
+        /// DataContext (ExcelImportDesignerVM) задаётся снаружи через фабрику.
+        /// </summary>
+        public ExcelImportDesignerWindow()
         {
             InitializeComponent();
-            DataContext = this;
-            _serviceProvider = serviceProvider;
-            _conversionService = conversionService;
-            _previewService = previewService;
-            _schemaBuilder = schemaBuilder;
-            _templateStorage = templateStorage;
-            _importPipeline = importPipeline;
-            _presentationPipeline = presentationPipeline;
+            DataContextChanged += OnDataContextChanged;
+        }
+
+        private ExcelImportDesignerVM? Vm => DataContext as ExcelImportDesignerVM;
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (_vm != null)
+            {
+                _vm.PropertyChanged -= OnVmPropertyChanged;
+                _vm.SchemaReloaded -= OnSchemaReloaded;
+            }
+
+            _vm = e.NewValue as ExcelImportDesignerVM;
+
+            if (_vm != null)
+            {
+                _vm.PropertyChanged += OnVmPropertyChanged;
+                _vm.SchemaReloaded += OnSchemaReloaded;
+            }
+
+            _diagramInitialLayoutPending = true;
+            RenderDiagram();
+        }
+
+        private void OnSchemaReloaded()
+        {
+            _diagramInitialLayoutPending = true;
+            RenderDiagram();
+        }
+
+        private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ExcelImportDesignerVM.Sheets)
+                || e.PropertyName == nameof(ExcelImportDesignerVM.Relations)
+                || e.PropertyName == nameof(ExcelImportDesignerVM.SelectedSheet))
+            {
+                RenderDiagram();
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
             ResetDiagramDragState();
-            SyncSchemaFromRootControls();
             base.OnClosing(e);
         }
 
-        internal void Initialize(
-            Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubModel shrub,
-            Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryModel repository,
-            IPhiladelphusRepositoryService repositoryService,
-            Action refreshRepositoryView)
-        {
-            _repository = repository;
-            _repositoryService = repositoryService;
-            _refreshRepositoryView = refreshRepositoryView;
-            InitializeRootsList(shrub);
-            ChkCreateNewRoot.IsChecked = true;
-            ChkCreateNewRoot_Checked(this, new RoutedEventArgs());
-        }
-
-        internal void LoadWorkbook(string filePath)
-        {
-            if (File.Exists(filePath) == false)
-                return;
-
-            LoadSchemaFromWorkbook(filePath);
-        }
-
-        internal void LoadSchema(ExcelImportSchema schema)
-        {
-            _schema = schema;
-            _diagramInitialLayoutPending = true;
-            ExcelImportSchemaNormalizer.EnsureEditableState(_schema);
-            ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
-
-            _selectedFilePath = _schema.SourceFilePath;
-            TxtFilePath.Text = string.IsNullOrWhiteSpace(_selectedFilePath)
-                ? "Файл не выбран"
-                : IOPath.GetFileName(_selectedFilePath);
-
-            _workbookPreview = string.IsNullOrWhiteSpace(_selectedFilePath) || File.Exists(_selectedFilePath) == false
-                ? null
-                : _previewService.GetWorkbookPreview(_selectedFilePath);
-
-            ApplyRootControlsFromSchema();
-            BindSchema();
-        }
-
-        private void InitializeRootsList(Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubModel shrub)
-        {
-            var roots = _conversionService.GetExistingRootsFromStorage(shrub);
-            CmbExistingRoots.ItemsSource = roots;
-            CmbExistingRoots.DisplayMemberPath = nameof(Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootModel.Name);
-            CmbExistingRoots.SelectedValuePath = nameof(Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootModel.Name);
-
-            if (roots.Count > 0)
-            {
-                CmbExistingRoots.SelectedIndex = 0;
-            }
-        }
-
-        private void ApplyRootControlsFromSchema()
-        {
-            if (_schema == null)
-                return;
-
-            // Книга Excel всегда является корнем результата, поэтому выбор существующего корня отключен.
-            _schema.CreateNewRoot = true;
-            TxtRootName.Text = _schema.RootName;
-            ChkCreateNewRoot.IsChecked = true;
-            ChkCreateNewRoot_Checked(this, new RoutedEventArgs());
-        }
-
-        private bool TrySyncSchemaFromImportParameters(bool isNewRoot, string rootName)
-        {
-            if (_schema == null)
-            {
-                MessageBox.Show("Сначала выберите Excel-файл и настройте схему импорта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            _schema.SourceFilePath = _selectedFilePath;
-            _schema.CreateNewRoot = true;
-            _schema.RootName = rootName;
-            ExcelImportSchemaNormalizer.NormalizeForExecution(_schema);
-            RefreshRelationViews();
-            return true;
-        }
-
-        private void SyncSchemaFromRootControls()
-        {
-            if (_schema == null)
-                return;
-
-            _schema.SourceFilePath = _selectedFilePath;
-            _schema.CreateNewRoot = true;
-            _schema.RootName = TxtRootName.Text?.Trim() ?? string.Empty;
-            ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
-        }
-
-        private void BtnSelectFile_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Excel Files|*.xlsx;*.xls",
-                Title = "Выберите файл Excel"
-            };
-
-            if (dialog.ShowDialog() != true)
-                return;
-
-            LoadSchemaFromWorkbook(dialog.FileName);
-        }
-
-        private void LoadSchemaFromWorkbook(string filePath)
-        {
-            _selectedFilePath = filePath;
-            TxtFilePath.Text = IOPath.GetFileName(filePath);
-            _workbookPreview = _previewService.GetWorkbookPreview(filePath);
-            _schema = _schemaBuilder.CreateDraftSchema(filePath, IOPath.GetFileNameWithoutExtension(filePath));
-            _diagramInitialLayoutPending = true;
-            _schema.CreateNewRoot = true;
-            ApplyRootControlsFromSchema();
-            BindSchema();
-        }
-
-        private void BindSchema()
-        {
-            if (_schema == null)
-                return;
-
-            ExcelImportSchemaNormalizer.EnsureEditableState(_schema);
-            RefreshRelationViews();
-            LstSchemaSheets.ItemsSource = _schema.Sheets;
-            CmbRelationChildSheet.ItemsSource = _schema.Sheets.Select(x => x.SourceName).ToList();
-
-            if (_schema.Sheets.Count > 0)
-            {
-                LstSchemaSheets.SelectedIndex = 0;
-            }
-
-            RenderDiagram();
-            ClearPreviewResult();
-        }
-
-        private void LstSchemaSheets_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _currentSheet = LstSchemaSheets.SelectedItem as ExcelImportSheetSchema;
-            BindCurrentSheet();
-        }
-
-        private void BindCurrentSheet()
-        {
-            _isUpdatingSheetControls = true;
-            try
-            {
-                if (_currentSheet == null || string.IsNullOrWhiteSpace(_selectedFilePath))
-                {
-                    TxtSheetDisplayName.Text = string.Empty;
-                    TxtCurrentSheetSource.Text = string.Empty;
-                    CmbSheetEntityKind.SelectedValue = ExcelImportEntityKind.Node;
-                    DgSheetColumns.ItemsSource = null;
-                    DgSheetPreview.ItemsSource = null;
-                    TxtSheetPreviewInfo.Text = "Лист не выбран.";
-                    return;
-                }
-
-                ExcelImportProfileEditorHelper.SyncSheetFieldsFromProfile(_currentSheet);
-
-                TxtSheetDisplayName.Text = _currentSheet.DisplayName;
-                TxtCurrentSheetSource.Text = _currentSheet.SourceName;
-                _currentSheet.EntityKind = ExcelImportEntityKind.Node;
-                _currentSheet.Profile.EntityKind = ExcelImportEntityKind.Node;
-                CmbSheetEntityKind.SelectedValue = ExcelImportEntityKind.Node;
-
-                var headers = ExcelImportProfileEditorHelper.BuildHeaderOptions(_currentSheet.Profile.Columns, sort: false);
-                CmbSheetKeyColumn.ItemsSource = headers;
-
-                CmbSheetKeyColumn.SelectedItem = string.IsNullOrWhiteSpace(_currentSheet.RowKeyColumnName) ? null : _currentSheet.RowKeyColumnName;
-
-                DgSheetColumns.ItemsSource = _currentSheet.Profile.Columns;
-
-                var preview = _previewService.GetPreview(_selectedFilePath, _currentSheet.Profile.SourceSelection);
-                TxtSheetPreviewInfo.Text = $"Лист: {preview.SourceName}. Строк данных: {preview.TotalRowCount}. Колонок: {preview.TotalColumnCount}.";
-                DgSheetPreview.ItemsSource = ExcelPreviewTableBuilder.Build(preview).DefaultView;
-            }
-            finally
-            {
-                _isUpdatingSheetControls = false;
-            }
-
-            BindRelationEditor(_currentSheet?.SourceName);
-            LstSchemaSheets.Items.Refresh();
-            DgRelations.Items.Refresh();
-            RenderDiagram();
-        }
-
-        private void TxtSheetDisplayName_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_isUpdatingSheetControls || _currentSheet == null)
-                return;
-
-            _currentSheet.DisplayName = TxtSheetDisplayName.Text.Trim();
-            LstSchemaSheets.Items.Refresh();
-            RenderDiagram();
-        }
-
-        private void CmbSheetKeyColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_isUpdatingSheetControls || _currentSheet == null)
-                return;
-
-            _currentSheet.RowKeyColumnName = CmbSheetKeyColumn.SelectedItem as string ?? string.Empty;
-            RenderDiagram();
-        }
-
-        private void CmbSheetEntityKind_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_isUpdatingSheetControls || _currentSheet == null)
-                return;
-
-            ApplySheetEntityKind(_currentSheet, ExcelImportEntityKind.Node);
-            LstSchemaSheets.Items.Refresh();
-            RenderDiagram();
-        }
-
-        private void ApplySheetEntityKind(ExcelImportSheetSchema sheet, ExcelImportEntityKind entityKind)
-        {
-            sheet.EntityKind = entityKind;
-            sheet.Profile.EntityKind = entityKind;
-        }
+        // ====== Мосты View → VM (события, не выражаемые биндингом) ======
 
         private void DgSheetColumns_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (_currentSheet == null)
-                    return;
-
-                ExcelImportProfileEditorHelper.SyncSheetFieldsFromProfile(_currentSheet);
-                BindCurrentSheet();
-            }), System.Windows.Threading.DispatcherPriority.Background);
+            Dispatcher.BeginInvoke(
+                new Action(() => Vm?.OnSheetColumnEdited()),
+                System.Windows.Threading.DispatcherPriority.Background);
         }
 
         private void SheetEnabledChanged(object sender, RoutedEventArgs e)
         {
-            RefreshRelationViews();
-            RenderDiagram();
+            Vm?.OnSheetEnabledChanged();
         }
 
-        private void RefreshRelationViews()
-        {
-            if (_schema == null)
-                return;
-
-            ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
-            DgRelations.ItemsSource = _schema.Relations;
-            DgRelations.Items.Refresh();
-        }
-
-        private void DgRelations_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var relation = DgRelations.SelectedItem as ExcelImportRelationSchema;
-            BindRelationEditor(relation?.ChildSourceName);
-        }
-
-        private void BindRelationEditor(string? childSourceName)
-        {
-            _isUpdatingRelationControls = true;
-            try
-            {
-                if (_schema == null)
-                    return;
-
-                var childSheets = _schema.Sheets.Select(x => x.SourceName).ToList();
-                CmbRelationChildSheet.ItemsSource = childSheets;
-                CmbRelationChildSheet.SelectedItem = string.IsNullOrWhiteSpace(childSourceName) ? null : childSourceName;
-
-                var childSheet = GetSheet(childSourceName);
-                if (childSheet == null)
-                {
-                    CmbRelationParentSheet.ItemsSource = null;
-                    CmbRelationParentKey.ItemsSource = null;
-                    CmbRelationChildKey.ItemsSource = null;
-                    return;
-                }
-
-                var parentOptions = ExcelImportProfileEditorHelper.BuildParentSourceOptions(
-                    _schema.Sheets.Select(x => x.SourceName),
-                    childSheet.SourceName,
-                    NoParentRelationOption);
-                CmbRelationParentSheet.ItemsSource = parentOptions;
-                CmbRelationParentSheet.SelectedItem = ExcelImportProfileEditorHelper.GetSelectedParentOption(
-                    childSheet.Profile.Relation.ParentSourceName,
-                    parentOptions,
-                    NoParentRelationOption);
-
-                var childHeaders = ExcelImportProfileEditorHelper.BuildHeaderOptions(childSheet.Profile.Columns, sort: false);
-                CmbRelationChildKey.ItemsSource = childHeaders;
-                CmbRelationChildKey.SelectedItem = string.IsNullOrWhiteSpace(childSheet.Profile.Relation.ChildKeyColumnName)
-                    ? null
-                    : childSheet.Profile.Relation.ChildKeyColumnName;
-
-                RefreshRelationParentKeyOptions(childSheet);
-            }
-            finally
-            {
-                _isUpdatingRelationControls = false;
-            }
-        }
-
-        private void RefreshRelationParentKeyOptions(ExcelImportSheetSchema childSheet)
-        {
-            var parentSheet = GetSheet(childSheet.Profile.Relation.ParentSourceName);
-            if (parentSheet == null)
-            {
-                CmbRelationParentKey.ItemsSource = null;
-                CmbRelationParentKey.SelectedItem = null;
-                return;
-            }
-
-            var headers = ExcelImportProfileEditorHelper.BuildHeaderOptions(parentSheet.Profile.Columns, sort: false);
-            CmbRelationParentKey.ItemsSource = headers;
-            CmbRelationParentKey.SelectedItem = string.IsNullOrWhiteSpace(childSheet.Profile.Relation.ParentKeyColumnName)
-                ? null
-                : childSheet.Profile.Relation.ParentKeyColumnName;
-        }
-
-        private void CmbRelationChildSheet_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_isUpdatingRelationControls)
-                return;
-
-            BindRelationEditor(CmbRelationChildSheet.SelectedItem as string);
-        }
-
-        private void CmbRelationParentSheet_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_isUpdatingRelationControls)
-                return;
-
-            var childSheet = GetSheet(CmbRelationChildSheet.SelectedItem as string);
-            if (childSheet == null)
-                return;
-
-            var parentName = CmbRelationParentSheet.SelectedItem as string;
-            if (TryApplyRelationParent(childSheet, parentName, selectChildSheet: false) == false)
-            {
-                BindRelationEditor(childSheet.SourceName);
-            }
-        }
-
-        private void CmbRelationParentKey_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_isUpdatingRelationControls)
-                return;
-
-            var childSheet = GetSheet(CmbRelationChildSheet.SelectedItem as string);
-            if (childSheet == null)
-                return;
-
-            ExcelImportProfileEditorHelper.SetRelationParentKey(childSheet, CmbRelationParentKey.SelectedItem as string);
-            RefreshRelationUi(childSheet, bindEditor: false, selectChildSheet: false);
-        }
-
-        private void CmbRelationChildKey_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_isUpdatingRelationControls)
-                return;
-
-            var childSheet = GetSheet(CmbRelationChildSheet.SelectedItem as string);
-            if (childSheet == null)
-                return;
-
-            ExcelImportProfileEditorHelper.SetRelationChildKey(childSheet, CmbRelationChildKey.SelectedItem as string);
-            RefreshRelationUi(childSheet, bindEditor: false, selectChildSheet: false);
-        }
-
-        private void BtnAddRelation_Click(object sender, RoutedEventArgs e)
-        {
-            if (_schema == null)
-                return;
-
-            var targetSheet = _schema.Sheets.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Profile.Relation.ParentSourceName));
-            if (targetSheet == null)
-            {
-                MessageBox.Show("Все листы уже имеют настроенную связь или книга не загружена.", "Связи", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            BindRelationEditor(targetSheet.SourceName);
-        }
-
-        private void BtnRemoveRelation_Click(object sender, RoutedEventArgs e)
-        {
-            var childSheet = GetSheet(CmbRelationChildSheet.SelectedItem as string);
-            if (childSheet == null)
-                return;
-
-            ClearSheetRelation(childSheet);
-        }
+        // ====== Диаграмма связей (Фаза 3 → DiagramBehavior) ======
 
         private void RenderDiagram()
         {
@@ -528,10 +148,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             _diagramColumnElements.Clear();
             _diagramRelationVisuals.Clear();
 
-            if (_schema == null)
+            if (Vm == null)
                 return;
 
-            var visibleSheets = _schema.Sheets.Where(x => x.IsEnabled).ToList();
+            var visibleSheets = Vm.Sheets.Where(x => x.IsEnabled).ToList();
             if (_diagramInitialLayoutPending)
             {
                 ArrangeDiagramCardsByGrid(visibleSheets);
@@ -547,7 +167,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             }
 
             DiagramCanvas.UpdateLayout();
-            foreach (var relation in ExcelImportSchemaNormalizer.BuildRelationProjection(_schema).Where(x => x.IsEnabled))
+            foreach (var relation in Vm.Relations.Where(x => x.IsEnabled))
             {
                 AddRelationVisual(relation);
             }
@@ -593,7 +213,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             {
                 Width = ResolveDiagramCardWidth(sheet),
                 MinHeight = DiagramCardMinHeight,
-                BorderBrush = ReferenceEquals(sheet, _currentSheet) ? Brushes.SteelBlue : Brushes.Silver,
+                BorderBrush = ReferenceEquals(sheet, Vm?.SelectedSheet) ? Brushes.SteelBlue : Brushes.Silver,
                 BorderThickness = new Thickness(1),
                 Background = Brushes.White,
                 Padding = new Thickness(8),
@@ -649,7 +269,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                     ToolTip = "Удалить связь с родителем",
                     VerticalAlignment = VerticalAlignment.Top
                 };
-                removeRelationButton.Click += (_, _) => ClearSheetRelation(sheet);
+                removeRelationButton.Click += (_, _) => Vm?.ClearSheetRelation(sheet);
                 Grid.SetColumn(removeRelationButton, 1);
                 relationPanel.Children.Add(removeRelationButton);
             }
@@ -866,7 +486,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
             if (dragMode == DiagramDragMode.CreateRelation && draggedColumn != null && targetColumn != null)
             {
-                TryApplyRelationColumns(
+                Vm?.ApplyRelationFromColumns(
                     targetColumn.Sheet,
                     draggedSheet.SourceName,
                     draggedColumn.HeaderName,
@@ -910,8 +530,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             e.Handled = true;
         }
 
-        // The diagram is only a visual/editor surface over the canonical relation state
-        // stored in sheet.Profile.Relation. The relation grid and import pipeline read the same data.
+        // Диаграмма — лишь визуальная/редакторская поверхность над канонической связью в sheet.Profile.Relation.
         private void AddRelationVisual(ExcelImportRelationSchema relation)
         {
             if (TryGetRelationColumnElements(relation, out var parentColumn, out var childColumn) == false)
@@ -939,7 +558,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
                 ArrowHead = arrowHead
             };
 
-            // Стрелки должны быть поверх карточек: связь должна явно выходить из колонки и приходить в колонку.
             DiagramCanvas.Children.Add(line);
             DiagramCanvas.Children.Add(arrowHead);
             _diagramRelationVisuals.Add(visual);
@@ -979,10 +597,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
         private bool IsRelationColumn(ExcelImportSheetSchema sheet, ExcelImportColumnProfile column)
         {
-            if (_schema == null)
+            if (Vm == null)
                 return false;
 
-            return ExcelImportSchemaNormalizer.BuildRelationProjection(_schema)
+            return Vm.Relations
                 .Where(x => x.IsEnabled)
                 .Any(relation =>
                     (string.Equals(relation.ParentSourceName, sheet.SourceName, StringComparison.OrdinalIgnoreCase)
@@ -993,7 +611,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 
         private static string GetDiagramColumnKey(string sourceName, string columnName)
         {
-            return $"{sourceName}\u001f{columnName}";
+            return $"{sourceName}{columnName}";
         }
 
         private Point GetColumnConnectionPoint(FrameworkElement sourceColumn, FrameworkElement targetColumn)
@@ -1211,300 +829,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
             }
 
             return false;
-        }
-
-        private bool TryApplyRelationParent(
-            ExcelImportSheetSchema childSheet,
-            string? parentSourceName,
-            bool selectChildSheet)
-        {
-            if (_schema == null)
-                return false;
-
-            if (ExcelImportProfileEditorHelper.TrySetRelationParent(
-                    _schema.Sheets,
-                    childSheet,
-                    parentSourceName,
-                    NoParentRelationOption,
-                    out var errorMessage) == false)
-            {
-                MessageBox.Show(errorMessage, "Связи", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet);
-            return true;
-        }
-
-        private bool TryApplyRelationColumns(
-            ExcelImportSheetSchema childSheet,
-            string parentSourceName,
-            string parentKeyColumnName,
-            string childKeyColumnName,
-            bool selectChildSheet)
-        {
-            if (_schema == null)
-                return false;
-
-            if (ExcelImportProfileEditorHelper.TrySetRelationColumns(
-                    _schema.Sheets,
-                    childSheet,
-                    parentSourceName,
-                    parentKeyColumnName,
-                    childKeyColumnName,
-                    out var errorMessage) == false)
-            {
-                MessageBox.Show(errorMessage, "Связи", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet);
-            return true;
-        }
-
-        private void ClearSheetRelation(ExcelImportSheetSchema childSheet)
-        {
-            ExcelImportProfileEditorHelper.ClearRelation(childSheet);
-            RefreshRelationUi(childSheet, bindEditor: true, selectChildSheet: false);
-        }
-
-        private void RefreshRelationUi(ExcelImportSheetSchema? childSheet, bool bindEditor, bool selectChildSheet)
-        {
-            RefreshRelationViews();
-
-            var selectionChanged = false;
-            if (childSheet != null && selectChildSheet && ReferenceEquals(LstSchemaSheets.SelectedItem, childSheet) == false)
-            {
-                LstSchemaSheets.SelectedItem = childSheet;
-                selectionChanged = true;
-            }
-
-            if (childSheet != null && bindEditor && selectionChanged == false)
-            {
-                BindRelationEditor(childSheet.SourceName);
-            }
-
-            if (selectionChanged == false)
-            {
-                RenderDiagram();
-            }
-
-            ClearPreviewResult();
-        }
-
-        private void BtnRefreshPreview_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (TryGetImportParameters(out var isNewRoot, out var rootName, out _) == false)
-                    return;
-
-                if (TrySyncSchemaFromImportParameters(isNewRoot, rootName) == false)
-                    return;
-
-                var profiles = _importPipeline.GetProfilesForExecution(_schema!);
-                var validationResult = _importPipeline.Validate(_schema!);
-                if (validationResult.HasErrors)
-                {
-                    MessageBox.Show(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (profiles.Count == 0)
-                {
-                    MessageBox.Show("Не выбраны источники Excel для предпросмотра импорта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var previewViewModel = _presentationPipeline.BuildRepositoryPreview(_schema!, isNewRoot ? null : rootName);
-                RepositoryExplorerPreview.DataContext = previewViewModel;
-                RepositoryExplorerPreviewConfigurator.ConfigureAsReadonly(RepositoryExplorerPreview);
-                TxtPreviewSummary.Text = _presentationPipeline.BuildPreviewSummary(previewViewModel);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось построить предпросмотр: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnImport_Click(object sender, RoutedEventArgs e)
-        {
-            if (_repository == null || _repositoryService == null)
-            {
-                MessageBox.Show("Не инициализирован контекст активного репозитория.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            try
-            {
-                if (TryGetImportParameters(out var isNewRoot, out var rootName, out var existingRoot) == false)
-                    return;
-
-                if (TrySyncSchemaFromImportParameters(isNewRoot, rootName) == false)
-                    return;
-
-                var profiles = _importPipeline.GetProfilesForExecution(_schema!);
-                if (profiles.Count == 0)
-                {
-                    MessageBox.Show("Не выбраны источники Excel для импорта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var validationResult = _importPipeline.Validate(_schema!);
-                if (validationResult.HasErrors)
-                {
-                    MessageBox.Show(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var progressWindow = _serviceProvider.GetRequiredService<ImportProgressWindow>();
-                progressWindow.Initialize("Импорт дерева", "Подготовка операции...");
-                progressWindow.Show();
-
-                var schema = _schema!;
-                var repository = _repository;
-                var repositoryService = _repositoryService;
-
-                CompletedImport = true;
-                Close();
-
-                IProgress<string> statusProgress = new Progress<string>(status => progressWindow.UpdateStatus(status));
-                _ = System.Threading.Tasks.Task.Run(() =>
-                {
-                    try
-                    {
-                        statusProgress.Report("Чтение Excel и формирование PHJSON...");
-                        statusProgress.Report("Импорт дерева в Чубушник...");
-                        _importPipeline.ImportToRepository(schema, repository, repositoryService, existingRoot);
-                        Dispatcher.Invoke(() =>
-                        {
-                            _refreshRepositoryView?.Invoke();
-                            progressWindow.Complete("Импорт завершен. Сохраните репозиторий для записи в хранилище.");
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        Dispatcher.Invoke(() => progressWindow.Fail($"Ошибка импорта: {ex.Message}"));
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось выполнить импорт: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnLoadTemplate_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Import Schema|*.phimportschema.json|JSON|*.json",
-                Title = "Выберите шаблон схемы импорта"
-            };
-
-            if (dialog.ShowDialog() != true)
-                return;
-
-            var loadedSchema = _templateStorage.Load(dialog.FileName);
-            var schemaFilePath = string.IsNullOrWhiteSpace(_selectedFilePath) ? loadedSchema.SourceFilePath : _selectedFilePath;
-            if (string.IsNullOrWhiteSpace(schemaFilePath) || File.Exists(schemaFilePath) == false)
-            {
-                MessageBox.Show("Для загруженного шаблона не найден Excel-файл. Сначала выберите книгу вручную.", "Шаблон импорта", MessageBoxButton.OK, MessageBoxImage.Warning);
-                _schema = loadedSchema;
-                ApplyRootControlsFromSchema();
-                BindSchema();
-                return;
-            }
-
-            _selectedFilePath = schemaFilePath;
-            TxtFilePath.Text = IOPath.GetFileName(schemaFilePath);
-            _workbookPreview = _previewService.GetWorkbookPreview(schemaFilePath);
-            _schema = loadedSchema;
-            _schema.SourceFilePath = schemaFilePath;
-            _schema.RootName = string.IsNullOrWhiteSpace(_schema.RootName) ? IOPath.GetFileNameWithoutExtension(schemaFilePath) : _schema.RootName;
-            ApplyRootControlsFromSchema();
-            BindSchema();
-        }
-
-        private void BtnSaveTemplate_Click(object sender, RoutedEventArgs e)
-        {
-            if (_schema == null)
-            {
-                MessageBox.Show("Сначала выберите Excel-файл и настройте схему импорта.", "Шаблон импорта", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            ExcelImportSchemaNormalizer.RefreshRelationProjection(_schema);
-            _schema.SourceFilePath = _selectedFilePath;
-            _schema.RootName = TxtRootName.Text.Trim();
-            _schema.CreateNewRoot = true;
-
-            var dialog = new SaveFileDialog
-            {
-                Filter = "Import Schema|*.phimportschema.json|JSON|*.json",
-                FileName = $"{_schema.Name}.phimportschema.json"
-            };
-
-            if (dialog.ShowDialog() != true)
-                return;
-
-            _templateStorage.Save(dialog.FileName, _schema);
-            MessageBox.Show("Шаблон схемы импорта сохранен.", "Шаблон импорта", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void ClearPreviewResult()
-        {
-            RepositoryExplorerPreview.DataContext = null;
-            TxtPreviewSummary.Text = "Предпросмотр результата еще не построен.";
-        }
-
-        private bool TryGetImportParameters(
-            out bool isNewRoot,
-            out string rootName,
-            out Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers.TreeRootModel? existingRoot)
-        {
-            isNewRoot = true;
-            rootName = string.Empty;
-            existingRoot = null;
-
-            if (string.IsNullOrWhiteSpace(_selectedFilePath))
-            {
-                MessageBox.Show("Сначала выберите файл Excel.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            rootName = TxtRootName.Text?.Trim() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(rootName))
-            {
-                MessageBox.Show("Укажите наименование корня.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
-        private void ChkCreateNewRoot_Checked(object sender, RoutedEventArgs e)
-        {
-            TxtRootName.IsEnabled = true;
-            CmbExistingRoots.IsEnabled = false;
-        }
-
-        private void ChkCreateNewRoot_Unchecked(object sender, RoutedEventArgs e)
-        {
-            ChkCreateNewRoot.IsChecked = true;
-            TxtRootName.IsEnabled = true;
-            CmbExistingRoots.IsEnabled = false;
-        }
-
-        private ExcelImportSheetSchema? GetSheet(string? sourceName)
-        {
-            return _schema?.Sheets.FirstOrDefault(x => string.Equals(x.SourceName, sourceName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private void BtnClose_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
     }
 }

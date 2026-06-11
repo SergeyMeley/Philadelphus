@@ -111,6 +111,11 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         }
 
         /// <summary>
+        /// Сигнал о полной перезагрузке схемы (новая книга/шаблон) — для перекомпоновки диаграммы.
+        /// </summary>
+        public event Action? SchemaReloaded;
+
+        /// <summary>
         /// Признак того, что импорт был запущен и окно следует закрыть.
         /// </summary>
         public bool CompletedImport { get; private set; }
@@ -545,6 +550,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             RefreshRelationViews();
             SelectedSheet = Sheets.FirstOrDefault();
             ClearPreviewResult();
+            SchemaReloaded?.Invoke();
         }
 
         private void BindCurrentSheet()
