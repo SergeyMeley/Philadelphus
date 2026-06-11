@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:repo="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
         mc:Ignorable="d"
         Title="Импорт дерева"
         Height="980"
@@ -211,8 +213,10 @@
                         <ScrollViewer x:Name="DiagramScrollViewer"
                                       Background="#FAFAFA"
                                       HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Auto"
-                                      PreviewMouseWheel="DiagramScrollViewer_PreviewMouseWheel">
+                                      VerticalScrollBarVisibility="Auto">
+                            <i:Interaction.Behaviors>
+                                <behaviors:DiagramBehavior/>
+                            </i:Interaction.Behaviors>
                             <Canvas x:Name="DiagramCanvas" Background="#FAFAFA" Width="1400" Height="900">
                                 <Canvas.LayoutTransform>
                                     <ScaleTransform x:Name="DiagramCanvasScaleTransform" ScaleX="1" ScaleY="1"/>

@@ -152,5 +152,6 @@ Combined-план: (1) `IExcelImportDesignerVMFactory` + DI ✅; (2) `DataContex
 - [x] Фаза 2 — XAML на VM (DataContext=VM, биндинги/команды); не-диаграммный code-behind удалён,
       диаграмма временно осталась в code-behind, читая состояние из VM
 - [x] Решение по диаграмме (раздел 6) — AttachedBehavior
-- [ ] Фаза 3 — диаграмма → DiagramBehavior, удалить остаток code-behind
+- [x] Фаза 3 — диаграмма → DiagramBehavior; code-behind окна сведён к ctor + 2 моста событий
+      контролов (CellEditEnding, вкл/выкл листа), не выражаемых биндингом
 - [x] Фаза 4 — открытие дизайнера через IWindowService; из ImportExportControlVM убрана ссылка на Views.Windows
