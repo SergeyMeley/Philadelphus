@@ -4,10 +4,9 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs.LaunchWindowTabContentVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
-using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls;
 using Serilog;
 using System.Reflection;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
@@ -179,7 +178,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return _commandFactory.Create(obj =>
                 {
-                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowStoragesTabControl);
+                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchStoragesTabVM);
                 });
             }
         }
@@ -190,8 +189,8 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             {
                 return _commandFactory.Create(obj =>
                 {
-                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchWindowSettingsTabControl);
-                    _applicationSettingsControlVM.SelectedApplicationSettingsTabItemVM = _applicationSettingsControlVM.ApplicationSettingsTabItemsVMs.Find(x => x.Content is ConnectionStringsTabControl);
+                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchSettingsTabVM);
+                    _applicationSettingsControlVM.SelectedApplicationSettingsTabItemVM = _applicationSettingsControlVM.ApplicationSettingsTabItemsVMs.FirstOrDefault();
                 });
             }
         }
@@ -242,31 +241,31 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             var tab1 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab1.Header = "Главная";
             tab1.IconKey = "imageRepository";
-            tab1.Content = new LaunchWindowMainTabControl() { DataContext = this };
+            tab1.Content = new LaunchMainTabVM();
 
             var tab2 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab2.Header = "Создать";
             tab2.IconKey = "imageAdd";
-            tab2.Content = new LaunchWindowCreatingTabControl() { DataContext = this };
+            tab2.Content = new LaunchCreatingTabVM();
 
             var tab3 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab3.Header = "Открыть";
             tab3.IconKey = "imageOpen";
-            tab3.Content = new LaunchWindowOpeningTabControl() { DataContext = this };
+            tab3.Content = new LaunchOpeningTabVM();
 
             var tab4 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab4.Header = "Хранилища";
             tab4.IconKey = "imageStorage";
-            tab4.Content = new LaunchWindowStoragesTabControl() { DataContext = this };
+            tab4.Content = new LaunchStoragesTabVM();
 
             var tab5 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab5.Header = "Настройки";
             tab5.IconKey = "imageSettings";
-            tab5.Content = new LaunchWindowSettingsTabControl() { DataContext = this };
+            tab5.Content = new LaunchSettingsTabVM();
 
             LaunchWindowTabItemsVMs = new List<LaunchWindowTabItemControlVM> { tab1, tab2, tab3, tab4, tab5 };
 
-            SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.FirstOrDefault(t => t.Content is LaunchWindowMainTabControl);
+            SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.FirstOrDefault(t => t.Content is LaunchMainTabVM);
         }
     }
 }
