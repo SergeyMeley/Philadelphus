@@ -11,7 +11,6 @@ using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.SettingsContainersVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -360,7 +359,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             var tab1 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
             tab1.Header = "Настроечные файлы";
-            tab1.Content = new ConfigFilesPathesTabControl() { DataContext = this };
+            tab1.Content = this;
 
             //var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
             //tab2.Header = "Строки подключения";
@@ -380,7 +379,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
 
             ApplicationSettingsTabItemsVMs = new List<ApplicationSettingsTabItemControlVM> { tab1 };
 
-            SelectedApplicationSettingsTabItemVM = ApplicationSettingsTabItemsVMs.FirstOrDefault(t => t.Content is ConfigFilesPathesTabControl);
+            SelectedApplicationSettingsTabItemVM = ApplicationSettingsTabItemsVMs.FirstOrDefault();
         }
     }
 }

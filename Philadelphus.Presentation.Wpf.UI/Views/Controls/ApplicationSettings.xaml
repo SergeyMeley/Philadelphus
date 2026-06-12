@@ -5,9 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
              xmlns:settings="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.Settings"
-             mc:Ignorable="d" 
+             xmlns:tabs="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls"
+             xmlns:vms="clr-namespace:Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <DataTemplate DataType="{x:Type vms:ApplicationSettingsControlVM}">
+            <tabs:ConfigFilesPathesTabControl/>
+        </DataTemplate>
         <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
         <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
