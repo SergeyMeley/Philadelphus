@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
@@ -111,13 +112,4 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels
             return null;
         }
     }
-
-    /// <summary>
-    /// Запрос открытия редактора формул из интерфейса репозитория.
-    /// </summary>
-    /// <param name="RepositoryExplorerControlVM">Обозреватель репозитория, задающий контекст формулы.</param>
-    /// <param name="FormulaText">Текущий текст формулы.</param>
-    public sealed record FormulaEditorOpenRequest(
-        RepositoryExplorerControlVM RepositoryExplorerControlVM,
-        string? FormulaText);
 }

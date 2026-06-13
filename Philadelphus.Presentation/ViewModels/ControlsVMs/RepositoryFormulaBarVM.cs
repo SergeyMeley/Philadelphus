@@ -25,7 +25,7 @@ using System.ComponentModel;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Управляет строкой формул и выбором ссылок на ячейки в обозревателе репозитория.

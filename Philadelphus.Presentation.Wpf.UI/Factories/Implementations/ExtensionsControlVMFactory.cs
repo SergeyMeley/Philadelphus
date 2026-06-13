@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Factories.Interfaces;
 namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
 {
     /// <summary>

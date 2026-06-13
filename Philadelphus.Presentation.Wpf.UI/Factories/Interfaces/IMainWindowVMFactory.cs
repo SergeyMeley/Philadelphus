@@ -1,4 +1,5 @@
-﻿using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+﻿using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.Factories.Interfaces
 {

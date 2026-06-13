@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// ViewModel для управления расширениями
@@ -114,7 +114,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             INotificationService notificationService,
             IExtensionManager extensionManager,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
-            ApplicationCommandsVM applicationCommandsVM,
+            IApplicationCommandsVM applicationCommandsVM,
             IRelayCommandFactory commandFactory,
             IAsyncRelayCommandFactory asyncCommandFactory)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)

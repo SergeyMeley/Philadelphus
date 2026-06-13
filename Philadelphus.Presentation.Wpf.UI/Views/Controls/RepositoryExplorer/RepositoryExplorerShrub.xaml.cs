@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using System.Windows;
 using System.Windows.Controls;
 

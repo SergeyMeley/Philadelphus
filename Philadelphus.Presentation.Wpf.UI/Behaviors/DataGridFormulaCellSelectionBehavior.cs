@@ -1,5 +1,5 @@
 using Philadelphus.Presentation.Models.Tables;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

@@ -1,5 +1,5 @@
-﻿using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+﻿using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.Factories.Interfaces
 {

@@ -20,12 +20,12 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
-using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
+using Philadelphus.Presentation.Factories.Interfaces;
 using Serilog;
 using IAsyncRelayCommand = Philadelphus.Presentation.Infrastructure.IAsyncRelayCommand;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления обозревателя репозитория Чубушника.
@@ -208,7 +208,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             FormulaRegistry formulaRegistry,
             IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             IExtensionsControlVMFactory extensionVMFactory,
-            ApplicationCommandsVM applicationCommandsVM,
+            IApplicationCommandsVM applicationCommandsVM,
             PhiladelphusRepositoryVM PhiladelphusRepositoryVM,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IFileDialogService fileDialogService,

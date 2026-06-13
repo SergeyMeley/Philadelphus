@@ -1,6 +1,6 @@
-﻿using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+﻿using Philadelphus.Presentation.ViewModels.ControlsVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories.Interfaces
+namespace Philadelphus.Presentation.Factories.Interfaces
 {
     /// <summary>
     /// Задает контракт для работы с расширения.

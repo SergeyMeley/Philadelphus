@@ -2,7 +2,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 
 namespace Philadelphus.Presentation.Wpf.UI.Services
 {
