@@ -4,7 +4,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Serilog;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services
+namespace Philadelphus.Presentation.Services
 {
     /// <summary>
     /// Sends Formula Engine diagnostics to the application notification service and Serilog.
