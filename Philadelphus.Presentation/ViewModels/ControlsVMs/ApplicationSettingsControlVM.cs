@@ -18,7 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления для настроек приложения.
@@ -111,7 +111,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
             ILogger logger,
             INotificationService notificationService,
             IConfigurationService configurationService,
-            ApplicationCommandsVM applicationCommandsVM,
+            IApplicationCommandsVM applicationCommandsVM,
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
             IRelayCommandFactory commandFactory,

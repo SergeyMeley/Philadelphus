@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
              xmlns:settings="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.Settings"
              xmlns:tabs="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls"
-             xmlns:vms="clr-namespace:Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs"
+             xmlns:vms="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs;assembly=Philadelphus.Presentation"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
