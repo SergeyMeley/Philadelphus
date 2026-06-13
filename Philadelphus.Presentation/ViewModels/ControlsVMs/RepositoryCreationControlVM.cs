@@ -12,7 +12,7 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using System.IO;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления для репозитория.
