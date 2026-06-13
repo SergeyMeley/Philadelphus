@@ -1,14 +1,14 @@
 ﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
+using Philadelphus.Presentation.ViewModels.ImportExport;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories.Interfaces
+namespace Philadelphus.Presentation.Factories.Interfaces
 {
     /// <summary>
     /// Задаёт контракт создания модели представления конструктора импорта из Excel.
     /// </summary>
-    internal interface IExcelImportDesignerVMFactory
+    public interface IExcelImportDesignerVMFactory
     {
         /// <summary>
         /// Создаёт модель представления конструктора импорта с рантайм-контекстом.

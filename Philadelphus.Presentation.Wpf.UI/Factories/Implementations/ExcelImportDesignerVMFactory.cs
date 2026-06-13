@@ -2,8 +2,8 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
+using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Presentation.ViewModels.ImportExport;
 
 namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
 {

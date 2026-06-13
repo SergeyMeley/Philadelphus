@@ -3,17 +3,15 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.ImportExport.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
-using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.Presentation.ViewModels.ImportExport;
-using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
+namespace Philadelphus.Presentation.ViewModels.ImportExport
 {
     /// <summary>
     /// Модель представления команд импорта, экспорта и конвертации.

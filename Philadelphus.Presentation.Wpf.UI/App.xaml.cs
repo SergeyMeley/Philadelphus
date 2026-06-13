@@ -43,7 +43,6 @@ using Philadelphus.Presentation.Wpf.UI.Services;
 using Philadelphus.Presentation.Wpf.UI.Services.Implementations;
 using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using Serilog;
 using Serilog.Events;
@@ -350,6 +349,7 @@ namespace Philadelphus.Presentation.Wpf.UI
 
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<IMessageDialogService, MessageDialogService>();
+            services.AddTransient<IImportProgressReporter, WpfImportProgressReporter>();
 
             services.AddTransient<ImportFromExcelVM>();
 

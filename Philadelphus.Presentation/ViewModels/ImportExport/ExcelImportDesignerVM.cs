@@ -1,19 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Philadelphus.Core.Domain.Entities.MainEntities;
+﻿using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Interfaces;
-using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Data;
-using System.IO;
 using System.Windows.Input;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
+namespace Philadelphus.Presentation.ViewModels.ImportExport
 {
     /// <summary>
     /// Модель представления конструктора импорта из Excel.
@@ -35,7 +31,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
         private readonly IDispatcherService _dispatcherService;
         private readonly IWindowService _windowService;
         private readonly IRelayCommandFactory _commandFactory;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IImportProgressReporter _importProgressReporter;
 
         // Рантайм-контекст, передаётся через Initialize после создания VM.
         private PhiladelphusRepositoryModel? _repository;
@@ -80,7 +76,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             IDispatcherService dispatcherService,
             IWindowService windowService,
             IRelayCommandFactory commandFactory,
-            IServiceProvider serviceProvider)
+            IImportProgressReporter importProgressReporter)
         {
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(templateStorage);
@@ -89,7 +85,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             ArgumentNullException.ThrowIfNull(dispatcherService);
             ArgumentNullException.ThrowIfNull(windowService);
             ArgumentNullException.ThrowIfNull(commandFactory);
-            ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(importProgressReporter);
 
             _session = session;
             _templateStorage = templateStorage;
@@ -98,7 +94,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
             _dispatcherService = dispatcherService;
             _windowService = windowService;
             _commandFactory = commandFactory;
-            _serviceProvider = serviceProvider;
+            _importProgressReporter = importProgressReporter;
 
             SelectFileCommand = _commandFactory.Create(_ => SelectFile());
             AddRelationCommand = _commandFactory.Create(_ => AddRelation());
@@ -845,9 +841,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                     return;
                 }
 
-                var progressWindow = _serviceProvider.GetRequiredService<ImportProgressWindow>();
-                progressWindow.Initialize("Импорт дерева", "Подготовка операции...");
-                progressWindow.Show();
+                _importProgressReporter.Begin("Импорт дерева", "Подготовка операции...");
 
                 var repository = _repository;
                 var repositoryService = _repositoryService;
@@ -856,23 +850,19 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
                 CompletedImport = true;
                 _windowService.Close(this);
 
-                IProgress<string> statusProgress = new Progress<string>(status => progressWindow.UpdateStatus(status));
                 _ = Task.Run(() =>
                 {
                     try
                     {
-                        statusProgress.Report("Чтение Excel и формирование PHJSON...");
-                        statusProgress.Report("Импорт дерева в Чубушник...");
+                        _importProgressReporter.Report("Чтение Excel и формирование PHJSON...");
+                        _importProgressReporter.Report("Импорт дерева в Чубушник...");
                         _session.ImportToRepository(repository, repositoryService, null);
-                        _dispatcherService.Invoke(() =>
-                        {
-                            refreshRepositoryView?.Invoke();
-                            progressWindow.Complete("Импорт завершен. Сохраните репозиторий для записи в хранилище.");
-                        });
+                        _dispatcherService.Invoke(() => refreshRepositoryView?.Invoke());
+                        _importProgressReporter.Complete("Импорт завершен. Сохраните репозиторий для записи в хранилище.");
                     }
                     catch (Exception ex)
                     {
-                        _dispatcherService.Invoke(() => progressWindow.Fail($"Ошибка импорта: {ex.Message}"));
+                        _importProgressReporter.Fail($"Ошибка импорта: {ex.Message}");
                     }
                 });
             }

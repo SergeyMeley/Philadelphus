@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xaml.Behaviors;
 using Philadelphus.Infrastructure.ImportExport.Excel;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
+using Philadelphus.Presentation.ViewModels.ImportExport;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;

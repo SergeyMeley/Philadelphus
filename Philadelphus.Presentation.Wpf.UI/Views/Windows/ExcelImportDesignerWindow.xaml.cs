@@ -1,4 +1,4 @@
-﻿using Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport;
+﻿using Philadelphus.Presentation.ViewModels.ImportExport;
 using System.Windows;
 using System.Windows.Controls;
 
