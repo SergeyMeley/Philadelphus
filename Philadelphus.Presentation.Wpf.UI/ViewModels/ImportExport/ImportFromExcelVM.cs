@@ -1,9 +1,9 @@
 ﻿using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ImportExport;
-using Philadelphus.Presentation.Wpf.UI.Services;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;

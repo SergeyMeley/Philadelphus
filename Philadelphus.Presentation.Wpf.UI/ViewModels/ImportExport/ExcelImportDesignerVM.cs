@@ -4,10 +4,10 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.Services;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Data;
 using System.IO;

@@ -10,7 +10,7 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services
+namespace Philadelphus.Presentation.Services
 {
     public class ExcelImportRepositoryPreviewBuilder
     {

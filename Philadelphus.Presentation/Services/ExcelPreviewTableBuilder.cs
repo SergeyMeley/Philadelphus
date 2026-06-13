@@ -2,11 +2,11 @@ using Philadelphus.Infrastructure.ImportExport.Excel;
 using System.Data;
 using System.Linq;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services
+namespace Philadelphus.Presentation.Services
 {
-    internal static class ExcelPreviewTableBuilder
+    public static class ExcelPreviewTableBuilder
     {
-        internal static DataTable Build(ExcelPreviewTable preview)
+        public static DataTable Build(ExcelPreviewTable preview)
         {
             var table = new DataTable();
 

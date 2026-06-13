@@ -4,7 +4,7 @@ using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services
+namespace Philadelphus.Presentation.Services
 {
     /// <summary>
     /// Координирует WPF-предпросмотр и импорт данных из Excel.

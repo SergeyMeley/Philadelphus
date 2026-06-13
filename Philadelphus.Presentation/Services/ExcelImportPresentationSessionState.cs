@@ -4,7 +4,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services
+namespace Philadelphus.Presentation.Services
 {
     /// <summary>
     /// Обертка Excel-сессии, добавляющая WPF-предпросмотр репозитория.
