@@ -14,11 +14,10 @@ using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
-using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Serilog;
 using System.Collections.ObjectModel;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления встроенного тестового интерфейса Formula Engine.
