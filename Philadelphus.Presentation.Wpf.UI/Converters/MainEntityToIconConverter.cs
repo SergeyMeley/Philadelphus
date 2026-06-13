@@ -1,6 +1,4 @@
-﻿using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
+﻿using Philadelphus.Presentation.Converters.Logic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
@@ -8,32 +6,15 @@ using System.Windows.Media.Imaging;
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
     /// <summary>
-    /// WPF-конвертер значений для MainEntityToIconConverter.
+    /// WPF-обёртка IValueConverter. Логика вынесена в <see cref="MainEntityToIconLogic" />.
     /// </summary>
     public class MainEntityToIconConverter : IValueConverter
     {
         private static readonly string BaseUri = "pack://application:,,,/Icons/";
 
-        /// <summary>
-        /// Преобразует значение для Convert.
-        /// </summary>
-        /// <param name="value">Значение.</param>
-        /// <param name="targetType">Целевой тип преобразования.</param>
-        /// <param name="parameter">Дополнительный параметр преобразования.</param>
-        /// <param name="culture">Культура преобразования.</param>
-        /// <returns>Преобразованное значение.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string iconPath = value switch
-            {
-                PhiladelphusRepositoryVM => "philadelphus_logo_64.png",
-                TreeRootVM => "root_64_1.png",
-                TreeNodeVM => "node_64_3.png",
-                TreeLeaveVM => "leave_64_3.png",
-                _ => "without_a_license/Flaticon_icon_empty.png"
-            };
-
-            var uri = new Uri(BaseUri + iconPath, UriKind.Absolute);
+            var uri = new Uri(BaseUri + MainEntityToIconLogic.ResolveIconFileName(value), UriKind.Absolute);
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.UriSource = uri;
@@ -42,15 +23,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
             return bitmap;
         }
 
-        /// <summary>
-        /// Преобразует значение для ConvertBack.
-        /// </summary>
-        /// <param name="value">Значение.</param>
-        /// <param name="targetType">Целевой тип преобразования.</param>
-        /// <param name="parameter">Дополнительный параметр преобразования.</param>
-        /// <param name="culture">Культура преобразования.</param>
-        /// <returns>Преобразованное значение.</returns>
-        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
     }
