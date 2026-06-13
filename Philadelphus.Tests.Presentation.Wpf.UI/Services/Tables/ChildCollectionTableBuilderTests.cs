@@ -6,7 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
-using Philadelphus.Presentation.Wpf.UI.Services.Tables;
+using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
 using System.Collections.ObjectModel;

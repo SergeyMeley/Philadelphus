@@ -8,7 +8,7 @@ using Philadelphus.Presentation.Models.Tables;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services.Tables
+namespace Philadelphus.Presentation.Services.Tables
 {
     /// <summary>
     /// Строит чистые модели Excel-подобной таблицы наследников выбранного элемента.
