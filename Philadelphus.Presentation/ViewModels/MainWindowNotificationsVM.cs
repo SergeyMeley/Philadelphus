@@ -2,7 +2,7 @@
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels
+namespace Philadelphus.Presentation.ViewModels
 {
     /// <summary>
     /// Модель представления для уведомления.

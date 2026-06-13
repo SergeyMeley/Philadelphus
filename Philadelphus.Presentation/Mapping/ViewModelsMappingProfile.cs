@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Philadelphus.Presentation.Wpf.UI.Mapping
+namespace Philadelphus.Presentation.Mapping
 {
     /// <summary>
     /// Профиль AutoMapper для сопоставления ViewModelsMappingProfile.

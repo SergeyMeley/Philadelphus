@@ -10,7 +10,7 @@ using Serilog;
 using System.Collections.ObjectModel;
 using System.IO;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
+namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
     /// <summary>
     /// Модель представления для коллекции репозиториев Чубушника.
@@ -155,7 +155,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
             return true;
         }
-        internal bool CheckPhiladelphusRepositoryVMAvailable(Guid uuid, out PhiladelphusRepositoryVM outPhiladelphusRepositoryVM)
+        public bool CheckPhiladelphusRepositoryVMAvailable(Guid uuid, out PhiladelphusRepositoryVM outPhiladelphusRepositoryVM)
         {
             ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 

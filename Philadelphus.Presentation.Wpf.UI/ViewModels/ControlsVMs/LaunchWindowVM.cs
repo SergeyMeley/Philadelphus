@@ -6,7 +6,7 @@ using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs.LaunchWindowTabContentVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using System.Reflection;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;

@@ -7,7 +7,7 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System.Collections.ObjectModel;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
+namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
     /// <summary>
     /// Модель представления для репозитория Чубушника.

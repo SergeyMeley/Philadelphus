@@ -9,7 +9,7 @@ using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
+namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
     /// <summary>
     /// Модель представления для заголовка репозитория Чубушника.

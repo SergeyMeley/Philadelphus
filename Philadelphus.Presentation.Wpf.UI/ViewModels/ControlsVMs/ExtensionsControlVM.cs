@@ -8,7 +8,7 @@ using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

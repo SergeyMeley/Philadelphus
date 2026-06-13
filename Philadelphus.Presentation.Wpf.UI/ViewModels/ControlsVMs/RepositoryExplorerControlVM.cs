@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
@@ -17,11 +16,11 @@ using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Services.Tables;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using IAsyncRelayCommand = Philadelphus.Presentation.Infrastructure.IAsyncRelayCommand;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;

@@ -4,8 +4,8 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 
 namespace Philadelphus.Presentation.Wpf.UI.ViewModels

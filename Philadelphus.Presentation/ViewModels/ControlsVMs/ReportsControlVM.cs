@@ -15,7 +15,7 @@ using Serilog;
 using System.Data;
 using System.Diagnostics;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления для отчета.

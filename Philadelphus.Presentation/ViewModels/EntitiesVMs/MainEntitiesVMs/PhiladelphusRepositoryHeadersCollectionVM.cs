@@ -10,7 +10,7 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Serilog;
 using System.Collections.ObjectModel;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs
+namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 {
     /// <summary>
     /// Модель представления для коллекции заголовков репозиториев Чубушника.
@@ -185,7 +185,7 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVM
             }
             return PhiladelphusRepositoryHeadersVMs;
         }
-        internal PhiladelphusRepositoryHeaderVM  AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(PhiladelphusRepositoryVM PhiladelphusRepositoryVM)
+        public PhiladelphusRepositoryHeaderVM  AddPhiladelphusRepositoryHeaderVMFromPhiladelphusRepositoryVM(PhiladelphusRepositoryVM PhiladelphusRepositoryVM)
         {
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryVM);
 

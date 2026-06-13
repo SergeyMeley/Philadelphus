@@ -1,11 +1,7 @@
-﻿using Philadelphus.Core.Domain.Entities.Enums;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+﻿using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
-using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 

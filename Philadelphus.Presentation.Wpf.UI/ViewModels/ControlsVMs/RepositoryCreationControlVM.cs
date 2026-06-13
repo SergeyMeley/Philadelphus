@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
@@ -9,7 +8,7 @@ using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
 using System.IO;
 
