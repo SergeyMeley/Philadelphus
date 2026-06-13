@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ImportExport
+namespace Philadelphus.Presentation.ViewModels.ImportExport
 {
     public class ImportFromExcelVM : ViewModelBase
     {
