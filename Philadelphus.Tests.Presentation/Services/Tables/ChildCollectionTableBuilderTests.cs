@@ -11,7 +11,7 @@ using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
 using System.Collections.ObjectModel;
 
-namespace Philadelphus.Tests.Presentation.Wpf.UI.Services.Tables
+namespace Philadelphus.Tests.Presentation.Services.Tables
 {
     public class ChildCollectionTableBuilderTests
     {
