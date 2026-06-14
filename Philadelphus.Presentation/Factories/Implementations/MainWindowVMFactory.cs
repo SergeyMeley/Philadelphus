@@ -1,22 +1,22 @@
 using Microsoft.Extensions.DependencyInjection;
-using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories
+namespace Philadelphus.Presentation.Factories.Implementations
 {
     /// <summary>
-    /// Фабрика создания расширения.
+    /// Фабрика создания главного окна.
     /// </summary>
-    internal class ExtensionsControlVMFactory : IExtensionsControlVMFactory
+    public class MainWindowVMFactory : IMainWindowVMFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="ExtensionsControlVMFactory" />.
+        /// Инициализирует новый экземпляр класса <see cref="MainWindowVMFactory" />.
         /// </summary>
         /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public ExtensionsControlVMFactory(IServiceProvider serviceProvider)
+        public MainWindowVMFactory(IServiceProvider serviceProvider)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
 
@@ -29,11 +29,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories
         /// <param name="repositoryExplorerControlVM">Параметр repositoryExplorerControlVM.</param>
         /// <returns>Созданный объект.</returns>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public ExtensionsControlVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)
+        public MainWindowVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
 
-            return ActivatorUtilities.CreateInstance<ExtensionsControlVM>(_serviceProvider, repositoryExplorerControlVM);
+            return ActivatorUtilities.CreateInstance<MainWindowVM>(_serviceProvider, repositoryExplorerControlVM);
         }
     }
 }

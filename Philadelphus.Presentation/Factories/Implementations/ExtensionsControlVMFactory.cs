@@ -1,23 +1,22 @@
 using Microsoft.Extensions.DependencyInjection;
-using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.Factories.Interfaces;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories
+namespace Philadelphus.Presentation.Factories.Implementations
 {
     /// <summary>
-    /// Фабрика создания репозитория.
+    /// Фабрика создания расширения.
     /// </summary>
-    internal class RepositoryExplorerControlVMFactory : IRepositoryExplorerControlVMFactory
+    public class ExtensionsControlVMFactory : IExtensionsControlVMFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="RepositoryExplorerControlVMFactory" />.
+        /// Инициализирует новый экземпляр класса <see cref="ExtensionsControlVMFactory" />.
         /// </summary>
         /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public RepositoryExplorerControlVMFactory(IServiceProvider serviceProvider)
+        public ExtensionsControlVMFactory(IServiceProvider serviceProvider)
         {
             ArgumentNullException.ThrowIfNull(serviceProvider);
 
@@ -27,14 +26,14 @@ namespace Philadelphus.Presentation.Wpf.UI.Factories
         /// <summary>
         /// Создает объект Create.
         /// </summary>
-        /// <param name="repositoryVM">Параметр repositoryVM.</param>
+        /// <param name="repositoryExplorerControlVM">Параметр repositoryExplorerControlVM.</param>
         /// <returns>Созданный объект.</returns>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public RepositoryExplorerControlVM Create(PhiladelphusRepositoryVM repositoryVM)
+        public ExtensionsControlVM Create(RepositoryExplorerControlVM repositoryExplorerControlVM)
         {
-            ArgumentNullException.ThrowIfNull(repositoryVM);
+            ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
 
-            return ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(_serviceProvider, repositoryVM);
+            return ActivatorUtilities.CreateInstance<ExtensionsControlVM>(_serviceProvider, repositoryExplorerControlVM);
         }
     }
 }

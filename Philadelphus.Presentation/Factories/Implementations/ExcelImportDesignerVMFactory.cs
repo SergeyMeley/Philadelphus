@@ -5,12 +5,12 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.ViewModels.ImportExport;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories
+namespace Philadelphus.Presentation.Factories.Implementations
 {
     /// <summary>
     /// Фабрика создания модели представления конструктора импорта из Excel.
     /// </summary>
-    internal class ExcelImportDesignerVMFactory : IExcelImportDesignerVMFactory
+    public class ExcelImportDesignerVMFactory : IExcelImportDesignerVMFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
