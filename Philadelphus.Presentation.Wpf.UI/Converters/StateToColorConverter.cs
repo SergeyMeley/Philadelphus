@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Presentation.Converters.Logic;
+using Philadelphus.Presentation.Wpf.UI.Helpers;
 using System.Globalization;
 using System.Windows.Data;
 

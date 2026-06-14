@@ -1,7 +1,7 @@
 ﻿using Philadelphus.Presentation.Enums;
 using System.Windows.Media;
 
-namespace Philadelphus.Presentation.Wpf.UI.Converters
+namespace Philadelphus.Presentation.Wpf.UI.Helpers
 {
     /// <summary>
     /// Материализация <see cref="ConverterColor" /> в WPF-кисть (кэшированные Brushes).
