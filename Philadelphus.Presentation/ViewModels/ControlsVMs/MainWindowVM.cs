@@ -11,14 +11,13 @@ using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.ImportExport;
-using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
 using Serilog;
 using System.Reflection;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 using IWindowService = Philadelphus.Presentation.Services.Interfaces.IWindowService;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления для главного окна.

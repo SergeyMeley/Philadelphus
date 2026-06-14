@@ -3,7 +3,7 @@ using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Wpf.UI.Views.Windows;
 using System.Windows;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
+namespace Philadelphus.Presentation.Wpf.UI.Services
 {
     /// <summary>
     /// WPF-реализация <see cref="IImportProgressReporter" /> поверх <see cref="ImportProgressWindow" />.

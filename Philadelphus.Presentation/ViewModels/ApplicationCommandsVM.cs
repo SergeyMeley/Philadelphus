@@ -1,13 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.Factories.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels
+namespace Philadelphus.Presentation.ViewModels
 {
     /// <summary>
     /// Модель представления для команд приложения.

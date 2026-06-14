@@ -5,7 +5,7 @@ using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.ViewModels.ImportExport;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
+namespace Philadelphus.Presentation.Wpf.UI.Factories
 {
     /// <summary>
     /// Фабрика создания модели представления конструктора импорта из Excel.

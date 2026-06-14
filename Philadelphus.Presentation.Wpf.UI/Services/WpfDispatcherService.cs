@@ -1,7 +1,7 @@
 using Philadelphus.Presentation.Services.Interfaces;
 using System.Windows;
 
-namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
+namespace Philadelphus.Presentation.Wpf.UI.Services
 {
     /// <summary>
     /// WPF-реализация IDispatcherService через Application.Current.Dispatcher.

@@ -12,7 +12,7 @@ using Serilog;
 using System.Reflection;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
+namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 {
     /// <summary>
     /// Модель представления для стартового окна.

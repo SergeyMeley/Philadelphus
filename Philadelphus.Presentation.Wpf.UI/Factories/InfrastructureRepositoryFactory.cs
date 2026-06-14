@@ -5,7 +5,7 @@ using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Serilog;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories.Implementations
+namespace Philadelphus.Presentation.Wpf.UI.Factories
 {
     /// <summary>
     /// Фабрика создания репозитория.

@@ -1,9 +1,8 @@
 using Philadelphus.Presentation.Services.Interfaces;
-using Philadelphus.Presentation.Wpf.UI.ViewModels;
 using System.Windows;
 
 using Philadelphus.Presentation.ViewModels;
-namespace Philadelphus.Presentation.Wpf.UI.Services.Implementations
+namespace Philadelphus.Presentation.Wpf.UI.Services
 {
     /// <summary>
     /// WPF-реализация IWindowService. Создаёт окна через реестр ViewModel→Window.

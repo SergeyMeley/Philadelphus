@@ -1,4 +1,4 @@
-﻿using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
+﻿using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using System.ComponentModel;
 using System.Windows;
 

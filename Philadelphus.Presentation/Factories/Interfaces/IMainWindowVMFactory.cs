@@ -1,12 +1,11 @@
 ﻿using Philadelphus.Presentation.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 
-namespace Philadelphus.Presentation.Wpf.UI.Factories.Interfaces
+namespace Philadelphus.Presentation.Factories.Interfaces
 {
     /// <summary>
     /// Задает контракт для работы с главного окна.
     /// </summary>
-    internal interface IMainWindowVMFactory
+    public interface IMainWindowVMFactory
     {
         /// <summary>
         /// Создает объект Create.

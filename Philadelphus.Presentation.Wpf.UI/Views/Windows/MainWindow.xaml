@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Windows"
-        xmlns:viewmodels="clr-namespace:Philadelphus.Presentation.Wpf.UI.ViewModels"
+        xmlns:viewmodels="clr-namespace:Philadelphus.Presentation.ViewModels;assembly=Philadelphus.Presentation"
         xmlns:i="Microsoft.Xaml.Behaviors;assembly=System.Windows.Interactivity"
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
         xmlns:re="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer"

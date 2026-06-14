@@ -6,10 +6,9 @@ using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
 using Serilog;
 
-namespace Philadelphus.Presentation.Wpf.UI.ViewModels
+namespace Philadelphus.Presentation.ViewModels
 {
     /// <summary>
     /// Модель представления для приложения.
