@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Enums;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
@@ -240,27 +241,27 @@ namespace Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs
         {
             var tab1 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab1.Header = "Главная";
-            tab1.IconKey = "imageRepository";
+            tab1.Icon = AppIcon.RepositoryLogo;
             tab1.Content = new LaunchMainTabVM();
 
             var tab2 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab2.Header = "Создать";
-            tab2.IconKey = "imageAdd";
+            tab2.Icon = AppIcon.Add;
             tab2.Content = new LaunchCreatingTabVM();
 
             var tab3 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab3.Header = "Открыть";
-            tab3.IconKey = "imageOpen";
+            tab3.Icon = AppIcon.Open;
             tab3.Content = new LaunchOpeningTabVM();
 
             var tab4 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab4.Header = "Хранилища";
-            tab4.IconKey = "imageStorage";
+            tab4.Icon = AppIcon.Storage;
             tab4.Content = new LaunchStoragesTabVM();
 
             var tab5 = _serviceProvider.GetRequiredService<LaunchWindowTabItemControlVM>();
             tab5.Header = "Настройки";
-            tab5.IconKey = "imageSettings";
+            tab5.Icon = AppIcon.Settings;
             tab5.Content = new LaunchSettingsTabVM();
 
             LaunchWindowTabItemsVMs = new List<LaunchWindowTabItemControlVM> { tab1, tab2, tab3, tab4, tab5 };

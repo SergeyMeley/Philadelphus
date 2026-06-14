@@ -4,7 +4,7 @@ using Philadelphus.Presentation.Enums;
 namespace Philadelphus.Presentation.Converters.Logic
 {
     /// <summary>
-    /// Чистая логика конвертера CriticalLevelToIconConverter (без привязки к UI-фреймворку).
+    /// Сопоставление уровня критичности уведомления с AppIcon (без привязки к UI-фреймворку).
     /// </summary>
     public static class CriticalLevelToIconLogic
     {

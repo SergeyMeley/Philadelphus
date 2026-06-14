@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Enums;
+using Philadelphus.Presentation.Services.Interfaces;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs
 {
@@ -16,9 +12,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs
     public class LaunchWindowTabItemControlVM : TabItemControlBaseVM
     {
         /// <summary>
-        /// Ключ иконки.
+        /// Иконка таба.
         /// </summary>
-        public string IconKey { get; set; }
+        public AppIcon Icon { get; set; }
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="LaunchWindowTabItemControlVM" />.

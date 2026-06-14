@@ -6,12 +6,12 @@ using System.Windows.Data;
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
     /// <summary>
-    /// WPF-обёртка IValueConverter. Логика — <see cref="MainEntityToIconLogic" />, материализация — <see cref="AppIconImageSource" />.
+    /// Единый конвертер иконок: значение → AppIcon (<see cref="IconResolver" />) → ImageSource (<see cref="AppIconImageSource" />).
     /// </summary>
-    public class MainEntityToIconConverter : IValueConverter
+    public class IconConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => AppIconImageSource.ToImageSource(MainEntityToIconLogic.ResolveIcon(value));
+            => AppIconImageSource.ToImageSource(IconResolver.Resolve(value));
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();

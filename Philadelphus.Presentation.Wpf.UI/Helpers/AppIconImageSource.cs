@@ -36,6 +36,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Helpers
                 AppIcon.TreeRoot => "root_64_1.png",
                 AppIcon.TreeNode => "node_64_3.png",
                 AppIcon.TreeLeaf => "leave_64_3.png",
+                AppIcon.Add => "without_a_license/Flaticon_icon_add.png",
+                AppIcon.Open => "open.png",
+                AppIcon.Storage => "storage.png",
+                AppIcon.Settings => "settings_64.png",
                 _ => "without_a_license/Flaticon_icon_empty.png"
             };
     }

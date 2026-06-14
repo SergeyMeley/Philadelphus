@@ -18,7 +18,6 @@
     </Window.Visibility>
     <Window.Resources>
         <converters:BooleanToColorConverter x:Key="booleanToColorConverter"/>
-        <converters:KeyToImageConverter x:Key="keyToImageConverter"/>
 
         <DataTemplate DataType="{x:Type vms:LaunchMainTabVM}">
             <tabs:LaunchWindowMainTabControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
@@ -147,7 +146,7 @@
                                     Height="75"
                                     Width="90"
                                     Margin="5,5">
-                            <Image Source="{Binding IconKey, Converter={StaticResource keyToImageConverter}}"
+                            <Image Source="{Binding Icon, Converter={StaticResource iconConverter}}"
                                    Width="45"
                                    Height="45"
                                    Margin="0,5,0,0"

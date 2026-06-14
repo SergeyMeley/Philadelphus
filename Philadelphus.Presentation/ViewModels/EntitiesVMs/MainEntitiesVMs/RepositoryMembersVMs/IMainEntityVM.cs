@@ -8,9 +8,16 @@ using System.Collections.ObjectModel;
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs
 {
     /// <summary>
+    /// Маркерный интерфейс модели представления сущности рабочего дерева (без параметра модели).
+    /// </summary>
+    public interface IMainEntityVM
+    {
+    }
+
+    /// <summary>
     /// Задает контракт для работы с IMainEntityVM.
     /// </summary>
-    public interface IMainEntityVM<out T> where T : IMainEntityModel
+    public interface IMainEntityVM<out T> : IMainEntityVM where T : IMainEntityModel
     {
         /// <summary>
         /// Модель.

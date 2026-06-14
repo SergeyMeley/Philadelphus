@@ -6,7 +6,7 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repositor
 namespace Philadelphus.Presentation.Converters.Logic
 {
     /// <summary>
-    /// Чистая логика конвертера MainEntityToIconConverter (без привязки к UI-фреймворку).
+    /// Сопоставление типа сущности рабочего дерева с AppIcon (без привязки к UI-фреймворку).
     /// </summary>
     public static class MainEntityToIconLogic
     {

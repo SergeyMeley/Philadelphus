@@ -15,6 +15,10 @@
         RepositoryLogo,
         TreeRoot,
         TreeNode,
-        TreeLeaf
+        TreeLeaf,
+        Add,
+        Open,
+        Storage,
+        Settings
     }
 }
