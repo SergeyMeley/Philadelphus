@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -42,7 +42,7 @@
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="1"></TextBlock>
         <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" Margin="1"></TextBlock>
-        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}" IsReadOnly="True" Margin="1"></TextBox>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay, Converter={StaticResource booleanToColorConverter}}" IsReadOnly="True" Margin="1"></TextBox>
         <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="100" Text="Хранилище:" FontWeight="Bold" Margin="1"></TextBlock>
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Наименование" Margin="1"></TextBlock>
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding OwnDataStorageName, Mode=OneWay}" IsReadOnly="True" Margin="1"></TextBox>

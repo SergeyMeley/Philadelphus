@@ -1,24 +1,25 @@
-﻿namespace Philadelphus.Presentation.Converters.Logic
+﻿using Philadelphus.Presentation.Enums;
+
+namespace Philadelphus.Presentation.Converters.Logic
 {
     /// <summary>
-    /// Чистая логика конвертеров CanExecuteToColorConverter и IsAvailableToColorConverter
-    /// (без привязки к UI-фреймворку).
+    /// Чистая логика конвертера BooleanToColorConverter (bool/null → цвет, без привязки к UI-фреймворку).
     /// </summary>
     public static class BooleanToColorLogic
     {
         /// <summary>
-        /// Возвращает имя цвета: "Green" для true, "Red" для false, "Black" для null,
-        /// "DarkRed" — для значения, не являющегося bool.
+        /// Возвращает цвет: Green для true, Red для false, Black для null,
+        /// DarkRed — для значения, не являющегося bool.
         /// </summary>
-        public static string ResolveColorName(object? value)
+        public static ConverterColor ResolveColor(object? value)
         {
             if (value is null)
-                return "Black";
+                return ConverterColor.Black;
 
             if (value is bool flag)
-                return flag ? "Green" : "Red";
+                return flag ? ConverterColor.Green : ConverterColor.Red;
 
-            return "DarkRed";
+            return ConverterColor.DarkRed;
         }
     }
 }

@@ -7,7 +7,7 @@
         <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
         <converters:MainEntityToIconConverter x:Key="mainEntityToIconConverter" />
         <converters:SelectedIndexConverter x:Key="selectedIndexConverter" />
-        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter" />
         <converters:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
         <converters:StateToColorConverter x:Key="stateToColorConverter" />
         

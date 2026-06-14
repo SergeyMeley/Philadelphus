@@ -1,19 +1,17 @@
 ﻿using Philadelphus.Presentation.Converters.Logic;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Media;
 
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
     /// <summary>
-    /// WPF-обёртка IValueConverter. Логика вынесена в <see cref="BooleanToColorLogic" />.
+    /// WPF-обёртка IValueConverter для bool/null → цвет (CanExecute и IsAvailable — идентичная семантика).
+    /// Логика вынесена в <see cref="BooleanToColorLogic" />, материализация — в <see cref="ConverterColorBrushes" />.
     /// </summary>
-    public class IsAvailableToColorConverter : IValueConverter
+    public class BooleanToColorConverter : IValueConverter
     {
-        private static readonly BrushConverter BrushConverter = new();
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => BrushConverter.ConvertFromString(BooleanToColorLogic.ResolveColorName(value))!;
+            => ConverterColorBrushes.ToBrush(BooleanToColorLogic.ResolveColor(value));
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();

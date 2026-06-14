@@ -17,7 +17,7 @@
         <Binding Path="StartWindowVisibility"/>
     </Window.Visibility>
     <Window.Resources>
-        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter"/>
         <converters:KeyToImageConverter x:Key="keyToImageConverter"/>
 
         <DataTemplate DataType="{x:Type vms:LaunchMainTabVM}">

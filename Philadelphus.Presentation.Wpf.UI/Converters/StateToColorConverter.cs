@@ -1,7 +1,6 @@
 ﻿using Philadelphus.Presentation.Converters.Logic;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Media;
 
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
@@ -10,10 +9,8 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
     /// </summary>
     public class StateToColorConverter : IValueConverter
     {
-        private static readonly BrushConverter BrushConverter = new();
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => BrushConverter.ConvertFromString(StateToColorLogic.ResolveColorName(value))!;
+            => ConverterColorBrushes.ToBrush(StateToColorLogic.ResolveColor(value));
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
