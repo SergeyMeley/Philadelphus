@@ -7,9 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UserSecretsId>9d9f6ea9-cd34-412e-b854-8fc4186804fc</UserSecretsId>
-    <ApplicationIcon>Icons\philadelphus_logo_64.ico</ApplicationIcon>
+    <ApplicationIcon>..\Assets\Icons\philadelphus_logo_64.ico</ApplicationIcon>
     <AssemblyVersion>1.0.8.0</AssemblyVersion>
-	  
+
 	<SignManifests>true</SignManifests>
 
 	  <FileVersion>1.0.8.0</FileVersion>
@@ -32,110 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Icons\alarm_64.png" />
-    <None Remove="Icons\approval_64.png" />
-    <None Remove="Icons\broom_64.png" />
-    <None Remove="Icons\check_64.png" />
-    <None Remove="Icons\edit_64.png" />
-    <None Remove="Icons\error_64_1.png" />
-    <None Remove="Icons\error_64_2.png" />
-    <None Remove="Icons\error_64_3.png" />
-    <None Remove="Icons\error_64_4.png" />
-    <None Remove="Icons\error_64_5.png" />
-    <None Remove="Icons\getwork_64.png" />
-    <None Remove="Icons\hard_delete_64_1.png" />
-    <None Remove="Icons\hard_delete_64_2.png" />
-    <None Remove="Icons\info_64_1.png" />
-    <None Remove="Icons\info_64_2.png" />
-    <None Remove="Icons\info_64_3.png" />
-    <None Remove="Icons\leave_64_1.png" />
-    <None Remove="Icons\leave_64_2.png" />
-    <None Remove="Icons\leave_64_3.png" />
-    <None Remove="Icons\leave_info_64.png" />
-    <None Remove="Icons\list_64.png" />
-    <None Remove="Icons\new-tab_64.png" />
-    <None Remove="Icons\node_64_1.png" />
-    <None Remove="Icons\node_64_2.png" />
-    <None Remove="Icons\node_64_3.png" />
-    <None Remove="Icons\ok_64_1.png" />
-    <None Remove="Icons\ok_64_2.png" />
-    <None Remove="Icons\open.png" />
-    <None Remove="Icons\philadelphus_logo_64.png" />
-    <None Remove="Icons\root_64_1.png" />
-    <None Remove="Icons\root_64_2.png" />
-    <None Remove="Icons\search_64_1.png" />
-    <None Remove="Icons\settings_64.png" />
-    <None Remove="Icons\soft_delete_64_1.png" />
-    <None Remove="Icons\soft_delete_64_2.png" />
-    <None Remove="Icons\storage.png" />
-    <None Remove="Icons\top_level_64.png" />
-    <None Remove="Icons\tree_64_1.png" />
-    <None Remove="Icons\tree_64_2.png" />
-    <None Remove="Icons\tree_64_3.png" />
-    <None Remove="Icons\tree_64_4.png" />
-    <None Remove="Icons\tree_64_5.png" />
-    <None Remove="Icons\tree_64_6.png" />
-    <None Remove="Icons\tree_64_7.png" />
-    <None Remove="Icons\tree_64_8.png" />
-    <None Remove="Icons\warning_64.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_add.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_back.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_copy.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_cut.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_delete.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_delete2.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_duplicate.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_empty.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_forward.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_freeze.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_leave.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_link.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_modify.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_move.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_node.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_node.svg" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_node2.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_paste.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_protect.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_remove.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_return.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_root.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_root.svg" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_root2.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_save.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_select.png" />
-    <None Remove="Icons\without_a_license\Flaticon_icon_up.png" />
-    <None Remove="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
-    <None Remove="Icons\without_a_license\icons8_icon_repository.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Icons\alarm_64.png" />
-    <Resource Include="Icons\broom_64.png" />
-    <Resource Include="Icons\error_64_1.png" />
-    <Resource Include="Icons\error_64_2.png" />
-    <Resource Include="Icons\error_64_3.png" />
-    <Resource Include="Icons\error_64_4.png" />
-    <Resource Include="Icons\error_64_5.png" />
-    <Resource Include="Icons\hard_delete_64_1.png" />
-    <Resource Include="Icons\hard_delete_64_2.png" />
-    <Resource Include="Icons\info_64_1.png" />
-    <Resource Include="Icons\info_64_2.png" />
-    <Resource Include="Icons\info_64_3.png" />
-    <Resource Include="Icons\leave_64_1.png" />
-    <Resource Include="Icons\leave_64_2.png" />
-    <Resource Include="Icons\leave_64_3.png" />
-    <Resource Include="Icons\leave_info_64.png" />
-    <Resource Include="Icons\list_64.png" />
-    <Resource Include="Icons\node_64_1.png" />
-    <Resource Include="Icons\node_64_2.png" />
-    <Resource Include="Icons\node_64_3.png" />
-    <Resource Include="Icons\ok_64_1.png" />
-    <Resource Include="Icons\ok_64_2.png" />
-    <Resource Include="Icons\philadelphus_logo_64.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
@@ -153,6 +49,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Presentation\Philadelphus.Presentation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Иконки из нейтрального проекта Assets: линкуются как Content и копируются рядом с exe (site-of-origin), не встраиваются в сборку. -->
+    <Content Include="..\Assets\Icons\**\*.*" Link="Icons\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -178,64 +79,6 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Icons\approval_64.png" />
-    <Resource Include="Icons\check_64.png" />
-    <Resource Include="Icons\edit_64.png" />
-    <Resource Include="Icons\getwork_64.png" />
-    <Resource Include="Icons\new-tab_64.png" />
-    <Resource Include="Icons\open.png" />
-    <Resource Include="Icons\philadelphus_logo_64.png" />
-    <Resource Include="Icons\root_64_1.png" />
-    <Resource Include="Icons\root_64_2.png" />
-    <Resource Include="Icons\search_64_1.png" />
-    <Resource Include="Icons\settings_64.png" />
-    <Resource Include="Icons\soft_delete_64_1.png" />
-    <Resource Include="Icons\soft_delete_64_2.png" />
-    <Resource Include="Icons\storage.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Icons\top_level_64.png" />
-    <Resource Include="Icons\tree_64_1.png" />
-    <Resource Include="Icons\tree_64_2.png" />
-    <Resource Include="Icons\tree_64_3.png" />
-    <Resource Include="Icons\tree_64_4.png" />
-    <Resource Include="Icons\tree_64_5.png" />
-    <Resource Include="Icons\tree_64_6.png" />
-    <Resource Include="Icons\tree_64_7.png" />
-    <Resource Include="Icons\tree_64_8.png" />
-    <Resource Include="Icons\warning_64.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_add.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_back.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_copy.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_cut.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_delete.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_delete2.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_duplicate.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_empty.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_forward.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_freeze.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_leave.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_link.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_modify.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_move.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_node.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_node.svg" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_node2.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_paste.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_protect.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_remove.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_return.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_root.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_root.svg" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_root2.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_save.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_select.png" />
-    <Resource Include="Icons\without_a_license\Flaticon_icon_up.png" />
-    <Resource Include="Icons\without_a_license\icons8-квадратный-корень-2-64.png" />
-    <Resource Include="Icons\without_a_license\icons8_icon_repository.png" />
   </ItemGroup>
 
 </Project>

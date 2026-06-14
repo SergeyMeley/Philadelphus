@@ -10,7 +10,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
     /// </summary>
     public class MainEntityToIconConverter : IValueConverter
     {
-        private static readonly string BaseUri = "pack://application:,,,/Icons/";
+        private static readonly string BaseUri = "pack://siteoforigin:,,,/Icons/";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
