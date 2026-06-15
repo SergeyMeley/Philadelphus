@@ -24,7 +24,6 @@ using Philadelphus.Infrastructure.ImportExport.Phjson;
 using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Presentation.Factories.Implementations;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services;
@@ -216,8 +215,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<IReportService, ReportService>();
                     services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();
                     RegisterFormulaEngine(services);
-                    // Слой Presentation
-                    services.AddSingleton<IConfigurationService, ConfigurationService>();
+
+                    // Слой Presentation (платформенные реализации)
                     services.AddSingleton<IDialogService, WpfDialogService>();
                     services.AddSingleton<IDispatcherService, WpfDispatcherService>();
                     services.AddSingleton<WpfWindowService>();
@@ -227,31 +226,8 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddSingleton<IRelayCommandFactory, RelayCommandFactory>();
                     services.AddSingleton<IAsyncRelayCommandFactory, AsyncRelayCommandFactory>();
 
-                    // Регистрация ViewModel
-                    // Общие ViewModel
-                    services.AddSingleton<ApplicationVM>();
-                    services.AddSingleton<ApplicationCommandsVM>();
-                    services.AddSingleton<IApplicationCommandsVM>(sp => sp.GetRequiredService<ApplicationCommandsVM>());
-                    services.AddTransient<MainWindowNotificationsVM>();
-                    services.AddTransient<MessageLogControlVM>();
-                    services.AddTransient<PopUpNotificationsControlVM>();
-                    services.AddTransient<ModalWindowNotificationsControlVM>();
-                    // ViewModel окон
-                    services.AddTransient<LaunchWindowVM>();
-                    // ViewModel контролов
-                    services.AddSingleton<ApplicationSettingsControlVM>();
-                    services.AddTransient<ApplicationSettingsTabItemControlVM>();
-                    services.AddTransient<LaunchWindowTabItemControlVM>();
-                    services.AddTransient<StorageCreationControlVM>();
-                    services.AddTransient<RepositoryCreationControlVM>();
-                    services.AddTransient<ReportsControlVM>();
-                    services.AddTransient<FormulaTestControlVM>();
-                    //services.AddTransient<MainWindowVM>();                    // Заменено на фабрику
-                    //services.AddTransient<RepositoryExplorerControlVM>();     // Заменено на фабрику
-                    // ViewModel сущностей
-                    services.AddSingleton<DataStoragesCollectionVM>();
-                    services.AddSingleton<PhiladelphusRepositoryCollectionVM>();        // Не менять. Приводит к ошибкам обновления интерфейса
-                    services.AddSingleton<PhiladelphusRepositoryHeadersCollectionVM>(); // Не менять. Приводит к ошибкам обновления интерфейса
+                    // Презентация: ViewModel, фабрики VM, Excel-импорт (shared)
+                    services.AddPhiladelphusPresentation();
 
                     // Регистрация View
                     services.AddTransient<MainWindow>();
@@ -261,11 +237,7 @@ namespace Philadelphus.Presentation.Wpf.UI
                     services.AddTransient<DetailsWindow>();
                     services.AddSingleton<SplashWindow>();
 
-                    // Регистрация фабрик
-                    services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
-                    services.AddTransient<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
-                    services.AddTransient<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
-                    services.AddTransient<IExcelImportDesignerVMFactory, ExcelImportDesignerVMFactory>();
+                    // Фабрика инфраструктуры (зависит от конкретной Persistence — остаётся в точке композиции)
                     services.AddTransient<IInfrastructureRepositoryFactory, InfrastructureRepositoryFactory>();
 
                     // Импорт из Excel
@@ -340,15 +312,9 @@ namespace Philadelphus.Presentation.Wpf.UI
 
         private static void RegisterExcelImportPresentation(IServiceCollection services)
         {
-            services.AddTransient<ExcelImportPresentationPipeline>();
-            services.AddTransient<ExcelImportRepositoryPreviewBuilder>();
-            services.AddTransient<ExcelImportPresentationSessionState>();
-
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<IMessageDialogService, MessageDialogService>();
             services.AddTransient<IImportProgressReporter, WpfImportProgressReporter>();
-
-            services.AddTransient<ImportFromExcelVM>();
 
             services.AddTransient<ImportFromExcelWindow>();
             services.AddTransient<ExcelImportDesignerWindow>();
