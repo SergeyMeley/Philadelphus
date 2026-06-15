@@ -8,7 +8,9 @@ using Serilog;
 namespace Philadelphus.Presentation.Wpf.UI.Factories
 {
     /// <summary>
-    /// Фабрика создания репозитория.
+    /// Фабрика создания инфраструктурного репозитория.
+    /// Зависит от конкретных Persistence.EF.PostgreSQL/SQLite, поэтому живёт в точке композиции
+    /// (как и WPF-версия), а не в shared-слое.
     /// </summary>
     public class InfrastructureRepositoryFactory : IInfrastructureRepositoryFactory
     {

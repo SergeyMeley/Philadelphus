@@ -25,7 +25,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
             _serviceProvider = serviceProvider;
         }
 
-        /// <inheritdoc />
         public void Begin(string header, string status)
             => OnUi(() =>
             {
@@ -34,13 +33,10 @@ namespace Philadelphus.Presentation.Wpf.UI.Services
                 _window.Show();
             });
 
-        /// <inheritdoc />
         public void Report(string status) => OnUi(() => _window?.UpdateStatus(status));
 
-        /// <inheritdoc />
         public void Complete(string status) => OnUi(() => _window?.Complete(status));
 
-        /// <inheritdoc />
         public void Fail(string status) => OnUi(() => _window?.Fail(status));
 
         private static void OnUi(Action action)

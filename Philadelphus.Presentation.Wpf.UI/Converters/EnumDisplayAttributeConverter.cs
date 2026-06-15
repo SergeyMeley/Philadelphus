@@ -13,8 +13,6 @@ namespace Philadelphus.Presentation.Wpf.UI.Converters
             => EnumDisplayLogic.Convert(value, parameter);
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }

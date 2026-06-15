@@ -312,7 +312,7 @@ namespace Philadelphus.Presentation.Wpf.UI
 
         private static void RegisterExcelImportPresentation(IServiceCollection services)
         {
-            services.AddSingleton<IFileDialogService, FileDialogService>();
+            services.AddSingleton<IFileDialogService, WpfFileDialogService>();
             services.AddSingleton<IMessageDialogService, MessageDialogService>();
             services.AddTransient<IImportProgressReporter, WpfImportProgressReporter>();
 
