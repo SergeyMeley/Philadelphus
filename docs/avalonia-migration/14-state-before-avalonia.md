@@ -16,16 +16,18 @@
 - **Converters/Logic** — чистая логика конвертеров: `BooleanToColorLogic`, `StateToColorLogic`, `CriticalLevelToIconLogic`, `MainEntityToIconLogic`, `IconResolver`, `EnumDisplayLogic`, `LastLaunchToDaysAgoLogic`, `UtcToLocalTimeLogic`, `SelectedIndexLogic`.
 - **Enums** — `ConverterColor` (палитра цветов конвертеров), `AppIcon` (идентичность динамической иконки).
 - **Services** — `FormulaDiagnosticsReporter`, интерфейс `IImportProgressReporter`, Excel-цепочка импорта, `ConfigurationService` и пр.
+- **DependencyInjection** — `AddPhiladelphusPresentation(IServiceCollection)` (namespace `Microsoft.Extensions.DependencyInjection`): регистрация всех shared VM, 4 фабрик VM, `IConfigurationService`, Excel-презентации. Avalonia вызывает её + добавляет свои платформенные регистрации.
+- **Behaviors/Logic** — `FormulaOperandFinder` (чистый разбор операнда/ссылки/литерала формулы по позиции каретки; вынесен из `FormulaBarTextBoxBehavior`).
 - Негенерик-маркер `IMainEntityVM` (для диспетчеризации сущностей в `IconResolver`).
 
 ## Что осталось в WPF (платформенный слой — переписывается под Avalonia)
 
 - **Views** — XAML + code-behind (в основном тонкий glue; исключение — `SplashWindow.xaml.cs` ~339 строк).
-- **App.xaml.cs** (~476) — bootstrap: Host, DI-регистрация, Serilog, AutoMapper-скан, плагины.
+- **App.xaml.cs** — bootstrap: Host, Serilog, AutoMapper-скан, плагины. Shared-регистрации вынесены в `services.AddPhiladelphusPresentation()`; в WPF остались только платформенные (WPF-сервисы, командные фабрики, окна, `InfrastructureRepositoryFactory`, диалоги/прогресс импорта, реестр `ViewModel→Window`).
 - **Behaviors** (9) — WPF attached behaviors (`DataGrid*`, `Formula*`, `DiagramBehavior`).
 - **Converters** — тонкие `IValueConverter`-обёртки поверх shared-логики.
 - **Helpers** — `AppIconImageSource` (`AppIcon → ImageSource`, site-of-origin), `ConverterColorBrushes` (`ConverterColor → Brush`).
-- **Services (WPF)** — `FileDialogService`, `WpfDialogService`, `WpfWindowService`, `WpfDispatcherService`, `WpfImportProgressReporter`; `RepositoryExplorerPreviewConfigurator` (мёртвый код — обход визуального дерева).
+- **Services (WPF)** — `FileDialogService`, `WpfDialogService`, `WpfWindowService`, `WpfDispatcherService`, `WpfImportProgressReporter`.
 - **`InfrastructureRepositoryFactory`** — зависит от конкретных `Infrastructure.Persistence.EF.PostgreSQL/SQLite`, поэтому остался в точке композиции (в shared нельзя — нарушило бы слои).
 - **Infrastructure** — WPF-копии `RelayCommand`/`AsyncRelayCommand` (через `CommandManager.RequerySuggested`); в shared есть свои платформо-нейтральные версии.
 
@@ -35,15 +37,20 @@
 
 ## Тесты
 
-`Philadelphus.Tests.Presentation` (net10.0, xUnit + FluentAssertions): тесты shared-логики конвертеров + `IconResolver` + `ChildCollectionTableBuilder`. Пустой `Philadelphus.Tests.Presentation.Wpf.UI` удалён; `InternalsVisibleTo` в `Core.Domain.csproj` переключён на `Philadelphus.Tests.Presentation`.
+`Philadelphus.Tests.Presentation` (net10.0, xUnit + FluentAssertions): тесты shared-логики конвертеров + `IconResolver` + `FormulaOperandFinder` + `ChildCollectionTableBuilder`. Пустой `Philadelphus.Tests.Presentation.Wpf.UI` удалён; `InternalsVisibleTo` в `Core.Domain.csproj` переключён на `Philadelphus.Tests.Presentation`.
 
-## Открытый тех-долг (можно делать до/во время Avalonia)
+## Тех-долг
 
-1. **Behaviors** — вынести чистую вычислительную логику крупных behaviors (`DiagramBehavior`, `FormulaBarTextBoxBehavior`, `DataGridColumnsBehavior`, `DataGridFormulaReferenceHighlightBehavior`, `DataGridAutoScrollBehavior`) в shared. В Avalonia behaviors переписываются — логику переиспользовать.
-2. **`App.xaml.cs`** — вынести регистрацию shared-сервисов/VM/фабрик в shared-extension `AddPhiladelphusPresentation(IServiceCollection)`; платформенные (`WpfWindowService`, окна, `ImageSource`-реестр) оставить в каждом приложении. Снимет дублирование bootstrap между WPF и Avalonia.
-3. **`appsettings.json`** — конфиг приложения, не презентационная логика. Решить при bootstrap: общий `appsettings.base.json` + per-app оверрайды или per-app полностью.
-4. **`RepositoryExplorerPreviewConfigurator`** — мёртвый код (метод `ConfigureAsReadonly` без вызывающих). Удалить либо оставить как заготовку (решение отложено).
-5. Naming `Reporter`/`Configurator` — оставлено как есть (решение пользователя: это валидные ролевые суффиксы).
+Закрыто в этой сессии:
+- **`App.xaml.cs`** → регистрация shared вынесена в `AddPhiladelphusPresentation()`; в WPF остались только платформенные регистрации.
+- **Behaviors** → у `FormulaBarTextBoxBehavior` логика разбора формулы вынесена в `FormulaOperandFinder` (+ тесты). Остальные behaviors — тонкие WPF-адаптеры (логика уже в shared-VM, напр. `IFormulaEditorIntelliSenseVM`) или DataGrid-glue (спеки колонок уже в `ChildCollectionTableBuilder`); выносить нечего.
+- **`RepositoryExplorerPreviewConfigurator`** → удалён (мёртвый код).
+- **`appsettings.json`** → решение: остаётся per-app (в точке композиции); общий `appsettings.base.json` вводить при Avalonia, если понадобится. В shared-библиотеку не кладётся.
+- **Naming** `Reporter`/`Configurator` → оставлено (валидные ролевые суффиксы).
+
+Остаток (по желанию, удобнее при Avalonia):
+- **`DiagramBehavior`** — немного математики раскладки переплетено с WPF `Canvas`/`Point`/`Rect`; вынос требует платформо-нейтральной геометрии, выгода низкая (диаграмма переписывается под Avalonia).
+- **`SplashWindow.xaml.cs`** (~339) — оркестрация запуска; в основном app-specific, можно ревизовать при bootstrap.
 
 ## Грабли окружения
 
@@ -60,4 +67,4 @@
 
 ## Формулировка для старта Avalonia-чата
 
-> Продолжаем миграцию WPF → Avalonia проекта Philadelphus, ветка `feature/#65575392-avalonia`. Прочитай `docs/avalonia-migration/14-state-before-avalonia.md` — там финальное состояние: весь портируемый слой (ViewModels, оконный кластер, фабрики, логика конвертеров, AppIcon/ConverterColor, сервисы) уже в общем `Philadelphus.Presentation` (net10.0), в WPF остался только платформенный код. Задача: создать новый проект **Avalonia** (`Philadelphus.Presentation.Avalonia`, MVVM), переиспользующий shared `Philadelphus.Presentation`. Нужно: bootstrap (Host + DI, переиспользовать фабрики и VM), реализации платформенных абстракций (`IWindowService`, `IDialogService`, `IDispatcherService`, `IFileDialogService`, `IImportProgressReporter`, провайдер `AppIcon → Bitmap/SVG`), линковку иконок из `Assets/Icons` как `AvaloniaResource`, и перенос View (XAML Avalonia) с биндингами на существующие VM. Иконки в Avalonia могут быть `.svg`. Правки — файловыми инструментами при закрытой IDE; перенос и изменение содержимого — разными коммитами; сборка на моей стороне как контрольная точка.
+> Продолжаем миграцию WPF → Avalonia проекта Philadelphus, ветка `feature/#65575392-avalonia`. Прочитай `docs/avalonia-migration/14-state-before-avalonia.md` — там финальное состояние: весь портируемый слой (ViewModels, оконный кластер, фабрики, логика конвертеров, AppIcon/ConverterColor, сервисы) уже в общем `Philadelphus.Presentation` (net10.0), в WPF остался только платформенный код. Задача: создать новый проект **Avalonia** (`Philadelphus.Presentation.Avalonia`, MVVM), переиспользующий shared `Philadelphus.Presentation`. Нужно: bootstrap (Host + DI: вызвать `services.AddPhiladelphusPresentation()`, затем зарегистрировать платформенные реализации, окна и реестр `ViewModel→Window`), реализации платформенных абстракций (`IWindowService`, `IDialogService`, `IDispatcherService`, `IFileDialogService`, `IImportProgressReporter`, провайдер `AppIcon → Bitmap/SVG`), линковку иконок из `Assets/Icons` как `AvaloniaResource`, и перенос View (XAML Avalonia) с биндингами на существующие VM. Иконки в Avalonia могут быть `.svg`. Правки — файловыми инструментами при закрытой IDE; перенос и изменение содержимого — разными коммитами; сборка на моей стороне как контрольная точка.
