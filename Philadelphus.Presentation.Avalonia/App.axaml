@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Philadelphus.Presentation.Avalonia.Converters"
+             x:Class="Philadelphus.Presentation.Avalonia.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Resources>
+        <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
+        <conv:IconConverter x:Key="iconConverter" />
+        <conv:SelectedIndexConverter x:Key="selectedIndexConverter" />
+        <conv:BooleanToColorConverter x:Key="booleanToColorConverter" />
+        <conv:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
+        <conv:StateToColorConverter x:Key="stateToColorConverter" />
+        <conv:LastLaunchToDaysAgoConverter x:Key="lastLaunchToDaysAgoConverter" />
+        <conv:UtcToLocalTimeConverter x:Key="utcToLocalTimeConverter" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+</Application>

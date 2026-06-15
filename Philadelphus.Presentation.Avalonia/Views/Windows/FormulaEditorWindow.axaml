@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.FormulaEditorWindow"
+        Title="Редактор формул"
+        Width="900"
+        Height="520"
+        MinWidth="760"
+        MinHeight="420"
+        WindowStartupLocation="CenterOwner">
+    <!-- Каркас. FormulaTestControl переносится из WPF инкрементально. -->
+    <Grid>
+        <TextBlock Text="FormulaEditorWindow (Avalonia) — каркас"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Opacity="0.5" />
+    </Grid>
+</Window>

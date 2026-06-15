@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <UserSecretsId>9d9f6ea9-cd34-412e-b854-8fc4186804fc</UserSecretsId>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <FileVersion>1.0.8.0</FileVersion>
+    <Product>Philadelphus</Product>
+    <Company>Sergey Meley</Company>
+    <Copyright>© 2026 Sergey Meley</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Иконки из нейтральной solution-папки Assets линкуются как AvaloniaResource:
+         доступны по avares://Philadelphus.Presentation.Avalonia/Assets/Icons/... -->
+    <AvaloniaResource Include="..\Assets\Icons\**" Link="Assets\Icons\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.17" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.17" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.17" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.17" />
+    <!-- Диагностика (DevTools) только в Debug -->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.17">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">none</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.12.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Общий портируемый слой -->
+    <ProjectReference Include="..\Philadelphus.Presentation\Philadelphus.Presentation.csproj" />
+
+    <!-- Точка композиции: те же зависимости, что в WPF (нужны для InfrastructureRepositoryFactory,
+         Kafka, Redis, Excel-импорт, отчёты, конфигурации). -->
+    <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.FormulaEngine\Philadelphus.Core.Domain.FormulaEngine.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.Reports\Philadelphus.Core.Domain.Reports.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.TablesExport\Philadelphus.Core.Domain.TablesExport.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Cache\Philadelphus.Infrastructure.Cache.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Cache.Redis\Philadelphus.Infrastructure.Cache.Redis.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.ImportExport.Excel\Philadelphus.Infrastructure.ImportExport.Excel.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.ImportExport.Phjson\Philadelphus.Infrastructure.ImportExport.Phjson.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Messaging.Kafka\Philadelphus.Infrastructure.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.SQLite\Philadelphus.Infrastructure.Persistence.EF.SQLite.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.ImportFromExcelWindow"
+        Title="Конвертер Excel -> PHJSON"
+        Width="980"
+        Height="760"
+        WindowStartupLocation="CenterScreen">
+    <!-- Каркас. Мастер конвертации переносится из WPF инкрементально. -->
+    <Grid>
+        <TextBlock Text="ImportFromExcelWindow (Avalonia) — каркас"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Opacity="0.5" />
+    </Grid>
+</Window>

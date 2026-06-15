@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.MainWindow"
+        Title="Philadelphus"
+        Width="1200"
+        Height="800"
+        WindowStartupLocation="CenterScreen">
+    <!-- Каркас. Контент MainWindow переносится из WPF инкрементально. -->
+    <Grid>
+        <TextBlock Text="MainWindow (Avalonia) — каркас"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Opacity="0.5" />
+    </Grid>
+</Window>
