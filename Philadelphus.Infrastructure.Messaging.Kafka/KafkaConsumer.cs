@@ -52,9 +52,11 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
         /// </summary>
         public void Dispose()
         {
-            if (_disposed) 
+            if (_disposed)
                 return;
-            _consumer?.Close();
+            // Graceful Close() уже выполняется в ExecuteAsync.finally при остановке BackgroundService.
+            // Здесь только освобождаем хэндл: повторный Close() бил бы по уничтоженному хэндлу
+            // (Confluent.Kafka: "handle is destroyed"). Аналогично KafkaProducer.Dispose().
             _consumer?.Dispose();
             _disposed = true;
         }
