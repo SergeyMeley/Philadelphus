@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.ListBoxes.DataStorageHeadersListBox">
+    <Grid>
+        <ListBox Margin="1" BorderBrush="LightGray" BorderThickness="1"
+                 ItemsSource="{Binding $parent[UserControl].DataStorageHeadersItemsSource}"
+                 SelectedItem="{Binding $parent[UserControl].DataStorageHeadersSelectedItem, Mode=TwoWay}">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MinWidth="300" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0" Grid.Row="0" Height="20" VerticalAlignment="Center" Margin="1">
+                                <Run Text="Хранилище: " FontWeight="Light" Foreground="LightSlateGray" />
+                                <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic" />
+                                <Run Text="   " />
+                                <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray" />
+                                <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
+                            </TextBlock>
+                            <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="100" Height="20" VerticalAlignment="Center" Margin="5,2,5,2">
+                                <Run Text="Доступность:" FontWeight="Light" Foreground="LightSlateGray" />
+                                <Run Text="{Binding IsAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource booleanToColorConverter}}" />
+                            </TextBlock>
+                        </Grid>
+                        <Rectangle Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="1" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

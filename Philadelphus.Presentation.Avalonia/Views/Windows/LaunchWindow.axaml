@@ -1,15 +1,59 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:titemvm="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;assembly=Philadelphus.Presentation"
+        xmlns:tabvm="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs.LaunchWindowTabContentVMs;assembly=Philadelphus.Presentation"
+        xmlns:tabs="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.LaunchWindow"
-        Title="Philadelphus"
+        Title="{Binding Title}"
         Width="1000"
         Height="650"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen">
-    <!-- Каркас. Контент LaunchWindow переносится из WPF инкрементально. -->
-    <Grid>
-        <TextBlock Text="LaunchWindow (Avalonia) — каркас"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Opacity="0.5" />
-    </Grid>
+
+    <Window.DataTemplates>
+        <!-- Контент выбранной вкладки: разворачиваем LaunchWindowTabItemControlVM в его .Content. -->
+        <DataTemplate DataType="titemvm:LaunchWindowTabItemControlVM">
+            <ContentControl Content="{Binding Content}" />
+        </DataTemplate>
+
+        <!-- Маппинг VM вкладок на UserControl'ы. DataContext контрола = DataContext окна (LaunchWindowVM),
+             как в WPF (RelativeSource AncestorType=Window). -->
+        <DataTemplate DataType="tabvm:LaunchMainTabVM">
+            <tabs:LaunchWindowMainTabControl DataContext="{Binding $parent[Window].DataContext}" />
+        </DataTemplate>
+        <DataTemplate DataType="tabvm:LaunchCreatingTabVM">
+            <tabs:LaunchWindowCreatingTabControl DataContext="{Binding $parent[Window].DataContext}" />
+        </DataTemplate>
+        <DataTemplate DataType="tabvm:LaunchOpeningTabVM">
+            <tabs:LaunchWindowOpeningTabControl DataContext="{Binding $parent[Window].DataContext}" />
+        </DataTemplate>
+        <DataTemplate DataType="tabvm:LaunchStoragesTabVM">
+            <tabs:LaunchWindowStoragesTabControl DataContext="{Binding $parent[Window].DataContext}" />
+        </DataTemplate>
+        <DataTemplate DataType="tabvm:LaunchSettingsTabVM">
+            <tabs:LaunchWindowSettingsTabControl DataContext="{Binding $parent[Window].DataContext}" />
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <TabControl TabStripPlacement="Left"
+                ItemsSource="{Binding LaunchWindowTabItemsVMs}"
+                SelectedItem="{Binding SelectedLaunchWindowTabItemVM, Mode=TwoWay}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Width="92" Height="78"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <Image Source="{Binding Icon, Converter={StaticResource iconConverter}}"
+                           Width="42" Height="42"
+                           Margin="0,6,0,4"
+                           Stretch="Uniform" />
+                    <TextBlock Text="{Binding Header}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               FontSize="14" />
+                </StackPanel>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+    </TabControl>
 </Window>

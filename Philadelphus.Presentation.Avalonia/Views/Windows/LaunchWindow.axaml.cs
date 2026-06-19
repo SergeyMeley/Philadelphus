@@ -6,10 +6,14 @@ using global::Avalonia.Controls.ApplicationLifetimes;
 namespace Philadelphus.Presentation.Avalonia.Views.Windows
 {
     /// <summary>
-    /// Стартовое окно. DataContext (LaunchWindowVM) задаётся снаружи через IWindowService.
+    /// Логика взаимодействия для LaunchWindow.axaml
     /// </summary>
     public partial class LaunchWindow : Window
     {
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="LaunchWindow" />.
+        /// DataContext (LaunchWindowVM) задаётся снаружи через IWindowService.
+        /// </summary>
         public LaunchWindow()
         {
             InitializeComponent();

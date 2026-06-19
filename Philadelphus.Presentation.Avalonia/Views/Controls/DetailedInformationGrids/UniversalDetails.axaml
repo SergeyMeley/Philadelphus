@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ac="using:Avalonia.Data.Converters"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             xmlns:infrast="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;assembly=Philadelphus.Presentation"
+             xmlns:mainent="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;assembly=Philadelphus.Presentation"
+             xmlns:rootmem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;assembly=Philadelphus.Presentation"
+             xmlns:repomem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;assembly=Philadelphus.Presentation"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.UniversalDetails">
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="infrast:DataStorageVM">
+            <local:DataStorageDetails />
+        </DataTemplate>
+        <DataTemplate DataType="mainent:PhiladelphusRepositoryHeaderVM">
+            <local:PhiladelphusRepositoryHeaderDetails />
+        </DataTemplate>
+        <DataTemplate DataType="mainent:PhiladelphusRepositoryVM">
+            <local:PhiladelphusRepositoryDetails />
+        </DataTemplate>
+        <DataTemplate DataType="repomem:TreeRootVM">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100" />
+                    <ColumnDefinition Width="*" MinWidth="100" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <local:PhiladelphusRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Text="Свойства корня:" FontWeight="Bold" Margin="1" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Количество узлов" Margin="1" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="rootmem:TreeNodeVM">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100" />
+                    <ColumnDefinition Width="*" MinWidth="100" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <local:TreeRootMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" />
+                <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Свойства узла" IsExpanded="True">
+                    <HeaderedContentControl>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="100" />
+                                <ColumnDefinition Width="*" MinWidth="100" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Количество узлов" Margin="1" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Количество листов" Margin="1" />
+                        </Grid>
+                    </HeaderedContentControl>
+                </Expander>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="rootmem:TreeLeaveVM">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100" />
+                    <ColumnDefinition Width="*" MinWidth="100" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <local:TreeRootMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" />
+                <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Свойства листа" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5">
+        <Panel>
+            <ContentControl Content="{Binding}"
+                            IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNotNull}}" />
+            <Border IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNull}}"
+                    Background="#FFF9F9F9" Padding="10" CornerRadius="8"
+                    BorderBrush="#FFE0E0E0" BorderThickness="1">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="🚫" FontSize="24" HorizontalAlignment="Center" />
+                    <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="Gray" HorizontalAlignment="Center" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Panel>
+    </ScrollViewer>
+</UserControl>

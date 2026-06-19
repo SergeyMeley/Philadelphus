@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.PhiladelphusRepositoryDetails">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="100" />
+            <ColumnDefinition Width="*" MinWidth="100" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <local:MainEntityDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" />
+    </Grid>
+</UserControl>

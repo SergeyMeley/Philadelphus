@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.MainEntityDetails">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="100" />
+            <ColumnDefinition Width="*" MinWidth="100" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Text="Основная информация:" FontWeight="Bold" Margin="1" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="1" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" Margin="1" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="1" />
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" Margin="1" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="1" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Псевдоним" Margin="1" />
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Alias}" Margin="1" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Пользовательский код" Margin="1" />
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding CustomCode}" Margin="1" />
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Состояние" Margin="1" />
+        <TextBox Grid.Row="7" Grid.Column="1"
+                 Text="{Binding State, Mode=OneWay, Converter={StaticResource enumDisplayAttributeConverter}}"
+                 ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}"
+                 IsReadOnly="True"
+                 Margin="1" />
+        <TextBlock Grid.Row="8" Grid.Column="0" Text="Тип сущности" Margin="1" />
+        <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding EntityType, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+
+        <TextBlock Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="100" Text="Хранилище:" FontWeight="Bold" Margin="1" />
+        <local:DataStorageDetails DataContext="{Binding StorageVM}" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="100" />
+
+        <TextBlock Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="100" Text="Аудит:" FontWeight="Bold" Margin="1" />
+        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="100" />
+    </Grid>
+</UserControl>

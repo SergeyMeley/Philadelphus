@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.PhiladelphusRepositoryHeaderDetails">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="100" />
+            <ColumnDefinition Width="*" MinWidth="100" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Text="Заголовок репозитория:" FontWeight="Bold" Margin="1" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="1" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name, Mode=OneWay}" Margin="1" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="1" />
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="1" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" Margin="1" />
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay}" Foreground="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay, Converter={StaticResource booleanToColorConverter}}" IsReadOnly="True" Margin="1" />
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="100" Text="Хранилище:" FontWeight="Bold" Margin="1" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Наименование" Margin="1" />
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding OwnDataStorageName, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Uuid" Margin="1" />
+        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding OwnDataStorageUuid, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+
+        <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="100" Text="Локальная информация:" FontWeight="Bold" Margin="1" />
+        <TextBlock Grid.Row="9" Grid.Column="0" Text="Последнее открытие" Margin="1" />
+        <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding LastOpening, Mode=OneWay}" IsReadOnly="True" Margin="1" />
+        <TextBlock Grid.Row="10" Grid.Column="0" Text="Избранное" Margin="1" />
+        <CheckBox Grid.Row="10" Grid.Column="1" IsChecked="{Binding IsFavorite}" Margin="1" />
+        <TextBlock Grid.Row="11" Grid.Column="0" Text="Скрытый" Margin="1" />
+        <CheckBox Grid.Row="11" Grid.Column="1" IsChecked="{Binding IsHidden}" Margin="1" />
+    </Grid>
+</UserControl>

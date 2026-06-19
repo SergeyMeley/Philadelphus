@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="clr-namespace:Philadelphus.Presentation.Avalonia.Converters"
              x:Class="Philadelphus.Presentation.Avalonia.App"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Light">
 
     <Application.Resources>
         <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
@@ -17,6 +17,37 @@
 
     <Application.Styles>
         <FluentTheme />
+
+        <!-- В теме Fluent у Button по умолчанию HorizontalAlignment/VerticalAlignment = Left/Top
+             (в WPF — Stretch), поэтому кнопки садятся по содержимому. Возвращаем WPF-поведение:
+             кнопка заполняет ячейку. Точечные HorizontalAlignment на конкретных кнопках это переопределят. -->
+        <Style Selector="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- Замена WPF GroupBox: HeaderedContentControl в виде рамки с заголовком.
+             Тип-селектор в Avalonia не затрагивает наследников (Expander), так что безопасно. -->
+        <Style Selector="HeaderedContentControl">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border BorderBrush="#8C8E94" BorderThickness="1" CornerRadius="3" Margin="2" Padding="4">
+                        <DockPanel LastChildFill="True">
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="{TemplateBinding Header}"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,4" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="Stretch"
+                                              VerticalContentAlignment="Stretch" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
     </Application.Styles>
 
 </Application>

@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls.LaunchWindowCreatingTabControl">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <ctrls:RepositoryCreation Grid.Row="0" DataContext="{Binding RepositoryCreationVM}" />
+        <HeaderedContentControl Grid.Row="1" Header="Выбор шаблона">
+            <ListBox>
+                <ListBoxItem Content="Пустой репозиторий" Height="50" />
+            </ListBox>
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

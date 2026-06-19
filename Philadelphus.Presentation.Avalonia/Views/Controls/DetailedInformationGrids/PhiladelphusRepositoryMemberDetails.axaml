@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.PhiladelphusRepositoryMemberDetails">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="100" />
+            <ColumnDefinition Width="*" MinWidth="100" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Expander Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Header="Основная информация" IsExpanded="True">
+            <HeaderedContentControl>
+                <local:MainEntityDetails />
+            </HeaderedContentControl>
+        </Expander>
+        <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Родительский репозиторий">
+            <HeaderedContentControl>
+                <local:PhiladelphusRepositoryDetails DataContext="{Binding Model.ParentRepository}" />
+            </HeaderedContentControl>
+        </Expander>
+    </Grid>
+</UserControl>
