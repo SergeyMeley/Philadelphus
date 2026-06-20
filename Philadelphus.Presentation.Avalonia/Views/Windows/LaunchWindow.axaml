@@ -40,19 +40,21 @@
                 SelectedItem="{Binding SelectedLaunchWindowTabItemVM, Mode=TwoWay}">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <StackPanel Width="92" Height="78"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
-                    <Image Source="{Binding Icon, Converter={StaticResource iconConverter}}"
-                           Width="42" Height="42"
-                           Margin="0,6,0,4"
-                           Stretch="Uniform" />
-                    <TextBlock Text="{Binding Header}"
-                               HorizontalAlignment="Center"
-                               TextAlignment="Center"
-                               TextWrapping="Wrap"
-                               FontSize="14" />
-                </StackPanel>
+                <Border BorderBrush="#D0D0D0" BorderThickness="0,0,0,1">
+                    <StackPanel Width="92" Height="78"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <Image Source="{Binding Icon, Converter={StaticResource iconConverter}}"
+                               Width="42" Height="42"
+                               Margin="0,6,0,4"
+                               Stretch="Uniform" />
+                        <TextBlock Text="{Binding Header}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   FontSize="14" />
+                    </StackPanel>
+                </Border>
             </DataTemplate>
         </TabControl.ItemTemplate>
     </TabControl>

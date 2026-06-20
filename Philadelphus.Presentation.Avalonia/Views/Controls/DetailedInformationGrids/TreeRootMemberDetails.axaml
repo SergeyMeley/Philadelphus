@@ -2,28 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.TreeRootMemberDetails">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="100" />
-            <ColumnDefinition Width="*" MinWidth="100" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <local:PhiladelphusRepositoryMemberDetails Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" />
-        <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Header="Родительский корень">
-            <HeaderedContentControl>
-                <local:UniversalDetails DataContext="{Binding Model.ParentRepository}" />
-            </HeaderedContentControl>
+    <StackPanel Spacing="4">
+        <local:PhiladelphusRepositoryMemberDetails />
+        <Expander Header="Родительский корень" HorizontalAlignment="Stretch">
+            <local:UniversalDetails DataContext="{Binding Model.ParentRepository}" />
         </Expander>
-        <Expander Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="100" Header="Родитель">
-            <HeaderedContentControl>
-                <local:UniversalDetails DataContext="{Binding Model.Parent}" />
-            </HeaderedContentControl>
+        <Expander Header="Родитель" HorizontalAlignment="Stretch">
+            <local:UniversalDetails DataContext="{Binding Model.Parent}" />
         </Expander>
-    </Grid>
+    </StackPanel>
 </UserControl>

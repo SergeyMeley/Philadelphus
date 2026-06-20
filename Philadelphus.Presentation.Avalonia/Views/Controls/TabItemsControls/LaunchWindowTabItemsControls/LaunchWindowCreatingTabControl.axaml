@@ -2,15 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls.LaunchWindowCreatingTabControl">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,*" RowSpacing="6" Margin="0,6,0,0">
         <ctrls:RepositoryCreation Grid.Row="0" DataContext="{Binding RepositoryCreationVM}" />
         <HeaderedContentControl Grid.Row="1" Header="Выбор шаблона">
             <ListBox>
-                <ListBoxItem Content="Пустой репозиторий" Height="50" />
+                <ListBoxItem Content="Пустой репозиторий" />
             </ListBox>
         </HeaderedContentControl>
     </Grid>

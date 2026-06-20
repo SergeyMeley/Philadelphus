@@ -41,6 +41,6 @@
                                      DataContext="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM}" />
         </Grid>
 
-        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Height="30" Command="{Binding OpenMainWindowWithHeaderCommand}" Margin="1" />
+        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Command="{Binding OpenMainWindowWithHeaderCommand}" />
     </Grid>
 </UserControl>

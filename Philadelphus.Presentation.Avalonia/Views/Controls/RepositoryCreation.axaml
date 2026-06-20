@@ -1,26 +1,16 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryCreation"
-             MinWidth="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30" />
-            <RowDefinition Height="30" />
-            <RowDefinition Height="30" />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
-
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" Margin="1" VerticalAlignment="Center" />
-        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Name}" Margin="1" />
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" Margin="1" VerticalAlignment="Center" />
-        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description}" Margin="1" />
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Хранилище данных" Margin="1" VerticalAlignment="Center" />
-        <ComboBox Grid.Row="2" Grid.Column="1" Margin="1" HorizontalAlignment="Stretch"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryCreation">
+    <Grid ColumnDefinitions="Auto,*,Auto"
+          RowDefinitions="Auto,Auto,Auto,Auto"
+          RowSpacing="6"
+          ColumnSpacing="8">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" VerticalAlignment="Center" />
+        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Name}" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" VerticalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description}" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Хранилище данных" VerticalAlignment="Center" />
+        <ComboBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch"
                   ItemsSource="{Binding DataStoragesCollectionVM.PhiladelphusRepositoriesDataStorageVMs}"
                   SelectedItem="{Binding DataStoragesCollectionVM.SelectedDataStorageVM}">
             <ComboBox.ItemTemplate>
@@ -33,7 +23,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenDataStoragesSettingsControlCommand}" Content="Открыть настройки хранилищ" Margin="1" />
-        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding CreateAndSaveRepositoryCommand}" Content="Создать и сохранить" Margin="1" />
+        <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenDataStoragesSettingsControlCommand}" Content="Открыть настройки хранилищ" />
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding CreateAndSaveRepositoryCommand}" Content="Создать и сохранить" />
     </Grid>
 </UserControl>

@@ -1,56 +1,31 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.DataStorageDetails">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="100" />
-            <ColumnDefinition Width="*" MinWidth="100" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid ColumnDefinitions="Auto,*"
+          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+          RowSpacing="4"
+          ColumnSpacing="8">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" VerticalAlignment="Center" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" VerticalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Description}" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Uuid" VerticalAlignment="Center" />
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Тип хранилища" VerticalAlignment="Center" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding InfrastructureType, Mode=OneWay}" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding IsAvailable, Mode=OneWay}" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Последняя проверка" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LastCheckTime, Mode=OneWay}" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Отключен" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding IsDisabled}" VerticalAlignment="Center" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" Margin="1" />
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" Margin="1" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" Margin="1" />
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" Margin="1" />
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" Margin="1" />
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" Margin="1" />
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Тип хранилища" Margin="1" />
-        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding InfrastructureType, Mode=OneWay}" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" Margin="1" />
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="Доступен" Margin="1" />
-        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding IsAvailable, Mode=OneWay}" Margin="1" />
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="Последняя проверка" Margin="1" />
-        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding LastCheckTime, Mode=OneWay}" Margin="1" />
-        <TextBlock Grid.Row="7" Grid.Column="0" Text="Отключен" Margin="1" />
-        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding IsDisabled}" Margin="1" />
-
-        <HeaderedContentControl Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="100" Header="Хранимые сущности">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MinWidth="100" />
-                    <ColumnDefinition Width="*" MinWidth="100" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Репозитории" Margin="1" />
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding HasPhiladelphusRepositoriesInfrastructureRepository}" Margin="1" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Участники репозитория" Margin="1" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HasMainEntitiesInfrastructureRepository}" Margin="1" />
+        <HeaderedContentControl Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Header="Хранимые сущности">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Репозитории" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding HasPhiladelphusRepositoriesInfrastructureRepository}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Участники репозитория" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HasMainEntitiesInfrastructureRepository}" />
             </Grid>
         </HeaderedContentControl>
     </Grid>
