@@ -35,6 +35,19 @@
         </DataTemplate>
     </Window.DataTemplates>
 
+    <!--
+      Перенос закомментированного в WPF LeftVerticalTabItemStyle (альтернативный стиль вертикальной вкладки
+      с иконкой и заголовком), адаптировано под Avalonia. Активный вид вкладки задаёт TabControl.ItemTemplate ниже.
+      <Style Selector="TabItem">
+          <Setter Property="Margin" Value="1" />
+          <Setter Property="BorderBrush" Value="LightSlateGray" />
+          <Setter Property="BorderThickness" Value="1,1,0,1" />
+      </Style>
+      <Style Selector="TabItem:selected">
+          <Setter Property="Background" Value="LightSkyBlue" />
+      </Style>
+    -->
+
     <TabControl TabStripPlacement="Left"
                 ItemsSource="{Binding LaunchWindowTabItemsVMs}"
                 SelectedItem="{Binding SelectedLaunchWindowTabItemVM, Mode=TwoWay}">

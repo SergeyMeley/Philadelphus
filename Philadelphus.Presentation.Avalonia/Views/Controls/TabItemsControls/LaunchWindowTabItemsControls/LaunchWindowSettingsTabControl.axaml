@@ -1,9 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls.LaunchWindowSettingsTabControl">
-    <!-- Этап 1: каркас. Контент (ApplicationSettings) переносится следующим коммитом. -->
-    <TextBlock HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               Opacity="0.5"
-               Text="Вкладка «Настройки» — перенос контента в процессе" />
+    <Grid>
+        <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}" />
+    </Grid>
 </UserControl>

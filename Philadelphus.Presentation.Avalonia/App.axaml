@@ -17,6 +17,15 @@
 
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+
+        <!-- В Avalonia DataGrid по умолчанию без линий сетки (в WPF они видны) — строки/ячейки сливаются.
+             Возвращаем линии и внешнюю рамку. -->
+        <Style Selector="DataGrid">
+            <Setter Property="GridLinesVisibility" Value="All" />
+            <Setter Property="BorderBrush" Value="#D0D0D0" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
 
         <!-- В теме Fluent у Button по умолчанию HorizontalAlignment/VerticalAlignment = Left/Top
              (в WPF — Stretch), поэтому кнопки садятся по содержимому. Возвращаем WPF-поведение:

@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.Settings.ConnectionStringContainersSettings">
+    <Grid RowDefinitions="Auto,*" RowSpacing="6" Margin="6">
+        <HeaderedContentControl Grid.Row="0" Header="Создать">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="8">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Строка подключения" VerticalAlignment="Center" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewConnectionStringsContainerConnectionString}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Провайдер" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding ProvidersNames}"
+                          SelectedItem="{Binding NewConnectionStringsContainerSelectedProvider}" />
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Создать и сохранить" Command="{Binding CreateAndSaveNewConnectionStringsContainerCommand}" />
+            </Grid>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="1" Header="Изменить">
+            <Grid RowDefinitions="*,Auto,Auto" RowSpacing="6">
+                <DataGrid Grid.Row="0"
+                          AutoGenerateColumns="False"
+                          ItemsSource="{Binding ConnectionStringsContainersVMs}"
+                          SelectedItem="{Binding SelectedConnectionStringsContainerVM}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="UUID" IsReadOnly="True" Binding="{Binding Uuid}" Width="Auto" />
+                        <!-- В Avalonia нет DataGridComboBoxColumn — выбор провайдера через DataGridTemplateColumn. -->
+                        <DataGridTemplateColumn Header="Провайдер" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ProviderName}" VerticalAlignment="Center" Margin="4,0" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding $parent[UserControl].DataContext.ProvidersNames}"
+                                              SelectedItem="{Binding ProviderName}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Строка подключения" Binding="{Binding ConnectionString}" Width="*" />
+                        <DataGridCheckBoxColumn Header="Для удаления" Binding="{Binding ForDelete}" Width="Auto" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Grid.Row="1" Content="Удалить" Command="{Binding DeleteConnectionStringsContainersCommand}" />
+                <Button Grid.Row="2" Content="Сохранить изменения" Command="{Binding SaveConnectionStringsContainersCommand}" />
+            </Grid>
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

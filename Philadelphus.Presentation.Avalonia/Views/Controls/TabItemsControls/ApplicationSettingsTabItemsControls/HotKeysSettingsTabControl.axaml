@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls.HotKeysSettingsTabControl">
+    <Grid>
+        <TextBlock Text="Здесь пока ничего нет, но мы работаем над этим ;-)"
+                   TextWrapping="Wrap"
+                   TextAlignment="Center"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="40"
+                   Margin="100" />
+    </Grid>
+</UserControl>
