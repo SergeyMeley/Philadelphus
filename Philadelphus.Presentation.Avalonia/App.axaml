@@ -82,6 +82,12 @@
             <Setter Property="BorderBrush" Value="#E0E0E0" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
+
+        <!-- Тонкая колонка-индикатор состояния в DataGrid: убираем отступы ячейки,
+             иначе padding раздувает узкую колонку. -->
+        <Style Selector="DataGridCell.statusStripe">
+            <Setter Property="Padding" Value="0" />
+        </Style>
     </Application.Styles>
 
 </Application>

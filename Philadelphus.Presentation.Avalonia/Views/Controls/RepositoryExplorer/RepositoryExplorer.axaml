@@ -136,10 +136,9 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Атрибуты (этап B) -->
+                <!-- Атрибуты -->
                 <TabItem Classes="compact" Header="Атрибуты">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
-                               Text="Атрибуты — перенос на этапе B" />
+                    <local:Attributes />
                 </TabItem>
 
                 <!-- Наследники (этап C) -->

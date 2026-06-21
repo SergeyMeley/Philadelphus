@@ -11,7 +11,7 @@
                   AutoGenerateColumns="False"
                   CanUserResizeColumns="True">
             <DataGrid.Columns>
-                <DataGridTemplateColumn Width="7">
+                <DataGridTemplateColumn Width="7" MinWidth="0" CellStyleClasses="statusStripe">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Background="{Binding State, Converter={StaticResource stateToColorConverter}}"
