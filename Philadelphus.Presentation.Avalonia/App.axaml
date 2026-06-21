@@ -19,6 +19,9 @@
             <conv:StateToColorConverter x:Key="stateToColorConverter" />
             <conv:LastLaunchToDaysAgoConverter x:Key="lastLaunchToDaysAgoConverter" />
             <conv:UtcToLocalTimeConverter x:Key="utcToLocalTimeConverter" />
+            <conv:FormulaHighlightKindToBrushConverter x:Key="formulaKindToBrushConverter" />
+            <conv:FormulaHighlightKindToFontWeightConverter x:Key="formulaKindToFontWeightConverter" />
+            <conv:BoolToBrushConverter x:Key="boolToBrushConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

@@ -1,12 +1,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorerChildrenFlatTable">
     <Grid RowDefinitions="Auto,*,Auto">
-        <!-- TODO этап D: <local:FormulaBar DataContext="{Binding FormulaBarVM}" /> -->
-        <Border Grid.Row="0" Height="28" Background="#FFF7F7F7" BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="0,0,0,2">
-            <TextBlock VerticalAlignment="Center" Margin="6,0" Opacity="0.5" Text="Строка формул — перенос на этапе D" />
-        </Border>
+        <local:FormulaBar Grid.Row="0" DataContext="{Binding FormulaBarVM}" />
 
         <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns (ViewModel не зависит от DataGrid). -->
         <DataGrid x:Name="SelectedElementChildsDataGrid"
