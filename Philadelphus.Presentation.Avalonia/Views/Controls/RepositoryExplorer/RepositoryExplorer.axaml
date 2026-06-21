@@ -24,7 +24,7 @@
                   IsVisible="{Binding #shrubToggle.IsChecked}">
                 <!-- Тулбар -->
                 <DockPanel Grid.Row="0">
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1" Classes="toolbar">
                         <Button Command="{Binding GetWorkCommand}" ToolTip.Tip="Обновить из хранилища" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                             <Image Source="/Assets/Icons/getwork_64.png" />
                         </Button>

@@ -48,6 +48,18 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
 
+        <!-- Тонкая рамка для всех кнопок: задаём на самом контроле — шаблон Fluent подхватывает
+             BorderBrush/BorderThickness через TemplateBinding. Внешний стиль на часть шаблона
+             (PART_ContentPresenter) TemplateBinding не переопределяет, поэтому рамка не появлялась. -->
+        <Style Selector="Button">
+            <Setter Property="BorderBrush" Value="#808080" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ToggleButton">
+            <Setter Property="BorderBrush" Value="#808080" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
         <!-- Замена WPF GroupBox: HeaderedContentControl в виде рамки с заголовком.
              Тип-селектор в Avalonia не затрагивает наследников (Expander), так что безопасно. -->
         <Style Selector="HeaderedContentControl">

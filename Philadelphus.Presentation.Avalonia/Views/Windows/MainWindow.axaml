@@ -224,10 +224,7 @@
                     </HeaderedContentControl>
                 </Grid>
 
-                <!-- TODO этап 2: <ctrls:MessageLog DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}" /> -->
-                <Border Grid.Row="1" Height="24" Background="#FFE8E8E8">
-                    <TextBlock VerticalAlignment="Center" Margin="6,0" Opacity="0.5" Text="MessageLog — перенос на этапе 2" />
-                </Border>
+                <ctrls:MessageLog Grid.Row="1" DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}" />
 
                 <Grid Grid.Row="2" ColumnDefinitions="*,320" MaxHeight="350">
                     <StackPanel x:Name="popupTarget" Grid.Column="1" />
