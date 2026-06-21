@@ -13,7 +13,8 @@
                   MinHeight="50"
                   AutoGenerateColumns="False"
                   ItemsSource="{Binding ChildCollectionTableRows}"
-                  beh:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}" />
+                  beh:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
+                  beh:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}" />
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding #SelectedElementChildsDataGrid.SelectedIndex, Converter={StaticResource selectedIndexConverter}}" FontSize="10" />
