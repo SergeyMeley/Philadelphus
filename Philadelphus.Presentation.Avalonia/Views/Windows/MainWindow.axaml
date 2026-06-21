@@ -211,9 +211,7 @@
                                 <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}" />
                             </TabItem>
                             <TabItem Classes="compact" Header="Отчеты">
-                                <!-- TODO этап 2: <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}" /> -->
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
-                                           Text="ReportProcessor — перенос на этапе 2" />
+                                <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}" />
                             </TabItem>
                             <!--
                             <TabItem Header="Настраиваемый отчет"><ctrls:CustomizableReport /></TabItem>
