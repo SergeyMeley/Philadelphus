@@ -28,6 +28,8 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.17" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.17" />
+    <!-- Сторонний Ribbon (MIT). Проверка совместимости с Avalonia 11.3 — контрольной сборкой. -->
+    <PackageReference Include="Ribbon.Avalonia" Version="0.9.0" />
     <!-- Диагностика (DevTools) только в Debug -->
     <PackageReference Include="Avalonia.Diagnostics" Version="11.3.17">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">none</IncludeAssets>

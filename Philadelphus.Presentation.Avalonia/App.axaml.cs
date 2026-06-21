@@ -35,6 +35,7 @@ using Philadelphus.Infrastructure.Messaging.Kafka;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Avalonia.Factories;
+using Philadelphus.Presentation.Avalonia.Infrastructure;
 using Philadelphus.Presentation.Avalonia.Services;
 using Philadelphus.Presentation.Avalonia.Views.Windows;
 using Philadelphus.Presentation.Factories.Interfaces;
@@ -68,6 +69,9 @@ namespace Philadelphus.Presentation.Avalonia
         public override void OnFrameworkInitializationCompleted()
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
+
+            // Переопрос доступности команд по вводу (аналог WPF CommandManager.RequerySuggested).
+            AvaloniaCommandManager.Initialize();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -273,10 +277,11 @@ namespace Philadelphus.Presentation.Avalonia
                     services.AddSingleton<AvaloniaWindowService>();
                     services.AddSingleton<IWindowService>(sp => sp.GetRequiredService<AvaloniaWindowService>());
 
-                    // Фабрики команд: общие дефолтные (на платформо-нейтральных RelayCommand/AsyncRelayCommand).
-                    // WPF подставляет свои фабрики на CommandManager.
-                    services.AddSingleton<IRelayCommandFactory, DefaultRelayCommandFactory>();
-                    services.AddSingleton<IAsyncRelayCommandFactory, DefaultAsyncRelayCommandFactory>();
+                    // Фабрики команд: Avalonia-реализация с переопросом доступности через
+                    // AvaloniaCommandManager (аналог WPF CommandManager.RequerySuggested). Общий
+                    // DefaultRelayCommandFactory не годится — у него нет авто-переопроса CanExecute.
+                    services.AddSingleton<IRelayCommandFactory, AvaloniaRelayCommandFactory>();
+                    services.AddSingleton<IAsyncRelayCommandFactory, AvaloniaAsyncRelayCommandFactory>();
 
                     // Презентация: ViewModel, фабрики VM, Excel-импорт (shared)
                     services.AddPhiladelphusPresentation();

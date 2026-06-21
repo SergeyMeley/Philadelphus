@@ -1,15 +1,251 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ribbon="clr-namespace:Ribbon.Avalonia;assembly=Ribbon.Avalonia"
+        xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.MainWindow"
-        Title="Philadelphus"
-        Width="1200"
-        Height="800"
-        WindowStartupLocation="CenterScreen">
-    <!-- Каркас. Контент MainWindow переносится из WPF инкрементально. -->
-    <Grid>
-        <TextBlock Text="MainWindow (Avalonia) — каркас"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Opacity="0.5" />
+        Title="{Binding Title}"
+        MinHeight="500" MinWidth="1000"
+        WindowState="Maximized"
+        Icon="/Assets/Icons/philadelphus_logo_64.png">
+
+    <!--
+      WPF Window.CommandBindings (New/Open/Save) были закомментированы — перенос как комментарий:
+      <CommandBinding Command="New" .../> <CommandBinding Command="Open" .../> <CommandBinding Command="Save" .../>
+    -->
+
+    <Grid Background="#FFF1F1F1">
+        <!-- Popup уведомлений (PopupVM). -->
+        <Popup IsOpen="{Binding PopupVM.IsOpen}"
+               PlacementTarget="{Binding #popupTarget}"
+               Placement="Top"
+               HorizontalOffset="-5"
+               VerticalOffset="-5">
+            <ListBox ItemsSource="{Binding PopupVM.NotificationList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="3" CornerRadius="5" BorderBrush="SlateGray" Background="LightGray">
+                            <TextBlock Foreground="Black" Width="300" Padding="10" TextWrapping="Wrap" Text="{Binding Text}" />
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Popup>
+
+        <DockPanel>
+            <!-- ===== Лента (Ribbon.Avalonia) =====
+                 Вкладки обязательно лежат в свойстве Ribbon.Tabs (иначе полоса вкладок пустая). -->
+            <ribbon:Ribbon DockPanel.Dock="Top" Orientation="Horizontal">
+                <ribbon:Ribbon.Tabs>
+                    <ribbon:RibbonTab Header="Главная">
+                        <ribbon:RibbonTab.Groups>
+                            <ribbon:RibbonGroupBox Header="Общее">
+                                <ribbon:RibbonButton Content="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" MinSize="Medium" />
+                            </ribbon:RibbonGroupBox>
+                            <!--
+                            <ribbon:RibbonGroupBox Header="Буфер обмена">
+                                <ribbon:RibbonButton Content="Копировать" /><ribbon:RibbonButton Content="Вырезать" />
+                                <ribbon:RibbonButton Content="Вставить" /><ribbon:RibbonButton Content="Дублировать" />
+                                <ribbon:RibbonButton Content="Переместить" />
+                            </ribbon:RibbonGroupBox>
+                            -->
+                        </ribbon:RibbonTab.Groups>
+                    </ribbon:RibbonTab>
+
+                    <ribbon:RibbonTab Header="Репозиторий">
+                        <ribbon:RibbonTab.Groups>
+                            <ribbon:RibbonGroupBox Header="Текущий репозиторий">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Состояние: " />
+                                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.State}" />
+                                    </StackPanel>
+                                    <Button Content="Открыть стартовое окно" Command="{Binding ApplicationCommandsVM.OpenLaunchWindowCommand}" />
+                                </StackPanel>
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Информация">
+                                <StackPanel Spacing="2">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Количество корней: " />
+                                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.ChildsCount}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Текущий участник репозитория: " />
+                                        <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}" />
+                                    </StackPanel>
+                                    <Button Content="Подробнее" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
+                                </StackPanel>
+                            </ribbon:RibbonGroupBox>
+                            <!--
+                            Закомментированные в WPF группы: Иерархия репозитория / Вхождения атрибутов / Атрибуты / Пресеты.
+                            -->
+                        </ribbon:RibbonTab.Groups>
+                    </ribbon:RibbonTab>
+
+                    <ribbon:RibbonTab Header="Формулы">
+                        <ribbon:RibbonTab.Groups>
+                            <ribbon:RibbonGroupBox Header="Редактор">
+                                <ribbon:RibbonButton Content="Редактор формул"
+                                                     Command="{Binding OpenFormulaEditorWindowCommand}"
+                                                     CommandParameter="{Binding FormulaTestControlVM}"
+                                                     MinSize="Medium" />
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Пересчет" DataContext="{Binding RepositoryExplorerVM.FormulaBarVM}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="Пересчет формул" />
+                                        <ComboBox ItemsSource="{Binding FormulaRecalculationModes}"
+                                                  SelectedItem="{Binding SelectedFormulaRecalculationMode}"
+                                                  MinWidth="180">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <Button Content="Пересчитать текущий"
+                                            ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория."
+                                            Command="{Binding RecalculateCurrentFormulaCommand}" />
+                                    <Button Content="Пересчитать все"
+                                            ToolTip.Tip="Пересчитать все формулы для всех элементов репозитория."
+                                            Command="{Binding RecalculateAllFormulasCommand}" />
+                                </StackPanel>
+                            </ribbon:RibbonGroupBox>
+                        </ribbon:RibbonTab.Groups>
+                    </ribbon:RibbonTab>
+
+                    <!--
+                    <ribbon:RibbonTab Header="Вставка" /><ribbon:RibbonTab Header="Рассылки" />
+                    -->
+
+                    <ribbon:RibbonTab Header="Данные">
+                        <ribbon:RibbonTab.Groups>
+                            <ribbon:RibbonGroupBox Header="Импорт">
+                                <ItemsControl ItemsSource="{Binding ImportExportVM.ImportOperations}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate><Button Content="{Binding Label}" Command="{Binding Command}" /></DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Экспорт">
+                                <ItemsControl ItemsSource="{Binding ImportExportVM.ExportOperations}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate><Button Content="{Binding Label}" Command="{Binding Command}" /></DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Конвертация">
+                                <ItemsControl ItemsSource="{Binding ImportExportVM.ConversionOperations}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate><Button Content="{Binding Label}" Command="{Binding Command}" /></DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Прогресс">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="{Binding ImportExportVM.CurrentProcess}" />
+                                    <TextBlock Text="{Binding ImportExportVM.CurrentProgress}" />
+                                </StackPanel>
+                            </ribbon:RibbonGroupBox>
+                        </ribbon:RibbonTab.Groups>
+                    </ribbon:RibbonTab>
+
+                    <!-- <ribbon:RibbonTab Header="Вид" /> -->
+
+                    <ribbon:RibbonTab Header="Расширения" DataContext="{Binding ExtensionsControlVM}">
+                        <ribbon:RibbonTab.Groups>
+                            <ribbon:RibbonGroupBox Header="Текущее расширение">
+                                <StackPanel Spacing="2">
+                                    <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding SelectedExtension}" Width="200">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Состояние: " />
+                                        <TextBlock Text="{Binding SelectedExtension.State}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Button Content="Запустить" Command="{Binding StartExtensionCommand}" />
+                                        <Button Content="Остановить" Command="{Binding StopExtensionCommand}" />
+                                    </StackPanel>
+                                    <Button Content="Выполнить" Command="{Binding ExecuteExtensionCommand}" />
+                                    <ToggleButton Content="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}" />
+                                </StackPanel>
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Виджеты расширений">
+                                <ContentControl Content="{Binding SelectedExtension.RibbonWidget}" />
+                            </ribbon:RibbonGroupBox>
+                            <!-- <ribbon:RibbonGroupBox Header="Окна расширений" /> -->
+                        </ribbon:RibbonTab.Groups>
+                    </ribbon:RibbonTab>
+
+                    <!--
+                    <ribbon:RibbonTab Header="Администрирование" /><ribbon:RibbonTab Header="Настройки" />
+                    <ribbon:RibbonTab Header="Справка"><ribbon:RibbonTab.Groups>
+                        <ribbon:RibbonGroupBox><ribbon:RibbonButton Content="О нас" /></ribbon:RibbonGroupBox>
+                    </ribbon:RibbonTab.Groups></ribbon:RibbonTab>
+                    -->
+                </ribbon:Ribbon.Tabs>
+            </ribbon:Ribbon>
+
+            <!-- ===== Основная компоновка ===== -->
+            <Grid RowDefinitions="4*,Auto,Auto,Auto,0">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,5*">
+                    <!--
+                    Закомментированная в WPF навигационная панель (Expander ExpandDirection=Left + GridSplitter):
+                    группы «Сервисы» и «Надстройки» со списками. Перенос отложен (адаптация под Avalonia).
+                    -->
+                    <HeaderedContentControl Grid.Column="2" Header="Рабочая область">
+                        <TabControl>
+                            <TabItem Header="Репозиторий">
+                                <!-- TODO этап 2: <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}" /> -->
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
+                                           Text="RepositoryExplorer — перенос на этапе 2" />
+                            </TabItem>
+                            <TabItem Header="Отчеты">
+                                <!-- TODO этап 2: <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}" /> -->
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
+                                           Text="ReportProcessor — перенос на этапе 2" />
+                            </TabItem>
+                            <!--
+                            <TabItem Header="Настраиваемый отчет"><ctrls:CustomizableReport /></TabItem>
+                            <TabItem Header="Импорт / экспорт"><ctrls:DataExchange /></TabItem>
+                            -->
+                            <TabItem Header="Настройки">
+                                <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}" />
+                            </TabItem>
+                        </TabControl>
+                    </HeaderedContentControl>
+                </Grid>
+
+                <!-- TODO этап 2: <ctrls:MessageLog DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}" /> -->
+                <Border Grid.Row="1" Height="24" Background="#FFE8E8E8">
+                    <TextBlock VerticalAlignment="Center" Margin="6,0" Opacity="0.5" Text="MessageLog — перенос на этапе 2" />
+                </Border>
+
+                <Grid Grid.Row="2" ColumnDefinitions="*,320" MaxHeight="350">
+                    <StackPanel x:Name="popupTarget" Grid.Column="1" />
+                </Grid>
+
+                <!-- Замена WPF StatusBar (в Avalonia нет StatusBar): рамка со строкой статуса. -->
+                <Border Grid.Row="3" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" Padding="6,2">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Grid.Column="0" Text="{Binding UserName}" />
+                        <TextBlock Grid.Column="2" Text="{Binding AssemblyVersion}" HorizontalAlignment="Right" />
+                    </Grid>
+                </Border>
+
+                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3" />
+            </Grid>
+        </DockPanel>
     </Grid>
 </Window>

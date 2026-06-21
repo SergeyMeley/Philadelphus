@@ -5,19 +5,27 @@
              RequestedThemeVariant="Light">
 
     <Application.Resources>
-        <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
-        <conv:IconConverter x:Key="iconConverter" />
-        <conv:SelectedIndexConverter x:Key="selectedIndexConverter" />
-        <conv:BooleanToColorConverter x:Key="booleanToColorConverter" />
-        <conv:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
-        <conv:StateToColorConverter x:Key="stateToColorConverter" />
-        <conv:LastLaunchToDaysAgoConverter x:Key="lastLaunchToDaysAgoConverter" />
-        <conv:UtcToLocalTimeConverter x:Key="utcToLocalTimeConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Локализованные ресурсы Ribbon.Avalonia (требуются контролом ленты). -->
+                <ResourceInclude Source="avares://Ribbon.Avalonia/Locale/en-ca.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
+            <conv:IconConverter x:Key="iconConverter" />
+            <conv:SelectedIndexConverter x:Key="selectedIndexConverter" />
+            <conv:BooleanToColorConverter x:Key="booleanToColorConverter" />
+            <conv:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
+            <conv:StateToColorConverter x:Key="stateToColorConverter" />
+            <conv:LastLaunchToDaysAgoConverter x:Key="lastLaunchToDaysAgoConverter" />
+            <conv:UtcToLocalTimeConverter x:Key="utcToLocalTimeConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://Ribbon.Avalonia/Styles/Fluent/Ribbon.Avalonia.xaml" /> 
 
         <!-- В Avalonia DataGrid по умолчанию без линий сетки (в WPF они видны) — строки/ячейки сливаются.
              Возвращаем линии и внешнюю рамку. -->
