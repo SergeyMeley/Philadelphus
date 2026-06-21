@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.FormulaBar">
     <!-- Цвета намеренно НЕ хардкодим (кроме мягкого акцента подсказки сигнатуры),
          чтобы корректно работала и тёмная тема.
@@ -28,7 +29,15 @@
                      Text="{Binding FormulaBarText, Mode=TwoWay}"
                      IsEnabled="{Binding IsFormulaBarEnabled}"
                      Height="25" Margin="1" VerticalContentAlignment="Center"
-                     FontFamily="Consolas" FontSize="13">
+                     FontFamily="Consolas" FontSize="13"
+                     beh:FormulaBarTextBoxBehavior.Track="True"
+                     beh:FormulaBarTextBoxBehavior.IsEditing="{Binding IsFormulaBarEditing, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.CaretIndex="{Binding FormulaBarCaretIndex, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.SelectionStart="{Binding FormulaBarSelectionStart, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.SelectionLength="{Binding FormulaBarSelectionLength, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.FocusRequestId="{Binding FormulaBarFocusRequestId, Mode=OneWay}"
+                     beh:FormulaSuggestionTextBoxBehavior.IsEnabled="True"
+                     beh:FormulaSuggestionTextBoxBehavior.SuggestionsListBox="{Binding #FormulaSuggestionsListBox}">
                 <TextBox.KeyBindings>
                     <KeyBinding Gesture="Enter" Command="{Binding ApplyFormulaBarCommand}" />
                     <KeyBinding Gesture="Escape" Command="{Binding CancelFormulaBarCommand}" />
