@@ -145,8 +145,7 @@
                 <TabItem Classes="compact" Header="Наследники" IsVisible="{Binding IsParentControlVisible}">
                     <TabControl Classes="compact">
                         <TabItem Classes="compact" Header="Плоская таблица">
-                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
-                                       Text="ChildrenFlatTable — перенос на этапе C" />
+                            <local:RepositoryExplorerChildrenFlatTable />
                         </TabItem>
                         <!--
                         Скрытые в WPF вкладки: «Перекрестная таблица значений», «Плоская таблица допустимых значений»,
