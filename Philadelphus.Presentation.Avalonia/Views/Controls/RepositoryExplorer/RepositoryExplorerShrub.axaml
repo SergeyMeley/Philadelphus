@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorerShrub">
+    <Grid>
+        <TreeView Name="MainTreeView"
+                  DataContext="{Binding PhiladelphusRepositoryVM}"
+                  ItemsSource="{Binding Childs}"
+                  SelectionChanged="MainTreeView_SelectionChanged">
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding ChildNodes}">
+                    <Grid Margin="1"
+                          Background="Snow"
+                          ColumnDefinitions="4,*"
+                          RowDefinitions="*,Auto"
+                          ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}">
+                        <Rectangle Grid.RowSpan="2"
+                                   Grid.Column="0"
+                                   Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <Image Width="24" Height="24" Margin="10,0,10,0"
+                                   Source="{Binding Converter={StaticResource iconConverter}}" />
+                            <StackPanel Margin="0,2,10,2">
+                                <TextBlock>
+                                    <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
+                                    <Run Text="{Binding Name}" FontStyle="Italic" Foreground="Black" />
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
+                                    <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" Foreground="Black" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="0.25" />
+                    </Grid>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
+</UserControl>

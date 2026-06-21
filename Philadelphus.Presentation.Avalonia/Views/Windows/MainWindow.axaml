@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ribbon="clr-namespace:Ribbon.Avalonia;assembly=Ribbon.Avalonia"
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+        xmlns:re="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.MainWindow"
         Title="{Binding Title}"
         MinHeight="500" MinWidth="1000"
@@ -205,13 +206,11 @@
                     группы «Сервисы» и «Надстройки» со списками. Перенос отложен (адаптация под Avalonia).
                     -->
                     <HeaderedContentControl Grid.Column="2" Header="Рабочая область">
-                        <TabControl>
-                            <TabItem Header="Репозиторий">
-                                <!-- TODO этап 2: <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}" /> -->
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
-                                           Text="RepositoryExplorer — перенос на этапе 2" />
+                        <TabControl Classes="compact">
+                            <TabItem Classes="compact" Header="Репозиторий">
+                                <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}" />
                             </TabItem>
-                            <TabItem Header="Отчеты">
+                            <TabItem Classes="compact" Header="Отчеты">
                                 <!-- TODO этап 2: <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}" /> -->
                                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
                                            Text="ReportProcessor — перенос на этапе 2" />
@@ -220,7 +219,7 @@
                             <TabItem Header="Настраиваемый отчет"><ctrls:CustomizableReport /></TabItem>
                             <TabItem Header="Импорт / экспорт"><ctrls:DataExchange /></TabItem>
                             -->
-                            <TabItem Header="Настройки">
+                            <TabItem Classes="compact" Header="Настройки">
                                 <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}" />
                             </TabItem>
                         </TabControl>

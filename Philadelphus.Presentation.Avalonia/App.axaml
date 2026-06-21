@@ -52,10 +52,12 @@
                 <ControlTemplate>
                     <Border BorderBrush="#8C8E94" BorderThickness="1" CornerRadius="3" Margin="2" Padding="4">
                         <DockPanel LastChildFill="True">
-                            <TextBlock DockPanel.Dock="Top"
-                                       Text="{TemplateBinding Header}"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,4" />
+                            <!-- ContentPresenter, а не TextBlock: заголовок может быть не строкой,
+                                 а контролом (например StackPanel) — TextBlock вывел бы его как ToString(). -->
+                            <ContentPresenter DockPanel.Dock="Top"
+                                              Content="{TemplateBinding Header}"
+                                              FontWeight="SemiBold"
+                                              Margin="0,0,0,4" />
                             <ContentPresenter Content="{TemplateBinding Content}"
                                               ContentTemplate="{TemplateBinding ContentTemplate}"
                                               HorizontalContentAlignment="Stretch"
@@ -64,6 +66,21 @@
                     </Border>
                 </ControlTemplate>
             </Setter>
+        </Style>
+
+        <!-- Компактные вкладки: дефолтные Fluent TabItem крупные и съедают рабочее пространство.
+             Применяется точечно через класс compact (чтобы не задевать LaunchWindow и левые вкладки Настроек). -->
+        <Style Selector="TabItem.compact">
+            <Setter Property="FontSize" Value="13" />
+            <!-- Высоту задаём, но Padding НЕ переопределяем: расстояние до линии выбора
+                 Fluent рассчитывает сам по шаблону, ручной Padding давал наезд/обратный эффект. -->
+            <Setter Property="MinHeight" Value="34" />
+        </Style>
+
+        <!-- Еле заметная рамка вокруг содержимого вкладки (только для compact-таб-контролов). -->
+        <Style Selector="TabControl.compact /template/ ContentPresenter#PART_SelectedContentHost">
+            <Setter Property="BorderBrush" Value="#E0E0E0" />
+            <Setter Property="BorderThickness" Value="1" />
         </Style>
     </Application.Styles>
 
