@@ -293,13 +293,41 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
 
         private void FilterVisibleNotifications()
         {
-            _currentMessageLogFilteredNotifications.Clear();
-
-            foreach (var item in _currentMessageLogAllNotifications
+            // Сверка на месте, без Clear+rebuild: иначе DataGrid сбрасывает прокрутку (мельтешение),
+            // а новое сообщение выглядит как «полностью новый список». Здесь новое уведомление —
+            // это один Insert в конец, исчезнувшие удаляются, порядок выравнивается Move.
+            var desired = _currentMessageLogAllNotifications
                 .Where(IsVisible)
-                .OrderBy(x => x.DateTime))
+                .OrderBy(x => x.DateTime)
+                .ToList();
+
+            for (int i = _currentMessageLogFilteredNotifications.Count - 1; i >= 0; i--)
             {
-                _currentMessageLogFilteredNotifications.Add(item);
+                if (desired.Contains(_currentMessageLogFilteredNotifications[i]) == false)
+                {
+                    _currentMessageLogFilteredNotifications.RemoveAt(i);
+                }
+            }
+
+            for (int i = 0; i < desired.Count; i++)
+            {
+                var item = desired[i];
+
+                if (i < _currentMessageLogFilteredNotifications.Count
+                    && ReferenceEquals(_currentMessageLogFilteredNotifications[i], item))
+                {
+                    continue;
+                }
+
+                var currentIndex = _currentMessageLogFilteredNotifications.IndexOf(item);
+                if (currentIndex >= 0)
+                {
+                    _currentMessageLogFilteredNotifications.Move(currentIndex, i);
+                }
+                else
+                {
+                    _currentMessageLogFilteredNotifications.Insert(i, item);
+                }
             }
 
             OnPropertyChanged(nameof(OkMessagesCount));

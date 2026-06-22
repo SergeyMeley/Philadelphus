@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.MessageLog">
     <Grid RowDefinitions="Auto,Auto">
         <!-- Заголовок-панель (вместо WPF Expander ExpandDirection=Down).
@@ -42,13 +43,14 @@
             </Button>
         </Grid>
 
-        <!-- TODO Тех. долг: автопрокрутка к новым сообщениям + подсветка (WPF DataGridAutoScrollBehavior). -->
+        <!-- Автопрокрутка к хвосту журнала при обновлении (DataGridAutoScrollBehavior). -->
         <DataGrid Grid.Row="1"
                   IsVisible="{Binding #logToggle.IsChecked}"
                   ItemsSource="{Binding CurrentMessageLogFilteredNotifications, Mode=OneWay}"
                   AutoGenerateColumns="False"
                   FontSize="12"
-                  Height="200" MinHeight="200">
+                  Height="200" MinHeight="200"
+                  beh:DataGridAutoScrollBehavior.IsEnabled="True">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="К." MaxWidth="30" IsReadOnly="True" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
