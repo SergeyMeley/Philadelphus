@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
@@ -146,7 +147,7 @@ namespace Philadelphus.Presentation.Avalonia
         {
             // Стартовый логгер: Console + File
             var startupConfig = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
@@ -158,10 +159,10 @@ namespace Philadelphus.Presentation.Avalonia
             Log.Information("=== Philadelphus Startup (Avalonia) ===");
 
             var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            Log.Information($"Загружаю конфиг из: {Directory.GetCurrentDirectory()}");
+            Log.Information($"Загружаю конфиг из: {AppContext.BaseDirectory}");
 
             _configuration = builder.Build();
 
@@ -171,7 +172,7 @@ namespace Philadelphus.Presentation.Avalonia
                 {
                     config.AddConfiguration(_configuration);
 
-                    var basePath = Environment.ExpandEnvironmentVariables(
+                    var basePath = ConfigPathHelper.Expand(
                         _configuration["ApplicationSettings:BasePath"]
                         ?? "%USERPROFILE%\\AppData\\Local\\Philadelphus\\Configuration");
 
@@ -181,13 +182,13 @@ namespace Philadelphus.Presentation.Avalonia
 
                     var configFiles = new Dictionary<string, object>
                     {
-                        [Environment.ExpandEnvironmentVariables(
+                        [ConfigPathHelper.Expand(
                             _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(ConnectionStringsCollectionConfig)}"]!)]
                             = new ConnectionStringsCollectionConfig { ConnectionStringsContainers = new() },
-                        [Environment.ExpandEnvironmentVariables(
+                        [ConfigPathHelper.Expand(
                             _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(DataStoragesCollectionConfig)}"]!)]
                             = new DataStoragesCollectionConfig { DataStorages = new() },
-                        [Environment.ExpandEnvironmentVariables(
+                        [ConfigPathHelper.Expand(
                             _configuration[$"{nameof(ApplicationSettingsConfig)}:ConfigurationFilesPathesStrings:{nameof(PhiladelphusRepositoryHeadersCollectionConfig)}"]!)]
                             = new PhiladelphusRepositoryHeadersCollectionConfig { PhiladelphusRepositoryHeaders = new() }
                     };

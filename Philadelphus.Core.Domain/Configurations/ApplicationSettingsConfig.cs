@@ -1,4 +1,5 @@
-﻿using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+﻿using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System.Text.Json.Serialization;
 
@@ -146,13 +147,13 @@ namespace Philadelphus.Core.Domain.Configurations
 
         private FileInfo GetFileInfo(string path)
         {
-            var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+            var expandedPath = ConfigPathHelper.Expand(path);
             var result = new FileInfo(expandedPath);
             return result;
         }
         private DirectoryInfo GetDirectoryInfo(string path)
         {
-            var expandedPath = Environment.ExpandEnvironmentVariables(path ?? string.Empty);
+            var expandedPath = ConfigPathHelper.Expand(path);
             var result = new DirectoryInfo(expandedPath);
             return result;
         }
