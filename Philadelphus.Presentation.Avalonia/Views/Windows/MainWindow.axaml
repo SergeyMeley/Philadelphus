@@ -159,7 +159,27 @@
                         </ribbon:RibbonTab.Groups>
                     </ribbon:RibbonTab>
 
-                    <!-- <ribbon:RibbonTab Header="Вид" /> -->
+                    <ribbon:RibbonTab Header="Вид">
+                        <ribbon:RibbonTab.Groups>
+                            <!-- DataContext задаётся на группе, а не на RibbonTab: Ribbon.Avalonia
+                                 выносит группы выбранной вкладки в свой контент, поэтому DataContext
+                                 с RibbonTab до групп не наследуется (ср. рабочая вкладка «Формулы»→«Пересчет»). -->
+                            <ribbon:RibbonGroupBox Header="Тема" DataContext="{Binding ThemeSettingsVM}">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Тема оформления" />
+                                    <ComboBox ItemsSource="{Binding Modes}"
+                                              SelectedItem="{Binding SelectedMode}"
+                                              MinWidth="160">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding DisplayName}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                            </ribbon:RibbonGroupBox>
+                        </ribbon:RibbonTab.Groups>
+                    </ribbon:RibbonTab>
 
                     <ribbon:RibbonTab Header="Расширения" DataContext="{Binding ExtensionsControlVM}">
                         <ribbon:RibbonTab.Groups>

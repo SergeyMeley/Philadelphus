@@ -33,6 +33,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly MainWindowNotificationsVM _mainWindowNotificationsVM;
         private readonly IRelayCommandFactory _commandFactory;
         private readonly IWindowService _windowService;
+        private readonly ThemeSettingsVM? _themeSettingsVM;
 
         /// <summary>
         /// Команды приложения.
@@ -110,6 +111,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// Уведомление.
         /// </summary>
         public MainWindowNotificationsVM MainWindowNotificationsVM { get => _mainWindowNotificationsVM; }
+
+        /// <summary>
+        /// Модель представления выбора темы оформления (вкладка ленты «Вид»).
+        /// На платформах без поддержки тем (текущий WPF) может быть null.
+        /// </summary>
+        public ThemeSettingsVM? ThemeSettingsVM { get => _themeSettingsVM; }
      
         /// <summary>
         /// Выбранная модель представления элемента.
@@ -131,6 +138,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="reportsControlVM">Параметр reportsControlVM.</param>
         /// <param name="mainWindowNotificationsVM">Параметр mainWindowNotificationsVM.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
+        /// <param name="windowService">Сервис управления окнами.</param>
+        /// <param name="themeSettingsVM">Модель представления выбора темы. Опционально: на платформах
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public MainWindowVM(
             IServiceProvider serviceProvider,
@@ -145,7 +154,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ReportsControlVM reportsControlVM,
             MainWindowNotificationsVM mainWindowNotificationsVM,
             IRelayCommandFactory commandFactory,
-            IWindowService windowService)
+            IWindowService windowService,
+            ThemeSettingsVM? themeSettingsVM = null)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -167,6 +177,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
             _commandFactory = commandFactory;
             _windowService = windowService;
+            // Опционально: на платформах без поддержки тем (текущий WPF) сервис не зарегистрирован в DI,
+            // и ActivatorUtilities подставит значение по умолчанию (null).
+            _themeSettingsVM = themeSettingsVM;
 
             _notificationService.SendTextMessage<MainWindowVM>("Основное окно. Начало инициализации расширений.", NotificationCriticalLevelModel.Info);
             _extensionsControlVM.InitializeAsync(options.Value.PluginsDirectories);

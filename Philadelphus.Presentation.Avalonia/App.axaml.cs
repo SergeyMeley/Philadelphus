@@ -39,6 +39,7 @@ using Philadelphus.Presentation.Avalonia.Factories;
 using Philadelphus.Presentation.Avalonia.Infrastructure;
 using Philadelphus.Presentation.Avalonia.Services;
 using Philadelphus.Presentation.Avalonia.Views.Windows;
+using Philadelphus.Presentation.Configurations;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services;
@@ -102,6 +103,9 @@ namespace Philadelphus.Presentation.Avalonia
                     Log.Information("Запуск Host...");
                     _host!.Start();
                 }).ConfigureAwait(true);
+
+                // Применяем сохранённую тему до показа окон (конструктор сервиса применяет режим).
+                _ = _host!.Services.GetRequiredService<IThemeService>();
 
                 var windowService = _host!.Services.GetRequiredService<AvaloniaWindowService>();
                 windowService.Register<MainWindowVM, MainWindow>();
@@ -215,6 +219,8 @@ namespace Philadelphus.Presentation.Avalonia
                     // Конфигурация
                     services.Configure<ApplicationSettingsConfig>(
                         context.Configuration.GetSection(nameof(ApplicationSettingsConfig)));
+                    services.Configure<AppearanceConfig>(
+                        context.Configuration.GetSection(nameof(AppearanceConfig)));
                     services.Configure<ConnectionStringsCollectionConfig>(
                         context.Configuration.GetSection(nameof(ConnectionStringsCollectionConfig)));
                     services.Configure<DataStoragesCollectionConfig>(
@@ -283,6 +289,10 @@ namespace Philadelphus.Presentation.Avalonia
                     // DefaultRelayCommandFactory не годится — у него нет авто-переопроса CanExecute.
                     services.AddSingleton<IRelayCommandFactory, AvaloniaRelayCommandFactory>();
                     services.AddSingleton<IAsyncRelayCommandFactory, AvaloniaAsyncRelayCommandFactory>();
+
+                    // Тема оформления: платформенная реализация (Avalonia) + VM выбора для ленты «Вид».
+                    services.AddSingleton<IThemeService, AvaloniaThemeService>();
+                    services.AddTransient<ThemeSettingsVM>();
 
                     // Презентация: ViewModel, фабрики VM, Excel-импорт (shared)
                     services.AddPhiladelphusPresentation();

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="clr-namespace:Philadelphus.Presentation.Avalonia.Converters"
              x:Class="Philadelphus.Presentation.Avalonia.App"
-             RequestedThemeVariant="Light">
+             RequestedThemeVariant="Default">
 
     <Application.Resources>
         <ResourceDictionary>
