@@ -15,9 +15,9 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.SystemBaseValueEdito
     /// используемые выбранным шаблоном (StringValue, TimeValue и т.д.).
     /// </summary>
     /// <remarks>
-    /// TODO: Тех. долг. Типизированные редакторы DATE/DATETIME (DatePicker) пока заменены
-    /// строковым редактором (правка StringValue) — у Avalonia DatePicker.SelectedDate тип
-    /// DateTimeOffset?, что требует отдельного согласования с DateValue (DateTime?).
+    /// DATE/DATETIME используют Avalonia DatePicker (SelectedDate — DateTimeOffset?), связанный с
+    /// DateValue/DateTimeDateValue (DateTime?) через NullableDateTimeToOffsetConverter. Время и offset
+    /// в DATETIME — текстовые поля (как в WPF, где нет TimePicker).
     /// </remarks>
     public class SystemBaseValueEditorTemplateSelector : IDataTemplate
     {
@@ -32,6 +32,12 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.SystemBaseValueEdito
 
         /// <summary>Шаблон для файла (FILE).</summary>
         public IDataTemplate? FileTemplate { get; set; }
+
+        /// <summary>Шаблон для даты (DATE).</summary>
+        public IDataTemplate? DateTemplate { get; set; }
+
+        /// <summary>Шаблон для даты-времени (DATETIME).</summary>
+        public IDataTemplate? DateTimeTemplate { get; set; }
 
         public bool Match(object? data) => true;
 
@@ -62,7 +68,8 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.SystemBaseValueEdito
                     or SystemBaseType.MONEY => NumericTemplate,
                 SystemBaseType.TIME => TimeTemplate,
                 SystemBaseType.FILE => FileTemplate,
-                // DATE/DATETIME пока редактируются как строка (см. TODO в summary класса).
+                SystemBaseType.DATE => DateTemplate ?? StringTemplate,
+                SystemBaseType.DATETIME => DateTimeTemplate ?? StringTemplate,
                 _ => StringTemplate,
             };
         }

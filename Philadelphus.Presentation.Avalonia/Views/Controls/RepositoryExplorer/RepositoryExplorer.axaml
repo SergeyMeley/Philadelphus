@@ -111,9 +111,13 @@
                                     </editors:SystemBaseValueEditorTemplateSelector.NumericTemplate>
                                     <editors:SystemBaseValueEditorTemplateSelector.TimeTemplate>
                                         <DataTemplate>
-                                            <TextBox Height="24" MinWidth="180" Margin="1" Padding="4,1" VerticalContentAlignment="Center"
-                                                     MaxLength="8" ToolTip.Tip="HH:mm:ss"
-                                                     Text="{Binding TimeValue, Mode=TwoWay}" />
+                                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                                <TimePicker ClockIdentifier="24HourClock"
+                                                            SelectedTime="{Binding TimeHoursMinutesValue, Mode=TwoWay}" />
+                                                <TextBox Height="24" MinWidth="44" Margin="1" Padding="4,1" VerticalContentAlignment="Center"
+                                                         MaxLength="2" ToolTip.Tip="секунды (00–59)"
+                                                         Text="{Binding TimeSecondsText, Mode=TwoWay}" />
+                                            </StackPanel>
                                         </DataTemplate>
                                     </editors:SystemBaseValueEditorTemplateSelector.TimeTemplate>
                                     <editors:SystemBaseValueEditorTemplateSelector.FileTemplate>
@@ -130,6 +134,28 @@
                                             </Grid>
                                         </DataTemplate>
                                     </editors:SystemBaseValueEditorTemplateSelector.FileTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.DateTemplate>
+                                        <DataTemplate>
+                                            <DatePicker Margin="1"
+                                                        SelectedDate="{Binding DateValue, Mode=TwoWay, Converter={StaticResource nullableDateTimeToOffsetConverter}}" />
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.DateTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.DateTimeTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                                <DatePicker MinWidth="150"
+                                                            SelectedDate="{Binding DateTimeDateValue, Mode=TwoWay, Converter={StaticResource nullableDateTimeToOffsetConverter}}" />
+                                                <TimePicker ClockIdentifier="24HourClock"
+                                                            SelectedTime="{Binding DateTimeHoursMinutesValue, Mode=TwoWay}" />
+                                                <TextBox Height="24" MinWidth="44" Padding="4,1" VerticalContentAlignment="Center"
+                                                         MaxLength="2" ToolTip.Tip="секунды (00–59)"
+                                                         Text="{Binding DateTimeSecondsText, Mode=TwoWay}" />
+                                                <TextBox Height="24" MinWidth="64" Padding="4,1" VerticalContentAlignment="Center"
+                                                         MaxLength="6" ToolTip.Tip="+03:00 (смещение)"
+                                                         Text="{Binding DateTimeOffsetValue, Mode=TwoWay}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.DateTimeTemplate>
                                 </editors:SystemBaseValueEditorTemplateSelector>
                             </ContentControl.ContentTemplate>
                         </ContentControl>

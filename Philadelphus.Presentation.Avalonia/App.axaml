@@ -22,6 +22,7 @@
             <conv:FormulaHighlightKindToBrushConverter x:Key="formulaKindToBrushConverter" />
             <conv:FormulaHighlightKindToFontWeightConverter x:Key="formulaKindToFontWeightConverter" />
             <conv:BoolToBrushConverter x:Key="boolToBrushConverter" />
+            <conv:NullableDateTimeToOffsetConverter x:Key="nullableDateTimeToOffsetConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

@@ -165,6 +165,45 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
         }
 
         /// <summary>
+        /// Часы:минуты значения TIME для Avalonia TimePicker (минутная точность; секунды — в
+        /// <see cref="TimeSecondsText" />). Avalonia-адаптер поверх <see cref="TimeValue" />, не вводит
+        /// отдельного источника истины. В WPF не используется (там TimePicker'а нет).
+        /// </summary>
+        public TimeSpan? TimeHoursMinutesValue
+        {
+            get => ParseHoursMinutes(TimeValue);
+            set => TimeValue = FormatHms(value, ParseSeconds(TimeValue));
+        }
+
+        /// <summary>
+        /// Секунды значения TIME (00..59) для отдельного поля рядом с TimePicker.
+        /// </summary>
+        public string TimeSecondsText
+        {
+            get => ParseSeconds(TimeValue).ToString("D2", CultureInfo.InvariantCulture);
+            set => TimeValue = FormatHms(ParseHoursMinutes(TimeValue), ClampSeconds(value));
+        }
+
+        /// <summary>
+        /// Часы:минуты временной части DATETIME для Avalonia TimePicker (секунды — в
+        /// <see cref="DateTimeSecondsText" />). Адаптер поверх <see cref="DateTimeTimeValue" />.
+        /// </summary>
+        public TimeSpan? DateTimeHoursMinutesValue
+        {
+            get => ParseHoursMinutes(DateTimeTimeValue);
+            set => DateTimeTimeValue = FormatHms(value, ParseSeconds(DateTimeTimeValue));
+        }
+
+        /// <summary>
+        /// Секунды временной части DATETIME (00..59) для отдельного поля рядом с TimePicker.
+        /// </summary>
+        public string DateTimeSecondsText
+        {
+            get => ParseSeconds(DateTimeTimeValue).ToString("D2", CultureInfo.InvariantCulture);
+            set => DateTimeTimeValue = FormatHms(ParseHoursMinutes(DateTimeTimeValue), ClampSeconds(value));
+        }
+
+        /// <summary>
         /// Команда выбора локального файла для значения системного типа FILE.
         /// </summary>
         /// <remarks>
@@ -255,6 +294,39 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             OnPropertyChanged(nameof(TimeValue));
             OnPropertyChanged(nameof(DateTimeTimeValue));
             OnPropertyChanged(nameof(DateTimeOffsetValue));
+            OnPropertyChanged(nameof(TimeHoursMinutesValue));
+            OnPropertyChanged(nameof(TimeSecondsText));
+            OnPropertyChanged(nameof(DateTimeHoursMinutesValue));
+            OnPropertyChanged(nameof(DateTimeSecondsText));
+        }
+
+        /// <summary>Часы:минуты из строки времени (HH:mm:ss) как TimeSpan для TimePicker; null если не распознано.</summary>
+        private static TimeSpan? ParseHoursMinutes(string? time)
+        {
+            return TimeOnly.TryParse(time, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed)
+                ? new TimeSpan(parsed.Hour, parsed.Minute, 0)
+                : null;
+        }
+
+        /// <summary>Секунды (0..59) из строки времени (HH:mm:ss); 0 если не распознано.</summary>
+        private static int ParseSeconds(string? time)
+        {
+            return TimeOnly.TryParse(time, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed)
+                ? parsed.Second
+                : 0;
+        }
+
+        /// <summary>Парсит секунды из текста поля и ограничивает диапазоном 0..59.</summary>
+        private static int ClampSeconds(string? text)
+        {
+            return int.TryParse(text, out var seconds) ? Math.Clamp(seconds, 0, 59) : 0;
+        }
+
+        /// <summary>Собирает строку времени HH:mm:ss из часов:минут (TimeSpan) и секунд.</summary>
+        private static string FormatHms(TimeSpan? hoursMinutes, int seconds)
+        {
+            var hm = hoursMinutes ?? TimeSpan.Zero;
+            return $"{hm.Hours:D2}:{hm.Minutes:D2}:{seconds:D2}";
         }
 
         /// <summary>
