@@ -81,9 +81,9 @@
                     <!-- Подписи Наименование/Uuid показываются только когда элемент выбран. -->
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6"
                                 IsVisible="{Binding SelectedRepositoryMember, Converter={x:Static ac:ObjectConverters.IsNotNull}}">
-                        <TextBlock Text="Наименование:" FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Center" />
+                        <TextBlock Text="Наименование:" FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="{Binding SelectedRepositoryMember.Name}" FontStyle="Italic" VerticalAlignment="Center" />
-                        <TextBlock Text="Uuid:" FontSize="10" FontWeight="Light" Foreground="LightSlateGray" VerticalAlignment="Center" />
+                        <TextBlock Text="Uuid:" FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="{Binding SelectedRepositoryMember.Uuid}" FontStyle="Italic" VerticalAlignment="Center" />
                     </StackPanel>
                 </StackPanel>

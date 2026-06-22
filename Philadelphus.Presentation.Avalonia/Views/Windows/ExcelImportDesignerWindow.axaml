@@ -170,7 +170,7 @@
                         <Button Content="Обновить предпросмотр" Command="{Binding RefreshPreviewCommand}" Padding="10,5" HorizontalAlignment="Left" />
                     </StackPanel>
                     <TextBlock Grid.Row="1" Margin="0,12,0,0" TextWrapping="Wrap" Text="{Binding PreviewSummary}" />
-                    <Border Grid.Row="3" BorderBrush="#D0D0D0" BorderThickness="1" Padding="8">
+                    <Border Grid.Row="3" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" Padding="8">
                         <repo:RepositoryExplorer DataContext="{Binding RepositoryPreviewVM}" />
                     </Border>
                 </Grid>

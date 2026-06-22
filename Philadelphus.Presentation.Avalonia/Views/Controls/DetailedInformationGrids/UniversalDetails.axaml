@@ -48,12 +48,12 @@
             <ContentControl Content="{Binding}"
                             IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNotNull}}" />
             <Border IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNull}}"
-                    Background="#FFF9F9F9" Padding="10" CornerRadius="8"
-                    BorderBrush="#FFE0E0E0" BorderThickness="1">
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Padding="10" CornerRadius="8"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
                     <TextBlock Text="🚫" FontSize="24" HorizontalAlignment="Center" />
                     <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="Gray" HorizontalAlignment="Center" TextAlignment="Center" />
+                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
                 </StackPanel>
             </Border>
         </Panel>

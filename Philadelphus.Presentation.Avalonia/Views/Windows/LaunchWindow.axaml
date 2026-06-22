@@ -53,7 +53,7 @@
                 SelectedItem="{Binding SelectedLaunchWindowTabItemVM, Mode=TwoWay}">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <Border BorderBrush="#D0D0D0" BorderThickness="0,0,0,1">
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1">
                     <StackPanel Width="92" Height="78"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">

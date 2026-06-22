@@ -9,7 +9,6 @@
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding ChildNodes}">
                     <Grid Margin="1"
-                          Background="Snow"
                           ColumnDefinitions="4,*"
                           RowDefinitions="*,Auto"
                           ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}">
@@ -21,16 +20,16 @@
                                    Source="{Binding Converter={StaticResource iconConverter}}" />
                             <StackPanel Margin="0,2,10,2">
                                 <TextBlock>
-                                    <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                                    <Run Text="{Binding Name}" FontStyle="Italic" Foreground="Black" />
+                                    <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding Name}" FontStyle="Italic" />
                                 </TextBlock>
                                 <TextBlock>
-                                    <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                                    <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" Foreground="Black" />
+                                    <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
                                 </TextBlock>
                             </StackPanel>
                         </StackPanel>
-                        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="0.25" />
+                        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="{DynamicResource SystemControlForegroundBaseLowBrush}" Height="0.25" />
                     </Grid>
                 </TreeDataTemplate>
             </TreeView.ItemTemplate>

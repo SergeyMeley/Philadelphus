@@ -2,13 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.ListBoxes.AvailableRepositoriesListBox">
     <Grid>
-        <ListBox BorderBrush="LightGray" BorderThickness="1"
+        <ListBox BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1"
                  ItemsSource="{Binding $parent[UserControl].RepositoriesItemsSource}"
                  SelectedItem="{Binding $parent[UserControl].RepositoriesSelectedItem, Mode=TwoWay}">
             <ListBox.Styles>
                 <Style Selector="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="BorderBrush" Value="#E5E5E5" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                 </Style>
             </ListBox.Styles>

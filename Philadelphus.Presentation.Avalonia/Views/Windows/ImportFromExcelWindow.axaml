@@ -25,7 +25,7 @@
                 <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
                     <CheckBox Content="Конвертировать все источники книги"
                               IsChecked="{Binding UseAllWorksheets, Mode=TwoWay}" Margin="0,0,0,10" />
-                    <Border BorderBrush="#D0D0D0" BorderThickness="1">
+                    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
                         <ListBox Name="LstPreviewSources" Height="320"
                                  ItemsSource="{Binding SourceItems}"
                                  SelectedItem="{Binding SelectedSourceItem, Mode=TwoWay}"

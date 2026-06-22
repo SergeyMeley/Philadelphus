@@ -2,13 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.ListBoxes.DataStorageHeadersListBox">
     <Grid>
-        <ListBox BorderBrush="LightGray" BorderThickness="1"
+        <ListBox BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1"
                  ItemsSource="{Binding $parent[UserControl].DataStorageHeadersItemsSource}"
                  SelectedItem="{Binding $parent[UserControl].DataStorageHeadersSelectedItem, Mode=TwoWay}">
             <ListBox.Styles>
                 <Style Selector="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="BorderBrush" Value="#E5E5E5" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                 </Style>
             </ListBox.Styles>
@@ -16,14 +16,14 @@
                 <DataTemplate>
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <TextBlock Grid.Column="0" VerticalAlignment="Center">
-                            <Run Text="Хранилище: " FontWeight="Light" Foreground="LightSlateGray" />
+                            <Run Text="Хранилище: " FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                             <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic" />
                             <Run Text="   " />
-                            <Run Text="UUID:" FontWeight="Light" Foreground="LightSlateGray" />
+                            <Run Text="UUID:" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                             <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
                         </TextBlock>
                         <TextBlock Grid.Column="1" VerticalAlignment="Center">
-                            <Run Text="Доступность:" FontWeight="Light" Foreground="LightSlateGray" />
+                            <Run Text="Доступность:" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                             <Run Text="{Binding IsAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource booleanToColorConverter}}" />
                         </TextBlock>
                     </Grid>

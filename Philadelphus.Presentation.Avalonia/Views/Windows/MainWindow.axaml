@@ -14,7 +14,7 @@
       <CommandBinding Command="New" .../> <CommandBinding Command="Open" .../> <CommandBinding Command="Save" .../>
     -->
 
-    <Grid Background="#FFF1F1F1">
+    <Grid>
         <!-- Popup уведомлений (PopupVM). -->
         <Popup IsOpen="{Binding PopupVM.IsOpen}"
                PlacementTarget="{Binding #popupTarget}"
@@ -24,8 +24,10 @@
             <ListBox ItemsSource="{Binding PopupVM.NotificationList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="3" CornerRadius="5" BorderBrush="SlateGray" Background="LightGray">
-                            <TextBlock Foreground="Black" Width="300" Padding="10" TextWrapping="Wrap" Text="{Binding Text}" />
+                        <Border BorderThickness="3" CornerRadius="5"
+                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+                            <TextBlock Width="300" Padding="10" TextWrapping="Wrap" Text="{Binding Text}" />
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -251,7 +253,7 @@
                 </Grid>
 
                 <!-- Замена WPF StatusBar (в Avalonia нет StatusBar): рамка со строкой статуса. -->
-                <Border Grid.Row="3" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" Padding="6,2">
+                <Border Grid.Row="3" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,1,0,0" Padding="6,2">
                     <Grid ColumnDefinitions="Auto,*,Auto">
                         <TextBlock Grid.Column="0" Text="{Binding UserName}" />
                         <TextBlock Grid.Column="2" Text="{Binding AssemblyVersion}" HorizontalAlignment="Right" />

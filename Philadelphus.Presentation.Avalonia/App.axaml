@@ -35,7 +35,7 @@
              Возвращаем линии и внешнюю рамку. -->
         <Style Selector="DataGrid">
             <Setter Property="GridLinesVisibility" Value="All" />
-            <Setter Property="BorderBrush" Value="#D0D0D0" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
 
@@ -53,11 +53,11 @@
              BorderBrush/BorderThickness через TemplateBinding. Внешний стиль на часть шаблона
              (PART_ContentPresenter) TemplateBinding не переопределяет, поэтому рамка не появлялась. -->
         <Style Selector="Button">
-            <Setter Property="BorderBrush" Value="#808080" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
         <Style Selector="ToggleButton">
-            <Setter Property="BorderBrush" Value="#808080" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
 
@@ -66,7 +66,7 @@
         <Style Selector="HeaderedContentControl">
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Border BorderBrush="#8C8E94" BorderThickness="1" CornerRadius="3" Margin="2" Padding="4">
+                    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1" CornerRadius="3" Margin="2" Padding="4">
                         <DockPanel LastChildFill="True">
                             <!-- ContentPresenter, а не TextBlock: заголовок может быть не строкой,
                                  а контролом (например StackPanel) — TextBlock вывел бы его как ToString(). -->
@@ -95,7 +95,7 @@
 
         <!-- Еле заметная рамка вокруг содержимого вкладки (только для compact-таб-контролов). -->
         <Style Selector="TabControl.compact /template/ ContentPresenter#PART_SelectedContentHost">
-            <Setter Property="BorderBrush" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
 
