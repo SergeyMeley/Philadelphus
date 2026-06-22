@@ -1,15 +1,64 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.ImportFromExcelWindow"
-        Title="Конвертер Excel -> PHJSON"
-        Width="980"
-        Height="760"
+        Title="Конвертер Excel -&gt; PHJSON"
+        Height="760" Width="980"
         WindowStartupLocation="CenterScreen">
-    <!-- Каркас. Мастер конвертации переносится из WPF инкрементально. -->
-    <Grid>
-        <TextBlock Text="ImportFromExcelWindow (Avalonia) — каркас"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Opacity="0.5" />
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,*,Auto">
+        <TextBlock Grid.Row="0" Text="Конвертер Excel в PHJSON." FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16" />
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
+            <Button Content="Выбрать Excel файл" Command="{Binding SelectFileCommand}" Padding="10,5" HorizontalAlignment="Left" />
+            <TextBlock Text="{Binding FilePathDisplay}" Margin="15,0,0,0" VerticalAlignment="Center" Opacity="0.6" />
+        </StackPanel>
+
+        <HeaderedContentControl Grid.Row="2" Header="Параметры PHJSON" Margin="0,0,0,20">
+            <Grid ColumnDefinitions="150,*">
+                <TextBlock Grid.Column="0" Text="Наименование корня:" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Margin="5,0,0,0" Text="{Binding RootName, Mode=TwoWay}" />
+            </Grid>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="3" Header="Выбор источников Excel">
+            <Grid ColumnDefinitions="280,20,*" RowDefinitions="Auto,*">
+                <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+                    <CheckBox Content="Конвертировать все источники книги"
+                              IsChecked="{Binding UseAllWorksheets, Mode=TwoWay}" Margin="0,0,0,10" />
+                    <Border BorderBrush="#D0D0D0" BorderThickness="1">
+                        <ListBox Name="LstPreviewSources" Height="320"
+                                 ItemsSource="{Binding SourceItems}"
+                                 SelectedItem="{Binding SelectedSourceItem, Mode=TwoWay}"
+                                 SelectionMode="Single">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2" ColumnDefinitions="Auto,*,Auto">
+                                        <CheckBox Grid.Column="0" VerticalAlignment="Top" Margin="0,2,8,0"
+                                                  IsChecked="{Binding IsIncluded, Mode=TwoWay}"
+                                                  IsEnabled="{Binding $parent[ListBox].DataContext.CanChooseIndividualSheets}" />
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding StatusText}" FontSize="11" Opacity="0.6" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding TotalRowCount}" Opacity="0.6" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </StackPanel>
+
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding PreviewInfo}" Margin="0,0,0,10" Opacity="0.6" />
+                <DataGrid Grid.Row="1" Grid.Column="2"
+                          AutoGenerateColumns="False" IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          beh:DataGridDataTableBehavior.Source="{Binding PreviewView}" />
+            </Grid>
+        </HeaderedContentControl>
+
+        <Grid Grid.Row="4" Margin="0,20,0,0" ColumnDefinitions="*,Auto">
+            <Button Grid.Column="1" Classes="accent" Content="Конвертировать в PHJSON"
+                    Command="{Binding MainActionCommand}" Height="40" FontSize="14" Padding="20,0" />
+        </Grid>
     </Grid>
 </Window>

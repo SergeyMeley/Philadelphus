@@ -1,6 +1,7 @@
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Controls.ApplicationLifetimes;
+using global::Avalonia.Threading;
 
 using Philadelphus.Presentation.Avalonia.Helpers;
 using Philadelphus.Presentation.Services.Interfaces;
@@ -40,21 +41,35 @@ namespace Philadelphus.Presentation.Avalonia.Services
         public bool? ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
         {
             var window = CreateWindow(viewModel);
-            var owner = Desktop?.MainWindow;
 
-            return UiSync.RunSync<bool?>(async () =>
+            void ShowCore()
             {
-                if (owner is not null && ReferenceEquals(owner, window) == false)
+                // Владельцем берём видимое окно: Avalonia запрещает ShowDialog с невидимым
+                // владельцем (например скрытым LaunchWindow).
+                var owner = ResolveVisibleOwner(window);
+                if (owner is not null)
                 {
-                    await window.ShowDialog(owner).ConfigureAwait(true);
+                    // Модально, но без синхронного ожидания закрытия: Avalonia ShowDialog
+                    // асинхронный, а блокировка UI-потока (busy-loop) вешает обработку ввода окна.
+                    // Результат диалога сейчас никем не используется.
+                    _ = window.ShowDialog(owner);
                 }
                 else
                 {
                     window.Show();
                 }
+            }
 
-                return null;
-            });
+            if (Dispatcher.UIThread.CheckAccess())
+            {
+                ShowCore();
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(ShowCore);
+            }
+
+            return null;
         }
 
         public void Close<TViewModel>(TViewModel viewModel) where TViewModel : ViewModelBase
@@ -138,6 +153,21 @@ namespace Philadelphus.Presentation.Avalonia.Services
 
             window.DataContext = viewModel;
             return window;
+        }
+
+        /// <summary>
+        /// Подбирает видимое окно-владельца для модального показа: приоритет — MainWindow рабочего стола,
+        /// если он видим; иначе последнее видимое окно. Возвращает null, если видимых окон нет.
+        /// </summary>
+        private static Window? ResolveVisibleOwner(Window window)
+        {
+            var main = Desktop?.MainWindow;
+            if (main is { IsVisible: true } && ReferenceEquals(main, window) == false)
+            {
+                return main;
+            }
+
+            return Windows.LastOrDefault(w => w.IsVisible && ReferenceEquals(w, window) == false);
         }
 
         private static IClassicDesktopStyleApplicationLifetime? Desktop

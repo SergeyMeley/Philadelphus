@@ -8,8 +8,10 @@ namespace Philadelphus.Presentation.Avalonia.Helpers
     /// Avalonia API (StorageProvider, Window.ShowDialog) только асинхронны.
     /// </summary>
     /// <remarks>
-    /// На UI-потоке выполняется откачка очереди диспетчера до завершения задачи. Корректно
-    /// работает для модальных окон/нативных диалогов. Кандидат на рефакторинг в async-интерфейсы.
+    /// На UI-потоке выполняется вложенный цикл диспетчера (<see cref="DispatcherFrame"/> +
+    /// <see cref="Dispatcher.PushFrame"/>) до завершения задачи: он, в отличие от busy-loop с
+    /// RunJobs(), корректно прокачивает ввод/рендер, поэтому нативные диалоги и модальные окна
+    /// остаются интерактивными, а UI не зависает. Кандидат на рефакторинг в async-интерфейсы.
     /// </remarks>
     internal static class UiSync
     {
@@ -21,9 +23,12 @@ namespace Philadelphus.Presentation.Avalonia.Helpers
             }
 
             var task = func();
-            while (task.IsCompleted == false)
+            if (task.IsCompleted == false)
             {
-                Dispatcher.UIThread.RunJobs();
+                var frame = new DispatcherFrame();
+                // Continue — free-threaded (см. DispatcherFrame): можно завершать кадр из любого потока.
+                task.ContinueWith(_ => frame.Continue = false, TaskScheduler.Default);
+                Dispatcher.UIThread.PushFrame(frame);
             }
 
             return task.GetAwaiter().GetResult();

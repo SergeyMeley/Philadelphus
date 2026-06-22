@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.FormulaTestControl">
+    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,8" VerticalAlignment="Center" Text="Формула" />
+        <TextBox x:Name="FormulaTextBox" Grid.Row="0" Grid.Column="1" Margin="0,0,8,8" MinHeight="28" VerticalContentAlignment="Center"
+                 Text="{Binding FormulaText, Mode=TwoWay}"
+                 beh:FormulaSuggestionTextBoxBehavior.IsEnabled="True"
+                 beh:FormulaSuggestionTextBoxBehavior.SuggestionsListBox="{Binding #FormulaSuggestionsListBox}" />
+
+        <Popup Grid.Row="0" Grid.Column="1"
+               IsOpen="{Binding IsFormulaSuggestionsOpen}"
+               PlacementTarget="{Binding #FormulaTextBox}"
+               Placement="Bottom">
+            <Border MinWidth="{Binding #FormulaTextBox.Bounds.Width}" MaxWidth="520" MaxHeight="260"
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1" Padding="2">
+                <ListBox x:Name="FormulaSuggestionsListBox"
+                         ItemsSource="{Binding FormulaSuggestions}"
+                         SelectedItem="{Binding SelectedFormulaSuggestion, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" Margin="4,3">
+                                <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Text="{Binding DisplayName}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" Opacity="0.7" Text="{Binding Category}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Opacity="0.7" Text="{Binding Signature}" TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Popup>
+
+        <Button Grid.Row="0" Grid.Column="2" Margin="0,0,0,8" MinWidth="120" Padding="12,4"
+                Command="{Binding EvaluateFormulaCommand}" Content="Вычислить" />
+
+        <!-- Подсветка синтаксиса (отдельная панель). -->
+        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,8" Padding="6,4"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1"
+                IsVisible="{Binding IsFormulaHighlightOpen}">
+            <ItemsControl ItemsSource="{Binding FormulaHighlightSegments}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock FontFamily="Consolas" FontSize="13"
+                                   Text="{Binding Text}"
+                                   Foreground="{Binding Kind, Converter={StaticResource formulaKindToBrushConverter}}"
+                                   FontWeight="{Binding Kind, Converter={StaticResource formulaKindToFontWeightConverter}}"
+                                   Background="{Binding IsMatchingParenthesis, Converter={StaticResource boolToBrushConverter}, ConverterParameter=#D7ECFF|Transparent}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- Подсказка по сигнатуре функции. -->
+        <Border Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,8" Padding="8,5"
+                Background="#33D8B75A" BorderBrush="#D8B75A" BorderThickness="1"
+                IsVisible="{Binding IsFormulaSignatureHelpOpen}">
+            <StackPanel>
+                <TextBlock FontWeight="SemiBold" Text="{Binding FormulaSignatureText}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Margin="0,2,0,0" Opacity="0.7" Text="{Binding FormulaActiveArgumentText}" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,8,8" VerticalAlignment="Center" Text="Результат" />
+        <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,8" MinHeight="28" IsReadOnly="True"
+                 VerticalContentAlignment="Center" Text="{Binding ResultText, Mode=OneWay}" />
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,8,8" VerticalAlignment="Center" Text="Тип" />
+        <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,8" MinHeight="28" IsReadOnly="True"
+                 VerticalContentAlignment="Center" Text="{Binding ResultTypeText, Mode=OneWay}" />
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Top" Text="Ошибка" />
+        <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" MinHeight="80" AcceptsReturn="True" IsReadOnly="True"
+                 TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" Text="{Binding ErrorText, Mode=OneWay}" />
+    </Grid>
+</UserControl>
