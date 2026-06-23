@@ -319,20 +319,23 @@ dotnet test Philadelphus.Tests.Presentation.Wpf.UI/Philadelphus.Tests.Presentati
 
 ## Этап 9: Темы и стили
 
+> **Статус:** Частично закрыт. Переключение тем и тематизация цветов — сделано; остаётся подсветка `FormulaBar`, визуальный QA в Dark и спайк иконок PNG→SVG.
+
 **Цель:** Внедрить систему Light/Dark/System тем. Перенести ресурсы иконок.
 
 **Scope:**
-- `LightTheme.axaml`, `DarkTheme.axaml`, `CommonTheme.axaml`
-- Иконки: переход с `pack://application:,,,/Icons/` на `avares://...Icons/`
-- Spike: оценить переход PNG → SVG (отдельная задача)
-- `ThemeVariant` switching: System/Light/Dark
+- ✅ `ThemeVariant` switching: System/Light/Dark — переключатель на вкладке «Вид», дефолт «Как в системе», применение `RequestedThemeVariant`.
+- ✅ Сохранение выбора — `AppearanceConfig:ThemeString` (presentation-конфиг).
+- ✅ Тематизация жёстких цветов — фоны/рамки/вторичный текст переведены на `DynamicResource` Fluent (вместо хардкода). Кастомные `Light/DarkTheme.axaml` пока не понадобились — хватает Fluent-ресурсов.
+- ⬜ Подсветка синтаксиса `FormulaBar` тема-зависимой (тех-долг C).
+- ⬜ Полный визуальный QA всех экранов в Dark.
+- ⬜ Иконки: сейчас растровый `AppIconBitmaps`+`IconConverter` (линкуются как ресурс); spike PNG → SVG для корректного отображения в Dark — отдельная задача.
 
 **Acceptance criteria:**
-- Avalonia-приложение переключает темы
-- Системная тема следует ОС
-- Иконки отображаются через `avares://`
+- ✅ Avalonia-приложение переключает темы; системная тема следует ОС.
+- ⬜ Все экраны читаемы в Dark; иконки не теряются на тёмном фоне.
 
-**Риск:** Средний. **Размер:** M. **PR:** 2-3 PR.
+**Риск:** Средний. **Размер:** M. **PR:** 2-3 PR (часть сделана).
 
 ---
 
