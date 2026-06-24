@@ -183,9 +183,12 @@
                         </ribbon:RibbonTab.Groups>
                     </ribbon:RibbonTab>
 
-                    <ribbon:RibbonTab Header="Расширения" DataContext="{Binding ExtensionsControlVM}">
+                    <ribbon:RibbonTab Header="Расширения">
                         <ribbon:RibbonTab.Groups>
-                            <ribbon:RibbonGroupBox Header="Текущее расширение">
+                            <!-- DataContext задаётся на группах, а не на RibbonTab: Ribbon.Avalonia выносит
+                                 группы выбранной вкладки в свой контент, поэтому DataContext с RibbonTab
+                                 до них не наследуется (ср. рабочие вкладки «Вид» и «Формулы»). -->
+                            <ribbon:RibbonGroupBox Header="Текущее расширение" DataContext="{Binding ExtensionsControlVM}">
                                 <StackPanel Spacing="2">
                                     <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding SelectedExtension}" Width="200">
                                         <ComboBox.ItemTemplate>
@@ -204,7 +207,7 @@
                                     <ToggleButton Content="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}" />
                                 </StackPanel>
                             </ribbon:RibbonGroupBox>
-                            <ribbon:RibbonGroupBox Header="Виджеты расширений">
+                            <ribbon:RibbonGroupBox Header="Виджеты расширений" DataContext="{Binding ExtensionsControlVM}">
                                 <ContentControl Content="{Binding SelectedExtension.RibbonWidget}" />
                             </ribbon:RibbonGroupBox>
                             <!-- <ribbon:RibbonGroupBox Header="Окна расширений" /> -->
