@@ -64,6 +64,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             }
             set
             {
+                if (value == null)  // Нужно, чтобы в стартовом окне не сбрасывалось на null, если заголовок не является избранным
+                    return;
                 _selectedPhiladelphusRepositoryHeaderVM = value;
                 if (_selectedPhiladelphusRepositoryHeaderVM != null)
                     CheckPhiladelphusRepositoryAvailable(_selectedPhiladelphusRepositoryHeaderVM);
