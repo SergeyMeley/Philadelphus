@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.FormulaBar">
+    <!-- Цвета намеренно НЕ хардкодим (кроме мягкого акцента подсказки сигнатуры),
+         чтобы корректно работала и тёмная тема.
+         TODO: Тех. долг / D1b. Подсветка синтаксиса формулы (цветной оверлей сегментов)
+         перенесена не будет до тех пор, пока не сделаем её тема-зависимой. -->
+    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="2" Margin="0,0,0,2">
+        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="160,Auto,Auto,Auto,Auto,*">
+            <TextBox Grid.Row="0" Grid.Column="0"
+                     Text="{Binding FormulaBarAddress, Mode=OneWay}"
+                     IsReadOnly="True" Height="25" Margin="1" VerticalContentAlignment="Center"
+                     ToolTip.Tip="Адрес ячейки" />
+
+            <Button Grid.Row="0" Grid.Column="1" Command="{Binding ApplyFormulaBarCommand}" Height="25" Width="25" Margin="1" Padding="2" Background="Transparent" ToolTip.Tip="Применить формулу">
+                <Image Source="/Assets/Icons/approval_64.png" />
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2" Command="{Binding CancelFormulaBarCommand}" Height="25" Width="25" Margin="1" Padding="2" Background="Transparent" ToolTip.Tip="Отменить редактирование формулы">
+                <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_return.png" />
+            </Button>
+            <Button Grid.Row="0" Grid.Column="3" Content="fx" Command="{Binding RecalculateCurrentFormulaCommand}" Height="25" Width="25" Margin="1" Background="Transparent" FontWeight="SemiBold" ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория." />
+            <Button Grid.Row="0" Grid.Column="4" Command="{Binding OpenFormulaEditorFromFormulaBarCommand}" Height="25" Width="25" Margin="1" Padding="2" Background="Transparent" ToolTip.Tip="Открыть редактор формул">
+                <Image Source="/Assets/Icons/open.png" />
+            </Button>
+
+            <!-- Поле формулы (обычный редактируемый TextBox; цвета — из темы). -->
+            <TextBox x:Name="FormulaTextBox" Grid.Row="0" Grid.Column="5"
+                     Text="{Binding FormulaBarText, Mode=TwoWay}"
+                     IsEnabled="{Binding IsFormulaBarEnabled}"
+                     Height="25" Margin="1" VerticalContentAlignment="Center"
+                     FontFamily="Consolas" FontSize="13"
+                     beh:FormulaBarTextBoxBehavior.Track="True"
+                     beh:FormulaBarTextBoxBehavior.IsEditing="{Binding IsFormulaBarEditing, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.CaretIndex="{Binding FormulaBarCaretIndex, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.SelectionStart="{Binding FormulaBarSelectionStart, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.SelectionLength="{Binding FormulaBarSelectionLength, Mode=TwoWay}"
+                     beh:FormulaBarTextBoxBehavior.FocusRequestId="{Binding FormulaBarFocusRequestId, Mode=OneWay}"
+                     beh:FormulaSuggestionTextBoxBehavior.IsEnabled="True"
+                     beh:FormulaSuggestionTextBoxBehavior.SuggestionsListBox="{Binding #FormulaSuggestionsListBox}">
+                <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter" Command="{Binding ApplyFormulaBarCommand}" />
+                    <KeyBinding Gesture="Escape" Command="{Binding CancelFormulaBarCommand}" />
+                </TextBox.KeyBindings>
+            </TextBox>
+
+            <!-- Автодополнение -->
+            <Popup Grid.Row="0" Grid.Column="5"
+                   IsOpen="{Binding IsFormulaSuggestionsOpen}"
+                   PlacementTarget="{Binding #FormulaTextBox}"
+                   Placement="Bottom">
+                <Border MinWidth="{Binding #FormulaTextBox.Bounds.Width}" MaxWidth="520" MaxHeight="260"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1" Padding="2">
+                    <ListBox x:Name="FormulaSuggestionsListBox"
+                             ItemsSource="{Binding FormulaSuggestions}"
+                             SelectedItem="{Binding SelectedFormulaSuggestion, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" Margin="4,3">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Text="{Binding DisplayName}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" Opacity="0.7" Text="{Binding Category}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Opacity="0.7" Text="{Binding Signature}" TextTrimming="CharacterEllipsis" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Popup>
+
+            <!-- Подсказка по сигнатуре функции (мягкий акцент). -->
+            <Border Grid.Row="1" Grid.Column="4" Margin="1,2,1,0" Padding="8,5"
+                    Background="#33D8B75A" BorderBrush="#D8B75A" BorderThickness="1"
+                    IsVisible="{Binding IsFormulaSignatureHelpOpen}">
+                <StackPanel>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding FormulaSignatureText}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Margin="0,2,0,0" Opacity="0.7" Text="{Binding FormulaActiveArgumentText}" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

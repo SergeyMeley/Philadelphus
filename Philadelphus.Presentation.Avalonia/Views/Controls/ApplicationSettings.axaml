@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tabs="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.ApplicationSettingsTabItemsControls"
+             xmlns:titemvm="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;assembly=Philadelphus.Presentation"
+             xmlns:vms="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs;assembly=Philadelphus.Presentation"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.ApplicationSettings">
+    <UserControl.DataTemplates>
+        <!-- Контент выбранной вкладки: разворачиваем ApplicationSettingsTabItemControlVM в его .Content. -->
+        <DataTemplate DataType="titemvm:ApplicationSettingsTabItemControlVM">
+            <ContentControl Content="{Binding Content}" />
+        </DataTemplate>
+        <!-- Content вкладки = сам ApplicationSettingsControlVM → ConfigFilesPathesTabControl. -->
+        <DataTemplate DataType="vms:ApplicationSettingsControlVM">
+            <tabs:ConfigFilesPathesTabControl />
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <!--
+      Перенос закомментированных в WPF под-вкладок настроек (ApplicationSettingsControlVM.InitializeTabs):
+      «Строки подключения» → ConnectionStringsTabControl, «Сочетания клавиш» → HotKeysSettingsTabControl
+      (+ Конфиденциальная информация, Учётная запись). В WPF контент вкладки задавался экземпляром View
+      (new ConnectionStringsTabControl { DataContext = this }), что неприменимо в платформо-нейтральной
+      shared-VM. Контролы перенесены (ConnectionStringsTabControl, HotKeysSettingsTabControl,
+      ConnectionStringContainersSettings) и готовы к активации; для включения нужны маркерные VM-типы
+      вкладок в shared (по образцу LaunchWindowTabContentVMs).
+
+      Альтернативный стиль вертикальной вкладки (перенос закомментированного WPF LeftVerticalTabItemStyle,
+      адаптировано под Avalonia):
+      <Style Selector="TabItem">
+          <Setter Property="Margin" Value="1" />
+          <Setter Property="BorderBrush" Value="LightSlateGray" />
+          <Setter Property="BorderThickness" Value="1,1,0,1" />
+      </Style>
+    -->
+
+    <TabControl TabStripPlacement="Left"
+                ItemsSource="{Binding ApplicationSettingsTabItemsVMs}"
+                SelectedItem="{Binding SelectedApplicationSettingsTabItemVM, Mode=TwoWay}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Header}"
+                           Width="150"
+                           Margin="4"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center" />
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+    </TabControl>
+</UserControl>

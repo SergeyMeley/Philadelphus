@@ -1,3 +1,4 @@
+using Philadelphus.Presentation.Infrastructure;
 using System.Windows.Input;
 
 namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
@@ -5,11 +6,13 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
     /// <summary>
     /// Команда выполнения операции AsyncRelayCommand.
     /// </summary>
-    public class AsyncRelayCommand : ICommand
+    public class AsyncRelayCommand : IAsyncRelayCommand
     {
         private readonly Func<object, System.Threading.Tasks.Task> _execute;
         private readonly Predicate<object> _canExecute;
         private bool _isExecuting;
+
+        public bool IsExecuting => _isExecuting;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="AsyncRelayCommand" />.
@@ -36,7 +39,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
         /// </summary>
         /// <param name="parameter">Дополнительный параметр преобразования.</param>
         /// <returns>true, если операция выполнена успешно; иначе false.</returns>
-        public bool CanExecute(object parameter) => !_isExecuting && (_canExecute?.Invoke(parameter) ?? true);
+        public bool CanExecute(object parameter) => _isExecuting == false && (_canExecute?.Invoke(parameter) ?? true);
 
         /// <summary>
         /// Выполняет операцию Execute.
@@ -47,7 +50,7 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
             if (!CanExecute(parameter)) return;
 
             _isExecuting = true;
-            CommandManager.InvalidateRequerySuggested();
+            RaiseCanExecuteChanged();
 
             try
             {
@@ -56,8 +59,11 @@ namespace Philadelphus.Presentation.Wpf.UI.Infrastructure
             finally
             {
                 _isExecuting = false;
-                CommandManager.InvalidateRequerySuggested();
+                RaiseCanExecuteChanged();
             }
         }
+
+        public void RaiseCanExecuteChanged()
+            => CommandManager.InvalidateRequerySuggested();
     }
 }

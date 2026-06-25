@@ -1,0 +1,25 @@
+{
+  "solution": {
+    "path": "Philadelphus.sln",
+    "projects": [
+      "Philadelphus.Core.Domain\\Philadelphus.Core.Domain.csproj",
+      "Philadelphus.Core.Domain.ExtensionSystem\\Philadelphus.Core.Domain.ExtensionSystem.csproj",
+      "Philadelphus.Core.Domain.FormulaEngine\\Philadelphus.Core.Domain.FormulaEngine.csproj",
+      "Philadelphus.Core.Domain.ImportExport\\Philadelphus.Core.Domain.ImportExport.csproj",
+      "Philadelphus.Core.Domain.Reports\\Philadelphus.Core.Domain.Reports.csproj",
+      "Philadelphus.Core.Domain.TablesExport\\Philadelphus.Core.Domain.TablesExport.csproj",
+      "Philadelphus.Infrastructure.Cache\\Philadelphus.Infrastructure.Cache.csproj",
+      "Philadelphus.Infrastructure.Cache.Redis\\Philadelphus.Infrastructure.Cache.Redis.csproj",
+      "Philadelphus.Infrastructure.ImportExport.Excel\\Philadelphus.Infrastructure.ImportExport.Excel.csproj",
+      "Philadelphus.Infrastructure.ImportExport.Phjson\\Philadelphus.Infrastructure.ImportExport.Phjson.csproj",
+      "Philadelphus.Infrastructure.Messaging.Kafka\\Philadelphus.Infrastructure.Messaging.Kafka.csproj",
+      "Philadelphus.Infrastructure.Persistence\\Philadelphus.Infrastructure.Persistence.csproj",
+      "Philadelphus.Infrastructure.Persistence.EF\\Philadelphus.Infrastructure.Persistence.EF.csproj",
+      "Philadelphus.Infrastructure.Persistence.EF.PostgreSQL\\Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.csproj",
+      "Philadelphus.Infrastructure.Persistence.EF.SQLite\\Philadelphus.Infrastructure.Persistence.EF.SQLite.csproj",
+      "Philadelphus.Infrastructure.Persistence.Json\\Philadelphus.Infrastructure.Persistence.Json.csproj",
+      "Philadelphus.Presentation\\Philadelphus.Presentation.csproj",
+      "Philadelphus.Presentation.Avalonia\\Philadelphus.Presentation.Avalonia.csproj"
+    ]
+  }
+}

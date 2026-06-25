@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls.LaunchWindowMainTabControl">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" MaxHeight="300" />
+            <RowDefinition Height="4*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+            <TextBlock FontSize="16" Text="Здравствуйте, " />
+            <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding UserName, Mode=OneWay}" />
+            <TextBlock FontSize="16" Text="! Выберите репозиторий для начала работы или создайте новый" />
+        </StackPanel>
+
+        <HeaderedContentControl Grid.Row="1" Header="Создать">
+            <ctrls:RepositoryCreation DataContext="{Binding RepositoryCreationVM}" />
+        </HeaderedContentControl>
+        <HeaderedContentControl Grid.Row="2" Header="Открыть">
+            <ctrls:FavoriteAndLastRepositoryHeaders />
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

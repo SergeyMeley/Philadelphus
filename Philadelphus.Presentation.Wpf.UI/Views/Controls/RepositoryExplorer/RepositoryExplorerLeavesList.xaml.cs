@@ -1,7 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.ControlsVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using System.Windows.Controls;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Controls.RepositoryExplorer

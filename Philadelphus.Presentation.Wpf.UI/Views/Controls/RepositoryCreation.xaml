@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              MinWidth="800">
     <UserControl.Resources>
-        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -33,7 +33,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Name}"></TextBlock>
                         <TextBlock Text=". Доступность: "></TextBlock>
-                        <TextBlock Text="{Binding IsAvailable}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource isAvailableToColorConverter}}"></TextBlock>
+                        <TextBlock Text="{Binding IsAvailable}" FontWeight="Bold" Foreground="{Binding IsAvailable, Mode=OneWay, Converter={StaticResource booleanToColorConverter}}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>

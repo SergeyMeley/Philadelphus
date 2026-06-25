@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorerLeavesList">
+    <Grid RowDefinitions="*,Auto">
+        <DataGrid Name="SelectedElementLeavesDataGrid"
+                  Grid.Row="0"
+                  Margin="1"
+                  MinHeight="50"
+                  ItemsSource="{Binding SelectedRepositoryMember.ChildLeaves}"
+                  SelectionChanged="SelectedElementLeavesDataGrid_SelectionChanged"
+                  AutoGenerateColumns="False"
+                  CanUserResizeColumns="True">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="7" MinWidth="0" CellStyleClasses="statusStripe">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding State, Converter={StaticResource stateToColorConverter}}"
+                                    ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="№" Binding="{Binding Sequence}" Width="Auto" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="Auto" />
+                <DataGridTextColumn Header="Код" Binding="{Binding Uuid}" Width="Auto" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <TextBlock Text="{Binding #SelectedElementLeavesDataGrid.SelectedIndex, Converter={StaticResource selectedIndexConverter}}" FontSize="10" />
+            <TextBlock Text=" / " FontSize="10" />
+            <TextBlock Text="{Binding SelectedRepositoryMember.ChildLeaves.Count}" FontSize="10" />
+        </StackPanel>
+    </Grid>
+</UserControl>

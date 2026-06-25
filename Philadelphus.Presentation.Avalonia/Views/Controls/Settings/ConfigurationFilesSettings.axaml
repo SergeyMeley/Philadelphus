@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.Settings.ConfigurationFilesSettings">
+    <Grid RowDefinitions="*,Auto" RowSpacing="6" Margin="6">
+        <DataGrid Grid.Row="0"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding ConfigFiles}"
+                  SelectedItem="{Binding SelectedConfigFile}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Настроечный файл" Binding="{Binding ConfigName, Mode=OneWay}" Width="Auto" />
+                <DataGridTextColumn Header="Путь к файлу" Binding="{Binding FilePath, Mode=OneWay}" Width="*" />
+                <DataGridCheckBoxColumn Header="Доступность файла" Binding="{Binding Exists, Mode=OneWay}" Width="Auto" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="1" Spacing="6">
+            <Button Content="Открыть файл" Command="{Binding OpenConfigCommand}" />
+            <Button Content="Переместить файл" Command="{Binding MoveConfigCommand}" />
+            <Button Content="Выбрать другой файл" Command="{Binding SelectAnotherConfigCommand}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

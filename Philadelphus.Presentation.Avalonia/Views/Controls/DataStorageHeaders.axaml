@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lbs="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.ListBoxes"
+             xmlns:detail="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DataStorageHeaders">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <HeaderedContentControl Grid.Row="1" Header="Хранилища">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <lbs:DataStorageHeadersListBox Grid.Row="0" Grid.Column="0"
+                    DataStorageHeadersItemsSource="{Binding DataStoragesSettingsVM.DataStoragesVMs}"
+                    DataStorageHeadersSelectedItem="{Binding DataStoragesSettingsVM.SelectedDataStorageVM, Mode=TwoWay}" />
+                <!-- Сворачиваемая боковая панель деталей (вместо WPF Expander ExpandDirection=Right). -->
+                <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto,Auto">
+                    <ToggleButton Grid.Column="0" x:Name="storageDetailToggle" VerticalAlignment="Stretch" Padding="2,8">
+                        <LayoutTransformControl>
+                            <LayoutTransformControl.LayoutTransform>
+                                <RotateTransform Angle="-90" />
+                            </LayoutTransformControl.LayoutTransform>
+                            <TextBlock Text="Детальная информация" />
+                        </LayoutTransformControl>
+                    </ToggleButton>
+                    <detail:UniversalDetails Grid.Column="1"
+                                             IsVisible="{Binding #storageDetailToggle.IsChecked}"
+                                             DataContext="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}"
+                                             Width="400" MinWidth="400" MaxWidth="700" />
+                </Grid>
+            </Grid>
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

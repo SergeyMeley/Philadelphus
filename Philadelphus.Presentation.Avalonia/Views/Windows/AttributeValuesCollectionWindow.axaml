@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.AttributeValuesCollectionWindow"
+        Title="Список значений атрибута"
+        Width="800" Height="600"
+        WindowStartupLocation="CenterOwner">
+    <Grid RowDefinitions="*,3*,Auto,Auto">
+        <HeaderedContentControl Grid.Row="0" Header="Добавленные значения">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ListBox ItemsSource="{Binding SelectedRepositoryMember.SelectedAttributeVM.AssignedValues}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="1" Header="Все значения">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ListBox DataContext="{Binding SelectedRepositoryMember.SelectedAttributeVM}"
+                         ItemsSource="{Binding ValuesList}"
+                         SelectedItem="{Binding SelectedValue}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Uuid}" Width="250" />
+                                <TextBlock Text=" Наименование: " />
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text=" Значение: " />
+                                <TextBlock Text="{Binding StringValue}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </HeaderedContentControl>
+
+        <Button Grid.Row="2" Content="Добавить значение" Command="{Binding AddAttributeValueCommand}" Height="30" Margin="1" />
+        <Button Grid.Row="3" Content="Исключить значение" Command="{Binding RemoveAttributeValueCommand}" Height="30" Margin="1" />
+    </Grid>
+</Window>

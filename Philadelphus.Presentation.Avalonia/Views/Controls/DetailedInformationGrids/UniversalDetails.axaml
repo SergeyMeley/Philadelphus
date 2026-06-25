@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ac="using:Avalonia.Data.Converters"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             xmlns:infrast="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;assembly=Philadelphus.Presentation"
+             xmlns:mainent="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;assembly=Philadelphus.Presentation"
+             xmlns:rootmem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;assembly=Philadelphus.Presentation"
+             xmlns:repomem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;assembly=Philadelphus.Presentation"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.UniversalDetails">
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="infrast:DataStorageVM">
+            <local:DataStorageDetails />
+        </DataTemplate>
+        <DataTemplate DataType="mainent:PhiladelphusRepositoryHeaderVM">
+            <local:PhiladelphusRepositoryHeaderDetails />
+        </DataTemplate>
+        <DataTemplate DataType="mainent:PhiladelphusRepositoryVM">
+            <local:PhiladelphusRepositoryDetails />
+        </DataTemplate>
+        <DataTemplate DataType="repomem:TreeRootVM">
+            <StackPanel Spacing="4">
+                <local:PhiladelphusRepositoryMemberDetails />
+                <TextBlock Text="Свойства корня:" FontWeight="Bold" />
+                <TextBlock Text="Количество узлов" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="rootmem:TreeNodeVM">
+            <StackPanel Spacing="4">
+                <local:TreeRootMemberDetails />
+                <Expander Header="Свойства узла" IsExpanded="True" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Количество узлов" />
+                        <TextBlock Text="Количество листов" />
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="rootmem:TreeLeaveVM">
+            <StackPanel Spacing="4">
+                <local:TreeRootMemberDetails />
+                <Expander Header="Свойства листа" HorizontalAlignment="Stretch" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Panel>
+            <ContentControl Content="{Binding}"
+                            IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNotNull}}" />
+            <Border IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNull}}"
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Padding="10" CornerRadius="8"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                    <TextBlock Text="🚫" FontSize="24" HorizontalAlignment="Center" />
+                    <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Panel>
+    </ScrollViewer>
+</UserControl>

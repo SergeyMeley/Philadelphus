@@ -1,29 +1,18 @@
-using Philadelphus.Core.Domain.Entities.Enums;
+﻿using Philadelphus.Presentation.Converters.Logic;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace Philadelphus.Presentation.Wpf.UI.Converters
 {
     /// <summary>
-    /// WPF-конвертер значений DisplayAttribute для enum.
+    /// WPF-обёртка IValueConverter. Логика вынесена в <see cref="EnumDisplayLogic" />.
     /// </summary>
     public class EnumDisplayAttributeConverter : IValueConverter
     {
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is not Enum enumValue)
-            {
-                return value?.ToString();
-            }
-
-            return parameter?.ToString() == "Description"
-                ? enumValue.GetDisplayDescription()
-                : enumValue.GetDisplayName();
-        }
+            => EnumDisplayLogic.Convert(value, parameter);
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }

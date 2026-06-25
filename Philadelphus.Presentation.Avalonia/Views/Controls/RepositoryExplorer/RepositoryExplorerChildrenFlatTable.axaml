@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorerChildrenFlatTable">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <local:FormulaBar Grid.Row="0" DataContext="{Binding FormulaBarVM}" />
+
+        <!-- Колонки строятся behavior-ом из ChildCollectionTableColumns (ViewModel не зависит от DataGrid). -->
+        <DataGrid x:Name="SelectedElementChildsDataGrid"
+                  Grid.Row="1"
+                  Margin="1"
+                  MinHeight="50"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding ChildCollectionTableRows}"
+                  beh:DataGridColumnsBehavior.ColumnsSource="{Binding ChildCollectionTableColumns}"
+                  beh:DataGridLostKeyboardFocusCommandBehavior.Command="{Binding RebuildChildCollectionTableIfOrderStaleCommand}" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <TextBlock Text="{Binding #SelectedElementChildsDataGrid.SelectedIndex, Converter={StaticResource selectedIndexConverter}}" FontSize="10" />
+            <TextBlock Text=" / " FontSize="10" />
+            <TextBlock Text="{Binding ChildCollectionTableRows.Count}" FontSize="10" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.ReportProcessor">
+    <Grid ColumnDefinitions="Auto,Auto,*">
+        <!-- Сворачиваемая панель настроек (вместо WPF Expander ExpandDirection=Left). -->
+        <ToggleButton Grid.Column="1" x:Name="reportSettingsToggle" IsChecked="True" VerticalAlignment="Stretch" Padding="2,8">
+            <LayoutTransformControl>
+                <LayoutTransformControl.LayoutTransform>
+                    <RotateTransform Angle="-90" />
+                </LayoutTransformControl.LayoutTransform>
+                <TextBlock Text="Настройки отчета" />
+            </LayoutTransformControl>
+        </ToggleButton>
+
+        <Grid Grid.Column="0" Width="400" RowDefinitions="Auto,*,Auto" Margin="1"
+              IsVisible="{Binding #reportSettingsToggle.IsChecked}">
+            <!-- Выбор отчета -->
+            <HeaderedContentControl Grid.Row="0" Header="Выбор отчета" Margin="1">
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Хранилище" Margin="1" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Отчет" Margin="1" VerticalAlignment="Center" />
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="1" HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding DataStoragesVMs}"
+                              SelectedItem="{Binding SelectedDataStorageVM}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="1" HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding ReportInfos}"
+                              SelectedItem="{Binding SelectedReportInfo}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <CheckBox Grid.Row="2" Grid.ColumnSpan="100" IsChecked="{Binding PreliminaryRefresh}"
+                              Content="Актуальные данные (?)"
+                              ToolTip.Tip="Принудительно обновить данные из базы данных перед формированием отчета (может занять длительное время)" />
+                </Grid>
+            </HeaderedContentControl>
+
+            <!-- Параметры -->
+            <HeaderedContentControl Grid.Row="1" Header="Параметры" Margin="1">
+                <DataGrid AutoGenerateColumns="False"
+                          ItemsSource="{Binding SelectedReportInfo.Parameters}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" MinWidth="100" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Описание" Binding="{Binding Description}" MinWidth="100" IsReadOnly="True" />
+                        <DataGridCheckBoxColumn Header="Обязательный" Binding="{Binding IsRequired}" MinWidth="90" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Значение" Binding="{Binding Value}" MinWidth="100" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </HeaderedContentControl>
+
+            <!--
+            Закомментированные в WPF группы (перенос как комментарий, адаптация под Avalonia):
+            «Шаблон» (выбор/сохранение шаблона), «Набор полей» (DataGrid + Добавить/Удалить/Сбросить),
+            «Фильтрация результатов» (DataGrid + Добавить/Удалить/Сбросить).
+            -->
+
+            <!-- Результат -->
+            <HeaderedContentControl Grid.Row="2" Header="Результат" Margin="1">
+                <StackPanel>
+                    <Button Content="Отобразить отчет" Command="{Binding ExecuteReportCommand}" Margin="1" />
+                    <Button Content="Экспорт отчета .xlsx" Command="{Binding ExportToXlsxCommand}" Margin="1" />
+                    <Button Content="Экспорт отчета .json" Command="{Binding ExportToJsonCommand}" Margin="1" />
+                    <Button Content="Экспорт отчета .xml" Command="{Binding ExportToXmlCommand}" Margin="1" />
+                </StackPanel>
+            </HeaderedContentControl>
+        </Grid>
+
+        <!-- Результирующая таблица отчёта (DataTable → колонки строятся behavior-ом). -->
+        <HeaderedContentControl Grid.Column="2" Header="Отчет" Margin="1">
+            <DataGrid AutoGenerateColumns="False" IsReadOnly="True"
+                      beh:DataGridDataTableBehavior.Source="{Binding ReportResult}" />
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

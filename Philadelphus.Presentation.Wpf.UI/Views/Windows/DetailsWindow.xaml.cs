@@ -1,7 +1,4 @@
-﻿using Philadelphus.Core.Domain.Entities.MainEntities;
-using Philadelphus.Presentation.Wpf.UI.ViewModels;
-using Philadelphus.Presentation.Wpf.UI.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
 {
@@ -13,11 +10,9 @@ namespace Philadelphus.Presentation.Wpf.UI.Views.Windows
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="DetailsWindow" />.
         /// </summary>
-        /// <param name="vm">Параметр vm.</param>
-        public DetailsWindow(IMainEntityVM<IMainEntityModel> vm)
+        public DetailsWindow()
         {
             InitializeComponent();
-            DataContext = vm;
         }
     }
 }

@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.ExtensionWidgetContainer">
+    <Grid>
+        <HeaderedContentControl Header="Расширения">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="Доступные расширения:" Margin="0,0,0,5" FontWeight="Bold" />
+                    <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding SelectedExtension}" Margin="0,0,0,10" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Ellipse Width="20" Height="20" Margin="0,0,10,0"
+                             HorizontalAlignment="Left"
+                             Fill="{Binding SelectedExtension.LastCanExecuteResult.CanExecute, Converter={StaticResource booleanToColorConverter}}"
+                             ToolTip.Tip="{Binding SelectedExtension.LastCanExecuteResult.Message}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Запустить" Command="{Binding StartExtensionCommand}" Margin="1" />
+                        <Button Content="Остановить" Command="{Binding StopExtensionCommand}" Margin="1" />
+                        <Button Content="Выполнить" Command="{Binding ExecuteExtensionCommand}" Margin="1" />
+                    </StackPanel>
+                    <HeaderedContentControl Header="Виджет расширения">
+                        <StackPanel>
+                            <ContentControl Content="{Binding SelectedExtension.RepositoryExplorerWidget}" />
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </ScrollViewer>
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

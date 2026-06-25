@@ -48,7 +48,7 @@
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Отчет" Margin="1"></TextBlock>
                             <ComboBox Grid.Row="0" 
                       Grid.Column="1" 
-                      ItemsSource="{Binding DisplayedDataStoragesVMs}" 
+                      ItemsSource="{Binding DataStoragesVMs}"
                       DisplayMemberPath="Name" 
                       SelectedItem="{Binding SelectedDataStorageVM}" 
                       Margin="1"></ComboBox>

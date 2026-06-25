@@ -1,0 +1,185 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+        xmlns:repo="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.ExcelImportDesignerWindow"
+        Title="Импорт дерева"
+        Height="980" Width="1460"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,*,Auto">
+        <TextBlock Grid.Row="0" Text="Импорт дерева" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16" />
+
+        <Grid Grid.Row="1" Margin="0,0,0,16" ColumnDefinitions="Auto,Auto,Auto,*">
+            <Button Grid.Column="0" Content="Выбрать Excel файл" Command="{Binding SelectFileCommand}" Padding="10,5" Margin="0,0,12,0" HorizontalAlignment="Left" />
+            <Button Grid.Column="1" Content="Загрузить шаблон" Command="{Binding LoadTemplateCommand}" Padding="10,5" Margin="0,0,8,0" HorizontalAlignment="Left" />
+            <Button Grid.Column="2" Content="Сохранить шаблон" Command="{Binding SaveTemplateCommand}" Padding="10,5" Margin="0,0,12,0" HorizontalAlignment="Left" />
+            <TextBlock Grid.Column="3" Text="{Binding FilePathDisplay}" VerticalAlignment="Center" Opacity="0.6" />
+        </Grid>
+
+        <HeaderedContentControl Grid.Row="2" Header="Параметры нового корня" Margin="0,0,0,16">
+            <Grid ColumnDefinitions="170,*">
+                <TextBlock Grid.Column="0" Text="Наименование корня:" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Margin="5,0,0,0" Text="{Binding RootName, Mode=TwoWay}" />
+            </Grid>
+        </HeaderedContentControl>
+
+        <TabControl Grid.Row="3" Classes="compact">
+            <!-- ===== Листы ===== -->
+            <TabItem Classes="compact" Header="Листы">
+                <Grid Margin="12" ColumnDefinitions="300,16,*">
+                    <HeaderedContentControl Grid.Column="0" Header="Листы книги">
+                        <ListBox ItemsSource="{Binding Sheets}" SelectedItem="{Binding SelectedSheet}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2" ColumnDefinitions="Auto,*">
+                                        <CheckBox Grid.Column="0" VerticalAlignment="Top" Margin="0,2,8,0"
+                                                  IsChecked="{Binding IsEnabled}"
+                                                  IsCheckedChanged="SheetEnabledChanged" />
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding SourceName}" FontSize="11" Opacity="0.6" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </HeaderedContentControl>
+
+                    <Grid Grid.Column="2" RowDefinitions="Auto,12,260,12,*">
+                        <HeaderedContentControl Grid.Row="0" Header="Свойства листа">
+                            <Grid ColumnDefinitions="170,*" RowDefinitions="Auto">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Имя сущности:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentSheetDisplayName, Mode=TwoWay}" />
+
+                                <!-- Скрытые в WPF элементы свойств листа (перенос как было, IsVisible=False). -->
+                                <ComboBox IsVisible="False" ItemsSource="{Binding SheetKeyColumns}" SelectedItem="{Binding SelectedSheetKeyColumn}" />
+                                <TextBlock IsVisible="False" Text="{Binding CurrentSheetSource}" />
+                                <ComboBox IsVisible="False" IsEnabled="False"
+                                          ItemsSource="{Binding AvailableEntityKinds}"
+                                          SelectedValue="{Binding SelectedSheetEntityKind}"
+                                          SelectedValueBinding="{Binding Value}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </HeaderedContentControl>
+
+                        <HeaderedContentControl Grid.Row="2" Header="Предпросмотр листа">
+                            <Grid RowDefinitions="Auto,*">
+                                <TextBlock Grid.Row="0" Opacity="0.6" Margin="0,0,0,8" Text="{Binding SheetPreviewInfo}" />
+                                <DataGrid Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
+                                          beh:DataGridDataTableBehavior.Source="{Binding SheetPreview}" />
+                            </Grid>
+                        </HeaderedContentControl>
+
+                        <HeaderedContentControl Grid.Row="4" Header="Колонки листа">
+                            <DataGrid ItemsSource="{Binding SheetColumns}"
+                                      AutoGenerateColumns="False"
+                                      CellEditEnding="DgSheetColumns_CellEditEnding">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Колонка" Binding="{Binding HeaderName}" IsReadOnly="True" Width="2*" />
+                                    <DataGridTextColumn Header="Пример" Binding="{Binding SampleValue}" IsReadOnly="True" Width="2*" />
+                                    <DataGridTemplateColumn Header="Роль" Width="2*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate><TextBlock Text="{Binding Role}" VerticalAlignment="Center" Margin="4,0" /></DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox HorizontalAlignment="Stretch"
+                                                          ItemsSource="{Binding $parent[Window].DataContext.AvailableColumnRoles}"
+                                                          SelectedItem="{Binding Role, Mode=TwoWay}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Тип данных" Width="2*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate><TextBlock Text="{Binding DataTypeNodeName}" VerticalAlignment="Center" Margin="4,0" /></DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox HorizontalAlignment="Stretch"
+                                                          ItemsSource="{Binding $parent[Window].DataTypeOptions}"
+                                                          SelectedItem="{Binding DataTypeNodeName, Mode=TwoWay}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </HeaderedContentControl>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- ===== Диаграмма (тех. долг: WPF DiagramBehavior, Canvas с перетаскиванием/зумом) ===== -->
+            <TabItem Classes="compact" Header="Диаграмма">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
+                           Text="Диаграмма связей — перенос отложен (WPF DiagramBehavior)" />
+            </TabItem>
+
+            <!-- ===== Связи ===== -->
+            <TabItem Classes="compact" Header="Связи">
+                <Grid Margin="12" ColumnDefinitions="2*,16,3*">
+                    <HeaderedContentControl Grid.Column="0" Header="Сводка связей">
+                        <DataGrid ItemsSource="{Binding Relations}" SelectedItem="{Binding SelectedRelation}"
+                                  AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Родитель" Binding="{Binding ParentSourceName}" Width="2*" />
+                                <DataGridTextColumn Header="Ребенок" Binding="{Binding ChildSourceName}" Width="2*" />
+                                <DataGridTextColumn Header="Ключ родителя" Binding="{Binding ParentKeyColumnName}" Width="2*" />
+                                <DataGridTextColumn Header="Ключ ребенка" Binding="{Binding ChildKeyColumnName}" Width="2*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </HeaderedContentControl>
+
+                    <HeaderedContentControl Grid.Column="2" Header="Редактор связи">
+                        <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,12,Auto,*">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Дочерний лист:" VerticalAlignment="Center" Margin="0,0,8,8" />
+                            <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding RelationChildSheets}" SelectedItem="{Binding SelectedRelationChildSheet}" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Родительский лист:" VerticalAlignment="Center" Margin="0,0,8,8" />
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding RelationParentSheets}" SelectedItem="{Binding SelectedRelationParentSheet}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Ключ у родителя:" VerticalAlignment="Center" Margin="0,0,8,8" />
+                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding RelationParentKeys}" SelectedItem="{Binding SelectedRelationParentKey}" />
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Ключ у ребенка:" VerticalAlignment="Center" Margin="0,0,8,8" />
+                            <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding RelationChildKeys}" SelectedItem="{Binding SelectedRelationChildKey}" />
+
+                            <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                <Button Content="Добавить связь" Command="{Binding AddRelationCommand}" Padding="10,5" Margin="0,0,8,0" HorizontalAlignment="Left" />
+                                <Button Content="Удалить связь" Command="{Binding RemoveRelationCommand}" Padding="10,5" HorizontalAlignment="Left" />
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="6" Grid.ColumnSpan="2" TextWrapping="Wrap" Opacity="0.6"
+                                       Text="Связи описывают реальную иерархию между листами. В конструкторе родитель и ребенок можно настраивать отдельно от быстрого мастера, а диаграмма показывает ту же схему графически." />
+                        </Grid>
+                    </HeaderedContentControl>
+                </Grid>
+            </TabItem>
+
+            <!-- ===== Предпросмотр результата ===== -->
+            <TabItem Classes="compact" Header="Предпросмотр результата">
+                <Grid Margin="12" RowDefinitions="Auto,Auto,12,*">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Button Content="Обновить предпросмотр" Command="{Binding RefreshPreviewCommand}" Padding="10,5" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Margin="0,12,0,0" TextWrapping="Wrap" Text="{Binding PreviewSummary}" />
+                    <Border Grid.Row="3" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" Padding="8">
+                        <repo:RepositoryExplorer DataContext="{Binding RepositoryPreviewVM}" />
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Импортировать" Width="160" Height="36" Margin="0,0,8,0" Command="{Binding ImportCommand}" />
+            <Button Content="Закрыть" Width="120" Height="36" Command="{Binding CloseCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>

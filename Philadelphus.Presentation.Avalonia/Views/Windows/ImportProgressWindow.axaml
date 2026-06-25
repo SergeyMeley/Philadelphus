@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.ImportProgressWindow"
+        Title="Выполнение операции"
+        Width="420"
+        Height="170"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto">
+        <TextBlock x:Name="TxtHeader"
+                   Grid.Row="0"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Text="Выполнение операции" />
+
+        <StackPanel Grid.Row="1" Margin="0,18,0,0">
+            <TextBlock x:Name="TxtStatus"
+                       Text="Подготовка..."
+                       Margin="0,0,0,10" />
+            <ProgressBar x:Name="ProgressOperation"
+                         Height="16"
+                         IsIndeterminate="True" />
+        </StackPanel>
+
+        <Button x:Name="BtnClose"
+                Grid.Row="2"
+                Width="100"
+                Height="30"
+                Margin="0,18,0,0"
+                HorizontalAlignment="Right"
+                Content="Закрыть"
+                Click="BtnClose_Click"
+                IsEnabled="False" />
+    </Grid>
+</Window>

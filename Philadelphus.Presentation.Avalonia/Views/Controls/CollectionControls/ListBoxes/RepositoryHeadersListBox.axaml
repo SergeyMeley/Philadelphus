@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.ListBoxes.RepositoryHeadersListBox">
+    <Grid>
+        <ListBox BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1"
+                 ItemsSource="{Binding $parent[UserControl].RepositoryHeadersItemsSource}"
+                 SelectedItem="{Binding $parent[UserControl].RepositoryHeadersSelectedItem, Mode=TwoWay}">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+                    <Setter Property="BorderThickness" Value="0,0,0,1" />
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock>
+                                <Run Text="Репозиторий: " FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                <Run Text="{Binding Name, Mode=OneWay}" FontStyle="Italic" />
+                                <Run Text="   " />
+                                <Run Text="UUID:" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="Хранилище: " FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                <Run Text="{Binding OwnDataStorageName, Mode=OneWay}" FontStyle="Italic" />
+                                <Run Text="   " />
+                                <Run Text="UUID:" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                <Run Text="{Binding OwnDataStorageUuid, Mode=OneWay}" FontStyle="Italic" />
+                            </TextBlock>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center">
+                            <Run Text="Доступность:" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                            <Run Text="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay}" FontWeight="Bold" Foreground="{Binding IsPhiladelphusRepositoryAvailable, Mode=OneWay, Converter={StaticResource booleanToColorConverter}}" />
+                        </TextBlock>
+                        <TextBlock Grid.Column="2" VerticalAlignment="Center">
+                            <Run Text="Последний запуск: " FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                            <Run Text="{Binding LastOpening, Mode=OneWay, Converter={StaticResource lastLaunchToDaysAgoConverter}}" />
+                        </TextBlock>
+                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsFavorite}" ToolTip.Tip="Избранное" VerticalAlignment="Center">
+                            <TextBlock Text="☆" FontSize="20" />
+                        </ToggleButton>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls.LaunchWindowStoragesTabControl">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MaxHeight="300" />
+            <RowDefinition Height="4*" />
+        </Grid.RowDefinitions>
+        <HeaderedContentControl Grid.Row="0" Header="Создать">
+            <ctrls:StoragesCreation DataContext="{Binding StorageCreationControlVM}" />
+        </HeaderedContentControl>
+        <HeaderedContentControl Grid.Row="1" Header="Открыть">
+            <ctrls:DataStorageHeaders />
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>

@@ -4,87 +4,86 @@
              xmlns:local="clr-namespace:Philadelphus.Presentation.Wpf.UI"
              xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters">
     <Application.Resources>
-        <converters:MainEntityToIconConverter x:Key="mainEntityToIconConverter" />
+        <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+        <converters:IconConverter x:Key="iconConverter" />
         <converters:SelectedIndexConverter x:Key="selectedIndexConverter" />
-        <converters:RepresentationToDataGridVisibilityConverter x:Key="representationToDataGridVisibilityConverter" />
-        <converters:RepresentationToStandardGridVisibilityConverter x:Key="representationToStandardGridVisibilityConverter" />
-        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter" />
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter" />
         <converters:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
         <converters:StateToColorConverter x:Key="stateToColorConverter" />
         
         <!--Иконки кнопок-->
-        <Image x:Key="imageAdd" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageApproval64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/approval_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageBack" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageBroom64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/broom_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageCheck64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/check_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageCopy" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageCut" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_cut.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDelete" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_delete.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDelete2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_delete2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDeleteSoft64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/soft_delete_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDeleteSoft64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/soft_delete_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDeleteHard64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/hard_delete_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDeleteHard64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/hard_delete_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageDuplicate" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_duplicate.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageEdit64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/edit_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageEditOld" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageEmpty" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_empty.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageForward" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageGetWork" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/getwork_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLeaveInfo64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/leave_info_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLink" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNewTab64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/new-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageOpen" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/open.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imagePaste" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageProtect" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageRemove" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageReturn" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageSave" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageSearch" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/search_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageSettings" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/settings_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageShowTopLevel64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/top_level_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageUp" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageAdd" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_add.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageApproval64" Source="pack://siteoforigin:,,,/Icons/approval_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageBack" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_back.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageBroom64" Source="pack://siteoforigin:,,,/Icons/broom_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageCheck64" Source="pack://siteoforigin:,,,/Icons/check_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageCopy" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_copy.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageCut" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_cut.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDelete" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_delete.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDelete2" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_delete2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDeleteSoft64_1" Source="pack://siteoforigin:,,,/Icons/soft_delete_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDeleteSoft64_2" Source="pack://siteoforigin:,,,/Icons/soft_delete_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDeleteHard64_1" Source="pack://siteoforigin:,,,/Icons/hard_delete_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDeleteHard64_2" Source="pack://siteoforigin:,,,/Icons/hard_delete_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageDuplicate" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_duplicate.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageEdit64" Source="pack://siteoforigin:,,,/Icons/edit_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageEditOld" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_modify.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageEmpty" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_empty.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageForward" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_forward.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageGetWork" Source="pack://siteoforigin:,,,/Icons/getwork_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLeaveInfo64" Source="pack://siteoforigin:,,,/Icons/leave_info_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLink" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_link.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNewTab64" Source="pack://siteoforigin:,,,/Icons/new-tab_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageOpen" Source="pack://siteoforigin:,,,/Icons/open.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imagePaste" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_paste.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageProtect" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_protect.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRemove" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_remove.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageReturn" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_return.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageSave" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_save.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageSearch" Source="pack://siteoforigin:,,,/Icons/search_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageSettings" Source="pack://siteoforigin:,,,/Icons/settings_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageShowTopLevel64" Source="pack://siteoforigin:,,,/Icons/top_level_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageUp" Source="pack://siteoforigin:,,,/Icons/without_a_license/Flaticon_icon_up.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
         <!--Иконки статусов-->
-        <Image x:Key="imageOk64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/ok_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageOk64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/ok_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageInfo64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/info_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageInfo64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/info_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageInfo64_3" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/info_64_3.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageWarning64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/warning_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageError64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/error_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageError64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/error_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageError64_3" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/error_64_3.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageError64_4" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/error_64_4.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageError64_5" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/error_64_5.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageAlarm64" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/alarm_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageOk64_1" Source="pack://siteoforigin:,,,/Icons/ok_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageOk64_2" Source="pack://siteoforigin:,,,/Icons/ok_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageInfo64_1" Source="pack://siteoforigin:,,,/Icons/info_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageInfo64_2" Source="pack://siteoforigin:,,,/Icons/info_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageInfo64_3" Source="pack://siteoforigin:,,,/Icons/info_64_3.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageWarning64" Source="pack://siteoforigin:,,,/Icons/warning_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageError64_1" Source="pack://siteoforigin:,,,/Icons/error_64_1.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageError64_2" Source="pack://siteoforigin:,,,/Icons/error_64_2.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageError64_3" Source="pack://siteoforigin:,,,/Icons/error_64_3.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageError64_4" Source="pack://siteoforigin:,,,/Icons/error_64_4.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageError64_5" Source="pack://siteoforigin:,,,/Icons/error_64_5.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageAlarm64" Source="pack://siteoforigin:,,,/Icons/alarm_64.png" Stretch="Fill" Margin="1" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
         <!--Логотипы-->
-        <Image x:Key="imagePhiladelphusLogo2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/philadelphus_logo_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <BitmapImage x:Key="imagePhiladelphusLogo" UriSource="/Philadelphus.Presentation.Wpf.UI;component/Icons/philadelphus_logo_64.png" x:Shared="false"></BitmapImage>
+        <Image x:Key="imagePhiladelphusLogo2" Source="pack://siteoforigin:,,,/Icons/philadelphus_logo_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <BitmapImage x:Key="imagePhiladelphusLogo" UriSource="pack://siteoforigin:,,,/Icons/philadelphus_logo_64.png" x:Shared="false"></BitmapImage>
         
         <!--Иконки сущностей-->
-        <Image x:Key="imageStorage" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/storage.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageRepository" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/philadelphus_logo_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_3" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_3.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_4" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_4.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_5" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_5.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_6" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_6.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_7" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_7.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageTree64_8" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/tree_64_8.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageRoot64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/root_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageRoot64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/root_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNode64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/node_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNode64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/node_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageNode64_3" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/node_64_3.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLeave64_1" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/leave_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLeave64_2" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/leave_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
-        <Image x:Key="imageLeave64_3" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/leave_64_3.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageStorage" Source="pack://siteoforigin:,,,/Icons/storage.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRepository" Source="pack://siteoforigin:,,,/Icons/philadelphus_logo_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_1" Source="pack://siteoforigin:,,,/Icons/tree_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_2" Source="pack://siteoforigin:,,,/Icons/tree_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_3" Source="pack://siteoforigin:,,,/Icons/tree_64_3.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_4" Source="pack://siteoforigin:,,,/Icons/tree_64_4.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_5" Source="pack://siteoforigin:,,,/Icons/tree_64_5.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_6" Source="pack://siteoforigin:,,,/Icons/tree_64_6.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_7" Source="pack://siteoforigin:,,,/Icons/tree_64_7.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageTree64_8" Source="pack://siteoforigin:,,,/Icons/tree_64_8.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRoot64_1" Source="pack://siteoforigin:,,,/Icons/root_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageRoot64_2" Source="pack://siteoforigin:,,,/Icons/root_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNode64_1" Source="pack://siteoforigin:,,,/Icons/node_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNode64_2" Source="pack://siteoforigin:,,,/Icons/node_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageNode64_3" Source="pack://siteoforigin:,,,/Icons/node_64_3.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLeave64_1" Source="pack://siteoforigin:,,,/Icons/leave_64_1.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLeave64_2" Source="pack://siteoforigin:,,,/Icons/leave_64_2.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageLeave64_3" Source="pack://siteoforigin:,,,/Icons/leave_64_3.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
-        <Image x:Key="imageList" Source="/Philadelphus.Presentation.Wpf.UI;component/Icons/list_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
+        <Image x:Key="imageList" Source="pack://siteoforigin:,,,/Icons/list_64.png" Stretch="Fill" MinHeight="15" MinWidth="15" x:Shared="false"></Image>
 
         <!--Кнопки-->
         <Button x:Key="buttonBack" Content="{StaticResource imageBack}" Margin="1" MinHeight="20" MinWidth="20" Background="Transparent" />
@@ -134,29 +133,5 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--<DataTemplate x:Key="RepositoryTreeItem">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal" >
-                    <Rectangle HorizontalAlignment="Left" VerticalAlignment="Stretch"  Fill="Gray" Width="0.25"/>
-                    <Image Height="24" Margin="10,0,10,0">
-                        <Image.Source>
-                            <BitmapImage UriSource="/Philadelphus.Presentation.Wpf.UI;component/Icons/without_a_license/icons8-квадратный-корень-2-64.png" />
-                        </Image.Source>
-                    </Image>
-                    <StackPanel Margin="0,2,10,2">
-                        <TextBlock>
-                <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                <Run Text="{Binding Name}" FontStyle="Italic" />
-                        </TextBlock>
-                        <TextBlock>
-                <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />
-                <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
-                        </TextBlock>
-
-                    </StackPanel>
-                </StackPanel>
-                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="Gray" Height="0.25"/>
-            </StackPanel>
-        </DataTemplate>-->
     </Application.Resources>
 </Application>

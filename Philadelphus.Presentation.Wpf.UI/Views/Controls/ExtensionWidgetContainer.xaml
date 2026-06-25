@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:CanExecuteToColorConverter x:Key="canExecuteToColorConverter"/>
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter"/>
     </UserControl.Resources>
     <Grid>
         <GroupBox>
@@ -17,7 +17,7 @@
                     <StackPanel>
                         <TextBlock Text="Доступные расширения:" Margin="0,0,0,5" FontWeight="Bold" />
                         <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding SelectedExtension}" DisplayMemberPath="Name" SelectedValuePath="Name" Margin="0,0,0,10"></ComboBox>
-                        <Ellipse Width="20" Height="20" Margin="0,0,10,0" Fill="{Binding SelectedExtension.LastCanExecuteResult.CanExecute, Converter={StaticResource canExecuteToColorConverter}}" ToolTip="{Binding SelectedExtension.LastCanExecuteResult.Message}"/>
+                        <Ellipse Width="20" Height="20" Margin="0,0,10,0" Fill="{Binding SelectedExtension.LastCanExecuteResult.CanExecute, Converter={StaticResource booleanToColorConverter}}" ToolTip="{Binding SelectedExtension.LastCanExecuteResult.Message}"/>
                         <StackPanel Orientation="Horizontal">
                             <Button Content="Запустить" Command="{Binding StartExtensionCommand}" Margin="1"></Button>
                             <Button Content="Остановить" Command="{Binding StopExtensionCommand}" Margin="1"></Button>

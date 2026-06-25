@@ -1,0 +1,109 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Philadelphus.Presentation.Avalonia.Converters"
+             x:Class="Philadelphus.Presentation.Avalonia.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Локализованные ресурсы Ribbon.Avalonia (требуются контролом ленты). -->
+                <ResourceInclude Source="avares://Ribbon.Avalonia/Locale/en-ca.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
+            <conv:IconConverter x:Key="iconConverter" />
+            <conv:SelectedIndexConverter x:Key="selectedIndexConverter" />
+            <conv:BooleanToColorConverter x:Key="booleanToColorConverter" />
+            <conv:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />
+            <conv:StateToColorConverter x:Key="stateToColorConverter" />
+            <conv:LastLaunchToDaysAgoConverter x:Key="lastLaunchToDaysAgoConverter" />
+            <conv:UtcToLocalTimeConverter x:Key="utcToLocalTimeConverter" />
+            <conv:FormulaHighlightKindToBrushConverter x:Key="formulaKindToBrushConverter" />
+            <conv:FormulaHighlightKindToFontWeightConverter x:Key="formulaKindToFontWeightConverter" />
+            <conv:BoolToBrushConverter x:Key="boolToBrushConverter" />
+            <conv:NullableDateTimeToOffsetConverter x:Key="nullableDateTimeToOffsetConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://Ribbon.Avalonia/Styles/Fluent/Ribbon.Avalonia.xaml" /> 
+
+        <!-- В Avalonia DataGrid по умолчанию без линий сетки (в WPF они видны) — строки/ячейки сливаются.
+             Возвращаем линии и внешнюю рамку. -->
+        <Style Selector="DataGrid">
+            <Setter Property="GridLinesVisibility" Value="All" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- В теме Fluent у Button по умолчанию HorizontalAlignment/VerticalAlignment = Left/Top
+             (в WPF — Stretch), поэтому кнопки садятся по содержимому. Возвращаем WPF-поведение:
+             кнопка заполняет ячейку. Точечные HorizontalAlignment на конкретных кнопках это переопределят. -->
+        <Style Selector="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- Тонкая рамка для всех кнопок: задаём на самом контроле — шаблон Fluent подхватывает
+             BorderBrush/BorderThickness через TemplateBinding. Внешний стиль на часть шаблона
+             (PART_ContentPresenter) TemplateBinding не переопределяет, поэтому рамка не появлялась. -->
+        <Style Selector="Button">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ToggleButton">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- Замена WPF GroupBox: HeaderedContentControl в виде рамки с заголовком.
+             Тип-селектор в Avalonia не затрагивает наследников (Expander), так что безопасно. -->
+        <Style Selector="HeaderedContentControl">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1" CornerRadius="3" Margin="2" Padding="4">
+                        <DockPanel LastChildFill="True">
+                            <!-- ContentPresenter, а не TextBlock: заголовок может быть не строкой,
+                                 а контролом (например StackPanel) — TextBlock вывел бы его как ToString(). -->
+                            <ContentPresenter DockPanel.Dock="Top"
+                                              Content="{TemplateBinding Header}"
+                                              FontWeight="SemiBold"
+                                              Margin="0,0,0,4" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="Stretch"
+                                              VerticalContentAlignment="Stretch" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <!-- Компактные вкладки: дефолтные Fluent TabItem крупные и съедают рабочее пространство.
+             Применяется точечно через класс compact (чтобы не задевать LaunchWindow и левые вкладки Настроек). -->
+        <Style Selector="TabItem.compact">
+            <Setter Property="FontSize" Value="13" />
+            <!-- Высоту задаём, но Padding НЕ переопределяем: расстояние до линии выбора
+                 Fluent рассчитывает сам по шаблону, ручной Padding давал наезд/обратный эффект. -->
+            <Setter Property="MinHeight" Value="34" />
+        </Style>
+
+        <!-- Еле заметная рамка вокруг содержимого вкладки (только для compact-таб-контролов). -->
+        <Style Selector="TabControl.compact /template/ ContentPresenter#PART_SelectedContentHost">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- Тонкая колонка-индикатор состояния в DataGrid: убираем отступы ячейки,
+             иначе padding раздувает узкую колонку. -->
+        <Style Selector="DataGridCell.statusStripe">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+    </Application.Styles>
+
+</Application>

@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.Attributes">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+        <!-- Тулбар атрибутов -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Command="{Binding CreateAttributeCommand}" ToolTip.Tip="Добавить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_add.png" />
+            </Button>
+            <Button Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" ToolTip.Tip="Удалить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_remove.png" />
+            </Button>
+            <Button Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip.Tip="Открыть настройки списка" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                <Image Source="/Assets/Icons/list_64.png" />
+            </Button>
+        </StackPanel>
+
+        <local:FormulaBar Grid.Row="1" DataContext="{Binding FormulaBarVM}" />
+
+        <DataGrid Name="SelectedElementAttributesDataGrid"
+                  Grid.Row="2"
+                  ItemsSource="{Binding SelectedRepositoryMember.AttributesVMs}"
+                  SelectedItem="{Binding FormulaBarVM.SelectedFormulaAttribute, Mode=TwoWay}"
+                  SelectionMode="Single"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <!-- Состояние -->
+                <DataGridTemplateColumn Width="7" MinWidth="0" CellStyleClasses="statusStripe">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding State, Converter={StaticResource stateToColorConverter}}"
+                                    ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Uuid" Binding="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" />
+
+                <!-- Тип данных -->
+                <DataGridTemplateColumn Header="Тип данных">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding ValueTypesList}"
+                                      SelectedItem="{Binding SelectedValueType, Mode=TwoWay}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" />
+
+                <!-- Значение
+                     TODO этап D / доводка: редактируемый ComboBox (ввод формулы Text=FormulaValueText)
+                     и подсветка «переопределено» (Moccasin) — в Avalonia ComboBox не editable. -->
+                <DataGridTemplateColumn Header="Значение">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayedValueText, Mode=OneWay}" VerticalAlignment="Center" Margin="2,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding ValuesList}"
+                                      SelectedItem="{Binding AssignedValue, Mode=TwoWay}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}" IsReadOnly="True" />
+
+                <!-- Область видимости -->
+                <DataGridTemplateColumn Header="Область видимости">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding VisibilityScopesList}"
+                                      SelectedValue="{Binding Visibility, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding Value}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Переопределение -->
+                <DataGridTemplateColumn Header="Переопределение">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding OverrideTypesList}"
+                                      SelectedValue="{Binding Override, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding Value}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Глубина наследования" Binding="{Binding InheritanceDepth}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Владелец" Binding="{Binding DeclaringOwner.Name}" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <TextBlock Text="{Binding #SelectedElementAttributesDataGrid.SelectedIndex, Converter={StaticResource selectedIndexConverter}}" FontSize="10" />
+            <TextBlock Text=" / " FontSize="10" />
+            <TextBlock Text="{Binding SelectedRepositoryMember.AttributesVMs.Count}" FontSize="10" />
+        </StackPanel>
+    </Grid>
+</UserControl>

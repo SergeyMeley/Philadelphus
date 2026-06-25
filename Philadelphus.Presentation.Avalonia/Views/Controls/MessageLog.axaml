@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.MessageLog">
+    <Grid RowDefinitions="Auto,Auto">
+        <!-- Заголовок-панель (вместо WPF Expander ExpandDirection=Down).
+             Тумблер-полоса на всю ширину как фон; фильтры/кнопки лежат поверх справа (ZIndex):
+             клик по пустой части полосы сворачивает/разворачивает, клик по кнопкам — срабатывает на них. -->
+        <Grid Grid.Row="0" Margin="1" ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto">
+            <ToggleButton Grid.Column="0" Grid.ColumnSpan="7" x:Name="logToggle" IsChecked="True"
+                          Content="Журнал сообщений" Padding="4,1" FontSize="12"
+                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
+
+            <ToggleButton Grid.Column="1" ZIndex="1" Classes="logbtn" IsChecked="{Binding IsOkMessagesVisible}" ToolTip.Tip="Отобразить / скрыть уведомления об успешном выполнении" Padding="0" Margin="1,0" VerticalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/Icons/ok_64_1.png" Height="13" Margin="1,0" />
+                    <TextBlock Text="{Binding OkMessagesCount}" MinWidth="22" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </ToggleButton>
+            <ToggleButton Grid.Column="2" ZIndex="1" Classes="logbtn" IsChecked="{Binding IsInfoMessagesVisible}" ToolTip.Tip="Отобразить / скрыть информационные сообщения" Padding="0" Margin="1,0" VerticalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/Icons/info_64_2.png" Height="13" Margin="1,0" />
+                    <TextBlock Text="{Binding InfoMessagesCount}" MinWidth="22" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </ToggleButton>
+            <ToggleButton Grid.Column="3" ZIndex="1" Classes="logbtn" IsChecked="{Binding IsWarningMessagesVisible}" ToolTip.Tip="Отобразить / скрыть предупреждения" Padding="0" Margin="1,0" VerticalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/Icons/warning_64.png" Height="13" Margin="1,0" />
+                    <TextBlock Text="{Binding WarningMessagesCount}" MinWidth="22" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </ToggleButton>
+            <ToggleButton Grid.Column="4" ZIndex="1" Classes="logbtn" IsChecked="{Binding IsErrorMessagesVisible}" ToolTip.Tip="Отобразить / скрыть сообщения об ошибках" Padding="0" Margin="1,0" VerticalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/Icons/error_64_3.png" Height="13" Margin="1,0" />
+                    <TextBlock Text="{Binding ErrorMessagesCount}" MinWidth="22" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </ToggleButton>
+            <Button Grid.Column="5" ZIndex="1" Classes="logbtn" Command="{Binding ClearMessageLogCommand}" ToolTip.Tip="Очистить журнал сообщений" Padding="2,0" Margin="1,0" VerticalAlignment="Stretch">
+                <Image Source="/Assets/Icons/broom_64.png" Height="13" />
+            </Button>
+            <Button Grid.Column="6" ZIndex="1" Classes="logbtn" Command="{Binding SendTestNotificationCommand}" ToolTip.Tip="Отправить тестовое уведомление всем пользователям" Padding="2,0" Margin="1,0" VerticalAlignment="Stretch">
+                <Image Source="/Assets/Icons/check_64.png" Height="13" />
+            </Button>
+        </Grid>
+
+        <!-- Автопрокрутка к хвосту журнала при обновлении (DataGridAutoScrollBehavior). -->
+        <DataGrid Grid.Row="1"
+                  IsVisible="{Binding #logToggle.IsChecked}"
+                  ItemsSource="{Binding CurrentMessageLogFilteredNotifications, Mode=OneWay}"
+                  AutoGenerateColumns="False"
+                  FontSize="12"
+                  Height="200" MinHeight="200"
+                  beh:DataGridAutoScrollBehavior.IsEnabled="True">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="К." MaxWidth="30" IsReadOnly="True" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding CriticalLevel, Converter={StaticResource iconConverter}}" Height="13" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Время" Binding="{Binding DateTime}" MinWidth="120" IsReadOnly="True" />
+                <DataGridTextColumn Header="Отправитель" Binding="{Binding SenderDisplayName}" MinWidth="150" IsReadOnly="True" CanUserSort="False" />
+                <DataGridTemplateColumn Header="Сообщение" Width="*" MinWidth="400" IsReadOnly="True" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" MaxHeight="50" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Источник" Binding="{Binding Source}" MinWidth="250" IsReadOnly="True" CanUserSort="False" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

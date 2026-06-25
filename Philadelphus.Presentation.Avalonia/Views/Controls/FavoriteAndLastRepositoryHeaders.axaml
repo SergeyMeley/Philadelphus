@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lbs="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.ListBoxes"
+             xmlns:detail="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.FavoriteAndLastRepositoryHeaders">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <HeaderedContentControl Grid.Row="0" Grid.Column="0" Header="Избранные">
+            <lbs:RepositoryHeadersListBox
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoritePhiladelphusRepositoryHeadersVMs}"
+                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}" />
+        </HeaderedContentControl>
+        <HeaderedContentControl Grid.Row="1" Grid.Column="0" Header="Недавние">
+            <lbs:RepositoryHeadersListBox
+                RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastPhiladelphusRepositoryHeadersVMs}"
+                RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}" />
+        </HeaderedContentControl>
+
+        <!-- Сворачиваемая боковая панель деталей (вместо WPF Expander ExpandDirection=Right):
+             вертикальная полоса-ToggleButton на всю высоту + панель, видимая по IsChecked. -->
+        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" ColumnDefinitions="Auto,Auto">
+            <ToggleButton Grid.Column="0" x:Name="favDetailToggle" VerticalAlignment="Stretch" Padding="2,8">
+                <LayoutTransformControl>
+                    <LayoutTransformControl.LayoutTransform>
+                        <RotateTransform Angle="-90" />
+                    </LayoutTransformControl.LayoutTransform>
+                    <TextBlock Text="Детальная информация" />
+                </LayoutTransformControl>
+            </ToggleButton>
+            <detail:UniversalDetails Grid.Column="1"
+                                     IsVisible="{Binding #favDetailToggle.IsChecked}"
+                                     DataContext="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM}" />
+        </Grid>
+
+        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Command="{Binding OpenMainWindowWithHeaderCommand}" />
+    </Grid>
+</UserControl>

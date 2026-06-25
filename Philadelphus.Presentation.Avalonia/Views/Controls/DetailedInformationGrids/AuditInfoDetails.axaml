@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.AuditInfoDetails">
+    <Grid ColumnDefinitions="Auto,*"
+          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+          RowSpacing="4"
+          ColumnSpacing="8">
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Заголовок:" FontWeight="Bold" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Кто создал" VerticalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CreatedBy, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Когда создал" VerticalAlignment="Center" />
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CreatedAt, Mode=OneWay, Converter={StaticResource utcToLocalTimeConverter}, ConverterParameter='LikeIso8601WithZone'}" IsReadOnly="True" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Кто изменил" VerticalAlignment="Center" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding UpdatedBy, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Когда изменил" VerticalAlignment="Center" />
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding UpdatedAt, Mode=OneWay, Converter={StaticResource utcToLocalTimeConverter}, ConverterParameter='LikeIso8601WithZone'}" IsReadOnly="True" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Удален" VerticalAlignment="Center" />
+        <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding IsDeleted}" IsEnabled="False" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Кто удалил" VerticalAlignment="Center" />
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding DeletedBy, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Когда удалил" VerticalAlignment="Center" />
+        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding DeletedAt, Mode=OneWay, Converter={StaticResource utcToLocalTimeConverter}, ConverterParameter='LikeIso8601WithZone'}" IsReadOnly="True" />
+
+        <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Text="Содержимое:" FontWeight="Bold" />
+        <Grid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Кто изменил" VerticalAlignment="Center" />
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ContentUpdatedAt, Mode=OneWay}" IsReadOnly="True" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Когда изменил" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ContentUpdatedBy, Mode=OneWay, Converter={StaticResource utcToLocalTimeConverter}, ConverterParameter='LikeIso8601WithZone'}" IsReadOnly="True" />
+        </Grid>
+    </Grid>
+</UserControl>

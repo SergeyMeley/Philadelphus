@@ -1,0 +1,157 @@
+﻿# 10 — Рефакторинг ExcelImportDesignerWindow: вынос логики из code-behind в MVVM
+
+> Документ-план. Закрывает последнее место Этапа 3.2 (B) — `ImportExportControlVM` ссылается на
+> `ExcelImportDesignerWindow` и открывает его напрямую. Окно — это 1510 строк code-behind, поэтому
+> простая абстракция открытия недостаточна: принято решение **полностью исключить code-behind** и
+> перевести окно на MVVM, чтобы и `ImportExportControlVM`, и сам дизайнер стали переносимыми.
+
+## 1. Контекст и цель
+
+- Ветка `feature/#65575392-avalonia`. Предыдущие шаги B: `RepositoryExplorerControlVM` и
+  `MainWindowVM` уже переведены на `IWindowService` (см. `09-handoff-portability.md`, раздел 8.B).
+- Остаток шага B — `ImportExportControlVM.ImportFromExcelDesigner()`:
+  `GetRequiredService<ExcelImportDesignerWindow>()` → `window.Initialize(4 арг.)` → `ShowDialog()`,
+  плюс `using …Wpf.UI.Views.Windows`.
+- Окно нельзя открыть через стандартный `IWindowService` (реестр VM→окно + `DataContext`), потому что
+  это не MVVM-окно: `DataContext = this`, императивная пост-инициализация `Initialize(...)`,
+  всё состояние и обработчики — в code-behind.
+- **Решение пользователя:** не вводить промежуточный сервис-обёртку, а отрефакторить окно —
+  исключить весь code-behind, вынеся логику в VM / `Infrastructure.ImportExport.Excel` /
+  `Core.Domain.ImportExport`, в крайнем случае — в `AttachedBehavior`.
+
+## 2. Текущее состояние окна
+
+- `Views/Windows/ExcelImportDesignerWindow.xaml` — 333 строки.
+- `Views/Windows/ExcelImportDesignerWindow.xaml.cs` — 1510 строк.
+- Конструктор принимает через DI: `IServiceProvider`, `ConversionService`, `ExcelPreviewService`,
+  `IExcelImportSchemaBuilder`, `IExcelImportSchemaTemplateStorage`, `ExcelImportPipeline`,
+  `ExcelImportPresentationPipeline`. В ctor — `DataContext = this`.
+- Пост-инициализация (рантайм-данные):
+  `Initialize(ShrubModel shrub, PhiladelphusRepositoryModel repository, IPhiladelphusRepositoryService repositoryService, Action refreshRepositoryView)`.
+- **Важно:** вся доменная логика уже вынесена в Infrastructure-хелперы и сервисы
+  (`ExcelImportSchemaBuilder/Normalizer`, `ExcelImportProfileEditorHelper`, `ExcelPreviewService`/`ExcelPreviewTableBuilder`,
+  `ExcelImportPipeline`, `ExcelImportPresentationPipeline`, `ExcelImportSchemaTemplateStorage`).
+  Code-behind в основном **оркеструет** эти сервисы и **императивно** связывает данные с именованными
+  контролами (`ItemsSource=`, `SelectedItem=`, `.Items.Refresh()`, `.Text=`), а также рисует диаграмму.
+
+## 3. Классификация ответственностей (1510 строк → целевой слой)
+
+| Кластер | Представители | Куда |
+|---|---|---|
+| Состояние | `_schema`, `_currentSheet`, `_selectedFilePath`, `_workbookPreview`, флаги `_isUpdating*`, `CompletedImport` | свойства **VM** |
+| Оркестрация схемы | `LoadWorkbook/LoadSchema/LoadSchemaFromWorkbook`, `BindSchema`, `BindCurrentSheet`, `BindRelationEditor`, `RefreshRelationViews/ParentKeyOptions/Ui`, `*SelectionChanged`, `TxtSheetDisplayName_TextChanged`, `Apply/ClearSheetRelation`, `TryApplyRelation*`, `Btn(Add/Remove)Relation`, `ApplySheetEntityKind`, `Sync*Schema*`, `TrySyncSchemaFromImportParameters`, `TryGetImportParameters`, `BtnImport`, `BtnRefreshPreview`, `Btn(Load/Save)Template`, `ChkCreateNewRoot_*`, `GetSheet`, `ClearPreviewResult` | **VM** (делегирует в те же Infrastructure-сервисы) |
+| Диалоги | `OpenFileDialog` (выбор файла, load/save шаблона), `MessageBox.Show` | `IFileDialogService` + `IMessageDialogService` (уже в shared) |
+| **Диаграмма: визуал+ввод** | `RenderDiagram`, `ArrangeDiagramCardsByGrid`, `Add/UpdateRelationVisual(s)`, `Create/Update/RemoveRelationPreviewLine`, `CreateArrowHead(Points)`, `Get(Border/Element)Center`, `GetCanvas(Left/Top)`, `FindDiagramColumnDropTarget`, `IsPointInsideElement`, `IsInsideButton`, `BeginColumnRelationDrag`, `DiagramCard_Mouse*`, `DiagramScrollViewer_PreviewMouseWheel` (zoom), `ResetDiagramDragState` | **остаётся в View** (рисование на `Canvas`: `Line/Polygon/Border`, `Point`, mouse capture, `ScaleTransform`) — переносу в чистый VM не подлежит |
+
+Именованные контролы, к которым обращается code-behind (станут биндингами/командами):
+`TxtRootName/FilePath/SheetDisplayName/CurrentSheetSource/SheetPreviewInfo/PreviewSummary`,
+`LstSchemaSheets`, `DgSheetColumns/DgSheetPreview/DgRelations`,
+`CmbExistingRoots/SheetKeyColumn/SheetEntityKind/RelationChildSheet/RelationParentSheet/RelationParentKey/RelationChildKey`,
+`ChkCreateNewRoot`, `Btn*`, `DiagramCanvas/DiagramScrollViewer/DiagramCanvasScaleTransform`.
+
+## 3.1. ⚠️ Транзитивный блокер размещения VM (найдено при глубоком чтении)
+
+`ExcelImportPresentationPipeline.BuildRepositoryPreview(...)` **возвращает `RepositoryExplorerControlVM`**.
+Сам pipeline лежит в WPF (`Philadelphus.Presentation.Wpf.UI/Services/ExcelImportPresentationPipeline.cs`)
+и ссылается на `RepositoryExplorerControlVM` (WPF). Поэтому превью дизайнера транзитивно зависит от
+WPF-резидентного хаба-эксплорера — и `ExcelImportDesignerVM` **пока нельзя положить в shared**
+(shared не может ссылаться на WPF). Это ровно случай из §5 хендоффа.
+
+**Решение (Вариант A):** делаем MVVM-рефакторинг, но `ExcelImportDesignerVM` размещаем в **WPF-проекте**
+(`Philadelphus.Presentation.Wpf.UI/ViewModels/ImportExport/`). Переезд в shared — позже, когда
+`RepositoryExplorerControlVM` + `ExcelImportPresentationPipeline` станут портабельными. Несмотря на
+размещение в WPF, VM сразу пишем «портабельно»: сервисы — через shared-абстракции (см. 3.2), прямые
+ссылки на WPF-типы держим минимально (только реально блокирующие: presentation-pipeline и
+`ImportProgressWindow`).
+
+## 3.2. View-завязки, найденные сверх поверхностной классификации, и их абстракции
+
+- `MessageBox.Show` → `IMessageDialogService` (ShowInformation/Warning/Error).
+- `OpenFileDialog`/`SaveFileDialog` → `IFileDialogService` (`OpenExcelFile`, `OpenImportSchemaFile`,
+  `SaveImportSchemaFile` — уже есть под эти сценарии).
+- `Dispatcher.Invoke` (фон импорта) → `IDispatcherService`.
+- `Close()` окна (после импорта и по кнопке) + флаг `CompletedImport` → `IWindowService.Close(this)`.
+- Превью: `RepositoryExplorerPreview.DataContext = previewVM` + `ConfigureAsReadonly(control)` →
+  свойство VM `RepositoryPreviewVM` (биндинг DataContext дочернего контрола) + readonly через XAML/behavior.
+  **Тип превью — `RepositoryExplorerControlVM`** (см. 3.1, это и есть блокер shared).
+- `ImportProgressWindow` (Initialize/Show/UpdateStatus/Complete/Fail + `Task.Run`) → пока используем
+  напрямую (WPF-блокер); позже — абстракция прогресса `IImportProgressReporter`.
+
+## 4. Целевая архитектура
+
+- Новый **`ExcelImportDesignerVM`** (пока в WPF, см. 3.1; позже shared): держит состояние, свойства
+  (наблюдаемые коллекции листов/связей/колонок, выбранные элементы, тексты), команды
+  (`SelectFile`, `Add/RemoveRelation`, `RefreshPreview`, `Import`, `Load/SaveTemplate`, `Close`),
+  делегирует в Infrastructure-сервисы (те же, что в окне) + `IFileDialogService`/`IMessageDialogService`.
+- Рантайм-данные (`shrub`, `repository`, `repositoryService`, `refreshRepositoryView`) и DI-сервисы
+  смешаны → создавать VM через **фабрику** `IExcelImportDesignerVMFactory.Create(...)`
+  (паттерн как `IMainWindowVMFactory`).
+- **Диаграмма** — единственная часть, что остаётся во View. VM владеет *моделью* диаграммы
+  (карточки с координатами X/Y, связи «родительская колонка → дочерняя»); рисование и обработка
+  мыши/зума — либо `AttachedBehavior`, либо data-templated `Canvas`. **Решение отложено до Фазы 3**
+  (см. раздел 6).
+- Открытие: окно становится VM-driven → `Register<ExcelImportDesignerVM, ExcelImportDesignerWindow>`,
+  `ImportExportControlVM` открывает через `_windowService.ShowDialog(factory.Create(...))`; прямая
+  ссылка на `Views.Windows` уходит.
+
+## 5. Фазы (каждая — отдельный коммит, отдельная контрольная сборка)
+
+**Фаза 1 — каркас VM (без подключения).** Создать `ExcelImportDesignerVM` в WPF-проекте (см. 3.1): состояние,
+свойства, команды; перенести非-визуальные методы (оркестрация + диалоги) с делегированием в
+Infrastructure-сервисы (через обязательные ctor-параметры, `ArgumentNullException.ThrowIfNull`).
+XAML/окно пока не трогаем. Результат: shared компилируется, VM ещё не используется.
+Параллельно — `IExcelImportDesignerVMFactory` + WPF-реализация + регистрация в DI.
+
+**Фаза 2 — перевод XAML на VM.** `DataContext` окна = `ExcelImportDesignerVM`; заменить весь
+императив (`ItemsSource/SelectedItem/Text/.Items.Refresh()`, `Btn*_Click`) на биндинги и команды;
+удалить перенесённый code-behind. После фазы в code-behind остаётся только кластер диаграммы.
+Тестируемо: всё, кроме диаграммы, работает по MVVM.
+
+**Фаза 3 — диаграмма.** По выбранному в разделе 6 подходу вынести рисование + drag/zoom; удалить
+остаток code-behind. В окне остаётся `InitializeComponent()` (пустой ctor).
+
+**Фаза 4 — открытие через IWindowService.** `Register<ExcelImportDesignerVM, ExcelImportDesignerWindow>`;
+`ImportExportControlVM`: инъекция `IWindowService` + `IExcelImportDesignerVMFactory`, тело
+`ImportFromExcelDesigner()` → `_windowService.ShowDialog(factory.Create(shrub, repo, service, refresh))`;
+убрать `using …Views.Windows`. **Исходная цель шага B закрыта.**
+
+## 6. Решение по диаграмме + объединение Фаз 2 и 3
+
+**⚠️ Фазы 2 и 3 неразделимы.** Диаграммный code-behind (~700 строк рисования/drag/zoom)
+работает с теми же приватными полями окна, что перенесены в VM (`_schema`, `_currentSheet`,
+`_previewService`) и именованными контролами. Удалить не-диаграммный code-behind (Фаза 2),
+оставив диаграммный, нельзя — он перестанет компилироваться. Значит Фазы 2 и 3 делаются вместе.
+
+**Решение по диаграмме: AttachedBehavior** (выбрано). Текущее императивное рисование/hit-testing/zoom
+переносится в `DiagramBehavior`, прикреплённый к `Canvas`; behavior читает схему/связи из VM (через
+DataContext/bound-свойства) и дёргает команды VM для создания/удаления связей. Data-templated Canvas
+отклонён как слишком объёмный и рисковый.
+
+**⚠️ XAML-биндинги и behaviors не проверяются сборкой** — ошибки только в рантайме. Каждый слайс
+Фаз 2+3 обязателен к рантайм-прогону пользователем (открыть окно дизайнера, проверить
+листы/связи/диаграмму/предпросмотр/импорт).
+
+Combined-план: (1) `IExcelImportDesignerVMFactory` + DI ✅; (2) `DataContext = VM`, не-диаграммные
+контролы на биндинги/команды; (3) диаграмму в `DiagramBehavior`; (4) удалить code-behind;
+(5) Фаза 4 — открытие через `IWindowService`, очистить `ImportExportControlVM`.
+
+## 7. Рабочие правила (напоминание)
+
+- Записи — при **закрытой Visual Studio** (иначе NUL-порча/обрезка через монтирование; уже ловили дважды,
+  лечится перезапуском сессии Cowork — после рестарта реальное состояние диска цело).
+- Сборка/git-запись — на **Windows**. `git reset` не делать; откат — новой правкой. Коммиты делает
+  пользователь; Claude пишет текст коммита.
+- Маленькие батчи, контрольная сборка пользователя после каждого. Сервисы — обязательные ctor-параметры
+  (DI) с `ArgumentNullException.ThrowIfNull`. `using` — сразу в отсортированную позицию, alias-using в конце.
+
+## 8. Прогресс
+
+- [x] Фаза 1 — `ExcelImportDesignerVM`: логика перенесена (группы 1-4: файл/схема/листы,
+      поля листа, редактор связей, действия предпросмотр/импорт/шаблоны/закрытие). Размещён в WPF.
+      Осталось при подключении: `IExcelImportDesignerVMFactory` + DI-регистрация (Фаза 2/4).
+- [x] Фаза 2 — XAML на VM (DataContext=VM, биндинги/команды); не-диаграммный code-behind удалён,
+      диаграмма временно осталась в code-behind, читая состояние из VM
+- [x] Решение по диаграмме (раздел 6) — AttachedBehavior
+- [x] Фаза 3 — диаграмма → DiagramBehavior; code-behind окна сведён к ctor + 2 моста событий
+      контролов (CellEditEnding, вкл/выкл листа), не выражаемых биндингом
+- [x] Фаза 4 — открытие дизайнера через IWindowService; из ImportExportControlVM убрана ссылка на Views.Windows

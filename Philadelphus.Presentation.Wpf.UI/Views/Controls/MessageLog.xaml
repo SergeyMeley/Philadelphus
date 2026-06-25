@@ -8,9 +8,6 @@
              xmlns:behaviors="clr-namespace:Philadelphus.Presentation.Wpf.UI.Behaviors"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <converters:CriticalLevelToIconConverter x:Key="criticalLevelToIconConverter"/>
-    </UserControl.Resources>
     <Grid>
         <Expander Header="Журнал сообщений" ExpandDirection="Down" Margin="1" IsExpanded="True">
             <Expander.HeaderTemplate>
@@ -149,7 +146,7 @@
                 </i:Interaction.Behaviors>
                 <DataGrid.Resources>
                     <DataTemplate x:Key="IconColumnTemplate">
-                        <Image Source="{Binding CriticalLevel, Converter={StaticResource criticalLevelToIconConverter}}" Height="15"></Image>
+                        <Image Source="{Binding CriticalLevel, Converter={StaticResource iconConverter}}" Height="15"></Image>
                     </DataTemplate>
                 </DataGrid.Resources>
                 <DataGrid.Columns>

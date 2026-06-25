@@ -38,7 +38,7 @@
                             <Image Width="24" 
                                    Height="24" 
                                    Margin="10,0,10,0" 
-                                   Source="{Binding ., Converter={StaticResource mainEntityToIconConverter}}"></Image>
+                                   Source="{Binding ., Converter={StaticResource iconConverter}}"></Image>
                             <StackPanel Margin="0,2,10,2">
                                 <TextBlock>
                                                 <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="LightSlateGray" />

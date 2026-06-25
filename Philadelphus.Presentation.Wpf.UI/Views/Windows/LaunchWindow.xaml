@@ -8,6 +8,8 @@
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls"
         xmlns:detail="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.DetailedInformationGrids"
         xmlns:converters="clr-namespace:Philadelphus.Presentation.Wpf.UI.Converters"
+        xmlns:tabs="clr-namespace:Philadelphus.Presentation.Wpf.UI.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls"
+        xmlns:vms="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs.LaunchWindowTabContentVMs;assembly=Philadelphus.Presentation"
         mc:Ignorable="d"
         Title="{Binding Title}"
         WindowState="Maximized">
@@ -15,8 +17,23 @@
         <Binding Path="StartWindowVisibility"/>
     </Window.Visibility>
     <Window.Resources>
-        <converters:IsAvailableToColorConverter x:Key="isAvailableToColorConverter"/>
-        <converters:KeyToImageConverter x:Key="keyToImageConverter"/>
+        <converters:BooleanToColorConverter x:Key="booleanToColorConverter"/>
+
+        <DataTemplate DataType="{x:Type vms:LaunchMainTabVM}">
+            <tabs:LaunchWindowMainTabControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:LaunchCreatingTabVM}">
+            <tabs:LaunchWindowCreatingTabControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:LaunchOpeningTabVM}">
+            <tabs:LaunchWindowOpeningTabControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:LaunchStoragesTabVM}">
+            <tabs:LaunchWindowStoragesTabControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:LaunchSettingsTabVM}">
+            <tabs:LaunchWindowSettingsTabControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </DataTemplate>
 
         <SolidColorBrush x:Key="TabControlNormalBorderBrush" Color="#8C8E94"/>
         <Style x:Key="LeftVerticalTabControlStyle" TargetType="{x:Type TabControl}">
@@ -129,7 +146,7 @@
                                     Height="75"
                                     Width="90"
                                     Margin="5,5">
-                            <Image Source="{Binding IconKey, Converter={StaticResource keyToImageConverter}}"
+                            <Image Source="{Binding Icon, Converter={StaticResource iconConverter}}"
                                    Width="45"
                                    Height="45"
                                    Margin="0,5,0,0"

@@ -1,0 +1,201 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ac="using:Avalonia.Data.Converters"
+             xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
+             xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+             xmlns:detail="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
+             xmlns:editors="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.SystemBaseValueEditors"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorer">
+    <Grid IsEnabled="{Binding IsRepositoryContentEnabled}"
+          ColumnDefinitions="Auto,*"
+          RowDefinitions="*,Auto">
+        <!-- ===== Рабочий кустарник (сворачиваемая боковая панель) =====
+             Вместо WPF Expander ExpandDirection=Left — ToggleButton + панель с IsVisible (как в LaunchWindow). -->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="1" ColumnDefinitions="Auto,Auto">
+            <ToggleButton Grid.Column="1" x:Name="shrubToggle" IsChecked="True" VerticalAlignment="Stretch" Padding="2,8">
+                <LayoutTransformControl>
+                    <LayoutTransformControl.LayoutTransform>
+                        <RotateTransform Angle="-90" />
+                    </LayoutTransformControl.LayoutTransform>
+                    <TextBlock Text="Рабочий кустарник" />
+                </LayoutTransformControl>
+            </ToggleButton>
+            <Grid Grid.Column="0" Width="450" RowDefinitions="Auto,*,Auto,*"
+                  IsVisible="{Binding #shrubToggle.IsChecked}">
+                <!-- Тулбар -->
+                <DockPanel Grid.Row="0">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1" Classes="toolbar">
+                        <Button Command="{Binding GetWorkCommand}" ToolTip.Tip="Обновить из хранилища" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/getwork_64.png" />
+                        </Button>
+                        <Button Command="{Binding SaveCommand}" ToolTip.Tip="Сохранить изменения" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_save.png" />
+                        </Button>
+                        <Button ToolTip.Tip="Режим редактирования" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/edit_64.png" />
+                        </Button>
+                        <Button Command="{Binding CreateRootCommand}" ToolTip.Tip="Добавить корень" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/root_64_1.png" />
+                        </Button>
+                        <Button Command="{Binding CreateNodeCommand}" ToolTip.Tip="Добавить узел" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/node_64_3.png" />
+                        </Button>
+                        <Button Command="{Binding CreateLeaveCommand}" ToolTip.Tip="Добавить лист" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/leave_64_3.png" />
+                        </Button>
+                        <Button Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip.Tip="Удалить выбранный элемент репозитория" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_delete.png" />
+                        </Button>
+                        <Button Command="{Binding ProtectCommand}" ToolTip.Tip="Защитить" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_protect.png" />
+                        </Button>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="1">
+                        <TextBlock VerticalAlignment="Center" Text="Представление " />
+                        <ComboBox MinWidth="50" SelectedIndex="0">
+                            <ComboBoxItem Content="Основной" />
+                            <ComboBoxItem Content="По иерархии наследования" />
+                            <ComboBoxItem Content="По содержимому" />
+                            <ComboBoxItem Content="По меткам" />
+                            <ComboBoxItem Content="По связям (Trace)" />
+                        </ComboBox>
+                    </StackPanel>
+                </DockPanel>
+                <!-- Деревья, корни и узлы -->
+                <HeaderedContentControl Grid.Row="1" Header="Деревья, корни и узлы" Margin="1">
+                    <local:RepositoryExplorerShrub />
+                </HeaderedContentControl>
+                <GridSplitter Grid.Row="2" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                <!-- Листы -->
+                <HeaderedContentControl Grid.Row="3" Header="Листы" Margin="1">
+                    <local:RepositoryExplorerLeavesList />
+                </HeaderedContentControl>
+            </Grid>
+        </Grid>
+
+        <!-- ===== Текущий элемент ===== -->
+        <HeaderedContentControl Grid.Row="0" Grid.Column="1">
+            <HeaderedContentControl.Header>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Text="Текущий элемент" VerticalAlignment="Center" />
+                    <!-- Подписи Наименование/Uuid показываются только когда элемент выбран. -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6"
+                                IsVisible="{Binding SelectedRepositoryMember, Converter={x:Static ac:ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="Наименование:" FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding SelectedRepositoryMember.Name}" FontStyle="Italic" VerticalAlignment="Center" />
+                        <TextBlock Text="Uuid:" FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding SelectedRepositoryMember.Uuid}" FontStyle="Italic" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </HeaderedContentControl.Header>
+            <TabControl x:Name="CurrentElementTabs" Classes="compact" SelectedIndex="0">
+                <!-- Значение -->
+                <TabItem Classes="compact" Header="Значение" IsVisible="{Binding IsSystemBaseLeaveControlVisible}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto">
+                        <TextBlock Grid.Column="0" Text="Значение" Margin="1" VerticalAlignment="Center" />
+                        <ContentControl Grid.Column="1" Margin="1" Content="{Binding SelectedRepositoryMember}">
+                            <ContentControl.ContentTemplate>
+                                <editors:SystemBaseValueEditorTemplateSelector>
+                                    <editors:SystemBaseValueEditorTemplateSelector.StringTemplate>
+                                        <DataTemplate>
+                                            <TextBox Height="24" MinWidth="180" Margin="1" Padding="4,1" VerticalContentAlignment="Center"
+                                                     Text="{Binding StringValue, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.StringTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.NumericTemplate>
+                                        <DataTemplate>
+                                            <TextBox Height="24" MinWidth="180" Margin="1" Padding="4,1" VerticalContentAlignment="Center"
+                                                     HorizontalContentAlignment="Right"
+                                                     Text="{Binding StringValue, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.NumericTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.TimeTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                                <TimePicker ClockIdentifier="24HourClock"
+                                                            SelectedTime="{Binding TimeHoursMinutesValue, Mode=TwoWay}" />
+                                                <TextBox Height="24" MinWidth="44" Margin="1" Padding="4,1" VerticalContentAlignment="Center"
+                                                         MaxLength="2" ToolTip.Tip="секунды (00–59)"
+                                                         Text="{Binding TimeSecondsText, Mode=TwoWay}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.TimeTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.FileTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                                <TextBox Grid.Column="0" Height="24" MinWidth="180" Margin="1" Padding="4,1" VerticalContentAlignment="Center"
+                                                         Text="{Binding StringValue, Mode=TwoWay}" ToolTip.Tip="{Binding StringValue}" />
+                                                <Button Grid.Column="1" Height="24" MinWidth="24" Margin="1" Padding="4,0" Background="Transparent"
+                                                        Command="{Binding BrowseFileValueCommand}" Content="..." ToolTip.Tip="Выбрать файл" />
+                                                <Button Grid.Column="2" Height="24" MinWidth="24" Margin="1" Padding="4,0" Background="Transparent"
+                                                        Command="{Binding OpenFileValueCommand}" ToolTip.Tip="Открыть файл">
+                                                    <Image Source="/Assets/Icons/open.png" Width="15" Height="15" />
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.FileTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.DateTemplate>
+                                        <DataTemplate>
+                                            <DatePicker Margin="1"
+                                                        SelectedDate="{Binding DateValue, Mode=TwoWay, Converter={StaticResource nullableDateTimeToOffsetConverter}}" />
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.DateTemplate>
+                                    <editors:SystemBaseValueEditorTemplateSelector.DateTimeTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                                <DatePicker MinWidth="150"
+                                                            SelectedDate="{Binding DateTimeDateValue, Mode=TwoWay, Converter={StaticResource nullableDateTimeToOffsetConverter}}" />
+                                                <TimePicker ClockIdentifier="24HourClock"
+                                                            SelectedTime="{Binding DateTimeHoursMinutesValue, Mode=TwoWay}" />
+                                                <TextBox Height="24" MinWidth="44" Padding="4,1" VerticalContentAlignment="Center"
+                                                         MaxLength="2" ToolTip.Tip="секунды (00–59)"
+                                                         Text="{Binding DateTimeSecondsText, Mode=TwoWay}" />
+                                                <TextBox Height="24" MinWidth="64" Padding="4,1" VerticalContentAlignment="Center"
+                                                         MaxLength="6" ToolTip.Tip="+03:00 (смещение)"
+                                                         Text="{Binding DateTimeOffsetValue, Mode=TwoWay}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </editors:SystemBaseValueEditorTemplateSelector.DateTimeTemplate>
+                                </editors:SystemBaseValueEditorTemplateSelector>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+                    </Grid>
+                </TabItem>
+
+                <!-- Атрибуты -->
+                <TabItem Classes="compact" Header="Атрибуты">
+                    <local:Attributes />
+                </TabItem>
+
+                <!-- Наследники (этап C) -->
+                <TabItem Classes="compact" Header="Наследники" IsVisible="{Binding IsParentControlVisible}">
+                    <TabControl Classes="compact">
+                        <TabItem Classes="compact" Header="Плоская таблица">
+                            <local:RepositoryExplorerChildrenFlatTable />
+                        </TabItem>
+                        <!--
+                        Скрытые в WPF вкладки: «Перекрестная таблица значений», «Плоская таблица допустимых значений»,
+                        «Перекрестная таблица допустимых значений». Перенос отложен.
+                        -->
+                    </TabControl>
+                </TabItem>
+
+                <!-- Свойства -->
+                <TabItem Classes="compact" Header="Свойства">
+                    <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}" />
+                </TabItem>
+
+                <!-- Расширения -->
+                <TabItem Classes="compact" Header="Расширения">
+                    <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}" />
+                </TabItem>
+            </TabControl>
+        </HeaderedContentControl>
+
+        <!-- Индикатор загрузки -->
+        <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                     Height="4" Margin="1,0,1,1"
+                     IsIndeterminate="True"
+                     IsVisible="{Binding IsRepositoryLoadingVisible}" />
+    </Grid>
+</UserControl>
