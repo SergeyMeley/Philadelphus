@@ -11,6 +11,7 @@ using global::Avalonia.Input;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
 using global::Avalonia.Threading;
+using global::Avalonia.VisualTree;
 
 using Philadelphus.Infrastructure.ImportExport.Excel;
 using Philadelphus.Presentation.ViewModels.ImportExport;
@@ -94,6 +95,14 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
             private bool _initialLayoutPending;
             private double _zoom = 1.0;
 
+            private readonly Dictionary<ExcelImportSheetSchema, Border> _cardElements = new();
+            private ExcelImportSheetSchema? _draggedSheet;
+            private Border? _draggedBorder;
+            private Point _dragStartPointer;
+            private double _dragStartLeft;
+            private double _dragStartTop;
+            private bool _isDragging;
+
             public DiagramController(ScrollViewer viewer)
             {
                 _viewer = viewer;
@@ -166,10 +175,15 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
             private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
                 if (e.PropertyName == nameof(ExcelImportDesignerVM.Sheets)
-                    || e.PropertyName == nameof(ExcelImportDesignerVM.Relations)
-                    || e.PropertyName == nameof(ExcelImportDesignerVM.SelectedSheet))
+                    || e.PropertyName == nameof(ExcelImportDesignerVM.Relations))
                 {
                     RenderDiagram();
+                }
+                else if (e.PropertyName == nameof(ExcelImportDesignerVM.SelectedSheet))
+                {
+                    // Подсветку выбора обновляем «на месте», без ререндера — иначе пересоздание
+                    // карточек ломает захват указателя при перетаскивании.
+                    UpdateSelectionHighlight();
                 }
             }
 
@@ -182,6 +196,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
 
                 _canvas.Children.Clear();
                 _columnElements.Clear();
+                _cardElements.Clear();
 
                 if (_vm == null)
                     return;
@@ -328,14 +343,113 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 layout.Children.Add(columnsScroll);
                 border.Child = layout;
 
-                // Этап 1: клик по карточке — выбор листа (без перетаскивания).
-                border.PointerPressed += (_, _) =>
-                {
-                    if (_vm != null)
-                        _vm.SelectedSheet = sheet;
-                };
+                _cardElements[sheet] = border;
+
+                // Выбор листа + перетаскивание карточки по Canvas (этап 2).
+                border.PointerPressed += OnCardPointerPressed;
+                border.PointerMoved += OnCardPointerMoved;
+                border.PointerReleased += OnCardPointerReleased;
+                border.PointerCaptureLost += OnCardPointerCaptureLost;
 
                 return border;
+            }
+
+            private void UpdateSelectionHighlight()
+            {
+                foreach (var pair in _cardElements)
+                {
+                    pair.Value.BorderBrush = ReferenceEquals(pair.Key, _vm?.SelectedSheet)
+                        ? Brushes.SteelBlue
+                        : Brushes.Silver;
+                }
+            }
+
+            // ====== Перетаскивание карточек ======
+
+            private void OnCardPointerPressed(object? sender, PointerPressedEventArgs e)
+            {
+                if (_canvas == null || sender is not Border border || border.Tag is not ExcelImportSheetSchema sheet)
+                    return;
+
+                // Нажатие на кнопке (удаление связи) не начинает перетаскивание.
+                if ((e.Source as Visual)?.FindAncestorOfType<Button>(includeSelf: true) != null)
+                    return;
+
+                var point = e.GetCurrentPoint(_canvas);
+                if (point.Properties.IsLeftButtonPressed == false)
+                    return;
+
+                if (_vm != null)
+                    _vm.SelectedSheet = sheet;
+
+                _draggedSheet = sheet;
+                _draggedBorder = border;
+                _dragStartPointer = point.Position;
+                _dragStartLeft = GetCanvasLeft(border);
+                _dragStartTop = GetCanvasTop(border);
+                _isDragging = true;
+                e.Pointer.Capture(border);
+                e.Handled = true;
+            }
+
+            private void OnCardPointerMoved(object? sender, PointerEventArgs e)
+            {
+                if (_isDragging == false || _draggedBorder == null || _canvas == null)
+                    return;
+
+                var point = e.GetCurrentPoint(_canvas);
+                if (point.Properties.IsLeftButtonPressed == false)
+                {
+                    CommitDrag();
+                    return;
+                }
+
+                var current = point.Position;
+                Canvas.SetLeft(_draggedBorder, _dragStartLeft + (current.X - _dragStartPointer.X));
+                Canvas.SetTop(_draggedBorder, _dragStartTop + (current.Y - _dragStartPointer.Y));
+                BuildRelationVisualsRefresh();
+                e.Handled = true;
+            }
+
+            private void OnCardPointerReleased(object? sender, PointerReleasedEventArgs e)
+            {
+                if (_isDragging == false)
+                    return;
+
+                CommitDrag();
+                e.Pointer.Capture(null);
+                e.Handled = true;
+            }
+
+            private void OnCardPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+            {
+                CommitDrag();
+            }
+
+            private void CommitDrag()
+            {
+                if (_draggedSheet != null && _draggedBorder != null)
+                {
+                    _draggedSheet.CanvasX = GetCanvasLeft(_draggedBorder);
+                    _draggedSheet.CanvasY = GetCanvasTop(_draggedBorder);
+                }
+
+                _isDragging = false;
+                _draggedSheet = null;
+                _draggedBorder = null;
+                BuildRelationVisualsRefresh();
+            }
+
+            private static double GetCanvasLeft(Control element)
+            {
+                var value = Canvas.GetLeft(element);
+                return double.IsNaN(value) ? 0 : value;
+            }
+
+            private static double GetCanvasTop(Control element)
+            {
+                var value = Canvas.GetTop(element);
+                return double.IsNaN(value) ? 0 : value;
             }
 
             private Border BuildColumnItem(ExcelImportSheetSchema sheet, ExcelImportColumnProfile column)
