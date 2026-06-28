@@ -14,6 +14,18 @@
       <CommandBinding Command="New" .../> <CommandBinding Command="Open" .../> <CommandBinding Command="Save" .../>
     -->
 
+    <Window.Resources>
+        <!-- Иконки для RibbonButton: свойство Icon/LargeIcon имеет тип IControlTemplate,
+             поэтому растровую иконку оборачиваем в ControlTemplate с Image внутри. -->
+        <ControlTemplate x:Key="IcoRoot"><Image Source="/Assets/Icons/root_64_1.png" /></ControlTemplate>
+        <ControlTemplate x:Key="IcoNode"><Image Source="/Assets/Icons/node_64_3.png" /></ControlTemplate>
+        <ControlTemplate x:Key="IcoLeave"><Image Source="/Assets/Icons/leave_64_3.png" /></ControlTemplate>
+        <ControlTemplate x:Key="IcoDelete"><Image Source="/Assets/Icons/without_a_license/Flaticon_icon_delete.png" /></ControlTemplate>
+        <ControlTemplate x:Key="IcoAdd"><Image Source="/Assets/Icons/without_a_license/Flaticon_icon_add.png" /></ControlTemplate>
+        <ControlTemplate x:Key="IcoRemove"><Image Source="/Assets/Icons/without_a_license/Flaticon_icon_remove.png" /></ControlTemplate>
+        <ControlTemplate x:Key="IcoDetails"><Image Source="/Assets/Icons/info_64_3.png" /></ControlTemplate>
+    </Window.Resources>
+
     <Grid>
         <!-- Popup уведомлений (PopupVM). -->
         <Popup IsOpen="{Binding PopupVM.IsOpen}"
@@ -58,30 +70,59 @@
                         <ribbon:RibbonTab.Groups>
                             <ribbon:RibbonGroupBox Header="Текущий репозиторий">
                                 <StackPanel Spacing="2">
-                                    <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Наименование: " />
+                                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}" />
+                                    </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="Состояние: " />
-                                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.State}" />
+                                        <Rectangle Width="12" Height="12" Fill="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.State, Converter={StaticResource stateToColorConverter}}" ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
                                     </StackPanel>
-                                    <Button Content="Открыть стартовое окно" Command="{Binding ApplicationCommandsVM.OpenLaunchWindowCommand}" />
                                 </StackPanel>
                             </ribbon:RibbonGroupBox>
-                            <ribbon:RibbonGroupBox Header="Информация">
+                            <ribbon:RibbonGroupBox Header="Текущий элемент">
                                 <StackPanel Spacing="2">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Количество корней: " />
-                                        <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.ChildsCount}" />
+                                        <TextBlock Text="Текущий элемент: " />
+                                        <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name, FallbackValue='&lt;не выбран&gt;', TargetNullValue='&lt;не выбран&gt;'}" />
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Текущий участник репозитория: " />
-                                        <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}" />
-                                    </StackPanel>
-                                    <Button Content="Подробнее" Command="{Binding OpenRepositoryMemberDetailsWindowCommand}" />
+                                    <ribbon:RibbonButton Content="Подробнее" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                        Icon="{StaticResource IcoDetails}"
+                                        Command="{Binding OpenRepositoryMemberDetailsWindowCommand}"  />
                                 </StackPanel>
                             </ribbon:RibbonGroupBox>
-                            <!--
-                            Закомментированные в WPF группы: Иерархия репозитория / Вхождения атрибутов / Атрибуты / Пресеты.
-                            -->
+                            <!-- Команды и иконки/подсказки — как в тулбаре обозревателя (RepositoryExplorerVM).
+                                 Компактные кнопки: MinSize/MaxSize=Small, иконка+подпись в Content
+                                 CanExecute сам управляет доступностью по выбранному элементу.
+                                 Size=Medium: иконка (Icon = ControlTemplate) слева + подпись справа. -->
+                            <ribbon:RibbonGroupBox Header="Иерархия репозитория">
+                                <ribbon:RibbonButton Content="Добавить корень" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                                     Icon="{StaticResource IcoRoot}"
+                                                     Command="{Binding RepositoryExplorerVM.CreateRootCommand}"
+                                                     ToolTip.Tip="Добавить корень" />
+                                <ribbon:RibbonButton Content="Добавить узел" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                                     Icon="{StaticResource IcoNode}"
+                                                     Command="{Binding RepositoryExplorerVM.CreateNodeCommand}"
+                                                     ToolTip.Tip="Добавить узел" />
+                                <ribbon:RibbonButton Content="Добавить лист" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                                     Icon="{StaticResource IcoLeave}"
+                                                     Command="{Binding RepositoryExplorerVM.CreateLeaveCommand}"
+                                                     ToolTip.Tip="Добавить лист" />
+                                <ribbon:RibbonButton Content="Удалить элемент" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                                     Icon="{StaticResource IcoDelete}"
+                                                     Command="{Binding RepositoryExplorerVM.SoftDeleteRepositoryMemberCommand}"
+                                                     ToolTip.Tip="Удалить выбранный элемент репозитория" />
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Атрибуты">
+                                <ribbon:RibbonButton Content="Добавить атрибут" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                                     Icon="{StaticResource IcoAdd}"
+                                                     Command="{Binding RepositoryExplorerVM.CreateAttributeCommand}"
+                                                     ToolTip.Tip="Добавить атрибут" />
+                                <ribbon:RibbonButton Content="Удалить атрибут" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                                     Icon="{StaticResource IcoRemove}"
+                                                     Command="{Binding RepositoryExplorerVM.SoftDeleteRepositoryMemberAttributeCommand}"
+                                                     ToolTip.Tip="Удалить атрибут" />
+                            </ribbon:RibbonGroupBox>
                         </ribbon:RibbonTab.Groups>
                     </ribbon:RibbonTab>
 
