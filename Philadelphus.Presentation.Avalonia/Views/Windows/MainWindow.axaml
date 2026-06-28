@@ -226,10 +226,23 @@
             <!-- ===== Основная компоновка ===== -->
             <Grid RowDefinitions="4*,Auto,Auto,Auto,0">
                 <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,5*">
-                    <!--
-                    Закомментированная в WPF навигационная панель (Expander ExpandDirection=Left + GridSplitter):
-                    группы «Сервисы» и «Надстройки» со списками. Перенос отложен (адаптация под Avalonia).
-                    -->
+                    <!-- Навигационная панель (адаптация закомментированного в WPF Expander ExpandDirection=Left):
+                         сворачивается ToggleButton + LayoutTransformControl (как в LaunchWindow), списки статические. -->
+                    <Grid Grid.Column="0" Margin="1" ColumnDefinitions="Auto,Auto">
+                        <ToggleButton Grid.Column="1" x:Name="navToggle" IsChecked="False" VerticalAlignment="Stretch" Padding="2,8">
+                            <LayoutTransformControl>
+                                <LayoutTransformControl.LayoutTransform>
+                                    <RotateTransform Angle="-90" />
+                                </LayoutTransformControl.LayoutTransform>
+                                <TextBlock Text="Навигационная панель" />
+                            </LayoutTransformControl>
+                        </ToggleButton>
+                        <ctrls:NavigationPanel Grid.Column="0" Width="260"
+                                               IsVisible="{Binding #navToggle.IsChecked}" />
+                    </Grid>
+
+                    <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
                     <HeaderedContentControl Grid.Column="2" Header="Рабочая область">
                         <TabControl Classes="compact">
                             <TabItem Classes="compact" Header="Репозиторий">

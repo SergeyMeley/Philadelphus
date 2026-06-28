@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.NavigationPanel">
+    <!-- Содержимое навигационной панели MainWindow. Списки статические (паритет с WPF, без привязок). -->
+    <Grid RowDefinitions="*,Auto,*">
+        <HeaderedContentControl Grid.Row="0" Header="Формы">
+            <ListBox>
+                <ListBoxItem Content="Дерево данных" />
+                <ListBoxItem Content="Атрибуты" />
+                <ListBoxItem Content="Отчеты" />
+                <ListBoxItem Content="Настраиваемый отчет" />
+                <ListBoxItem Content="Импорт / экспорт репозитория" />
+                <ListBoxItem Content="Расширения, надстройки" />
+                <ListBoxItem Content="Общие настройки" />
+                <ListBoxItem Content="Настройки репозитория" />
+                <ListBoxItem Content="Администрирование" />
+            </ListBox>
+        </HeaderedContentControl>
+        <GridSplitter Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+        <HeaderedContentControl Grid.Row="2" Header="Расширения">
+            <ListBox>
+                <ListBoxItem Content="Git" />
+                <ListBoxItem Content="Расчет трубопроводных элементов" />
+                <ListBoxItem Content="Определение критической точки" />
+                <ListBoxItem Content="Номинальные давления" />
+                <ListBoxItem Content="Допускаемые напряжения" />
+            </ListBox>
+        </HeaderedContentControl>
+    </Grid>
+</UserControl>
