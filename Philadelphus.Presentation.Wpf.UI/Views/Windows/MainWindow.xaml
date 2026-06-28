@@ -308,9 +308,6 @@
                             </TabItem>
                             <!--<TabItem Header="Настраиваемый отчет">
                                 <ctrls:CustomizableReport></ctrls:CustomizableReport>
-                            </TabItem>
-                            <TabItem Header="Импорт / экспорт">
-                                <ctrls:DataExchange></ctrls:DataExchange>
                             </TabItem>-->
                             <TabItem Header="Настройки">
                                 <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}"></ctrls:ApplicationSettings>

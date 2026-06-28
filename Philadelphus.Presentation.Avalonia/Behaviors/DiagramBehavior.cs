@@ -86,6 +86,9 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
             private const double ZoomMax = 2.5;
             private const double ZoomStep = 1.1;
 
+            // Полупрозрачная заливка колонки-участницы связи (акцент, читается в обеих темах).
+            private static readonly IBrush RelationColumnFill = new SolidColorBrush(Color.FromArgb(0x33, 0x2E, 0x8B, 0x57));
+
             private readonly ScrollViewer _viewer;
             private readonly Dictionary<string, Control> _columnElements = new(StringComparer.OrdinalIgnoreCase);
 
@@ -283,9 +286,11 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 {
                     Width = ResolveCardWidth(sheet),
                     MinHeight = CardMinHeight,
-                    BorderBrush = ReferenceEquals(sheet, _vm?.SelectedSheet) ? Brushes.SteelBlue : Brushes.Silver,
+                    BorderBrush = ReferenceEquals(sheet, _vm?.SelectedSheet)
+                        ? Brushes.SteelBlue
+                        : ThemeBrush("SystemControlForegroundBaseMediumBrush", Brushes.Silver),
                     BorderThickness = new Thickness(1),
-                    Background = Brushes.White,
+                    Background = ThemeBrush("SystemControlBackgroundAltHighBrush", Brushes.White),
                     Padding = new Thickness(8),
                     CornerRadius = new CornerRadius(6),
                     Tag = sheet
@@ -310,7 +315,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                             || string.IsNullOrWhiteSpace(sheet.Profile.Relation.ChildKeyColumnName)
                                 ? $"Родитель: {sheet.Profile.Relation.ParentSourceName}; ключи не заданы"
                                 : $"Родитель: {sheet.Profile.Relation.ParentSourceName} ({sheet.Profile.Relation.ParentKeyColumnName} -> {sheet.Profile.Relation.ChildKeyColumnName})",
-                    Foreground = Brushes.DimGray,
+                    Foreground = ThemeBrush("SystemControlForegroundBaseMediumBrush", Brushes.DimGray),
                     Margin = new Thickness(0, 6, 0, 0),
                     TextWrapping = TextWrapping.Wrap
                 };
@@ -343,7 +348,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 {
                     Text = "Колонки",
                     FontSize = 11,
-                    Foreground = Brushes.DimGray,
+                    Foreground = ThemeBrush("SystemControlForegroundBaseMediumBrush", Brushes.DimGray),
                     Margin = new Thickness(0, 8, 0, 3)
                 };
                 Grid.SetRow(columnsTitle, 2);
@@ -383,7 +388,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 {
                     pair.Value.BorderBrush = ReferenceEquals(pair.Key, _vm?.SelectedSheet)
                         ? Brushes.SteelBlue
-                        : Brushes.Silver;
+                        : ThemeBrush("SystemControlForegroundBaseMediumBrush", Brushes.Silver);
                 }
             }
 
@@ -594,16 +599,15 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 var columnBorder = new Border
                 {
                     Tag = new ColumnTag(sheet, column),
-                    Background = isIgnored
-                        ? Brushes.Gainsboro
-                        : isRelationColumn ? Brushes.Honeydew : Brushes.AliceBlue,
-                    BorderBrush = isIgnored
-                        ? Brushes.LightGray
-                        : isRelationColumn ? Brushes.SeaGreen : Brushes.LightSteelBlue,
+                    Background = isRelationColumn ? RelationColumnFill : Brushes.Transparent,
+                    BorderBrush = isRelationColumn
+                        ? Brushes.SeaGreen
+                        : ThemeBrush("SystemControlForegroundBaseLowBrush", Brushes.LightSteelBlue),
                     BorderThickness = isRelationColumn ? new Thickness(2) : new Thickness(1),
                     CornerRadius = new CornerRadius(4),
                     Padding = new Thickness(6, 3, 6, 3),
-                    Margin = new Thickness(0, 0, 0, 4)
+                    Margin = new Thickness(0, 0, 0, 4),
+                    Opacity = isIgnored ? 0.55 : 1.0
                 };
 
                 var text = string.IsNullOrWhiteSpace(column.DataTypeNodeName)
@@ -616,7 +620,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 {
                     Text = text,
                     FontSize = 11,
-                    Foreground = isIgnored ? Brushes.DimGray : Brushes.Black,
+                    Foreground = ThemeBrush("SystemControlForegroundBaseHighBrush", Brushes.Black),
                     TextTrimming = TextTrimming.CharacterEllipsis
                 };
 
@@ -668,6 +672,20 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
             }
 
             private static string GetColumnKey(string sourceName, string columnName) => $"{sourceName}{columnName}";
+
+            // Берёт кисть из ресурсов текущей темы (Fluent); при отсутствии ключа — запасная кисть.
+            private static IBrush ThemeBrush(string key, IBrush fallback)
+            {
+                var app = global::Avalonia.Application.Current;
+                if (app != null
+                    && app.TryGetResource(key, app.ActualThemeVariant, out var resource)
+                    && resource is IBrush brush)
+                {
+                    return brush;
+                }
+
+                return fallback;
+            }
 
             // ====== Связи ======
 
