@@ -177,6 +177,25 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
         public bool IsRepositoryLoadingVisible => IsRepositoryLoading;
 
+        private bool _isReadOnly;
+
+        /// <summary>
+        /// Режим «только чтение» (например, предпросмотр импорта): редактирующие
+        /// кнопки/команды недоступны, изменить содержимое нельзя.
+        /// </summary>
+        public bool IsReadOnly
+        {
+            get => _isReadOnly;
+            set
+            {
+                if (_isReadOnly != value)
+                {
+                    _isReadOnly = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         #endregion
 
         #region [ Construct ]

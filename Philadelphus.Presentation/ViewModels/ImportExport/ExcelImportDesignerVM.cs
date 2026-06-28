@@ -802,6 +802,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                 }
 
                 var previewVm = _session.BuildRepositoryPreview(null);
+                previewVm.IsReadOnly = true; // предпросмотр — только просмотр дерева, без редактирования
                 RepositoryPreviewVM = previewVm;
                 PreviewSummary = _session.BuildPreviewSummary(previewVm);
             }
