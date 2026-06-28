@@ -1,15 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:detail="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.DetailsWindow"
-        Title="DetailsWindow"
+        Title="{Binding Content.Name}"
         Width="640"
         Height="480"
         WindowStartupLocation="CenterOwner">
-    <!-- Каркас. UniversalDetails переносится из WPF инкрементально. -->
     <Grid>
-        <TextBlock Text="DetailsWindow (Avalonia) — каркас"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Opacity="0.5" />
+        <detail:UniversalDetails DataContext="{Binding Content}" />
     </Grid>
 </Window>
