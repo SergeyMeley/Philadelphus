@@ -96,12 +96,35 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
             private double _zoom = 1.0;
 
             private readonly Dictionary<ExcelImportSheetSchema, Border> _cardElements = new();
+            private DragMode _dragMode = DragMode.None;
             private ExcelImportSheetSchema? _draggedSheet;
+            private ExcelImportColumnProfile? _draggedColumn;
             private Border? _draggedBorder;
+            private Line? _relationPreviewLine;
             private Point _dragStartPointer;
             private double _dragStartLeft;
             private double _dragStartTop;
             private bool _isDragging;
+
+            private enum DragMode
+            {
+                None,
+                MoveSheet,
+                CreateRelation
+            }
+
+            private sealed class ColumnTag
+            {
+                public ColumnTag(ExcelImportSheetSchema sheet, ExcelImportColumnProfile column)
+                {
+                    Sheet = sheet;
+                    Column = column;
+                }
+
+                public ExcelImportSheetSchema Sheet { get; }
+
+                public ExcelImportColumnProfile Column { get; }
+            }
 
             public DiagramController(ScrollViewer viewer)
             {
@@ -382,7 +405,9 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 if (_vm != null)
                     _vm.SelectedSheet = sheet;
 
+                _dragMode = DragMode.MoveSheet;
                 _draggedSheet = sheet;
+                _draggedColumn = null;
                 _draggedBorder = border;
                 _dragStartPointer = point.Position;
                 _dragStartLeft = GetCanvasLeft(border);
@@ -392,52 +417,162 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 e.Handled = true;
             }
 
+            // Нажатие на колонке-источнике начинает создание/переназначение связи (этап 3).
+            private void OnColumnPointerPressed(object? sender, PointerPressedEventArgs e)
+            {
+                if (_canvas == null || sender is not Border columnBorder || columnBorder.Tag is not ColumnTag tag)
+                    return;
+
+                var point = e.GetCurrentPoint(_canvas);
+                if (point.Properties.IsLeftButtonPressed == false)
+                    return;
+
+                if (_cardElements.TryGetValue(tag.Sheet, out var card) == false)
+                    return;
+
+                if (_vm != null)
+                    _vm.SelectedSheet = tag.Sheet;
+
+                _dragMode = DragMode.CreateRelation;
+                _draggedSheet = tag.Sheet;
+                _draggedColumn = tag.Column;
+                _draggedBorder = card;
+                _isDragging = true;
+
+                var rect = GetCanvasRect(columnBorder);
+                var start = rect != null
+                    ? new Point(rect.Value.X + rect.Value.Width / 2, rect.Value.Y + rect.Value.Height / 2)
+                    : point.Position;
+                CreateRelationPreviewLine(start);
+
+                e.Pointer.Capture(card);
+                e.Handled = true;
+            }
+
             private void OnCardPointerMoved(object? sender, PointerEventArgs e)
             {
-                if (_isDragging == false || _draggedBorder == null || _canvas == null)
+                if (_dragMode == DragMode.None || _canvas == null)
                     return;
 
                 var point = e.GetCurrentPoint(_canvas);
                 if (point.Properties.IsLeftButtonPressed == false)
                 {
-                    CommitDrag();
+                    FinishDrag(point.Position);
                     return;
                 }
 
                 var current = point.Position;
-                Canvas.SetLeft(_draggedBorder, _dragStartLeft + (current.X - _dragStartPointer.X));
-                Canvas.SetTop(_draggedBorder, _dragStartTop + (current.Y - _dragStartPointer.Y));
-                BuildRelationVisualsRefresh();
+                if (_dragMode == DragMode.MoveSheet && _draggedBorder != null)
+                {
+                    Canvas.SetLeft(_draggedBorder, _dragStartLeft + (current.X - _dragStartPointer.X));
+                    Canvas.SetTop(_draggedBorder, _dragStartTop + (current.Y - _dragStartPointer.Y));
+                    BuildRelationVisualsRefresh();
+                }
+                else if (_dragMode == DragMode.CreateRelation && _relationPreviewLine != null)
+                {
+                    _relationPreviewLine.EndPoint = current;
+                }
+
                 e.Handled = true;
             }
 
             private void OnCardPointerReleased(object? sender, PointerReleasedEventArgs e)
             {
-                if (_isDragging == false)
+                if (_dragMode == DragMode.None)
                     return;
 
-                CommitDrag();
+                var drop = _canvas != null ? e.GetPosition(_canvas) : (Point?)null;
+                FinishDrag(drop);
                 e.Pointer.Capture(null);
                 e.Handled = true;
             }
 
             private void OnCardPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
             {
-                CommitDrag();
+                if (_dragMode == DragMode.None)
+                    return;
+
+                FinishDrag(null);
             }
 
-            private void CommitDrag()
+            private void FinishDrag(Point? dropPoint)
             {
-                if (_draggedSheet != null && _draggedBorder != null)
+                var mode = _dragMode;
+                var sourceSheet = _draggedSheet;
+                var sourceColumn = _draggedColumn;
+                var border = _draggedBorder;
+
+                if (mode == DragMode.MoveSheet && sourceSheet != null && border != null)
                 {
-                    _draggedSheet.CanvasX = GetCanvasLeft(_draggedBorder);
-                    _draggedSheet.CanvasY = GetCanvasTop(_draggedBorder);
+                    sourceSheet.CanvasX = GetCanvasLeft(border);
+                    sourceSheet.CanvasY = GetCanvasTop(border);
                 }
 
-                _isDragging = false;
+                RemoveRelationPreviewLine();
+                _dragMode = DragMode.None;
                 _draggedSheet = null;
+                _draggedColumn = null;
                 _draggedBorder = null;
+                _isDragging = false;
+
+                if (mode == DragMode.CreateRelation && sourceSheet != null && sourceColumn != null && dropPoint != null)
+                {
+                    var target = FindColumnDropTarget(dropPoint.Value, sourceColumn);
+                    if (target != null && _vm != null)
+                    {
+                        // Тянем от родительской колонки (источник) к дочерней (цель).
+                        _vm.ApplyRelationFromColumns(
+                            target.Sheet,
+                            sourceSheet.SourceName,
+                            sourceColumn.HeaderName,
+                            target.Column.HeaderName,
+                            selectChildSheet: true);
+                        return; // VM перерисует диаграмму (изменились Relations).
+                    }
+                }
+
                 BuildRelationVisualsRefresh();
+            }
+
+            private ColumnTag? FindColumnDropTarget(Point dropPoint, ExcelImportColumnProfile draggedColumn)
+            {
+                foreach (var element in _columnElements.Values)
+                {
+                    if (element.Tag is not ColumnTag tag || ReferenceEquals(tag.Column, draggedColumn))
+                        continue;
+
+                    var rect = GetCanvasRect(element);
+                    if (rect != null && rect.Value.Contains(dropPoint))
+                        return tag;
+                }
+
+                return null;
+            }
+
+            private void CreateRelationPreviewLine(Point start)
+            {
+                if (_canvas == null)
+                    return;
+
+                RemoveRelationPreviewLine();
+                _relationPreviewLine = new Line
+                {
+                    StartPoint = start,
+                    EndPoint = start,
+                    Stroke = Brushes.SteelBlue,
+                    StrokeThickness = 2,
+                    StrokeDashArray = new AvaloniaList<double> { 4, 3 },
+                    IsHitTestVisible = false
+                };
+                _canvas.Children.Add(_relationPreviewLine);
+            }
+
+            private void RemoveRelationPreviewLine()
+            {
+                if (_relationPreviewLine != null && _canvas != null)
+                    _canvas.Children.Remove(_relationPreviewLine);
+
+                _relationPreviewLine = null;
             }
 
             private static double GetCanvasLeft(Control element)
@@ -458,7 +593,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 var isRelationColumn = IsRelationColumn(sheet, column);
                 var columnBorder = new Border
                 {
-                    Tag = column,
+                    Tag = new ColumnTag(sheet, column),
                     Background = isIgnored
                         ? Brushes.Gainsboro
                         : isRelationColumn ? Brushes.Honeydew : Brushes.AliceBlue,
@@ -485,6 +620,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                     TextTrimming = TextTrimming.CharacterEllipsis
                 };
 
+                columnBorder.PointerPressed += OnColumnPointerPressed;
                 _columnElements[GetColumnKey(sheet.SourceName, column.HeaderName)] = columnBorder;
                 return columnBorder;
             }

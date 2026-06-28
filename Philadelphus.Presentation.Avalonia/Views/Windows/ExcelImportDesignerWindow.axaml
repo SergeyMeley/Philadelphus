@@ -116,8 +116,9 @@
             <TabItem Classes="compact" Header="Диаграмма">
                 <Grid RowDefinitions="Auto,*">
                     <TextBlock Grid.Row="0" Margin="4,2,4,6" Opacity="0.6"
-                               Text="Диаграмма связей листов. Ctrl + колесо — масштаб. (Перетаскивание листов и создание связей — в работе.)" />
+                               Text="Диаграмма связей листов. Ctrl + колесо — масштаб; перетаскивайте карточки; тяните колонку родителя на колонку ребёнка, чтобы создать связь." />
                     <ScrollViewer Grid.Row="1"
+                                  Background="#FAFAFA"
                                   beh:DiagramBehavior.IsEnabled="True"
                                   HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Auto">
@@ -125,7 +126,7 @@
                             <LayoutTransformControl.LayoutTransform>
                                 <ScaleTransform ScaleX="1" ScaleY="1" />
                             </LayoutTransformControl.LayoutTransform>
-                            <Canvas Background="#FAFAFA" Width="1400" Height="900" />
+                            <Canvas Background="Transparent" Width="1400" Height="900" />
                         </LayoutTransformControl>
                     </ScrollViewer>
                 </Grid>
