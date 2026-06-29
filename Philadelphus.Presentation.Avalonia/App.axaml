@@ -11,6 +11,19 @@
                 <ResourceInclude Source="avares://Ribbon.Avalonia/Locale/en-ca.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Тёмная тема Fluent почти чёрная; делаем фоны чуть светлее (VS-подобный серый).
+                 Переопределяем только фоновые ресурсы для варианта Dark; текст/рамки остаются из Fluent. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <!-- Фон окна (Window.Background = SystemRegionBrush). -->
+                    <SolidColorBrush x:Key="SystemRegionBrush" Color="#FF1E1E1E" />
+                    <!-- Панели/карточки/детали/сплэш. -->
+                    <SolidColorBrush x:Key="SystemControlBackgroundAltHighBrush" Color="#FF252526" />
+                    <!-- Подложка диаграммы импорта. -->
+                    <SolidColorBrush x:Key="SystemControlBackgroundChromeMediumLowBrush" Color="#FF2D2D30" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
             <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
             <conv:IconConverter x:Key="iconConverter" />
             <conv:SelectedIndexConverter x:Key="selectedIndexConverter" />
