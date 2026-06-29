@@ -79,6 +79,10 @@ namespace Philadelphus.Presentation.Avalonia
             {
                 desktop.Exit += OnExit;
 
+                // Применяем сохранённую тему до показа splash — иначе сплэш рисуется раньше темы
+                // и игнорирует выбранную светлую/тёмную схему.
+                ApplySavedThemeEarly();
+
                 // Показываем splash сразу; тяжёлый подъём Host идёт в фоне (InitializeAsync),
                 // чтобы анимация работала на свободном UI-потоке.
                 var splash = new SplashWindow();
@@ -88,6 +92,39 @@ namespace Philadelphus.Presentation.Avalonia
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        // Применяет сохранённую тему (AppearanceConfig:ThemeString) до построения Host,
+        // чтобы splash и первые окна сразу отображались в нужной светлой/тёмной схеме.
+        private static void ApplySavedThemeEarly()
+        {
+            try
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+                if (File.Exists(path) == false)
+                {
+                    return;
+                }
+
+                var root = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path)) as System.Text.Json.Nodes.JsonObject;
+                var themeString = root?["AppearanceConfig"]?["ThemeString"]?.GetValue<string>();
+
+                var variant = themeString?.Trim().ToLowerInvariant() switch
+                {
+                    "light" => global::Avalonia.Styling.ThemeVariant.Light,
+                    "dark" => global::Avalonia.Styling.ThemeVariant.Dark,
+                    _ => global::Avalonia.Styling.ThemeVariant.Default,
+                };
+
+                if (Current != null)
+                {
+                    Current.RequestedThemeVariant = variant;
+                }
+            }
+            catch
+            {
+                // Тема не критична для запуска — игнорируем сбой чтения/парсинга.
+            }
         }
 
         private async Task InitializeAsync(IClassicDesktopStyleApplicationLifetime desktop, SplashWindow splash)
