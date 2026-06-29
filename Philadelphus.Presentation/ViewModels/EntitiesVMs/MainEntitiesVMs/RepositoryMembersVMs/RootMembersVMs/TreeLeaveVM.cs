@@ -210,12 +210,12 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
         /// Сейчас UI выбирает файл из локальной файловой системы. При появлении MinIO рядом можно добавить
         /// отдельную команду/диалог выбора объекта внешнего хранилища, сохранив общий StringValue-контракт.
         /// </remarks>
-        public RelayCommand BrowseFileValueCommand
+        public AsyncRelayCommand BrowseFileValueCommand
         {
             get
             {
-                return new RelayCommand(
-                    _ => BrowseFileValue(),
+                return new AsyncRelayCommand(
+                    _ => BrowseFileValueAsync(),
                     _ => SystemBaseType == SystemBaseType.FILE);
             }
         }
@@ -451,9 +451,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
         /// <summary>
         /// Открывает стандартный диалог выбора локального файла и записывает выбранный путь в <see cref="StringValue" />.
         /// </summary>
-        private void BrowseFileValue()
+        private async Task BrowseFileValueAsync()
         {
-            var path = _fileDialogService.BrowseLocalFile();
+            var path = await _fileDialogService.BrowseLocalFileAsync();
             if (path != null)
             {
                 StringValue = path;

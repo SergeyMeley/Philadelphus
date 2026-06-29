@@ -29,6 +29,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly IFileDialogService _fileDialogService;
 
         /// <summary>
@@ -115,6 +116,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IOptions<ApplicationSettingsConfig> appConfig,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
             IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory,
             IFileDialogService fileDialogService)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -126,12 +128,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
             ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value.ConnectionStringsContainers);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
             ArgumentNullException.ThrowIfNull(fileDialogService);
 
             _configurationService = configurationService;
             _appConfig = appConfig;
             _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
             _fileDialogService = fileDialogService;
 
             Dictionary<string, Type> existingTypes = new()
@@ -195,14 +199,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 });
             }
         }
-        public IRelayCommand MoveConfigCommand
+        public IAsyncRelayCommand MoveConfigCommand
         {
             get
             {
-                return _commandFactory.Create(obj =>
+                return _asyncCommandFactory.Create(async obj =>
                 {
                     var path = string.Empty;
-                    var selectedFolder = _fileDialogService.BrowseFolder(
+                    var selectedFolder = await _fileDialogService.BrowseFolderAsync(
                         "Выберите директорию",
                         SelectedConfigFile.FileInfo.Directory.FullName);
 
@@ -229,14 +233,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             }
         }
 
-        public IRelayCommand SelectAnotherConfigCommand
+        public IAsyncRelayCommand SelectAnotherConfigCommand
         {
             get
             {
-                return _commandFactory.Create(obj =>
+                return _asyncCommandFactory.Create(async obj =>
                 {
                     var path = string.Empty;
-                    var selectedFile = _fileDialogService.OpenFile(
+                    var selectedFile = await _fileDialogService.OpenFileAsync(
                         "JSON файлы (*.json)|*.json|" +
                             "Все файлы (*.*)|*.*",
                         null,

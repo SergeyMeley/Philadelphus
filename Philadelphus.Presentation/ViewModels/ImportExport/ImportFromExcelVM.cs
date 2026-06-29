@@ -43,7 +43,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _commandFactory = commandFactory;
             _asyncCommandFactory = asyncCommandFactory;
 
-            SelectFileCommand = _commandFactory.Create(_ => SelectFile());
+            SelectFileCommand = _asyncCommandFactory.Create(_ => SelectFileAsync());
             MainActionCommand = _asyncCommandFactory.Create(_ => ExecuteMainActionAsync());
         }
 
@@ -120,9 +120,9 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             OnPropertyChanged(nameof(PreviewInfo));
         }
 
-        private void SelectFile()
+        private async Task SelectFileAsync()
         {
-            var filePath = _fileDialogService.OpenExcelFile();
+            var filePath = await _fileDialogService.OpenExcelFileAsync();
             if (string.IsNullOrWhiteSpace(filePath))
                 return;
 
@@ -268,16 +268,15 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             OnPropertyChanged(nameof(PreviewInfo));
         }
 
-        private Task ExecuteMainActionAsync()
+        private async Task ExecuteMainActionAsync()
         {
             if (TrySyncSchemaFromConvertParameters() == false)
-                return Task.CompletedTask;
+                return;
 
-            ConvertToPhjson();
-            return Task.CompletedTask;
+            await ConvertToPhjsonAsync();
         }
 
-        private void ConvertToPhjson()
+        private async Task ConvertToPhjsonAsync()
         {
             try
             {
@@ -299,7 +298,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
                 var jsonResult = _session.BuildJson();
                 var defaultFileName = Path.GetFileNameWithoutExtension(_session.SelectedFilePath) + ".phjson";
-                var savePath = _fileDialogService.SavePhjsonFile(defaultFileName);
+                var savePath = await _fileDialogService.SavePhjsonFileAsync(defaultFileName);
                 if (string.IsNullOrWhiteSpace(savePath))
                     return;
 

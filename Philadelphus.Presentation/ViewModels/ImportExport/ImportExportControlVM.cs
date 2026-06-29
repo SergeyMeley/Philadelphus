@@ -23,6 +23,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
         private readonly IPhiladelphusRepositoryService _repositoryService;
         private readonly RepositoryExplorerControlVM _repositoryExplorerControlVM;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly IFileDialogService _fileDialogService;
         private readonly IWindowService _windowService;
 
@@ -42,6 +43,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             IPhiladelphusRepositoryService repositoryService,
             RepositoryExplorerControlVM repositoryExplorerControlVM,
             IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory,
             IFileDialogService fileDialogService,
             IWindowService windowService)
         {
@@ -50,6 +52,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             ArgumentNullException.ThrowIfNull(repositoryService);
             ArgumentNullException.ThrowIfNull(repositoryExplorerControlVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
             ArgumentNullException.ThrowIfNull(fileDialogService);
             ArgumentNullException.ThrowIfNull(windowService);
 
@@ -58,6 +61,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _repositoryService = repositoryService;
             _repositoryExplorerControlVM = repositoryExplorerControlVM;
             _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
             _fileDialogService = fileDialogService;
             _windowService = windowService;
 
@@ -135,8 +139,8 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
             ImportOperations.Add(new ImportExportOperationVM(
                 $"Импорт из {adapter.FileFormat}",
-                _commandFactory.Create(
-                    _ => ImportFromFile(adapter.FileFormat, adapter.AdapterName),
+                _asyncCommandFactory.Create(
+                    _ => ImportFromFileAsync(adapter.FileFormat, adapter.AdapterName),
                     _ => CanImportToRepository())));
         }
 
@@ -149,8 +153,8 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
             ExportOperations.Add(new ImportExportOperationVM(
                 $"Экспорт в {adapter.FileFormat}",
-                _commandFactory.Create(
-                    _ => ExportToFile(adapter.FileFormat, adapter.AdapterName),
+                _asyncCommandFactory.Create(
+                    _ => ExportToFileAsync(adapter.FileFormat, adapter.AdapterName),
                     _ => CanExportSelectedWorkingTree())));
         }
 
@@ -165,8 +169,8 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
             ConversionOperations.Add(new ImportExportOperationVM(
                 $"Конвертировать {sourceAdapter.FileFormat} в {targetAdapter.FileFormat}",
-                _commandFactory.Create(
-                    _ => ConvertFile(
+                _asyncCommandFactory.Create(
+                    _ => ConvertFileAsync(
                         sourceAdapter.FileFormat,
                         sourceAdapter.AdapterName,
                         targetAdapter.FileFormat,
@@ -174,7 +178,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                     _ => CanConvertFile())));
         }
 
-        private void ExportToFile(string fileFormat, string adapterName)
+        private async Task ExportToFileAsync(string fileFormat, string adapterName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(fileFormat);
             ArgumentException.ThrowIfNullOrWhiteSpace(adapterName);
@@ -184,7 +188,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                 return;
             }
 
-            var savedFilePath = _fileDialogService.SaveFile(
+            var savedFilePath = await _fileDialogService.SaveFileAsync(
                 BuildFileDialogFilter(fileFormat),
                 NormalizeFileFormat(fileFormat));
 
@@ -202,7 +206,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             OpenFile(savedFilePath);
         }
 
-        private void ImportFromFile(string fileFormat, string adapterName)
+        private async Task ImportFromFileAsync(string fileFormat, string adapterName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(fileFormat);
             ArgumentException.ThrowIfNullOrWhiteSpace(adapterName);
@@ -215,7 +219,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                 return;
             }
 
-            var importFilePath = _fileDialogService.OpenFile(
+            var importFilePath = await _fileDialogService.OpenFileAsync(
                 BuildFileDialogFilter(fileFormat),
                 NormalizeFileFormat(fileFormat));
 
@@ -258,7 +262,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _windowService.ShowDialog(designerVm);
         }
 
-        private void ConvertFile(
+        private async Task ConvertFileAsync(
             string sourceFileFormat,
             string sourceAdapterName,
             string targetFileFormat,
@@ -269,7 +273,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             ArgumentException.ThrowIfNullOrWhiteSpace(targetFileFormat);
             ArgumentException.ThrowIfNullOrWhiteSpace(targetAdapterName);
 
-            var sourceFilePath = _fileDialogService.OpenFile(
+            var sourceFilePath = await _fileDialogService.OpenFileAsync(
                 BuildFileDialogFilter(sourceFileFormat),
                 NormalizeFileFormat(sourceFileFormat));
 
@@ -278,7 +282,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                 return;
             }
 
-            var targetFilePath = _fileDialogService.SaveFile(
+            var targetFilePath = await _fileDialogService.SaveFileAsync(
                 BuildFileDialogFilter(targetFileFormat),
                 NormalizeFileFormat(targetFileFormat));
 

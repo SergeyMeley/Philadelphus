@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Controls.ApplicationLifetimes;
@@ -21,6 +23,16 @@ namespace Philadelphus.Presentation.Avalonia.Services
 
         public void ShowError(string message, string title)
             => UiSync.RunSync(() => MessageBox.ShowAsync(Owner, title, message));
+
+        // True-async (без UiSync).
+        public Task ShowInformationAsync(string message, string title)
+            => MessageBox.ShowAsync(Owner, title, message);
+
+        public Task ShowWarningAsync(string message, string title)
+            => MessageBox.ShowAsync(Owner, title, message);
+
+        public Task ShowErrorAsync(string message, string title)
+            => MessageBox.ShowAsync(Owner, title, message);
 
         private static Window? Owner
             => (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;

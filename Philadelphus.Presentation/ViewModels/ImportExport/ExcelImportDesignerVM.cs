@@ -7,6 +7,7 @@ using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using System.Data;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Philadelphus.Presentation.ViewModels.ImportExport
@@ -31,6 +32,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
         private readonly IDispatcherService _dispatcherService;
         private readonly IWindowService _windowService;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly IImportProgressReporter _importProgressReporter;
 
         // Рантайм-контекст, передаётся через Initialize после создания VM.
@@ -76,6 +78,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             IDispatcherService dispatcherService,
             IWindowService windowService,
             IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory,
             IImportProgressReporter importProgressReporter)
         {
             ArgumentNullException.ThrowIfNull(session);
@@ -85,6 +88,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             ArgumentNullException.ThrowIfNull(dispatcherService);
             ArgumentNullException.ThrowIfNull(windowService);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
             ArgumentNullException.ThrowIfNull(importProgressReporter);
 
             _session = session;
@@ -94,15 +98,16 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _dispatcherService = dispatcherService;
             _windowService = windowService;
             _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
             _importProgressReporter = importProgressReporter;
 
-            SelectFileCommand = _commandFactory.Create(_ => SelectFile());
+            SelectFileCommand = _asyncCommandFactory.Create(_ => SelectFileAsync());
             AddRelationCommand = _commandFactory.Create(_ => AddRelation());
             RemoveRelationCommand = _commandFactory.Create(_ => RemoveRelation());
             RefreshPreviewCommand = _commandFactory.Create(_ => RefreshPreview());
             ImportCommand = _commandFactory.Create(_ => Import());
-            LoadTemplateCommand = _commandFactory.Create(_ => LoadTemplate());
-            SaveTemplateCommand = _commandFactory.Create(_ => SaveTemplate());
+            LoadTemplateCommand = _asyncCommandFactory.Create(_ => LoadTemplateAsync());
+            SaveTemplateCommand = _asyncCommandFactory.Create(_ => SaveTemplateAsync());
             CloseCommand = _commandFactory.Create(_ => Close());
         }
 
@@ -512,9 +517,9 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             RefreshRelationViews();
         }
 
-        private void SelectFile()
+        private async Task SelectFileAsync()
         {
-            var filePath = _fileDialogService.OpenExcelFile();
+            var filePath = await _fileDialogService.OpenExcelFileAsync();
             if (string.IsNullOrWhiteSpace(filePath))
                 return;
 
@@ -873,9 +878,9 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             }
         }
 
-        private void LoadTemplate()
+        private async Task LoadTemplateAsync()
         {
-            var filePath = _fileDialogService.OpenImportSchemaFile();
+            var filePath = await _fileDialogService.OpenImportSchemaFileAsync();
             if (string.IsNullOrWhiteSpace(filePath))
                 return;
 
@@ -902,7 +907,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             ApplyLoadedSchema();
         }
 
-        private void SaveTemplate()
+        private async Task SaveTemplateAsync()
         {
             var schema = _session.Schema;
             if (schema == null)
@@ -915,7 +920,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _session.SyncRootSettings(createNewRoot: true, RootName?.Trim() ?? string.Empty);
 
             var defaultFileName = $"{schema.Name}.phimportschema.json";
-            var savePath = _fileDialogService.SaveImportSchemaFile(defaultFileName);
+            var savePath = await _fileDialogService.SaveImportSchemaFileAsync(defaultFileName);
             if (string.IsNullOrWhiteSpace(savePath))
                 return;
 

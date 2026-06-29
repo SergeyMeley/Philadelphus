@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Controls.ApplicationLifetimes;
@@ -25,6 +27,19 @@ namespace Philadelphus.Presentation.Avalonia.Services
 
         public bool Confirm(string message, string title = "Подтверждение")
             => UiSync.RunSync(() => MessageBox.ConfirmAsync(Owner, title, message));
+
+        // True-async (без UiSync): напрямую возвращаем задачу MessageBox.
+        public Task ShowErrorAsync(string message, string title = "Ошибка")
+            => MessageBox.ShowAsync(Owner, title, message);
+
+        public Task ShowWarningAsync(string message, string title = "Предупреждение")
+            => MessageBox.ShowAsync(Owner, title, message);
+
+        public Task ShowInformationAsync(string message, string title = "Информация")
+            => MessageBox.ShowAsync(Owner, title, message);
+
+        public Task<bool> ConfirmAsync(string message, string title = "Подтверждение")
+            => MessageBox.ConfirmAsync(Owner, title, message);
 
         private static Window? Owner
             => (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
