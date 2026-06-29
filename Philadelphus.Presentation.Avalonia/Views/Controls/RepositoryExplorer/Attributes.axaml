@@ -55,20 +55,34 @@
 
                 <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" />
 
-                <!-- Значение
-                     TODO этап D / доводка: редактируемый ComboBox (ввод формулы Text=FormulaValueText)
-                     и подсветка «переопределено» (Moccasin) — в Avalonia ComboBox не editable. -->
+                <!-- Значение: подсветка «переопределено» (Moccasin, статусный цвет; текст чёрный для
+                     читаемости в обеих темах) + редактируемый ввод через AutoCompleteBox
+                     (Avalonia ComboBox не editable): ввод формулы — Text=FormulaValueText, выбор из ValuesList. -->
                 <DataGridTemplateColumn Header="Значение">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding DisplayedValueText, Mode=OneWay}" VerticalAlignment="Center" Margin="2,0" />
+                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    Background="{Binding IsValueOverridden, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Moccasin|}"
+                                    ToolTip.Tip="{Binding ValueOverrideToolTip}">
+                                <TextBlock Text="{Binding DisplayedValueText, Mode=OneWay}" VerticalAlignment="Center" Margin="2,0"
+                                           Foreground="{Binding IsValueOverridden, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Black|}" />
+                            </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
+                            <!-- Штатный редактируемый ComboBox (Avalonia 11.3: IsEditable + Text).
+                                 SelectedItem НЕ привязываем: при вводе текста, не совпадающего с элементом,
+                                 ComboBox сбрасывает SelectedItem в null и обнуляет значение. Вместо этого всё
+                                 идёт через Text=FormulaValueText: выбор из списка пишет в текст «[uuid]»
+                                 (TextSearch.TextBinding), а сеттер FormulaValueText сам присваивает значение
+                                 по ссылке (TryGetLeafUuidReference). Ввод формулы/значения — тоже через Text. -->
                             <ComboBox HorizontalAlignment="Stretch"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="False"
                                       ItemsSource="{Binding ValuesList}"
-                                      SelectedItem="{Binding AssignedValue, Mode=TwoWay}">
+                                      Text="{Binding FormulaValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      TextSearch.TextBinding="{Binding Uuid, StringFormat='[{0}]'}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -77,7 +91,19 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Присвоенные значения" Binding="{Binding AssignedValuesString, Mode=OneWay}" IsReadOnly="True" />
+                <!-- Присвоенные значения: подсветка «переопределено» коллекции. -->
+                <DataGridTemplateColumn Header="Присвоенные значения" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    Background="{Binding AreValuesOverridden, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Moccasin|}"
+                                    ToolTip.Tip="{Binding ValuesOverrideToolTip}">
+                                <TextBlock Text="{Binding AssignedValuesString, Mode=OneWay}" VerticalAlignment="Center" Margin="2,0"
+                                           Foreground="{Binding AreValuesOverridden, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Black|}" />
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <!-- Область видимости -->
                 <DataGridTemplateColumn Header="Область видимости">

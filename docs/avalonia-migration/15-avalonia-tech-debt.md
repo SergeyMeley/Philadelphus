@@ -43,8 +43,9 @@
 
 ## E. Таблица атрибутов и наследников (RepositoryExplorer)
 
-- Редактируемый `ComboBox` значения с вводом формулы (`Text=FormulaValueText`) — в Avalonia `ComboBox` не editable; сейчас обычный выбор из списка. Долг: AutoCompleteBox или иной редактируемый вариант.
-- Подсветка «переопределено» (Moccasin, `IsValueOverridden`/`AreValuesOverridden`/`ValueOverrideStates`) в таблицах «Атрибуты» и наследников — не перенесена (требует per-cell стиля по данным).
+- **Сделано:** редактируемый ввод значения — штатный editable `ComboBox` (Avalonia 11.3: `IsEditable`+`Text`). Всё идёт через `Text=FormulaValueText` (TwoWay, `UpdateSourceTrigger=LostFocus`), без `SelectedItem`: связка `SelectedItem`+`Text` сбрасывала значение в null при ручном вводе. Выбор из списка пишет в текст «[uuid]» через `TextSearch.TextBinding="{Binding Uuid, StringFormat='[{0}]'}"`, а сеттер `FormulaValueText` присваивает значение по ссылке (`TryGetLeafUuidReference`); ввод формул/значений — тоже через `Text`. (`AutoCompleteBox` отверг — нет выпадашки.)
+- **Сделано:** подсветка «переопределено» (Moccasin) для «Значение» (`IsValueOverridden`) и «Присвоенные значения» (`AreValuesOverridden`) — через `boolToBrushConverter` на фоне ячейки + чёрный текст для читаемости в Dark (пустая часть параметра конвертера → `UnsetValue`, т.е. дефолт темы). Moccasin — статусный цвет (исключение из тематизации).
+- **Остаётся:** скрытые таблицы наследников — «Перекрестная таблица значений», «Плоская/Перекрестная таблица допустимых значений» (в Avalonia закомментированы в `RepositoryExplorer.axaml`, см. вкладка «Наследники»). Требуют переноса (динамические колонки/`DataGridDataTableBehavior`).
 
 ## F. Конструктор импорта Excel — вкладка «Диаграмма»
 

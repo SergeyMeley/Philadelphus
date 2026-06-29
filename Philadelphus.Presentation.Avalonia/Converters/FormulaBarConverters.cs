@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 
+using global::Avalonia;
 using global::Avalonia.Data.Converters;
 using global::Avalonia.Media;
 
@@ -68,6 +69,8 @@ namespace Philadelphus.Presentation.Avalonia.Converters
 
     /// <summary>
     /// Булево значение → кисть. Параметр: "ЦветTrue|ЦветFalse" (например "Transparent|Black").
+    /// Пустая часть (например "Moccasin|") → <see cref="AvaloniaProperty.UnsetValue"/>:
+    /// свойство возвращается к значению по умолчанию/наследуемому из темы.
     /// </summary>
     public sealed class BoolToBrushConverter : IValueConverter
     {
@@ -78,6 +81,11 @@ namespace Philadelphus.Presentation.Avalonia.Converters
             var colorText = parts is { Length: 2 }
                 ? (flag ? parts[0] : parts[1])
                 : (flag ? "Black" : "Transparent");
+
+            if (string.IsNullOrWhiteSpace(colorText))
+            {
+                return AvaloniaProperty.UnsetValue;
+            }
 
             return new SolidColorBrush(Color.Parse(colorText));
         }
