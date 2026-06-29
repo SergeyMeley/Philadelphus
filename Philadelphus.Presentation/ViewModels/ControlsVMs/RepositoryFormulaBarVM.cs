@@ -506,7 +506,26 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             UpdateFormulaSignatureHelp(source, caretIndex);
 
+            // Автодополнение имеет смысл только там, где может стоять имя формулы.
+            // Внутри строкового литерала ("...") это обычный текст — список не показываем.
+            if (IsCaretInsideStringLiteral(source, caretIndex))
+            {
+                IsFormulaSuggestionsOpen = false;
+                SelectedFormulaSuggestion = null;
+                return;
+            }
+
             if (TryGetCompletionPrefix(source, caretIndex, out var prefix, out _) == false)
+            {
+                IsFormulaSuggestionsOpen = false;
+                SelectedFormulaSuggestion = null;
+                return;
+            }
+
+            // Автодополнение показываем только после ввода минимум двух символов имени формулы:
+            // иначе пустой/однобуквенный префикс открывает полный список и перекрывает подсказку
+            // по аргументам функции.
+            if (prefix.Length < 2)
             {
                 IsFormulaSuggestionsOpen = false;
                 SelectedFormulaSuggestion = null;
@@ -1526,6 +1545,38 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private static bool IsFormulaInput(string source)
         {
             return source.TrimStart().StartsWith("=", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Определяет, находится ли курсор внутри строкового литерала формулы ("..."),
+        /// где автодополнение имён формул не нужно. Незавершённый литерал (без закрывающей
+        /// кавычки) считается «внутри» вплоть до конца текста.
+        /// </summary>
+        private static bool IsCaretInsideStringLiteral(string source, int caretIndex)
+        {
+            if (caretIndex <= 0 || caretIndex > source.Length)
+            {
+                return false;
+            }
+
+            foreach (var token in FormulaTokenizer.Tokenize(source).Tokens)
+            {
+                if (token.Kind != FormulaTokenKind.String)
+                {
+                    continue;
+                }
+
+                var start = token.Span.Start;
+                var end = start + token.Span.Length;
+                var terminated = token.Text.Length >= 2 && token.Text[^1] == '"';
+
+                if (caretIndex > start && (terminated ? caretIndex < end : caretIndex <= end))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool TryGetCompletionPrefix(

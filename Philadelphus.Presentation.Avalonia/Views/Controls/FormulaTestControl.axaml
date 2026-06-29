@@ -50,7 +50,7 @@
                                    Text="{Binding Text}"
                                    Foreground="{Binding Kind, Converter={StaticResource formulaKindToBrushConverter}}"
                                    FontWeight="{Binding Kind, Converter={StaticResource formulaKindToFontWeightConverter}}"
-                                   Background="{Binding IsMatchingParenthesis, Converter={StaticResource boolToBrushConverter}, ConverterParameter=#D7ECFF|Transparent}" />
+                                   Background="{Binding IsMatchingParenthesis, Converter={StaticResource formulaMatchingParenConverter}}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

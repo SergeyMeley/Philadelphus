@@ -34,6 +34,7 @@
             <conv:UtcToLocalTimeConverter x:Key="utcToLocalTimeConverter" />
             <conv:FormulaHighlightKindToBrushConverter x:Key="formulaKindToBrushConverter" />
             <conv:FormulaHighlightKindToFontWeightConverter x:Key="formulaKindToFontWeightConverter" />
+            <conv:FormulaMatchingParenthesisToBrushConverter x:Key="formulaMatchingParenConverter" />
             <conv:BoolToBrushConverter x:Key="boolToBrushConverter" />
             <conv:NullableDateTimeToOffsetConverter x:Key="nullableDateTimeToOffsetConverter" />
         </ResourceDictionary>

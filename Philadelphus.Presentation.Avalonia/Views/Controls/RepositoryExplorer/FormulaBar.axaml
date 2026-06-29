@@ -2,47 +2,73 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.FormulaBar">
-    <!-- Цвета намеренно НЕ хардкодим (кроме мягкого акцента подсказки сигнатуры),
-         чтобы корректно работала и тёмная тема.
-         TODO: Тех. долг / D1b. Подсветка синтаксиса формулы (цветной оверлей сегментов)
-         перенесена не будет до тех пор, пока не сделаем её тема-зависимой. -->
+    <!-- Подсветка синтаксиса наложена прямо в поле ввода: раскрашенный TextBlock (инлайны через
+         FormulaHighlightOverlayBehavior) лежит ПОД прозрачным (по тексту) TextBox. Поле многострочное
+         с авто-переносом (TextWrapping=Wrap, AcceptsReturn=False — Enter применяет формулу). Цвета
+         тема-зависимы (FormulaHighlightKindToBrushConverter). Для совпадения переносов оверлей и TextBox
+         используют одинаковые шрифт/размер/Padding и единый вес шрифта. -->
     <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="2" Margin="0,0,0,2">
         <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="160,Auto,Auto,Auto,Auto,*">
             <TextBox Grid.Row="0" Grid.Column="0"
                      Text="{Binding FormulaBarAddress, Mode=OneWay}"
-                     IsReadOnly="True" Height="25" Margin="1" VerticalContentAlignment="Center"
+                     IsReadOnly="True" Height="28" MinHeight="28" Margin="1" VerticalAlignment="Top" VerticalContentAlignment="Center"
                      ToolTip.Tip="Адрес ячейки" />
 
-            <Button Grid.Row="0" Grid.Column="1" Command="{Binding ApplyFormulaBarCommand}" Height="25" Width="25" Margin="1" Padding="2" Background="Transparent" ToolTip.Tip="Применить формулу">
+            <Button Grid.Row="0" Grid.Column="1" Command="{Binding ApplyFormulaBarCommand}" Height="28" Width="28" MinHeight="28" MinWidth="28" Margin="1" Padding="2" VerticalAlignment="Top" Background="Transparent" ToolTip.Tip="Применить формулу">
                 <Image Source="/Assets/Icons/approval_64.png" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="2" Command="{Binding CancelFormulaBarCommand}" Height="25" Width="25" Margin="1" Padding="2" Background="Transparent" ToolTip.Tip="Отменить редактирование формулы">
+            <Button Grid.Row="0" Grid.Column="2" Command="{Binding CancelFormulaBarCommand}" Height="28" Width="28" MinHeight="28" MinWidth="28" Margin="1" Padding="2" VerticalAlignment="Top" Background="Transparent" ToolTip.Tip="Отменить редактирование формулы">
                 <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_return.png" />
             </Button>
-            <Button Grid.Row="0" Grid.Column="3" Content="fx" Command="{Binding RecalculateCurrentFormulaCommand}" Height="25" Width="25" Margin="1" Background="Transparent" FontWeight="SemiBold" ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория." />
-            <Button Grid.Row="0" Grid.Column="4" Command="{Binding OpenFormulaEditorFromFormulaBarCommand}" Height="25" Width="25" Margin="1" Padding="2" Background="Transparent" ToolTip.Tip="Открыть редактор формул">
+            <Button Grid.Row="0" Grid.Column="3" Content="fx" Command="{Binding RecalculateCurrentFormulaCommand}" Height="28" Width="28" MinHeight="28" MinWidth="28" Margin="1" VerticalAlignment="Top" Background="Transparent" FontWeight="SemiBold" ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория." />
+            <Button Grid.Row="0" Grid.Column="4" Command="{Binding OpenFormulaEditorFromFormulaBarCommand}" Height="28" Width="28" MinHeight="28" MinWidth="28" Margin="1" Padding="2" VerticalAlignment="Top" Background="Transparent" ToolTip.Tip="Открыть редактор формул">
                 <Image Source="/Assets/Icons/open.png" />
             </Button>
 
-            <!-- Поле формулы (обычный редактируемый TextBox; цвета — из темы). -->
-            <TextBox x:Name="FormulaTextBox" Grid.Row="0" Grid.Column="5"
-                     Text="{Binding FormulaBarText, Mode=TwoWay}"
-                     IsEnabled="{Binding IsFormulaBarEnabled}"
-                     Height="25" Margin="1" VerticalContentAlignment="Center"
-                     FontFamily="Consolas" FontSize="13"
-                     beh:FormulaBarTextBoxBehavior.Track="True"
-                     beh:FormulaBarTextBoxBehavior.IsEditing="{Binding IsFormulaBarEditing, Mode=TwoWay}"
-                     beh:FormulaBarTextBoxBehavior.CaretIndex="{Binding FormulaBarCaretIndex, Mode=TwoWay}"
-                     beh:FormulaBarTextBoxBehavior.SelectionStart="{Binding FormulaBarSelectionStart, Mode=TwoWay}"
-                     beh:FormulaBarTextBoxBehavior.SelectionLength="{Binding FormulaBarSelectionLength, Mode=TwoWay}"
-                     beh:FormulaBarTextBoxBehavior.FocusRequestId="{Binding FormulaBarFocusRequestId, Mode=OneWay}"
-                     beh:FormulaSuggestionTextBoxBehavior.IsEnabled="True"
-                     beh:FormulaSuggestionTextBoxBehavior.SuggestionsListBox="{Binding #FormulaSuggestionsListBox}">
-                <TextBox.KeyBindings>
-                    <KeyBinding Gesture="Enter" Command="{Binding ApplyFormulaBarCommand}" />
-                    <KeyBinding Gesture="Escape" Command="{Binding CancelFormulaBarCommand}" />
-                </TextBox.KeyBindings>
-            </TextBox>
+            <!-- Поле формулы: оверлей подсветки (снизу) + редактируемый TextBox (сверху, текст прозрачный при подсветке). -->
+            <Border Grid.Row="0" Grid.Column="5" Margin="1" MinHeight="28"
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" BorderThickness="1" CornerRadius="3">
+                <Panel>
+                    <TextBlock x:Name="FormulaHighlightLayer"
+                               FontFamily="Consolas" FontSize="13"
+                               TextWrapping="Wrap" Padding="6,4"
+                               VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                               IsHitTestVisible="False"
+                               IsVisible="{Binding IsFormulaHighlightOpen}"
+                               beh:FormulaHighlightOverlayBehavior.Segments="{Binding FormulaHighlightSegments}" />
+                    <TextBox x:Name="FormulaTextBox"
+                             Text="{Binding FormulaBarText, Mode=TwoWay}"
+                             IsEnabled="{Binding IsFormulaBarEnabled}"
+                             Background="Transparent" BorderThickness="0" Padding="6,4"
+                             TextWrapping="Wrap" AcceptsReturn="False"
+                             VerticalContentAlignment="Top"
+                             FontFamily="Consolas" FontSize="13"
+                             CaretBrush="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                             Foreground="{Binding IsFormulaHighlightOpen, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Transparent|}"
+                             beh:FormulaBarTextBoxBehavior.Track="True"
+                             beh:FormulaBarTextBoxBehavior.IsEditing="{Binding IsFormulaBarEditing, Mode=TwoWay}"
+                             beh:FormulaBarTextBoxBehavior.CaretIndex="{Binding FormulaBarCaretIndex, Mode=TwoWay}"
+                             beh:FormulaBarTextBoxBehavior.SelectionStart="{Binding FormulaBarSelectionStart, Mode=TwoWay}"
+                             beh:FormulaBarTextBoxBehavior.SelectionLength="{Binding FormulaBarSelectionLength, Mode=TwoWay}"
+                             beh:FormulaBarTextBoxBehavior.FocusRequestId="{Binding FormulaBarFocusRequestId, Mode=OneWay}"
+                             beh:FormulaSuggestionTextBoxBehavior.IsEnabled="True"
+                             beh:FormulaSuggestionTextBoxBehavior.SuggestionsListBox="{Binding #FormulaSuggestionsListBox}">
+                        <!-- Фон поля прозрачен во ВСЕХ состояниях, иначе при фокусе Fluent подменяет фон
+                             внутренней рамки на непрозрачный TextControlBackgroundFocused и перекрывает оверлей. -->
+                        <TextBox.Resources>
+                            <SolidColorBrush x:Key="TextControlBackground" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="Transparent" />
+                        </TextBox.Resources>
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding ApplyFormulaBarCommand}" />
+                            <KeyBinding Gesture="Escape" Command="{Binding CancelFormulaBarCommand}" />
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                </Panel>
+            </Border>
 
             <!-- Автодополнение -->
             <Popup Grid.Row="0" Grid.Column="5"
@@ -68,8 +94,8 @@
                 </Border>
             </Popup>
 
-            <!-- Подсказка по сигнатуре функции (мягкий акцент). -->
-            <Border Grid.Row="1" Grid.Column="4" Margin="1,2,1,0" Padding="8,5"
+            <!-- Подсказка по сигнатуре функции — сквозная на всю ширину строки (мягкий акцент). -->
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Margin="1,2,1,0" Padding="8,5"
                     Background="#33D8B75A" BorderBrush="#D8B75A" BorderThickness="1"
                     IsVisible="{Binding IsFormulaSignatureHelpOpen}">
                 <StackPanel>
