@@ -21,9 +21,11 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// генерация колонок вынесена из code-behind, ViewModel отдает чистые дескрипторы.
     /// </summary>
     /// <remarks>
-    /// TODO: Тех. долг / этап D. Не перенесено: подсветка локального переопределения значения
-    /// атрибута (Moccasin, ValueOverrideStates/ValueOverrideToolTips) и редактируемый ComboBox
-    /// с вводом формулы (в Avalonia ComboBox не editable).
+    /// Подсветка локального переопределения значения атрибута (Moccasin,
+    /// ValueOverrideStates/ValueOverrideToolTips) перенесена — см. WrapWithOverride.
+    /// TODO: Тех. долг / этап I, п.2. Остаётся редактируемый ComboBox с вводом формулы
+    /// в ячейке значения (сейчас combo только выбирает из списка; модель строки оперирует
+    /// объектом-значением, а не формульной строкой).
     /// </remarks>
     public sealed class DataGridColumnsBehavior
     {
@@ -33,6 +35,12 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
 
         private static readonly StateToColorConverter StateToColor = new();
         private static readonly EnumDisplayAttributeConverter EnumDisplay = new();
+        private static readonly BoolToBrushConverter BoolToBrush = new();
+
+        // Подсветка «переопределено» (Moccasin, статусный цвет) + чёрный текст для читаемости в Dark,
+        // как в таблице атрибутов (см. Attributes.axaml). Пустая часть параметра → UnsetValue (дефолт темы).
+        private const string OverrideBackgroundParameter = "Moccasin|";
+        private const string OverrideForegroundParameter = "Black|";
 
         /// <summary>Источник дескрипторов колонок для динамического DataGrid.</summary>
         public static readonly AttachedProperty<IEnumerable?> ColumnsSourceProperty =
@@ -108,7 +116,8 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
         private static DataGridColumn CreateComboBoxColumn(ChildCollectionTableColumn column)
         {
             var column1 = column;
-            var template = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
+
+            FuncDataTemplate<ChildCollectionTableRow> CreateComboTemplate() => new((_, _) =>
             {
                 var comboBox = new ComboBox { HorizontalAlignment = HorizontalAlignment.Stretch };
                 comboBox.Bind(ItemsControl.ItemsSourceProperty, new Binding($"ValueOptions[{column1.BindingKey}]"));
@@ -122,20 +131,62 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 return comboBox;
             });
 
-            return new DataGridTemplateColumn
+            // Неатрибутные combo-колонки: combo всегда (как было).
+            if (column.IsAttribute == false)
+            {
+                var template = CreateComboTemplate();
+                return new DataGridTemplateColumn
+                {
+                    Header = CreateHeader(column),
+                    IsReadOnly = column.IsReadOnly,
+                    Width = DataGridLength.Auto,
+                    MinWidth = 80,
+                    CellTemplate = template,
+                    CellEditingTemplate = template,
+                };
+            }
+
+            // Атрибутные: в покое — текст значения на подсветке (как в таблице атрибутов, читаемо в Dark),
+            // combo появляется только при редактировании.
+            var cellTemplate = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
+            {
+                var text = new TextBlock
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(4, 0),
+                };
+                text.Bind(TextBlock.TextProperty, new Binding($"[{column1.BindingKey}].Name"));
+                text.Bind(TextBlock.ForegroundProperty, OverrideForegroundBinding(column1.BindingKey));
+                return WrapWithOverride(column1, text);
+            });
+
+            var result = new DataGridTemplateColumn
             {
                 Header = CreateHeader(column),
                 IsReadOnly = column.IsReadOnly,
                 Width = DataGridLength.Auto,
-                MinWidth = column.IsAttribute ? 120 : 80,
-                CellTemplate = template,
-                CellEditingTemplate = template,
+                MinWidth = 120,
+                CellTemplate = cellTemplate,
             };
+
+            if (column.IsReadOnly == false)
+            {
+                result.CellEditingTemplate = CreateComboTemplate();
+            }
+
+            return result;
         }
 
         /// <summary>Текстовая колонка для readonly и простых редактируемых значений.</summary>
         private static DataGridColumn CreateTextColumn(ChildCollectionTableColumn column)
         {
+            // Атрибутные колонки получают подсветку «переопределено» + тултип (как в таблице атрибутов),
+            // поэтому строятся шаблоном, а не DataGridTextColumn.
+            if (column.IsAttribute)
+            {
+                return CreateAttributeTextColumn(column);
+            }
+
             var binding = new Binding($"[{column.BindingKey}]")
             {
                 Mode = column.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay,
@@ -152,9 +203,72 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 Binding = binding,
                 IsReadOnly = column.IsReadOnly,
                 Width = DataGridLength.Auto,
-                MinWidth = column.IsAttribute ? 120 : 80,
+                MinWidth = 80,
             };
         }
+
+        /// <summary>
+        /// Текстовая колонка атрибута: подсветка «переопределено» (Moccasin) + тултип на ячейке,
+        /// чёрный текст при переопределении. Редактирование — TextBox в CellEditingTemplate.
+        /// </summary>
+        private static DataGridColumn CreateAttributeTextColumn(ChildCollectionTableColumn column)
+        {
+            var column1 = column;
+
+            var cellTemplate = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
+            {
+                var text = new TextBlock
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(4, 0),
+                };
+                text.Bind(TextBlock.TextProperty, new Binding($"[{column1.BindingKey}]"));
+                text.Bind(TextBlock.ForegroundProperty, OverrideForegroundBinding(column1.BindingKey));
+                return WrapWithOverride(column1, text);
+            });
+
+            var result = new DataGridTemplateColumn
+            {
+                Header = CreateHeader(column),
+                IsReadOnly = column.IsReadOnly,
+                Width = DataGridLength.Auto,
+                MinWidth = 120,
+                CellTemplate = cellTemplate,
+            };
+
+            if (column.IsReadOnly == false)
+            {
+                result.CellEditingTemplate = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
+                {
+                    var box = new TextBox { VerticalAlignment = VerticalAlignment.Stretch };
+                    box.Bind(TextBox.TextProperty, new Binding($"[{column1.BindingKey}]") { Mode = BindingMode.TwoWay });
+                    return box;
+                });
+            }
+
+            return result;
+        }
+
+        /// <summary>Оборачивает контент ячейки атрибута в Border с подсветкой переопределения и тултипом.</summary>
+        private static Border WrapWithOverride(ChildCollectionTableColumn column, Control content)
+        {
+            var border = new Border { Child = content };
+            border.Bind(Border.BackgroundProperty, new Binding($"ValueOverrideStates[{column.BindingKey}]")
+            {
+                Converter = BoolToBrush,
+                ConverterParameter = OverrideBackgroundParameter,
+            });
+            border.Bind(ToolTip.TipProperty, new Binding($"ValueOverrideToolTips[{column.BindingKey}]"));
+            return border;
+        }
+
+        /// <summary>Привязка цвета текста: чёрный при переопределении, иначе цвет темы.</summary>
+        private static Binding OverrideForegroundBinding(string bindingKey)
+            => new($"ValueOverrideStates[{bindingKey}]")
+            {
+                Converter = BoolToBrush,
+                ConverterParameter = OverrideForegroundParameter,
+            };
 
         private static object CreateHeader(ChildCollectionTableColumn column)
         {
