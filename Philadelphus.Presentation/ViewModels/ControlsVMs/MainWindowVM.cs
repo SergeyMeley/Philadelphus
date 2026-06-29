@@ -196,6 +196,17 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </summary>
         public IRelayCommand OpenFormulaEditorWindowCommand => _applicationCommandsVM.OpenFormulaEditorWindowCommand;
 
+        /// <summary>
+        /// Открывает окно «О программе» (кнопка «?» на ленте).
+        /// </summary>
+        public IRelayCommand OpenAboutWindowCommand
+        {
+            get
+            {
+                return _commandFactory.Create(_ => _windowService.Show(new AboutWindowVM(AssemblyVersion)));
+            }
+        }
+
         public IRelayCommand OpenRepositoryMemberDetailsWindowCommand
         {
             get

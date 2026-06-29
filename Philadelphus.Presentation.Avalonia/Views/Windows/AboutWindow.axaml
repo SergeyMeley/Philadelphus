@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.AboutWindow"
+        Title="О программе"
+        Width="420" Height="260"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="24" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Image Source="/Assets/Icons/philadelphus_logo_64.png" Width="56" Height="56" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding AppName}" FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding Version}" HorizontalAlignment="Center"
+                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        <TextBlock Text="{Binding Credit}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"
+                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        <Button Content="Закрыть" HorizontalAlignment="Center" MinWidth="100" Margin="0,8,0,0"
+                Click="OnCloseClick" />
+    </StackPanel>
+</Window>

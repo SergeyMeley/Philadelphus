@@ -150,6 +150,7 @@ namespace Philadelphus.Presentation.Avalonia
                 windowService.Register<FormulaTestControlVM, FormulaEditorWindow>();
                 windowService.Register<RepositoryExplorerControlVM, AttributeValuesCollectionWindow>();
                 windowService.Register<DetailsWindowVM, DetailsWindow>();
+                windowService.Register<AboutWindowVM, AboutWindow>();
                 windowService.Register<ExcelImportDesignerVM, ExcelImportDesignerWindow>();
 
                 // Стартовое окно — LaunchWindow.
@@ -340,6 +341,7 @@ namespace Philadelphus.Presentation.Avalonia
                     services.AddTransient<FormulaEditorWindow>();
                     services.AddTransient<AttributeValuesCollectionWindow>();
                     services.AddTransient<DetailsWindow>();
+                    services.AddTransient<AboutWindow>();
 
                     // Фабрика инфраструктуры (зависит от конкретной Persistence — точка композиции)
                     services.AddTransient<IInfrastructureRepositoryFactory, InfrastructureRepositoryFactory>();

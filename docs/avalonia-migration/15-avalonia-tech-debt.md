@@ -13,15 +13,21 @@
 
 ## A. Лента (Ribbon.Avalonia) — детальная настройка
 
-Лента `MainWindow` переведена с самодельного `TabControl` на библиотеку `Ribbon.Avalonia` 0.9.0 (форк dmitryzarubin, pre-1.0; namespace `Ribbon.Avalonia`, вкладки в `Ribbon.Tabs`, окно — обычный `Window`). Базовая структура рабочая. Осталось:
+Лента `MainWindow` переведена с самодельного `TabControl` на библиотеку `Ribbon.Avalonia` 0.9.0 (форк dmitryzarubin, pre-1.0; namespace `Ribbon.Avalonia`, вкладки в `Ribbon.Tabs`, окно — обычный `Window`).
 
-- Иконки кнопок: `RibbonButton` сейчас текстовые; добавить `LargeIcon`/`Icon` и осмысленные `MinSize`/`MaxSize`.
-- Заменить обычные `Button`/`ToggleButton`/`ComboBox`/`ItemsControl` внутри групп на риббон-контролы (`RibbonButton`/`RibbonToggleButton`/`RibbonSplitButton`/`Gallery`), где уместно.
-- Группы со смешанным контентом («Пересчёт», «Текущий репозиторий», «Расширения») — выверить вёрстку.
-- `Ribbon.Menu` (app-menu/backstage) и QuickAccessToolbar — не задействованы; решить, нужны ли.
-- `KeyTip`/навигация по Alt, `HelpButton` (`?`), сворачивание ленты, контекстные группы вкладок, `RibbonGroupBox.Command` (диалог-лончер) — восстановить при необходимости.
-- Локализация (сейчас `Locale/en-ca.xaml`), проверка темы Light/Dark.
-- Версия библиотеки pre-1.0 запинена (0.9.0); при апдейте сверять breaking changes.
+Сделано:
+- Иконки кнопок (`Icon`=ControlTemplate с Image), единые размеры (Size=Medium, MaxSize=Large, MinSize=Small с иконкой / Medium без), все обычные `Button` в группах → `RibbonButton`/`RibbonToggleButton`.
+- Авто-раскладка кнопок: контролы — прямые элементы `RibbonGroupBox`, лента сама раскладывает `WrapPanel`'ом и переносит (группы со смешанным контентом «Пересчёт»/«Текущее расширение», «Данные» через `ItemsSource`).
+- **Сворачивание ленты** — встроенный шеврон в шапке (привязан к `IsCollapsed`), работает из коробки.
+- **Кнопка «?»** (`HelpButtonCommand`) → открывает окно «О программе» (`AboutWindow`/`AboutWindowVM`).
+- Цвета — тема-зависимые (Light/Dark).
+
+Осталось (опционально):
+- **QuickAccessToolbar** — в 0.9.0 штатно не поддержан: в шаблоне `Ribbon` нет места под QAT, код добавления через контекстное меню (`pinToQat`/`_rightClicked` в `Ribbon.cs`) закомментирован. Нужна кастомная реализация — отложено по решению пользователя.
+- `Ribbon.Menu` (app-menu/backstage) — не задействован; отложено.
+- `KeyTip`/навигация по Alt, контекстные группы вкладок, `RibbonGroupBox.Command` (диалог-лончер) — при необходимости.
+- При свёрнутой ленте клик по вкладке не открывает popup (соответствующий код в библиотеке 0.9.0 закомментирован).
+- Локализация (`Locale/en-ca.xaml`). Версия pre-1.0 запинена (0.9.0) — при апдейте сверять breaking changes.
 
 ## B. Формульные взаимодействия с таблицами (Avalonia DataGrid)
 
