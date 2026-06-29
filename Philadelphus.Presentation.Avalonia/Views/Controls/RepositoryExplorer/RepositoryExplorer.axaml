@@ -174,10 +174,25 @@
                         <TabItem Classes="compact" Header="Плоская таблица">
                             <local:RepositoryExplorerChildrenFlatTable />
                         </TabItem>
-                        <!--
-                        Скрытые в WPF вкладки: «Перекрестная таблица значений», «Плоская таблица допустимых значений»,
-                        «Перекрестная таблица допустимых значений». Перенос отложен.
-                        -->
+
+                        <!-- Вкладки-заглушки: в WPF они тоже скрыты (Visibility=Collapsed) и не реализованы
+                             (нет привязок/источника данных в VM). Перенесены 1-в-1 ради структурного паритета;
+                             функциональность — отдельная фича (см. тех. долг, раздел E). -->
+                        <TabItem Classes="compact" Header="Перекрестная таблица значений" IsVisible="False">
+                            <StackPanel>
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Вертикальная ось" VerticalAlignment="Center" Margin="1" />
+                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="1" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Горизонтальная ось" VerticalAlignment="Center" Margin="1" />
+                                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="1" />
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Ячейки" VerticalAlignment="Center" Margin="1" />
+                                    <ComboBox Grid.Row="2" Grid.Column="1" Margin="1" />
+                                </Grid>
+                                <DataGrid />
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Classes="compact" Header="Плоская таблица допустимых значений" IsVisible="False" />
+                        <TabItem Classes="compact" Header="Перекрестная таблица допустимых значений" IsVisible="False" />
                     </TabControl>
                 </TabItem>
 
