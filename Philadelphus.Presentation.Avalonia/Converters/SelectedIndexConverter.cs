@@ -11,10 +11,10 @@ namespace Philadelphus.Presentation.Avalonia.Converters
     /// </summary>
     public sealed class SelectedIndexConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
             => SelectedIndexLogic.Convert(value);
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();
     }
 }

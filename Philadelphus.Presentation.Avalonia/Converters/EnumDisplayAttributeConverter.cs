@@ -11,10 +11,10 @@ namespace Philadelphus.Presentation.Avalonia.Converters
     /// </summary>
     public sealed class EnumDisplayAttributeConverter : IValueConverter
     {
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
             => EnumDisplayLogic.Convert(value, parameter);
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();
     }
 }

@@ -12,10 +12,10 @@ namespace Philadelphus.Presentation.Avalonia.Converters
     /// </summary>
     public sealed class IconConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
             => AppIconBitmaps.ToBitmap(IconResolver.Resolve(value));
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();
     }
 }

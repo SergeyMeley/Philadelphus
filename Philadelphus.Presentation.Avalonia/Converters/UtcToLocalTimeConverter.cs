@@ -11,10 +11,10 @@ namespace Philadelphus.Presentation.Avalonia.Converters
     /// </summary>
     public sealed class UtcToLocalTimeConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
             => UtcToLocalTimeLogic.Convert(value, parameter);
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => UtcToLocalTimeLogic.ConvertBack(value);
     }
 }

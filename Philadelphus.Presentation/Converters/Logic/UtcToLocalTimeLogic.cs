@@ -36,7 +36,7 @@ namespace Philadelphus.Presentation.Converters.Logic
         /// <summary>
         /// Форматирует DateTime согласно стилю (parameter — имя DateTimeStyle).
         /// </summary>
-        public static object Convert(object value, object parameter)
+        public static object Convert(object? value, object? parameter)
         {
             if (value is DateTime dateTime)
             {
@@ -77,7 +77,7 @@ namespace Philadelphus.Presentation.Converters.Logic
                     _ => localTime.ToString("yyyy-MM-ddTHH:mm:ss")
                 };
             }
-            return value;
+            return value ?? string.Empty;
         }
 
         private static string AutoFormat(DateTime dateTime)
@@ -96,7 +96,7 @@ namespace Philadelphus.Presentation.Converters.Logic
         /// <summary>
         /// Парсит строку обратно в DateTime (ISO 8601 или российские форматы).
         /// </summary>
-        public static object ConvertBack(object value)
+        public static object ConvertBack(object? value)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
