@@ -11,7 +11,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// Навигация и подстановка предложений автодополнения формул в TextBox.
     /// Avalonia-аналог WPF-behavior: tunnel-обработка клавиш, обновление предложений по смене каретки.
     /// </summary>
-    public class FormulaSuggestionTextBoxBehavior
+    public sealed class FormulaSuggestionTextBoxBehavior
     {
         private FormulaSuggestionTextBoxBehavior()
         {

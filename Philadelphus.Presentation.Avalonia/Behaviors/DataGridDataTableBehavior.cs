@@ -15,7 +15,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// строит текстовые колонки из столбцов и подставляет строки. В отличие от WPF, Avalonia DataGrid
     /// не умеет авто-генерацию колонок из DataTable/DataView.
     /// </summary>
-    public class DataGridDataTableBehavior
+    public sealed class DataGridDataTableBehavior
     {
         private DataGridDataTableBehavior()
         {

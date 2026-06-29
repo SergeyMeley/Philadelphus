@@ -31,7 +31,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// и <see cref="ScaleTransform"/> в <c>LayoutTransform</c> (аналог WPF Canvas.LayoutTransform).
     /// Цвета карточек пока жёсткие (как в WPF) — тематизация под Dark в общем тех-долге темы.
     /// </remarks>
-    public class DiagramBehavior
+    public sealed class DiagramBehavior
     {
         private DiagramBehavior()
         {

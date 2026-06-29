@@ -22,7 +22,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// Avalonia ScrollIntoView к последнему ряду нередко «не доезжает» до измерения. Подсветка —
     /// best-effort: контейнеры строк виртуализированы, фон строки ставится/снимается по таймеру.
     /// </remarks>
-    public class DataGridAutoScrollBehavior
+    public sealed class DataGridAutoScrollBehavior
     {
         private DataGridAutoScrollBehavior()
         {

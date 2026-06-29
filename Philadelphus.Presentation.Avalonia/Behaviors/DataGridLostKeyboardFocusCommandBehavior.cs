@@ -13,7 +13,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// Avalonia-аналог WPF DataGridLostKeyboardFocusCommandBehavior: используется для отложенной
     /// пересортировки таблицы наследников (редактирование Sequence не дергает порядок во время ввода).
     /// </summary>
-    public class DataGridLostKeyboardFocusCommandBehavior
+    public sealed class DataGridLostKeyboardFocusCommandBehavior
     {
         private DataGridLostKeyboardFocusCommandBehavior()
         {

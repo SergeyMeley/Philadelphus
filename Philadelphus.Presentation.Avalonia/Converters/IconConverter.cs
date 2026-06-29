@@ -10,12 +10,12 @@ namespace Philadelphus.Presentation.Avalonia.Converters
     /// <summary>
     /// Единый конвертер иконок: значение → AppIcon (<see cref="IconResolver" />) → Bitmap (<see cref="AppIconBitmaps" />).
     /// </summary>
-    public class IconConverter : IValueConverter
+    public sealed class IconConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             => AppIconBitmaps.ToBitmap(IconResolver.Resolve(value));
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException();
     }
 }

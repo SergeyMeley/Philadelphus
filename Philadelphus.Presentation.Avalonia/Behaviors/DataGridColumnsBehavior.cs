@@ -25,7 +25,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// атрибута (Moccasin, ValueOverrideStates/ValueOverrideToolTips) и редактируемый ComboBox
     /// с вводом формулы (в Avalonia ComboBox не editable).
     /// </remarks>
-    public class DataGridColumnsBehavior
+    public sealed class DataGridColumnsBehavior
     {
         private DataGridColumnsBehavior()
         {

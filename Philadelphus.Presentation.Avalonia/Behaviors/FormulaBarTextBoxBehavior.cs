@@ -15,7 +15,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// Avalonia-аналог одноименного WPF-behavior (в Avalonia TextBox использует SelectionStart/SelectionEnd,
     /// нет SelectionChanged — отслеживаем через PropertyChanged).
     /// </summary>
-    public class FormulaBarTextBoxBehavior
+    public sealed class FormulaBarTextBoxBehavior
     {
         private FormulaBarTextBoxBehavior()
         {
