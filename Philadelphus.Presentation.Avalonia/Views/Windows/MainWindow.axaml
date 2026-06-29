@@ -54,7 +54,7 @@
                     <ribbon:RibbonTab Header="Главная">
                         <ribbon:RibbonTab.Groups>
                             <ribbon:RibbonGroupBox Header="Общее">
-                                <ribbon:RibbonButton Content="Открыть стартовое окно" Command="{Binding OpenLaunchWindowCommand}" MinSize="Medium" />
+                                <ribbon:RibbonButton Content="Стартовое окно" Command="{Binding OpenLaunchWindowCommand}" Size="Medium" MinSize="Medium" MaxSize="Medium" />
                             </ribbon:RibbonGroupBox>
                             <!--
                             <ribbon:RibbonGroupBox Header="Буфер обмена">
@@ -86,39 +86,40 @@
                                         <TextBlock Text="Текущий элемент: " />
                                         <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name, FallbackValue='&lt;не выбран&gt;', TargetNullValue='&lt;не выбран&gt;'}" />
                                     </StackPanel>
-                                    <ribbon:RibbonButton Content="Подробнее" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                    <ribbon:RibbonButton Content="Подробнее" Size="Medium" MinSize="Small" MaxSize="Large"
                                         Icon="{StaticResource IcoDetails}"
                                         Command="{Binding OpenRepositoryMemberDetailsWindowCommand}"  />
                                 </StackPanel>
                             </ribbon:RibbonGroupBox>
-                            <!-- Команды и иконки/подсказки — как в тулбаре обозревателя (RepositoryExplorerVM).
-                                 Компактные кнопки: MinSize/MaxSize=Small, иконка+подпись в Content
-                                 CanExecute сам управляет доступностью по выбранному элементу.
-                                 Size=Medium: иконка (Icon = ControlTemplate) слева + подпись справа. -->
+                            <!-- Команды и иконки/подсказки — как в тулбаре обозревателя (RepositoryExplorerVM);
+                                 CanExecute сам управляет доступностью по выбранному элементу. Размеры по
+                                 общему правилу: Size=Medium (иконка слева + подпись), MinSize=Small
+                                 (иконка-only при нехватке места), MaxSize=Large (иконка сверху + подпись).
+                                 Иконка — Icon=ControlTemplate (тип IControlTemplate, не растр). -->
                             <ribbon:RibbonGroupBox Header="Иерархия репозитория">
-                                <ribbon:RibbonButton Content="Добавить корень" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                <ribbon:RibbonButton Content="Добавить корень" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoRoot}"
                                                      Command="{Binding RepositoryExplorerVM.CreateRootCommand}"
                                                      ToolTip.Tip="Добавить корень" />
-                                <ribbon:RibbonButton Content="Добавить узел" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                <ribbon:RibbonButton Content="Добавить узел" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoNode}"
                                                      Command="{Binding RepositoryExplorerVM.CreateNodeCommand}"
                                                      ToolTip.Tip="Добавить узел" />
-                                <ribbon:RibbonButton Content="Добавить лист" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                <ribbon:RibbonButton Content="Добавить лист" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoLeave}"
                                                      Command="{Binding RepositoryExplorerVM.CreateLeaveCommand}"
                                                      ToolTip.Tip="Добавить лист" />
-                                <ribbon:RibbonButton Content="Удалить элемент" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                <ribbon:RibbonButton Content="Удалить элемент" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoDelete}"
                                                      Command="{Binding RepositoryExplorerVM.SoftDeleteRepositoryMemberCommand}"
                                                      ToolTip.Tip="Удалить выбранный элемент репозитория" />
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Атрибуты">
-                                <ribbon:RibbonButton Content="Добавить атрибут" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                <ribbon:RibbonButton Content="Добавить атрибут" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoAdd}"
                                                      Command="{Binding RepositoryExplorerVM.CreateAttributeCommand}"
                                                      ToolTip.Tip="Добавить атрибут" />
-                                <ribbon:RibbonButton Content="Удалить атрибут" Size="Medium" MinSize="Medium" MaxSize="Medium"
+                                <ribbon:RibbonButton Content="Удалить атрибут" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoRemove}"
                                                      Command="{Binding RepositoryExplorerVM.SoftDeleteRepositoryMemberAttributeCommand}"
                                                      ToolTip.Tip="Удалить атрибут" />
@@ -132,27 +133,29 @@
                                 <ribbon:RibbonButton Content="Редактор формул"
                                                      Command="{Binding OpenFormulaEditorWindowCommand}"
                                                      CommandParameter="{Binding FormulaTestControlVM}"
-                                                     MinSize="Medium" />
+                                                     Size="Medium" MinSize="Medium" MaxSize="Large" />
                             </ribbon:RibbonGroupBox>
-                            <ribbon:RibbonGroupBox Header="Пересчет" DataContext="{Binding RepositoryExplorerVM.FormulaBarVM}">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <StackPanel Spacing="2">
-                                        <TextBlock Text="Пересчет формул" />
-                                        <ComboBox ItemsSource="{Binding FormulaRecalculationModes}"
-                                                  SelectedItem="{Binding SelectedFormulaRecalculationMode}"
-                                                  MinWidth="180">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                        </ComboBox>
-                                    </StackPanel>
-                                    <Button Content="Пересчитать текущий"
-                                            ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория."
-                                            Command="{Binding RecalculateCurrentFormulaCommand}" />
-                                    <Button Content="Пересчитать все"
-                                            ToolTip.Tip="Пересчитать все формулы для всех элементов репозитория."
-                                            Command="{Binding RecalculateAllFormulasCommand}" />
+                            <!-- Orientation="Horizontal": элементы кладём прямо в группу, ribbon сам
+                                 раскладывает их в колонки (внутренний WrapPanel) и переносит. -->
+                            <ribbon:RibbonGroupBox Header="Пересчет" Orientation="Horizontal" DataContext="{Binding RepositoryExplorerVM.FormulaBarVM}">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Пересчет формул" />
+                                    <ComboBox ItemsSource="{Binding FormulaRecalculationModes}"
+                                              SelectedItem="{Binding SelectedFormulaRecalculationMode}"
+                                              MinWidth="180">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
                                 </StackPanel>
+                                <ribbon:RibbonButton Content="Пересчитать текущий"
+                                        ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория."
+                                        Size="Medium" MinSize="Medium" MaxSize="Large"
+                                        Command="{Binding RecalculateCurrentFormulaCommand}" />
+                                <ribbon:RibbonButton Content="Пересчитать все"
+                                        ToolTip.Tip="Пересчитать все формулы для всех элементов репозитория."
+                                        Size="Medium" MinSize="Medium" MaxSize="Large"
+                                        Command="{Binding RecalculateAllFormulasCommand}" />
                             </ribbon:RibbonGroupBox>
                         </ribbon:RibbonTab.Groups>
                     </ribbon:RibbonTab>
@@ -163,35 +166,22 @@
 
                     <ribbon:RibbonTab Header="Данные">
                         <ribbon:RibbonTab.Groups>
-                            <ribbon:RibbonGroupBox Header="Импорт">
-                                <ItemsControl ItemsSource="{Binding ImportExportVM.ImportOperations}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate><Button Content="{Binding Label}" Command="{Binding Command}" /></DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                            <!-- Кнопки операций — прямые элементы RibbonGroupBox (HeaderedItemsControl):
+                                 лента сама раскладывает их WrapPanel'ом и переносит, не обрезая при росте списка. -->
+                            <ribbon:RibbonGroupBox Header="Импорт" ItemsSource="{Binding ImportExportVM.ImportOperations}">
+                                <ribbon:RibbonGroupBox.ItemTemplate>
+                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
+                                </ribbon:RibbonGroupBox.ItemTemplate>
                             </ribbon:RibbonGroupBox>
-                            <ribbon:RibbonGroupBox Header="Экспорт">
-                                <ItemsControl ItemsSource="{Binding ImportExportVM.ExportOperations}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate><Button Content="{Binding Label}" Command="{Binding Command}" /></DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                            <ribbon:RibbonGroupBox Header="Экспорт" ItemsSource="{Binding ImportExportVM.ExportOperations}">
+                                <ribbon:RibbonGroupBox.ItemTemplate>
+                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
+                                </ribbon:RibbonGroupBox.ItemTemplate>
                             </ribbon:RibbonGroupBox>
-                            <ribbon:RibbonGroupBox Header="Конвертация">
-                                <ItemsControl ItemsSource="{Binding ImportExportVM.ConversionOperations}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate><Button Content="{Binding Label}" Command="{Binding Command}" /></DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                            <ribbon:RibbonGroupBox Header="Конвертация" ItemsSource="{Binding ImportExportVM.ConversionOperations}">
+                                <ribbon:RibbonGroupBox.ItemTemplate>
+                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
+                                </ribbon:RibbonGroupBox.ItemTemplate>
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Прогресс">
                                 <StackPanel Spacing="2">
@@ -229,7 +219,7 @@
                             <!-- DataContext задаётся на группах, а не на RibbonTab: Ribbon.Avalonia выносит
                                  группы выбранной вкладки в свой контент, поэтому DataContext с RibbonTab
                                  до них не наследуется (ср. рабочие вкладки «Вид» и «Формулы»). -->
-                            <ribbon:RibbonGroupBox Header="Текущее расширение" DataContext="{Binding ExtensionsControlVM}">
+                            <ribbon:RibbonGroupBox Header="Текущее расширение" Orientation="Horizontal" DataContext="{Binding ExtensionsControlVM}">
                                 <StackPanel Spacing="2">
                                     <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding SelectedExtension}" Width="200">
                                         <ComboBox.ItemTemplate>
@@ -240,13 +230,13 @@
                                         <TextBlock Text="Состояние: " />
                                         <TextBlock Text="{Binding SelectedExtension.State}" />
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <Button Content="Запустить" Command="{Binding StartExtensionCommand}" />
-                                        <Button Content="Остановить" Command="{Binding StopExtensionCommand}" />
-                                    </StackPanel>
-                                    <Button Content="Выполнить" Command="{Binding ExecuteExtensionCommand}" />
-                                    <ToggleButton Content="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}" />
                                 </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <ribbon:RibbonButton Content="Запустить" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding StartExtensionCommand}" />
+                                    <ribbon:RibbonButton Content="Остановить" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding StopExtensionCommand}" />
+                                </StackPanel>
+                                <ribbon:RibbonButton Content="Выполнить" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding ExecuteExtensionCommand}" />
+                                <ribbon:RibbonToggleButton Content="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}" />
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Виджеты расширений" DataContext="{Binding ExtensionsControlVM}">
                                 <ContentControl Content="{Binding SelectedExtension.RibbonWidget}" />
