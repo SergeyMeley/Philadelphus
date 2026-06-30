@@ -11,6 +11,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
+using Philadelphus.Core.Domain.FormulaEngine.Services;
 using Philadelphus.Core.Domain.FormulaEngine.TreeLeaves;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
@@ -35,6 +36,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly RepositoryExplorerControlVM _repositoryExplorerVM;
         private readonly IPhiladelphusRepositoryService _service;
         private readonly FormulaAstEvaluator _formulaEvaluator;
+        private readonly IAttributeFormulaService _attributeFormulaService;
         private readonly FormulaRegistry _formulaRegistry;
         private readonly IFormulaDiagnosticsReporter _formulaDiagnosticsReporter;
         private readonly INotificationService _notificationService;
@@ -102,6 +104,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _repositoryExplorerVM = repositoryExplorerVM;
             _service = service;
             _formulaEvaluator = formulaEvaluator;
+            _attributeFormulaService = new AttributeFormulaService(formulaEvaluator, notificationService);
             _formulaRegistry = formulaRegistry;
             _formulaDiagnosticsReporter = formulaDiagnosticsReporter;
             _notificationService = notificationService;
@@ -857,45 +860,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             return TryApplyPlainFormulaBarText(targetAttribute, text);
         }
 
-        private bool TryApplyFormulaResult(ElementAttributeModel targetAttribute, FormulaResult result, string formulaText)
-        {
-            if (result.TreeLeave != null)
-            {
-                if (IsTreeLeaveCompatible(targetAttribute, result.TreeLeave) == false)
-                {
-                    SendFormulaTypeMismatch(targetAttribute, result.TreeLeave.ParentNode.Name);
-                    return false;
-                }
-
-                targetAttribute.Value = result.TreeLeave;
-                targetAttribute.ValueFormula = formulaText;
-                targetAttribute.ValueFormulaErrorCode = string.Empty;
-                return true;
-            }
-
-            if (targetAttribute.ValueType is not SystemBaseTreeNodeModel systemBaseNode)
-            {
-                SendFormulaTypeMismatch(targetAttribute, result.ValueType.ToString());
-                return false;
-            }
-
-            if (IsSystemBaseResultCompatible(systemBaseNode.SystemBaseType, result.ValueType) == false
-                || SystemBaseStringValueValidator.TryFormat(systemBaseNode.SystemBaseType, result.Value, out var stringValue) == false)
-            {
-                SendFormulaTypeMismatch(targetAttribute, result.ValueType.ToString());
-                return false;
-            }
-
-            if (targetAttribute.TrySetSystemBaseValueFromString(stringValue) == false)
-            {
-                return false;
-            }
-
-            targetAttribute.ValueFormula = formulaText;
-            targetAttribute.ValueFormulaErrorCode = string.Empty;
-            return true;
-        }
-
         private bool TryApplyPlainFormulaBarText(ElementAttributeModel targetAttribute, string text)
         {
             var trimmedText = text.Trim();
@@ -963,25 +927,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             var systemBaseWorkingTree = _repositoryExplorerVM.PhiladelphusRepositoryVM.Model.ContentShrub.SystemBaseWorkingTree;
             return _repositoryExplorerVM.PhiladelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees
                 .FirstOrDefault(x => x.Uuid != systemBaseWorkingTree?.Uuid);
-        }
-
-        private static bool IsTreeLeaveCompatible(ElementAttributeModel attribute, TreeLeaveModel value)
-        {
-            return attribute.ValueType?.Uuid == value.ParentNode.Uuid;
-        }
-
-        private static bool IsSystemBaseResultCompatible(SystemBaseType expectedType, SystemBaseType actualType)
-        {
-            return expectedType == actualType
-                || expectedType == SystemBaseType.OBJECT
-                || expectedType == SystemBaseType.NUMERIC && actualType is SystemBaseType.INTEGER or SystemBaseType.FLOAT;
-        }
-
-        private void SendFormulaTypeMismatch(ElementAttributeModel attribute, string actualType)
-        {
-            _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
-                $"Тип результата формулы '{actualType}' не соответствует типу данных атрибута '{attribute.Name}' ({attribute.ValueType?.Name}).",
-                NotificationCriticalLevelModel.Warning);
         }
 
         private void NotifyFormulaAttributeChanged(ElementAttributeModel attribute)
@@ -1146,86 +1091,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ISet<Guid> stack,
             ISet<Guid> recalculated)
         {
-            var formulaText = formulaTextOverride ?? attribute.ValueFormula;
-            if (string.IsNullOrWhiteSpace(formulaText))
-            {
-                return true;
-            }
-
-            if (recalculated.Contains(attribute.Uuid))
-            {
-                return true;
-            }
-
-            if (stack.Add(attribute.Uuid) == false)
-            {
-                attribute.ValueFormula = formulaText;
-                attribute.ValueFormulaErrorCode = "#CYCLE!";
-                NotifyFormulaAttributeChanged(attribute);
-                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
-                    $"Обнаружена циклическая зависимость формулы атрибута '{attribute.Name}'.",
-                    NotificationCriticalLevelModel.Warning);
-                return false;
-            }
-
-            // Сначала пересчитываем формулы, на которые ссылается текущая формула,
-            // чтобы результат не зависел от устаревших вычисленных значений.
-            foreach (var dependency in GetReferencedFormulaAttributes(attribute, formulaText))
-            {
-                if (RecalculateFormulaAttribute(dependency, null, stack, recalculated) == false)
-                {
-                    attribute.ValueFormula = formulaText;
-                    attribute.ValueFormulaErrorCode = "#DEPENDENCY!";
-                    NotifyFormulaAttributeChanged(attribute);
-                    stack.Remove(attribute.Uuid);
-                    return true;
-                }
-            }
-
-            var result = _formulaEvaluator.Evaluate(formulaText, CreateFormulaExecutionContext(attribute));
-            if (result.IsSuccess == false)
-            {
-                attribute.ValueFormula = formulaText;
-                attribute.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
-                NotifyFormulaAttributeChanged(attribute);
-                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
-                    $"Формула сохранена, но не вычислена: {result.Error?.Message}",
-                    NotificationCriticalLevelModel.Warning);
-                stack.Remove(attribute.Uuid);
-                recalculated.Add(attribute.Uuid);
-                return true;
-            }
-
-            var isApplied = TryApplyFormulaResult(attribute, result, formulaText);
-            if (isApplied)
-            {
-                NotifyFormulaAttributeChanged(attribute);
-                recalculated.Add(attribute.Uuid);
-            }
-
-            stack.Remove(attribute.Uuid);
-            return isApplied;
-        }
-
-        /// <summary>
-        /// Находит формульные атрибуты того же владельца, на которые ссылается переданная формула.
-        /// </summary>
-        private IEnumerable<ElementAttributeModel> GetReferencedFormulaAttributes(
-            ElementAttributeModel targetAttribute,
-            string formulaText)
-        {
-            if (targetAttribute.Owner is not IAttributeOwnerModel owner)
-            {
-                return Enumerable.Empty<ElementAttributeModel>();
-            }
-
-            return owner.Attributes
-                .Where(x => x.Uuid != targetAttribute.Uuid
-                    && string.IsNullOrWhiteSpace(x.ValueFormula) == false
-                    && FormulaReferencesAttribute(formulaText, x))
-                .GroupBy(x => x.Uuid)
-                .Select(x => x.First())
-                .ToList();
+            // Оркестрация пересчёта живёт в доменном сервисе (Core.FormulaEngine). Здесь — только
+            // презентационная обвязка: построение контекста выполнения и оповещение об изменении.
+            return _attributeFormulaService.RecalculateAttribute(
+                attribute,
+                formulaTextOverride,
+                stack,
+                recalculated,
+                a => CreateFormulaExecutionContext(a),
+                NotifyFormulaAttributeChanged);
         }
 
         private void RecalculateDependentFormulas(ElementAttributeModel changedAttribute)
@@ -1246,7 +1120,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 .Where(x => x.Uuid != changedAttribute.Uuid
                     && visited.Contains(x.Uuid) == false
                     && string.IsNullOrWhiteSpace(x.ValueFormula) == false
-                    && FormulaReferencesAttribute(x.ValueFormula, changedAttribute))
+                    && _attributeFormulaService.FormulaReferencesAttribute(x.ValueFormula, changedAttribute))
                 .ToList();
 
             foreach (var dependent in dependents)
@@ -1285,7 +1159,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 return true;
             }
 
-            var reference = CreateRelativeAttributeReference(referencedAttribute);
+            var reference = _attributeFormulaService.CreateRelativeAttributeReference(referencedAttribute);
             var text = FormulaBarText ?? string.Empty;
             if (text.TrimStart().StartsWith("=", StringComparison.Ordinal) == false)
             {
@@ -1334,12 +1208,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ElementAttributeModel referencedAttribute)
         {
             return targetAttribute.Owner?.Uuid == referencedAttribute.Owner?.Uuid;
-        }
-
-        private static string CreateRelativeAttributeReference(ElementAttributeModel attribute)
-        {
-            var escapedName = (attribute.Name ?? string.Empty).Replace("\"", "\"\"", StringComparison.Ordinal);
-            return $"АТРИБУТ(\"{escapedName}\")";
         }
 
         private static bool TryFindAttributeReferenceAtCaret(
@@ -1967,11 +1835,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             };
         }
 
-        private static bool FormulaReferencesAttribute(string formula, ElementAttributeModel attribute)
-        {
-            return formula.Contains(CreateRelativeAttributeReference(attribute), StringComparison.OrdinalIgnoreCase);
-        }
-
         private static string FormatAttributeValue(ElementAttributeModel? attribute)
         {
             if (attribute == null)
@@ -2002,13 +1865,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 && text.StartsWith("[", StringComparison.Ordinal)
                 && text.EndsWith("]", StringComparison.Ordinal)
                 && Guid.TryParse(text[1..^1], out uuid);
-        }
-
-        private static string FormatFormulaErrorCode(FormulaResult result)
-        {
-            return result.Error == null
-                ? "#ERROR!"
-                : $"#{result.Error.Code}!";
         }
 
         private sealed record FormulaBarTarget(
