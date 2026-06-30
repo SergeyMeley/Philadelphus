@@ -299,7 +299,27 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
                 ApplySheetEntityKind(_session.CurrentSheet);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedSheetEntityKindItem));
                 OnPropertyChanged(nameof(Sheets));
+            }
+        }
+
+        /// <summary>
+        /// Выбранный элемент вида сущности. Avalonia привязывает ComboBox по ссылке через SelectedItem,
+        /// чтобы не использовать SelectedValue+SelectedValueBinding в рециклируемых DataGrid-сценариях.
+        /// </summary>
+        public ExcelImportEntityKindItem? SelectedSheetEntityKindItem
+        {
+            get => AvailableEntityKinds.FirstOrDefault(x => x.Value == SelectedSheetEntityKind);
+            set
+            {
+                if (value == null)
+                {
+                    return;
+                }
+
+                SelectedSheetEntityKind = value.Value;
+                OnPropertyChanged(nameof(SelectedSheetEntityKindItem));
             }
         }
 
@@ -592,6 +612,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
             BindRelationEditor(_session.CurrentSheet?.SourceName);
             OnPropertyChanged(nameof(SelectedSheetEntityKind));
+            OnPropertyChanged(nameof(SelectedSheetEntityKindItem));
             OnPropertyChanged(nameof(Sheets));
         }
 
