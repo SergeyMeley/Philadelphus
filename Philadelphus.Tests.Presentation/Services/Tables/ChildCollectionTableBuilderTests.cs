@@ -286,6 +286,50 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
         }
 
         [Fact]
+        public void buildChildCollectionTableRows_Allows_Formula_Input_Via_EditText()
+        {
+            var fixture = CreateFixture();
+            var children = new IChildrenModel[] { fixture.Leave };
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                fixture.Root,
+                children);
+            var priceColumn = columns.Single(x => x.Header == "Цена, руб");
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+
+            row.EditText[priceColumn.BindingKey] = "=1+2";
+
+            fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб").ValueFormula.Should().Be("=1+2");
+        }
+
+        [Fact]
+        public void buildChildCollectionTableRows_Resolves_Leaf_Reference_Via_EditText()
+        {
+            var fixture = CreateFixture();
+            var newPriceValue = new TreeLeaveModel(
+                Guid.CreateVersion7(),
+                fixture.Node,
+                fixture.Root.OwningWorkingTree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>())
+            {
+                Name = "12000",
+            };
+            var children = new IChildrenModel[] { fixture.Leave };
+            var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
+                fixture.Root,
+                children);
+            var priceColumn = columns.Single(x => x.Header == "Цена, руб");
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+
+            row.ValueOptions[priceColumn.BindingKey].Should().Contain(newPriceValue);
+
+            // Выбор из списка пишет в Text «[uuid]» (TextSearch.TextBinding) — сеттер EditText его разбирает.
+            row.EditText[priceColumn.BindingKey] = $"[{newPriceValue.Uuid}]";
+
+            fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб").Value.Should().Be(newPriceValue);
+        }
+
+        [Fact]
         public void buildChildCollectionTableRows_Allows_Manual_SystemBase_Attribute_Value_Input()
         {
             var notificationService = new FakeNotificationService();

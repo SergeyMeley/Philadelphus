@@ -22,6 +22,17 @@ namespace Philadelphus.Presentation.Models.Tables
         private readonly IReadOnlyDictionary<string, Func<bool>> _valueOverrideStateRefreshers;
         private readonly Dictionary<string, string?> _valueOverrideToolTips;
         private readonly IReadOnlyDictionary<string, Func<string?>> _valueOverrideToolTipRefreshers;
+
+        // Канал «отображаемый текст значения атрибута» (результат формулы / код ошибки / значение) —
+        // для режима просмотра ячейки. Обновляется тем же каскадом, что и _cells.
+        private readonly Dictionary<string, string?> _displayTexts;
+        private readonly IReadOnlyDictionary<string, Func<string?>> _displayTextRefreshers;
+
+        // Канал «текст редактирования» (формула / ссылка «[uuid]») — для редактируемого ComboBox,
+        // ПОЛНОСТЬЮ как ячейка значения в таблице атрибутов (см. AttributeValueText).
+        private readonly IReadOnlyDictionary<string, Func<string?>> _editTextGetters;
+        private readonly IReadOnlyDictionary<string, Action<string?>> _editTextSetters;
+
         private readonly IReadOnlyDictionary<string, string> _keyAliases;
         private readonly IReadOnlyDictionary<string, string> _logicalKeys;
 
@@ -36,7 +47,11 @@ namespace Philadelphus.Presentation.Models.Tables
             IReadOnlyDictionary<string, bool>? valueOverrideStates = null,
             IReadOnlyDictionary<string, Func<bool>>? valueOverrideStateRefreshers = null,
             IReadOnlyDictionary<string, string?>? valueOverrideToolTips = null,
-            IReadOnlyDictionary<string, Func<string?>>? valueOverrideToolTipRefreshers = null)
+            IReadOnlyDictionary<string, Func<string?>>? valueOverrideToolTipRefreshers = null,
+            IReadOnlyDictionary<string, string?>? displayTexts = null,
+            IReadOnlyDictionary<string, Func<string?>>? displayTextRefreshers = null,
+            IReadOnlyDictionary<string, Func<string?>>? editTextGetters = null,
+            IReadOnlyDictionary<string, Action<string?>>? editTextSetters = null)
         {
             ArgumentNullException.ThrowIfNull(cells);
 
@@ -62,6 +77,18 @@ namespace Philadelphus.Presentation.Models.Tables
             _valueOverrideToolTipRefreshers = valueOverrideToolTipRefreshers == null
                 ? new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>())
                 : new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>(valueOverrideToolTipRefreshers));
+            _displayTexts = displayTexts == null
+                ? new Dictionary<string, string?>()
+                : new Dictionary<string, string?>(displayTexts);
+            _displayTextRefreshers = displayTextRefreshers == null
+                ? new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>())
+                : new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>(displayTextRefreshers));
+            _editTextGetters = editTextGetters == null
+                ? new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>())
+                : new ReadOnlyDictionary<string, Func<string?>>(new Dictionary<string, Func<string?>>(editTextGetters));
+            _editTextSetters = editTextSetters == null
+                ? new ReadOnlyDictionary<string, Action<string?>>(new Dictionary<string, Action<string?>>())
+                : new ReadOnlyDictionary<string, Action<string?>>(new Dictionary<string, Action<string?>>(editTextSetters));
             _keyAliases = keyAliases == null
                 ? new ReadOnlyDictionary<string, string>(new Dictionary<string, string>())
                 : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(keyAliases));
@@ -74,6 +101,8 @@ namespace Philadelphus.Presentation.Models.Tables
             ValueOptions = new ReadOnlyDictionary<string, IEnumerable<object>?>(_valueOptions);
             ValueOverrideStates = new ReadOnlyDictionary<string, bool>(_valueOverrideStates);
             ValueOverrideToolTips = new ReadOnlyDictionary<string, string?>(_valueOverrideToolTips);
+            DisplayTexts = new ReadOnlyDictionary<string, string?>(_displayTexts);
+            EditText = new EditTextAccessor(this);
             SourceUuid = sourceUuid;
             CellChanged = cellChanged;
         }
@@ -104,6 +133,18 @@ namespace Philadelphus.Presentation.Models.Tables
         /// Подсказки переопределения значений атрибутов, индексированные техническими binding-ключами.
         /// </summary>
         public IReadOnlyDictionary<string, string?> ValueOverrideToolTips { get; }
+
+        /// <summary>
+        /// Отображаемый текст значения атрибута (режим просмотра), индексированный binding-ключами.
+        /// Эквивалент <c>DisplayedValueText</c> ячейки таблицы атрибутов.
+        /// </summary>
+        public IReadOnlyDictionary<string, string?> DisplayTexts { get; }
+
+        /// <summary>
+        /// Редактируемый текст значения атрибута (формула / ссылка «[uuid]»), привязывается TwoWay
+        /// к <c>Text</c> редактируемого ComboBox — ПОЛНОСТЬЮ как в таблице атрибутов.
+        /// </summary>
+        public EditTextAccessor EditText { get; }
 
         private Action<Guid, string>? CellChanged { get; }
 
@@ -137,27 +178,78 @@ namespace Philadelphus.Presentation.Models.Tables
                 }
 
                 _cells[cellKey] = setter(value);
-                foreach (var refresher in _refreshers)
-                {
-                    _cells[refresher.Key] = refresher.Value();
-                }
-
-                foreach (var refresher in _valueOverrideStateRefreshers)
-                {
-                    _valueOverrideStates[refresher.Key] = refresher.Value();
-                }
-
-                foreach (var refresher in _valueOverrideToolTipRefreshers)
-                {
-                    _valueOverrideToolTips[refresher.Key] = refresher.Value();
-                }
-
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Cells)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideStates)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideToolTips)));
-                CellChanged?.Invoke(SourceUuid, ResolveLogicalKey(cellKey));
+                RaiseAfterCellChange(cellKey);
             }
+        }
+
+        /// <summary>
+        /// Читает редактируемый текст значения атрибута по логическому ключу или binding-ключу.
+        /// </summary>
+        internal string? GetEditText(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return null;
+            }
+
+            return _editTextGetters.TryGetValue(ResolveCellKey(key), out var getter)
+                ? getter()
+                : null;
+        }
+
+        /// <summary>
+        /// Разбирает введённый текст значения атрибута и применяет его к модели, затем запускает
+        /// тот же каскад пересчёта/уведомлений, что и обычная правка ячейки.
+        /// </summary>
+        internal void SetEditText(string key, string? value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return;
+            }
+
+            var cellKey = ResolveCellKey(key);
+            if (_editTextSetters.TryGetValue(cellKey, out var setter) == false)
+            {
+                return;
+            }
+
+            setter(value);
+            RaiseAfterCellChange(cellKey);
+        }
+
+        /// <summary>
+        /// Пересчитывает зависимые ячейки/подсветку/подсказки и поднимает уведомления после правки.
+        /// </summary>
+        private void RaiseAfterCellChange(string cellKey)
+        {
+            foreach (var refresher in _refreshers)
+            {
+                _cells[refresher.Key] = refresher.Value();
+            }
+
+            foreach (var refresher in _displayTextRefreshers)
+            {
+                _displayTexts[refresher.Key] = refresher.Value();
+            }
+
+            foreach (var refresher in _valueOverrideStateRefreshers)
+            {
+                _valueOverrideStates[refresher.Key] = refresher.Value();
+            }
+
+            foreach (var refresher in _valueOverrideToolTipRefreshers)
+            {
+                _valueOverrideToolTips[refresher.Key] = refresher.Value();
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Cells)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayTexts)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideStates)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideToolTips)));
+            EditText.RaiseChanged();
+            CellChanged?.Invoke(SourceUuid, ResolveLogicalKey(cellKey));
         }
 
         private string ResolveCellKey(string key)
@@ -175,6 +267,33 @@ namespace Philadelphus.Presentation.Models.Tables
             return _logicalKeys.TryGetValue(cellKey, out var logicalKey)
                 ? logicalKey
                 : cellKey;
+        }
+
+        /// <summary>
+        /// Индексируемый доступ к редактируемому тексту значения атрибута для XAML-привязки
+        /// (<c>Text="{Binding EditText[ключ], Mode=TwoWay}"</c>). Делегирует в строку.
+        /// </summary>
+        public sealed class EditTextAccessor : INotifyPropertyChanged
+        {
+            private readonly ChildCollectionTableRow _row;
+
+            internal EditTextAccessor(ChildCollectionTableRow row)
+            {
+                _row = row;
+            }
+
+            public event PropertyChangedEventHandler? PropertyChanged;
+
+            public string? this[string key]
+            {
+                get => _row.GetEditText(key);
+                set => _row.SetEditText(key, value);
+            }
+
+            internal void RaiseChanged()
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+            }
         }
     }
 }

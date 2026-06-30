@@ -23,9 +23,9 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// <remarks>
     /// Подсветка локального переопределения значения атрибута (Moccasin,
     /// ValueOverrideStates/ValueOverrideToolTips) перенесена — см. WrapWithOverride.
-    /// TODO: Тех. долг / этап I, п.2. Остаётся редактируемый ComboBox с вводом формулы
-    /// в ячейке значения (сейчас combo только выбирает из списка; модель строки оперирует
-    /// объектом-значением, а не формульной строкой).
+    /// Ячейка значения атрибута работает идентично таблице атрибутов (см. тех-долг I, п.2):
+    /// просмотр — DisplayTexts (результат формулы/код ошибки/значение), редактирование —
+    /// editable ComboBox с вводом формулы (Text=EditText), общая логика — AttributeValueText.
     /// </remarks>
     public sealed class DataGridColumnsBehavior
     {
@@ -146,8 +146,10 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 };
             }
 
-            // Атрибутные: в покое — текст значения на подсветке (как в таблице атрибутов, читаемо в Dark),
-            // combo появляется только при редактировании.
+            // Атрибутные: в покое — отображаемый текст значения (результат формулы / код ошибки /
+            // значение) на подсветке, combo появляется только при редактировании. ПОЛНОСТЬЮ как
+            // ячейка значения в таблице атрибутов (Attributes.axaml): просмотр — DisplayTexts,
+            // редактирование — editable ComboBox с вводом формулы (Text=EditText).
             var cellTemplate = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
             {
                 var text = new TextBlock
@@ -155,7 +157,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(4, 0),
                 };
-                text.Bind(TextBlock.TextProperty, new Binding($"[{column1.BindingKey}].Name"));
+                text.Bind(TextBlock.TextProperty, new Binding($"DisplayTexts[{column1.BindingKey}]"));
                 text.Bind(TextBlock.ForegroundProperty, OverrideForegroundBinding(column1.BindingKey));
                 return WrapWithOverride(column1, text);
             });
@@ -171,10 +173,44 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
 
             if (column.IsReadOnly == false)
             {
-                result.CellEditingTemplate = CreateComboTemplate();
+                result.CellEditingTemplate = CreateEditableFormulaComboTemplate(column1);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Редактируемый ComboBox ввода значения атрибута — идентичен ячейке таблицы атрибутов
+        /// (Avalonia 11.3: IsEditable + Text). SelectedItem НЕ привязываем (сбрасывает значение при
+        /// ручном вводе); всё идёт через Text=EditText: выбор из списка пишет «[uuid]»
+        /// (TextSearch.TextBinding), сеттер EditText присваивает значение по ссылке, ввод формулы/
+        /// значения — тоже через Text.
+        /// </summary>
+        private static FuncDataTemplate<ChildCollectionTableRow> CreateEditableFormulaComboTemplate(ChildCollectionTableColumn column)
+        {
+            return new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
+            {
+                var comboBox = new ComboBox
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    IsEditable = true,
+                    IsTextSearchEnabled = false,
+                };
+                comboBox.Bind(ItemsControl.ItemsSourceProperty, new Binding($"ValueOptions[{column.BindingKey}]"));
+                comboBox.Bind(ComboBox.TextProperty, new Binding($"EditText[{column.BindingKey}]")
+                {
+                    Mode = BindingMode.TwoWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.LostFocus,
+                });
+                comboBox.SetValue(TextSearch.TextBindingProperty, new Binding("Uuid") { StringFormat = "[{0}]" });
+                comboBox.ItemTemplate = new FuncDataTemplate<object>((_, _) =>
+                {
+                    var textBlock = new TextBlock();
+                    textBlock.Bind(TextBlock.TextProperty, new Binding("Name"));
+                    return textBlock;
+                });
+                return comboBox;
+            });
         }
 
         /// <summary>Текстовая колонка для readonly и простых редактируемых значений.</summary>

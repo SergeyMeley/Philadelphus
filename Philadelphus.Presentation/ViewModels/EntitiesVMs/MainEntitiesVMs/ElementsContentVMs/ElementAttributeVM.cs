@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using System.Collections.ObjectModel;
 
@@ -148,16 +149,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         /// </summary>
         public string DisplayedValueText
         {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_model.ValueFormula) == false
-                    && string.IsNullOrWhiteSpace(_model.ValueFormulaErrorCode) == false)
-                {
-                    return _model.ValueFormulaErrorCode;
-                }
-
-                return AssignedValueText;
-            }
+            // Единая логика с таблицей наследников — см. AttributeValueText.
+            get => AttributeValueText.GetDisplayText(_model);
         }
 
         /// <summary>
@@ -165,46 +158,19 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         /// </summary>
         public string FormulaValueText
         {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_model.ValueFormula) == false)
-                {
-                    return _model.ValueFormula;
-                }
-
-                return AssignedValue?.Uuid == null
-                    ? string.Empty
-                    : $"=[{AssignedValue.Uuid}]";
-            }
+            // Единая логика с таблицей наследников — см. AttributeValueText.
+            get => AttributeValueText.GetFormulaText(_model);
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    AssignedValue = null;
-                    return;
-                }
-
-                var trimmedValue = value.Trim();
-                if (trimmedValue.StartsWith("=", StringComparison.Ordinal))
-                {
-                    _model.ValueFormula = trimmedValue;
-                    _model.ValueFormulaErrorCode = string.Empty;
-                    OnPropertyChanged(nameof(State));
-                    OnPropertyChanged(nameof(DisplayedValueText));
-                    OnPropertyChanged(nameof(FormulaValueText));
-                    OnPropertyChanged(nameof(IsValueOverridden));
-                    OnPropertyChanged(nameof(ValueOverrideToolTip));
-                    return;
-                }
-
-                if (TryGetLeafUuidReference(trimmedValue, out var valueUuid)
-                    && ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
-                {
-                    AssignedValue = referencedValue;
-                    return;
-                }
-
-                AssignedValueText = trimmedValue;
+                AttributeValueText.SetFormulaText(_model, value);
+                OnPropertyChanged(nameof(State));
+                OnPropertyChanged(nameof(AssignedValue));
+                OnPropertyChanged(nameof(AssignedValueText));
+                OnPropertyChanged(nameof(DisplayedValueText));
+                OnPropertyChanged(nameof(FormulaValueText));
+                OnPropertyChanged(nameof(ValuesList));
+                OnPropertyChanged(nameof(IsValueOverridden));
+                OnPropertyChanged(nameof(ValueOverrideToolTip));
             }
         }
 
@@ -473,16 +439,6 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             return names is { Length: > 0 }
                 ? string.Join("; ", names)
                 : "<не задано>";
-        }
-
-        private static bool TryGetLeafUuidReference(string text, out Guid uuid)
-        {
-            uuid = Guid.Empty;
-
-            return text.Length == 38
-                && text.StartsWith("[", StringComparison.Ordinal)
-                && text.EndsWith("]", StringComparison.Ordinal)
-                && Guid.TryParse(text[1..^1], out uuid);
         }
 
         #endregion

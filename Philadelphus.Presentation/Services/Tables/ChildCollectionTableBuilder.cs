@@ -322,6 +322,29 @@ namespace Philadelphus.Presentation.Services.Tables
                     x => x.BindingKey,
                     x => new Func<string?>(() => GetAttributeValueOverrideToolTip(child, x)));
 
+                // Каналы «отображаемый текст» и «текст редактирования» только для редактируемых
+                // одиночных атрибутных колонок (HasValueOptions) — чтобы ячейка значения работала
+                // идентично таблице атрибутов (формула / ссылка / системное значение / код ошибки).
+                var attributeValueColumns = columnsList
+                    .Where(x => x.IsAttribute && x.HasValueOptions)
+                    .ToList();
+
+                var displayTexts = attributeValueColumns.ToDictionary(
+                    x => x.BindingKey,
+                    x => GetAttributeDisplayText(child, x.Key));
+
+                var displayTextRefreshers = attributeValueColumns.ToDictionary(
+                    x => x.BindingKey,
+                    x => new Func<string?>(() => GetAttributeDisplayText(child, x.Key)));
+
+                var editTextGetters = attributeValueColumns.ToDictionary(
+                    x => x.BindingKey,
+                    x => new Func<string?>(() => GetAttributeEditText(child, x.Key)));
+
+                var editTextSetters = attributeValueColumns.ToDictionary(
+                    x => x.BindingKey,
+                    x => new Action<string?>(value => SetAttributeEditText(child, x.Key, value)));
+
                 var keyAliases = columnsList.ToDictionary(
                     x => x.Key,
                     x => x.BindingKey);
@@ -337,7 +360,11 @@ namespace Philadelphus.Presentation.Services.Tables
                     valueOverrideStates,
                     valueOverrideStateRefreshers,
                     valueOverrideToolTips,
-                    valueOverrideToolTipRefreshers));
+                    valueOverrideToolTipRefreshers,
+                    displayTexts,
+                    displayTextRefreshers,
+                    editTextGetters,
+                    editTextSetters));
             }
 
             return rows;
@@ -704,6 +731,44 @@ namespace Philadelphus.Presentation.Services.Tables
         private static IEnumerable<object>? GetAttributeValueOptions(IChildrenModel child, string attributeName)
         {
             return GetAttribute(child, attributeName)?.ValuesList?.Cast<object>();
+        }
+
+        /// <summary>
+        /// Отображаемый текст значения атрибута (результат формулы / код ошибки / значение) —
+        /// идентично ячейке таблицы атрибутов.
+        /// </summary>
+        private static string? GetAttributeDisplayText(IChildrenModel child, string attributeName)
+        {
+            var attribute = GetAttribute(child, attributeName);
+            return attribute == null
+                ? null
+                : AttributeValueText.GetDisplayText(attribute);
+        }
+
+        /// <summary>
+        /// Текст редактирования значения атрибута (формула / ссылка «[uuid]»).
+        /// </summary>
+        private static string? GetAttributeEditText(IChildrenModel child, string attributeName)
+        {
+            var attribute = GetAttribute(child, attributeName);
+            return attribute == null
+                ? null
+                : AttributeValueText.GetFormulaText(attribute);
+        }
+
+        /// <summary>
+        /// Применяет введённый в ячейку текст значения атрибута к доменной модели (формула / ссылка /
+        /// системное значение) — идентично сеттеру ячейки таблицы атрибутов.
+        /// </summary>
+        private static void SetAttributeEditText(IChildrenModel child, string attributeName, string? value)
+        {
+            var attribute = GetAttribute(child, attributeName);
+            if (attribute == null || attribute.IsCollectionValue)
+            {
+                return;
+            }
+
+            AttributeValueText.SetFormulaText(attribute, value);
         }
 
         private static ElementAttributeModel? GetAttribute(IChildrenModel child, string attributeName)
