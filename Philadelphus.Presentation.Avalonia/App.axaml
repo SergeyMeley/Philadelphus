@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="clr-namespace:Philadelphus.Presentation.Avalonia.Converters"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              x:Class="Philadelphus.Presentation.Avalonia.App"
              RequestedThemeVariant="Default">
 
@@ -10,6 +11,10 @@
                 <!-- Локализованные ресурсы Ribbon.Avalonia (требуются контролом ленты). -->
                 <ResourceInclude Source="avares://Ribbon.Avalonia/Locale/en-ca.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Ribbon.Avalonia 0.9.0 содержит только en-ca/test locale; переопределяем видимые строки. -->
+            <sys:String x:Key="AvaloniaRibbon.MinimizeRibbon">Свернуть ленту</sys:String>
+            <sys:String x:Key="AvaloniaRibbon.MoreQATCommands">Дополнительные команды панели быстрого доступа</sys:String>
 
             <!-- Тёмная тема Fluent почти чёрная; делаем фоны чуть светлее (VS-подобный серый).
                  Переопределяем только фоновые ресурсы для варианта Dark; текст/рамки остаются из Fluent. -->
