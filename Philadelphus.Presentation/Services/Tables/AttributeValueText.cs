@@ -86,8 +86,16 @@ namespace Philadelphus.Presentation.Services.Tables
 
             if (attribute.TrySetSystemBaseValueFromString(trimmedValue))
             {
+                // TrySet уже присвоил Value и выставил признак переопределения. Но очистка формулы
+                // ниже у УНАСЛЕДОВАННОГО атрибута сбрасывает _isValueOverridden (сеттер ValueFormula
+                // сравнивает с формулой родителя: "" == "" → переопределение снимается), и эффективное
+                // значение откатывалось к унаследованному — значение «обнулялось». Поэтому очищаем
+                // формулу и ПЕРЕ-присваиваем значение последним действием, чтобы вернуть признак
+                // переопределения (как в AssignValue, где значение ставится ПОСЛЕ очистки формулы).
+                var assignedValue = attribute.Value;
                 attribute.ValueFormula = string.Empty;
                 attribute.ValueFormulaErrorCode = string.Empty;
+                attribute.Value = assignedValue;
             }
         }
 
