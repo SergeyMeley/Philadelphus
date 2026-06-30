@@ -250,8 +250,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             TreeLeaveModel treeLeave,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
-            IFileDialogService fileDialogService) 
-            : base(treeLeave, dataStoragesCollectionVM, service, fileDialogService)
+            IFileDialogService fileDialogService,
+            INotificationService? notificationService) 
+            : base(treeLeave, dataStoragesCollectionVM, service, fileDialogService, notificationService)
         {
             ArgumentNullException.ThrowIfNull(parent);
             ArgumentNullException.ThrowIfNull(service);

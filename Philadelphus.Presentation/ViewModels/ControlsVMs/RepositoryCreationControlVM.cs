@@ -167,7 +167,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     model.Description = Description;
                     _collectionService.SaveChanges(ref model);
 
-                    var vm = new PhiladelphusRepositoryVM(model, _dataStoragesCollectionVM, _repositoryService, _fileDialogService);
+                    var vm = new PhiladelphusRepositoryVM(model, _dataStoragesCollectionVM, _repositoryService, _fileDialogService, _notificationService);
                     
                     _repositoryCollectionVM.PhiladelphusRepositoriesVMs.Add(vm);
                     _repositoryCollectionVM.CurrentRepositoryVM = vm;

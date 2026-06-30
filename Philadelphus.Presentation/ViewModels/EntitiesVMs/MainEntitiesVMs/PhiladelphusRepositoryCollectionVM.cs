@@ -137,7 +137,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 {
                     var builder = new DataStorageBuilder();
                     var repository = _collectionService.CreateNewPhiladelphusRepository(builder.Build());
-                    var repositorVM = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service, _fileDialogService);
+                    var repositorVM = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service, _fileDialogService, _notificationService);
                     PhiladelphusRepositoriesVMs.Add(repositorVM);
                      
                 });
@@ -151,7 +151,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 return false;
             foreach (var item in repositories)
             {
-                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _dataStoragesSettingsVM, _service, _fileDialogService));
+                _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _dataStoragesSettingsVM, _service, _fileDialogService, _notificationService));
             }
             return true;
         }
@@ -178,7 +178,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             var repository = repositories.FirstOrDefault(x => x.Uuid == uuid);
             if (repository == null)
                 return null;
-            var result = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service, _fileDialogService);
+            var result = new PhiladelphusRepositoryVM(repository, _dataStoragesSettingsVM, _service, _fileDialogService, _notificationService);
             _PhiladelphusRepositoriesVMs.Add(result);
             return result;
         }

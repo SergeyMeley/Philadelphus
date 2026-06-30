@@ -16,13 +16,16 @@ namespace Philadelphus.Presentation.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IFileDialogService _fileDialogService;
+        private readonly INotificationService _notificationService;
 
         public ExcelImportRepositoryPreviewBuilder(
             IServiceProvider serviceProvider,
-            IFileDialogService fileDialogService)
+            IFileDialogService fileDialogService,
+            INotificationService? notificationService)
         {
             _serviceProvider = serviceProvider;
             _fileDialogService = fileDialogService;
+            _notificationService = notificationService;
         }
 
         public RepositoryExplorerControlVM Build(
@@ -45,13 +48,13 @@ namespace Philadelphus.Presentation.Services
                 previewTargetRoot.Name = targetExistingRootName;
             }
 
-            var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService, _fileDialogService);
+            var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService, _fileDialogService, _notificationService);
             previewRepositoryVm.Childs.Clear();
 
             var rootForPreview = previewTargetRoot ?? previewTree.ContentRoot;
             if (rootForPreview != null && rootForPreview.IsSystemBase == false)
             {
-                previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService, _fileDialogService));
+                previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService, _fileDialogService, _notificationService));
             }
 
             var previewExplorerVm = ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(

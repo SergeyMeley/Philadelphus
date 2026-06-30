@@ -79,8 +79,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             TreeNodeModel treeNode,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
-            IFileDialogService fileDialogService) 
-            : base(treeNode, dataStoragesCollectionVM, service, fileDialogService)
+            IFileDialogService fileDialogService,
+            INotificationService? notificationService) 
+            : base(treeNode, dataStoragesCollectionVM, service, fileDialogService, notificationService)
         {
             ArgumentNullException.ThrowIfNull(treeNode);
             ArgumentNullException.ThrowIfNull(treeNode.ChildNodes);
@@ -93,11 +94,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             _model = treeNode;
             foreach (var item in treeNode.ChildNodes)
             {
-                _childNodes.Add(new TreeNodeVM(item, dataStoragesCollectionVM, _service, _fileDialogService));
-            }
+                _childNodes.Add(new TreeNodeVM(item, dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
+            }   
             foreach (var item in treeNode.ChildLeaves)
             {
-                _childLeaves.Add(new TreeLeaveVM(this, item, dataStoragesCollectionVM, _service, _fileDialogService));
+                _childLeaves.Add(new TreeLeaveVM(this, item, dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
             }
         }
 
@@ -119,7 +120,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             var resultModel = _service.CreateTreeNode(_model);
             if (resultModel == null)
                 return null;
-            var result = new TreeNodeVM(resultModel, _dataStoragesCollectionVM, _service, _fileDialogService);
+            var result = new TreeNodeVM(resultModel, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService);
             _childNodes.Add(result);
             OnPropertyChanged(nameof(ChildNodes));
             return result;
@@ -134,7 +135,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             var resultModel = _service.CreateTreeLeave(_model);
             if (resultModel == null)
                 return null;
-            var result = new TreeLeaveVM(this, resultModel, _dataStoragesCollectionVM, _service, _fileDialogService);
+            var result = new TreeLeaveVM(this, resultModel, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService);
             _childLeaves.Add(result);
             OnPropertyChanged(nameof(ChildLeaves));
             return result;

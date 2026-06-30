@@ -65,8 +65,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             TreeRootModel treeRoot,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
-            IFileDialogService fileDialogService) 
-            : base(treeRoot, dataStoragesCollectionVM, service, fileDialogService)
+            IFileDialogService fileDialogService,
+            INotificationService? notificationService) 
+            : base(treeRoot, dataStoragesCollectionVM, service, fileDialogService, notificationService)
         {
             ArgumentNullException.ThrowIfNull(treeRoot);
             ArgumentNullException.ThrowIfNull(service);
@@ -80,7 +81,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
                 {
                     if (item is TreeNodeModel)
                     {
-                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, dataStoragesCollectionVM, _service, _fileDialogService));
+                        _childNodes.Add(new TreeNodeVM((TreeNodeModel)item, dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
                     }
                 }
             }
@@ -103,7 +104,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             var resultModel = _service.CreateTreeNode(_model as TreeRootModel);
             if (resultModel == null)
                 return null;
-            var result = new TreeNodeVM(resultModel, _dataStoragesCollectionVM, _service, _fileDialogService);
+            var result = new TreeNodeVM(resultModel, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService);
             _childNodes.Add(result);
             OnPropertyChanged(nameof(ChildNodes));
             return result;

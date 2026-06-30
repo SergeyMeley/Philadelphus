@@ -112,7 +112,7 @@
                         </Style>
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridComboBoxColumn Header="Область видимости" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Visibility}" SelectedValuePath="Value">
+                <DataGridComboBoxColumn Header="Область видимости" DisplayMemberPath="DisplayName" SelectedItemBinding="{Binding SelectedVisibilityScope}">
                     <DataGridComboBoxColumn.ElementStyle>
                         <Style TargetType="ComboBox">
                             <Setter Property="ItemsSource" Value="{Binding VisibilityScopesList}" />
@@ -124,7 +124,7 @@
                         </Style>
                     </DataGridComboBoxColumn.EditingElementStyle>
                 </DataGridComboBoxColumn>
-                <DataGridComboBoxColumn Header="Переопределение" DisplayMemberPath="DisplayName" SelectedValueBinding="{Binding Override}" SelectedValuePath="Value">
+                <DataGridComboBoxColumn Header="Переопределение" DisplayMemberPath="DisplayName" SelectedItemBinding="{Binding SelectedOverrideType}">
                     <DataGridComboBoxColumn.ElementStyle>
                         <Style TargetType="ComboBox">
                             <Setter Property="ItemsSource" Value="{Binding OverrideTypesList}" />

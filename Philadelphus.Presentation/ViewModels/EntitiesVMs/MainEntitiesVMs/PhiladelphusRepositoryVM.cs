@@ -99,15 +99,16 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             PhiladelphusRepositoryModel repositoryModel,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
-            IFileDialogService fileDialogService)
-            : base(repositoryModel, dataStoragesCollectionVM, service, fileDialogService)
+            IFileDialogService fileDialogService,
+            INotificationService? notificationService)
+            : base(repositoryModel, dataStoragesCollectionVM, service, fileDialogService, notificationService)
         {
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub);
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub.ContentWorkingTrees);
 
             foreach (var item in repositoryModel.ContentShrub.ContentWorkingTrees.Select(x => x.ContentRoot))
             {
-                Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service, _fileDialogService));
+                Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service, _fileDialogService, notificationService));
             }
         }
     }

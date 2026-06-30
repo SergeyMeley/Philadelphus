@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
@@ -21,6 +22,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
     {
         protected readonly IPhiladelphusRepositoryService _service;
         protected readonly IFileDialogService? _fileDialogService;
+        protected readonly INotificationService? _notificationService;
+
         protected readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
 
         protected readonly T _model;
@@ -107,7 +110,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 {
                     foreach (var attribute in sm.Attributes)
                     {
-                        var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService);
+                        var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService, notificationService: _notificationService);
                         result.Add(attributeVM);
                     }
                 }
@@ -138,7 +141,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             T IMainEntityModel,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
-            IFileDialogService fileDialogService)
+            IFileDialogService fileDialogService,
+            INotificationService? notificationService)
         {
             ArgumentNullException.ThrowIfNull(service);
             ArgumentNullException.ThrowIfNull(fileDialogService);
@@ -146,9 +150,12 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionVM.DataStoragesVMs);
             ArgumentNullException.ThrowIfNull(IMainEntityModel.DataStorage);
+            ArgumentNullException.ThrowIfNull(notificationService);
 
             _service = service;
             _fileDialogService = fileDialogService;
+            _notificationService = notificationService;
+
             _model = IMainEntityModel;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _storageVM = dataStoragesCollectionVM?.DataStoragesVMs?.SingleOrDefault(x => x.Uuid == _model.DataStorage.Uuid) ?? throw new NullReferenceException();
@@ -167,7 +174,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 if (attribute != null)
                 {
                     attributeOwnerModel.AddAttribute(attribute);
-                    var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService);
+                    var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService, notificationService: _notificationService);
                     AttributesVMs.Add(attributeVM);
                     OnPropertyChanged(nameof(AttributesVMs));
                     return attributeVM;

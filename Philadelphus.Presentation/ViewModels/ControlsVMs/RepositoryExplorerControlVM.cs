@@ -309,7 +309,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 {
                     var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
                     var result = _service.CreateTreeRoot(tree);
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service, _fileDialogService));
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
                     NotifyRepositoryTreeChanged();
                 },
                 ce =>
@@ -597,7 +597,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 if (item.ContentRoot != null)
                 {
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service, _fileDialogService));
+                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
                 }
             }
 
@@ -618,7 +618,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             ArgumentNullException.ThrowIfNull(treeRoot);
 
-            _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(treeRoot, _dataStoragesCollectionVM, _service, _fileDialogService));
+            _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(treeRoot, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
             NotifyRepositoryTreeChanged();
         }
 

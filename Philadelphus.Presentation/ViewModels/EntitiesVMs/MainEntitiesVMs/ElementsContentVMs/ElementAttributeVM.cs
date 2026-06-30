@@ -18,7 +18,6 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         #region [ Props ]
 
         private readonly IPhiladelphusRepositoryService _service;
-        private readonly INotificationService? _notificationService;
 
         private readonly ElementAttributeModel _model;
         private ObservableCollection<TreeLeaveModel> _assignedValues = new ObservableCollection<TreeLeaveModel>();
@@ -264,23 +263,30 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             }
         }
 
-        public VisibilityScope Visibility
+        /// <summary>
+        /// Выбранный элемент области видимости (единственная точка выбора из UI).
+        /// Привязывается к <see cref="VisibilityScopesList" /> по ССЫЛКЕ через ComboBox.SelectedItem.
+        /// Выбор-по-значению (SelectedValue+SelectedValueBinding) в Avalonia терял выбор при
+        /// рециклинге ячеек DataGrid — значение «слетало» при добавлении/прокрутке строк (см. тех-долг E);
+        /// item-based SelectedItem сравнивает по ссылке и переживает подмену DataContext.
+        /// Геттер всегда отдаёт актуальный элемент из списка → выбор корректно восстанавливается.
+        /// </summary>
+        public VisibilityScopeItem? SelectedVisibilityScope
         {
             get
             {
-                return _model.Visibility;
+                return VisibilityScopesList.FirstOrDefault(x => x.Value == _model.Visibility);
             }
             set
             {
-                if (_model.State != State.Initialized)
+                // Паразитный null при рециклинге ячейки игнорируем — иначе затрём модель.
+                if (value == null)
                 {
-                    _notificationService?.SendModalWindow<ElementAttributeVM>(
-                        "На данный момент переопределение области видимости невозможно");
                     return;
                 }
 
-                _model.Visibility = value;
-                OnPropertyChanged(nameof(Visibility));
+                _model.Visibility = value.Value;
+                OnPropertyChanged(nameof(SelectedVisibilityScope));
             }
         }
 
@@ -289,16 +295,26 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         /// </summary>
         public List<VisibilityScopeItem> VisibilityScopesList { get; }
 
-        public OverrideType Override
+        /// <summary>
+        /// Выбранный элемент режима переопределения (единственная точка выбора из UI).
+        /// Привязка по ССЫЛКЕ к <see cref="OverrideTypesList" /> через ComboBox.SelectedItem —
+        /// аналогично <see cref="SelectedVisibilityScope" /> (см. тех-долг E).
+        /// </summary>
+        public OverrideTypeItem? SelectedOverrideType
         {
             get
             {
-                return _model.Override;
+                return OverrideTypesList.FirstOrDefault(x => x.Value == _model.Override);
             }
             set
             {
-                _model.Override = value;
-                OnPropertyChanged(nameof(Override));
+                if (value == null)
+                {
+                    return;
+                }
+
+                _model.Override = value.Value;
+                OnPropertyChanged(nameof(SelectedOverrideType));
             }
         }
 
@@ -333,8 +349,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
             IFileDialogService fileDialogService,
-            INotificationService? notificationService = null)
-            : base(elementAttribute, dataStoragesCollectionVM, service, fileDialogService)
+            INotificationService? notificationService)
+            : base(elementAttribute, dataStoragesCollectionVM, service, fileDialogService, notificationService)
         {
             ArgumentNullException.ThrowIfNull(elementAttribute);
             ArgumentNullException.ThrowIfNull(elementAttribute.Values);
@@ -342,7 +358,6 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             ArgumentNullException.ThrowIfNull(fileDialogService);
 
             _service = service;
-            _notificationService = notificationService;
 
             _model = elementAttribute;
 

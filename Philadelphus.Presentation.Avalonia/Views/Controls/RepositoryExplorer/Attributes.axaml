@@ -109,10 +109,12 @@
                 <DataGridTemplateColumn Header="Область видимости">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
+                            <!-- Выбор по ССЫЛКЕ (SelectedItem→SelectedVisibilityScope), НЕ по значению.
+                                 SelectedValue+SelectedValueBinding в Avalonia теряет выбор при рециклинге
+                                 ячеек DataGrid (значение «слетало» при добавлении/прокрутке) — см. тех-долг E. -->
                             <ComboBox HorizontalAlignment="Stretch"
                                       ItemsSource="{Binding VisibilityScopesList}"
-                                      SelectedValue="{Binding Visibility, Mode=TwoWay}"
-                                      SelectedValueBinding="{Binding Value}">
+                                      SelectedItem="{Binding SelectedVisibilityScope, Mode=TwoWay}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -125,10 +127,10 @@
                 <DataGridTemplateColumn Header="Переопределение">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
+                            <!-- Выбор по ССЫЛКЕ (см. колонку «Область видимости» и тех-долг E). -->
                             <ComboBox HorizontalAlignment="Stretch"
                                       ItemsSource="{Binding OverrideTypesList}"
-                                      SelectedValue="{Binding Override, Mode=TwoWay}"
-                                      SelectedValueBinding="{Binding Value}">
+                                      SelectedItem="{Binding SelectedOverrideType, Mode=TwoWay}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
                                 </ComboBox.ItemTemplate>
