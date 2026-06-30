@@ -23,13 +23,13 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
     /// Данные читает из <see cref="ExcelImportDesignerVM"/> (DataContext), связи удаляет через команды VM.
     /// </summary>
     /// <remarks>
-    /// Этап 1 (текущий): отрисовка карточек листов, линий связей со стрелками, кнопка удаления связи,
-    /// выбор листа кликом, зум по Ctrl+колесо. Перетаскивание листов и создание связи перетягиванием
-    /// колонки — последующие этапы (см. docs/avalonia-migration/15, пункт F).
+    /// Реализованы этапы из docs/avalonia-migration/15, пункт F: отрисовка карточек, связей и стрелок,
+    /// выбор листа кликом, зум по Ctrl+колесо, перетаскивание карточек и создание/переназначение связи
+    /// перетягиванием колонки родителя на колонку ребёнка.
     /// Подключается attached-свойством <see cref="IsEnabledProperty"/> к <see cref="ScrollViewer"/>,
     /// чей <c>Content</c> — <see cref="LayoutTransformControl"/> с <see cref="Canvas"/> внутри
     /// и <see cref="ScaleTransform"/> в <c>LayoutTransform</c> (аналог WPF Canvas.LayoutTransform).
-    /// Цвета карточек пока жёсткие (как в WPF) — тематизация под Dark в общем тех-долге темы.
+    /// Нейтральные цвета берутся из Fluent-ресурсов темы; акценты связей/выбора остаются статусными.
     /// </remarks>
     public sealed class DiagramBehavior
     {
