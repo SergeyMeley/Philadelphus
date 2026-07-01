@@ -3,6 +3,7 @@
         xmlns:ribbon="clr-namespace:Ribbon.Avalonia;assembly=Ribbon.Avalonia"
         xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+        xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
         xmlns:re="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.MainWindow"
         Title="{Binding Title}"
@@ -313,8 +314,8 @@
             </ribbon:Ribbon>
 
             <!-- ===== Основная компоновка ===== -->
-            <Grid RowDefinitions="4*,Auto,Auto,Auto,0">
-                <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,5*,Auto,Auto">
+            <Grid x:Name="mainLayoutGrid" RowDefinitions="4*,Auto,200,Auto,Auto,0">
+                <Grid x:Name="mainWorkspaceGrid" Grid.Row="0" ColumnDefinitions="Auto,Auto,5*,Auto,Auto">
                     <!-- Навигационная панель (адаптация закомментированного в WPF Expander ExpandDirection=Left):
                          сворачивается ToggleButton + LayoutTransformControl (как в LaunchWindow), списки статические. -->
                     <Grid Grid.Column="0" Margin="1" ColumnDefinitions="*,Auto">
@@ -337,7 +338,13 @@
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Stretch"
                                   ResizeDirection="Columns"
-                                  ResizeBehavior="PreviousAndNext" />
+                                  ResizeBehavior="PreviousAndNext"
+                                  beh:CollapsibleGridDefinitionBehavior.TargetGrid="{Binding #mainWorkspaceGrid}"
+                                  beh:CollapsibleGridDefinitionBehavior.DefinitionIndex="0"
+                                  beh:CollapsibleGridDefinitionBehavior.Kind="Column"
+                                  beh:CollapsibleGridDefinitionBehavior.IsExpanded="{Binding #navToggle.IsChecked}"
+                                  beh:CollapsibleGridDefinitionBehavior.MinSize="290"
+                                  beh:CollapsibleGridDefinitionBehavior.DefaultSize="290" />
 
                     <HeaderedContentControl Grid.Column="2" Header="Рабочая область">
                         <TabControl Classes="compact">
@@ -361,7 +368,13 @@
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Stretch"
                                   ResizeDirection="Columns"
-                                  ResizeBehavior="PreviousAndNext" />
+                                  ResizeBehavior="PreviousAndNext"
+                                  beh:CollapsibleGridDefinitionBehavior.TargetGrid="{Binding #mainWorkspaceGrid}"
+                                  beh:CollapsibleGridDefinitionBehavior.DefinitionIndex="4"
+                                  beh:CollapsibleGridDefinitionBehavior.Kind="Column"
+                                  beh:CollapsibleGridDefinitionBehavior.IsExpanded="{Binding #extensionsPanelToggle.IsChecked}"
+                                  beh:CollapsibleGridDefinitionBehavior.MinSize="350"
+                                  beh:CollapsibleGridDefinitionBehavior.DefaultSize="350" />
 
                     <Grid Grid.Column="4" Margin="1" ColumnDefinitions="Auto,*">
                         <ToggleButton Grid.Column="0" x:Name="extensionsPanelToggle" IsChecked="False" VerticalAlignment="Stretch" Padding="2,8">
@@ -380,21 +393,36 @@
                     </Grid>
                 </Grid>
 
-                <ctrls:MessageLog Grid.Row="1" DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}" />
+                <GridSplitter Grid.Row="1"
+                              Height="3"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"
+                              ResizeDirection="Rows"
+                              ResizeBehavior="PreviousAndNext"
+                              beh:CollapsibleGridDefinitionBehavior.TargetGrid="{Binding #mainLayoutGrid}"
+                              beh:CollapsibleGridDefinitionBehavior.DefinitionIndex="2"
+                              beh:CollapsibleGridDefinitionBehavior.Kind="Row"
+                              beh:CollapsibleGridDefinitionBehavior.IsExpanded="{Binding #messageLog.(beh:CollapsibleGridDefinitionBehavior.IsExpanded)}"
+                              beh:CollapsibleGridDefinitionBehavior.MinSize="120"
+                              beh:CollapsibleGridDefinitionBehavior.DefaultSize="200" />
 
-                <Grid Grid.Row="2" ColumnDefinitions="*,320" MaxHeight="350">
+                <ctrls:MessageLog x:Name="messageLog"
+                                  Grid.Row="2"
+                                  DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}" />
+
+                <Grid Grid.Row="3" ColumnDefinitions="*,320" MaxHeight="350">
                     <StackPanel x:Name="popupTarget" Grid.Column="1" />
                 </Grid>
 
                 <!-- Замена WPF StatusBar (в Avalonia нет StatusBar): рамка со строкой статуса. -->
-                <Border Grid.Row="3" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,1,0,0" Padding="6,2">
+                <Border Grid.Row="4" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,1,0,0" Padding="6,2">
                     <Grid ColumnDefinitions="Auto,*,Auto">
                         <TextBlock Grid.Column="0" Text="{Binding UserName}" />
                         <TextBlock Grid.Column="2" Text="{Binding AssemblyVersion}" HorizontalAlignment="Right" />
                     </Grid>
                 </Border>
 
-                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3" />
+                <ProgressBar Grid.Row="5" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}" Height="3" />
             </Grid>
         </DockPanel>
     </Grid>
