@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.ExtensionWidgetContainer">
     <Grid>
         <HeaderedContentControl Header="Расширения">
@@ -18,9 +19,24 @@
                              Fill="{Binding SelectedExtension.LastCanExecuteResult.CanExecute, Converter={StaticResource booleanToColorConverter}}"
                              ToolTip.Tip="{Binding SelectedExtension.LastCanExecuteResult.Message}" />
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="Запустить" Command="{Binding StartExtensionCommand}" Margin="1" />
-                        <Button Content="Остановить" Command="{Binding StopExtensionCommand}" Margin="1" />
-                        <Button Content="Выполнить" Command="{Binding ExecuteExtensionCommand}" Margin="1" />
+                        <Button Command="{Binding StartExtensionCommand}" Margin="1">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <localControls:ThemedSvg Icon="play" Width="16" Height="16" />
+                                <TextBlock Text="Запустить" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding StopExtensionCommand}" Margin="1">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <localControls:ThemedSvg Icon="stop" Width="16" Height="16" />
+                                <TextBlock Text="Остановить" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ExecuteExtensionCommand}" Margin="1">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <localControls:ThemedSvg Icon="execute" Width="16" Height="16" />
+                                <TextBlock Text="Выполнить" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                     <HeaderedContentControl Header="Виджет расширения">
                         <StackPanel>

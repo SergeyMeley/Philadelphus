@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.ReportProcessor">
     <Grid ColumnDefinitions="Auto,Auto,*">
         <!-- Сворачиваемая панель настроек (вместо WPF Expander ExpandDirection=Left). -->
@@ -62,10 +63,30 @@
             <!-- Результат -->
             <HeaderedContentControl Grid.Row="2" Header="Результат" Margin="1">
                 <StackPanel>
-                    <Button Content="Отобразить отчет" Command="{Binding ExecuteReportCommand}" Margin="1" />
-                    <Button Content="Экспорт отчета .xlsx" Command="{Binding ExportToXlsxCommand}" Margin="1" />
-                    <Button Content="Экспорт отчета .json" Command="{Binding ExportToJsonCommand}" Margin="1" />
-                    <Button Content="Экспорт отчета .xml" Command="{Binding ExportToXmlCommand}" Margin="1" />
+                    <Button Command="{Binding ExecuteReportCommand}" Margin="1">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <localControls:ThemedSvg Icon="report" Width="16" Height="16" />
+                            <TextBlock Text="Отобразить отчет" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ExportToXlsxCommand}" Margin="1">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <localControls:ThemedSvg Icon="export" Width="16" Height="16" />
+                            <TextBlock Text="Экспорт отчета .xlsx" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ExportToJsonCommand}" Margin="1">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <localControls:ThemedSvg Icon="export" Width="16" Height="16" />
+                            <TextBlock Text="Экспорт отчета .json" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ExportToXmlCommand}" Margin="1">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <localControls:ThemedSvg Icon="export" Width="16" Height="16" />
+                            <TextBlock Text="Экспорт отчета .xml" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </HeaderedContentControl>
         </Grid>

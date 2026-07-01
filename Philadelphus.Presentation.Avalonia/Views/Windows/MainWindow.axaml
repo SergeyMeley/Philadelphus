@@ -45,6 +45,39 @@
         <ControlTemplate x:Key="IcoDetails">
             <localControls:ThemedSvg Icon="status-info" Width="22" Height="22" />
         </ControlTemplate>
+        <ControlTemplate x:Key="IcoHome">
+            <localControls:ThemedSvg Icon="home" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoFormula">
+            <localControls:ThemedSvg Icon="formula" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoRefresh">
+            <localControls:ThemedSvg Icon="refresh" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoRefreshAll">
+            <localControls:ThemedSvg Icon="refresh-all" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoImport">
+            <localControls:ThemedSvg Icon="import" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoExport">
+            <localControls:ThemedSvg Icon="export" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoConvert">
+            <localControls:ThemedSvg Icon="convert" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoPlay">
+            <localControls:ThemedSvg Icon="play" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoStop">
+            <localControls:ThemedSvg Icon="stop" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoExecute">
+            <localControls:ThemedSvg Icon="execute" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoWindow">
+            <localControls:ThemedSvg Icon="window" Width="22" Height="22" />
+        </ControlTemplate>
     </Window.Resources>
 
     <Grid>
@@ -76,7 +109,7 @@
                     <ribbon:RibbonTab Header="Главная">
                         <ribbon:RibbonTab.Groups>
                             <ribbon:RibbonGroupBox Header="Общее">
-                                <ribbon:RibbonButton Content="Стартовое окно" Command="{Binding OpenLaunchWindowCommand}" Size="Medium" MinSize="Medium" MaxSize="Medium" />
+                                <ribbon:RibbonButton Content="Стартовое окно" Icon="{StaticResource IcoHome}" Command="{Binding OpenLaunchWindowCommand}" Size="Medium" MinSize="Medium" MaxSize="Medium" />
                             </ribbon:RibbonGroupBox>
                             <!--
                             <ribbon:RibbonGroupBox Header="Буфер обмена">
@@ -153,6 +186,7 @@
                         <ribbon:RibbonTab.Groups>
                             <ribbon:RibbonGroupBox Header="Редактор">
                                 <ribbon:RibbonButton Content="Редактор формул"
+                                                     Icon="{StaticResource IcoFormula}"
                                                      Command="{Binding OpenFormulaEditorWindowCommand}"
                                                      CommandParameter="{Binding FormulaTestControlVM}"
                                                      Size="Medium" MinSize="Medium" MaxSize="Large" />
@@ -171,10 +205,12 @@
                                     </ComboBox>
                                 </StackPanel>
                                 <ribbon:RibbonButton Content="Пересчитать текущий"
+                                        Icon="{StaticResource IcoRefresh}"
                                         ToolTip.Tip="Пересчитать все формулы для текущего выбранного элемента репозитория."
                                         Size="Medium" MinSize="Medium" MaxSize="Large"
                                         Command="{Binding RecalculateCurrentFormulaCommand}" />
                                 <ribbon:RibbonButton Content="Пересчитать все"
+                                        Icon="{StaticResource IcoRefreshAll}"
                                         ToolTip.Tip="Пересчитать все формулы для всех элементов репозитория."
                                         Size="Medium" MinSize="Medium" MaxSize="Large"
                                         Command="{Binding RecalculateAllFormulasCommand}" />
@@ -192,17 +228,17 @@
                                  лента сама раскладывает их WrapPanel'ом и переносит, не обрезая при росте списка. -->
                             <ribbon:RibbonGroupBox Header="Импорт" ItemsSource="{Binding ImportExportVM.ImportOperations}">
                                 <ribbon:RibbonGroupBox.ItemTemplate>
-                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
+                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Icon="{StaticResource IcoImport}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
                                 </ribbon:RibbonGroupBox.ItemTemplate>
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Экспорт" ItemsSource="{Binding ImportExportVM.ExportOperations}">
                                 <ribbon:RibbonGroupBox.ItemTemplate>
-                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
+                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Icon="{StaticResource IcoExport}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
                                 </ribbon:RibbonGroupBox.ItemTemplate>
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Конвертация" ItemsSource="{Binding ImportExportVM.ConversionOperations}">
                                 <ribbon:RibbonGroupBox.ItemTemplate>
-                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
+                                    <DataTemplate><ribbon:RibbonButton Content="{Binding Label}" Icon="{StaticResource IcoConvert}" Command="{Binding Command}" Size="Medium" MinSize="Medium" MaxSize="Large" /></DataTemplate>
                                 </ribbon:RibbonGroupBox.ItemTemplate>
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Прогресс">
@@ -254,11 +290,11 @@
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <ribbon:RibbonButton Content="Запустить" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding StartExtensionCommand}" />
-                                    <ribbon:RibbonButton Content="Остановить" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding StopExtensionCommand}" />
+                                    <ribbon:RibbonButton Content="Запустить" Icon="{StaticResource IcoPlay}" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding StartExtensionCommand}" />
+                                    <ribbon:RibbonButton Content="Остановить" Icon="{StaticResource IcoStop}" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding StopExtensionCommand}" />
                                 </StackPanel>
-                                <ribbon:RibbonButton Content="Выполнить" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding ExecuteExtensionCommand}" />
-                                <ribbon:RibbonToggleButton Content="Окно" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}" />
+                                <ribbon:RibbonButton Content="Выполнить" Icon="{StaticResource IcoExecute}" Size="Medium" MinSize="Medium" MaxSize="Large" Command="{Binding ExecuteExtensionCommand}" />
+                                <ribbon:RibbonToggleButton Content="Окно" Icon="{StaticResource IcoWindow}" Command="{Binding OpenMainWindowCommand}" IsChecked="{Binding SelectedExtension.Window.IsVisible, Mode=OneWay}" />
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Виджеты расширений" DataContext="{Binding ExtensionsControlVM}">
                                 <ContentControl Content="{Binding SelectedExtension.RibbonWidget}" />
