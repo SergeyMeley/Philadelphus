@@ -14,8 +14,8 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationG
 
         public bool IsReadOnly
         {
-            get { return GetValue(IsReadOnlyProperty); }
-            set { SetValue(IsReadOnlyProperty, value); }
+            get => GetValue(IsReadOnlyProperty);
+            set => SetValue(IsReadOnlyProperty, value);
         }
 
         /// <summary>

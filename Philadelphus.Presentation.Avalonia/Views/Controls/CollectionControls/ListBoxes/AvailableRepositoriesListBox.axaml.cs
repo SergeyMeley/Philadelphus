@@ -20,14 +20,14 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.L
 
         public IEnumerable? RepositoriesItemsSource
         {
-            get { return GetValue(RepositoriesItemsSourceProperty); }
-            set { SetValue(RepositoriesItemsSourceProperty, value); }
+            get => GetValue(RepositoriesItemsSourceProperty);
+            set => SetValue(RepositoriesItemsSourceProperty, value);
         }
 
         public object? RepositoriesSelectedItem
         {
-            get { return GetValue(RepositoriesSelectedItemProperty); }
-            set { SetValue(RepositoriesSelectedItemProperty, value); }
+            get => GetValue(RepositoriesSelectedItemProperty);
+            set => SetValue(RepositoriesSelectedItemProperty, value);
         }
 
         /// <summary>

@@ -20,14 +20,14 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.CollectionControls.L
 
         public IEnumerable? DataStorageHeadersItemsSource
         {
-            get { return GetValue(DataStorageHeadersItemsSourceProperty); }
-            set { SetValue(DataStorageHeadersItemsSourceProperty, value); }
+            get => GetValue(DataStorageHeadersItemsSourceProperty);
+            set => SetValue(DataStorageHeadersItemsSourceProperty, value);
         }
 
         public object? DataStorageHeadersSelectedItem
         {
-            get { return GetValue(DataStorageHeadersSelectedItemProperty); }
-            set { SetValue(DataStorageHeadersSelectedItemProperty, value); }
+            get => GetValue(DataStorageHeadersSelectedItemProperty);
+            set => SetValue(DataStorageHeadersSelectedItemProperty, value);
         }
 
         /// <summary>
