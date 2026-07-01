@@ -324,7 +324,7 @@
                                 <LayoutTransformControl.LayoutTransform>
                                     <RotateTransform Angle="-90" />
                                 </LayoutTransformControl.LayoutTransform>
-                                <TextBlock Text="Навигационная панель" />
+                                <TextBlock Text="Панель форм" />
                             </LayoutTransformControl>
                         </ToggleButton>
                         <ctrls:NavigationPanel Grid.Column="0"
@@ -346,22 +346,17 @@
                                   beh:CollapsibleGridDefinitionBehavior.MinSize="290"
                                   beh:CollapsibleGridDefinitionBehavior.DefaultSize="290" />
 
-                    <HeaderedContentControl Grid.Column="2" Header="Рабочая область">
-                        <TabControl Classes="compact">
-                            <TabItem Classes="compact" Header="Репозиторий">
-                                <re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}" />
-                            </TabItem>
-                            <TabItem Classes="compact" Header="Отчеты">
-                                <ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}" />
-                            </TabItem>
-                            <!--
-                            <TabItem Header="Настраиваемый отчет"><ctrls:CustomizableReport /></TabItem>
-                            -->
-                            <TabItem Classes="compact" Header="Настройки">
-                                <ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}" />
-                            </TabItem>
-                        </TabControl>
-                    </HeaderedContentControl>
+					<TabControl Grid.Column="2" Classes="compact">
+						<TabItem Classes="compact" Header="Рабочий кустарник">
+							<re:RepositoryExplorer DataContext="{Binding RepositoryExplorerVM}" />
+						</TabItem>
+						<TabItem Classes="compact" Header="Отчеты">
+							<ctrls:ReportProcessor DataContext="{Binding ReportsControlVM}" />
+						</TabItem>
+						<TabItem Classes="compact" Header="Настройки">
+							<ctrls:ApplicationSettings DataContext="{Binding ApplicationSettingsControlVM}" />
+						</TabItem>
+					</TabControl>
 
                     <GridSplitter Grid.Column="3"
                                   Width="3"
