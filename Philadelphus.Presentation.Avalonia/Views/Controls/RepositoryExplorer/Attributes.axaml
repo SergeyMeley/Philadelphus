@@ -1,18 +1,19 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
+             xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.Attributes">
     <Grid RowDefinitions="Auto,Auto,*,Auto">
         <!-- Тулбар атрибутов -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" IsEnabled="{Binding !IsReadOnly}">
             <Button Command="{Binding CreateAttributeCommand}" ToolTip.Tip="Добавить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_add.png" />
+                <localControls:ThemedSvg Icon="add" />
             </Button>
             <Button Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" ToolTip.Tip="Удалить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_remove.png" />
+                <localControls:ThemedSvg Icon="remove" />
             </Button>
             <Button Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip.Tip="Открыть настройки списка" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                <Image Source="/Assets/Icons/list_64.png" />
+                <localControls:ThemedSvg Icon="list" />
             </Button>
         </StackPanel>
 

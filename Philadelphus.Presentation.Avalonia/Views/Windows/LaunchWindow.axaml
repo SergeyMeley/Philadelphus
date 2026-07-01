@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:titemvm="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;assembly=Philadelphus.Presentation"
+        xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
         xmlns:tabvm="clr-namespace:Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs.LaunchWindowTabContentVMs;assembly=Philadelphus.Presentation"
         xmlns:tabs="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.LaunchWindow"
@@ -57,10 +58,9 @@
                     <StackPanel Width="92" Height="78"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">
-                        <Image Source="{Binding Icon, Converter={StaticResource iconConverter}}"
-                               Width="42" Height="42"
-                               Margin="0,6,0,4"
-                               Stretch="Uniform" />
+                        <localControls:ThemedSvg Icon="{Binding Icon, Converter={StaticResource iconNameConverter}, ConverterParameter=LaunchTab}"
+                                                 Width="42" Height="42"
+                                                 Margin="0,6,0,4" />
                         <TextBlock Text="{Binding Header}"
                                    HorizontalAlignment="Center"
                                    TextAlignment="Center"

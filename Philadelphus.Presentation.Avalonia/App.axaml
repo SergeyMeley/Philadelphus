@@ -30,7 +30,7 @@
             </ResourceDictionary.ThemeDictionaries>
 
             <!-- Тонкие конвертеры поверх shared-логики (аналог App.xaml в WPF). -->
-            <conv:IconConverter x:Key="iconConverter" />
+            <conv:IconNameConverter x:Key="iconNameConverter" />
             <conv:SelectedIndexConverter x:Key="selectedIndexConverter" />
             <conv:BooleanToColorConverter x:Key="booleanToColorConverter" />
             <conv:EnumDisplayAttributeConverter x:Key="enumDisplayAttributeConverter" />

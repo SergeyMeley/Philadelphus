@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ac="using:Avalonia.Data.Converters"
+             xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
              xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
              xmlns:detail="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
@@ -27,28 +28,28 @@
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1" Classes="toolbar"
                                 IsEnabled="{Binding !IsReadOnly}">
                         <Button Command="{Binding GetWorkCommand}" ToolTip.Tip="Обновить из хранилища" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/getwork_64.png" />
+                            <localControls:ThemedSvg Icon="getwork" />
                         </Button>
                         <Button Command="{Binding SaveCommand}" ToolTip.Tip="Сохранить изменения" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_save.png" />
+                            <localControls:ThemedSvg Icon="save" />
                         </Button>
                         <Button ToolTip.Tip="Режим редактирования" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/edit_64.png" />
+                            <localControls:ThemedSvg Icon="edit" />
                         </Button>
                         <Button Command="{Binding CreateRootCommand}" ToolTip.Tip="Добавить корень" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/root_64_1.png" />
+                            <localControls:ThemedSvg Icon="root" />
                         </Button>
                         <Button Command="{Binding CreateNodeCommand}" ToolTip.Tip="Добавить узел" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/node_64_3.png" />
+                            <localControls:ThemedSvg Icon="node" />
                         </Button>
                         <Button Command="{Binding CreateLeaveCommand}" ToolTip.Tip="Добавить лист" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/leave_64_3.png" />
+                            <localControls:ThemedSvg Icon="leave" />
                         </Button>
                         <Button Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip.Tip="Удалить выбранный элемент репозитория" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_delete.png" />
+                            <localControls:ThemedSvg Icon="delete" />
                         </Button>
                         <Button Command="{Binding ProtectCommand}" ToolTip.Tip="Защитить" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <Image Source="/Assets/Icons/without_a_license/Flaticon_icon_protect.png" />
+                            <localControls:ThemedSvg Icon="protect" />
                         </Button>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="1">
@@ -130,7 +131,7 @@
                                                         Command="{Binding BrowseFileValueCommand}" Content="..." ToolTip.Tip="Выбрать файл" />
                                                 <Button Grid.Column="2" Height="24" MinWidth="24" Margin="1" Padding="4,0" Background="Transparent"
                                                         Command="{Binding OpenFileValueCommand}" ToolTip.Tip="Открыть файл">
-                                                    <Image Source="/Assets/Icons/open.png" Width="15" Height="15" />
+                                                    <localControls:ThemedSvg Icon="open" Width="15" Height="15" />
                                                 </Button>
                                             </Grid>
                                         </DataTemplate>

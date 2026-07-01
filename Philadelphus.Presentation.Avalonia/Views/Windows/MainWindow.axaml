@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ribbon="clr-namespace:Ribbon.Avalonia;assembly=Ribbon.Avalonia"
+        xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
         xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
         xmlns:re="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.MainWindow"
@@ -16,14 +17,34 @@
 
     <Window.Resources>
         <!-- Иконки для RibbonButton: свойство Icon/LargeIcon имеет тип IControlTemplate,
-             поэтому растровую иконку оборачиваем в ControlTemplate с Image внутри. -->
-        <ControlTemplate x:Key="IcoRoot"><Image Source="/Assets/Icons/root_64_1.png" /></ControlTemplate>
-        <ControlTemplate x:Key="IcoNode"><Image Source="/Assets/Icons/node_64_3.png" /></ControlTemplate>
-        <ControlTemplate x:Key="IcoLeave"><Image Source="/Assets/Icons/leave_64_3.png" /></ControlTemplate>
-        <ControlTemplate x:Key="IcoDelete"><Image Source="/Assets/Icons/without_a_license/Flaticon_icon_delete.png" /></ControlTemplate>
-        <ControlTemplate x:Key="IcoAdd"><Image Source="/Assets/Icons/without_a_license/Flaticon_icon_add.png" /></ControlTemplate>
-        <ControlTemplate x:Key="IcoRemove"><Image Source="/Assets/Icons/without_a_license/Flaticon_icon_remove.png" /></ControlTemplate>
-        <ControlTemplate x:Key="IcoDetails"><Image Source="/Assets/Icons/info_64_3.png" /></ControlTemplate>
+             поэтому иконку оборачиваем в ControlTemplate. Root/Node/Leave — PNG→SVG-spike с файлами в Assets/Icons. -->
+        <ControlTemplate x:Key="IcoRoot">
+            <localControls:ThemedSvg Icon="root"
+                                     Width="22"
+                                     Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoNode">
+            <localControls:ThemedSvg Icon="node"
+                                     Width="22"
+                                     Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoLeave">
+            <localControls:ThemedSvg Icon="leave"
+                                     Width="22"
+                                     Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoDelete">
+            <localControls:ThemedSvg Icon="delete" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoAdd">
+            <localControls:ThemedSvg Icon="add" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoRemove">
+            <localControls:ThemedSvg Icon="remove" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoDetails">
+            <localControls:ThemedSvg Icon="status-info" Width="22" Height="22" />
+        </ControlTemplate>
     </Window.Resources>
 
     <Grid>

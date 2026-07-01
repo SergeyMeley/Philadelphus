@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorerShrub">
     <Grid>
         <TreeView Name="MainTreeView"
@@ -16,8 +17,8 @@
                                    Grid.Column="0"
                                    Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                            <Image Width="24" Height="24" Margin="10,0,10,0"
-                                   Source="{Binding Converter={StaticResource iconConverter}}" />
+                            <localControls:ThemedSvg Icon="{Binding Converter={StaticResource iconNameConverter}}"
+                                                     Width="24" Height="24" Margin="10,0,10,0" />
                             <StackPanel Margin="0,2,10,2">
                                 <TextBlock>
                                     <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />

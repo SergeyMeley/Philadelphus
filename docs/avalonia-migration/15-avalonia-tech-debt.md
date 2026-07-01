@@ -95,7 +95,8 @@
 ## K. Прочее
 
 - `KafkaConsumer.Dispose`: убран двойной `Close` (graceful Close делается в `ExecuteAsync.finally`) — зафиксировано как осознанное изменение, проверить при нагрузочном тесте.
-- Тема: **реализовано** — переключатель Светлая/Тёмная/Как в системе (вкладка ленты «Вид» → группа «Тема»), дефолт «Как в системе»; применение `RequestedThemeVariant`, сохранение в `AppearanceConfig:ThemeString` (presentation-конфиг, не Core). Жёсткие светлые цвета (фоны/рамки/вторичный текст) переведены на `DynamicResource` Fluent. **Dark QA пройден вручную по экранам.** Оставшийся долг: спайк иконок PNG→SVG (иконки сейчас растровые, в Dark не инвертируются).
+- Тема: **реализовано** — переключатель Светлая/Тёмная/Как в системе (вкладка ленты «Вид» → группа «Тема»), дефолт «Как в системе»; применение `RequestedThemeVariant`, сохранение в `AppearanceConfig:ThemeString` (presentation-конфиг, не Core). Жёсткие светлые цвета (фоны/рамки/вторичный текст) переведены на `DynamicResource` Fluent. **Dark QA пройден вручную по экранам.**
+- Иконки: **SVG spike расширен на используемые Avalonia-иконки** — не-логотипные PNG-иконки в Ribbon, MessageLog, LaunchWindow, RepositoryExplorer/Attributes/FormulaBar и дереве репозитория заменены на минималистичные SVG из `Assets/Icons/svg/light` и `Assets/Icons/svg/dark`; цвет задаётся прямо в SVG-файлах, `ThemedSvg` строит путь по `Icon` и переключает его при смене `ActualThemeVariant`, динамические `AppIcon`-привязки идут через `IconNameConverter`. Логотип приложения (`philadelphus_logo_64.png`/`.ico`) остаётся PNG. Оставшийся долг: визуально проверить набор иконок и при необходимости заменить временные минималистичные SVG на финальные.
 
 ## L. Лента — DataContext групп vs RibbonTab
 
