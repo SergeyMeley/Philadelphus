@@ -3,7 +3,6 @@
              xmlns:ac="using:Avalonia.Data.Converters"
              xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
-             xmlns:ctrls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
              xmlns:detail="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
              xmlns:editors="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.SystemBaseValueEditors"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorer">
@@ -200,11 +199,6 @@
                 <!-- Свойства -->
                 <TabItem Classes="compact" Header="Свойства">
                     <detail:UniversalDetails DataContext="{Binding SelectedRepositoryMember}" />
-                </TabItem>
-
-                <!-- Расширения -->
-                <TabItem Classes="compact" Header="Расширения">
-                    <ctrls:ExtensionWidgetContainer DataContext="{Binding ExtensionsControlVM}" />
                 </TabItem>
             </TabControl>
         </HeaderedContentControl>

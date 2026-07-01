@@ -314,10 +314,10 @@
 
             <!-- ===== Основная компоновка ===== -->
             <Grid RowDefinitions="4*,Auto,Auto,Auto,0">
-                <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,5*">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,5*,Auto,Auto">
                     <!-- Навигационная панель (адаптация закомментированного в WPF Expander ExpandDirection=Left):
                          сворачивается ToggleButton + LayoutTransformControl (как в LaunchWindow), списки статические. -->
-                    <Grid Grid.Column="0" Margin="1" ColumnDefinitions="Auto,Auto">
+                    <Grid Grid.Column="0" Margin="1" ColumnDefinitions="*,Auto">
                         <ToggleButton Grid.Column="1" x:Name="navToggle" IsChecked="False" VerticalAlignment="Stretch" Padding="2,8">
                             <LayoutTransformControl>
                                 <LayoutTransformControl.LayoutTransform>
@@ -326,11 +326,18 @@
                                 <TextBlock Text="Навигационная панель" />
                             </LayoutTransformControl>
                         </ToggleButton>
-                        <ctrls:NavigationPanel Grid.Column="0" Width="260"
+                        <ctrls:NavigationPanel Grid.Column="0"
+                                               MinWidth="260"
+                                               HorizontalAlignment="Stretch"
                                                IsVisible="{Binding #navToggle.IsChecked}" />
                     </Grid>
 
-                    <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                    <GridSplitter Grid.Column="1"
+                                  Width="3"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Stretch"
+                                  ResizeDirection="Columns"
+                                  ResizeBehavior="PreviousAndNext" />
 
                     <HeaderedContentControl Grid.Column="2" Header="Рабочая область">
                         <TabControl Classes="compact">
@@ -348,6 +355,29 @@
                             </TabItem>
                         </TabControl>
                     </HeaderedContentControl>
+
+                    <GridSplitter Grid.Column="3"
+                                  Width="3"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Stretch"
+                                  ResizeDirection="Columns"
+                                  ResizeBehavior="PreviousAndNext" />
+
+                    <Grid Grid.Column="4" Margin="1" ColumnDefinitions="Auto,*">
+                        <ToggleButton Grid.Column="0" x:Name="extensionsPanelToggle" IsChecked="False" VerticalAlignment="Stretch" Padding="2,8">
+                            <LayoutTransformControl>
+                                <LayoutTransformControl.LayoutTransform>
+                                    <RotateTransform Angle="90" />
+                                </LayoutTransformControl.LayoutTransform>
+                                <TextBlock Text="Панель расширений" />
+                            </LayoutTransformControl>
+                        </ToggleButton>
+                        <ctrls:ExtensionWidgetContainer Grid.Column="1"
+                                                        MinWidth="320"
+                                                        HorizontalAlignment="Stretch"
+                                                        DataContext="{Binding RepositoryExplorerVM.ExtensionsControlVM}"
+                                                        IsVisible="{Binding #extensionsPanelToggle.IsChecked}" />
+                    </Grid>
                 </Grid>
 
                 <ctrls:MessageLog Grid.Row="1" DataContext="{Binding MainWindowNotificationsVM.MessageLogControlVM}" />
