@@ -3,45 +3,43 @@ using global::Avalonia.Controls;
 using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Platform.Storage;
 
-using Philadelphus.Presentation.Avalonia.Helpers;
 using Philadelphus.Presentation.Services.Interfaces;
 
 namespace Philadelphus.Presentation.Avalonia.Services
 {
     /// <summary>
     /// Avalonia-реализация <see cref="IFileDialogService" /> поверх <see cref="IStorageProvider" />.
-    /// Storage API только асинхронный — есть нативно-асинхронные методы (без блокировки UI-потока),
-    /// синхронные сигнатуры обеспечиваются мостом <see cref="UiSync" /> поверх тех же async-методов.
+    /// Storage API только асинхронный, поэтому Avalonia-код должен использовать async-методы.
     /// </summary>
     public class AvaloniaFileDialogService : IFileDialogService
     {
-        // ===== Синхронные методы (мост поверх async-реализаций) =====
+        // Синхронные методы оставлены только для общего контракта/WPF-совместимости.
 
         public string? OpenExcelFile()
-            => UiSync.RunSync(OpenExcelFileAsync);
+            => ThrowSyncNotSupported<string?>();
 
         public string? SavePhjsonFile(string defaultFileName)
-            => UiSync.RunSync(() => SavePhjsonFileAsync(defaultFileName));
+            => ThrowSyncNotSupported<string?>();
 
         public string? OpenImportSchemaFile()
-            => UiSync.RunSync(OpenImportSchemaFileAsync);
+            => ThrowSyncNotSupported<string?>();
 
         public string? SaveImportSchemaFile(string defaultFileName)
-            => UiSync.RunSync(() => SaveImportSchemaFileAsync(defaultFileName));
+            => ThrowSyncNotSupported<string?>();
 
         public string? BrowseLocalFile()
-            => UiSync.RunSync(BrowseLocalFileAsync);
+            => ThrowSyncNotSupported<string?>();
 
         public string? OpenFile(string? filter = null, string? defaultExtension = null, string? title = null, string? initialDirectory = null)
-            => UiSync.RunSync(() => OpenFileAsync(filter, defaultExtension, title, initialDirectory));
+            => ThrowSyncNotSupported<string?>();
 
         public string? SaveFile(string? filter = null, string? defaultExtension = null, string? title = null, string? initialDirectory = null)
-            => UiSync.RunSync(() => SaveFileAsync(filter, defaultExtension, title, initialDirectory));
+            => ThrowSyncNotSupported<string?>();
 
         public string? BrowseFolder(string? title = null, string? initialDirectory = null)
-            => UiSync.RunSync(() => BrowseFolderAsync(title, initialDirectory));
+            => ThrowSyncNotSupported<string?>();
 
-        // ===== Нативно-асинхронные методы (без UiSync) =====
+        // ===== Нативно-асинхронные методы =====
 
         public Task<string?> OpenExcelFileAsync()
             => PickOpenAsync("Excel Files|*.xlsx;*.xls", title: "Выберите файл Excel");
@@ -173,5 +171,8 @@ namespace Philadelphus.Presentation.Avalonia.Services
                 return owner?.StorageProvider;
             }
         }
+
+        private static T ThrowSyncNotSupported<T>()
+            => throw new NotSupportedException("Avalonia file dialogs are asynchronous. Use IFileDialogService.*Async methods.");
     }
 }

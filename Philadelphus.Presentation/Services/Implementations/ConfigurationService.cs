@@ -138,7 +138,7 @@ namespace Philadelphus.Presentation.Services.Implementations
                 ?? "Production";
             if (env.Equals("Development", StringComparison.OrdinalIgnoreCase))
             {
-                _dialogService.ShowWarning("В режиме разработки изменения не могут быть сохранены. Повторите попытку в режиме Продакшн.");
+                _ = _dialogService.ShowWarningAsync("В режиме разработки изменения не могут быть сохранены. Повторите попытку в режиме Продакшн.");
                 return false;
             }
 

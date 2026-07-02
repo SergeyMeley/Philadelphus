@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Handlers;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
@@ -14,6 +15,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
     public class ModalWindowNotificationsControlVM : ControlBaseVM, IDisposable
     {
         private bool _isSetedHandler;
+        private NotificationHandler? _modalWindowHandler;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ModalWindowNotificationsControlVM" />.
@@ -39,7 +41,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
             if (_isSetedHandler)
                 return false;
 
-            _notificationService.ModalWindowHandler = notification => ShowModal(notification);
+            _modalWindowHandler = ShowModal;
+            _notificationService.ModalWindowHandler = _modalWindowHandler;
 
             _isSetedHandler = true;
 
@@ -54,31 +57,37 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
         {
             ArgumentNullException.ThrowIfNull(notification);
 
+            _ = ShowModalAsync(notification);
+            return true;
+        }
+
+        private async Task ShowModalAsync(Notification notification)
+        {
             var dialog = _serviceProvider.GetRequiredService<IDialogService>();
             var title = notification.CriticalLevel.ToString();
 
-            switch (notification.CriticalLevel)
+            try
             {
-                case NotificationCriticalLevelModel.Ok:
-                    dialog.ShowInformation(notification.Text, title); 
-                    break;
-                case NotificationCriticalLevelModel.Info:
-                    dialog.ShowInformation(notification.Text, title);
-                    break;
-                case NotificationCriticalLevelModel.Warning:
-                    dialog.ShowWarning(notification.Text, title);
-                    break;
-                case NotificationCriticalLevelModel.Error:
-                    dialog.ShowError(notification.Text, title);
-                    break;
-                case NotificationCriticalLevelModel.Alarm:
-                    dialog.ShowError(notification.Text, title);
-                    break;
-                default:
-                    dialog.ShowError(notification.Text, title);
-                    break;
+                switch (notification.CriticalLevel)
+                {
+                    case NotificationCriticalLevelModel.Ok:
+                    case NotificationCriticalLevelModel.Info:
+                        await dialog.ShowInformationAsync(notification.Text, title);
+                        break;
+                    case NotificationCriticalLevelModel.Warning:
+                        await dialog.ShowWarningAsync(notification.Text, title);
+                        break;
+                    case NotificationCriticalLevelModel.Error:
+                    case NotificationCriticalLevelModel.Alarm:
+                    default:
+                        await dialog.ShowErrorAsync(notification.Text, title);
+                        break;
+                }
             }
-            return true;
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Ошибка показа модального уведомления.");
+            }
         }
 
         /// <summary>
@@ -88,7 +97,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
         {
             if (_isSetedHandler)
             {
-                _notificationService.ModalWindowHandler -= (n) => ShowModal(n);
+                if (_modalWindowHandler != null)
+                {
+                    _notificationService.ModalWindowHandler -= _modalWindowHandler;
+                    _modalWindowHandler = null;
+                }
+
                 _isSetedHandler = false;
             }
         }

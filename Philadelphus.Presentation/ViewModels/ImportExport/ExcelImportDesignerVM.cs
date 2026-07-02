@@ -102,10 +102,10 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _importProgressReporter = importProgressReporter;
 
             SelectFileCommand = _asyncCommandFactory.Create(_ => SelectFileAsync());
-            AddRelationCommand = _commandFactory.Create(_ => AddRelation());
+            AddRelationCommand = _asyncCommandFactory.Create(_ => AddRelationAsync());
             RemoveRelationCommand = _commandFactory.Create(_ => RemoveRelation());
-            RefreshPreviewCommand = _commandFactory.Create(_ => RefreshPreview());
-            ImportCommand = _commandFactory.Create(_ => Import());
+            RefreshPreviewCommand = _asyncCommandFactory.Create(_ => RefreshPreviewAsync());
+            ImportCommand = _asyncCommandFactory.Create(_ => ImportAsync());
             LoadTemplateCommand = _asyncCommandFactory.Create(_ => LoadTemplateAsync());
             SaveTemplateCommand = _asyncCommandFactory.Create(_ => SaveTemplateAsync());
             CloseCommand = _commandFactory.Create(_ => Close());
@@ -551,7 +551,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             }
             catch (Exception ex)
             {
-                _messageDialogService.ShowError($"Не удалось загрузить книгу: {ex.Message}", "Ошибка");
+                await _messageDialogService.ShowErrorAsync($"Не удалось загрузить книгу: {ex.Message}", "Ошибка");
             }
         }
 
@@ -727,7 +727,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                     NoParentRelationOption,
                     out var errorMessage) == false)
             {
-                _messageDialogService.ShowWarning(errorMessage, "Связи");
+                _ = _messageDialogService.ShowWarningAsync(errorMessage, "Связи");
                 return false;
             }
 
@@ -770,7 +770,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                     childKeyColumnName,
                     out var errorMessage) == false)
             {
-                _messageDialogService.ShowWarning(errorMessage, "Связи");
+                _ = _messageDialogService.ShowWarningAsync(errorMessage, "Связи");
                 return false;
             }
 
@@ -778,7 +778,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             return true;
         }
 
-        private void AddRelation()
+        private async Task AddRelationAsync()
         {
             var schema = _session.Schema;
             if (schema == null)
@@ -787,7 +787,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             var targetSheet = schema.Sheets.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Profile.Relation.ParentSourceName));
             if (targetSheet == null)
             {
-                _messageDialogService.ShowInformation("Все листы уже имеют настроенную связь или книга не загружена.", "Связи");
+                await _messageDialogService.ShowInformationAsync("Все листы уже имеют настроенную связь или книга не загружена.", "Связи");
                 return;
             }
 
@@ -803,27 +803,28 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             ClearSheetRelation(childSheet);
         }
 
-        private void RefreshPreview()
+        private async Task RefreshPreviewAsync()
         {
             try
             {
-                if (TryGetImportRootName(out var rootName) == false)
+                var rootNameResult = await TryGetImportRootNameAsync();
+                if (rootNameResult.HasValue == false)
                     return;
 
-                if (TrySyncSchemaForExecution(rootName) == false)
+                if (await TrySyncSchemaForExecutionAsync(rootNameResult.Value) == false)
                     return;
 
                 var profiles = _session.GetProfilesForExecution();
                 var validationResult = _session.Validate();
                 if (validationResult.HasErrors)
                 {
-                    _messageDialogService.ShowWarning(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
+                    await _messageDialogService.ShowWarningAsync(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
                     return;
                 }
 
                 if (profiles.Count == 0)
                 {
-                    _messageDialogService.ShowWarning("Не выбраны источники Excel для предпросмотра импорта.", "Ошибка");
+                    await _messageDialogService.ShowWarningAsync("Не выбраны источники Excel для предпросмотра импорта.", "Ошибка");
                     return;
                 }
 
@@ -834,37 +835,38 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             }
             catch (Exception ex)
             {
-                _messageDialogService.ShowError($"Не удалось построить предпросмотр: {ex.Message}", "Ошибка");
+                await _messageDialogService.ShowErrorAsync($"Не удалось построить предпросмотр: {ex.Message}", "Ошибка");
             }
         }
 
-        private void Import()
+        private async Task ImportAsync()
         {
             if (_repository == null || _repositoryService == null)
             {
-                _messageDialogService.ShowError("Не инициализирован контекст активного репозитория.", "Ошибка");
+                await _messageDialogService.ShowErrorAsync("Не инициализирован контекст активного репозитория.", "Ошибка");
                 return;
             }
 
             try
             {
-                if (TryGetImportRootName(out var rootName) == false)
+                var rootNameResult = await TryGetImportRootNameAsync();
+                if (rootNameResult.HasValue == false)
                     return;
 
-                if (TrySyncSchemaForExecution(rootName) == false)
+                if (await TrySyncSchemaForExecutionAsync(rootNameResult.Value) == false)
                     return;
 
                 var profiles = _session.GetProfilesForExecution();
                 if (profiles.Count == 0)
                 {
-                    _messageDialogService.ShowWarning("Не выбраны источники Excel для импорта.", "Ошибка");
+                    await _messageDialogService.ShowWarningAsync("Не выбраны источники Excel для импорта.", "Ошибка");
                     return;
                 }
 
                 var validationResult = _session.Validate();
                 if (validationResult.HasErrors)
                 {
-                    _messageDialogService.ShowWarning(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
+                    await _messageDialogService.ShowWarningAsync(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
                     return;
                 }
 
@@ -895,7 +897,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             }
             catch (Exception ex)
             {
-                _messageDialogService.ShowError($"Не удалось выполнить импорт: {ex.Message}", "Ошибка");
+                await _messageDialogService.ShowErrorAsync($"Не удалось выполнить импорт: {ex.Message}", "Ошибка");
             }
         }
 
@@ -912,7 +914,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
             if (string.IsNullOrWhiteSpace(schemaFilePath) || File.Exists(schemaFilePath) == false)
             {
-                _messageDialogService.ShowWarning(
+                await _messageDialogService.ShowWarningAsync(
                     "Для загруженного шаблона не найден Excel-файл. Сначала выберите книгу вручную.",
                     "Шаблон импорта");
                 _session.UseSchema(loadedSchema);
@@ -933,7 +935,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             var schema = _session.Schema;
             if (schema == null)
             {
-                _messageDialogService.ShowInformation("Сначала выберите Excel-файл и настройте схему импорта.", "Шаблон импорта");
+                await _messageDialogService.ShowInformationAsync("Сначала выберите Excel-файл и настройте схему импорта.", "Шаблон импорта");
                 return;
             }
 
@@ -946,7 +948,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                 return;
 
             _templateStorage.Save(savePath, schema);
-            _messageDialogService.ShowInformation("Шаблон схемы импорта сохранен.", "Шаблон импорта");
+            await _messageDialogService.ShowInformationAsync("Шаблон схемы импорта сохранен.", "Шаблон импорта");
         }
 
         private void Close()
@@ -954,32 +956,30 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             _windowService.Close(this);
         }
 
-        private bool TryGetImportRootName(out string rootName)
+        private async Task<ImportRootNameResult> TryGetImportRootNameAsync()
         {
-            rootName = string.Empty;
-
             if (string.IsNullOrWhiteSpace(_session.SelectedFilePath))
             {
-                _messageDialogService.ShowWarning("Сначала выберите файл Excel.", "Ошибка");
-                return false;
+                await _messageDialogService.ShowWarningAsync("Сначала выберите файл Excel.", "Ошибка");
+                return default;
             }
 
-            rootName = RootName?.Trim() ?? string.Empty;
+            var rootName = RootName?.Trim() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(rootName))
             {
-                _messageDialogService.ShowWarning("Укажите наименование корня.", "Ошибка");
-                return false;
+                await _messageDialogService.ShowWarningAsync("Укажите наименование корня.", "Ошибка");
+                return default;
             }
 
-            return true;
+            return new ImportRootNameResult(rootName);
         }
 
-        private bool TrySyncSchemaForExecution(string rootName)
+        private async Task<bool> TrySyncSchemaForExecutionAsync(string rootName)
         {
             var schema = _session.Schema;
             if (schema == null)
             {
-                _messageDialogService.ShowWarning("Сначала выберите Excel-файл и настройте схему импорта.", "Ошибка");
+                await _messageDialogService.ShowWarningAsync("Сначала выберите Excel-файл и настройте схему импорта.", "Ошибка");
                 return false;
             }
 
@@ -993,6 +993,11 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
         {
             RepositoryPreviewVM = null;
             PreviewSummary = "Предпросмотр результата еще не построен.";
+        }
+
+        private readonly record struct ImportRootNameResult(string Value)
+        {
+            public bool HasValue => string.IsNullOrWhiteSpace(Value) == false;
         }
     }
 }

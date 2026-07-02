@@ -139,7 +139,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             {
                 PreviewView = null;
                 SourceItems.Clear();
-                _messageDialogService.ShowError($"Не удалось загрузить предпросмотр: {ex.Message}", "Ошибка");
+                await _messageDialogService.ShowErrorAsync($"Не удалось загрузить предпросмотр: {ex.Message}", "Ошибка");
             }
         }
 
@@ -270,7 +270,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
 
         private async Task ExecuteMainActionAsync()
         {
-            if (TrySyncSchemaFromConvertParameters() == false)
+            if (await TrySyncSchemaFromConvertParametersAsync() == false)
                 return;
 
             await ConvertToPhjsonAsync();
@@ -285,14 +285,14 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                 var profiles = _session.GetProfilesForExecution();
                 if (profiles.Count == 0)
                 {
-                    _messageDialogService.ShowWarning("Не выбраны источники Excel для конвертации.", "Ошибка");
+                    await _messageDialogService.ShowWarningAsync("Не выбраны источники Excel для конвертации.", "Ошибка");
                     return;
                 }
 
                 var validationResult = _session.Validate();
                 if (validationResult.HasErrors)
                 {
-                    _messageDialogService.ShowWarning(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
+                    await _messageDialogService.ShowWarningAsync(ExcelImportValidationMessageBuilder.Build(validationResult), "Ошибка проверки данных");
                     return;
                 }
 
@@ -303,7 +303,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
                     return;
 
                 File.WriteAllText(savePath, jsonResult);
-                _messageDialogService.ShowInformation("Файл успешно создан!", "Успех");
+                await _messageDialogService.ShowInformationAsync("Файл успешно создан!", "Успех");
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = savePath,
@@ -312,7 +312,7 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             }
             catch (Exception ex)
             {
-                _messageDialogService.ShowError($"Произошла ошибка: {ex.Message}", "Ошибка");
+                await _messageDialogService.ShowErrorAsync($"Произошла ошибка: {ex.Message}", "Ошибка");
             }
             finally
             {
@@ -320,18 +320,18 @@ namespace Philadelphus.Presentation.ViewModels.ImportExport
             }
         }
 
-        private bool TrySyncSchemaFromConvertParameters()
+        private async Task<bool> TrySyncSchemaFromConvertParametersAsync()
         {
             if (_session.Schema == null || string.IsNullOrWhiteSpace(_session.SelectedFilePath))
             {
-                _messageDialogService.ShowWarning("Сначала выберите файл Excel.", "Ошибка");
+                await _messageDialogService.ShowWarningAsync("Сначала выберите файл Excel.", "Ошибка");
                 return false;
             }
 
             var rootName = RootName?.Trim() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(rootName))
             {
-                _messageDialogService.ShowWarning("Укажите наименование корня.", "Ошибка");
+                await _messageDialogService.ShowWarningAsync("Укажите наименование корня.", "Ошибка");
                 return false;
             }
 

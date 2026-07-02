@@ -3,7 +3,6 @@ using global::Avalonia.Controls;
 using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Threading;
 
-using Philadelphus.Presentation.Avalonia.Helpers;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 

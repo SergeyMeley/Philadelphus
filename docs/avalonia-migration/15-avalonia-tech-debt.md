@@ -61,17 +61,13 @@
 
 ## H. Инфраструктура показа окон / sync-over-async
 
-**Сделано (частично).** Все файловые диалоги переведены на true-async и больше не используют `UiSync`:
-- В интерфейсы `IFileDialogService`/`IMessageDialogService`/`IDialogService` добавлены `*Async`-методы (дефолт — обёртка поверх синхронных через default-interface-methods, чтобы WPF не править); Avalonia-реализации переопределяют их нативно-асинхронно (без моста).
+**Сделано.** Мост `UiSync` удалён:
+- В интерфейсы `IFileDialogService`/`IMessageDialogService`/`IDialogService` добавлены `*Async`-методы (дефолт — обёртка поверх синхронных через default-interface-methods, чтобы WPF не править); Avalonia-реализации переопределяют их нативно-асинхронно.
 - Вызыватели переведены на `await …Async` + `IAsyncRelayCommandFactory`/`AsyncRelayCommand`: `ExcelImportDesignerVM`, `ImportFromExcelVM`, `ImportExportControlVM`, `TreeLeaveVM`, `ApplicationSettingsControlVM`.
+- Оставшиеся сообщения из синхронных границ (`INotificationService.ModalWindowHandler`, `ConfigurationService.UpdateConfigFile<T>`) больше не блокируют UI: они запускают async-показ сообщений без синхронного ожидания.
+- Синхронные методы Avalonia-реализаций `IFileDialogService`/`IMessageDialogService`/`IDialogService` больше не имитируют блокирующую семантику поверх Avalonia async API и явно требуют использовать `*Async`.
 
-**Осознанно оставлено (мост `UiSync` сохранён).** Полностью удалить `UiSync` нельзя без правок контрактов Core. Окна сообщений вызываются с синхронных границ:
-- `INotificationService.ModalWindowHandler` — Core-делегат `delegate bool NotificationHandler(Notification)`, синхронный, общий для 6 типов обработчиков, вызывается синхронно в `NotificationService.ProcessNotification`; `SendModalWindow/SendTextMessage` дёргаются синхронно из множества мест. `ModalWindowNotificationsControlVM.ShowModal` назначается этим обработчиком.
-- `ConfigurationService.UpdateConfigFile<T>(...)` — синхронный сервисный метод (`bool`) в цепочке сохранения конфигов; использует `_dialogService.ShowWarning(...)`.
-
-Поэтому синхронные методы сервисов диалогов и `UiSync.RunSync` оставлены работать на этих границах. `UiSync.RunSync` корректен (вложенный цикл диспетчера `DispatcherFrame` + `Dispatcher.PushFrame`, не busy-loop). Дальнейшее удаление моста вынесено в отдельную карточку тех-долга (далёкое будущее) — см. ниже.
-
-**Долг (отдельная карточка).** Сделать `NotificationHandler` асинхронным (`Func<Notification, Task<bool>>` или эквивалент), перевести `NotificationService.ProcessNotification` и всех синхронных отправителей уведомлений на async, перевести `ConfigurationService.UpdateConfigFile` на async, мигрировать оставшиеся `ShowError/ShowWarning/ShowInformation` на `*Async`, после чего удалить синхронные методы сервисов диалогов и `UiSync`. Затрагивает доменный слой и тесты — высокий риск, требует отдельной проработки.
+**Остаток не считается миграционным долгом.** `INotificationService.ModalWindowHandler` и `NotificationService.ProcessNotification` остаются синхронными Core-контрактами (`delegate bool NotificationHandler(Notification)`). Полный перевод уведомлений на `Func<Notification, Task<bool>>` и async-цепочку отправителей — отдельный архитектурный рефакторинг Core/тестов, не требующийся для завершения Avalonia-миграции.
 
 - `AvaloniaWindowService.ShowDialog` показывает окно модально, но без синхронного ожидания закрытия (Avalonia `ShowDialog` асинхронный; результат `bool?` сейчас не используется). Если понадобится результат диалога — переводить вызов в async.
 

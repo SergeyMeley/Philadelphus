@@ -20,8 +20,8 @@
 
         string? BrowseFolder(string? title = null, string? initialDirectory = null);
 
-        // Async-версии (дефолт — обёртка поверх синхронных; Avalonia переопределяет на true-async,
-        // чтобы не блокировать UI-поток мостом UiSync).
+        // Async-версии (дефолт — обёртка поверх синхронных; async-first платформы
+        // переопределяют на нативную реализацию без блокировки UI-потока).
         Task<string?> BrowseLocalFileAsync() => Task.FromResult(BrowseLocalFile());
 
         Task<string?> OpenExcelFileAsync() => Task.FromResult(OpenExcelFile());
