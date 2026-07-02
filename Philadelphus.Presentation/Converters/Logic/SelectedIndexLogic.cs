@@ -9,6 +9,6 @@
         /// Возвращает 1-based номер (index + 1) в виде строки.
         /// </summary>
         public static string Convert(object? value)
-            => value is int index ? (index + 1).ToString() : string.Empty;
+            => value is null ? string.Empty : ((int)value + 1).ToString();
     }
 }
