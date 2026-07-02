@@ -9,6 +9,8 @@
 - Предпочитаем дефолтные стили Avalonia вместо точечных WPF-микрозначений.
 - Конструкции, вынужденные платформой (`global::Avalonia.*`, `value!`, `object?` и т.п.), — норма; в долг идёт только опционально-косметическое.
 
+Итог финального прохода: активных пунктов миграционного техдолга в разделах A, D–M не осталось. Оставшиеся упоминания — это журнал принятых решений или будущие задачи вне рамок миграции (формулы, полный async-рефакторинг Core-уведомлений, удаление WPF-проекта, обновление библиотек расширений, нагрузочное тестирование инфраструктуры).
+
 ---
 
 ## A. Лента (Ribbon.Avalonia) — детальная настройка
@@ -66,6 +68,7 @@
 - Вызыватели переведены на `await …Async` + `IAsyncRelayCommandFactory`/`AsyncRelayCommand`: `ExcelImportDesignerVM`, `ImportFromExcelVM`, `ImportExportControlVM`, `TreeLeaveVM`, `ApplicationSettingsControlVM`.
 - Оставшиеся сообщения из синхронных границ (`INotificationService.ModalWindowHandler`, `ConfigurationService.UpdateConfigFile<T>`) больше не блокируют UI: они запускают async-показ сообщений без синхронного ожидания.
 - Синхронные методы Avalonia-реализаций `IFileDialogService`/`IMessageDialogService`/`IDialogService` больше не имитируют блокирующую семантику поверх Avalonia async API и явно требуют использовать `*Async`.
+- Smoke QA по H пройден вручную: файловые диалоги, Excel import-сценарии и модальные уведомления проверены после удаления моста.
 
 **Остаток не считается миграционным долгом.** `INotificationService.ModalWindowHandler` и `NotificationService.ProcessNotification` остаются синхронными Core-контрактами (`delegate bool NotificationHandler(Notification)`). Полный перевод уведомлений на `Func<Notification, Task<bool>>` и async-цепочку отправителей — отдельный архитектурный рефакторинг Core/тестов, не требующийся для завершения Avalonia-миграции.
 
@@ -87,13 +90,13 @@
 
 ## K. Прочее
 
-- `KafkaConsumer.Dispose`: убран двойной `Close` (graceful Close делается в `ExecuteAsync.finally`) — зафиксировано как осознанное изменение, проверить при нагрузочном тесте.
+- `KafkaConsumer.Dispose`: убран двойной `Close` (graceful Close делается в `ExecuteAsync.finally`) — зафиксировано как осознанное изменение; нагрузочный тест Kafka относится к инфраструктурной проверке, а не к миграционному долгу Avalonia.
 - Тема: **реализовано** — переключатель Светлая/Тёмная/Как в системе (вкладка ленты «Вид» → группа «Тема»), дефолт «Как в системе»; применение `RequestedThemeVariant`, сохранение в `AppearanceConfig:ThemeString` (presentation-конфиг, не Core). Жёсткие светлые цвета (фоны/рамки/вторичный текст) переведены на `DynamicResource` Fluent. **Dark QA пройден вручную по экранам.**
 - Иконки: **SVG spike расширен на используемые Avalonia-иконки, визуальный QA пройден вручную** — не-логотипные PNG-иконки в Ribbon, MessageLog, LaunchWindow, RepositoryExplorer/Attributes/FormulaBar и дереве репозитория заменены на минималистичные SVG из `Assets/Icons/svg/light` и `Assets/Icons/svg/dark`; цвет задаётся прямо в SVG-файлах, `ThemedSvg` строит путь по `Icon` и переключает его при смене `ActualThemeVariant`, динамические `AppIcon`-привязки идут через `IconNameConverter`. Логотип приложения (`philadelphus_logo_64.png`/`.ico`) остаётся PNG. Миграционный долг по PNG→SVG закрыт; дальнейшая замена временных минималистичных SVG на финальные дизайнерские версии — отдельная продуктовая полировка.
 
 ## L. Лента — DataContext групп vs RibbonTab
 
-`Ribbon.Avalonia` выносит группы выбранной вкладки в свой контент, поэтому `DataContext`, заданный на `RibbonTab`, **до групп не наследуется** — биндинги внутри `RibbonGroupBox` резолвятся против `DataContext` ленты. Рабочий приём: задавать `DataContext` на самой `RibbonGroupBox` (как во вкладках «Формулы»→«Пересчет», «Вид»→«Тема», «Расширения»). **Исправлено** для всех затронутых вкладок, включая «Расширения» (`DataContext="{Binding ExtensionsControlVM}"` перенесён с `RibbonTab` на обе группы). На текущий момент список расширений всё равно пуст — библиотеки расширений устарели после рефакторинга; раскрытие проверить после их обновления.
+`Ribbon.Avalonia` выносит группы выбранной вкладки в свой контент, поэтому `DataContext`, заданный на `RibbonTab`, **до групп не наследуется** — биндинги внутри `RibbonGroupBox` резолвятся против `DataContext` ленты. Рабочий приём: задавать `DataContext` на самой `RibbonGroupBox` (как во вкладках «Формулы»→«Пересчет», «Вид»→«Тема», «Расширения»). **Исправлено** для всех затронутых вкладок, включая «Расширения» (`DataContext="{Binding ExtensionsControlVM}"` перенесён с `RibbonTab` на обе группы). На текущий момент список расширений пуст, потому что библиотеки расширений устарели после рефакторинга; их обновление и повторная проверка раскрытия — отдельная задача вне Avalonia-миграции.
 
 ## M. Два списка на один SelectedItem (стартовое окно)
 
