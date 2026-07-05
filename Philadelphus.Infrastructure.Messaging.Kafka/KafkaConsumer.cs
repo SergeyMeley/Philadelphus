@@ -64,6 +64,7 @@ namespace Philadelphus.Infrastructure.Messaging.Kafka
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
             _consumer.Subscribe(_topic);
+            await Task.Yield();
 
             try
             {

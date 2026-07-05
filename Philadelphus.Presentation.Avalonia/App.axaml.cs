@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -7,6 +8,7 @@ using AutoMapper;
 using global::Avalonia;
 using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Markup.Xaml;
+using global::Avalonia.Threading;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,12 +88,13 @@ namespace Philadelphus.Presentation.Avalonia
                 // и игнорирует выбранную светлую/тёмную схему.
                 ApplySavedThemeEarly();
 
-                // Показываем splash сразу; тяжёлый подъём Host идёт в фоне (InitializeAsync),
-                // чтобы анимация работала на свободном UI-потоке.
-                var splash = new SplashWindow();
-                splash.Show();
+                // Основной вариант — внешний splash-процесс: его анимация не зависит от UI-dispatcher этого процесса.
+                // Если процесс не стартовал, остаёмся на встроенном окне как на безопасном fallback.
+                var splash = CreateSplashController();
 
-                _ = InitializeAsync(desktop, splash);
+                Dispatcher.UIThread.Post(
+                    () => _ = InitializeAsync(desktop, splash),
+                    DispatcherPriority.Background);
             }
 
             base.OnFrameworkInitializationCompleted();
@@ -130,22 +133,36 @@ namespace Philadelphus.Presentation.Avalonia
             }
         }
 
-        private async Task InitializeAsync(IClassicDesktopStyleApplicationLifetime desktop, SplashWindow splash)
+        private async Task InitializeAsync(IClassicDesktopStyleApplicationLifetime desktop, ISplashController splash)
         {
             var startedAt = Environment.TickCount64;
 
             try
             {
+                await Task.Delay(100).ConfigureAwait(true);
+                splash.SetStatus("Загружаю конфигурацию...");
+
                 // Подъём Host — в фоновом потоке: UI-поток свободен для анимации splash.
                 await Task.Run(() =>
                 {
+                    splash.SetStatus("Собираю сервисы приложения...");
                     BuildHost();
-                    Log.Information("Запуск Host...");
-                    _host!.Start();
                 }).ConfigureAwait(true);
+
+                splash.SetStatus("Запускаю сервисы приложения...");
+                await Task.Yield();
+
+                Log.Information("Запуск Host...");
+                await Task.Run(() => _host!.StartAsync()).ConfigureAwait(true);
+
+                splash.SetStatus("Применяю тему...");
+                await Task.Yield();
 
                 // Применяем сохранённую тему до показа окон (конструктор сервиса применяет режим).
                 _ = _host!.Services.GetRequiredService<IThemeService>();
+
+                splash.SetStatus("Регистрирую окна...");
+                await Task.Yield();
 
                 var windowService = _host!.Services.GetRequiredService<AvaloniaWindowService>();
                 windowService.Register<MainWindowVM, MainWindow>();
@@ -156,10 +173,15 @@ namespace Philadelphus.Presentation.Avalonia
                 windowService.Register<AboutWindowVM, AboutWindow>();
                 windowService.Register<ExcelImportDesignerVM, ExcelImportDesignerWindow>();
 
+                splash.SetStatus("Создаю стартовое окно...");
+                await Task.Yield();
+
                 // Стартовое окно — LaunchWindow.
                 var launchWindow = _host.Services.GetRequiredService<LaunchWindow>();
                 launchWindow.DataContext = _host.Services.GetRequiredService<LaunchWindowVM>();
                 desktop.MainWindow = launchWindow;
+
+                splash.SetStatus("Открываю приложение...");
 
                 // Минимальное время показа splash, чтобы он не мелькал на быстром старте.
                 const long MinSplashMs = 1200;
@@ -180,12 +202,157 @@ namespace Philadelphus.Presentation.Avalonia
             }
         }
 
+        private static ISplashController CreateSplashController()
+        {
+            var externalSplash = ExternalSplashController.TryStart();
+            if (externalSplash != null)
+            {
+                return externalSplash;
+            }
+
+            var splash = new SplashWindow();
+            splash.Show();
+            return new WindowSplashController(splash);
+        }
+
         private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
         {
             Log.Information("Завершение приложения...");
             _host?.StopAsync().GetAwaiter().GetResult();
             _host?.Dispose();
             Log.CloseAndFlush();
+        }
+
+        private interface ISplashController
+        {
+            void SetStatus(string status);
+
+            void Close();
+        }
+
+        private sealed class WindowSplashController : ISplashController
+        {
+            private readonly SplashWindow _window;
+
+            public WindowSplashController(SplashWindow window)
+                => _window = window;
+
+            public void SetStatus(string status)
+            {
+                if (Dispatcher.UIThread.CheckAccess())
+                {
+                    _window.SetStatus(status);
+                    return;
+                }
+
+                Dispatcher.UIThread.Post(() => _window.SetStatus(status), DispatcherPriority.Background);
+            }
+
+            public void Close()
+            {
+                if (Dispatcher.UIThread.CheckAccess())
+                {
+                    _window.Close();
+                    return;
+                }
+
+                Dispatcher.UIThread.Post(_window.Close, DispatcherPriority.Background);
+            }
+        }
+
+        private sealed class ExternalSplashController : ISplashController
+        {
+            private readonly object _syncRoot = new();
+            private readonly Process _process;
+            private readonly string _closeSignalPath;
+            private readonly string _statusFilePath;
+
+            private ExternalSplashController(Process process, string statusFilePath, string closeSignalPath)
+            {
+                _process = process;
+                _statusFilePath = statusFilePath;
+                _closeSignalPath = closeSignalPath;
+            }
+
+            public static ExternalSplashController? TryStart()
+            {
+                try
+                {
+                    var processPath = Environment.ProcessPath;
+                    if (string.IsNullOrWhiteSpace(processPath))
+                    {
+                        return null;
+                    }
+
+                    var directoryPath = Path.Combine(
+                        Path.GetTempPath(),
+                        "Philadelphus.Splash",
+                        Guid.NewGuid().ToString("N"));
+
+                    Directory.CreateDirectory(directoryPath);
+                    var statusFilePath = Path.Combine(directoryPath, "status.txt");
+                    var closeSignalPath = Path.Combine(directoryPath, "close.signal");
+                    File.WriteAllText(statusFilePath, "Подготовка запуска...");
+
+                    var startInfo = new ProcessStartInfo(processPath)
+                    {
+                        UseShellExecute = false,
+                    };
+                    startInfo.ArgumentList.Add(SplashProcessHost.Argument);
+                    startInfo.ArgumentList.Add(statusFilePath);
+                    startInfo.ArgumentList.Add(closeSignalPath);
+                    startInfo.ArgumentList.Add(Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
+
+                    var process = Process.Start(startInfo);
+                    return process == null
+                        ? null
+                        : new ExternalSplashController(process, statusFilePath, closeSignalPath);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            public void SetStatus(string status)
+            {
+                lock (_syncRoot)
+                {
+                    TryWriteText(_statusFilePath, string.IsNullOrWhiteSpace(status) ? "Загрузка..." : status);
+                }
+            }
+
+            public void Close()
+            {
+                lock (_syncRoot)
+                {
+                    TryWriteText(_closeSignalPath, string.Empty);
+                }
+
+                try
+                {
+                    if (_process.HasExited == false)
+                    {
+                        _process.WaitForExit(1000);
+                    }
+                }
+                catch
+                {
+                    // Закрытие splash не должно ломать завершение запуска основного приложения.
+                }
+            }
+
+            private static void TryWriteText(string path, string text)
+            {
+                try
+                {
+                    File.WriteAllText(path, text);
+                }
+                catch
+                {
+                    // Статус splash информативный; сбой записи не критичен для запуска.
+                }
+            }
         }
 
         private void BuildHost()
