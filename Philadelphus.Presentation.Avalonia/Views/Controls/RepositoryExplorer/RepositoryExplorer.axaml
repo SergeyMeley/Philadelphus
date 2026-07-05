@@ -26,15 +26,15 @@
                 <DockPanel Grid.Row="0">
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1" Classes="toolbar"
                                 IsEnabled="{Binding !IsReadOnly}">
-                        <Button Command="{Binding GetWorkCommand}" ToolTip.Tip="Обновить из хранилища" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+						<Button Command="{Binding SaveCommand}" ToolTip.Tip="Сохранить изменения" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+							<localControls:ThemedSvg Icon="save" />
+						</Button>
+						<Button Command="{Binding GetWorkCommand}" ToolTip.Tip="Обновить из хранилища" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                             <localControls:ThemedSvg Icon="getwork" />
                         </Button>
-                        <Button Command="{Binding SaveCommand}" ToolTip.Tip="Сохранить изменения" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                            <localControls:ThemedSvg Icon="save" />
-                        </Button>
-                        <Button ToolTip.Tip="Режим редактирования" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                        <!--<Button ToolTip.Tip="Режим редактирования" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                             <localControls:ThemedSvg Icon="edit" />
-                        </Button>
+                        </Button>-->
                         <Button Command="{Binding CreateRootCommand}" ToolTip.Tip="Добавить корень" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                             <localControls:ThemedSvg Icon="root" />
                         </Button>
@@ -47,9 +47,9 @@
                         <Button Command="{Binding SoftDeleteRepositoryMemberCommand}" ToolTip.Tip="Удалить выбранный элемент репозитория" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                             <localControls:ThemedSvg Icon="delete" />
                         </Button>
-                        <Button Command="{Binding ProtectCommand}" ToolTip.Tip="Защитить" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                        <!--<Button Command="{Binding ProtectCommand}" ToolTip.Tip="Защитить" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                             <localControls:ThemedSvg Icon="protect" />
-                        </Button>
+                        </Button>-->
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" Margin="1">
                         <TextBlock VerticalAlignment="Center" Text="Представление " />
