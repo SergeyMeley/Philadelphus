@@ -48,6 +48,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private int _repositoryLoadVersion;
 
         private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
+        private TreeLeaveVM? _currentLeave;
+        private ILeaveParent? _currentLeavesOwner;
         private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
         private IReadOnlyList<ChildCollectionTableRow> _childCollectionTableRows = Array.Empty<ChildCollectionTableRow>();
 
@@ -97,6 +99,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             set
             {
                 _selectedRepositoryMember = value;
+                UpdateCurrentLeavesOwner(value);
                 RebuildChildCollectionTable();
                 OnPropertyChanged(nameof(PropertyList));
                 OnPropertyChanged(nameof(SelectedRepositoryMember));
@@ -107,6 +110,25 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 FormulaBarVM.NotifySelectedRepositoryMemberChanged();
             }
         }
+
+        /// <summary>
+        /// Текущий лист.
+        /// </summary>
+        public TreeLeaveVM? CurrentLeave
+        {
+            get => _currentLeave;
+            private set => SetProperty(ref _currentLeave, value);
+        }
+
+        /// <summary>
+        /// Текущий владелец листьев, отображаемых в таблице листов.
+        /// </summary>
+        public ILeaveParent? CurrentLeavesOwner
+        {
+            get => _currentLeavesOwner;
+            private set => SetProperty(ref _currentLeavesOwner, value);
+        }
+
         //public List<InfrastructureTypes> InfrastructureTypes
         //{
         //    get
@@ -656,6 +678,24 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.Childs));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+        }
+
+        private void UpdateCurrentLeavesOwner(IMainEntityVM<IMainEntityModel>? selectedRepositoryMember)
+        {
+            CurrentLeavesOwner = selectedRepositoryMember switch
+            {
+                TreeNodeVM node => node,
+                TreeLeaveVM leave => leave.Parent,
+                _ => null,
+            };
+            if (selectedRepositoryMember is TreeLeaveVM l)
+            {
+                CurrentLeave = l;
+            }   
+            else
+            {
+                CurrentLeave = null;
+            }
         }
 
         internal IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(Guid uuid)

@@ -6,8 +6,9 @@
                   Grid.Row="0"
                   Margin="1"
                   MinHeight="50"
-                  ItemsSource="{Binding SelectedRepositoryMember.ChildLeaves}"
-                  SelectionChanged="SelectedElementLeavesDataGrid_SelectionChanged"
+                  ItemsSource="{Binding CurrentLeavesOwner.ChildLeaves}"
+				  SelectedItem="{Binding CurrentLeave, Mode=OneWay}}"
+				  SelectionChanged="SelectedElementLeavesDataGrid_SelectionChanged"
                   AutoGenerateColumns="False"
                   CanUserResizeColumns="True">
             <DataGrid.Columns>
@@ -27,7 +28,7 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding #SelectedElementLeavesDataGrid.SelectedIndex, Converter={StaticResource selectedIndexConverter}}" FontSize="10" />
             <TextBlock Text=" / " FontSize="10" />
-            <TextBlock Text="{Binding SelectedRepositoryMember.ChildLeaves.Count}" FontSize="10" />
+            <TextBlock Text="{Binding CurrentLeavesOwner.ChildLeaves.Count}" FontSize="10" />
         </StackPanel>
     </Grid>
 </UserControl>
