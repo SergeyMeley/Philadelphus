@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO;
 
 using global::Avalonia;
@@ -8,6 +7,8 @@ using global::Avalonia.Styling;
 using global::Avalonia.Themes.Fluent;
 using global::Avalonia.Threading;
 
+using Philadelphus.Presentation.Avalonia.Infrastructure.Splash;
+using Philadelphus.Presentation.Avalonia.Infrastructure.Theme;
 using Philadelphus.Presentation.Avalonia.Views.Windows;
 
 namespace Philadelphus.Presentation.Avalonia
@@ -20,7 +21,7 @@ namespace Philadelphus.Presentation.Avalonia
         public override void Initialize()
         {
             Styles.Add(new FluentTheme());
-            ApplySavedThemeEarly();
+            AppThemeBootstrapper.ApplySavedTheme(this);
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -43,33 +44,6 @@ namespace Philadelphus.Presentation.Avalonia
             }
 
             base.OnFrameworkInitializationCompleted();
-        }
-
-        private void ApplySavedThemeEarly()
-        {
-            try
-            {
-                var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
-                if (File.Exists(path) == false)
-                {
-                    RequestedThemeVariant = ThemeVariant.Default;
-                    return;
-                }
-
-                var root = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path)) as System.Text.Json.Nodes.JsonObject;
-                var themeString = root?["AppearanceConfig"]?["ThemeString"]?.GetValue<string>();
-
-                RequestedThemeVariant = themeString?.Trim().ToLowerInvariant() switch
-                {
-                    "light" => ThemeVariant.Light,
-                    "dark" => ThemeVariant.Dark,
-                    _ => ThemeVariant.Default,
-                };
-            }
-            catch
-            {
-                RequestedThemeVariant = ThemeVariant.Default;
-            }
         }
 
         private void ApplySplashThemeResources()
@@ -130,86 +104,4 @@ namespace Philadelphus.Presentation.Avalonia
         }
     }
 
-    internal static class SplashProcessHost
-    {
-        public const string Argument = "--philadelphus-splash";
-
-        private static string? _closeSignalPath;
-        private static int _parentProcessId;
-
-        public static string? StatusFilePath { get; private set; }
-
-        public static bool ShouldClose
-            => string.IsNullOrWhiteSpace(_closeSignalPath) == false && File.Exists(_closeSignalPath);
-
-        public static bool TryInitialize(string[] args)
-        {
-            if (args.Length < 4 || args[0] != Argument)
-            {
-                return false;
-            }
-
-            StatusFilePath = args[1];
-            _closeSignalPath = args[2];
-            _ = int.TryParse(args[3], out _parentProcessId);
-            return true;
-        }
-
-        public static bool IsParentAlive()
-        {
-            if (_parentProcessId <= 0)
-            {
-                return true;
-            }
-
-            try
-            {
-                var parentProcess = Process.GetProcessById(_parentProcessId);
-                return parentProcess.HasExited == false;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static void TryCleanup()
-        {
-            TryDeleteFile(StatusFilePath);
-            TryDeleteFile(_closeSignalPath);
-
-            var directoryPath = Path.GetDirectoryName(StatusFilePath);
-            if (string.IsNullOrWhiteSpace(directoryPath))
-            {
-                return;
-            }
-
-            try
-            {
-                if (Directory.Exists(directoryPath) && Directory.GetFiles(directoryPath).Length == 0)
-                {
-                    Directory.Delete(directoryPath);
-                }
-            }
-            catch
-            {
-                // Временные файлы splash не критичны для работы приложения.
-            }
-        }
-
-        private static void TryDeleteFile(string? path)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(path) == false && File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
-            catch
-            {
-                // Временные файлы splash не критичны для работы приложения.
-            }
-        }
-    }
 }

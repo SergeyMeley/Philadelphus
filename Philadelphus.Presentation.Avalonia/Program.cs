@@ -1,5 +1,7 @@
 using global::Avalonia;
 
+using Philadelphus.Presentation.Avalonia.Infrastructure.Splash;
+
 namespace Philadelphus.Presentation.Avalonia
 {
     internal static class Program
