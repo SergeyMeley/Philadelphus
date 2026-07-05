@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Enums;
 using Philadelphus.Presentation.Infrastructure;
@@ -20,6 +21,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
     public class LaunchWindowVM : ControlBaseVM
     {
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Стартовое окно.
@@ -79,7 +81,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <summary>
         /// Имя пользователя.
         /// </summary>
-        public string UserName { get => Environment.UserName; }
+        public string UserName { get => _userService.CurrentUser.NameWithNanoid; }
         /// <summary>
         /// Заголовок.
         /// </summary>
@@ -110,6 +112,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
+            IUserService userService,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             PhiladelphusRepositoryCollectionVM repositoryCollectionVM,
             PhiladelphusRepositoryHeadersCollectionVM repositoryHeadersCollectionVM,
@@ -127,8 +130,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(repositoryCreationControlVM);
             ArgumentNullException.ThrowIfNull(applicationSettingsControlVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(userService);
 
             _commandFactory = commandFactory;
+            _userService = userService;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _repositoryCollectionVM = repositoryCollectionVM;
             _repositoryHeadersCollectionVM = repositoryHeadersCollectionVM;

@@ -11,8 +11,6 @@ namespace Philadelphus.Tests.Common.Fakes.Services
     {
         public List<string> Messages { get; } = new();
 
-        public MessagingUser CurrentUser => throw new NotImplementedException();
-
         public NotificationHandler TextMessageHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public NotificationHandler ModalWindowHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public NotificationHandler PopUpWindowHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

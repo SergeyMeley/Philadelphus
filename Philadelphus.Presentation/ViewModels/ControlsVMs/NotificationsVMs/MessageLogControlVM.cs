@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Handlers;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
@@ -25,6 +26,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
         private readonly ObservableCollection<NotificationVM> _currentMessageLogFilteredNotifications = new ObservableCollection<NotificationVM>();
         private readonly ConcurrentQueue<Notification> _pendingNotifications = new ConcurrentQueue<Notification>();
         private readonly CancellationTokenSource _flushTimerCts = new();
+        private readonly IUserService _userService;
 
         private bool _isOkMessagesVisible = true;
         private bool _isInfoMessagesVisible = true;
@@ -146,7 +148,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
         /// <summary>
         /// Пользователь системы сообщений.
         /// </summary>
-        public string MessagingUserName => _notificationService.CurrentUser.NameWithNanoid;
+        public string MessagingUserName => _userService.CurrentUser.NameWithNanoid;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="MessageLogControlVM" />.
@@ -161,9 +163,13 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
+            IUserService userService,
             IApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _userService = userService;
             _ = RunFlushTimerAsync(_flushTimerCts.Token);
 
             CopyNotificationsHistory();
@@ -176,7 +182,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
             {
                 foreach (var item in history)
                 {
-                    _currentMessageLogAllNotifications.Add(new NotificationVM(item, _notificationService));
+                    _currentMessageLogAllNotifications.Add(new NotificationVM(item, _userService));
                 }
 
                 FilterVisibleNotifications();
@@ -255,7 +261,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs.NotificationsVMs
                 if (_currentMessageLogAllNotifications.Any(x => x.Model == notification))
                     continue;
 
-                _currentMessageLogAllNotifications.Add(new NotificationVM(notification, _notificationService));
+                _currentMessageLogAllNotifications.Add(new NotificationVM(notification, _userService));
                 addedAny = true;
             }
 

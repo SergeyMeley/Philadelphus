@@ -29,6 +29,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         }
 
         protected readonly ILogger _logger;
+        private readonly string _auditUserName;
         
         /// <summary>
         /// Группа инфраструктурных сущностей.
@@ -38,10 +39,14 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         protected TContext _context { get; init; }
         protected EfInfrastructureRepositoryBase(
             ILogger logger, 
-            string connectionString)
+            string connectionString,
+            string auditUserName)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(auditUserName);
+
             _logger = logger;
             _connectionString = connectionString;       //TODO: Заменить на использование контекста на сессию с ленивой загрузкой
+            _auditUserName = auditUserName;
             _context = GetNewContext();
 
             InitDb();
@@ -210,10 +215,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
             });
         }
 
-        private static void AssignAuditInfoToTrackedGraph(DbContext context, AuditOperation operation)
+        private void AssignAuditInfoToTrackedGraph(DbContext context, AuditOperation operation)
         {
             var now = DateTime.UtcNow;
-            var userName = Environment.UserName;
+            var userName = _auditUserName;
 
             foreach (var entry in context.ChangeTracker.Entries<IMainEntity>())
             {

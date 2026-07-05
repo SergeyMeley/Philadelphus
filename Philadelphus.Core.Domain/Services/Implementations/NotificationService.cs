@@ -1,7 +1,6 @@
-using Microsoft.Extensions.Options;
-using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Handlers;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.Infrastructure.Messaging;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -17,6 +16,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
     public class NotificationService : INotificationService, IDisposable
     {
         private readonly ILogger _logger;
+        private readonly IUserService _userService;
+        private readonly MessagingUser _currentMessagingUser;
         private readonly IMessageConsumer<Notification> _mainConsumer;
         private readonly IMessageProducer<Notification> _mainProducer;
         private readonly IMessageConsumer<MessagingUser> _consumerJoinedMessageConsumer;
@@ -33,7 +34,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <summary>
         /// Текущий пользователь
         /// </summary>
-        public MessagingUser CurrentUser { get; }
+        private MessagingUser CurrentUser => _currentMessagingUser;
 
         /// <summary>
         /// Активные получатели уведомлений
@@ -96,22 +97,23 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IMessageProducer<MessagingUser> consumerJoinedMessageProducer, 
             IMessageConsumer<Notification> mainConsumer,
             IMessageProducer<Notification> mainProducer,
-            IOptions<MessagingConfig> options)
+            IUserService userService)
         {
-            ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(consumerJoinedMessageConsumer);
             ArgumentNullException.ThrowIfNull(mainConsumer);
             ArgumentNullException.ThrowIfNull(mainProducer);
             ArgumentNullException.ThrowIfNull(consumerJoinedMessageProducer);
+            ArgumentNullException.ThrowIfNull(userService);
 
             _logger = logger
                 .ForContext("SourceContext", "NotificationService");
 
-            CurrentUser = new MessagingUser(
-                Guid.CreateVersion7(), 
-                options?.Value?.MessagingUserName ?? $"{Environment.UserDomainName}\\{Environment.UserName}");
-
+            _userService = userService;
+            _currentMessagingUser = new MessagingUser(
+                _userService.CurrentUser.UserUuid,
+                _userService.CurrentUser.ManualUserName,
+                _userService.CurrentUser.AutomaticUserName);
             _consumerJoinedMessageConsumer = consumerJoinedMessageConsumer;
             _mainConsumer = mainConsumer;
             _mainProducer = mainProducer;

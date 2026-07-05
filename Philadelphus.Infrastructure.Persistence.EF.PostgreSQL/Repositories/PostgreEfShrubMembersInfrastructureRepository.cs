@@ -26,8 +26,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
         /// <param name="connectionString">Строка подключения.</param>
         public PostgreEfShrubMembersInfrastructureRepository(
             ILogger logger,
-            string connectionString)
-            : base(logger, connectionString)
+            string connectionString,
+            string auditUserName)
+            : base(logger, connectionString, auditUserName)
         {
         }
 

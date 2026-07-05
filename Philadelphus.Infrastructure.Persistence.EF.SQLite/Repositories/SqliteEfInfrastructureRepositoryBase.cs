@@ -13,8 +13,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
     {
         protected SqliteEfInfrastructureRepositoryBase(
             ILogger logger,
-            string connectionString)
-            : base(logger, connectionString)
+            string connectionString,
+            string auditUserName)
+            : base(logger, connectionString, auditUserName)
         {
         }
         protected override bool IsDuplicateTableException(Exception ex)

@@ -17,11 +17,6 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         public event Action<Notification>? HistoryUpdated;
 
         /// <summary>
-        /// Текущий пользователь
-        /// </summary>
-        public MessagingUser CurrentUser { get; }
-
-        /// <summary>
         /// Обработчик текстовых сообщений
         /// </summary>
         public NotificationHandler TextMessageHandler { get; set; }

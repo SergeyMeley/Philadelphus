@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.Identity\Philadelphus.Core.Domain.Identity.csproj" />
   </ItemGroup>
 
 </Project>

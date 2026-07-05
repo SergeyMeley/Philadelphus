@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
@@ -24,6 +25,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
+        private readonly IUserService _userService;
         private readonly IOptions<ApplicationSettingsConfig> _applicationSettings;
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
@@ -47,6 +49,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             IMapper mapper,
             ILogger logger,
             INotificationService notificationService,
+            IUserService userService,
             IOptions<ApplicationSettingsConfig> applicationSettings,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
             IOptions<DataStoragesCollectionConfig> dataStoragesCollection)
@@ -54,6 +57,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             ArgumentNullException.ThrowIfNull(mapper);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(notificationService);
+            ArgumentNullException.ThrowIfNull(userService);
             ArgumentNullException.ThrowIfNull(applicationSettings);
             ArgumentNullException.ThrowIfNull(connectionStringsCollection);
             ArgumentNullException.ThrowIfNull(dataStoragesCollection);
@@ -61,6 +65,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
+            _userService = userService;
             _applicationSettings = applicationSettings;
             _connectionStringsCollection = connectionStringsCollection;
             _dataStoragesCollection = dataStoragesCollection;
@@ -145,6 +150,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 ?? throw new InvalidOperationException("MainDataStorage не инициализирован");
 
             var path = mainDataStorage.FullName;
+            var auditUserName = _userService.CurrentUser.UserName;
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
@@ -154,9 +160,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     uuid: Guid.Parse("00000000-0000-0000-0000-19201518a07e"),
                     infrastructureType: InfrastructureTypes.SQLiteEf,
                     isDisabled: false)
-            .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}"))
-            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}"))
-            .SetRepository(new SqliteEfReportsInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-reports-data-storage.db")}"));
+            .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}", auditUserName))
+            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}", auditUserName))
+            .SetRepository(new SqliteEfReportsInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-reports-data-storage.db")}", auditUserName));
 
             var mainDataStorageModel = dataStorageBuilder.Build();
 

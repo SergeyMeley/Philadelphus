@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Philadelphus.Core.Domain.Identity\Philadelphus.Core.Domain.Identity.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.EF.SQLite\Philadelphus.Infrastructure.Persistence.EF.SQLite.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence\Philadelphus.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.Persistence.Json\Philadelphus.Infrastructure.Persistence.Json.csproj" />

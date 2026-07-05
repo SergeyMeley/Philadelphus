@@ -79,6 +79,7 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
                 $"nanoid - '{Nanoid}'; " +
                 $"код - '{Code}'; " +
                 $"источник - '{Source}'; " +
+                $"отправитель - '{SendingUser.NameWithNanoid}'; " +
                 $"тип - '{NotificationType}'; " +
                 $"критичность - '{CriticalLevel}'; " +
                 $"текст: '{Text}'";

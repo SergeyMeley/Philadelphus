@@ -13,8 +13,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
     {
         protected PostgreEfInfrastructureRepositoryBase(
             ILogger logger,
-            string connectionString)
-            : base(logger, connectionString)
+            string connectionString,
+            string auditUserName)
+            : base(logger, connectionString, auditUserName)
         {
         }
         protected override bool IsDuplicateTableException(Exception ex)

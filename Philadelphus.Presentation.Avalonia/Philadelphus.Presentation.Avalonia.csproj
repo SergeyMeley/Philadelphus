@@ -57,6 +57,7 @@
     <!-- Точка композиции: те же зависимости, что в WPF (нужны для InfrastructureRepositoryFactory,
          Kafka, Redis, Excel-импорт, отчёты, конфигурации). -->
     <ProjectReference Include="..\Philadelphus.Core.Domain\Philadelphus.Core.Domain.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.Identity\Philadelphus.Core.Domain.Identity.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ExtensionSystem\Philadelphus.Core.Domain.ExtensionSystem.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.FormulaEngine\Philadelphus.Core.Domain.FormulaEngine.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />

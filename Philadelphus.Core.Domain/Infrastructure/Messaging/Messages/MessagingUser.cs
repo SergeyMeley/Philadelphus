@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
 {
@@ -19,9 +15,28 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
         public Guid UserUuid { get; }
 
         /// <summary>
-        /// Имя пользователя.
+        /// Имя пользователя, заданное вручную.
         /// </summary>
-        public string UserName { get; }
+        public string? ManualUserName { get; }
+
+        /// <summary>
+        /// Имя пользователя, определенное автоматически.
+        /// </summary>
+        public string AutomaticUserName { get; }
+
+        /// <summary>
+        /// Отображаемое имя пользователя без технических уточнений.
+        /// </summary>
+        public string DisplayUserName => string.IsNullOrWhiteSpace(ManualUserName)
+            ? AutomaticUserName
+            : ManualUserName;
+
+        /// <summary>
+        /// Имя пользователя для логов, аудита и передачи между клиентами.
+        /// </summary>
+        public string UserName => string.IsNullOrWhiteSpace(ManualUserName)
+            ? AutomaticUserName
+            : $"{ManualUserName} [{AutomaticUserName}]";
 
         /// <summary>
         /// Короткий уникальный идентификатор Nanoid.
@@ -34,6 +49,11 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
         /// </summary>
         /// <returns>Результат выполнения операции.</returns>
         public string NameWithNanoid { get => $"{UserName} ({Nanoid})"; }
+
+        /// <summary>
+        /// Отображаемое имя с коротким уникальным идентификатором Nanoid.
+        /// </summary>
+        public string DisplayNameWithNanoid => $"{DisplayUserName} ({Nanoid})";
         
         /// <summary>
         /// Уникальный идентификатор сессии.
@@ -44,6 +64,7 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
         /// Дата и время начала сессии.
         /// </summary>
         public DateTime StartSessionDateTime { get; private set; }
+
         public bool IsActive 
         { 
             get
@@ -52,22 +73,46 @@ namespace Philadelphus.Core.Domain.Infrastructure.Messaging.Messages
                     && DateTime.UtcNow <= StartSessionDateTime + _sessionDurability;
             }
         }
+
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="MessagingUser" />.
         /// </summary>
         /// <param name="userUuid">Уникальный идентификатор пользователя.</param>
         /// <param name="userName">Имя пользователя.</param>
         public MessagingUser(Guid userUuid, string userName)
+            : this(userUuid, null, userName)
         {
+        }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="MessagingUser" />.
+        /// </summary>
+        /// <param name="userUuid">Уникальный идентификатор пользователя.</param>
+        /// <param name="manualUserName">Имя пользователя, заданное вручную.</param>
+        /// <param name="automaticUserName">Имя пользователя, определенное автоматически.</param>
+        [JsonConstructor]
+        public MessagingUser(Guid userUuid, string? manualUserName, string? automaticUserName, string? userName = null)
+        {
+            var normalizedAutomaticUserName = string.IsNullOrWhiteSpace(automaticUserName)
+                ? userName
+                : automaticUserName;
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(normalizedAutomaticUserName);
+
             UserUuid = userUuid;
-            UserName = userName;
+            ManualUserName = string.IsNullOrWhiteSpace(manualUserName)
+                ? null
+                : manualUserName.Trim();
+            AutomaticUserName = normalizedAutomaticUserName.Trim();
             UpdateSession();
         }
+
         internal void UpdateSession()
         {
             SessionUuid = Guid.CreateVersion7();
             StartSessionDateTime = DateTime.UtcNow;
         }
+
         internal static int GetSessionDurability() => (int)_sessionDurability.TotalMilliseconds;
     }
 }

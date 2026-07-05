@@ -1,6 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
-using Philadelphus.Core.Domain.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.OtherEntitiesVMs
     public class NotificationVM : ViewModelBase
     {
         private readonly Notification _model;
-        private readonly INotificationService _service;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Модель.
@@ -64,14 +64,20 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.OtherEntitiesVMs
         { 
             get
             {
-                if (_model.SendingUser.UserUuid == _service.CurrentUser.UserUuid)
+                if (_model.SendingUser.UserUuid == _userService.CurrentUser.UserUuid)
                 {
                     return "Текущий";
                 }
-                else
+
+                if (string.Equals(
+                    _model.SendingUser.DisplayUserName,
+                    _userService.CurrentUser.DisplayUserName,
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     return _model.SendingUser.NameWithNanoid;
                 }
+
+                return _model.SendingUser.DisplayNameWithNanoid;
             }
         }
 
@@ -79,17 +85,17 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.OtherEntitiesVMs
         /// Инициализирует новый экземпляр класса <see cref="NotificationVM" />.
         /// </summary>
         /// <param name="model">Модель.</param>
-        /// <param name="service">Доменный сервис.</param>
+        /// <param name="userService">Сервис данных текущего пользователя.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public NotificationVM(
             Notification model,
-            INotificationService service)
+            IUserService userService)
         {
             ArgumentNullException.ThrowIfNull(model);
-            ArgumentNullException.ThrowIfNull(service);
+            ArgumentNullException.ThrowIfNull(userService);
 
             _model = model;
-            _service = service;
+            _userService = userService;
         }
     }
 }

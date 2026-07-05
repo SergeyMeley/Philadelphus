@@ -26,8 +26,9 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories
         /// <param name="connectionString">Строка подключения.</param>
         public SqliteEfShrubMembersInfrastructureRepository(
             ILogger logger,
-            string connectionString)
-            : base(logger, connectionString)
+            string connectionString,
+            string auditUserName)
+            : base(logger, connectionString, auditUserName)
         {
         }
 

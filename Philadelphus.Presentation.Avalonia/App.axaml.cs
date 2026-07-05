@@ -15,6 +15,9 @@ using Microsoft.Extensions.Hosting;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.ExtensionSystem.Services;
 using Philadelphus.Core.Domain.Helpers;
+using Philadelphus.Core.Domain.Identity.Configurations;
+using Philadelphus.Core.Domain.Identity.Services.Implementations;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.FormulaEngine.Contracts;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
@@ -267,6 +270,8 @@ namespace Philadelphus.Presentation.Avalonia
                         context.Configuration.GetSection(nameof(PhiladelphusRepositoryHeadersCollectionConfig)));
                     services.Configure<MessagingConfig>(
                         context.Configuration.GetSection(nameof(MessagingConfig)));
+                    services.Configure<IdentityConfig>(
+                        context.Configuration.GetSection(nameof(IdentityConfig)));
 
                     // AutoMapper
                     var profileAssemblies = GetPhiladelphusProfileAssemblies();
@@ -307,6 +312,11 @@ namespace Philadelphus.Presentation.Avalonia
                     services.AddSingleton<IPhiladelphusRepositoryContentCache, DistributedPhiladelphusRepositoryContentCache>();
 
                     // Слой Core
+                    services.AddSingleton<IUserService>(sp =>
+                    {
+                        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<IdentityConfig>>();
+                        return new UserService(options.Value.UserName);
+                    });
                     services.AddSingleton<INotificationService, NotificationService>();
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
                     services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();

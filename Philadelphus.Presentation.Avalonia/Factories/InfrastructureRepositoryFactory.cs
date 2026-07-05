@@ -3,6 +3,7 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories;
 using Philadelphus.Infrastructure.Persistence.EF.SQLite.Repositories;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 
 using Serilog;
 
@@ -16,14 +17,20 @@ namespace Philadelphus.Presentation.Avalonia.Factories
     public class InfrastructureRepositoryFactory : IInfrastructureRepositoryFactory
     {
         private readonly ILogger _logger;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="InfrastructureRepositoryFactory" />.
         /// </summary>
         /// <param name="logger">Логгер.</param>
-        public InfrastructureRepositoryFactory(ILogger logger)
+        public InfrastructureRepositoryFactory(
+            ILogger logger,
+            IUserService userService)
         {
+            ArgumentNullException.ThrowIfNull(userService);
+
             _logger = logger;
+            _userService = userService;
         }
 
         /// <summary>
@@ -36,17 +43,19 @@ namespace Philadelphus.Presentation.Avalonia.Factories
         /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
         public IInfrastructureRepository Create(InfrastructureTypes infrastructureType, InfrastructureEntityGroups entityGroup, string connectionString)
         {
+            var auditUserName = _userService.CurrentUser.UserName;
+
             switch (infrastructureType)
             {
                 case InfrastructureTypes.PostgreSqlEf:
                     switch (entityGroup)
                     {
                         case InfrastructureEntityGroups.PhiladelphusRepositories:
-                            return new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString);
+                            return new PostgreEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString, auditUserName);
                         case InfrastructureEntityGroups.ShrubMembers:
-                            return new PostgreEfShrubMembersInfrastructureRepository(_logger, connectionString);
+                            return new PostgreEfShrubMembersInfrastructureRepository(_logger, connectionString, auditUserName);
                         case InfrastructureEntityGroups.Reports:
-                            return new PostgreEfReportsInfrastructureRepository(_logger, connectionString);
+                            return new PostgreEfReportsInfrastructureRepository(_logger, connectionString, auditUserName);
                         default:
                             break;
                     }
@@ -55,11 +64,11 @@ namespace Philadelphus.Presentation.Avalonia.Factories
                     switch (entityGroup)
                     {
                         case InfrastructureEntityGroups.PhiladelphusRepositories:
-                            return new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString);
+                            return new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, connectionString, auditUserName);
                         case InfrastructureEntityGroups.ShrubMembers:
-                            return new SqliteEfShrubMembersInfrastructureRepository(_logger, connectionString);
+                            return new SqliteEfShrubMembersInfrastructureRepository(_logger, connectionString, auditUserName);
                         case InfrastructureEntityGroups.Reports:
-                            return new SqliteEfReportsInfrastructureRepository(_logger, connectionString);
+                            return new SqliteEfReportsInfrastructureRepository(_logger, connectionString, auditUserName);
                         default:
                             break;
                     }
