@@ -68,7 +68,12 @@
                 <DataGridTemplateColumn Header="Сообщение" Width="*" MinWidth="400" IsReadOnly="True" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" MaxHeight="50" />
+                            <TextBlock Text="{Binding Text}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Left"
+                                       MaxHeight="50"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
