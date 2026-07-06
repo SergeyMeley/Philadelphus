@@ -17,6 +17,8 @@ namespace Philadelphus.Presentation.Converters.Logic
             => value switch
             {
                 PhiladelphusRepositoryVM => AppIcon.RepositoryLogo,
+                ShrubVM => AppIcon.Shrub,
+                WorkingTreeVM => AppIcon.WorkingTree,
                 TreeRootVM => AppIcon.TreeRoot,
                 TreeNodeVM => AppIcon.TreeNode,
                 TreeLeaveVM => AppIcon.TreeLeaf,

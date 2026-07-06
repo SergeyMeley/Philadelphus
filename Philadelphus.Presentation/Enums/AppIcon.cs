@@ -13,6 +13,8 @@
         StatusError,
         StatusAlarm,
         RepositoryLogo,
+        Shrub,
+        WorkingTree,
         TreeRoot,
         TreeNode,
         TreeLeaf,

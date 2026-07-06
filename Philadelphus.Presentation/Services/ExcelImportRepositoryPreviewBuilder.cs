@@ -49,12 +49,15 @@ namespace Philadelphus.Presentation.Services
             }
 
             var previewRepositoryVm = new PhiladelphusRepositoryVM(previewRepository, dataStoragesCollectionVm, repositoryService, _fileDialogService, _notificationService);
-            previewRepositoryVm.Childs.Clear();
 
             var rootForPreview = previewTargetRoot ?? previewTree.ContentRoot;
             if (rootForPreview != null && rootForPreview.IsSystemBase == false)
             {
-                previewRepositoryVm.Childs.Add(new TreeRootVM(rootForPreview, dataStoragesCollectionVm, repositoryService, _fileDialogService, _notificationService));
+                previewRepositoryVm.RebuildTreeItems([rootForPreview.OwningWorkingTree]);
+            }
+            else
+            {
+                previewRepositoryVm.RebuildTreeItems([]);
             }
 
             var previewExplorerVm = ActivatorUtilities.CreateInstance<RepositoryExplorerControlVM>(

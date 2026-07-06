@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -53,9 +54,16 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         private ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
        
         /// <summary>
-        /// Дочерние элементы.
+        /// Корни рабочих деревьев. Используется существующими командами и таблицами.
         /// </summary>
         public ObservableCollection<TreeRootVM> Childs { get => _childs; }
+
+        private readonly ObservableCollection<ShrubVM> _treeItems = new();
+
+        /// <summary>
+        /// Верхний уровень визуального дерева обозревателя: кустарник текущего репозитория.
+        /// </summary>
+        public ObservableCollection<ShrubVM> TreeItems => _treeItems;
 
        
         /// <summary>
@@ -106,10 +114,42 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub);
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub.ContentWorkingTrees);
 
-            foreach (var item in repositoryModel.ContentShrub.ContentWorkingTrees.Select(x => x.ContentRoot))
+            RebuildTreeItems();
+        }
+
+        /// <summary>
+        /// Перестраивает коллекции визуального дерева из текущей доменной модели.
+        /// </summary>
+        public void RebuildTreeItems()
+            => RebuildTreeItems(_model.ContentShrub?.ContentWorkingTrees);
+
+        /// <summary>
+        /// Перестраивает коллекции визуального дерева из указанного набора рабочих деревьев.
+        /// </summary>
+        public void RebuildTreeItems(IEnumerable<WorkingTreeModel>? workingTrees)
+        {
+            Childs.Clear();
+            TreeItems.Clear();
+
+            var shrub = _model.ContentShrub;
+            if (shrub == null)
             {
-                Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, service, _fileDialogService, notificationService));
+                return;
             }
+
+            var visibleWorkingTrees = (workingTrees ?? []).ToList();
+            foreach (var item in visibleWorkingTrees.Select(x => x.ContentRoot))
+            {
+                if (item != null)
+                {
+                    Childs.Add(new TreeRootVM(item, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
+                }
+            }
+
+            TreeItems.Add(new ShrubVM(shrub, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService, visibleWorkingTrees));
+            OnPropertyChanged(nameof(Childs));
+            OnPropertyChanged(nameof(TreeItems));
+            OnPropertyChanged(nameof(ChildsCount));
         }
     }
 }

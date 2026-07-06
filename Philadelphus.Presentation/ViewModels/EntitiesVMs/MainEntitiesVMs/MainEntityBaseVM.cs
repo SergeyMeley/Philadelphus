@@ -90,6 +90,16 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
         public string StateVisibilityToolTip => StateVisibilityInfoBuilder.Build(_model).ToolTip;
 
+        /// <summary>
+        /// Дочерние элементы для визуального дерева обозревателя.
+        /// </summary>
+        public virtual IEnumerable<IMainEntityVM> TreeChilds => Array.Empty<IMainEntityVM>();
+
+        /// <summary>
+        /// Нужно ли раскрыть элемент в TreeView при первичном отображении.
+        /// </summary>
+        public virtual bool IsTreeExpandedByDefault => false;
+
         public long Sequence 
         { 
             get

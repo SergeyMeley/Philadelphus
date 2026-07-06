@@ -50,6 +50,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
         /// </summary>
         public ObservableCollection<TreeNodeVM> Childs => _childNodes;
 
+        public override IEnumerable<IMainEntityVM> TreeChilds => _childNodes;
+
         #endregion
 
         #region [ Construct ]

@@ -331,7 +331,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 {
                     var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
                     var result = _service.CreateTreeRoot(tree);
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(result, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
+                    _philadelphusRepositoryVM.RebuildTreeItems();
                     NotifyRepositoryTreeChanged();
                 },
                 ce =>
@@ -399,7 +399,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _softDeleteRepositoryMemberCommand ??= _commandFactory.Create(
                 obj =>
                 {
-                    if (_selectedRepositoryMember.Model is IContentModel c)
+                    if (CanSoftDeleteSelectedRepositoryMember()
+                        && _selectedRepositoryMember?.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
                         NotifyRepositoryTreeChanged();
@@ -408,7 +409,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 ce =>
                 {
                     return CanModifyRepository()
-                        && _selectedRepositoryMember?.Model is IContentModel;
+                        && CanSoftDeleteSelectedRepositoryMember();
                 });
 
         public IRelayCommand SoftDeleteRepositoryMemberAttributeCommand =>
@@ -613,14 +614,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             var selectedUuid = SelectedRepositoryMember?.Uuid;
 
             SelectedRepositoryMember = null;
-            _philadelphusRepositoryVM.Childs.Clear();
-            foreach (var item in newRepo.ContentShrub.ContentWorkingTrees)
-            {
-                if (item.ContentRoot != null)
-                {
-                    _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(item.ContentRoot, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
-                }
-            }
+            _philadelphusRepositoryVM.RebuildTreeItems();
 
             if (selectedUuid.HasValue)
             {
@@ -639,7 +633,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             ArgumentNullException.ThrowIfNull(treeRoot);
 
-            _philadelphusRepositoryVM.Childs.Add(new TreeRootVM(treeRoot, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService));
+            _philadelphusRepositoryVM.RebuildTreeItems();
             NotifyRepositoryTreeChanged();
         }
 
@@ -675,6 +669,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             OnPropertyChanged(nameof(PhiladelphusRepositoryVM));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.Childs));
+            _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.TreeItems));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
             NotifyChildsPropertyChangedRecursive();
@@ -702,7 +697,60 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
+            foreach (var shrub in _philadelphusRepositoryVM.TreeItems)
+            {
+                var found = FindRepositoryMemberByUuid(shrub, uuid);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
             foreach (var root in _philadelphusRepositoryVM.Childs)
+            {
+                var found = FindRepositoryMemberByUuid(root, uuid);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        private static IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(ShrubVM shrub, Guid uuid)
+        {
+            ArgumentNullException.ThrowIfNull(shrub);
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
+            if (shrub.Uuid == uuid)
+            {
+                return shrub;
+            }
+
+            foreach (var workingTree in shrub.WorkingTrees)
+            {
+                var found = FindRepositoryMemberByUuid(workingTree, uuid);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        private static IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(WorkingTreeVM workingTree, Guid uuid)
+        {
+            ArgumentNullException.ThrowIfNull(workingTree);
+            ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
+
+            if (workingTree.Uuid == uuid)
+            {
+                return workingTree;
+            }
+
+            foreach (var root in workingTree.Roots)
             {
                 var found = FindRepositoryMemberByUuid(root, uuid);
                 if (found != null)
@@ -769,6 +817,13 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private bool CanModifyRepository()
         {
             return IsRepositoryLoading == false;
+        }
+
+        private bool CanSoftDeleteSelectedRepositoryMember()
+        {
+            return _selectedRepositoryMember is TreeRootVM
+                or TreeNodeVM
+                or TreeLeaveVM;
         }
 
         /// <summary>
@@ -889,6 +944,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         internal void NotifyChildsPropertyChangedRecursive()
         {
             OnPropertyChanged(nameof(State));
+            foreach (var item in _philadelphusRepositoryVM.TreeItems)
+            {
+                item.NotifyChildsPropertyChangedRecursive();
+            }
+
             foreach (var item in _philadelphusRepositoryVM.Childs)
             {
                 item.NotifyChildsPropertyChangedRecursive();
@@ -903,6 +963,18 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             if (parent is PhiladelphusRepositoryVM repository)
             {
+                for (int i = repository.TreeItems.Count - 1; i >= 0; i--)
+                {
+                    if (repository.TreeItems[i].State == State.ForHardDelete
+                    || repository.TreeItems[i].State == State.ForSoftDelete
+                    || repository.TreeItems[i].State == State.SoftDeleted)
+                    {
+                        repository.TreeItems.Remove(repository.TreeItems[i]);
+                    }
+                    else
+                        UpdateChildsCollection(repository.TreeItems[i]);
+                }
+
                 for (int i = repository.Childs.Count - 1; i >= 0; i--)
                 {
                     if (repository.Childs[i].State == State.ForHardDelete
@@ -913,6 +985,34 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     }
                     else
                         UpdateChildsCollection(repository.Childs[i]);
+                }
+            }
+            if (parent is ShrubVM shrub)
+            {
+                for (int i = shrub.WorkingTrees.Count - 1; i >= 0; i--)
+                {
+                    if (shrub.WorkingTrees[i].State == State.ForHardDelete
+                    || shrub.WorkingTrees[i].State == State.ForSoftDelete
+                    || shrub.WorkingTrees[i].State == State.SoftDeleted)
+                    {
+                        shrub.WorkingTrees.Remove(shrub.WorkingTrees[i]);
+                    }
+                    else
+                        UpdateChildsCollection(shrub.WorkingTrees[i]);
+                }
+            }
+            if (parent is WorkingTreeVM workingTree)
+            {
+                for (int i = workingTree.Roots.Count - 1; i >= 0; i--)
+                {
+                    if (workingTree.Roots[i].State == State.ForHardDelete
+                    || workingTree.Roots[i].State == State.ForSoftDelete
+                    || workingTree.Roots[i].State == State.SoftDeleted)
+                    {
+                        workingTree.Roots.Remove(workingTree.Roots[i]);
+                    }
+                    else
+                        UpdateChildsCollection(workingTree.Roots[i]);
                 }
             }
             if (parent is TreeRootVM root)

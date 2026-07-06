@@ -5,10 +5,15 @@
     <Grid>
         <TreeView Name="MainTreeView"
                   DataContext="{Binding PhiladelphusRepositoryVM}"
-                  ItemsSource="{Binding Childs}"
+                  ItemsSource="{Binding TreeItems}"
                   SelectionChanged="MainTreeView_SelectionChanged">
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="{Binding IsTreeExpandedByDefault}" />
+                </Style>
+            </TreeView.Styles>
             <TreeView.ItemTemplate>
-                <TreeDataTemplate ItemsSource="{Binding ChildNodes}">
+                <TreeDataTemplate ItemsSource="{Binding TreeChilds}">
                     <Grid Margin="1"
                           ColumnDefinitions="4,*"
                           RowDefinitions="*,Auto"
