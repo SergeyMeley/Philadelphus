@@ -699,6 +699,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             foreach (var shrub in _philadelphusRepositoryVM.TreeItems)
             {
+                if (shrub.Uuid == uuid)
+                {
+                    return shrub;
+                }
+
                 var found = FindRepositoryMemberByUuid(shrub, uuid);
                 if (found != null)
                 {

@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.MainEntityModelDetails">
+    <Grid ColumnDefinitions="Auto,*"
+          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+          RowSpacing="4"
+          ColumnSpacing="8">
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Основная информация:" FontWeight="Bold" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Наименование" VerticalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание" VerticalAlignment="Center" />
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Uuid" VerticalAlignment="Center" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" />
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Состояние" VerticalAlignment="Center" />
+        <TextBox Grid.Row="4" Grid.Column="1"
+                 Text="{Binding State, Mode=OneWay, Converter={StaticResource enumDisplayAttributeConverter}}"
+                 ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}"
+                 IsReadOnly="True" />
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Тип сущности" VerticalAlignment="Center" />
+        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Type, Mode=OneWay}" IsReadOnly="True" />
+
+    </Grid>
+</UserControl>

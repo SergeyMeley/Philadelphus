@@ -2,13 +2,5 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.TreeRootMemberDetails">
-    <StackPanel Spacing="4">
-        <local:PhiladelphusRepositoryMemberDetails />
-        <Expander Header="Родительский корень" HorizontalAlignment="Stretch">
-            <local:UniversalDetails DataContext="{Binding Model.ParentRepository}" />
-        </Expander>
-        <Expander Header="Родитель" HorizontalAlignment="Stretch">
-            <local:UniversalDetails DataContext="{Binding Model.Parent}" />
-        </Expander>
-    </StackPanel>
+    <local:MainEntityDetails />
 </UserControl>

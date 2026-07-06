@@ -19,6 +19,17 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
 
         private readonly ObservableCollection<TreeNodeVM> _childNodes = new ObservableCollection<TreeNodeVM>();
 
+        public string Alias
+        {
+            get => _model.Alias;
+            set
+            {
+                _model.Alias = value;
+                OnPropertyChanged(nameof(Alias));
+                NotifyStateVisibilityPropertiesChanged();
+            }
+        }
+
         public string CustomCode
         {
             get

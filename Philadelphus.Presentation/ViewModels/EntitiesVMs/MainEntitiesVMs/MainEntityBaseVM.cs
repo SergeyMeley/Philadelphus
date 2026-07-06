@@ -84,6 +84,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             }
         }
 
+        public string EntityType => _model.GetType().Name;
+
         public State ParentOwnerAggregateState => StateVisibilityInfoBuilder.Build(_model).ParentOwnerState ?? State.SavedOrLoaded;
 
         public State ChildContentAggregateState => StateVisibilityInfoBuilder.Build(_model).ChildContentState ?? State.SavedOrLoaded;

@@ -42,6 +42,17 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             }
         }
 
+        public string CustomCode
+        {
+            get => _model.CustomCode;
+            set
+            {
+                _model.CustomCode = value;
+                OnPropertyChanged(nameof(CustomCode));
+                NotifyStateVisibilityPropertiesChanged();
+            }
+        }
+
         /// <summary>
         /// Строковое значение системного листа.
         /// </summary>

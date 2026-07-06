@@ -6,56 +6,454 @@
              xmlns:mainent="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;assembly=Philadelphus.Presentation"
              xmlns:rootmem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;assembly=Philadelphus.Presentation"
              xmlns:repomem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;assembly=Philadelphus.Presentation"
+             xmlns:domainmain="clr-namespace:Philadelphus.Core.Domain.Entities.MainEntities;assembly=Philadelphus.Core.Domain"
+             xmlns:domainrepo="clr-namespace:Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;assembly=Philadelphus.Core.Domain"
+             xmlns:domainshrub="clr-namespace:Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;assembly=Philadelphus.Core.Domain"
+             xmlns:domaintree="clr-namespace:Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;assembly=Philadelphus.Core.Domain"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.UniversalDetails">
     <UserControl.DataTemplates>
         <DataTemplate DataType="infrast:DataStorageVM">
-            <local:DataStorageDetails />
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <local:DataStorageDetails />
+            </ScrollViewer>
         </DataTemplate>
         <DataTemplate DataType="mainent:PhiladelphusRepositoryHeaderVM">
-            <local:PhiladelphusRepositoryHeaderDetails />
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <local:PhiladelphusRepositoryHeaderDetails />
+            </ScrollViewer>
         </DataTemplate>
         <DataTemplate DataType="mainent:PhiladelphusRepositoryVM">
-            <local:PhiladelphusRepositoryDetails />
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.ContentShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding Model.DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="repomem:ShrubVM">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="repomem:WorkingTreeVM">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
         </DataTemplate>
         <DataTemplate DataType="repomem:TreeRootVM">
-            <StackPanel Spacing="4">
-                <local:PhiladelphusRepositoryMemberDetails />
-                <TextBlock Text="Свойства корня:" FontWeight="Bold" />
-                <TextBlock Text="Количество узлов" />
-            </StackPanel>
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningWorkingTree}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningWorkingTree.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
         </DataTemplate>
         <DataTemplate DataType="rootmem:TreeNodeVM">
-            <StackPanel Spacing="4">
-                <local:TreeRootMemberDetails />
-                <Expander Header="Свойства узла" IsExpanded="True" HorizontalAlignment="Stretch">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Количество узлов" />
-                        <TextBlock Text="Количество листов" />
-                    </StackPanel>
-                </Expander>
-            </StackPanel>
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:UniversalDetails DataContext="{Binding Model.Parent}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningWorkingTree}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningWorkingTree.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
         </DataTemplate>
         <DataTemplate DataType="rootmem:TreeLeaveVM">
-            <StackPanel Spacing="4">
-                <local:TreeRootMemberDetails />
-                <Expander Header="Свойства листа" HorizontalAlignment="Stretch" />
-            </StackPanel>
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:UniversalDetails DataContext="{Binding Parent}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningWorkingTree}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningWorkingTree.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding Model.OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="domainmain:PhiladelphusRepositoryModel">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding ContentShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="domainrepo:ShrubModel">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="domainshrub:WorkingTreeModel">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="domaintree:TreeRootModel">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент" IsEnabled="False" />
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningWorkingTree}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningWorkingTree.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="domaintree:TreeNodeModel">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:UniversalDetails DataContext="{Binding Parent}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningWorkingTree}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningWorkingTree.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DataTemplate>
+        <DataTemplate DataType="domaintree:TreeLeaveModel">
+            <TabControl Classes="compact">
+                <TabItem Classes="compact" Header="Основная информация">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Родительский элемент">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:UniversalDetails DataContext="{Binding Parent}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Дерево">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningWorkingTree}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Кустарник">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningWorkingTree.OwningShrub}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Репозиторий">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:MainEntityModelDetails DataContext="{Binding OwningRepository}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Хранилище">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:DataStorageDetails DataContext="{Binding DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Аудит">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:AuditInfoDetails DataContext="{Binding AuditInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
         </DataTemplate>
     </UserControl.DataTemplates>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Panel>
-            <ContentControl Content="{Binding}"
-                            IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNotNull}}" />
-            <Border IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNull}}"
-                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Padding="10" CornerRadius="8"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
-                    <TextBlock Text="🚫" FontSize="24" HorizontalAlignment="Center" />
-                    <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                    <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
-                </StackPanel>
-            </Border>
-        </Panel>
-    </ScrollViewer>
+    <Panel>
+        <ContentControl Content="{Binding}"
+                        IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNotNull}}" />
+        <Border IsVisible="{Binding Converter={x:Static ac:ObjectConverters.IsNull}}"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Padding="10" CornerRadius="8"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                <TextBlock Text="Элемент не выбран" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Выберите элемент для просмотра свойств" FontStyle="Italic" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Panel>
 </UserControl>

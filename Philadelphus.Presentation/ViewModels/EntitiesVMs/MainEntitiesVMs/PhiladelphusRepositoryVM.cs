@@ -44,6 +44,18 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             }
         }
 
+        public string Alias
+        {
+            get => string.Empty;
+            set { }
+        }
+
+        public string CustomCode
+        {
+            get => string.Empty;
+            set { }
+        }
+
         private ObservableCollection<IDataStorageModel> _dataStorages { get; }
       
         /// <summary>

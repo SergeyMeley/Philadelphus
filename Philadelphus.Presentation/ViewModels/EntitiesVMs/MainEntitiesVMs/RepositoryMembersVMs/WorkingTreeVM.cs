@@ -20,6 +20,23 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
 
         public override bool IsTreeExpandedByDefault => true;
 
+        public string Alias
+        {
+            get => Model.Alias;
+            set
+            {
+                Model.Alias = value;
+                OnPropertyChanged(nameof(Alias));
+                NotifyStateVisibilityPropertiesChanged();
+            }
+        }
+
+        public string CustomCode
+        {
+            get => string.Empty;
+            set { }
+        }
+
         public WorkingTreeVM(
             WorkingTreeModel workingTree,
             DataStoragesCollectionVM dataStoragesCollectionVM,
