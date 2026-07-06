@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Services.StateVisibility;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
@@ -364,11 +365,20 @@ namespace Philadelphus.Presentation.Services.Tables
                     displayTexts,
                     displayTextRefreshers,
                     editTextGetters,
-                    editTextSetters));
+                    editTextSetters,
+                    () => GetStateVisibilityInfo(child).ParentOwnerState ?? State.SavedOrLoaded,
+                    () => child is IMainEntityModel entity ? entity.State : State.SavedOrLoaded,
+                    () => GetStateVisibilityInfo(child).ChildContentState ?? State.SavedOrLoaded,
+                    () => child is IMainEntityModel entity ? StateVisibilityInfoBuilder.Build(entity).ToolTip : string.Empty));
             }
 
             return rows;
         }
+
+        private static StateVisibilityInfo GetStateVisibilityInfo(IChildrenModel child)
+            => child is IMainEntityModel entity
+                ? StateVisibilityInfoBuilder.Build(entity)
+                : new StateVisibilityInfo(null, State.SavedOrLoaded, null, string.Empty);
 
         /// <summary>
         /// Рекурсивно добавляет наследников так, чтобы дочерние элементы располагались сразу под родителем.

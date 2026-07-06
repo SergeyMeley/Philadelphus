@@ -10,6 +10,7 @@ using global::Avalonia.Data;
 using global::Avalonia.Layout;
 
 using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Presentation.Avalonia.Controls;
 using Philadelphus.Presentation.Avalonia.Converters;
 using Philadelphus.Presentation.Models.Tables;
 
@@ -89,7 +90,6 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
             var header = new TextBlock { Text = string.Empty, MinWidth = 7 };
             ToolTip.SetTip(header, column.HeaderToolTip ?? column.Header);
 
-            var column1 = column;
             var col = new DataGridTemplateColumn
             {
                 Header = header,
@@ -98,14 +98,12 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 MinWidth = 7,
                 CellTemplate = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
                 {
-                    var border = new Border();
-                    border.Bind(Border.BackgroundProperty, new Binding($"[{column1.BindingKey}]") { Converter = StateToColor });
-                    border.Bind(ToolTip.TipProperty, new Binding($"[{column1.BindingKey}]")
-                    {
-                        Converter = EnumDisplay,
-                        ConverterParameter = "Description",
-                    });
-                    return border;
+                    var stripe = new StateVisibilityStripe();
+                    stripe.Bind(StateVisibilityStripe.ParentOwnerStateProperty, new Binding(nameof(ChildCollectionTableRow.ParentOwnerAggregateState)));
+                    stripe.Bind(StateVisibilityStripe.StateProperty, new Binding(nameof(ChildCollectionTableRow.State)));
+                    stripe.Bind(StateVisibilityStripe.ChildContentStateProperty, new Binding(nameof(ChildCollectionTableRow.ChildContentAggregateState)));
+                    stripe.Bind(StateVisibilityStripe.StateVisibilityToolTipProperty, new Binding(nameof(ChildCollectionTableRow.StateVisibilityToolTip)));
+                    return stripe;
                 }),
             };
             col.CellStyleClasses.Add("statusStripe");

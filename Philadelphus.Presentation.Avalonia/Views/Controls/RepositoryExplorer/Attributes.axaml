@@ -30,8 +30,10 @@
                 <DataGridTemplateColumn Width="7" MinWidth="0" CellStyleClasses="statusStripe">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Background="{Binding State, Converter={StaticResource stateToColorConverter}}"
-                                    ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}" />
+                            <localControls:StateVisibilityStripe ParentOwnerState="{Binding ParentOwnerAggregateState}"
+                                                                 State="{Binding State}"
+                                                                 ChildContentState="{Binding ChildContentAggregateState}"
+                                                                 StateVisibilityToolTip="{Binding StateVisibilityToolTip}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

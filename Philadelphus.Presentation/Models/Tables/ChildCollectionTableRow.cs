@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
+using Philadelphus.Core.Domain.Entities.Enums;
+
 namespace Philadelphus.Presentation.Models.Tables
 {
     /// <summary>
@@ -35,6 +37,10 @@ namespace Philadelphus.Presentation.Models.Tables
 
         private readonly IReadOnlyDictionary<string, string> _keyAliases;
         private readonly IReadOnlyDictionary<string, string> _logicalKeys;
+        private readonly Func<State>? _parentOwnerAggregateStateGetter;
+        private readonly Func<State>? _stateGetter;
+        private readonly Func<State>? _childContentAggregateStateGetter;
+        private readonly Func<string>? _stateVisibilityToolTipGetter;
 
         public ChildCollectionTableRow(
             IReadOnlyDictionary<string, object?> cells,
@@ -51,7 +57,11 @@ namespace Philadelphus.Presentation.Models.Tables
             IReadOnlyDictionary<string, string?>? displayTexts = null,
             IReadOnlyDictionary<string, Func<string?>>? displayTextRefreshers = null,
             IReadOnlyDictionary<string, Func<string?>>? editTextGetters = null,
-            IReadOnlyDictionary<string, Action<string?>>? editTextSetters = null)
+            IReadOnlyDictionary<string, Action<string?>>? editTextSetters = null,
+            Func<State>? parentOwnerAggregateStateGetter = null,
+            Func<State>? stateGetter = null,
+            Func<State>? childContentAggregateStateGetter = null,
+            Func<string>? stateVisibilityToolTipGetter = null)
         {
             ArgumentNullException.ThrowIfNull(cells);
 
@@ -96,6 +106,10 @@ namespace Philadelphus.Presentation.Models.Tables
                 _keyAliases
                     .GroupBy(x => x.Value, StringComparer.Ordinal)
                     .ToDictionary(x => x.Key, x => x.First().Key, StringComparer.Ordinal));
+            _parentOwnerAggregateStateGetter = parentOwnerAggregateStateGetter;
+            _stateGetter = stateGetter;
+            _childContentAggregateStateGetter = childContentAggregateStateGetter;
+            _stateVisibilityToolTipGetter = stateVisibilityToolTipGetter;
 
             Cells = new ReadOnlyDictionary<string, object?>(_cells);
             ValueOptions = new ReadOnlyDictionary<string, IEnumerable<object>?>(_valueOptions);
@@ -145,6 +159,14 @@ namespace Philadelphus.Presentation.Models.Tables
         /// к <c>Text</c> редактируемого ComboBox — ПОЛНОСТЬЮ как в таблице атрибутов.
         /// </summary>
         public EditTextAccessor EditText { get; }
+
+        public State ParentOwnerAggregateState => _parentOwnerAggregateStateGetter?.Invoke() ?? State.SavedOrLoaded;
+
+        public State State => _stateGetter?.Invoke() ?? State.SavedOrLoaded;
+
+        public State ChildContentAggregateState => _childContentAggregateStateGetter?.Invoke() ?? State.SavedOrLoaded;
+
+        public string StateVisibilityToolTip => _stateVisibilityToolTipGetter?.Invoke() ?? string.Empty;
 
         private Action<Guid, string>? CellChanged { get; }
 
@@ -248,6 +270,10 @@ namespace Philadelphus.Presentation.Models.Tables
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayTexts)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideStates)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueOverrideToolTips)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ParentOwnerAggregateState)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ChildContentAggregateState)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StateVisibilityToolTip)));
             EditText.RaiseChanged();
             CellChanged?.Invoke(SourceUuid, ResolveLogicalKey(cellKey));
         }
