@@ -86,7 +86,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         [Display(Name = "[Все владельцы]", Description = "Все владельцы")]
         public virtual ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive 
         { 
-            get => throw new NotImplementedException(); 
+            get => Philadelphus.Core.Domain.Helpers.RecursiveRelationshipHelper.ToReadOnlyDictionary(
+                Philadelphus.Core.Domain.Helpers.RecursiveRelationshipHelper.EnumerateOwnersRecursive(this)); 
         }
 
         #endregion

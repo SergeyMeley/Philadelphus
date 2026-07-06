@@ -350,7 +350,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                         np.CreateTreeNode();
                         RebuildChildCollectionTable();
                     }
-                    _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+                    NotifyRepositoryTreeChanged();
                 },
                 ce =>
                 {
@@ -372,7 +372,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     {
                         leave.Parent.CreateTreeLeave();
                     }
-                    _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+                    NotifyRepositoryTreeChanged();
                 },
                 ce =>
                 {
@@ -388,7 +388,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     _selectedRepositoryMember.AddAttribute();
                     RebuildChildCollectionTable();
 
-                    _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+                    NotifyRepositoryTreeChanged();
                 },
                 ce =>
                 {
@@ -402,8 +402,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
-                        (_selectedRepositoryMember as ViewModelBase)?.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.State));
-                        NotifyChildsPropertyChangedRecursive();
+                        NotifyRepositoryTreeChanged();
                     }
                 },
                 ce =>
@@ -419,7 +418,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     if (_selectedRepositoryMember?.SelectedAttributeVM?.Model is IContentModel c)
                     {
                         _service.SoftDeleteShrubMember(c);
-                        _selectedRepositoryMember.SelectedAttributeVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.State));
+                        NotifyRepositoryTreeChanged();
                     }
                 },
                 ce =>
@@ -678,6 +677,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.Childs));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+            NotifyChildsPropertyChangedRecursive();
         }
 
         private void UpdateCurrentLeavesOwner(IMainEntityVM<IMainEntityModel>? selectedRepositoryMember)

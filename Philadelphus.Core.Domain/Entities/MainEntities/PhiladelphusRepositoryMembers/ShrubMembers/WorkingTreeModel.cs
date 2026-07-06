@@ -94,6 +94,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                     result.Add(leave.Uuid, leave);
                 }
 
+                foreach (var attribute in ContentAttributes)
+                {
+                    result.TryAdd(attribute.Uuid, attribute);
+                }
+
                 return result.AsReadOnly();
             }
             
@@ -103,9 +108,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Все содержимое (рекурсивно)
         /// </summary>
         [Display(Name = "[Все содержимое]", Description = "Все содержимое")]
-        public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
+        public override ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
-            get => throw new NotImplementedException(); 
+            get => RecursiveRelationshipHelper.ToReadOnlyDictionary(
+                RecursiveRelationshipHelper.EnumerateContentRecursive(this)); 
         }
 
         /// <summary>

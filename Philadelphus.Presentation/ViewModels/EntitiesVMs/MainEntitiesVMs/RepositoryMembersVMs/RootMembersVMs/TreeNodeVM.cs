@@ -27,7 +27,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             {
                 _model.Alias = value;
                 OnPropertyChanged(nameof(Alias));
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
             }
         }
 
@@ -41,7 +41,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             {
                 _model.CustomCode = value;
                 OnPropertyChanged(nameof(CustomCode));
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
             }
         }
 
@@ -143,7 +143,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
 
         internal void NotifyChildsPropertyChangedRecursive()
         {
-            OnPropertyChanged(nameof(State));
+            NotifyStateVisibilityPropertiesChanged();
             //for (int i = 0; i < ChildNodes.Count; i++)
             //{
             //    ChildNodes[i].NotifyChildsPropertyChangedRecursive();

@@ -17,7 +17,7 @@ namespace Philadelphus.Core.Domain.Interfaces
         /// <summary>
         /// Все родители (рекурсивно)
         /// </summary>
-        public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive { get; }
+        public ReadOnlyDictionary<Guid, IParentModel> AllParentsRecursive { get; }
 
         /// <summary>
         /// Путь порядковых номеров от родителя к текущему наследнику.

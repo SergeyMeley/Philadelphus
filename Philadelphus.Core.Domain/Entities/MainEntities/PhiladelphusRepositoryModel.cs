@@ -116,7 +116,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         [Display(Name = "[Все содержимое]", Description = "Все содержимое")]
         public virtual ReadOnlyDictionary<Guid, IContentModel> AllContentRecursive 
         { 
-            get => throw new NotImplementedException(); 
+            get => RecursiveRelationshipHelper.ToReadOnlyDictionary(
+                RecursiveRelationshipHelper.EnumerateContentRecursive(this)); 
         }
 
         #endregion

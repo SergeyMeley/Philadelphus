@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.Services.StateVisibility;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
@@ -51,7 +52,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             {
                 _model.Name = value;
                 OnPropertyChanged(nameof(Name));
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
             }
         }
         
@@ -65,7 +66,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             {
                 _model.Description = value;
                 OnPropertyChanged(nameof(Description));
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
             }
         }
         public AuditInfoModel AuditInfo 
@@ -82,6 +83,12 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 return _model.State;
             }
         }
+
+        public State ParentOwnerAggregateState => StateVisibilityInfoBuilder.Build(_model).ParentOwnerState ?? State.SavedOrLoaded;
+
+        public State ChildContentAggregateState => StateVisibilityInfoBuilder.Build(_model).ChildContentState ?? State.SavedOrLoaded;
+
+        public string StateVisibilityToolTip => StateVisibilityInfoBuilder.Build(_model).ToolTip;
 
         public long Sequence 
         { 
@@ -177,10 +184,19 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                     var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService, notificationService: _notificationService);
                     AttributesVMs.Add(attributeVM);
                     OnPropertyChanged(nameof(AttributesVMs));
+                    NotifyStateVisibilityPropertiesChanged();
                     return attributeVM;
                 }
             }
             return null;
+        }
+
+        protected void NotifyStateVisibilityPropertiesChanged()
+        {
+            OnPropertyChanged(nameof(State));
+            OnPropertyChanged(nameof(ParentOwnerAggregateState));
+            OnPropertyChanged(nameof(ChildContentAggregateState));
+            OnPropertyChanged(nameof(StateVisibilityToolTip));
         }
     }
 }

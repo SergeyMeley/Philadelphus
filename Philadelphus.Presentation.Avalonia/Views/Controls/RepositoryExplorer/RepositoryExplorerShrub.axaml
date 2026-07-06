@@ -12,10 +12,17 @@
                     <Grid Margin="1"
                           ColumnDefinitions="4,*"
                           RowDefinitions="*,Auto"
-                          ToolTip.Tip="{Binding State, Converter={StaticResource enumDisplayAttributeConverter}, ConverterParameter=Description}">
-                        <Rectangle Grid.RowSpan="2"
-                                   Grid.Column="0"
-                                   Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
+                          ToolTip.Tip="{Binding StateVisibilityToolTip}">
+                        <Grid Grid.RowSpan="2"
+                              Grid.Column="0"
+                              RowDefinitions="*,*,*">
+                            <Rectangle Grid.Row="0"
+                                       Fill="{Binding ParentOwnerAggregateState, Converter={StaticResource stateToColorConverter}}" />
+                            <Rectangle Grid.Row="1"
+                                       Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
+                            <Rectangle Grid.Row="2"
+                                       Fill="{Binding ChildContentAggregateState, Converter={StaticResource stateToColorConverter}}" />
+                        </Grid>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                             <localControls:ThemedSvg Icon="{Binding Converter={StaticResource iconNameConverter}}"
                                                      Width="24" Height="24" Margin="10,0,10,0" />

@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -85,9 +86,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Все родители рекурсивно.
         /// </summary>
         [Display(Name = "[Родители]", Description = "Все родители рекурсивно")]
-        public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive
+        public ReadOnlyDictionary<Guid, IParentModel> AllParentsRecursive
         {
-            get => throw new NotImplementedException();
+            get => RecursiveRelationshipHelper.ToReadOnlyDictionary(
+                RecursiveRelationshipHelper.EnumerateParentsRecursive(this));
         }
 
         #endregion

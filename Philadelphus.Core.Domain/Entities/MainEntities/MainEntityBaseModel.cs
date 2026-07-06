@@ -207,7 +207,18 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                     return default;
                 }
 
-                return (TValue)_propertiesPolicy?.OnRead((T)this, prop, field);
+                if (_propertiesPolicy == null)
+                {
+                    return field;
+                }
+
+                var value = _propertiesPolicy.OnRead((T)this, prop, field);
+                if (value == null && default(TValue) != null)
+                {
+                    return field;
+                }
+
+                return (TValue)value;
             }
             finally
             {

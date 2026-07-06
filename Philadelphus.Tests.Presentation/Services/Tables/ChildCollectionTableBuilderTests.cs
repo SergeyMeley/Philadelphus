@@ -609,8 +609,8 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
 
             public IParentModel Parent => throw new NotImplementedException();
 
-            public ReadOnlyDictionary<Guid, IOwnerModel> AllParentsRecursive => new(
-                new Dictionary<Guid, IOwnerModel>());
+            public ReadOnlyDictionary<Guid, IParentModel> AllParentsRecursive => new(
+                new Dictionary<Guid, IParentModel>());
 
             public bool ChangeParent(IParentModel newParent)
             {

@@ -273,9 +273,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Все владельцы (рекурсивно)
         /// </summary>
-        public ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive 
+        public override ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive 
         { 
-            get => throw new NotImplementedException(); 
+            get => RecursiveRelationshipHelper.ToReadOnlyDictionary(
+                RecursiveRelationshipHelper.EnumerateOwnersRecursive(this)); 
         }
 
         #endregion

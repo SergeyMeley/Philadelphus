@@ -61,7 +61,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Содержимое
         /// </summary>
         [Display(Name = "[Содержимое]", Description = "Содержимое")]
-        public override ReadOnlyDictionary<Guid, IContentModel> Content { get; }
+        public override ReadOnlyDictionary<Guid, IContentModel> Content
+        {
+            get => Attributes.ToDictionary(x => x.Uuid, x => (IContentModel)x).AsReadOnly();
+        }
 
         #endregion
 

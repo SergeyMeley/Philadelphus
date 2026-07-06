@@ -108,7 +108,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                     _model.ValueFormulaErrorCode = string.Empty;
                     _model.Value = value;
                 }
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
                 OnPropertyChanged(nameof(AssignedValue));
                 OnPropertyChanged(nameof(AssignedValueText));
                 OnPropertyChanged(nameof(DisplayedValueText));
@@ -132,7 +132,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 {
                     _model.ValueFormula = string.Empty;
                     _model.ValueFormulaErrorCode = string.Empty;
-                    OnPropertyChanged(nameof(State));
+                    NotifyStateVisibilityPropertiesChanged();
                     OnPropertyChanged(nameof(AssignedValue));
                     OnPropertyChanged(nameof(AssignedValueText));
                     OnPropertyChanged(nameof(DisplayedValueText));
@@ -163,7 +163,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             set
             {
                 AttributeValueText.SetFormulaText(_model, value);
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
                 OnPropertyChanged(nameof(AssignedValue));
                 OnPropertyChanged(nameof(AssignedValueText));
                 OnPropertyChanged(nameof(DisplayedValueText));
@@ -361,7 +361,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
         public void NotifyChildsPropertyChangedRecursive()
         {
-            OnPropertyChanged(nameof(State));
+            NotifyStateVisibilityPropertiesChanged();
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 OnPropertyChanged(nameof(AssignedValuesString));
                 OnPropertyChanged(nameof(AreValuesOverridden));
                 OnPropertyChanged(nameof(ValuesOverrideToolTip));
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
                 return true;
             }
             
@@ -411,7 +411,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 OnPropertyChanged(nameof(AssignedValuesString));
                 OnPropertyChanged(nameof(AreValuesOverridden));
                 OnPropertyChanged(nameof(ValuesOverrideToolTip));
-                OnPropertyChanged(nameof(State));
+                NotifyStateVisibilityPropertiesChanged();
                 return true;
             }
 

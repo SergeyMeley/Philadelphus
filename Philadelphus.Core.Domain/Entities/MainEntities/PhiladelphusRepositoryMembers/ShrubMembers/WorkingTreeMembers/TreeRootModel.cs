@@ -83,7 +83,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// Все наследники (рекурсивно)
         /// </summary>
         [Display(Name = "[Наследники]", Description = "Все наследники (рекурсивно)")]
-        public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive { get; }
+        public ReadOnlyDictionary<Guid, IChildrenModel> AllChildsRecursive
+        {
+            get => RecursiveRelationshipHelper.ToReadOnlyDictionary(
+                RecursiveRelationshipHelper.EnumerateChildsRecursive(this));
+        }
 
         #endregion
 
