@@ -1,7 +1,44 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
+             xmlns:repomem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;assembly=Philadelphus.Presentation"
+             xmlns:rootmem="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;assembly=Philadelphus.Presentation"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryExplorerShrub">
+    <UserControl.Resources>
+        <DataTemplate x:Key="RepositoryMemberTreeItemTemplate">
+            <Grid Margin="1"
+                  ColumnDefinitions="4,*"
+                  RowDefinitions="*,Auto"
+                  ToolTip.Tip="{Binding StateVisibilityToolTip}">
+                <Grid Grid.RowSpan="2"
+                      Grid.Column="0"
+                      RowDefinitions="*,*,*">
+                    <Rectangle Grid.Row="0"
+                               Fill="{Binding ParentOwnerAggregateState, Converter={StaticResource stateToColorConverter}}" />
+                    <Rectangle Grid.Row="1"
+                               Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
+                    <Rectangle Grid.Row="2"
+                               Fill="{Binding ChildContentAggregateState, Converter={StaticResource stateToColorConverter}}" />
+                </Grid>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                    <localControls:ThemedSvg Icon="{Binding Converter={StaticResource iconNameConverter}}"
+                                             Width="24" Height="24" Margin="10,0,10,0" />
+                    <StackPanel Margin="0,2,10,2">
+                        <TextBlock>
+                            <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                            <Run Text="{Binding Name}" FontStyle="Italic" />
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                            <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+                <Rectangle Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="{DynamicResource SystemControlForegroundBaseLowBrush}" Height="0.25" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <Grid>
         <TreeView Name="MainTreeView"
                   DataContext="{Binding PhiladelphusRepositoryVM}"
@@ -12,40 +49,41 @@
                     <Setter Property="IsExpanded" Value="{Binding IsTreeExpandedByDefault}" />
                 </Style>
             </TreeView.Styles>
-            <TreeView.ItemTemplate>
-                <TreeDataTemplate ItemsSource="{Binding TreeChilds}">
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="repomem:ShrubVM" ItemsSource="{Binding TreeChilds}">
                     <Grid Margin="1"
                           ColumnDefinitions="4,*"
-                          RowDefinitions="*,Auto"
                           ToolTip.Tip="{Binding StateVisibilityToolTip}">
-                        <Grid Grid.RowSpan="2"
-                              Grid.Column="0"
-                              RowDefinitions="*,*,*">
+                        <Grid Grid.Column="0"
+                              RowDefinitions="*,*">
                             <Rectangle Grid.Row="0"
-                                       Fill="{Binding ParentOwnerAggregateState, Converter={StaticResource stateToColorConverter}}" />
-                            <Rectangle Grid.Row="1"
                                        Fill="{Binding State, Converter={StaticResource stateToColorConverter}}" />
-                            <Rectangle Grid.Row="2"
+                            <Rectangle Grid.Row="1"
                                        Fill="{Binding ChildContentAggregateState, Converter={StaticResource stateToColorConverter}}" />
                         </Grid>
-                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <localControls:ThemedSvg Icon="{Binding Converter={StaticResource iconNameConverter}}"
                                                      Width="24" Height="24" Margin="10,0,10,0" />
-                            <StackPanel Margin="0,2,10,2">
-                                <TextBlock>
-                                    <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                                    <Run Text="{Binding Name}" FontStyle="Italic" />
-                                </TextBlock>
-                                <TextBlock>
-                                    <Run Text="Uuid: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                                    <Run Text="{Binding Uuid, Mode=OneWay}" FontStyle="Italic" />
-                                </TextBlock>
-                            </StackPanel>
+                            <TextBlock VerticalAlignment="Center">
+                                <Run Text="Наименование: " FontSize="10" FontWeight="Light" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                <Run Text="{Binding Name}" FontStyle="Italic" />
+                            </TextBlock>
                         </StackPanel>
-                        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Fill="{DynamicResource SystemControlForegroundBaseLowBrush}" Height="0.25" />
                     </Grid>
                 </TreeDataTemplate>
-            </TreeView.ItemTemplate>
+                <TreeDataTemplate DataType="repomem:WorkingTreeVM" ItemsSource="{Binding TreeChilds}">
+                    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource RepositoryMemberTreeItemTemplate}" />
+                </TreeDataTemplate>
+                <TreeDataTemplate DataType="repomem:TreeRootVM" ItemsSource="{Binding TreeChilds}">
+                    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource RepositoryMemberTreeItemTemplate}" />
+                </TreeDataTemplate>
+                <TreeDataTemplate DataType="rootmem:TreeNodeVM" ItemsSource="{Binding TreeChilds}">
+                    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource RepositoryMemberTreeItemTemplate}" />
+                </TreeDataTemplate>
+                <TreeDataTemplate DataType="rootmem:TreeLeaveVM">
+                    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource RepositoryMemberTreeItemTemplate}" />
+                </TreeDataTemplate>
+            </TreeView.DataTemplates>
         </TreeView>
     </Grid>
 </UserControl>

@@ -723,11 +723,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(shrub);
             ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
-            if (shrub.Uuid == uuid)
-            {
-                return shrub;
-            }
-
             foreach (var workingTree in shrub.WorkingTrees)
             {
                 var found = FindRepositoryMemberByUuid(workingTree, uuid);
@@ -965,14 +960,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 for (int i = repository.TreeItems.Count - 1; i >= 0; i--)
                 {
-                    if (repository.TreeItems[i].State == State.ForHardDelete
-                    || repository.TreeItems[i].State == State.ForSoftDelete
-                    || repository.TreeItems[i].State == State.SoftDeleted)
-                    {
-                        repository.TreeItems.Remove(repository.TreeItems[i]);
-                    }
-                    else
-                        UpdateChildsCollection(repository.TreeItems[i]);
+                    UpdateChildsCollection(repository.TreeItems[i]);
                 }
 
                 for (int i = repository.Childs.Count - 1; i >= 0; i--)

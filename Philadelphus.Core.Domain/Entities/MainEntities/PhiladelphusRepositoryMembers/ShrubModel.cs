@@ -1,5 +1,7 @@
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
@@ -31,6 +33,39 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ General Properties ]
 
+        /// <summary>
+        /// Наименование кустарника транслируется из репозитория: кустарник является
+        /// структурным контейнером рабочих деревьев, а не самостоятельной сущностью.
+        /// </summary>
+        public override string Name
+        {
+            get => OwningRepository.Name;
+            set => OwningRepository.Name = value;
+        }
+
+        /// <summary>
+        /// Описание кустарника транслируется из репозитория.
+        /// </summary>
+        public override string? Description
+        {
+            get => OwningRepository.Description;
+            set => OwningRepository.Description = value;
+        }
+
+        /// <summary>
+        /// Аудит кустарника транслируется из репозитория.
+        /// </summary>
+        public override AuditInfoModel AuditInfo
+        {
+            get => OwningRepository.AuditInfo;
+            set => OwningRepository.AuditInfo = value;
+        }
+
+        /// <summary>
+        /// Состояние кустарника транслируется из репозитория, чтобы индикаторы
+        /// владельцев рабочих деревьев показывали состояние репозитория.
+        /// </summary>
+        public override State State => OwningRepository.State;
 
 
         #endregion
@@ -42,12 +77,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         #endregion
 
         #region [ Ownership Properties ]
-
-        /// <summary>
-        /// Владеющий репозиторий
-        /// </summary>
-        [Display(Name = "[Репозиторий]", Description = "Владеющий репозиторий")]
-        public PhiladelphusRepositoryModel OwningRepository { get; }
 
         /// <summary>
         /// Содержащиеся рабочие деревья
@@ -143,8 +172,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             : base(uuid, owner, notificationService, propertiesPolicy)
         {
             ArgumentNullException.ThrowIfNull(owner);
-
-            OwningRepository = owner;
 
             ContentWorkingTrees = new List<WorkingTreeModel>();
         }

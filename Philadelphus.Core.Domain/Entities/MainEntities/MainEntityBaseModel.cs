@@ -76,7 +76,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Описание
         /// </summary>
         [Display(Name = "[Описание]", Description = "Описание")]
-        public string? Description
+        public virtual string? Description
         {
             get => GetValue(_description);
             set => SetValue(ref _description, value);
@@ -87,7 +87,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         /// <returns>Результат выполнения операции.</returns>
         [Display(Name = "[Аудит]", Description = "Информация для аудита")]
-        public AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
+        public virtual AuditInfoModel AuditInfo { get; set; } = new AuditInfoModel();
 
         /// <summary>
         /// Скрыт от нового использования (устаревший для бизнеса)
@@ -107,7 +107,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Состояние
         /// </summary>
         [Display(Name = "[Состояние]", Description = "Состояние элемента - создано, изменено, удалено или сохранено")]
-        public State State
+        public virtual State State
         {
             get => GetValue(_state);
         }
