@@ -125,6 +125,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             {
                 _model.IsHidden = value;
                 SaveRepositoryHeader();
+                _updatePhiladelphusRepositoryHeaders.Invoke();
                 OnPropertyChanged(nameof(IsHidden));
             }
         }

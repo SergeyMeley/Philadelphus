@@ -141,14 +141,16 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         private void RefreshFilteredCollections()
         {
             FavoritePhiladelphusRepositoryHeadersVMs.Clear();
-            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => x.IsFavorite))
+            // TODO #67065834: доработать полноценное управление скрытыми заголовками вместо временного исключения из загрузки.
+            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => x.IsHidden == false && x.IsFavorite))
             {
                 FavoritePhiladelphusRepositoryHeadersVMs.Add(item);
             }
 
             var threshold = TimeSpan.FromDays(90);
             LastPhiladelphusRepositoryHeadersVMs.Clear();
-            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => DateTime.UtcNow - x.LastOpening <= threshold))
+            // TODO #67065834: доработать полноценное управление скрытыми заголовками вместо временного исключения из загрузки.
+            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => x.IsHidden == false && DateTime.UtcNow - x.LastOpening <= threshold))
             {
                 LastPhiladelphusRepositoryHeadersVMs.Add(item);
             }
@@ -177,9 +179,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             var headers = config.Value.PhiladelphusRepositoryHeaders;
             if (headers == null)
                 return null;
-            headers.OrderByDescending(x => x.LastOpening);
 
-            foreach (var header in headers)
+            // TODO #67065834: доработать полноценное управление скрытыми заголовками вместо временного исключения из загрузки.
+            foreach (var header in headers.Where(x => x.IsHidden == false).OrderByDescending(x => x.LastOpening))
             {
                 var vm = new PhiladelphusRepositoryHeaderVM(_mapper, _mapper.Map<PhiladelphusRepositoryHeaderModel>(header), _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _philadelphusRepositoryHeadersCollectionConfig);
                 CheckPhiladelphusRepositoryAvailable(vm);
