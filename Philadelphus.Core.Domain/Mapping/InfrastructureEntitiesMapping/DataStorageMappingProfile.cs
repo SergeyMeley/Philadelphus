@@ -59,17 +59,26 @@ namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
                     if (src.HasPhiladelphusRepositoriesInfrastructureRepository)
                     {
                         var repo = repositories.SingleOrDefault(x => x is IPhiladelphusRepositoriesInfrastructureRepository);
-                        dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.PhiladelphusRepositories, repo);
+                        if (repo != null)
+                        {
+                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.PhiladelphusRepositories, repo);
+                        }
                     }
                     if (src.HasShrubMembersInfrastructureRepository)
                     {
                         var repo = repositories.SingleOrDefault(x => x is IShrubMembersInfrastructureRepository);
-                        dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.ShrubMembers, repo);
+                        if (repo != null)
+                        {
+                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.ShrubMembers, repo);
+                        }
                     }
                     if (src.HasReportsInfrastructureRepository)
                     {
                         var repo = repositories.SingleOrDefault(x => x is IReportsInfrastructureRepository);
-                        dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.Reports, repo);
+                        if (repo != null)
+                        {
+                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.Reports, repo);
+                        }
                     }
                     dest.CheckAvailableAsync();
                 });

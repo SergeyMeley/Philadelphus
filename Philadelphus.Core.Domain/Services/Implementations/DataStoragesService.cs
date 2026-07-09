@@ -114,15 +114,58 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 if (isDisabled == false)
                 {
                     if (entity.HasPhiladelphusRepositoriesInfrastructureRepository)
-                        infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories));
+                        TryAddInfrastructureRepository(
+                            infrastructureRepositories,
+                            getInfrastructureRepository,
+                            connectionString,
+                            entity,
+                            InfrastructureEntityGroups.PhiladelphusRepositories);
                     if (entity.HasShrubMembersInfrastructureRepository)
-                        infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.ShrubMembers));
+                        TryAddInfrastructureRepository(
+                            infrastructureRepositories,
+                            getInfrastructureRepository,
+                            connectionString,
+                            entity,
+                            InfrastructureEntityGroups.ShrubMembers);
                     if (entity.HasReportsInfrastructureRepository)
-                        infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.Reports));
+                        TryAddInfrastructureRepository(
+                            infrastructureRepositories,
+                            getInfrastructureRepository,
+                            connectionString,
+                            entity,
+                            InfrastructureEntityGroups.Reports);
                 }
 
                 var model = _mapper.MapDataStorage(entity, infrastructureRepositories, _logger);
                 yield return model;
+            }
+        }
+
+        private void TryAddInfrastructureRepository(
+            ICollection<IInfrastructureRepository> infrastructureRepositories,
+            Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository,
+            ConnectionStringsContainer connectionString,
+            DataStorage entity,
+            InfrastructureEntityGroups entityGroup)
+        {
+            try
+            {
+                var infrastructureRepository = getInfrastructureRepository(connectionString, entity.InfrastructureType, entityGroup);
+                if (infrastructureRepository != null)
+                {
+                    infrastructureRepositories.Add(infrastructureRepository);
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    "Не удалось инициализировать инфраструктурный репозиторий {EntityGroup} для хранилища {DataStorageName} ({DataStorageUuid}).",
+                    entityGroup,
+                    entity.Name,
+                    entity.Uuid);
+                _notificationService.SendTextMessage<DataStoragesService>(
+                    $"Не удалось инициализировать инфраструктурный репозиторий {entityGroup} для хранилища {entity.Name}");
             }
         }
 

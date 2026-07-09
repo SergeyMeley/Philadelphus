@@ -205,6 +205,12 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         {
             if (e.PropertyName == nameof(PhiladelphusRepositoryVM.IsHidden))
             {
+                if (sender is PhiladelphusRepositoryVM repository)
+                {
+                    var model = repository.Model;
+                    _collectionService.SaveChanges(ref model);
+                }
+
                 RefreshVisiblePhiladelphusRepositoriesVMs();
             }
         }

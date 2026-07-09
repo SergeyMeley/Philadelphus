@@ -49,8 +49,6 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             get
             {
-                if (_isDisabled)
-                    return null;
                 return _infrastructureRepositories;
             }
             internal set
@@ -249,7 +247,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 {
                     _logger.Information($"Task '{Task.CurrentId}'. Хранилище '{Name}'. Проверка доступности от {DateTime.Now}");
 
-                    var result = true;
+                    var result = InfrastructureRepositories.Count != 0;
                     foreach (var item in InfrastructureRepositories)
                     {
                         if (item.Value.CheckAvailability() == false)
