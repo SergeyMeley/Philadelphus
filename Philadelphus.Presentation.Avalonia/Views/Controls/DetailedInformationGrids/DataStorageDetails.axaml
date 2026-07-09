@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.DataStorageDetails">
     <Grid ColumnDefinitions="Auto,*"
-          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
           RowSpacing="4"
           ColumnSpacing="8">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" VerticalAlignment="Center" />
@@ -12,20 +12,30 @@
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Uuid" VerticalAlignment="Center" />
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Uuid, Mode=OneWay}" IsReadOnly="True" />
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Тип хранилища" VerticalAlignment="Center" />
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding InfrastructureType, Mode=OneWay}" IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding InfrastructureType, Mode=OneWay}" IsReadOnly="True" />
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Доступен" VerticalAlignment="Center" />
         <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding IsAvailable, Mode=OneWay}" VerticalAlignment="Center" />
         <TextBlock Grid.Row="5" Grid.Column="0" Text="Последняя проверка" VerticalAlignment="Center" />
         <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LastCheckTime, Mode=OneWay}" VerticalAlignment="Center" />
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="Отключен" VerticalAlignment="Center" />
-        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding IsDisabled}" VerticalAlignment="Center" />
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Скрыт" VerticalAlignment="Center" />
+        <CheckBox Grid.Row="6" Grid.Column="1"
+                  IsChecked="{Binding IsHidden, Mode=TwoWay}"
+                  IsEnabled="{Binding !$parent[UserControl].IsReadOnly}" />
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Отключен" VerticalAlignment="Center" />
+        <CheckBox Grid.Row="7" Grid.Column="1"
+                  IsChecked="{Binding IsDisabled, Mode=TwoWay}"
+                  IsEnabled="{Binding !$parent[UserControl].IsReadOnly}" />
 
-        <HeaderedContentControl Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Header="Хранимые сущности">
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="8">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Репозитории" />
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding HasPhiladelphusRepositoriesInfrastructureRepository}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Участники репозитория" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HasMainEntitiesInfrastructureRepository}" />
+        <HeaderedContentControl Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Header="Хранимые сущности">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Наличие репозиториев" />
+                <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding HasInfrastructureRepositories, Mode=OneWay}" IsEnabled="False" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Репозитории" />
+                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding HasPhiladelphusRepositoriesInfrastructureRepository, Mode=OneWay}" IsEnabled="False" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Участники репозитория" />
+                <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding HasMainEntitiesInfrastructureRepository, Mode=OneWay}" IsEnabled="False" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Отчеты" />
+                <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding HasReportsInfrastructureRepository, Mode=OneWay}" IsEnabled="False" />
             </Grid>
         </HeaderedContentControl>
     </Grid>

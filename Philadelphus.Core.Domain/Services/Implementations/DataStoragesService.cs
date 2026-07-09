@@ -110,7 +110,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
 
                 var infrastructureRepositories = new List<IInfrastructureRepository>();
-                if (entity.IsHidden == false)
+                var isDisabled = entity.IsDisabled ?? false;
+                if (isDisabled == false)
                 {
                     if (entity.HasPhiladelphusRepositoriesInfrastructureRepository)
                         infrastructureRepositories.Add(getInfrastructureRepository(connectionString, entity.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories));

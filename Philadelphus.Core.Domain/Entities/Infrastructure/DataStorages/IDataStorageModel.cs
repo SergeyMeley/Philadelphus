@@ -71,6 +71,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Состояние отключенности
         /// </summary>
+        public bool IsDisabled { get; set; }
+
+        /// <summary>
+        /// Признак скрытого элемента
+        /// </summary>
         public bool IsHidden { get; set; }
 
         /// <summary>

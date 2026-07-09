@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
 using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Presentation.Services.Interfaces;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -23,6 +24,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollection;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollection;
         private readonly IInfrastructureRepositoryFactory _infrastructureRepositoryFactory;
+        private readonly IConfigurationService _configurationService;
 
         private DataStorageVM _mainDataStorageVM;
         public DataStorageVM MainDataStorageVM
@@ -102,6 +104,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         /// <param name="connectionStringsCollection">Параметр connectionStringsCollection.</param>
         /// <param name="dataStoragesCollection">Параметр dataStoragesCollection.</param>
         /// <param name="infrastructureRepositoryFactory">Параметр infrastructureRepositoryFactory.</param>
+        /// <param name="configurationService">Сервис работы с файлами конфигурации.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public DataStoragesCollectionVM(
             ILogger logger,
@@ -110,7 +113,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             IOptions<ApplicationSettingsConfig> applicationSettings,
             IOptions<ConnectionStringsCollectionConfig> connectionStringsCollection,
             IOptions<DataStoragesCollectionConfig> dataStoragesCollection,
-            IInfrastructureRepositoryFactory infrastructureRepositoryFactory)
+            IInfrastructureRepositoryFactory infrastructureRepositoryFactory,
+            IConfigurationService configurationService)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(notificationService);
@@ -122,6 +126,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             ArgumentNullException.ThrowIfNull(dataStoragesCollection);
             ArgumentNullException.ThrowIfNull(dataStoragesCollection.Value);
             ArgumentNullException.ThrowIfNull(infrastructureRepositoryFactory);
+            ArgumentNullException.ThrowIfNull(configurationService);
 
             _logger = logger;
             _notificationService = notificationService;
@@ -130,6 +135,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             _connectionStringsCollection = connectionStringsCollection;
             _dataStoragesCollection = dataStoragesCollection;
             _infrastructureRepositoryFactory = infrastructureRepositoryFactory;
+            _configurationService = configurationService;
 
             SubscribeDataStoragesCollectionChanged();
             InitMainDataStorageVM();
@@ -169,10 +175,35 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
 
         private void DataStorageVMPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            if (sender is not DataStorageVM storage)
+                return;
+
+            if (e.PropertyName == nameof(DataStorageVM.Name)
+                || e.PropertyName == nameof(DataStorageVM.Description)
+                || e.PropertyName == nameof(DataStorageVM.IsDisabled)
+                || e.PropertyName == nameof(DataStorageVM.IsHidden))
+            {
+                SaveDataStorage(storage);
+            }
+
             if (e.PropertyName == nameof(DataStorageVM.IsHidden))
             {
                 RefreshVisibleDataStoragesVMs();
             }
+        }
+
+        private void SaveDataStorage(DataStorageVM storage)
+        {
+            var entity = _dataStoragesCollection.Value.DataStorages
+                .SingleOrDefault(x => x.Uuid == storage.Uuid);
+            if (entity == null)
+                return;
+
+            entity.Name = storage.Name;
+            entity.Description = storage.Description;
+            entity.IsDisabled = storage.IsDisabled;
+            entity.IsHidden = storage.IsHidden;
+            _configurationService.UpdateConfigFile(_applicationSettings.Value.StoragesConfigFullPath, _dataStoragesCollection);
         }
 
         private void RefreshVisibleDataStoragesVMs()

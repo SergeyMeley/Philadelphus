@@ -40,7 +40,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Репозитории БД
         /// </summary>
-        private Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> _infrastructureRepositories;
+        private Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> _infrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
 
         /// <summary>
         /// Репозитории БД
@@ -49,15 +49,13 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             get
             {
-                if (_isHidden)
+                if (_isDisabled)
                     return null;
                 return _infrastructureRepositories;
             }
             internal set
             {
-                if (_isHidden)
-                    return;
-                _infrastructureRepositories = value;
+                _infrastructureRepositories = value ?? new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
             }
         }
 
@@ -68,11 +66,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             get
             {
-                if (_isHidden)
+                if (_isDisabled)
                     return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.PhiladelphusRepositories) == false)
+                var repositories = InfrastructureRepositories;
+                if (repositories == null || repositories.ContainsKey(InfrastructureEntityGroups.PhiladelphusRepositories) == false)
                     return null;
-                return (IPhiladelphusRepositoriesInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.PhiladelphusRepositories];
+                return (IPhiladelphusRepositoriesInfrastructureRepository)repositories[InfrastructureEntityGroups.PhiladelphusRepositories];
             }
         }
 
@@ -83,11 +82,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             get
             {
-                if (_isHidden)
+                if (_isDisabled)
                     return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.ShrubMembers) == false)
+                var repositories = InfrastructureRepositories;
+                if (repositories == null || repositories.ContainsKey(InfrastructureEntityGroups.ShrubMembers) == false)
                     return null;
-                return (IShrubMembersInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.ShrubMembers];
+                return (IShrubMembersInfrastructureRepository)repositories[InfrastructureEntityGroups.ShrubMembers];
             }
         }
 
@@ -98,11 +98,12 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             get
             {
-                if (_isHidden)
+                if (_isDisabled)
                     return null;
-                if (InfrastructureRepositories.ContainsKey(InfrastructureEntityGroups.Reports) == false)
+                var repositories = InfrastructureRepositories;
+                if (repositories == null || repositories.ContainsKey(InfrastructureEntityGroups.Reports) == false)
                     return null;
-                return (IReportsInfrastructureRepository)InfrastructureRepositories[InfrastructureEntityGroups.Reports];
+                return (IReportsInfrastructureRepository)repositories[InfrastructureEntityGroups.Reports];
             }
         }
 
@@ -134,10 +135,20 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Состояние отключенности
         /// </summary>
-        private bool _isHidden;
+        private bool _isDisabled = false;
 
         /// <summary>
         /// Состояние отключенности
+        /// </summary>
+        public bool IsDisabled { get => _isDisabled; set => _isDisabled = value; }
+
+        /// <summary>
+        /// Признак скрытого элемента
+        /// </summary>
+        private bool _isHidden = false;
+
+        /// <summary>
+        /// Признак скрытого элемента
         /// </summary>
         public bool IsHidden { get => _isHidden; set => _isHidden = value; }
 
@@ -159,13 +170,15 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="name">Наименование</param>
         /// <param name="description">Описание</param>
         /// <param name="infrastructureType">Тип</param>
-        /// <param name="isHidden">Состояние отключенности</param>
+        /// <param name="isDisabled">Состояние отключенности</param>
+        /// <param name="isHidden">Признак скрытого элемента.</param>
         internal DataStorageModel(
             ILogger logger,
             Guid uuid, 
             string name, 
             string description,
             InfrastructureTypes infrastructureType, 
+            bool isDisabled,
             bool isHidden)
         {
             _logger = logger;
@@ -173,6 +186,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             Name = name;
             Description = description;
             InfrastructureType = infrastructureType;
+            IsDisabled = isDisabled;
             IsHidden = isHidden;
             InfrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
         }
@@ -184,7 +198,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <returns>Результат выполнения операции.</returns>
         public bool StartAvailableAutoChecking(int interval = 60)
         {
-            if (_isHidden)
+            if (_isDisabled)
                 return false;
             if (_isAutoChecking)
                 return false;
@@ -227,7 +241,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             var task = Task.Run(() =>
             {
-                if (_isHidden)
+                if (_isDisabled)
                 {
                     _isAvailable = false;
                 }

@@ -39,7 +39,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             ArgumentException.ThrowIfNullOrWhiteSpace(name);
             ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
-            _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled);
+            _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled, isHidden: false);
             return this;
         }
 
@@ -56,7 +56,7 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
                 return this;
             if (_storageModel == null)
                 throw new InvalidOperationException("Сначала необходимо назначить основные параметры");
-            if (_storageModel.IsHidden)
+            if (_storageModel.IsDisabled)
                 return this;
 
             if (_storageModel.InfrastructureRepositories.ContainsKey(repository.EntityGroup))

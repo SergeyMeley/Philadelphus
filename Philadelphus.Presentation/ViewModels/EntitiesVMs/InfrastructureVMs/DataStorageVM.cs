@@ -108,6 +108,18 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 OnPropertyChanged(nameof(HeaderOpacity));
             }
         }
+        public bool IsDisabled
+        {
+            get
+            {
+                return _model.IsDisabled;
+            }
+            set
+            {
+                _model.IsDisabled = value;
+                OnPropertyChanged(nameof(IsDisabled));
+            }
+        }
         public double HeaderOpacity
         {
             get

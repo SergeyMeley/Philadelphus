@@ -33,6 +33,7 @@ namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
                 .ForMember(dest => dest.HasPhiladelphusRepositoriesInfrastructureRepository, opt => opt.MapFrom(src => src.HasPhiladelphusRepositoriesInfrastructureRepository))
                 .ForMember(dest => dest.HasShrubMembersInfrastructureRepository, opt => opt.MapFrom(src => src.HasShrubMembersInfrastructureRepository))
                 .ForMember(dest => dest.HasReportsInfrastructureRepository, opt => opt.MapFrom(src => src.HasReportsInfrastructureRepository))
+                .ForMember(dest => dest.IsDisabled, opt => opt.MapFrom(src => src.IsDisabled))
                 .ForMember(dest => dest.IsHidden, opt => opt.MapFrom(src => src.IsHidden));
 
             // Сущность инфраструктуры => Модель бизнес-слоя
@@ -43,31 +44,32 @@ namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
                     src.Name,
                     src.Description,
                     src.InfrastructureType,
+                    src.IsDisabled ?? false,
                     src.IsHidden))
                 .ForMember(dest => dest.PhiladelphusRepositoriesInfrastructureRepository, opt => opt.Ignore())  // Сложная логика
                 .ForMember(dest => dest.ShrubMembersInfrastructureRepository, opt => opt.Ignore())              // Сложная логика
                 .ForMember(dest => dest.ReportsInfrastructureRepository, opt => opt.Ignore())                   // Сложная логика
                 .AfterMap((src, dest, ctx) =>
                 {
-                    if (dest.IsHidden == false)
-                    {
-                        var repositories = ctx.Items["Repositories"] as IEnumerable<IInfrastructureRepository>;
+                    if (src.IsDisabled ?? false)
+                        return;
 
-                        if (src.HasPhiladelphusRepositoriesInfrastructureRepository)
-                        {
-                            var repo = repositories.SingleOrDefault(x => x is IPhiladelphusRepositoriesInfrastructureRepository);
-                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.PhiladelphusRepositories, repo);
-                        }
-                        if (src.HasShrubMembersInfrastructureRepository)
-                        {
-                            var repo = repositories.SingleOrDefault(x => x is IShrubMembersInfrastructureRepository);
-                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.ShrubMembers, repo);
-                        }
-                        if (src.HasReportsInfrastructureRepository)
-                        {
-                            var repo = repositories.SingleOrDefault(x => x is IReportsInfrastructureRepository);
-                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.Reports, repo);
-                        }
+                    var repositories = ctx.Items["Repositories"] as IEnumerable<IInfrastructureRepository>;
+
+                    if (src.HasPhiladelphusRepositoriesInfrastructureRepository)
+                    {
+                        var repo = repositories.SingleOrDefault(x => x is IPhiladelphusRepositoriesInfrastructureRepository);
+                        dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.PhiladelphusRepositories, repo);
+                    }
+                    if (src.HasShrubMembersInfrastructureRepository)
+                    {
+                        var repo = repositories.SingleOrDefault(x => x is IShrubMembersInfrastructureRepository);
+                        dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.ShrubMembers, repo);
+                    }
+                    if (src.HasReportsInfrastructureRepository)
+                    {
+                        var repo = repositories.SingleOrDefault(x => x is IReportsInfrastructureRepository);
+                        dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.Reports, repo);
                     }
                     dest.CheckAvailableAsync();
                 });

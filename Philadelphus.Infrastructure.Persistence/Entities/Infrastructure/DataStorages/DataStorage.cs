@@ -41,10 +41,15 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataSt
         /// Указывает наличие репозитория БД отчета.
         /// </summary>
         public bool HasReportsInfrastructureRepository { get; set; }
+
+        /// <summary>
+        /// Признак отключенного хранилища. Отключенные хранилища загружаются без инфраструктурных репозиториев.
+        /// </summary>
+        public bool? IsDisabled { get; set; } = null;
         
         /// <summary>
         /// Признак скрытого элемента.
         /// </summary>
-        public bool IsHidden { get; set; }
+        public bool IsHidden { get; set; } = false;
     }
 }
