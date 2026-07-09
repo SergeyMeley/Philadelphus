@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Helpers;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Services.StateVisibility;
 using Philadelphus.Presentation.ViewModels;
@@ -81,6 +82,27 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             get
             {
                 return _model.State;
+            }
+        }
+        public bool IsHidden
+        {
+            get
+            {
+                return _model.IsHidden;
+            }
+            set
+            {
+                _model.IsHidden = value;
+                OnPropertyChanged(nameof(IsHidden));
+                OnPropertyChanged(nameof(HeaderOpacity));
+            }
+        }
+
+        public double HeaderOpacity
+        {
+            get
+            {
+                return HiddenElementPresentationHelper.GetOpacity(IsHidden);
             }
         }
 

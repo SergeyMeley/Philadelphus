@@ -107,6 +107,27 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             //}
         }
 
+        public ObservableCollection<PhiladelphusRepositoryVM> VisiblePhiladelphusRepositoriesVMs { get; }
+            = new ObservableCollection<PhiladelphusRepositoryVM>();
+
+        private bool _showHiddenPhiladelphusRepositories;
+        public bool ShowHiddenPhiladelphusRepositories
+        {
+            get
+            {
+                return _showHiddenPhiladelphusRepositories;
+            }
+            set
+            {
+                if (_showHiddenPhiladelphusRepositories == value)
+                    return;
+
+                _showHiddenPhiladelphusRepositories = value;
+                RefreshVisiblePhiladelphusRepositoriesVMs();
+                OnPropertyChanged(nameof(ShowHiddenPhiladelphusRepositories));
+            }
+        }
+
         public Dictionary<string, string>? PropertyList
         {
             get
@@ -145,6 +166,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         }
         private bool InitRepositoriesVMsCollection()
         {
+            PhiladelphusRepositoriesVMs.CollectionChanged += PhiladelphusRepositoriesVMsCollectionChanged;
+
             var storages = _dataStoragesSettingsVM.DataStoragesVMs.Select(x => x.Model);
             var repositories = _collectionService.GetPhiladelphusRepositoriesCollection(storages);
             if (repositories == null)
@@ -153,7 +176,47 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             {
                 _PhiladelphusRepositoriesVMs.Add(new PhiladelphusRepositoryVM(item, _dataStoragesSettingsVM, _service, _fileDialogService, _notificationService));
             }
+            RefreshVisiblePhiladelphusRepositoriesVMs();
             return true;
+        }
+
+        private void PhiladelphusRepositoriesVMsCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (PhiladelphusRepositoryVM repository in e.OldItems)
+                {
+                    repository.PropertyChanged -= PhiladelphusRepositoryVMPropertyChanged;
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (PhiladelphusRepositoryVM repository in e.NewItems)
+                {
+                    repository.PropertyChanged += PhiladelphusRepositoryVMPropertyChanged;
+                }
+            }
+
+            RefreshVisiblePhiladelphusRepositoriesVMs();
+        }
+
+        private void PhiladelphusRepositoryVMPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PhiladelphusRepositoryVM.IsHidden))
+            {
+                RefreshVisiblePhiladelphusRepositoriesVMs();
+            }
+        }
+
+        private void RefreshVisiblePhiladelphusRepositoriesVMs()
+        {
+            VisiblePhiladelphusRepositoriesVMs.Clear();
+            foreach (var repository in PhiladelphusRepositoriesVMs.Where(x => ShowHiddenPhiladelphusRepositories || x.IsHidden == false))
+            {
+                VisiblePhiladelphusRepositoriesVMs.Add(repository);
+            }
+            OnPropertyChanged(nameof(VisiblePhiladelphusRepositoriesVMs));
         }
         public bool CheckPhiladelphusRepositoryVMAvailable(Guid uuid, out PhiladelphusRepositoryVM outPhiladelphusRepositoryVM)
         {

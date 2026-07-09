@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
+using Philadelphus.Presentation.Helpers;
 using System.Timers;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
@@ -92,6 +93,26 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             get
             {
                 return _model.IsAvailable;
+            }
+        }
+        public bool IsHidden
+        {
+            get
+            {
+                return _model.IsHidden;
+            }
+            set
+            {
+                _model.IsHidden = value;
+                OnPropertyChanged(nameof(IsHidden));
+                OnPropertyChanged(nameof(HeaderOpacity));
+            }
+        }
+        public double HeaderOpacity
+        {
+            get
+            {
+                return HiddenElementPresentationHelper.GetOpacity(IsHidden);
             }
         }
         public DateTime? LastCheckTime 

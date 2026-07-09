@@ -6,10 +6,18 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="3*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <HeaderedContentControl Grid.Row="1" Header="Хранилища">
+
+        <CheckBox Grid.Row="1"
+                  Content="Отобразить скрытые"
+                  IsChecked="{Binding DataStoragesSettingsVM.ShowHiddenDataStorages, Mode=TwoWay}"
+                  Margin="4,2,4,2"
+                  HorizontalAlignment="Left" />
+
+        <HeaderedContentControl Grid.Row="2" Header="Хранилища">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -20,9 +28,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <lbs:DataStorageHeadersListBox Grid.Row="0" Grid.Column="0"
-                    DataStorageHeadersItemsSource="{Binding DataStoragesSettingsVM.DataStoragesVMs}"
+                    DataStorageHeadersItemsSource="{Binding DataStoragesSettingsVM.VisibleDataStoragesVMs}"
                     DataStorageHeadersSelectedItem="{Binding DataStoragesSettingsVM.SelectedDataStorageVM, Mode=TwoWay}" />
-                <!-- Сворачиваемая боковая панель деталей (вместо WPF Expander ExpandDirection=Right). -->
                 <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto,Auto">
                     <ToggleButton Grid.Column="0" x:Name="storageDetailToggle" VerticalAlignment="Stretch" Padding="2,8">
                         <LayoutTransformControl>

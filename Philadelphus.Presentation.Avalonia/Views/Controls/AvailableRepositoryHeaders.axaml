@@ -6,10 +6,18 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="3*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <HeaderedContentControl Grid.Row="1" Header="Репозитории">
+
+        <CheckBox Grid.Row="1"
+                  Content="Отобразить скрытые"
+                  IsChecked="{Binding RepositoryCollectionVM.ShowHiddenPhiladelphusRepositories, Mode=TwoWay}"
+                  Margin="4,2,4,2"
+                  HorizontalAlignment="Left" />
+
+        <HeaderedContentControl Grid.Row="2" Header="Репозитории">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -21,9 +29,8 @@
                 </Grid.ColumnDefinitions>
                 <lbs:AvailableRepositoriesListBox Grid.Row="0" Grid.Column="0"
                     DataContext="{Binding RepositoryCollectionVM}"
-                    RepositoriesItemsSource="{Binding PhiladelphusRepositoriesVMs}"
+                    RepositoriesItemsSource="{Binding VisiblePhiladelphusRepositoriesVMs}"
                     RepositoriesSelectedItem="{Binding CurrentRepositoryVM, Mode=TwoWay}" />
-                <!-- Сворачиваемая боковая панель деталей (вместо WPF Expander ExpandDirection=Right). -->
                 <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto,Auto">
                     <ToggleButton Grid.Column="0" x:Name="repoDetailToggle" VerticalAlignment="Stretch" Padding="2,8">
                         <LayoutTransformControl>
@@ -35,7 +42,7 @@
                     </ToggleButton>
                     <detail:UniversalDetails Grid.Column="1"
                                              IsVisible="{Binding #repoDetailToggle.IsChecked}"
-                                             DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryExplorerVM}"
+                                             DataContext="{Binding RepositoryCollectionVM.CurrentRepositoryVM}"
                                              Width="400" MinWidth="400" MaxWidth="700" />
                 </Grid>
                 <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="100" Content="Открыть" Command="{Binding OpenMainWindowCommand}" />

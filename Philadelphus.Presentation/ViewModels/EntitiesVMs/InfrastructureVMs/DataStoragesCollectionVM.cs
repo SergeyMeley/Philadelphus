@@ -5,6 +5,8 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Presentation.Factories.Interfaces;
 using Serilog;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
@@ -41,9 +43,33 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             set
             {
                 _dataStoragesVMs = value;
+                SubscribeDataStoragesCollectionChanged();
+                RefreshVisibleDataStoragesVMs();
                 OnPropertyChanged(nameof(DataStoragesVMs));
             }
         }
+
+        public ObservableCollection<DataStorageVM> VisibleDataStoragesVMs { get; }
+            = new ObservableCollection<DataStorageVM>();
+
+        private bool _showHiddenDataStorages;
+        public bool ShowHiddenDataStorages
+        {
+            get
+            {
+                return _showHiddenDataStorages;
+            }
+            set
+            {
+                if (_showHiddenDataStorages == value)
+                    return;
+
+                _showHiddenDataStorages = value;
+                RefreshVisibleDataStoragesVMs();
+                OnPropertyChanged(nameof(ShowHiddenDataStorages));
+            }
+        }
+
         public IEnumerable<DataStorageVM>? PhiladelphusRepositoriesDataStorageVMs
         {
             get
@@ -105,8 +131,61 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             _dataStoragesCollection = dataStoragesCollection;
             _infrastructureRepositoryFactory = infrastructureRepositoryFactory;
 
+            SubscribeDataStoragesCollectionChanged();
             InitMainDataStorageVM();
             InitDataStorages();
+            RefreshVisibleDataStoragesVMs();
+        }
+
+        private void SubscribeDataStoragesCollectionChanged()
+        {
+            if (_dataStoragesVMs == null)
+                return;
+
+            _dataStoragesVMs.CollectionChanged -= DataStoragesVMsCollectionChanged;
+            _dataStoragesVMs.CollectionChanged += DataStoragesVMsCollectionChanged;
+        }
+
+        private void DataStoragesVMsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (DataStorageVM storage in e.OldItems)
+                {
+                    storage.PropertyChanged -= DataStorageVMPropertyChanged;
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (DataStorageVM storage in e.NewItems)
+                {
+                    storage.PropertyChanged += DataStorageVMPropertyChanged;
+                }
+            }
+
+            RefreshVisibleDataStoragesVMs();
+        }
+
+        private void DataStorageVMPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DataStorageVM.IsHidden))
+            {
+                RefreshVisibleDataStoragesVMs();
+            }
+        }
+
+        private void RefreshVisibleDataStoragesVMs()
+        {
+            VisibleDataStoragesVMs.Clear();
+            if (_dataStoragesVMs == null)
+                return;
+
+            foreach (var storage in _dataStoragesVMs.Where(x => ShowHiddenDataStorages || x.IsHidden == false))
+            {
+                VisibleDataStoragesVMs.Add(storage);
+            }
+            OnPropertyChanged(nameof(VisibleDataStoragesVMs));
         }
         private bool InitMainDataStorageVM()
         {

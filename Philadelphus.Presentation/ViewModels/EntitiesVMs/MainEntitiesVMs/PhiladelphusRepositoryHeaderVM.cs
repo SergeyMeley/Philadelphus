@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Presentation.Helpers;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -134,7 +135,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         {
             get
             {
-                return IsHidden ? 0.55 : 1.0;
+                return HiddenElementPresentationHelper.GetOpacity(IsHidden);
             }
         }
         public State State

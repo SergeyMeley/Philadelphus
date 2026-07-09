@@ -14,7 +14,7 @@
             </ListBox.Styles>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12">
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" Opacity="{Binding HeaderOpacity}">
                         <TextBlock Grid.Column="0" Grid.Row="0">
                             <Run Text="Наименование: '" FontWeight="Light" /><Run Text="{Binding Name, Mode=OneWay}" /><Run Text="'. " />
                         </TextBlock>
