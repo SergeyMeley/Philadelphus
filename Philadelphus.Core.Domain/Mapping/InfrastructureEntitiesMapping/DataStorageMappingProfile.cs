@@ -60,30 +60,11 @@ namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
 
                     var repositories = ctx.Items["Repositories"] as IEnumerable<IInfrastructureRepository>;
 
-                    if (src.HasPhiladelphusRepositoriesInfrastructureRepository)
+                    foreach (var repository in repositories ?? Enumerable.Empty<IInfrastructureRepository>())
                     {
-                        var repo = repositories.SingleOrDefault(x => x is IPhiladelphusRepositoriesInfrastructureRepository);
-                        if (repo != null)
-                        {
-                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.PhiladelphusRepositories, repo);
-                        }
+                        dest.InfrastructureRepositories[repository.EntityGroup] = repository;
                     }
-                    if (src.HasShrubMembersInfrastructureRepository)
-                    {
-                        var repo = repositories.SingleOrDefault(x => x is IShrubMembersInfrastructureRepository);
-                        if (repo != null)
-                        {
-                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.ShrubMembers, repo);
-                        }
-                    }
-                    if (src.HasReportsInfrastructureRepository)
-                    {
-                        var repo = repositories.SingleOrDefault(x => x is IReportsInfrastructureRepository);
-                        if (repo != null)
-                        {
-                            dest.InfrastructureRepositories.Add(InfrastructureEntityGroups.Reports, repo);
-                        }
-                    }
+
                     dest.CheckAvailableAsync();
                 });
         }

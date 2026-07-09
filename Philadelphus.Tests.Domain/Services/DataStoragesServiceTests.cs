@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Philadelphus.Core.Domain.Configurations;
+using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
@@ -91,6 +92,28 @@ public class DataStoragesServiceTests
         result.Should().ContainSingle();
         result[0].HasPhiladelphusRepositoriesInfrastructureRepository.Should().BeFalse();
         notificationService.Messages.Should().ContainSingle(x => x.Contains(InfrastructureEntityGroups.PhiladelphusRepositories.ToString()));
+    }
+
+    [Fact]
+    public void MapDataStorage_RepositoryPassedWithFalseLegacyFlag_SetsHasFlagFromRepository()
+    {
+        // Arrange
+        var mapperConfiguration = new MapperConfiguration(
+            cfg => cfg.AddProfile<DataStorageMappingProfile>(),
+            NullLoggerFactory.Instance);
+        var mapper = mapperConfiguration.CreateMapper();
+        var storage = CreateDataStorage(
+            Guid.CreateVersion7(),
+            isHidden: false,
+            isDisabled: false,
+            hasPhiladelphusRepository: false);
+        var repository = CreatePhiladelphusRepository();
+
+        // Act
+        var result = mapper.MapDataStorage(storage, new[] { repository }, Mock.Of<ILogger>());
+
+        // Assert
+        result.HasPhiladelphusRepositoriesInfrastructureRepository.Should().BeTrue();
     }
 
     private static DataStoragesService CreateSut(
