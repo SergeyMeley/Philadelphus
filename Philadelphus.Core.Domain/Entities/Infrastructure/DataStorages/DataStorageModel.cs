@@ -12,6 +12,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
     /// </summary>
     public class DataStorageModel : IDataStorageModel, IDisposable
     {
+        /// <summary>
+        /// Уникальный идентификатор основного хранилища.
+        /// </summary>
+        public static Guid MainDataStorageUuid { get => Guid.Parse("00000000-0000-0000-0000-19201518a07e"); }
+
         private readonly ILogger _logger;
         private System.Timers.Timer? _timer;
 
@@ -25,22 +30,82 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Наименование
         /// </summary>
-        public string Name { get; set; }
+        private string _name = string.Empty;
+
+        /// <summary>
+        /// Наименование
+        /// </summary>
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (IsMainDataStorage)
+                    return;
+
+                _name = value;
+            }
+        }
 
         /// <summary>
         /// Описание
         /// </summary>
-        public string Description { get; set; }
+        private string _description = string.Empty;
+
+        /// <summary>
+        /// Описание
+        /// </summary>
+        public string Description
+        {
+            get => _description;
+            set
+            {
+                if (IsMainDataStorage)
+                    return;
+
+                _description = value;
+            }
+        }
 
         /// <summary>
         /// Тип хранилища данных
         /// </summary>
-        public InfrastructureTypes InfrastructureType { get; set; }
+        private InfrastructureTypes _infrastructureType;
+
+        /// <summary>
+        /// Тип хранилища данных
+        /// </summary>
+        public InfrastructureTypes InfrastructureType
+        {
+            get => _infrastructureType;
+            set
+            {
+                if (IsMainDataStorage)
+                    return;
+
+                _infrastructureType = value;
+            }
+        }
 
         /// <summary>
         /// Наименование провайдера БД
         /// </summary>
-        public string ProviderName { get; set; }
+        private string _providerName = string.Empty;
+
+        /// <summary>
+        /// Наименование провайдера БД
+        /// </summary>
+        public string ProviderName
+        {
+            get => _providerName;
+            set
+            {
+                if (IsMainDataStorage)
+                    return;
+
+                _providerName = value;
+            }
+        }
 
         /// <summary>
         /// Строки подключения к БД для разных групп сущностей
@@ -146,6 +211,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public bool HasReportsInfrastructureRepository { get => ReportsInfrastructureRepository != null; }
 
         /// <summary>
+        /// Основное хранилище данных
+        /// </summary>
+        public bool IsMainDataStorage { get; } = false;
+
+        /// <summary>
         /// Доступность хранилища (доступность всех репозиториев БД)
         /// </summary>
         private bool _isAvailable = false;
@@ -163,7 +233,17 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Состояние отключенности
         /// </summary>
-        public bool IsDisabled { get => _isDisabled; set => _isDisabled = value; }
+        public bool IsDisabled
+        {
+            get => _isDisabled;
+            set
+            {
+                if (IsMainDataStorage)
+                    return;
+
+                _isDisabled = value;
+            }
+        }
 
         /// <summary>
         /// Признак скрытого элемента
@@ -173,7 +253,17 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <summary>
         /// Признак скрытого элемента
         /// </summary>
-        public bool IsHidden { get => _isHidden; set => _isHidden = value; }
+        public bool IsHidden
+        {
+            get => _isHidden;
+            set
+            {
+                if (IsMainDataStorage)
+                    return;
+
+                _isHidden = value;
+            }
+        }
 
 
         /// <summary>
@@ -210,10 +300,15 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         {
             _logger = logger;
             Uuid = uuid;
-            Name = name;
-            Description = description;
-            InfrastructureType = infrastructureType;
-            ProviderName = providerName ?? string.Empty;
+            if (uuid == MainDataStorageUuid)
+            {
+                IsMainDataStorage = true;
+            }
+
+            _name = name;
+            _description = description;
+            _infrastructureType = infrastructureType;
+            _providerName = providerName ?? string.Empty;
             ConnectionStrings = connectionStrings ?? new Dictionary<InfrastructureEntityGroups, string>();
             IsDisabled = isDisabled;
             IsHidden = isHidden;

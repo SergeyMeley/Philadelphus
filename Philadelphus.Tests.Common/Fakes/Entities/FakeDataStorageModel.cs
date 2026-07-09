@@ -40,6 +40,8 @@ namespace Philadelphus.Tests.Common.Fakes.Entities
 
         public bool HasReportsInfrastructureRepository => throw new NotImplementedException();
 
+        public bool IsMainDataStorage => false;
+
         public bool CheckAvailable()
         {
             throw new NotImplementedException();

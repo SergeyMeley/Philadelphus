@@ -232,7 +232,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
 
             var mainDataStorageModel = _dataStoragesService.CreateMainDataStorageModel(path);
             
-            _mainDataStorageVM = new DataStorageVM(mainDataStorageModel);
+            _mainDataStorageVM = new DataStorageVM(mainDataStorageModel, _notificationService);
             _dataStoragesVMs.Add(_mainDataStorageVM);
             
             return true;
@@ -250,7 +250,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             {
                 if (_dataStoragesVMs?.Any(x => x.Model?.Uuid == model.Uuid) == false)
                 {
-                    _dataStoragesVMs.Add(new DataStorageVM(model));
+                    _dataStoragesVMs.Add(new DataStorageVM(model, _notificationService));
                 }
                 else
                 {

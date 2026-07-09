@@ -136,7 +136,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                             csc.ConnectionStrings.TryGetValue(group, out var cs);
                             return _infrastructureRepositoryFactory.Create(type, group, cs);
                         });
-                    var vm = new DataStorageVM(model);
+                    var vm = new DataStorageVM(model, _notificationService);
                     var entity = _mapper.Map<DataStorage>(model);
                     _dataStoragesCollectionConfig.Value.DataStorages.Add(entity);
                     _configurationService.UpdateConfigFile<DataStoragesCollectionConfig>(_configFile, _dataStoragesCollectionConfig);

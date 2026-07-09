@@ -74,6 +74,11 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public bool HasReportsInfrastructureRepository { get; }
 
         /// <summary>
+        /// Основное хранилище данных
+        /// </summary>
+        public bool IsMainDataStorage { get; }
+
+        /// <summary>
         /// Доступность хранилища данных
         /// </summary>
         public bool IsAvailable { get; }

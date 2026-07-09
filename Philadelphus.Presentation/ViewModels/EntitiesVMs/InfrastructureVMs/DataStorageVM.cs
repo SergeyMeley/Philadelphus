@@ -1,4 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Presentation.Helpers;
 using System.Timers;
@@ -12,6 +14,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
     {
         private System.Timers.Timer? _timer;
         private IDataStorageModel? _model;
+        private readonly INotificationService? _notificationService;
         public IDataStorageModel? Model
         { 
             get
@@ -34,6 +37,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
             set
             {
+                if (TryRejectMainDataStorageSettingsChange(nameof(Name)))
+                    return;
+
                 _model.Name = value;
                 OnPropertyChanged(nameof(Name));
             }
@@ -46,6 +52,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
             set
             {
+                if (TryRejectMainDataStorageSettingsChange(nameof(Description)))
+                    return;
+
                 _model.Description = value;
                 OnPropertyChanged(nameof(Description));
             }
@@ -55,6 +64,13 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             get
             {
                 return _model.InfrastructureType;
+            }
+        }
+        public bool IsMainDataStorage
+        {
+            get
+            {
+                return _model.IsMainDataStorage;
             }
         }
         public bool HasInfrastructureRepositories
@@ -103,6 +119,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
             set
             {
+                if (TryRejectMainDataStorageSettingsChange(nameof(IsHidden), nameof(HeaderOpacity)))
+                    return;
+
                 _model.IsHidden = value;
                 OnPropertyChanged(nameof(IsHidden));
                 OnPropertyChanged(nameof(HeaderOpacity));
@@ -116,6 +135,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
             set
             {
+                if (TryRejectMainDataStorageSettingsChange(nameof(IsDisabled)))
+                    return;
+
                 _model.IsDisabled = value;
                 OnPropertyChanged(nameof(IsDisabled));
             }
@@ -140,12 +162,27 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         /// </summary>
         /// <param name="model">Модель.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public DataStorageVM(IDataStorageModel model)
+        public DataStorageVM(IDataStorageModel model, INotificationService? notificationService = null)
         {
             ArgumentNullException.ThrowIfNull(model);
 
             _model = model;
+            _notificationService = notificationService;
             StartCheckingStorage();
+        }
+        private bool TryRejectMainDataStorageSettingsChange(params string[] propertyNames)
+        {
+            if (IsMainDataStorage == false)
+                return false;
+
+            _notificationService?.SendTextMessage<DataStorageVM>(
+                "Настройки основного хранилища нельзя изменять.",
+                NotificationCriticalLevelModel.Warning);
+
+            foreach (var propertyName in propertyNames)
+                OnPropertyChanged(propertyName);
+
+            return true;
         }
         private void StartCheckingStorage()
         {

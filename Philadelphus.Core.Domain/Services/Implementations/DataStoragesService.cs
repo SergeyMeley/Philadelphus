@@ -223,7 +223,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     logger: _logger,
                     name: "Основное хранилище",
                     description: "Основное хранилище",
-                    uuid: Guid.Parse("00000000-0000-0000-0000-19201518a07e"),
+                    uuid: DataStorageModel.MainDataStorageUuid,
                     infrastructureType: InfrastructureTypes.SQLiteEf,
                     isDisabled: false)
             .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}", auditUserName))
