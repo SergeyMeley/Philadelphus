@@ -22,6 +22,8 @@ namespace Philadelphus.Tests.Common.Fakes.Entities
 
         public bool IsAvailable => throw new NotImplementedException();
 
+        public bool IsDisabled { get; set; } = false;
+
         public bool IsHidden { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public DateTime LastCheckTime => throw new NotImplementedException();
