@@ -29,17 +29,36 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="uuid">Уникальный идентификатор хранилища данных</param>
         /// <param name="infrastructureType">Тип хранилища данных</param>
         /// <param name="isDisabled">Состояние отключенности хранилища данных</param>
+        /// <param name="providerName">Наименование провайдера БД</param>
+        /// <param name="connectionStrings">Строки подключения к БД для разных групп сущностей</param>
         /// <returns>Строитель хранилища данных</returns>
         /// <exception cref="ArgumentException">Выбрасывается, если наименование пусто или некорректно</exception>
         /// <param name="logger">Логгер.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public DataStorageBuilder SetGeneralParameters(ILogger logger, string name, string description, Guid uuid, InfrastructureTypes infrastructureType, bool isDisabled)
+        public DataStorageBuilder SetGeneralParameters(
+            ILogger logger,
+            string name,
+            string description,
+            Guid uuid,
+            InfrastructureTypes infrastructureType,
+            bool isDisabled,
+            string providerName = "",
+            Dictionary<InfrastructureEntityGroups, string> connectionStrings = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentException.ThrowIfNullOrWhiteSpace(name);
             ArgumentOutOfRangeException.ThrowIfEqual(uuid, Guid.Empty);
 
-            _storageModel = new DataStorageModel(logger, uuid, name, description, infrastructureType, isDisabled, isHidden: false);
+            _storageModel = new DataStorageModel(
+                logger,
+                uuid,
+                name,
+                description,
+                infrastructureType,
+                isDisabled,
+                isHidden: false,
+                providerName,
+                connectionStrings);
             return this;
         }
 

@@ -38,6 +38,31 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public InfrastructureTypes InfrastructureType { get; set; }
 
         /// <summary>
+        /// Наименование провайдера БД
+        /// </summary>
+        public string ProviderName { get; set; }
+
+        /// <summary>
+        /// Строки подключения к БД для разных групп сущностей
+        /// </summary>
+        private Dictionary<InfrastructureEntityGroups, string> _connectionStrings = new Dictionary<InfrastructureEntityGroups, string>();
+
+        /// <summary>
+        /// Строки подключения к БД для разных групп сущностей
+        /// </summary>
+        public Dictionary<InfrastructureEntityGroups, string> ConnectionStrings
+        {
+            get
+            {
+                return _connectionStrings;
+            }
+            internal set
+            {
+                _connectionStrings = value ?? new Dictionary<InfrastructureEntityGroups, string>();
+            }
+        }
+
+        /// <summary>
         /// Репозитории БД
         /// </summary>
         private Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> _infrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();
@@ -168,6 +193,8 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         /// <param name="name">Наименование</param>
         /// <param name="description">Описание</param>
         /// <param name="infrastructureType">Тип</param>
+        /// <param name="providerName">Наименование провайдера БД</param>
+        /// <param name="connectionStrings">Строки подключения к БД для разных групп сущностей</param>
         /// <param name="isDisabled">Состояние отключенности</param>
         /// <param name="isHidden">Признак скрытого элемента.</param>
         internal DataStorageModel(
@@ -177,13 +204,17 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
             string description,
             InfrastructureTypes infrastructureType, 
             bool isDisabled,
-            bool isHidden)
+            bool isHidden,
+            string providerName = "",
+            Dictionary<InfrastructureEntityGroups, string> connectionStrings = null)
         {
             _logger = logger;
             Uuid = uuid;
             Name = name;
             Description = description;
             InfrastructureType = infrastructureType;
+            ProviderName = providerName ?? string.Empty;
+            ConnectionStrings = connectionStrings ?? new Dictionary<InfrastructureEntityGroups, string>();
             IsDisabled = isDisabled;
             IsHidden = isHidden;
             InfrastructureRepositories = new Dictionary<InfrastructureEntityGroups, IInfrastructureRepository>();

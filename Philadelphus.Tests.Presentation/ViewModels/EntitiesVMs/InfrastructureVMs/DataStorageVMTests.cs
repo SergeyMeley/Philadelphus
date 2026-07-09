@@ -53,6 +53,10 @@ public class DataStorageVMTests
 
         public InfrastructureTypes InfrastructureType { get; } = InfrastructureTypes.SQLiteEf;
 
+        public string ProviderName { get; set; } = string.Empty;
+
+        public Dictionary<InfrastructureEntityGroups, string> ConnectionStrings { get; } = new();
+
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories { get; } = new();
 
         public IPhiladelphusRepositoriesInfrastructureRepository PhiladelphusRepositoriesInfrastructureRepository => null!;

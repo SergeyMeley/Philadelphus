@@ -28,6 +28,16 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataSt
         public InfrastructureTypes InfrastructureType { get; set; }
 
         /// <summary>
+        /// Наименование провайдера БД.
+        /// </summary>
+        public string ProviderName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Строки подключения к БД для разных групп сущностей.
+        /// </summary>
+        public Dictionary<InfrastructureEntityGroups, string> ConnectionStrings { get; set; } = new();
+
+        /// <summary>
         /// Указывает наличие репозитория БД инфраструктурного репозитория.
         /// </summary>
         public bool HasPhiladelphusRepositoriesInfrastructureRepository { get; set; }

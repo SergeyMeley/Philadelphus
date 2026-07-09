@@ -14,6 +14,10 @@ namespace Philadelphus.Tests.Common.Fakes.Entities
 
         public InfrastructureTypes InfrastructureType => throw new NotImplementedException();
 
+        public string ProviderName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public Dictionary<InfrastructureEntityGroups, string> ConnectionStrings => throw new NotImplementedException();
+
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories => throw new NotImplementedException();
 
         public IPhiladelphusRepositoriesInfrastructureRepository PhiladelphusRepositoriesInfrastructureRepository => throw new NotImplementedException();

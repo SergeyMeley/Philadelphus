@@ -29,6 +29,16 @@ namespace Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages
         public InfrastructureTypes InfrastructureType { get; }
 
         /// <summary>
+        /// Наименование провайдера БД
+        /// </summary>
+        public string ProviderName { get; set; }
+
+        /// <summary>
+        /// Строки подключения к БД для разных групп сущностей
+        /// </summary>
+        public Dictionary<InfrastructureEntityGroups, string> ConnectionStrings { get; }
+
+        /// <summary>
         /// Репозитории БД
         /// </summary>
         public Dictionary<InfrastructureEntityGroups, IInfrastructureRepository> InfrastructureRepositories { get; }

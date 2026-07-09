@@ -30,6 +30,8 @@ namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.InfrastructureType, opt => opt.MapFrom(src => src.InfrastructureType))
+                .ForMember(dest => dest.ProviderName, opt => opt.MapFrom(src => src.ProviderName))
+                .ForMember(dest => dest.ConnectionStrings, opt => opt.MapFrom(src => src.ConnectionStrings))
                 .ForMember(dest => dest.HasPhiladelphusRepositoriesInfrastructureRepository, opt => opt.MapFrom(src => src.HasPhiladelphusRepositoriesInfrastructureRepository))
                 .ForMember(dest => dest.HasShrubMembersInfrastructureRepository, opt => opt.MapFrom(src => src.HasShrubMembersInfrastructureRepository))
                 .ForMember(dest => dest.HasReportsInfrastructureRepository, opt => opt.MapFrom(src => src.HasReportsInfrastructureRepository))
@@ -45,7 +47,9 @@ namespace Philadelphus.Core.Domain.Mapping.InfrastructureEntitiesMapping
                     src.Description,
                     src.InfrastructureType,
                     src.IsDisabled ?? false,
-                    src.IsHidden))
+                    src.IsHidden,
+                    src.ProviderName,
+                    src.ConnectionStrings))
                 .ForMember(dest => dest.PhiladelphusRepositoriesInfrastructureRepository, opt => opt.Ignore())  // Сложная логика
                 .ForMember(dest => dest.ShrubMembersInfrastructureRepository, opt => opt.Ignore())              // Сложная логика
                 .ForMember(dest => dest.ReportsInfrastructureRepository, opt => opt.Ignore())                   // Сложная логика
