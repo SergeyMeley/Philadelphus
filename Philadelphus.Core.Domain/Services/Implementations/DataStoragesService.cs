@@ -90,7 +90,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             ArgumentNullException.ThrowIfNull(getInfrastructureRepository);
 
             // Валидация конфигурации
-            var connectionStrings = _connectionStringsCollection.Value?.ConnectionStringsContainers
+            var legacyConnectionStrings = _connectionStringsCollection.Value?.ConnectionStringsContainers
                 ?? throw new InvalidOperationException(
                     "ConnectionStrings не инициализированы. Проверьте конфиг ConnectionStringsCollectionConfig");
 
@@ -100,7 +100,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             foreach (var entity in dbEntities)
             {
-                var connectionString = connectionStrings.SingleOrDefault(x => x.StorageUuid == entity.Uuid);
+                var connectionString = GetConnectionStringsContainer(
+                    entity,
+                    legacyConnectionStrings.SingleOrDefault(x => x.StorageUuid == entity.Uuid));
 
                 if (connectionString == null)
                 {
@@ -139,6 +141,26 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 var model = _mapper.MapDataStorage(entity, infrastructureRepositories, _logger);
                 yield return model;
             }
+        }
+
+        private static ConnectionStringsContainer? GetConnectionStringsContainer(
+            DataStorage dataStorage,
+            ConnectionStringsContainer? legacyConnectionStrings)
+        {
+            if (dataStorage.ConnectionStrings != null && dataStorage.ConnectionStrings.Count > 0)
+            {
+                return new ConnectionStringsContainer
+                {
+                    StorageUuid = dataStorage.Uuid,
+                    ProviderName = string.IsNullOrWhiteSpace(dataStorage.ProviderName)
+                        ? legacyConnectionStrings?.ProviderName
+                        : dataStorage.ProviderName,
+                    InfrastructureType = dataStorage.InfrastructureType,
+                    ConnectionStrings = dataStorage.ConnectionStrings
+                };
+            }
+
+            return legacyConnectionStrings;
         }
 
         private void TryAddInfrastructureRepository(
@@ -242,7 +264,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     description: desctiption,
                     uuid: connectionString.StorageUuid,
                     infrastructureType: connectionString.InfrastructureType,
-                    isDisabled: false)
+                    isDisabled: false,
+                    providerName: connectionString.ProviderName,
+                    connectionStrings: connectionString.ConnectionStrings)
                 .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories))
                 .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.ShrubMembers))
                 .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.Reports));

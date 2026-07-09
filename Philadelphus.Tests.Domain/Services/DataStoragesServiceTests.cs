@@ -95,6 +95,77 @@ public class DataStoragesServiceTests
     }
 
     [Fact]
+    public void GetStoragesModels_EmbeddedConnectionStringsExist_UsesEmbeddedConnectionStrings()
+    {
+        // Arrange
+        var storageUuid = Guid.CreateVersion7();
+        var storage = CreateDataStorage(
+            storageUuid,
+            isHidden: false,
+            isDisabled: false,
+            hasPhiladelphusRepository: true);
+        storage.ProviderName = "Embedded";
+        storage.ConnectionStrings = new Dictionary<InfrastructureEntityGroups, string>
+        {
+            [InfrastructureEntityGroups.PhiladelphusRepositories] = "embedded-connection"
+        };
+        var legacyConnectionStrings = CreateConnectionStringsContainer(
+            storageUuid,
+            providerName: "Legacy",
+            philadelphusRepositoriesConnectionString: "legacy-connection");
+        var sut = CreateSut(storage, legacyConnectionStrings: legacyConnectionStrings);
+        ConnectionStringsContainer? usedConnectionStrings = null;
+
+        // Act
+        var result = sut.GetStoragesModels((connectionStrings, _, _) =>
+        {
+            usedConnectionStrings = connectionStrings;
+            return CreatePhiladelphusRepository();
+        }).ToList();
+
+        // Assert
+        result.Should().ContainSingle();
+        usedConnectionStrings.Should().NotBeNull();
+        usedConnectionStrings!.ProviderName.Should().Be("Embedded");
+        usedConnectionStrings.ConnectionStrings[InfrastructureEntityGroups.PhiladelphusRepositories]
+            .Should().Be("embedded-connection");
+    }
+
+    [Fact]
+    public void GetStoragesModels_EmbeddedConnectionStringsEmpty_UsesLegacyConnectionStrings()
+    {
+        // Arrange
+        var storageUuid = Guid.CreateVersion7();
+        var storage = CreateDataStorage(
+            storageUuid,
+            isHidden: false,
+            isDisabled: false,
+            hasPhiladelphusRepository: true);
+        storage.ProviderName = "Embedded";
+        storage.ConnectionStrings = new Dictionary<InfrastructureEntityGroups, string>();
+        var legacyConnectionStrings = CreateConnectionStringsContainer(
+            storageUuid,
+            providerName: "Legacy",
+            philadelphusRepositoriesConnectionString: "legacy-connection");
+        var sut = CreateSut(storage, legacyConnectionStrings: legacyConnectionStrings);
+        ConnectionStringsContainer? usedConnectionStrings = null;
+
+        // Act
+        var result = sut.GetStoragesModels((connectionStrings, _, _) =>
+        {
+            usedConnectionStrings = connectionStrings;
+            return CreatePhiladelphusRepository();
+        }).ToList();
+
+        // Assert
+        result.Should().ContainSingle();
+        usedConnectionStrings.Should().NotBeNull();
+        usedConnectionStrings!.ProviderName.Should().Be("Legacy");
+        usedConnectionStrings.ConnectionStrings[InfrastructureEntityGroups.PhiladelphusRepositories]
+            .Should().Be("legacy-connection");
+    }
+
+    [Fact]
     public void MapDataStorage_RepositoryPassedWithFalseLegacyFlag_SetsHasFlagFromRepository()
     {
         // Arrange
@@ -118,7 +189,8 @@ public class DataStoragesServiceTests
 
     private static DataStoragesService CreateSut(
         DataStorage dataStorage,
-        FakeNotificationService? notificationService = null)
+        FakeNotificationService? notificationService = null,
+        ConnectionStringsContainer? legacyConnectionStrings = null)
     {
         var mapperConfiguration = new MapperConfiguration(
             cfg => cfg.AddProfile<DataStorageMappingProfile>(),
@@ -130,13 +202,8 @@ public class DataStoragesServiceTests
         {
             ConnectionStringsContainers = new List<ConnectionStringsContainer>
             {
-                new()
-                {
-                    StorageUuid = dataStorage.Uuid,
-                    InfrastructureType = dataStorage.InfrastructureType,
-                    ProviderName = "Test",
-                    ConnectionStrings = new Dictionary<InfrastructureEntityGroups, string>()
-                }
+                legacyConnectionStrings
+                ?? CreateConnectionStringsContainer(dataStorage.Uuid, "Test", string.Empty)
             }
         };
 
@@ -172,6 +239,23 @@ public class DataStoragesServiceTests
             HasReportsInfrastructureRepository = false,
             IsHidden = isHidden,
             IsDisabled = isDisabled
+        };
+    }
+
+    private static ConnectionStringsContainer CreateConnectionStringsContainer(
+        Guid storageUuid,
+        string providerName,
+        string philadelphusRepositoriesConnectionString)
+    {
+        return new ConnectionStringsContainer
+        {
+            StorageUuid = storageUuid,
+            InfrastructureType = InfrastructureTypes.SQLiteEf,
+            ProviderName = providerName,
+            ConnectionStrings = new Dictionary<InfrastructureEntityGroups, string>
+            {
+                [InfrastructureEntityGroups.PhiladelphusRepositories] = philadelphusRepositoriesConnectionString
+            }
         };
     }
 
