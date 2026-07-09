@@ -55,6 +55,24 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         public ObservableCollection<PhiladelphusRepositoryHeaderVM> LastPhiladelphusRepositoryHeadersVMs { get; }
             = new ObservableCollection<PhiladelphusRepositoryHeaderVM>();
 
+        private bool _showHiddenRepositoryHeaders;
+        public bool ShowHiddenRepositoryHeaders
+        {
+            get
+            {
+                return _showHiddenRepositoryHeaders;
+            }
+            set
+            {
+                if (_showHiddenRepositoryHeaders == value)
+                    return;
+
+                _showHiddenRepositoryHeaders = value;
+                RefreshFilteredCollections();
+                OnPropertyChanged(nameof(ShowHiddenRepositoryHeaders));
+            }
+        }
+
         private PhiladelphusRepositoryHeaderVM _selectedPhiladelphusRepositoryHeaderVM;
         public PhiladelphusRepositoryHeaderVM SelectedPhiladelphusRepositoryHeaderVM 
         {
@@ -142,7 +160,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         {
             FavoritePhiladelphusRepositoryHeadersVMs.Clear();
             // TODO #67065834: доработать полноценное управление скрытыми заголовками вместо временного исключения из загрузки.
-            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => x.IsHidden == false && x.IsFavorite))
+            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => ShouldShowHeader(x) && x.IsFavorite))
             {
                 FavoritePhiladelphusRepositoryHeadersVMs.Add(item);
             }
@@ -150,10 +168,15 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             var threshold = TimeSpan.FromDays(90);
             LastPhiladelphusRepositoryHeadersVMs.Clear();
             // TODO #67065834: доработать полноценное управление скрытыми заголовками вместо временного исключения из загрузки.
-            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => x.IsHidden == false && DateTime.UtcNow - x.LastOpening <= threshold))
+            foreach (var item in _PhiladelphusRepositoryHeadersVMs.Where(x => ShouldShowHeader(x) && DateTime.UtcNow - x.LastOpening <= threshold))
             {
                 LastPhiladelphusRepositoryHeadersVMs.Add(item);
             }
+        }
+
+        private bool ShouldShowHeader(PhiladelphusRepositoryHeaderVM header)
+        {
+            return ShowHiddenRepositoryHeaders || header.IsHidden == false;
         }
 
         /// <summary>
@@ -180,8 +203,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             if (headers == null)
                 return null;
 
-            // TODO #67065834: доработать полноценное управление скрытыми заголовками вместо временного исключения из загрузки.
-            foreach (var header in headers.Where(x => x.IsHidden == false).OrderByDescending(x => x.LastOpening))
+            foreach (var header in headers.OrderByDescending(x => x.LastOpening))
             {
                 var vm = new PhiladelphusRepositoryHeaderVM(_mapper, _mapper.Map<PhiladelphusRepositoryHeaderModel>(header), _service, _dataStoragesSettingsVM.MainDataStorageVM, _updatePhiladelphusRepositoryHeaders, _configurationService, _appConfig, _philadelphusRepositoryHeadersCollectionConfig);
                 CheckPhiladelphusRepositoryAvailable(vm);

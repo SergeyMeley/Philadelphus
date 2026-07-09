@@ -127,6 +127,14 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 SaveRepositoryHeader();
                 _updatePhiladelphusRepositoryHeaders.Invoke();
                 OnPropertyChanged(nameof(IsHidden));
+                OnPropertyChanged(nameof(HeaderOpacity));
+            }
+        }
+        public double HeaderOpacity
+        {
+            get
+            {
+                return IsHidden ? 0.55 : 1.0;
             }
         }
         public State State

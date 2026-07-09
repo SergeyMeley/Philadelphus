@@ -5,6 +5,7 @@
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.FavoriteAndLastRepositoryHeaders">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="Auto" />
@@ -14,20 +15,24 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <HeaderedContentControl Grid.Row="0" Grid.Column="0" Header="Избранные">
+        <CheckBox Grid.Row="0" Grid.Column="0"
+                  Content="Отобразить скрытые"
+                  IsChecked="{Binding RepositoryHeadersCollectionVM.ShowHiddenRepositoryHeaders, Mode=TwoWay}"
+                  Margin="4,2,4,2"
+                  HorizontalAlignment="Left" />
+
+        <HeaderedContentControl Grid.Row="1" Grid.Column="0" Header="Избранные">
             <lbs:RepositoryHeadersListBox
                 RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.FavoritePhiladelphusRepositoryHeadersVMs}"
                 RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}" />
         </HeaderedContentControl>
-        <HeaderedContentControl Grid.Row="1" Grid.Column="0" Header="Недавние">
+        <HeaderedContentControl Grid.Row="2" Grid.Column="0" Header="Недавние">
             <lbs:RepositoryHeadersListBox
                 RepositoryHeadersItemsSource="{Binding RepositoryHeadersCollectionVM.LastPhiladelphusRepositoryHeadersVMs}"
                 RepositoryHeadersSelectedItem="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM, Mode=TwoWay}" />
         </HeaderedContentControl>
 
-        <!-- Сворачиваемая боковая панель деталей (вместо WPF Expander ExpandDirection=Right):
-             вертикальная полоса-ToggleButton на всю высоту + панель, видимая по IsChecked. -->
-        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" ColumnDefinitions="Auto,Auto">
+        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" ColumnDefinitions="Auto,Auto">
             <ToggleButton Grid.Column="0" x:Name="favDetailToggle" VerticalAlignment="Stretch" Padding="2,8">
                 <LayoutTransformControl>
                     <LayoutTransformControl.LayoutTransform>
@@ -41,6 +46,6 @@
                                      DataContext="{Binding RepositoryHeadersCollectionVM.SelectedPhiladelphusRepositoryHeaderVM}" />
         </Grid>
 
-        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Command="{Binding OpenMainWindowWithHeaderCommand}" />
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="100" Content="Выбрать и начать работу!" Command="{Binding OpenMainWindowWithHeaderCommand}" />
     </Grid>
 </UserControl>
