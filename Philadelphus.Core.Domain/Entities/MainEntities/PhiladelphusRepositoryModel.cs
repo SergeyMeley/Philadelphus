@@ -182,6 +182,18 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         public List<IDataStorageModel> DataStorages { get; } = new List<IDataStorageModel>();
 
         /// <summary>
+        /// Хранилище данных по умолчанию для участников кустарника.
+        /// </summary>
+        [Display(Name = "[Хранилище кустарника по умолчанию]", Description = "Хранилище данных кустарника по умолчанию")]
+        public IDataStorageModel? DefaultShrubMembersDataStorage { get; internal set; }
+
+        /// <summary>
+        /// Хранилище данных по умолчанию для отчетов.
+        /// </summary>
+        [Display(Name = "[Хранилище отчетов по умолчанию]", Description = "Хранилище данных отчетов по умолчанию")]
+        public IDataStorageModel? DefaultReportsDataStorage { get; internal set; }
+
+        /// <summary>
         /// Хранилище данных
         /// </summary>
         [Display(Name = "[Хранилище]", Description = "Хранилище данных")]

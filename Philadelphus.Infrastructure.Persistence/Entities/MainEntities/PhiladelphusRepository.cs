@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Properties;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 
 namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
 {
@@ -11,6 +12,16 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntities
         /// Собственное хранилище данных.
         /// </summary>
         public Guid OwnDataStorageUuid { get; set; }
+
+        /// <summary>
+        /// Возможные хранилища данных для содержимого репозитория.
+        /// </summary>
+        public Guid[] AvailableDataStorageUuids { get; set; } = Array.Empty<Guid>();
+
+        /// <summary>
+        /// Хранилища данных по умолчанию для групп сущностей.
+        /// </summary>
+        public Dictionary<InfrastructureEntityGroups, Guid> DefaultDataStorageUuids { get; set; } = new();
        
         /// <summary>
         /// Рабочее дерево.

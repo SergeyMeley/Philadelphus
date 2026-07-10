@@ -50,6 +50,10 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
                 .HasColumnName("data_storage_uuid")
                   .IsRequired();
 
+            // Хранение этих полей в EF будет добавлено отдельной миграцией.
+            builder.Ignore(x => x.AvailableDataStorageUuids);
+            builder.Ignore(x => x.DefaultDataStorageUuids);
+
             builder.OwnsOne(x => x.AuditInfo, audit =>
             {
                 audit.Property(a => a.CreatedAt)
