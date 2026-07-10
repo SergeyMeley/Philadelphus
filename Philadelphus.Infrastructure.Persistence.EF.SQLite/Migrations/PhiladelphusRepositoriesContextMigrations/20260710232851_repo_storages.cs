@@ -24,7 +24,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.Philadelp
                 table: "philadelphus_repositories",
                 type: "TEXT",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "{}");
         }
 
         /// <inheritdoc />

@@ -25,7 +25,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.Phila
                 table: "philadelphus_repositories",
                 type: "text",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "{}");
         }
 
         /// <inheritdoc />
