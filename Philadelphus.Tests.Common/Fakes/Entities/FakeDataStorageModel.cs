@@ -34,11 +34,11 @@ namespace Philadelphus.Tests.Common.Fakes.Entities
 
         public bool HasPhiladelphusRepositoriesInfrastructureRepository => throw new NotImplementedException();
 
-        public bool HasShrubMembersInfrastructureRepository => throw new NotImplementedException();
+        public bool HasShrubMembersInfrastructureRepository { get; set; }
 
         public IReportsInfrastructureRepository ReportsInfrastructureRepository => throw new NotImplementedException();
 
-        public bool HasReportsInfrastructureRepository => throw new NotImplementedException();
+        public bool HasReportsInfrastructureRepository { get; set; }
 
         public bool IsMainDataStorage => false;
 

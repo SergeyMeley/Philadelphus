@@ -213,17 +213,27 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// </summary>
         /// <param name="uuid">Уникальный идентификатор</param>
         /// <param name="dataStorage">Хранилище данных</param>
+        /// <param name="initializeDefaultDataStorages">Необходимость инициализировать хранилища по умолчанию.</param>
         internal PhiladelphusRepositoryModel(
             Guid uuid, 
             IDataStorageModel dataStorage,
             INotificationService notificationService,
             IPropertiesPolicy<PhiladelphusRepositoryModel> propertiesPolicy,
-            IPropertiesPolicy<ShrubModel> shrubPropertiesPolicy)
+            IPropertiesPolicy<ShrubModel> shrubPropertiesPolicy,
+            bool initializeDefaultDataStorages = true)
             : base(uuid, notificationService, propertiesPolicy)
         {
             ArgumentNullException.ThrowIfNull(dataStorage);
 
             OwnDataStorage = dataStorage;
+
+            if (initializeDefaultDataStorages)
+            {
+                if (dataStorage.HasShrubMembersInfrastructureRepository)
+                    DefaultShrubMembersDataStorage = dataStorage;
+                if (dataStorage.HasReportsInfrastructureRepository)
+                    DefaultReportsDataStorage = dataStorage;
+            }
 
             ContentShrub = new ShrubModel(uuid, this, notificationService, shrubPropertiesPolicy);
 

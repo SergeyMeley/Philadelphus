@@ -57,7 +57,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         storage,
                         notificationService,
                         propertiesPolicy,
-                        srubPropertiesPolicy);
+                        srubPropertiesPolicy,
+                        initializeDefaultDataStorages: false);
                 })
 
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
