@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
@@ -11,9 +12,11 @@ using Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Contexts;
 namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Migrations.ShrubMembersContextMigrations
 {
     [DbContext(typeof(PostgreEfShrubMembersContext))]
-    partial class PostgreEfShrubMembersContextModelSnapshot : ModelSnapshot
+    [Migration("20260710232845_repo_storages")]
+    partial class repo_storages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

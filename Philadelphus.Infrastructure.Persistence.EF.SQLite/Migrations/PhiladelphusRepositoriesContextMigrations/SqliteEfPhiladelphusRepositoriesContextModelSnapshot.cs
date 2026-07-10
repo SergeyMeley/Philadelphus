@@ -15,7 +15,7 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.Philadelp
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.14");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
             modelBuilder.Entity("Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepository", b =>
                 {
@@ -29,6 +29,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.Philadelp
                         .HasColumnType("TEXT")
                         .HasColumnName("alias");
 
+                    b.PrimitiveCollection<string>("AvailableDataStorageUuids")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("available_data_storage_uuids");
+
                     b.PrimitiveCollection<string>("ContentWorkingTreesUuids")
                         .IsRequired()
                         .HasColumnType("uuid[]")
@@ -37,6 +42,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.SQLite.Migrations.Philadelp
                     b.Property<string>("CustomCode")
                         .HasColumnType("TEXT")
                         .HasColumnName("custom_code");
+
+                    b.Property<string>("DefaultDataStorageUuids")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("default_data_storage_uuids");
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT")

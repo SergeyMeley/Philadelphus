@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
 {
@@ -9,6 +12,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
     /// </summary>
     public class PhiladelphusRepositoryConfiguration : IEntityTypeConfiguration<PhiladelphusRepository>
     {
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
         /// <summary>
         /// Выполняет операцию Configure.
         /// </summary>
@@ -50,9 +58,19 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
                 .HasColumnName("data_storage_uuid")
                   .IsRequired();
 
-            // Хранение этих полей в EF будет добавлено отдельной миграцией.
-            builder.Ignore(x => x.AvailableDataStorageUuids);
-            builder.Ignore(x => x.DefaultDataStorageUuids);
+            builder.Property(x => x.AvailableDataStorageUuids)
+                .HasColumnName("available_data_storage_uuids")
+                .HasColumnType("uuid[]");
+
+            builder.Property(x => x.DefaultDataStorageUuids)
+                .HasColumnName("default_data_storage_uuids")
+                .HasConversion(
+                    value => JsonSerializer.Serialize(value, JsonOptions),
+                    value => string.IsNullOrWhiteSpace(value)
+                        ? new Dictionary<InfrastructureEntityGroups, Guid>()
+                        : JsonSerializer.Deserialize<Dictionary<InfrastructureEntityGroups, Guid>>(
+                            value,
+                            JsonOptions) ?? new());
 
             builder.OwnsOne(x => x.AuditInfo, audit =>
             {
