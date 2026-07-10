@@ -170,6 +170,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             DataStorage entity,
             InfrastructureEntityGroups entityGroup)
         {
+            if (HasConnectionString(connectionString, entityGroup) == false)
+                return;
+
             try
             {
                 var infrastructureRepository = getInfrastructureRepository(connectionString, entity.InfrastructureType, entityGroup);
@@ -189,6 +192,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 _notificationService.SendTextMessage<DataStoragesService>(
                     $"Не удалось инициализировать инфраструктурный репозиторий {entityGroup} для хранилища {entity.Name}");
             }
+        }
+
+        private static bool HasConnectionString(
+            ConnectionStringsContainer connectionString,
+            InfrastructureEntityGroups entityGroup)
+        {
+            return connectionString.ConnectionStrings != null
+                && connectionString.ConnectionStrings.TryGetValue(entityGroup, out var value)
+                && string.IsNullOrWhiteSpace(value) == false;
         }
 
         #endregion
@@ -266,16 +278,42 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     infrastructureType: connectionString.InfrastructureType,
                     isDisabled: false,
                     providerName: connectionString.ProviderName,
-                    connectionStrings: connectionString.ConnectionStrings)
-                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.PhiladelphusRepositories))
-                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.ShrubMembers))
-                .SetRepository(getInfrastructureRepository(connectionString, connectionString.InfrastructureType, InfrastructureEntityGroups.Reports));
+                    connectionStrings: connectionString.ConnectionStrings);
+
+            TrySetInfrastructureRepository(
+                dataStorageBuilder,
+                getInfrastructureRepository,
+                connectionString,
+                InfrastructureEntityGroups.PhiladelphusRepositories);
+            TrySetInfrastructureRepository(
+                dataStorageBuilder,
+                getInfrastructureRepository,
+                connectionString,
+                InfrastructureEntityGroups.ShrubMembers);
+            TrySetInfrastructureRepository(
+                dataStorageBuilder,
+                getInfrastructureRepository,
+                connectionString,
+                InfrastructureEntityGroups.Reports);
 
             var dataStorageModel = dataStorageBuilder.Build();
 
             Log.Information("Хранилище инициализировано.");
 
             return dataStorageModel;
+        }
+
+        private static void TrySetInfrastructureRepository(
+            DataStorageBuilder dataStorageBuilder,
+            Func<ConnectionStringsContainer, InfrastructureTypes, InfrastructureEntityGroups, IInfrastructureRepository> getInfrastructureRepository,
+            ConnectionStringsContainer connectionString,
+            InfrastructureEntityGroups entityGroup)
+        {
+            if (HasConnectionString(connectionString, entityGroup) == false)
+                return;
+
+            dataStorageBuilder.SetRepository(
+                getInfrastructureRepository(connectionString, connectionString.InfrastructureType, entityGroup));
         }
 
         #endregion

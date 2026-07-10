@@ -95,6 +95,37 @@ public class DataStoragesServiceTests
     }
 
     [Fact]
+    public void GetStoragesModels_EmptyConnectionString_DoesNotLoadInfrastructureRepository()
+    {
+        // Arrange
+        var storageUuid = Guid.CreateVersion7();
+        var storage = CreateDataStorage(
+            storageUuid,
+            isHidden: false,
+            isDisabled: false,
+            hasPhiladelphusRepository: true);
+        var sut = CreateSut(
+            storage,
+            legacyConnectionStrings: CreateConnectionStringsContainer(
+                storageUuid,
+                providerName: "Test",
+                philadelphusRepositoriesConnectionString: string.Empty));
+        var callsCount = 0;
+
+        // Act
+        var result = sut.GetStoragesModels((_, _, _) =>
+        {
+            callsCount++;
+            throw new InvalidOperationException("Factory should not be called for empty connection strings.");
+        }).ToList();
+
+        // Assert
+        result.Should().ContainSingle();
+        result[0].HasPhiladelphusRepositoriesInfrastructureRepository.Should().BeFalse();
+        callsCount.Should().Be(0);
+    }
+
+    [Fact]
     public void GetStoragesModels_EmbeddedConnectionStringsExist_UsesEmbeddedConnectionStrings()
     {
         // Arrange
@@ -187,6 +218,50 @@ public class DataStoragesServiceTests
         result.HasPhiladelphusRepositoriesInfrastructureRepository.Should().BeTrue();
     }
 
+    [Fact]
+    public void CreateDataStorageModel_EmptyConnectionStringForGroup_DoesNotCreateRepositoryForGroup()
+    {
+        // Arrange
+        var sut = CreateSut(CreateDataStorage(
+            Guid.CreateVersion7(),
+            isHidden: false,
+            isDisabled: false,
+            hasPhiladelphusRepository: false));
+        var connectionStrings = new ConnectionStringsContainer
+        {
+            StorageUuid = Guid.CreateVersion7(),
+            InfrastructureType = InfrastructureTypes.SQLiteEf,
+            ProviderName = "Test",
+            ConnectionStrings = new Dictionary<InfrastructureEntityGroups, string>
+            {
+                [InfrastructureEntityGroups.PhiladelphusRepositories] = "repository-connection",
+                [InfrastructureEntityGroups.ShrubMembers] = string.Empty,
+                [InfrastructureEntityGroups.Reports] = " "
+            }
+        };
+        var calls = new List<InfrastructureEntityGroups>();
+
+        // Act
+        var result = sut.CreateDataStorageModel(
+            "Test storage",
+            "Test storage",
+            connectionStrings,
+            (_, _, group) =>
+            {
+                calls.Add(group);
+                if (group == InfrastructureEntityGroups.PhiladelphusRepositories)
+                    return CreatePhiladelphusRepository();
+
+                throw new InvalidOperationException("Factory should not be called for empty connection strings.");
+            });
+
+        // Assert
+        result.HasPhiladelphusRepositoriesInfrastructureRepository.Should().BeTrue();
+        result.HasShrubMembersInfrastructureRepository.Should().BeFalse();
+        result.HasReportsInfrastructureRepository.Should().BeFalse();
+        calls.Should().Equal(InfrastructureEntityGroups.PhiladelphusRepositories);
+    }
+
     private static DataStoragesService CreateSut(
         DataStorage dataStorage,
         FakeNotificationService? notificationService = null,
@@ -203,7 +278,7 @@ public class DataStoragesServiceTests
             ConnectionStringsContainers = new List<ConnectionStringsContainer>
             {
                 legacyConnectionStrings
-                ?? CreateConnectionStringsContainer(dataStorage.Uuid, "Test", string.Empty)
+                ?? CreateConnectionStringsContainer(dataStorage.Uuid, "Test", "test-connection")
             }
         };
 
