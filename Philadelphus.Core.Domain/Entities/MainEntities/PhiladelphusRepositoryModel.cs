@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using System;
 using System.Collections.ObjectModel;
@@ -255,6 +256,84 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
             ArgumentNullException.ThrowIfNull(storage);
 
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Добавить возможное хранилище данных для содержимого репозитория.
+        /// </summary>
+        /// <param name="storage">Хранилище данных.</param>
+        /// <returns>true, если хранилище добавлено; иначе false.</returns>
+        public bool AddAvailableDataStorage(IDataStorageModel storage)
+        {
+            ArgumentNullException.ThrowIfNull(storage);
+
+            if (DataStorages.Any(x => x.Uuid == storage.Uuid))
+                return false;
+
+            DataStorages.Add(storage);
+            UpdateStateStateAfterChange();
+            return true;
+        }
+
+        /// <summary>
+        /// Назначить хранилище данных по умолчанию для участников кустарника.
+        /// </summary>
+        /// <param name="storage">Хранилище данных или null для очистки значения.</param>
+        /// <returns>true, если значение изменено; иначе false.</returns>
+        public bool SetDefaultShrubMembersDataStorage(IDataStorageModel? storage)
+        {
+            return SetDefaultDataStorage(InfrastructureEntityGroups.ShrubMembers, storage);
+        }
+
+        /// <summary>
+        /// Назначить хранилище данных по умолчанию для отчетов.
+        /// </summary>
+        /// <param name="storage">Хранилище данных или null для очистки значения.</param>
+        /// <returns>true, если значение изменено; иначе false.</returns>
+        public bool SetDefaultReportsDataStorage(IDataStorageModel? storage)
+        {
+            return SetDefaultDataStorage(InfrastructureEntityGroups.Reports, storage);
+        }
+
+        private bool SetDefaultDataStorage(
+            InfrastructureEntityGroups entityGroup,
+            IDataStorageModel? storage)
+        {
+            IDataStorageModel? availableStorage = null;
+            if (storage != null)
+            {
+                availableStorage = DataStorages.SingleOrDefault(x => x.Uuid == storage.Uuid)
+                    ?? throw new InvalidOperationException(
+                        $"Хранилище '{storage.Name}' не входит в список возможных хранилищ репозитория.");
+
+                var supportsEntityGroup = entityGroup switch
+                {
+                    InfrastructureEntityGroups.ShrubMembers =>
+                        availableStorage.HasShrubMembersInfrastructureRepository,
+                    InfrastructureEntityGroups.Reports =>
+                        availableStorage.HasReportsInfrastructureRepository,
+                    _ => false
+                };
+                if (supportsEntityGroup == false)
+                {
+                    throw new InvalidOperationException(
+                        $"Хранилище '{availableStorage.Name}' не поддерживает группу сущностей {entityGroup}.");
+                }
+            }
+
+            var currentStorage = entityGroup == InfrastructureEntityGroups.ShrubMembers
+                ? DefaultShrubMembersDataStorage
+                : DefaultReportsDataStorage;
+            if (currentStorage?.Uuid == availableStorage?.Uuid)
+                return false;
+
+            if (entityGroup == InfrastructureEntityGroups.ShrubMembers)
+                DefaultShrubMembersDataStorage = availableStorage;
+            else
+                DefaultReportsDataStorage = availableStorage;
+
+            UpdateStateStateAfterChange();
+            return true;
         }
 
         /// <summary>
