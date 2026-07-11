@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Philadelphus.Presentation.Infrastructure;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -75,6 +76,37 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         {
             AdditionalParameters.CollectionChanged += AdditionalParametersCollectionChanged;
             ConnectionString = connectionString;
+        }
+
+        /// <summary>
+        /// Добавляет пустой дополнительный параметр.
+        /// </summary>
+        public RelayCommand AddAdditionalParameterCommand
+        {
+            get
+            {
+                return new RelayCommand(_ =>
+                {
+                    AdditionalParameters.Add(new ConnectionStringParameterVM(string.Empty, string.Empty));
+                });
+            }
+        }
+
+        /// <summary>
+        /// Удаляет указанный дополнительный параметр.
+        /// </summary>
+        public RelayCommand RemoveAdditionalParameterCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    parameter =>
+                    {
+                        AdditionalParameters.Remove((ConnectionStringParameterVM)parameter);
+                    },
+                    parameter => parameter is ConnectionStringParameterVM vm
+                        && AdditionalParameters.Contains(vm));
+            }
         }
 
         private void AdditionalParametersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

@@ -52,4 +52,33 @@ public class SqliteConnectionStringVMTests
         // Assert
         sut.ConnectionString.Should().Contain("Mode=ReadWriteCreate");
     }
+
+    [Fact]
+    public void AddAdditionalParameterCommand_AddsEmptyParameter()
+    {
+        // Arrange
+        var sut = new SqliteConnectionStringVM();
+
+        // Act
+        sut.AddAdditionalParameterCommand.Execute(null);
+
+        // Assert
+        sut.AdditionalParameters.Should().ContainSingle()
+            .Which.Should().BeEquivalentTo(new { Key = string.Empty, Value = string.Empty });
+    }
+
+    [Fact]
+    public void RemoveAdditionalParameterCommand_RemovesParameter()
+    {
+        // Arrange
+        var sut = new SqliteConnectionStringVM("Mode=ReadOnly");
+        var parameter = sut.AdditionalParameters.Single();
+
+        // Act
+        sut.RemoveAdditionalParameterCommand.Execute(parameter);
+
+        // Assert
+        sut.AdditionalParameters.Should().BeEmpty();
+        sut.ConnectionString.Should().NotContain("Mode");
+    }
 }
