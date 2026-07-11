@@ -181,6 +181,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
 
                     // Слой Presentation (платформенные реализации Avalonia)
                     services.AddSingleton<IDialogService, AvaloniaDialogService>();
+                    services.AddSingleton<IDataStorageSelectionDialogService, AvaloniaDataStorageSelectionDialogService>();
                     services.AddSingleton<IDispatcherService, AvaloniaDispatcherService>();
                     services.AddSingleton<AvaloniaWindowService>();
                     services.AddSingleton<IWindowService>(sp => sp.GetRequiredService<AvaloniaWindowService>());
