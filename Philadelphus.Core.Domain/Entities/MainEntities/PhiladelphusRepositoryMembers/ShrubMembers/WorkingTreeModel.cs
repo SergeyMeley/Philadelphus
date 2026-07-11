@@ -251,14 +251,33 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         #region [ Methods ]
 
         /// <summary>
-        /// Изменить хранилище данных (не реализовано)
+        /// Изменить хранилище данных
         /// </summary>
         /// <param name="storage">Новое хранилище</param>
         /// <returns>Результат выполнения операции.</returns>
-        /// <exception cref="NotImplementedException">Метод еще не реализован.</exception>
+        /// <exception cref="ArgumentNullException">Если хранилище не задано.</exception>
+        /// <exception cref="InvalidOperationException">Если хранилище недоступно для репозитория или не поддерживает участников кустарника.</exception>
         public bool ChangeDataStorage(IDataStorageModel storage)
         {
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(storage);
+
+            var availableStorage = OwningShrub.OwningRepository.DataStorages
+                .SingleOrDefault(x => x.Uuid == storage.Uuid)
+                ?? throw new InvalidOperationException(
+                    $"Хранилище '{storage.Name}' не входит в список возможных хранилищ репозитория.");
+
+            if (availableStorage.HasShrubMembersInfrastructureRepository == false)
+            {
+                throw new InvalidOperationException(
+                    $"Хранилище '{availableStorage.Name}' не поддерживает участников кустарника.");
+            }
+
+            if (_ownDataStorage.Uuid == availableStorage.Uuid)
+                return false;
+
+            _ownDataStorage = availableStorage;
+            UpdateStateStateAfterChange();
+            return true;
         }
 
         /// <summary>
