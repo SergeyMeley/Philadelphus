@@ -10,6 +10,24 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.InfrastructureV
 public class DataStorageVMTests
 {
     [Fact]
+    public void ConnectionStrings_InitializesAllGroupsAndUpdatesModel()
+    {
+        // Arrange
+        var model = new FakeDataStorageModel();
+        model.ConnectionStrings[InfrastructureEntityGroups.ShrubMembers] = "old";
+        using var sut = new DataStorageVM(model);
+
+        // Act
+        var connectionString = sut.ConnectionStrings.Single(x =>
+            x.EntityGroup == InfrastructureEntityGroups.ShrubMembers);
+        connectionString.ConnectionString = "new";
+
+        // Assert
+        sut.ConnectionStrings.Should().HaveCount(Enum.GetValues<InfrastructureEntityGroups>().Length);
+        model.ConnectionStrings[InfrastructureEntityGroups.ShrubMembers].Should().Be("new");
+    }
+
+    [Fact]
     public void IsHidden_SetTrue_UpdatesModelAndHeaderOpacity()
     {
         // Arrange

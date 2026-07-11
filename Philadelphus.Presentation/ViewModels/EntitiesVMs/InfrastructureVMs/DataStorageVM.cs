@@ -3,6 +3,8 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Presentation.Helpers;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Timers;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
@@ -15,6 +17,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         private System.Timers.Timer? _timer;
         private IDataStorageModel? _model;
         private readonly INotificationService? _notificationService;
+        public ObservableCollection<DataStorageConnectionStringVM> ConnectionStrings { get; }
         public IDataStorageModel? Model
         { 
             get
@@ -168,7 +171,23 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
 
             _model = model;
             _notificationService = notificationService;
+            ConnectionStrings = new ObservableCollection<DataStorageConnectionStringVM>(
+                Enum.GetValues<InfrastructureEntityGroups>().Select(group =>
+                {
+                    model.ConnectionStrings.TryGetValue(group, out var connectionString);
+                    var result = new DataStorageConnectionStringVM(group, connectionString ?? string.Empty);
+                    result.PropertyChanged += ConnectionStringPropertyChanged;
+                    return result;
+                }));
             StartCheckingStorage();
+        }
+        private void ConnectionStringPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is not DataStorageConnectionStringVM connectionString
+                || e.PropertyName != nameof(DataStorageConnectionStringVM.ConnectionString))
+                return;
+
+            _model.ConnectionStrings[connectionString.EntityGroup] = connectionString.ConnectionString;
         }
         private bool TryRejectMainDataStorageSettingsChange(params string[] propertyNames)
         {
@@ -202,6 +221,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         /// </summary>
         public void Dispose()
         {
+            foreach (var connectionString in ConnectionStrings)
+                connectionString.PropertyChanged -= ConnectionStringPropertyChanged;
+
             _timer?.Stop();
             _timer?.Dispose();
             Model?.StopAvailableAutoChecking();
