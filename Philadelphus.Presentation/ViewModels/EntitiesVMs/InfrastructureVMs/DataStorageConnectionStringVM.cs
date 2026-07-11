@@ -1,3 +1,4 @@
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
@@ -10,6 +11,17 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         private string _connectionString;
 
         public InfrastructureEntityGroups EntityGroup { get; }
+
+        /// <summary>
+        /// Отображаемое наименование группы сущностей.
+        /// </summary>
+        public string EntityGroupDisplayName
+        {
+            get
+            {
+                return EntityGroup.GetDisplayName();
+            }
+        }
 
         public string ConnectionString
         {

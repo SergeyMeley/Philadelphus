@@ -1,31 +1,50 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.StoragesCreation">
-    <Grid ColumnDefinitions="Auto,*,Auto"
+    <Grid ColumnDefinitions="Auto,*"
           RowDefinitions="Auto,Auto,Auto,Auto"
           RowSpacing="6"
           ColumnSpacing="8">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" VerticalAlignment="Center" />
-        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Name}" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" />
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание" VerticalAlignment="Center" />
-        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description}" />
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Строка подключения" VerticalAlignment="Center" />
-        <ComboBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch"
-                  ItemsSource="{Binding ConnectionStringsContainers}"
-                  SelectedItem="{Binding SelectedConnectionStringsContainer}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Uuid}" />
-                        <TextBlock Text=". Провайдер: " />
-                        <TextBlock Text="{Binding ProviderName}" />
-                        <TextBlock Text=". Строка подключения: " />
-                        <TextBlock Text="{Binding ConnectionString}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenConnectionStringsSettingsControlCommand}" Content="Открыть настройки строк подключения" />
-        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding CreateAndSaveDataStorageCommand}" Content="Создать и сохранить" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Description}" />
+
+        <HeaderedContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                Header="Провайдер и строки подключения">
+            <Grid ColumnDefinitions="180,*"
+                  RowDefinitions="Auto,Auto,Auto"
+                  RowSpacing="4"
+                  ColumnSpacing="8">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Тип хранилища" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="0" Grid.Column="1"
+                          ItemsSource="{Binding AvailableInfrastructureTypes}"
+                          SelectedItem="{Binding InfrastructureType}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Провайдер" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ProviderName}" />
+                <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                              ItemsSource="{Binding ConnectionStrings}"
+                              HorizontalAlignment="Stretch">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="180,*" ColumnSpacing="8" Margin="0,2"
+                                  HorizontalAlignment="Stretch">
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding EntityGroupDisplayName}"
+                                           VerticalAlignment="Center" />
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding ConnectionString}"
+                                         MinWidth="0"
+                                         HorizontalAlignment="Stretch" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </HeaderedContentControl>
+
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                Command="{Binding CreateAndSaveDataStorageCommand}"
+                Content="Создать и сохранить" />
     </Grid>
 </UserControl>

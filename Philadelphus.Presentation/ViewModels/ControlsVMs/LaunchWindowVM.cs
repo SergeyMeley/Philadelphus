@@ -142,7 +142,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _repositoryCreationVM = repositoryCreationControlVM;
             _applicationSettingsControlVM = applicationSettingsControlVM;
 
-            _storageCreationControlVM.OpenConnectionStringsSettingsControlCommand = OpenConnectionStringsSettingsControlCommand;
             _repositoryCreationVM.OpenDataStoragesSettingsControlCommand = OpenDataStoragesSettingsControlCommand;
 
             InitializeTabs();

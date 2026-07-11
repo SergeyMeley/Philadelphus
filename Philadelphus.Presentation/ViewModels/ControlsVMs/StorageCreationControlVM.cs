@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorages;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
@@ -21,7 +22,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IDataStoragesService _service;
         private readonly IConfigurationService _configurationService;
         private readonly IInfrastructureRepositoryFactory _infrastructureRepositoryFactory;
-        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollectionConfig;
         private readonly FileInfo _configFile;
 
@@ -40,14 +40,28 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         public string Description { get => _description; set => _description = value; }
        
         /// <summary>
-        /// Контейнер строк подключения.
+        /// Тип инфраструктуры создаваемого хранилища.
         /// </summary>
-        public List<ConnectionStringsContainer> ConnectionStringsContainers { get => _connectionStringsCollectionConfig.Value.ConnectionStringsContainers; }
+        public InfrastructureTypes InfrastructureType { get; set; } = InfrastructureTypes.SQLiteEf;
       
         /// <summary>
-        /// Контейнер строк подключения.
+        /// Доступные типы инфраструктуры.
         /// </summary>
-        public ConnectionStringsContainer SelectedConnectionStringsContainer { get; set; }
+        public IEnumerable<InfrastructureTypes> AvailableInfrastructureTypes { get; }
+            = Enum.GetValues<InfrastructureTypes>();
+
+        /// <summary>
+        /// Наименование провайдера создаваемого хранилища.
+        /// </summary>
+        public string ProviderName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Строки подключения создаваемого хранилища по группам сущностей.
+        /// </summary>
+        public IEnumerable<DataStorageConnectionStringVM> ConnectionStrings { get; }
+            = Enum.GetValues<InfrastructureEntityGroups>()
+                .Select(group => new DataStorageConnectionStringVM(group, string.Empty))
+                .ToList();
 
         private DataStoragesCollectionVM _dataStoragesCollectionVM;
       
@@ -68,7 +82,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
         /// <param name="infrastructureRepositoryFactory">Параметр infrastructureRepositoryFactory.</param>
         /// <param name="options">Параметры конфигурации приложения.</param>
-        /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
         /// <param name="dataStoragesCollectionConfig">Параметр dataStoragesCollectionConfig.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
@@ -82,7 +95,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IInfrastructureRepositoryFactory infrastructureRepositoryFactory,
             IOptions<ApplicationSettingsConfig> options,
-            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
             IOptions<DataStoragesCollectionConfig> dataStoragesCollectionConfig,
             IApplicationCommandsVM applicationCommandsVM)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
@@ -93,14 +105,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(infrastructureRepositoryFactory);
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.Value);
-            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
-            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionConfig);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionConfig.Value);
 
             _service = service;
             _configurationService = configurationService;
-            _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _dataStoragesCollectionConfig = dataStoragesCollectionConfig;
 
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -114,8 +123,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 return new RelayCommand(obj =>
                 {
-                    if (string.IsNullOrEmpty(Name)
-                        || SelectedConnectionStringsContainer == null)
+                    if (string.IsNullOrWhiteSpace(Name)
+                        || string.IsNullOrWhiteSpace(ProviderName)
+                        || ConnectionStrings.All(x => string.IsNullOrWhiteSpace(x.ConnectionString)))
                     {
                         _notificationService.SendModalWindow<StorageCreationControlVM>(
                             "Некорректно заполнены параметры, операция не выполнена.", 
@@ -130,7 +140,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                         return;
                     }
 
-                    var model = _service.CreateDataStorageModel(Name, Description, SelectedConnectionStringsContainer,
+                    var connectionStringsContainer = new ConnectionStringsContainer
+                    {
+                        StorageUuid = Guid.CreateVersion7(),
+                        InfrastructureType = InfrastructureType,
+                        ProviderName = ProviderName,
+                        ConnectionStrings = ConnectionStrings.ToDictionary(x => x.EntityGroup, x => x.ConnectionString)
+                    };
+
+                    var model = _service.CreateDataStorageModel(Name, Description, connectionStringsContainer,
                         (csc, type, group) =>
                         {
                             csc.ConnectionStrings.TryGetValue(group, out var cs);
@@ -146,9 +164,5 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             }
         }
 
-        /// <summary>
-        /// Команда выполнения операции элемента управления.
-        /// </summary>
-        public IRelayCommand OpenConnectionStringsSettingsControlCommand { get; set; }
     }
 }

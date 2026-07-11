@@ -9,6 +9,21 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.InfrastructureV
 
 public class DataStorageVMTests
 {
+    [Theory]
+    [InlineData(InfrastructureEntityGroups.PhiladelphusRepositories, "Репозитории")]
+    [InlineData(InfrastructureEntityGroups.ShrubMembers, "Элементы кустарника")]
+    [InlineData(InfrastructureEntityGroups.Reports, "Отчёты")]
+    public void ConnectionString_UsesRussianEntityGroupDisplayName(
+        InfrastructureEntityGroups entityGroup,
+        string expectedDisplayName)
+    {
+        // Act
+        var sut = new DataStorageConnectionStringVM(entityGroup, string.Empty);
+
+        // Assert
+        sut.EntityGroupDisplayName.Should().Be(expectedDisplayName);
+    }
+
     [Fact]
     public void ProviderName_Set_UpdatesModel()
     {

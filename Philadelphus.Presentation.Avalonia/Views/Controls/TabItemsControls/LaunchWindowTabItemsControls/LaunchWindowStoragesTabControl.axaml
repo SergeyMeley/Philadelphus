@@ -4,11 +4,14 @@
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.TabItemsControls.LaunchWindowTabItemsControls.LaunchWindowStoragesTabControl">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" MaxHeight="300" />
-            <RowDefinition Height="4*" />
+            <RowDefinition Height="2*" MinHeight="220" />
+            <RowDefinition Height="3*" />
         </Grid.RowDefinitions>
         <HeaderedContentControl Grid.Row="0" Header="Создать">
-            <ctrls:StoragesCreation DataContext="{Binding StorageCreationControlVM}" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ctrls:StoragesCreation DataContext="{Binding StorageCreationControlVM}" />
+            </ScrollViewer>
         </HeaderedContentControl>
         <HeaderedContentControl Grid.Row="1" Header="Открыть">
             <ctrls:DataStorageHeaders />

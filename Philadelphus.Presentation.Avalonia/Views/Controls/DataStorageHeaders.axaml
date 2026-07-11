@@ -42,7 +42,7 @@
                     <detail:UniversalDetails Grid.Column="1"
                                              IsVisible="{Binding #storageDetailToggle.IsChecked}"
                                              DataContext="{Binding DataStoragesSettingsVM.SelectedDataStorageVM}"
-                                             Width="400" MinWidth="400" MaxWidth="700" />
+                                             Width="520" MinWidth="520" MaxWidth="850" />
                 </Grid>
             </Grid>
         </HeaderedContentControl>
