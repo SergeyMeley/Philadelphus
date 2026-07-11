@@ -62,6 +62,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 OnPropertyChanged(nameof(Description));
             }
         }
+
         public InfrastructureTypes InfrastructureType
         {
             get
@@ -69,6 +70,23 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 return _model.InfrastructureType;
             }
         }
+
+        public string ProviderName
+        {
+            get
+            {
+                return _model.ProviderName;
+            }
+            set
+            {
+                if (TryRejectMainDataStorageSettingsChange(nameof(ProviderName)))
+                    return;
+
+                _model.ProviderName = value;
+                OnPropertyChanged(nameof(ProviderName));
+            }
+        }
+
         public bool IsMainDataStorage
         {
             get
@@ -76,6 +94,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 return _model.IsMainDataStorage;
             }
         }
+
         public bool HasInfrastructureRepositories
         {
             get

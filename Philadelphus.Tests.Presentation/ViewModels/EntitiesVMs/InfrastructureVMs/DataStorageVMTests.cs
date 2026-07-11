@@ -10,6 +10,20 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.InfrastructureV
 public class DataStorageVMTests
 {
     [Fact]
+    public void ProviderName_Set_UpdatesModel()
+    {
+        // Arrange
+        var model = new FakeDataStorageModel { ProviderName = "old" };
+        using var sut = new DataStorageVM(model);
+
+        // Act
+        sut.ProviderName = "new";
+
+        // Assert
+        model.ProviderName.Should().Be("new");
+    }
+
+    [Fact]
     public void ConnectionStrings_InitializesAllGroupsAndUpdatesModel()
     {
         // Arrange

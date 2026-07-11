@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.DetailedInformationGrids.DataStorageDetails">
     <Grid ColumnDefinitions="Auto,*"
-          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
           RowSpacing="4"
           ColumnSpacing="8">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Наименование" VerticalAlignment="Center" />
@@ -37,6 +37,27 @@
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Отчеты" />
                 <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding HasReportsInfrastructureRepository, Mode=OneWay}" IsEnabled="False" />
             </Grid>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Header="Провайдер и строки подключения">
+            <StackPanel Spacing="4">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <TextBlock Grid.Column="0" Text="Провайдер" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Text="{Binding ProviderName}"
+                             IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding ConnectionStrings}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="180,*" ColumnSpacing="8" Margin="0,2">
+                                <TextBlock Grid.Column="0" Text="{Binding EntityGroup}" VerticalAlignment="Center" />
+                                <TextBox Grid.Column="1" Text="{Binding ConnectionString}"
+                                         IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </HeaderedContentControl>
     </Grid>
 </UserControl>
