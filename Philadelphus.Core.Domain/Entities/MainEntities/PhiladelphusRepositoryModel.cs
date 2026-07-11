@@ -276,6 +276,37 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         }
 
         /// <summary>
+        /// Удалить возможное хранилище данных для содержимого репозитория.
+        /// </summary>
+        /// <param name="storage">Хранилище данных.</param>
+        /// <returns>true, если хранилище удалено; иначе false.</returns>
+        public bool RemoveAvailableDataStorage(IDataStorageModel storage)
+        {
+            ArgumentNullException.ThrowIfNull(storage);
+
+            if (storage.Uuid == OwnDataStorage.Uuid)
+            {
+                throw new InvalidOperationException(
+                    "Собственное хранилище репозитория нельзя удалить из списка возможных хранилищ.");
+            }
+
+            var availableStorage = DataStorages.SingleOrDefault(x => x.Uuid == storage.Uuid);
+            if (availableStorage == null)
+                return false;
+
+            if (DefaultShrubMembersDataStorage?.Uuid == storage.Uuid
+                || DefaultReportsDataStorage?.Uuid == storage.Uuid)
+            {
+                throw new InvalidOperationException(
+                    $"Хранилище '{availableStorage.Name}' используется репозиторием по умолчанию.");
+            }
+
+            DataStorages.Remove(availableStorage);
+            UpdateStateStateAfterChange();
+            return true;
+        }
+
+        /// <summary>
         /// Назначить хранилище данных по умолчанию для участников кустарника.
         /// </summary>
         /// <param name="storage">Хранилище данных или null для очистки значения.</param>

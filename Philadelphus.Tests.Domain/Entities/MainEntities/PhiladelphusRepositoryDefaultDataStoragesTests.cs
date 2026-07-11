@@ -124,6 +124,54 @@ public class PhiladelphusRepositoryDefaultDataStoragesTests
         sut.DefaultReportsDataStorage.Should().BeNull();
     }
 
+    [Fact]
+    public void RemoveAvailableDataStorage_AvailableStorage_RemovesStorage()
+    {
+        // Arrange
+        var sut = CreateSut(CreateDataStorage(false, false));
+        var availableStorage = CreateDataStorage(true, true);
+        sut.AddAvailableDataStorage(availableStorage);
+
+        // Act
+        var result = sut.RemoveAvailableDataStorage(availableStorage);
+
+        // Assert
+        result.Should().BeTrue();
+        sut.DataStorages.Should().NotContain(availableStorage);
+    }
+
+    [Fact]
+    public void RemoveAvailableDataStorage_OwnStorage_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var ownStorage = CreateDataStorage(true, true);
+        var sut = CreateSut(ownStorage);
+
+        // Act
+        var act = () => sut.RemoveAvailableDataStorage(ownStorage);
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>();
+        sut.DataStorages.Should().Contain(ownStorage);
+    }
+
+    [Fact]
+    public void RemoveAvailableDataStorage_DefaultStorage_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var sut = CreateSut(CreateDataStorage(false, false));
+        var defaultStorage = CreateDataStorage(true, false);
+        sut.AddAvailableDataStorage(defaultStorage);
+        sut.SetDefaultShrubMembersDataStorage(defaultStorage);
+
+        // Act
+        var act = () => sut.RemoveAvailableDataStorage(defaultStorage);
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>();
+        sut.DataStorages.Should().Contain(defaultStorage);
+    }
+
     private static PhiladelphusRepositoryModel CreateSut(IDataStorageModel dataStorage)
     {
         return new PhiladelphusRepositoryDefaultDataStoragesTestingFixture(
