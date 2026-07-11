@@ -63,6 +63,64 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         /// </summary>
         public ObservableCollection<IDataStorageModel> DataStorages { get => _dataStorages; }
 
+        /// <summary>
+        /// Все настроенные хранилища данных.
+        /// </summary>
+        public IEnumerable<IDataStorageModel> AllDataStorages
+        {
+            get
+            {
+                return _dataStoragesCollectionVM.DataStoragesVMs?
+                    .Select(x => x.Model)
+                    .OfType<IDataStorageModel>()
+                    ?? Enumerable.Empty<IDataStorageModel>();
+            }
+        }
+
+        /// <summary>
+        /// Возможные хранилища участников кустарника по умолчанию.
+        /// </summary>
+        public IEnumerable<IDataStorageModel> ShrubMembersDefaultDataStorages
+            => DataStorages.Where(x => x.HasShrubMembersInfrastructureRepository);
+
+        /// <summary>
+        /// Возможные хранилища отчетов по умолчанию.
+        /// </summary>
+        public IEnumerable<IDataStorageModel> ReportsDefaultDataStorages
+            => DataStorages.Where(x => x.HasReportsInfrastructureRepository);
+
+        /// <summary>
+        /// Хранилище участников кустарника по умолчанию.
+        /// </summary>
+        public IDataStorageModel? DefaultShrubMembersDataStorage
+        {
+            get => _model.DefaultShrubMembersDataStorage;
+            set
+            {
+                if (!_model.SetDefaultShrubMembersDataStorage(value))
+                    return;
+
+                OnPropertyChanged(nameof(DefaultShrubMembersDataStorage));
+                NotifyStateVisibilityPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// Хранилище отчетов по умолчанию.
+        /// </summary>
+        public IDataStorageModel? DefaultReportsDataStorage
+        {
+            get => _model.DefaultReportsDataStorage;
+            set
+            {
+                if (!_model.SetDefaultReportsDataStorage(value))
+                    return;
+
+                OnPropertyChanged(nameof(DefaultReportsDataStorage));
+                NotifyStateVisibilityPropertiesChanged();
+            }
+        }
+
         private ObservableCollection<TreeRootVM> _childs = new ObservableCollection<TreeRootVM>();
        
         /// <summary>
@@ -126,7 +184,47 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub);
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub.ContentWorkingTrees);
 
+            _dataStorages = new ObservableCollection<IDataStorageModel>(repositoryModel.DataStorages);
             RebuildTreeItems();
+        }
+
+        /// <summary>
+        /// Добавить возможное хранилище данных.
+        /// </summary>
+        /// <param name="storage">Хранилище данных.</param>
+        /// <returns>true, если хранилище добавлено; иначе false.</returns>
+        public bool AddAvailableDataStorage(IDataStorageModel storage)
+        {
+            if (!_model.AddAvailableDataStorage(storage))
+                return false;
+
+            DataStorages.Add(storage);
+            NotifyDataStoragesChanged();
+            return true;
+        }
+
+        /// <summary>
+        /// Удалить возможное хранилище данных.
+        /// </summary>
+        /// <param name="storage">Хранилище данных.</param>
+        /// <returns>true, если хранилище удалено; иначе false.</returns>
+        public bool RemoveAvailableDataStorage(IDataStorageModel storage)
+        {
+            if (!_model.RemoveAvailableDataStorage(storage))
+                return false;
+
+            var availableStorage = DataStorages.Single(x => x.Uuid == storage.Uuid);
+            DataStorages.Remove(availableStorage);
+            NotifyDataStoragesChanged();
+            return true;
+        }
+
+        private void NotifyDataStoragesChanged()
+        {
+            OnPropertyChanged(nameof(DataStorages));
+            OnPropertyChanged(nameof(ShrubMembersDefaultDataStorages));
+            OnPropertyChanged(nameof(ReportsDefaultDataStorages));
+            NotifyStateVisibilityPropertiesChanged();
         }
 
         /// <summary>
