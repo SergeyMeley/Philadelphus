@@ -70,6 +70,13 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 return _model.InfrastructureType;
             }
         }
+        public bool IsSqliteInfrastructure
+        {
+            get
+            {
+                return InfrastructureType == InfrastructureTypes.SQLiteEf;
+            }
+        }
 
         public string ProviderName
         {
@@ -194,7 +201,10 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 Enum.GetValues<InfrastructureEntityGroups>().Select(group =>
                 {
                     model.ConnectionStrings.TryGetValue(group, out var connectionString);
-                    var result = new DataStorageConnectionStringVM(group, connectionString ?? string.Empty);
+                    var result = new DataStorageConnectionStringVM(
+                        group,
+                        connectionString ?? string.Empty,
+                        createSqliteEditor: model.InfrastructureType == InfrastructureTypes.SQLiteEf);
                     result.PropertyChanged += ConnectionStringPropertyChanged;
                     return result;
                 }));

@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.SqliteConnectionStringEditor">
+    <StackPanel Spacing="4">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <TextBlock Grid.Column="0" Text="Путь к файлу базы" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1"
+                     Text="{Binding DataSource}"
+                     MinWidth="0"
+                     IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+        </Grid>
+        <ItemsControl ItemsSource="{Binding AdditionalParameters}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="4" Margin="0,2">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding Key}"
+                                 Watermark="Параметр"
+                                 IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding Value}"
+                                 Watermark="Значение"
+                                 IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
+                        <Button Grid.Column="2"
+                                Content="Удалить"
+                                IsVisible="{Binding !$parent[UserControl].IsReadOnly}"
+                                Command="{Binding $parent[ItemsControl].DataContext.RemoveAdditionalParameterCommand}"
+                                CommandParameter="{Binding}" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Button Content="Добавить параметр"
+                HorizontalAlignment="Left"
+                IsVisible="{Binding !$parent[UserControl].IsReadOnly}"
+                Command="{Binding AddAdditionalParameterCommand}" />
+    </StackPanel>
+</UserControl>

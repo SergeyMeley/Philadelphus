@@ -73,6 +73,23 @@ public class DataStorageVMTests
     }
 
     [Fact]
+    public void ConnectionStrings_ForSqliteStorage_InitializesSqliteEditors()
+    {
+        // Arrange
+        var model = new FakeDataStorageModel();
+        model.ConnectionStrings[InfrastructureEntityGroups.Reports] = "Data Source=reports.db";
+
+        // Act
+        using var sut = new DataStorageVM(model);
+
+        // Assert
+        sut.IsSqliteInfrastructure.Should().BeTrue();
+        sut.ConnectionStrings.Should().OnlyContain(x => x.SqliteEditor != null);
+        sut.ConnectionStrings.Single(x => x.EntityGroup == InfrastructureEntityGroups.Reports)
+            .SqliteEditor!.DataSource.Should().Be("reports.db");
+    }
+
+    [Fact]
     public void IsHidden_SetTrue_UpdatesModelAndHeaderOpacity()
     {
         // Arrange
