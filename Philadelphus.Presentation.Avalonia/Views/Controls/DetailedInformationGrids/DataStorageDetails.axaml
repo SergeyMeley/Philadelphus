@@ -52,14 +52,19 @@
                               HorizontalAlignment="Stretch">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid ColumnDefinitions="180,*" ColumnSpacing="8" Margin="0,2"
-                                  HorizontalAlignment="Stretch">
-                                <TextBlock Grid.Column="0" Text="{Binding EntityGroupDisplayName}" VerticalAlignment="Center" />
-                                <TextBox Grid.Column="1" Text="{Binding ConnectionString}"
+                            <Expander Header="{Binding EntityGroupDisplayName}"
+                                      IsExpanded="True"
+                                      Margin="0,4"
+                                      HorizontalAlignment="Stretch">
+                                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                                        BorderThickness="1,0,1,1"
+                                        Padding="8">
+                                <TextBox Text="{Binding ConnectionString}"
                                          MinWidth="0"
                                          HorizontalAlignment="Stretch"
                                          IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
-                            </Grid>
+                                </Border>
+                            </Expander>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

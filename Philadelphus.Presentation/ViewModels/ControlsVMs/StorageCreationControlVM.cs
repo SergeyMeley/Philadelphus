@@ -42,7 +42,32 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <summary>
         /// Тип инфраструктуры создаваемого хранилища.
         /// </summary>
-        public InfrastructureTypes InfrastructureType { get; set; } = InfrastructureTypes.SQLiteEf;
+        private InfrastructureTypes _infrastructureType = InfrastructureTypes.SQLiteEf;
+
+        public InfrastructureTypes InfrastructureType
+        {
+            get
+            {
+                return _infrastructureType;
+            }
+            set
+            {
+                if (_infrastructureType == value)
+                    return;
+
+                _infrastructureType = value;
+                OnPropertyChanged(nameof(InfrastructureType));
+                OnPropertyChanged(nameof(IsSqliteInfrastructure));
+            }
+        }
+
+        public bool IsSqliteInfrastructure
+        {
+            get
+            {
+                return InfrastructureType == InfrastructureTypes.SQLiteEf;
+            }
+        }
       
         /// <summary>
         /// Доступные типы инфраструктуры.
@@ -60,7 +85,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </summary>
         public IEnumerable<DataStorageConnectionStringVM> ConnectionStrings { get; }
             = Enum.GetValues<InfrastructureEntityGroups>()
-                .Select(group => new DataStorageConnectionStringVM(group, string.Empty))
+                .Select(group => new DataStorageConnectionStringVM(group, string.Empty, createSqliteEditor: true))
                 .ToList();
 
         private DataStoragesCollectionVM _dataStoragesCollectionVM;

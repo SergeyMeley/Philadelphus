@@ -25,6 +25,22 @@ public class DataStorageVMTests
     }
 
     [Fact]
+    public void ConnectionString_WithSqliteEditor_SynchronizesBuiltString()
+    {
+        // Arrange
+        var sut = new DataStorageConnectionStringVM(
+            InfrastructureEntityGroups.ShrubMembers,
+            string.Empty,
+            createSqliteEditor: true);
+
+        // Act
+        sut.SqliteEditor!.DataSource = "shrub.db";
+
+        // Assert
+        sut.ConnectionString.Should().Be("Data Source=shrub.db");
+    }
+
+    [Fact]
     public void ProviderName_Set_UpdatesModel()
     {
         // Arrange

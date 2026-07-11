@@ -19,7 +19,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         public ObservableCollection<ConnectionStringParameterVM> AdditionalParameters { get; } = new();
 
         /// <summary>
-        /// Путь или другое имя источника данных SQLite.
+        /// Путь к файлу базы данных SQLite, сохраняемый в параметре Data Source.
         /// </summary>
         public string DataSource
         {
