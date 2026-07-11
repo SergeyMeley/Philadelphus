@@ -1,4 +1,7 @@
 using Microsoft.Data.Sqlite;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
 {
@@ -8,6 +11,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
     public class SqliteConnectionStringVM : ViewModelBase
     {
         private string _dataSource = string.Empty;
+
+        /// <summary>
+        /// Дополнительные параметры строки подключения SQLite.
+        /// </summary>
+        public ObservableCollection<ConnectionStringParameterVM> AdditionalParameters { get; } = new();
 
         /// <summary>
         /// Путь или другое имя источника данных SQLite.
@@ -36,22 +44,58 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         {
             get
             {
-                return new SqliteConnectionStringBuilder
+                var builder = new SqliteConnectionStringBuilder
                 {
                     DataSource = DataSource
-                }.ConnectionString;
+                };
+                foreach (var parameter in AdditionalParameters.Where(x => string.IsNullOrWhiteSpace(x.Key) == false))
+                    builder[parameter.Key] = parameter.Value;
+
+                return builder.ConnectionString;
             }
             set
             {
                 var builder = new SqliteConnectionStringBuilder(value ?? string.Empty);
                 DataSource = builder.DataSource;
+                AdditionalParameters.Clear();
+                foreach (KeyValuePair<string, object> parameter in builder)
+                {
+                    if (string.Equals(parameter.Key, "Data Source", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    AdditionalParameters.Add(new ConnectionStringParameterVM(
+                        parameter.Key,
+                        parameter.Value?.ToString() ?? string.Empty));
+                }
                 OnPropertyChanged(nameof(ConnectionString));
             }
         }
 
         public SqliteConnectionStringVM(string connectionString = "")
         {
+            AdditionalParameters.CollectionChanged += AdditionalParametersCollectionChanged;
             ConnectionString = connectionString;
+        }
+
+        private void AdditionalParametersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (ConnectionStringParameterVM parameter in e.OldItems)
+                    parameter.PropertyChanged -= AdditionalParameterPropertyChanged;
+            }
+            if (e.NewItems != null)
+            {
+                foreach (ConnectionStringParameterVM parameter in e.NewItems)
+                    parameter.PropertyChanged += AdditionalParameterPropertyChanged;
+            }
+
+            OnPropertyChanged(nameof(ConnectionString));
+        }
+
+        private void AdditionalParameterPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ConnectionString));
         }
     }
 }
