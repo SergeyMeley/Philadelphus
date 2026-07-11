@@ -38,12 +38,17 @@
                 </TabItem>
                 <TabItem Classes="compact" Header="Репозиторий">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <local:MainEntityDetails />
+                        <local:PhiladelphusRepositoryHeaderDetails />
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Classes="compact" Header="Хранилище">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <local:DataStorageDetails DataContext="{Binding Model.DataStorage}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Настройка хранилищ">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:PhiladelphusRepositoryDetails />
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Classes="compact" Header="Аудит">
@@ -75,6 +80,11 @@
                 <TabItem Classes="compact" Header="Хранилище">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Classes="compact" Header="Настройка хранилищ">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <local:PhiladelphusRepositoryDetails DataContext="{Binding OwningRepositoryVM}" />
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Classes="compact" Header="Аудит">

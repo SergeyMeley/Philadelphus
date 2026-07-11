@@ -78,6 +78,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             }
         }
 
+        public bool IsPhiladelphusRepositoryAvailable
+            => OwnDataStorage.IsAvailable == true;
+
         /// <summary>
         /// Возможные хранилища участников кустарника по умолчанию.
         /// </summary>
@@ -103,6 +106,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
                 OnPropertyChanged(nameof(DefaultShrubMembersDataStorage));
                 OnPropertyChanged(nameof(RemoveAvailableDataStorageCommand));
+                OnPropertyChanged(nameof(ClearDefaultShrubMembersDataStorageCommand));
                 NotifyStateVisibilityPropertiesChanged();
             }
         }
@@ -120,6 +124,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
                 OnPropertyChanged(nameof(DefaultReportsDataStorage));
                 OnPropertyChanged(nameof(RemoveAvailableDataStorageCommand));
+                OnPropertyChanged(nameof(ClearDefaultReportsDataStorageCommand));
                 NotifyStateVisibilityPropertiesChanged();
             }
         }
@@ -152,6 +157,32 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                         && DefaultShrubMembersDataStorage?.Uuid != dataStorage.Uuid
                         && DefaultReportsDataStorage?.Uuid != dataStorage.Uuid
                         && DataStorages.Any(x => x.Uuid == dataStorage.Uuid));
+            }
+        }
+
+        /// <summary>
+        /// Команда очистки хранилища участников кустарника по умолчанию.
+        /// </summary>
+        public RelayCommand ClearDefaultShrubMembersDataStorageCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    _ => DefaultShrubMembersDataStorage = null,
+                    _ => DefaultShrubMembersDataStorage != null);
+            }
+        }
+
+        /// <summary>
+        /// Команда очистки хранилища отчетов по умолчанию.
+        /// </summary>
+        public RelayCommand ClearDefaultReportsDataStorageCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    _ => DefaultReportsDataStorage = null,
+                    _ => DefaultReportsDataStorage != null);
             }
         }
 
@@ -292,7 +323,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 }
             }
 
-            TreeItems.Add(new ShrubVM(shrub, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService, visibleWorkingTrees));
+            TreeItems.Add(new ShrubVM(shrub, this, _dataStoragesCollectionVM, _service, _fileDialogService, _notificationService, visibleWorkingTrees));
             OnPropertyChanged(nameof(Childs));
             OnPropertyChanged(nameof(TreeItems));
             OnPropertyChanged(nameof(ChildsCount));

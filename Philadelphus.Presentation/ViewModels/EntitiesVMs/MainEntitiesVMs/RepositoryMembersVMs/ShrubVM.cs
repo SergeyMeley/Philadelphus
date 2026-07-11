@@ -18,6 +18,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
 
         public ObservableCollection<WorkingTreeVM> WorkingTrees => _workingTrees;
 
+        /// <summary>
+        /// Модель представления репозитория-владельца.
+        /// </summary>
+        public PhiladelphusRepositoryVM OwningRepositoryVM { get; }
+
         public override IEnumerable<IMainEntityVM> TreeChilds => _workingTrees;
 
         public override bool IsTreeExpandedByDefault => true;
@@ -41,6 +46,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
 
         public ShrubVM(
             ShrubModel shrub,
+            PhiladelphusRepositoryVM owningRepositoryVM,
             DataStoragesCollectionVM dataStoragesCollectionVM,
             IPhiladelphusRepositoryService service,
             IFileDialogService fileDialogService,
@@ -49,6 +55,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
             : base(shrub, dataStoragesCollectionVM, service, fileDialogService, notificationService)
         {
             ArgumentNullException.ThrowIfNull(shrub);
+            ArgumentNullException.ThrowIfNull(owningRepositoryVM);
+
+            OwningRepositoryVM = owningRepositoryVM;
 
             foreach (var workingTree in workingTrees ?? shrub.ContentWorkingTrees)
             {
