@@ -41,6 +41,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IRelayCommandFactory _commandFactory;
         private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly IWindowService _windowService;
+        private readonly IDataStorageSelectionDialogService _dataStorageSelectionDialogService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -59,7 +60,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
         private IAsyncRelayCommand? _getWorkCommand;
         private IRelayCommand? _saveCommand;
-        private IRelayCommand? _createRootCommand;
+        private IAsyncRelayCommand? _createRootCommand;
         private IRelayCommand? _createNodeCommand;
         private IRelayCommand? _createLeaveCommand;
         private IRelayCommand? _createAttributeCommand;
@@ -256,6 +257,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IRelayCommandFactory commandFactory,
             IAsyncRelayCommandFactory asyncCommandFactory,
             IWindowService windowService,
+            IDataStorageSelectionDialogService dataStorageSelectionDialogService,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -272,12 +274,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(commandFactory);
             ArgumentNullException.ThrowIfNull(asyncCommandFactory);
             ArgumentNullException.ThrowIfNull(windowService);
+            ArgumentNullException.ThrowIfNull(dataStorageSelectionDialogService);
 
             _service = service;
             _fileDialogService = fileDialogService;
             _commandFactory = commandFactory;
             _asyncCommandFactory = asyncCommandFactory;
             _windowService = windowService;
+            _dataStorageSelectionDialogService = dataStorageSelectionDialogService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -325,19 +329,18 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     return CanModifyRepository();
                 });
 
-        public IRelayCommand CreateRootCommand =>
-            _createRootCommand ??= _commandFactory.Create(
-                obj =>
-                {
-                    var tree = _service.CreateWorkingTree(_philadelphusRepositoryVM.Model, _philadelphusRepositoryVM.Model.OwnDataStorage);
-                    var result = _service.CreateTreeRoot(tree);
-                    _philadelphusRepositoryVM.RebuildTreeItems();
-                    NotifyRepositoryTreeChanged();
-                },
-                ce =>
-                {
-                    return CanModifyRepository();
-                });
+        public IAsyncRelayCommand CreateRootCommand
+        {
+            get
+            {
+                return _createRootCommand ??= _asyncCommandFactory.Create(
+                    ExecuteCreateRootAsync,
+                    ce =>
+                    {
+                        return CanModifyRepository();
+                    });
+            }
+        }
 
         public IRelayCommand CreateNodeCommand =>
             _createNodeCommand ??= _commandFactory.Create(
@@ -603,6 +606,32 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     $"Ошибка обновления содержимого репозитория. Подробности: {ex.Message}",
                     criticalLevel: NotificationCriticalLevelModel.Error);
             }
+        }
+
+        private async Task ExecuteCreateRootAsync(object obj)
+        {
+            var repository = _philadelphusRepositoryVM.Model;
+            var dataStorage = repository.DefaultShrubMembersDataStorage;
+
+            if (dataStorage?.HasShrubMembersInfrastructureRepository != true
+                || repository.DataStorages.Any(x => x.Uuid == dataStorage.Uuid) == false)
+            {
+                var availableDataStorages = repository.DataStorages
+                    .Where(x => x.HasShrubMembersInfrastructureRepository)
+                    .ToList();
+
+                dataStorage = await _dataStorageSelectionDialogService.SelectAsync(
+                    availableDataStorages,
+                    "Хранилище участников кустарника по умолчанию не задано. Выберите хранилище для нового рабочего дерева.");
+            }
+
+            if (dataStorage == null)
+                return;
+
+            var tree = _service.CreateWorkingTree(repository, dataStorage);
+            _service.CreateTreeRoot(tree);
+            _philadelphusRepositoryVM.RebuildTreeItems();
+            NotifyRepositoryTreeChanged();
         }
 
         private void UpdateLoadedPhiladelphusRepository(PhiladelphusRepositoryModel newRepo)
