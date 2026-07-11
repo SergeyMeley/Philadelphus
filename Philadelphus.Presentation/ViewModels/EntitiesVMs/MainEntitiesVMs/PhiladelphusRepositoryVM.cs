@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
@@ -101,6 +102,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                     return;
 
                 OnPropertyChanged(nameof(DefaultShrubMembersDataStorage));
+                OnPropertyChanged(nameof(RemoveAvailableDataStorageCommand));
                 NotifyStateVisibilityPropertiesChanged();
             }
         }
@@ -117,7 +119,39 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                     return;
 
                 OnPropertyChanged(nameof(DefaultReportsDataStorage));
+                OnPropertyChanged(nameof(RemoveAvailableDataStorageCommand));
                 NotifyStateVisibilityPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// Команда добавления возможного хранилища данных.
+        /// </summary>
+        public RelayCommand AddAvailableDataStorageCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    storage => AddAvailableDataStorage((IDataStorageModel)storage!),
+                    storage => storage is IDataStorageModel dataStorage
+                        && DataStorages.All(x => x.Uuid != dataStorage.Uuid));
+            }
+        }
+
+        /// <summary>
+        /// Команда удаления возможного хранилища данных.
+        /// </summary>
+        public RelayCommand RemoveAvailableDataStorageCommand
+        {
+            get
+            {
+                return new RelayCommand(
+                    storage => RemoveAvailableDataStorage((IDataStorageModel)storage!),
+                    storage => storage is IDataStorageModel dataStorage
+                        && dataStorage.Uuid != OwnDataStorageUuid
+                        && DefaultShrubMembersDataStorage?.Uuid != dataStorage.Uuid
+                        && DefaultReportsDataStorage?.Uuid != dataStorage.Uuid
+                        && DataStorages.Any(x => x.Uuid == dataStorage.Uuid));
             }
         }
 
@@ -224,6 +258,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             OnPropertyChanged(nameof(DataStorages));
             OnPropertyChanged(nameof(ShrubMembersDefaultDataStorages));
             OnPropertyChanged(nameof(ReportsDefaultDataStorages));
+            OnPropertyChanged(nameof(AddAvailableDataStorageCommand));
+            OnPropertyChanged(nameof(RemoveAvailableDataStorageCommand));
             NotifyStateVisibilityPropertiesChanged();
         }
 
