@@ -150,7 +150,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 {
                     if (string.IsNullOrWhiteSpace(Name)
                         || string.IsNullOrWhiteSpace(ProviderName)
-                        || ConnectionStrings.All(x => string.IsNullOrWhiteSpace(x.ConnectionString)))
+                        || ConnectionStrings.All(x => string.IsNullOrWhiteSpace(x.ConnectionString))
+                        || IsSqliteInfrastructure &&
+                            (ConnectionStrings.All(x => x.SqliteEditor!.IsValid == false)
+                            || ConnectionStrings.Any(x => x.SqliteEditor!.IsEmpty == false && x.SqliteEditor.IsValid == false)))
                     {
                         _notificationService.SendModalWindow<StorageCreationControlVM>(
                             "Некорректно заполнены параметры, операция не выполнена.", 

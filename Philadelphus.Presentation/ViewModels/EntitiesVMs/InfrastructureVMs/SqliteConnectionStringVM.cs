@@ -3,6 +3,7 @@ using Philadelphus.Presentation.Infrastructure;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
 {
@@ -45,14 +46,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
         {
             get
             {
-                var builder = new SqliteConnectionStringBuilder
-                {
-                    DataSource = DataSource
-                };
-                foreach (var parameter in AdditionalParameters.Where(x => string.IsNullOrWhiteSpace(x.Key) == false))
-                    builder[parameter.Key] = parameter.Value;
-
-                return builder.ConnectionString;
+                return TryBuildConnectionString(out var connectionString)
+                    ? connectionString
+                    : string.Empty;
             }
             set
             {
@@ -69,6 +65,26 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                         parameter.Value?.ToString() ?? string.Empty));
                 }
                 OnPropertyChanged(nameof(ConnectionString));
+            }
+        }
+
+        public bool IsValid
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(DataSource) == false
+                    && AdditionalParameters.All(x => string.IsNullOrWhiteSpace(x.Key) == false)
+                    && AdditionalParameters.GroupBy(x => x.Key, StringComparer.OrdinalIgnoreCase).All(x => x.Count() == 1)
+                    && TryBuildConnectionString(out _);
+            }
+        }
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(DataSource)
+                    && AdditionalParameters.Count == 0;
             }
         }
 
@@ -109,6 +125,24 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
         }
 
+        /// <summary>
+        /// Открывает официальную документацию по строкам подключения SQLite.
+        /// </summary>
+        public RelayCommand OpenDocumentationCommand
+        {
+            get
+            {
+                return new RelayCommand(_ =>
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "https://learn.microsoft.com/dotnet/standard/data/sqlite/connection-strings",
+                        UseShellExecute = true
+                    });
+                });
+            }
+        }
+
         private void AdditionalParametersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
@@ -123,11 +157,33 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
 
             OnPropertyChanged(nameof(ConnectionString));
+            OnPropertyChanged(nameof(IsValid));
+            OnPropertyChanged(nameof(IsEmpty));
         }
 
         private void AdditionalParameterPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(ConnectionString));
+            OnPropertyChanged(nameof(IsValid));
+            OnPropertyChanged(nameof(IsEmpty));
+        }
+
+        private bool TryBuildConnectionString(out string connectionString)
+        {
+            try
+            {
+                var builder = new SqliteConnectionStringBuilder { DataSource = DataSource };
+                foreach (var parameter in AdditionalParameters.Where(x => string.IsNullOrWhiteSpace(x.Key) == false))
+                    builder[parameter.Key] = parameter.Value;
+
+                connectionString = builder.ConnectionString;
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                connectionString = string.Empty;
+                return false;
+            }
         }
     }
 }

@@ -34,5 +34,8 @@
                 HorizontalAlignment="Left"
                 IsVisible="{Binding !$parent[UserControl].IsReadOnly}"
                 Command="{Binding AddAdditionalParameterCommand}" />
+        <Button Content="Документация по параметрам SQLite"
+                HorizontalAlignment="Left"
+                Command="{Binding OpenDocumentationCommand}" />
     </StackPanel>
 </UserControl>

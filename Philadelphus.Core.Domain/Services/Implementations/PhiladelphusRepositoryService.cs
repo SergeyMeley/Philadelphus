@@ -212,6 +212,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (workingTrees == null || workingTrees.Count() == 0)
                 return 0;
 
+            EnsureShrubMembersStorageSupport(workingTrees.Select(x => x.DataStorage));
+
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                 $"Начало сохранения рабочих деревьев. Рабочие деревья: {string.Join(", ", workingTrees.Select(x => $"'{x.Name}' [{x.Uuid}].").Distinct())}",
@@ -280,6 +282,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             // Проверка исходных данных
             if (treeRoots == null || treeRoots.Count() == 0)
                 return 0;
+
+            EnsureShrubMembersStorageSupport(treeRoots.Select(x => x.DataStorage));
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
@@ -350,6 +354,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             if (treeNodes == null || treeNodes.Count() == 0)
                 return 0;
 
+            EnsureShrubMembersStorageSupport(treeNodes.Select(x => x.DataStorage));
+
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
                 $"Начало сохранения узлов. Рабочие деревья: {string.Join(", ", treeNodes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
@@ -419,6 +425,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             // Проверка исходных данных
             if (treeLeaves == null || treeLeaves.Count() == 0)
                 return 0;
+
+            EnsureShrubMembersStorageSupport(treeLeaves.Select(x => x.DataStorage));
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
@@ -1489,6 +1497,22 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             return child is IParentModel parent
                 && parent.Childs.Values.Any(x => HasInheritedAttributeInBranch(x, declaringUuid));
+        }
+
+        /// <summary>
+        /// Проверяет поддержку сущностей кустарника всеми указанными хранилищами.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Если хранилище не поддерживает сущности кустарника.</exception>
+        private static void EnsureShrubMembersStorageSupport(IEnumerable<IDataStorageModel> dataStorages)
+        {
+            var unsupportedStorage = dataStorages
+                .DistinctBy(x => x.Uuid)
+                .FirstOrDefault(x => x.HasShrubMembersInfrastructureRepository == false);
+            if (unsupportedStorage == null)
+                return;
+
+            throw new InvalidOperationException(
+                $"Хранилище '{unsupportedStorage.Name}' [{unsupportedStorage.Uuid}] не поддерживает сохранение элементов кустарника.");
         }
 
         #endregion
