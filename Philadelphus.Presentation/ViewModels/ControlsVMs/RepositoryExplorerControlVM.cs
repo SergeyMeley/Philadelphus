@@ -12,6 +12,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels;
@@ -622,19 +623,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private async Task ExecuteCreateRootAsync(object obj)
         {
             var repository = _philadelphusRepositoryVM.Model;
-            var dataStorage = repository.DefaultShrubMembersDataStorage;
-
-            if (dataStorage?.HasShrubMembersInfrastructureRepository != true
-                || repository.DataStorages.Any(x => x.Uuid == dataStorage.Uuid) == false)
-            {
-                var availableDataStorages = repository.DataStorages
-                    .Where(x => x.HasShrubMembersInfrastructureRepository)
-                    .ToList();
-
-                dataStorage = await _dataStorageSelectionDialogService.SelectAsync(
-                    availableDataStorages,
-                    "Хранилище участников кустарника по умолчанию не задано. Выберите хранилище для нового рабочего дерева.");
-            }
+            var dataStorage = await WorkingTreeDataStorageSelector.SelectAsync(
+                repository.DefaultShrubMembersDataStorage,
+                repository.DataStorages,
+                _dataStorageSelectionDialogService);
 
             if (dataStorage == null)
                 return;

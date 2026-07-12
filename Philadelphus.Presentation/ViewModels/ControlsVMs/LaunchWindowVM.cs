@@ -188,17 +188,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             }
         }
 
-        public IRelayCommand OpenConnectionStringsSettingsControlCommand
-        {
-            get
-            {
-                return _commandFactory.Create(obj =>
-                {
-                    SelectedLaunchWindowTabItemVM = LaunchWindowTabItemsVMs.Find(x => x.Content is LaunchSettingsTabVM);
-                    _applicationSettingsControlVM.SelectedApplicationSettingsTabItemVM = _applicationSettingsControlVM.ApplicationSettingsTabItemsVMs.FirstOrDefault();
-                });
-            }
-        }
         private bool CheckPhiladelphusRepositoryAvailable(PhiladelphusRepositoryHeaderVM header)
         {
             if (header == null)

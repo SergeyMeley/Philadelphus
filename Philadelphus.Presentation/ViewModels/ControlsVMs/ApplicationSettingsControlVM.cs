@@ -8,11 +8,9 @@ using Philadelphus.Infrastructure.Persistence.Entities.Infrastructure.DataStorag
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
-using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.ControlsVMs.TabItemsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Serilog;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -27,7 +25,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
     {
         private readonly IConfigurationService _configurationService;
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IRelayCommandFactory _commandFactory;
         private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly IFileDialogService _fileDialogService;
@@ -63,37 +60,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         public ConfigurationFileVM SelectedConfigFile { get; set; }
        
         /// <summary>
-        /// Выполняет операцию контейнера строк подключения.
-        /// </summary>
-        /// <returns>Коллекция полученных данных.</returns>
-        public ObservableCollection<ConnectionStringsContainerVM> ConnectionStringsContainersVMs { get; } = new ObservableCollection<ConnectionStringsContainerVM>();
-      
-        /// <summary>
-        /// Контейнер строк подключения.
-        /// </summary>
-        public ConnectionStringsContainerVM SelectedConnectionStringsContainerVM {  get; set; } 
-        public string[] ProvidersNames
-        { 
-            get
-            {
-                return new[] {
-                    "Npgsql.EntityFrameworkCore.PostgreSQL",
-                    "System.Text.Json.JsonSerializer"
-                };
-            }
-        }
-
-        /// <summary>
-        /// Контейнер строк подключения.
-        /// </summary>
-        public string NewConnectionStringsContainerSelectedProvider { get; set; }
-       
-        /// <summary>
-        /// Контейнер строк подключения.
-        /// </summary>
-        public string NewConnectionStringsContainerConnectionString { get; set; }
-
-        /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ApplicationSettingsControlVM" />.
         /// </summary>
         /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
@@ -103,7 +69,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="configurationService">Параметр configurationService.</param>
         /// <param name="applicationCommandsVM">Модель представления команд приложения.</param>
         /// <param name="appConfig">Параметр appConfig.</param>
-        /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <param name="fileDialogService">Сервис файловых диалогов.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
@@ -114,7 +79,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IConfigurationService configurationService,
             IApplicationCommandsVM applicationCommandsVM,
             IOptions<ApplicationSettingsConfig> appConfig,
-            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
             IRelayCommandFactory commandFactory,
             IAsyncRelayCommandFactory asyncCommandFactory,
             IFileDialogService fileDialogService)
@@ -124,16 +88,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(appConfig);
             ArgumentNullException.ThrowIfNull(appConfig.Value);
             ArgumentNullException.ThrowIfNull(appConfig.Value.ConfigurationFilesPathes);
-            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
-            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value);
-            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig.Value.ConnectionStringsContainers);
             ArgumentNullException.ThrowIfNull(commandFactory);
             ArgumentNullException.ThrowIfNull(asyncCommandFactory);
             ArgumentNullException.ThrowIfNull(fileDialogService);
 
             _configurationService = configurationService;
             _appConfig = appConfig;
-            _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _commandFactory = commandFactory;
             _asyncCommandFactory = asyncCommandFactory;
             _fileDialogService = fileDialogService;
@@ -168,11 +128,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                         ?? configFile.Key;
 
                 ConfigFiles.Add(new ConfigurationFileVM(displayName, configFile.Value));
-            }
-
-            foreach (var cs in _connectionStringsCollectionConfig.Value.ConnectionStringsContainers) 
-            {
-                ConnectionStringsContainersVMs.Add(_mapper.Map<ConnectionStringsContainerVM>(cs));
             }
 
             InitializeTabs();
@@ -271,103 +226,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 });
             }
         }
-        public IRelayCommand CreateAndSaveNewConnectionStringsContainerCommand
-        {
-            get
-            {
-                return _commandFactory.Create(
-                    obj =>
-                    {
-                        var vm = new ConnectionStringsContainerVM()
-                        {
-                            Uuid = Guid.CreateVersion7(),
-                            ProviderName = NewConnectionStringsContainerSelectedProvider,
-                            ConnectionString = NewConnectionStringsContainerConnectionString
-                        };
-                        ConnectionStringsContainersVMs.Add(vm);
-                        SaveConnectionStringsContainersCommand.Execute(obj);
-                    },
-                    ce =>
-                    {
-                        if (string.IsNullOrEmpty(NewConnectionStringsContainerSelectedProvider))
-                            return false;
-                        if (string.IsNullOrEmpty(NewConnectionStringsContainerConnectionString))
-                            return false;
-                        return true;
-                    });
-            }
-        }
-        public IRelayCommand SaveConnectionStringsContainersCommand
-        {
-            get
-            {
-                return _commandFactory.Create(obj =>
-                {
-                    // Изменение существующих строк подключения
-                    for (int i = 0; i < _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Count; i++)
-                    {
-                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringsContainers[i];
-                        var vm = ConnectionStringsContainersVMs.SingleOrDefault(x => x.Uuid == cs.StorageUuid);
-                        if (vm != null)
-                        {
-                            _connectionStringsCollectionConfig.Value.ConnectionStringsContainers[i] = _mapper.Map<ConnectionStringsContainer>(vm);
-                        }
-                    }
-
-                    // Добавление новых строк подключения
-                    var newVms = ConnectionStringsContainersVMs.Where(x => _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Any(c => c.StorageUuid == x.Uuid) == false);
-                    foreach (var newVm in newVms)
-                    {
-                        _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Add(_mapper.Map<ConnectionStringsContainer>(newVm));
-                    }
-
-                    // Исключение удаленных строк подключения
-                    foreach (var vm in ConnectionStringsContainersVMs.Where(x => x.ForDelete == true))
-                    {
-                        var cs = _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.SingleOrDefault(x => x.StorageUuid == vm.Uuid);
-                        _connectionStringsCollectionConfig.Value.ConnectionStringsContainers.Remove(cs);
-                    }
-                    for (int i = ConnectionStringsContainersVMs.Count - 1; i >= 0; i--)
-    {
-                        if (ConnectionStringsContainersVMs[i].ForDelete == true)
-        {
-                            ConnectionStringsContainersVMs.RemoveAt(i);
-                        }
-                    }
-
-                    // Обновление настроечного файла
-                    if (_appConfig.Value.TryGetConfigFileFullPath<ConnectionStringsCollectionConfig>(out var config))
-                    {
-                        _configurationService.UpdateConfigFile(config, _connectionStringsCollectionConfig);
-                    }
-                    else
-                    {
-                        _notificationService.SendModalWindow<ApplicationSettingsControlVM>(
-                            "Путь к конфигурационному файлу 'ConnectionStringsCollectionConfig' не найден, изменения не сохранены");
-                    }
-                });
-            }
-        }
-
-        public IRelayCommand DeleteConnectionStringsContainersCommand
-        {
-            get
-            {
-                return _commandFactory.Create(obj =>
-        {
-                    SelectedConnectionStringsContainerVM.ForDelete = true;
-                });
-            }
-        }
         private void InitializeTabs()
         {
             var tab1 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
             tab1.Header = "Настроечные файлы";
             tab1.Content = this;
-
-            //var tab2 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
-            //tab2.Header = "Строки подключения";
-            //tab2.Content = new ConnectionStringsTabControl() { DataContext = this };
 
             //var tab3 = _serviceProvider.GetRequiredService<ApplicationSettingsTabItemControlVM>();
             //tab3.Header = "Конфиденциальная информация";

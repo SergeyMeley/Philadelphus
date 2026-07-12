@@ -5,17 +5,11 @@ using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.SettingsContainersVMs;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace Philadelphus.Presentation.Services.Implementations
 {
@@ -25,7 +19,6 @@ namespace Philadelphus.Presentation.Services.Implementations
     public class ConfigurationService : IConfigurationService
     {
         private readonly IOptions<ApplicationSettingsConfig> _appConfig;
-        private readonly IOptions<ConnectionStringsCollectionConfig> _connectionStringsCollectionConfig;
         private readonly IOptions<DataStoragesCollectionConfig> _dataStoragesCollectionConfig;
         private readonly IOptions<PhiladelphusRepositoryHeadersCollectionConfig> _PhiladelphusRepositoryHeadersCollectionConfig;
         private readonly IDialogService _dialogService;
@@ -34,26 +27,22 @@ namespace Philadelphus.Presentation.Services.Implementations
         /// Инициализирует новый экземпляр класса <see cref="ConfigurationService" />.
         /// </summary>
         /// <param name="appConfig">Параметр appConfig.</param>
-        /// <param name="connectionStringsCollectionConfig">Параметр connectionStringsCollectionConfig.</param>
         /// <param name="dataStoragesCollectionConfig">Параметр dataStoragesCollectionConfig.</param>
         /// <param name="PhiladelphusRepositoryHeadersCollectionConfig">Параметр PhiladelphusRepositoryHeadersCollectionConfig.</param>
         /// <param name="dialogService">Сервис диалоговых сообщений.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public ConfigurationService(
             IOptions<ApplicationSettingsConfig> appConfig,
-            IOptions<ConnectionStringsCollectionConfig> connectionStringsCollectionConfig,
             IOptions<DataStoragesCollectionConfig> dataStoragesCollectionConfig,
             IOptions<PhiladelphusRepositoryHeadersCollectionConfig> PhiladelphusRepositoryHeadersCollectionConfig,
             IDialogService dialogService)
         {
             ArgumentNullException.ThrowIfNull(appConfig);
-            ArgumentNullException.ThrowIfNull(connectionStringsCollectionConfig);
             ArgumentNullException.ThrowIfNull(dataStoragesCollectionConfig);
             ArgumentNullException.ThrowIfNull(PhiladelphusRepositoryHeadersCollectionConfig);
             ArgumentNullException.ThrowIfNull(dialogService);
 
             _appConfig = appConfig;
-            _connectionStringsCollectionConfig = connectionStringsCollectionConfig;
             _dataStoragesCollectionConfig = dataStoragesCollectionConfig;
             _PhiladelphusRepositoryHeadersCollectionConfig = PhiladelphusRepositoryHeadersCollectionConfig;
             _dialogService = dialogService;
