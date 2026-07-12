@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -119,14 +120,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="type">Тип листа для случаев, когда идентификатор еще не зарегистрирован как системный.</param>
         /// <param name="notificationService">Сервис уведомлений об изменениях модели.</param>
         /// <param name="propertiesPolicy">Политика доступности свойств листа.</param>
+        /// <param name="loadedDataStorage">Хранилище-источник загруженного листа.</param>
         internal SystemBaseTreeLeaveModel(
             Guid uuid, 
             SystemBaseTreeNodeModel parent, 
             WorkingTreeModel owner,
             SystemBaseType type,
             INotificationService notificationService,
-            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy) 
-            : base(uuid, parent, owner, notificationService, propertiesPolicy)
+            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy,
+            IDataStorageModel? loadedDataStorage = null)
+            : base(uuid, parent, owner, notificationService, propertiesPolicy, loadedDataStorage)
         {
             SystemBaseType = IsSystemBaseValue(uuid)
                 ? GetTypeByUuid(uuid)

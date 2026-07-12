@@ -261,6 +261,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             ArgumentNullException.ThrowIfNull(storage);
 
+            if (IsSystemBase && storage.Uuid != DataStorageModel.MainDataStorageUuid)
+            {
+                throw new InvalidOperationException(
+                    "Системное рабочее дерево может храниться только в основном хранилище данных.");
+            }
+
             var availableStorage = OwningShrub.OwningRepository.DataStorages
                 .SingleOrDefault(x => x.Uuid == storage.Uuid)
                 ?? throw new InvalidOperationException(

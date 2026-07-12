@@ -209,14 +209,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public long SaveChanges(IEnumerable<WorkingTreeModel> workingTrees, SaveMode saveMode)
         {
             // Проверка исходных данных
-            if (workingTrees == null || workingTrees.Count() == 0)
+            if (workingTrees == null)
                 return 0;
 
-            EnsureShrubMembersStorageSupport(workingTrees.Select(x => x.DataStorage));
+            var workingTreesList = workingTrees.ToList();
+            if (workingTreesList.Count == 0)
+                return 0;
+
+            EnsureSystemWorkingTreeUsesMainDataStorage(workingTreesList);
+            EnsureShrubMembersStorageSupport(workingTreesList.Select(x => x.DataStorage));
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения рабочих деревьев. Рабочие деревья: {string.Join(", ", workingTrees.Select(x => $"'{x.Name}' [{x.Uuid}].").Distinct())}",
+                $"Начало сохранения рабочих деревьев. Рабочие деревья: {string.Join(", ", workingTreesList.Select(x => $"'{x.Name}' [{x.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Сохранение изменений
@@ -224,9 +229,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             long initCount = 0;
             long changedCount = 0;
             long deletedCount = 0;
-            foreach (var infrastructure in workingTrees.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
+            foreach (var infrastructure in workingTreesList.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
-                var fullCollection = workingTrees.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
+                var fullCollection = workingTreesList.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
 
                 SaveAndReturnAuditInfo<WorkingTreeModel, WorkingTree>(
                     fullCollection,
@@ -248,19 +253,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
 
             // Постобработка сохраненных элементов
-            PostProcessSavedEntities(workingTrees);
+            PostProcessSavedEntities(workingTreesList);
 
             // Сохранение содержимого
             if (saveMode == SaveMode.WithContent ||
                 saveMode == SaveMode.WithContentAndMembers)
             {
-                result += SaveContentChanges(workingTrees.SelectMany(x => x.Attributes));
+                result += SaveContentChanges(workingTreesList.SelectMany(x => x.Attributes));
             }
 
             // Сохранение участников
             if (saveMode == SaveMode.WithContentAndMembers)
             {
-                result += SaveChanges(workingTrees.Select(x => x.ContentRoot), saveMode);
+                result += SaveChanges(workingTreesList.Select(x => x.ContentRoot), saveMode);
             }
 
             // Уведомление
@@ -1052,27 +1057,19 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private bool InitSystemWorkingTree(
             ShrubModel shrub)
         {
+            var mainDataStorage = GetMainDataStorage(shrub);
             var existTree = shrub.ContentWorkingTrees.SingleOrDefault(x => x.Uuid == WorkingTreeModel.SystemBaseUuid);
             if (existTree != null)
-                return EnsureSystemBaseTypes(existTree);
-
-            var dbExistTrees = shrub.DataStorage.ShrubMembersInfrastructureRepository
-                .SelectTreeAggregates(new Guid[] { WorkingTreeModel.SystemBaseUuid });
-            existTree = _mapper.MapWorkingTrees(dbExistTrees, shrub.OwningRepository.DataStorages, shrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>()).SingleOrDefault();
-
-            if (existTree != null)
             {
-                shrub.ContentWorkingTrees.Add(existTree);
-                shrub.ContentWorkingTreesUuids.Add(existTree.Uuid);
-                EnsureSystemBaseTypes(existTree);
-                return true;
+                existTree.ChangeDataStorage(mainDataStorage);
+                return EnsureSystemBaseTypes(existTree);
             }
 
             // TODO: ех. долг #61187115
 
             var tree = new WorkingTreeModel(
                 uuid: WorkingTreeModel.SystemBaseUuid,
-                dataStorage: shrub.DataStorage,
+                dataStorage: mainDataStorage,
                 owner: shrub,
                 notificationService: _notificationService,
                 new EmptyPropertiesPolicy<WorkingTreeModel>())
@@ -1094,7 +1091,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             EnsureSystemBaseTypes(tree);
 
             shrub.ContentWorkingTrees.Add(tree);
-            shrub.ContentWorkingTreesUuids.Add(tree.Uuid);
+            if (shrub.ContentWorkingTreesUuids.Contains(tree.Uuid) == false)
+                shrub.ContentWorkingTreesUuids.Add(tree.Uuid);
             return true;
         }
 
@@ -1106,6 +1104,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private bool EnsureSystemBaseTypes(
             WorkingTreeModel tree)
         {
+            var nodesChanged = EnsureSystemBaseNodes(tree);
+            var leavesChanged = EnsureSystemBaseLeaves(tree);
+            return nodesChanged || leavesChanged;
+        }
+
+        /// <summary>
+        /// Инициализирует недостающие узлы системных базовых типов.
+        /// </summary>
+        private bool EnsureSystemBaseNodes(WorkingTreeModel tree)
+        {
             ArgumentNullException.ThrowIfNull(tree);
 
             var root = tree.ContentRoot
@@ -1116,7 +1124,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             var obj = GetOrCreateSystemBaseNode(tree, root, SystemBaseType.OBJECT, ref changed);
 
             GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.STRING, ref changed);
-            var boolean = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.BOOL, ref changed);
+            GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.BOOL, ref changed);
             GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.FILE, ref changed);
 
             var num = GetOrCreateSystemBaseNode(tree, obj, SystemBaseType.NUMERIC, ref changed);
@@ -1129,6 +1137,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.DATE, ref changed);
             GetOrCreateSystemBaseNode(tree, dateTime, SystemBaseType.TIME, ref changed);
+
+            return changed;
+        }
+
+        /// <summary>
+        /// Инициализирует недостающие предопределённые листья системных типов.
+        /// </summary>
+        private bool EnsureSystemBaseLeaves(WorkingTreeModel tree)
+        {
+            ArgumentNullException.ThrowIfNull(tree);
+
+            var boolean = tree.ContentNodes
+                .OfType<SystemBaseTreeNodeModel>()
+                .Single(x => x.SystemBaseType == SystemBaseType.BOOL);
+            var changed = false;
 
             // Значения логического типа хранятся системными листьями под узлом BOOL.
             foreach (var value in SystemBaseTreeLeaveModel.GetValuesByType(SystemBaseType.BOOL))
@@ -1306,46 +1329,66 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             repository.ContentShrub.ContentWorkingTrees.Clear();
             var loadedTreeAggregates = new List<(WorkingTreeModel tree, WorkingTree dbTree)>();
+            var systemTreeAggregates = new List<(IDataStorageModel storage, WorkingTree dbTree)>();
+            var userTreeAggregates = new List<WorkingTree>();
 
             foreach (var dataStorage in repository.DataStorages ?? Enumerable.Empty<IDataStorageModel>())
             {
                 if (dataStorage.IsAvailable)
                 {
                     var treesUuids = repository.ContentShrub.ContentWorkingTreesUuids?.ToArray();
+                    if (treesUuids != null
+                        && treesUuids.Contains(WorkingTreeModel.SystemBaseUuid) == false)
+                    {
+                        treesUuids = treesUuids
+                            .Append(WorkingTreeModel.SystemBaseUuid)
+                            .ToArray();
+                    }
+
                     var dbTrees = dataStorage.ShrubMembersInfrastructureRepository
                         .SelectTreeAggregates(treesUuids)
                         .ToList();
+                    systemTreeAggregates.AddRange(dbTrees
+                        .Where(x => x.Uuid == WorkingTreeModel.SystemBaseUuid)
+                        .Select(x => (dataStorage, x)));
+                    userTreeAggregates.AddRange(dbTrees
+                        .Where(x => x.Uuid != WorkingTreeModel.SystemBaseUuid));
+                }
+            }
 
-                    // Деревья при чтении из БД сначала создаются с пустой политикой.
-                    // Это позволяет загрузить данные, которые могли быть сохранены до появления новых правил.
-                    // Рабочая политика назначается сразу после добавления модели в доменный граф.
-                    var trees = _mapper.MapWorkingTrees(dbTrees, repository.DataStorages, repository.ContentShrub, _notificationService, new EmptyPropertiesPolicy<WorkingTreeModel>());
-                    
-                    var dbTreesByUuid = dbTrees.ToDictionary(x => x.Uuid);
+            // Системное дерево восстанавливается первым: его узлы и листья используются
+            // как типы и значения при загрузке атрибутов пользовательских деревьев.
+            LoadSystemWorkingTreeAggregate(
+                repository,
+                systemTreeAggregates,
+                loadedTreeAggregates);
 
-                    foreach (var tree in trees)
-                    {
-                        repository.ContentShrub.ContentWorkingTrees.Add(tree);
+            // Пользовательские деревья при чтении из БД сначала создаются с пустой политикой.
+            // Рабочая политика назначается сразу после добавления модели в доменный граф.
+            var userTrees = _mapper.MapWorkingTrees(
+                userTreeAggregates,
+                repository.DataStorages,
+                repository.ContentShrub,
+                _notificationService,
+                new EmptyPropertiesPolicy<WorkingTreeModel>());
+            var userDbTreesByUuid = userTreeAggregates.ToDictionary(x => x.Uuid);
 
-                        // После загрузки модель снова должна вести себя как обычная пользовательская модель:
-                        // все дальнейшие изменения из UI, включая таблицу "Наследники", проходят через правила.
-                        tree.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateWorkingTreeDefault(_notificationService));
+            foreach (var tree in userTrees)
+            {
+                repository.ContentShrub.ContentWorkingTrees.Add(tree);
+                tree.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateWorkingTreeDefault(_notificationService));
 
-                        if (dbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
-                        {
-                            var dbRoots = dbTree.ContentRoot == null
-                                ? Array.Empty<TreeRoot>()
-                                : new[] { dbTree.ContentRoot };
-
-                            DistributeWorkingTreeContentWithoutAttributes(
-                                tree,
-                                dbRoots,
-                                dbTree.ContentNodes.ToList(),
-                                dbTree.ContentLeaves.ToList());
-
-                            loadedTreeAggregates.Add((tree, dbTree));
-                        }
-                    }
+                if (userDbTreesByUuid.TryGetValue(tree.Uuid, out var dbTree))
+                {
+                    var dbRoots = dbTree.ContentRoot == null
+                        ? Array.Empty<TreeRoot>()
+                        : new[] { dbTree.ContentRoot };
+                    DistributeWorkingTreeContentWithoutAttributes(
+                        tree,
+                        dbRoots,
+                        dbTree.ContentNodes.ToList(),
+                        dbTree.ContentLeaves.ToList());
+                    loadedTreeAggregates.Add((tree, dbTree));
                 }
             }
 
@@ -1371,6 +1414,109 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             SetModelState(repository, State.SavedOrLoaded);
 
             return repository;
+        }
+
+        /// <summary>
+        /// Загружает единый системный каркас из первого найденного агрегата и объединяет системные листья из всех хранилищ.
+        /// </summary>
+        private void LoadSystemWorkingTreeAggregate(
+            PhiladelphusRepositoryModel repository,
+            IReadOnlyCollection<(IDataStorageModel storage, WorkingTree dbTree)> systemTreeAggregates,
+            ICollection<(WorkingTreeModel tree, WorkingTree dbTree)> loadedTreeAggregates)
+        {
+            if (systemTreeAggregates.Count == 0)
+                return;
+
+            var mainDataStorage = GetMainDataStorage(repository.ContentShrub);
+            var firstAggregate = systemTreeAggregates.First().dbTree;
+            var mainAggregate = systemTreeAggregates
+                .FirstOrDefault(x => x.storage.Uuid == mainDataStorage.Uuid)
+                .dbTree;
+            var mainNodeUuids = mainAggregate?.ContentNodes
+                .Select(x => x.Uuid)
+                .ToHashSet() ?? new HashSet<Guid>();
+            var allSystemLeaves = systemTreeAggregates
+                .SelectMany(x => x.dbTree.ContentLeaves.Select(leave => (x.storage, leave)))
+                .DistinctBy(x => x.leave.Uuid)
+                .ToList();
+            var loadedSystemLeaveUuids = allSystemLeaves
+                .Select(x => x.leave.Uuid)
+                .ToHashSet();
+
+            // Дерево, корень и узлы берутся только из первой найденной копии.
+            // Листья добавляются из остальных хранилищ после восстановления системных узлов.
+            firstAggregate.OwnDataStorageUuid = mainDataStorage.Uuid;
+
+            var systemTree = _mapper.MapWorkingTrees(
+                    new[] { firstAggregate },
+                    repository.DataStorages,
+                    repository.ContentShrub,
+                    _notificationService,
+                    new EmptyPropertiesPolicy<WorkingTreeModel>())
+                .Single();
+            repository.ContentShrub.ContentWorkingTrees.Add(systemTree);
+            if (repository.ContentShrub.ContentWorkingTreesUuids.Contains(systemTree.Uuid) == false)
+                repository.ContentShrub.ContentWorkingTreesUuids.Add(systemTree.Uuid);
+            systemTree.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateWorkingTreeDefault(_notificationService));
+
+            var dbRoots = firstAggregate.ContentRoot == null
+                ? Array.Empty<TreeRoot>()
+                : new[] { firstAggregate.ContentRoot };
+            DistributeWorkingTreeContentWithoutAttributes(
+                systemTree,
+                dbRoots,
+                firstAggregate.ContentNodes.ToList(),
+                Array.Empty<TreeLeave>());
+            EnsureSystemBaseNodes(systemTree);
+
+            foreach (var (storage, dbLeave) in allSystemLeaves)
+            {
+                var loadedLeave = _mapper.MapTreeLeaves(
+                        new[] { dbLeave },
+                        systemTree.ContentNodes,
+                        systemTree,
+                        _notificationService,
+                        new EmptyPropertiesPolicy<TreeLeaveModel>(),
+                        storage)
+                    .SingleOrDefault();
+                if (loadedLeave == null)
+                    continue;
+
+                loadedLeave.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService));
+                SetModelState(loadedLeave, State.SavedOrLoaded);
+            }
+            EnsureSystemBaseLeaves(systemTree);
+            firstAggregate.ContentLeaves = allSystemLeaves.Select(x => x.leave).ToList();
+
+            if (mainAggregate == null)
+            {
+                SetSystemWorkingTreeState(systemTree, State.Initialized);
+                foreach (var leave in systemTree.ContentLeaves.Where(x => loadedSystemLeaveUuids.Contains(x.Uuid)))
+                    SetModelState(leave, State.SavedOrLoaded);
+            }
+            else
+            {
+                if (systemTree.ContentRoot != null)
+                {
+                    SetModelState(
+                        systemTree.ContentRoot,
+                        mainAggregate.ContentRoot == null ? State.Initialized : State.SavedOrLoaded);
+                }
+                foreach (var node in systemTree.ContentNodes)
+                {
+                    SetModelState(
+                        node,
+                        mainNodeUuids.Contains(node.Uuid) ? State.SavedOrLoaded : State.Initialized);
+                }
+                foreach (var leave in systemTree.ContentLeaves)
+                {
+                    SetModelState(
+                        leave,
+                        loadedSystemLeaveUuids.Contains(leave.Uuid) ? State.SavedOrLoaded : State.Initialized);
+                }
+            }
+
+            loadedTreeAggregates.Add((systemTree, firstAggregate));
         }
 
         /// <summary>
@@ -1414,7 +1560,13 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 nodes = _mapper.MapTreeNodes(dbNodes, nodes, tree.ContentRoot.OwningWorkingTree, _notificationService, new EmptyPropertiesPolicy<TreeNodeModel>());
             }
 
-            var allLeaves = _mapper.MapTreeLeaves(dbLeaves, allNodes, tree, _notificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
+            var allLeaves = _mapper.MapTreeLeaves(
+                dbLeaves,
+                allNodes,
+                tree,
+                _notificationService,
+                new EmptyPropertiesPolicy<TreeLeaveModel>(),
+                tree.DataStorage);
             // Листья загружаются после всех узлов, поэтому к моменту назначения политики их родители уже известны.
             allLeaves.ToList().ForEach(x => x.SetPropertiesPolicy(PropertiesPolicyBuilder.CreateTreeLeaveDefault(_notificationService)));
 
@@ -1513,6 +1665,42 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             throw new InvalidOperationException(
                 $"Хранилище '{unsupportedStorage.Name}' [{unsupportedStorage.Uuid}] не поддерживает сохранение элементов кустарника.");
+        }
+
+        /// <summary>
+        /// Назначает основное хранилище всем системным рабочим деревьям перед сохранением.
+        /// </summary>
+        private static void EnsureSystemWorkingTreeUsesMainDataStorage(
+            IEnumerable<WorkingTreeModel> workingTrees)
+        {
+            foreach (var systemTree in workingTrees.Where(x => x.Uuid == WorkingTreeModel.SystemBaseUuid))
+            {
+                systemTree.ChangeDataStorage(GetMainDataStorage(systemTree.OwningShrub));
+            }
+        }
+
+        /// <summary>
+        /// Возвращает основное хранилище приложения из списка доступных хранилищ репозитория.
+        /// </summary>
+        private static IDataStorageModel GetMainDataStorage(ShrubModel shrub)
+        {
+            return shrub.OwningRepository.DataStorages
+                .SingleOrDefault(x => x.Uuid == DataStorageModel.MainDataStorageUuid)
+                ?? throw new InvalidOperationException(
+                    "Основное хранилище данных не входит в список доступных хранилищ репозитория.");
+        }
+
+        /// <summary>
+        /// Назначает состояние всему системному дереву, включая корень, узлы, листья и атрибуты.
+        /// </summary>
+        private void SetSystemWorkingTreeState(WorkingTreeModel tree, State state)
+        {
+            SetModelState(tree, state);
+            if (tree.ContentRoot != null)
+                SetModelState(tree.ContentRoot, state);
+            tree.ContentNodes.ToList().ForEach(x => SetModelState(x, state));
+            tree.ContentLeaves.ToList().ForEach(x => SetModelState(x, state));
+            tree.ContentAttributes.ToList().ForEach(x => SetModelState(x, state));
         }
 
         #endregion

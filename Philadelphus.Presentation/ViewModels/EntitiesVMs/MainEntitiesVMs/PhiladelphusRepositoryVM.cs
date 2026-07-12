@@ -244,6 +244,15 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub);
             ArgumentNullException.ThrowIfNull(repositoryModel.ContentShrub.ContentWorkingTrees);
 
+            // Основное хранилище обязательно доступно репозиторию: системное дерево
+            // независимо от собственного хранилища репозитория сохраняется только туда.
+            var mainDataStorage = dataStoragesCollectionVM.MainDataStorageVM.Model;
+            if (mainDataStorage != null
+                && repositoryModel.DataStorages.All(x => x.Uuid != mainDataStorage.Uuid))
+            {
+                repositoryModel.AddAvailableDataStorage(mainDataStorage);
+            }
+
             _dataStorages = new ObservableCollection<IDataStorageModel>(repositoryModel.DataStorages);
             RebuildTreeItems();
         }

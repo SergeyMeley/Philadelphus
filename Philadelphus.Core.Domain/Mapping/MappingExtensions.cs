@@ -210,13 +210,15 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <returns>Результат выполнения операции.</returns>
         /// <param name="notificationService">Сервис уведомлений.</param>
         /// <param name="propertiesPolicy">Политика свойств.</param>
+        /// <param name="dataStorage">Хранилище, из которого загружены листья.</param>
         public static IEnumerable<TreeLeaveModel> MapTreeLeaves(
             this IMapper mapper,
             IEnumerable<TreeLeave> treeLeaves,
             IEnumerable<TreeNodeModel> parents,
             WorkingTreeModel owner,
             INotificationService notificationService,
-            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy)
+            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy,
+            IDataStorageModel? dataStorage = null)
         {
             var correctLeaves = treeLeaves.Where(x => parents.Any(o => o.Uuid == x.ParentTreeNodeUuid));
 
@@ -226,6 +228,7 @@ namespace Philadelphus.Core.Domain.Mapping
                 {
                     opt.Items.Add("Parents", parents);
                     opt.Items.Add("Owner", owner);
+                    opt.Items.Add("DataStorage", dataStorage ?? owner.DataStorage);
                     opt.Items.Add(nameof(INotificationService), notificationService);
                     opt.Items.Add(nameof(IPropertiesPolicy<TreeLeaveModel>), propertiesPolicy);
                 });

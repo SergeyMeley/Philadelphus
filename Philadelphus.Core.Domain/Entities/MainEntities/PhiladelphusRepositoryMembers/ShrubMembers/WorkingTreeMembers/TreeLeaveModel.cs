@@ -1,4 +1,5 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
@@ -26,6 +27,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         protected override string _defaultFixedPartOfName => "Новый лист";
 
         private string _stringValue = EmptyStringValue;
+        private readonly IDataStorageModel _dataStorage;
 
         /// <summary>
         /// Техническое значение пустого листа для хранения в не-null поле.
@@ -100,7 +102,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         #region [ Infrastructure Properties ]
 
-
+        /// <summary>
+        /// Хранилище листа. Новый лист использует хранилище рабочего дерева,
+        /// а загруженный лист сохраняет хранилище-источник.
+        /// </summary>
+        public override IDataStorageModel DataStorage => _dataStorage;
 
         #endregion
 
@@ -116,18 +122,21 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// <param name="owner">Рабочее дерево, которому принадлежит лист.</param>
         /// <param name="notificationService">Сервис уведомлений.</param>
         /// <param name="propertiesPolicy">Политика свойств.</param>
+        /// <param name="loadedDataStorage">Хранилище-источник загруженного листа.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         internal TreeLeaveModel(
             Guid uuid,
             TreeNodeModel parent,
             WorkingTreeModel owner,
             INotificationService notificationService,
-            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy)
+            IPropertiesPolicy<TreeLeaveModel> propertiesPolicy,
+            IDataStorageModel? loadedDataStorage = null)
             : base(uuid, owner, notificationService, propertiesPolicy)
         {
             ArgumentNullException.ThrowIfNull(parent);
 
             ParentNode = parent;
+            _dataStorage = loadedDataStorage ?? owner.DataStorage;
 
             Parent.AddChild(this);
             OwningWorkingTree.ContentLeaves.Add(this);

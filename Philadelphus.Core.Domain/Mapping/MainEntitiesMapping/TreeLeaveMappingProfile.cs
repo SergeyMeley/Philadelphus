@@ -62,6 +62,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 {
                     var parent = (ctx.Items["Parents"] as IEnumerable<TreeNodeModel>).Single(x => x.Uuid == src.ParentTreeNodeUuid);
                     var owner = ctx.Items["Owner"] as WorkingTreeModel;
+                    var dataStorage = ctx.Items["DataStorage"] as IDataStorageModel;
                     var notificationService = ctx.Items[nameof(INotificationService)] as INotificationService;
                     var propertiesPolicy = ctx.Items[nameof(IPropertiesPolicy<TreeLeaveModel>)] as IPropertiesPolicy<TreeLeaveModel>;
 
@@ -72,7 +73,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             parent,
                             owner,
                             notificationService,
-                            propertiesPolicy);
+                            propertiesPolicy,
+                            dataStorage);
                     }
                     else
                     {
@@ -84,7 +86,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                             owner,
                             type,
                             notificationService,
-                            propertiesPolicy);
+                            propertiesPolicy,
+                            dataStorage);
                     }
                 })
 
