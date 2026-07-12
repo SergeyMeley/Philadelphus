@@ -40,10 +40,13 @@
                                          Text="{Binding ConnectionString}"
                                          MinWidth="0"
                                          HorizontalAlignment="Stretch"
-                                         IsVisible="{Binding !$parent[UserControl].DataContext.IsSqliteInfrastructure}" />
+                                         IsVisible="{Binding $parent[UserControl].DataContext.IsRawConnectionStringInfrastructure}" />
                                 <controls:SqliteConnectionStringEditor
                                     IsVisible="{Binding $parent[UserControl].DataContext.IsSqliteInfrastructure}"
                                     DataContext="{Binding SqliteEditor}" />
+                                <controls:PostgreSqlConnectionStringEditor
+                                    IsVisible="{Binding $parent[UserControl].DataContext.IsPostgreSqlInfrastructure}"
+                                    DataContext="{Binding PostgreSqlEditor}" />
                                 </Grid>
                                 </Border>
                             </Expander>

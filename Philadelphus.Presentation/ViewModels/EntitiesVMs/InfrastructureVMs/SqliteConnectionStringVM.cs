@@ -52,7 +52,17 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             }
             set
             {
-                var builder = new SqliteConnectionStringBuilder(value ?? string.Empty);
+                SqliteConnectionStringBuilder builder;
+                try
+                {
+                    builder = new SqliteConnectionStringBuilder(value ?? string.Empty);
+                }
+                catch (ArgumentException)
+                {
+                    DataSource = string.Empty;
+                    AdditionalParameters.Clear();
+                    return;
+                }
                 DataSource = builder.DataSource;
                 AdditionalParameters.Clear();
                 foreach (KeyValuePair<string, object> parameter in builder)

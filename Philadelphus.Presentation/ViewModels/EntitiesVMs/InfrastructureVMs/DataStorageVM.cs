@@ -77,6 +77,14 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 return InfrastructureType == InfrastructureTypes.SQLiteEf;
             }
         }
+        public bool IsPostgreSqlInfrastructure
+        {
+            get { return InfrastructureType == InfrastructureTypes.PostgreSqlEf; }
+        }
+        public bool IsRawConnectionStringInfrastructure
+        {
+            get { return IsSqliteInfrastructure == false && IsPostgreSqlInfrastructure == false; }
+        }
 
         public string ProviderName
         {
@@ -204,7 +212,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                     var result = new DataStorageConnectionStringVM(
                         group,
                         connectionString ?? string.Empty,
-                        createSqliteEditor: model.InfrastructureType == InfrastructureTypes.SQLiteEf);
+                        createSqliteEditor: model.InfrastructureType == InfrastructureTypes.SQLiteEf,
+                        createPostgreSqlEditor: model.InfrastructureType == InfrastructureTypes.PostgreSqlEf);
                     result.PropertyChanged += ConnectionStringPropertyChanged;
                     return result;
                 }));

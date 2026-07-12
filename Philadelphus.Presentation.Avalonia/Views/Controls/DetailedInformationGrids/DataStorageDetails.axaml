@@ -64,12 +64,16 @@
                                 <TextBox Text="{Binding ConnectionString}"
                                          MinWidth="0"
                                          HorizontalAlignment="Stretch"
-                                         IsVisible="{Binding !$parent[UserControl].DataContext.IsSqliteInfrastructure}"
+                                         IsVisible="{Binding $parent[UserControl].DataContext.IsRawConnectionStringInfrastructure}"
                                          IsReadOnly="{Binding $parent[UserControl].IsReadOnly}" />
                                 <controls:SqliteConnectionStringEditor
                                     IsVisible="{Binding $parent[UserControl].DataContext.IsSqliteInfrastructure}"
                                     IsReadOnly="{Binding $parent[UserControl].IsReadOnly}"
                                     DataContext="{Binding SqliteEditor}" />
+                                <controls:PostgreSqlConnectionStringEditor
+                                    IsVisible="{Binding $parent[UserControl].DataContext.IsPostgreSqlInfrastructure}"
+                                    IsReadOnly="{Binding $parent[UserControl].IsReadOnly}"
+                                    DataContext="{Binding PostgreSqlEditor}" />
                                 </Grid>
                                 </Border>
                             </Expander>

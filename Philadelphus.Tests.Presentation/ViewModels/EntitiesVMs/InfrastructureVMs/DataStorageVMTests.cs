@@ -41,6 +41,22 @@ public class DataStorageVMTests
     }
 
     [Fact]
+    public void ConnectionString_WithPostgreSqlEditor_SynchronizesBuiltString()
+    {
+        var sut = new DataStorageConnectionStringVM(
+            InfrastructureEntityGroups.Reports,
+            string.Empty,
+            createPostgreSqlEditor: true);
+
+        sut.PostgreSqlEditor!.Host = "db.local";
+        sut.PostgreSqlEditor.Database = "reports";
+        sut.PostgreSqlEditor.Username = "user";
+
+        sut.ConnectionString.Should().Contain("Host=db.local");
+        sut.ConnectionString.Should().Contain("Database=reports");
+    }
+
+    [Fact]
     public void ProviderName_Set_UpdatesModel()
     {
         // Arrange

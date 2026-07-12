@@ -58,6 +58,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 _infrastructureType = value;
                 OnPropertyChanged(nameof(InfrastructureType));
                 OnPropertyChanged(nameof(IsSqliteInfrastructure));
+                OnPropertyChanged(nameof(IsPostgreSqlInfrastructure));
+                OnPropertyChanged(nameof(IsRawConnectionStringInfrastructure));
             }
         }
 
@@ -67,6 +69,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 return InfrastructureType == InfrastructureTypes.SQLiteEf;
             }
+        }
+        public bool IsPostgreSqlInfrastructure
+        {
+            get { return InfrastructureType == InfrastructureTypes.PostgreSqlEf; }
+        }
+        public bool IsRawConnectionStringInfrastructure
+        {
+            get { return IsSqliteInfrastructure == false && IsPostgreSqlInfrastructure == false; }
         }
       
         /// <summary>
@@ -85,7 +95,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </summary>
         public IEnumerable<DataStorageConnectionStringVM> ConnectionStrings { get; }
             = Enum.GetValues<InfrastructureEntityGroups>()
-                .Select(group => new DataStorageConnectionStringVM(group, string.Empty, createSqliteEditor: true))
+                .Select(group => new DataStorageConnectionStringVM(
+                    group, string.Empty, createSqliteEditor: true, createPostgreSqlEditor: true))
                 .ToList();
 
         private DataStoragesCollectionVM _dataStoragesCollectionVM;
@@ -153,7 +164,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                         || ConnectionStrings.All(x => string.IsNullOrWhiteSpace(x.ConnectionString))
                         || IsSqliteInfrastructure &&
                             (ConnectionStrings.All(x => x.SqliteEditor!.IsValid == false)
-                            || ConnectionStrings.Any(x => x.SqliteEditor!.IsEmpty == false && x.SqliteEditor.IsValid == false)))
+                            || ConnectionStrings.Any(x => x.SqliteEditor!.IsEmpty == false && x.SqliteEditor.IsValid == false))
+                        || IsPostgreSqlInfrastructure &&
+                            (ConnectionStrings.All(x => x.PostgreSqlEditor!.IsValid == false)
+                            || ConnectionStrings.Any(x => x.PostgreSqlEditor!.IsEmpty == false && x.PostgreSqlEditor.IsValid == false)))
                     {
                         _notificationService.SendModalWindow<StorageCreationControlVM>(
                             "Некорректно заполнены параметры, операция не выполнена.", 
