@@ -1330,7 +1330,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             repository.ContentShrub.ContentWorkingTrees.Clear();
             var loadedTreeAggregates = new List<(WorkingTreeModel tree, WorkingTree dbTree)>();
             var systemTreeAggregates = new List<(IDataStorageModel storage, WorkingTree dbTree)>();
-            var userTreeAggregates = new List<WorkingTree>();
+            var userTreeAggregates = new List<(IDataStorageModel storage, WorkingTree dbTree)>();
 
             foreach (var dataStorage in repository.DataStorages ?? Enumerable.Empty<IDataStorageModel>())
             {
@@ -1352,7 +1352,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         .Where(x => x.Uuid == WorkingTreeModel.SystemBaseUuid)
                         .Select(x => (dataStorage, x)));
                     userTreeAggregates.AddRange(dbTrees
-                        .Where(x => x.Uuid != WorkingTreeModel.SystemBaseUuid));
+                        .Where(x => x.Uuid != WorkingTreeModel.SystemBaseUuid)
+                        .Select(x => (dataStorage, x)));
                 }
             }
 
@@ -1365,13 +1366,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             // Пользовательские деревья при чтении из БД сначала создаются с пустой политикой.
             // Рабочая политика назначается сразу после добавления модели в доменный граф.
+            var selectedUserTreeAggregates = userTreeAggregates
+                .GroupBy(x => x.dbTree.Uuid)
+                .Select(group => group.FirstOrDefault(x => x.storage.Uuid == x.dbTree.OwnDataStorageUuid).dbTree
+                    ?? group.First().dbTree)
+                .ToList();
             var userTrees = _mapper.MapWorkingTrees(
-                userTreeAggregates,
+                selectedUserTreeAggregates,
                 repository.DataStorages,
                 repository.ContentShrub,
                 _notificationService,
                 new EmptyPropertiesPolicy<WorkingTreeModel>());
-            var userDbTreesByUuid = userTreeAggregates.ToDictionary(x => x.Uuid);
+            var userDbTreesByUuid = selectedUserTreeAggregates.ToDictionary(x => x.Uuid);
 
             foreach (var tree in userTrees)
             {

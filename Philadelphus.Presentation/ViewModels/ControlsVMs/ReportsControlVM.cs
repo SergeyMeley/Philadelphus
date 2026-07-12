@@ -42,9 +42,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             get
             {
-                return _dataStoragesCollectionVM.DataStoragesVMs?
+                var repositoryStorageUuids = _repositoryVM?.DataStorages
+                    .Select(x => x.Uuid)
+                    .ToHashSet();
+
+                return (_dataStoragesCollectionVM.DataStoragesVMs
+                        ?? Enumerable.Empty<DataStorageVM>())
                     .Where(x => x.Model?.HasReportsInfrastructureRepository == true)
-                    ?? Enumerable.Empty<DataStorageVM>();
+                    .Where(x => repositoryStorageUuids == null || repositoryStorageUuids.Contains(x.Uuid));
             }
         }
         public DataStorageVM? SelectedDataStorageVM
@@ -72,6 +77,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             _repositoryVM = repositoryVM;
             _repositoryVM.PropertyChanged += RepositoryPropertyChanged;
+            OnPropertyChanged(nameof(DataStoragesVMs));
             ApplyRepositoryDefaultDataStorage();
         }
         public IEnumerable<ReportInfoModel> ReportInfos 
@@ -292,6 +298,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             if (e.PropertyName == nameof(PhiladelphusRepositoryVM.DefaultReportsDataStorage))
                 ApplyRepositoryDefaultDataStorage();
+            else if (e.PropertyName == nameof(PhiladelphusRepositoryVM.DataStorages))
+            {
+                OnPropertyChanged(nameof(DataStoragesVMs));
+                if (SelectedDataStorageVM != null
+                    && DataStoragesVMs.All(x => x.Uuid != SelectedDataStorageVM.Uuid))
+                {
+                    ApplyRepositoryDefaultDataStorage();
+                }
+            }
         }
 
         private void ApplyRepositoryDefaultDataStorage()
@@ -321,6 +336,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "Ошибка выполнения отчёта '{ReportName}'", SelectedReportInfo.Name);
+                _notificationService.SendTextMessage<ReportsControlVM>(
+                    $"Не удалось выполнить отчёт '{SelectedReportInfo.Name}'. Подробнее:\r\n{ex.Message}",
+                    NotificationCriticalLevelModel.Error);
             }
         }
     }
