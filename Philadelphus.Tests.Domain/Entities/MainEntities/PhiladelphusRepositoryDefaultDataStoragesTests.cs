@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Tests.Common.Fakes.Services;
 
 namespace Philadelphus.Tests.Domain.Entities.MainEntities;
@@ -76,6 +77,23 @@ public class PhiladelphusRepositoryDefaultDataStoragesTests
         result.Should().BeTrue();
         sut.DefaultShrubMembersDataStorage.Should().BeSameAs(availableStorage);
         sut.DefaultReportsDataStorage.Should().BeNull();
+    }
+
+    [Fact]
+    public void SetDefaultReportsDataStorage_ConfiguredStorageWithoutRuntimeRepository_SetsDefault()
+    {
+        // Arrange
+        var sut = CreateSut(CreateDataStorage(false, false));
+        var availableStorage = CreateDataStorage(false, false);
+        availableStorage.ConnectionStrings[InfrastructureEntityGroups.Reports] = "configured";
+        sut.AddAvailableDataStorage(availableStorage);
+
+        // Act
+        var result = sut.SetDefaultReportsDataStorage(availableStorage);
+
+        // Assert
+        result.Should().BeTrue();
+        sut.DefaultReportsDataStorage.Should().BeSameAs(availableStorage);
     }
 
     [Fact]
@@ -190,6 +208,8 @@ public class PhiladelphusRepositoryDefaultDataStoragesTests
             .Returns(hasShrubMembersRepository);
         dataStorage.Setup(x => x.HasReportsInfrastructureRepository)
             .Returns(hasReportsRepository);
+        dataStorage.Setup(x => x.ConnectionStrings)
+            .Returns(new Dictionary<InfrastructureEntityGroups, string>());
         return dataStorage.Object;
     }
 }

@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -24,12 +25,6 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             }
         }
 
-        private DataStorageVM _storageVM;
-       
-        /// <summary>
-        /// Модель представления хранилища данных.
-        /// </summary>
-        public DataStorageVM StorageVM { get => _storageVM; }
         public string OwnDataStorageName
         {
             get
@@ -85,13 +80,13 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         /// Возможные хранилища участников кустарника по умолчанию.
         /// </summary>
         public IEnumerable<IDataStorageModel> ShrubMembersDefaultDataStorages
-            => DataStorages.Where(x => x.HasShrubMembersInfrastructureRepository);
+            => DataStorages.Where(x => x.SupportsEntityGroup(InfrastructureEntityGroups.ShrubMembers));
 
         /// <summary>
         /// Возможные хранилища отчетов по умолчанию.
         /// </summary>
         public IEnumerable<IDataStorageModel> ReportsDefaultDataStorages
-            => DataStorages.Where(x => x.HasReportsInfrastructureRepository);
+            => DataStorages.Where(x => x.SupportsEntityGroup(InfrastructureEntityGroups.Reports));
 
         /// <summary>
         /// Хранилище участников кустарника по умолчанию.

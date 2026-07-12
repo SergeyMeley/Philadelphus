@@ -337,14 +337,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                     ?? throw new InvalidOperationException(
                         $"Хранилище '{storage.Name}' не входит в список возможных хранилищ репозитория.");
 
-                var supportsEntityGroup = entityGroup switch
-                {
-                    InfrastructureEntityGroups.ShrubMembers =>
-                        availableStorage.HasShrubMembersInfrastructureRepository,
-                    InfrastructureEntityGroups.Reports =>
-                        availableStorage.HasReportsInfrastructureRepository,
-                    _ => false
-                };
+                var supportsEntityGroup = availableStorage.SupportsEntityGroup(entityGroup);
                 if (supportsEntityGroup == false)
                 {
                     throw new InvalidOperationException(

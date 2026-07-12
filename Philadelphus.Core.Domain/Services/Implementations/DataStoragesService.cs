@@ -229,6 +229,15 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             var path = mainDataStorage.FullName;
             var auditUserName = _userService.CurrentUser.UserName;
+            var connectionStrings = new Dictionary<InfrastructureEntityGroups, string>
+            {
+                [InfrastructureEntityGroups.PhiladelphusRepositories] =
+                    $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}",
+                [InfrastructureEntityGroups.ShrubMembers] =
+                    $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}",
+                [InfrastructureEntityGroups.Reports] =
+                    $"Data Source={Path.Combine(path, "main-reports-data-storage.db")}"
+            };
 
             DataStorageBuilder dataStorageBuilder = new DataStorageBuilder()
                 .SetGeneralParameters(
@@ -237,10 +246,21 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     description: "Основное хранилище",
                     uuid: DataStorageModel.MainDataStorageUuid,
                     infrastructureType: InfrastructureTypes.SQLiteEf,
-                    isDisabled: false)
-            .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-repositories-data-storage.db")}", auditUserName))
-            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-working-trees-data-storage.db")}", auditUserName))
-            .SetRepository(new SqliteEfReportsInfrastructureRepository(_logger, $"Data Source={Path.Combine(path, "main-reports-data-storage.db")}", auditUserName));
+                    isDisabled: false,
+                    providerName: "Microsoft.EntityFrameworkCore.Sqlite",
+                    connectionStrings: connectionStrings)
+            .SetRepository(new SqliteEfPhiladelphusRepositoriesInfrastructureRepository(
+                _logger,
+                connectionStrings[InfrastructureEntityGroups.PhiladelphusRepositories],
+                auditUserName))
+            .SetRepository(new SqliteEfShrubMembersInfrastructureRepository(
+                _logger,
+                connectionStrings[InfrastructureEntityGroups.ShrubMembers],
+                auditUserName))
+            .SetRepository(new SqliteEfReportsInfrastructureRepository(
+                _logger,
+                connectionStrings[InfrastructureEntityGroups.Reports],
+                auditUserName));
 
             var mainDataStorageModel = dataStorageBuilder.Build();
 

@@ -43,7 +43,7 @@
                 </TabItem>
                 <TabItem Classes="compact" Header="Хранилище">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <local:DataStorageDetails DataContext="{Binding Model.DataStorage}" IsReadOnly="True" />
+                        <local:DataStorageDetails DataContext="{Binding StorageVM}" IsReadOnly="True" />
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Classes="compact" Header="Настройка хранилищ">
