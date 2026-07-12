@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using System.ComponentModel;
+using System.IO;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
 {
@@ -28,6 +29,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
             {
                 return EntityGroup.GetDisplayName();
             }
+        }
+
+        public bool CanFillFromRepositories
+        {
+            get { return EntityGroup != InfrastructureEntityGroups.PhiladelphusRepositories; }
         }
 
         public string ConnectionString
@@ -79,6 +85,69 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 return;
 
             ConnectionString = SqliteEditor!.ConnectionString;
+        }
+
+        /// <summary>
+        /// Заполняет параметры из строки репозиториев с учетом типа инфраструктуры.
+        /// </summary>
+        public void FillFromRepositories(
+            DataStorageConnectionStringVM source,
+            InfrastructureTypes infrastructureType)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            if (CanFillFromRepositories == false)
+                return;
+
+            if (infrastructureType == InfrastructureTypes.SQLiteEf)
+            {
+                CopySqliteSettings(source.SqliteEditor!, SqliteEditor!);
+                return;
+            }
+            if (infrastructureType == InfrastructureTypes.PostgreSqlEf)
+            {
+                CopyPostgreSqlSettings(source.PostgreSqlEditor!, PostgreSqlEditor!);
+                return;
+            }
+
+            ConnectionString = source.ConnectionString;
+        }
+
+        private void CopySqliteSettings(SqliteConnectionStringVM source, SqliteConnectionStringVM target)
+        {
+            target.DataSource = BuildDistinctSqlitePath(source.DataSource);
+            target.AdditionalParameters.Clear();
+            foreach (var parameter in source.AdditionalParameters)
+                target.AdditionalParameters.Add(new(parameter.Key, parameter.Value));
+        }
+
+        private static void CopyPostgreSqlSettings(
+            PostgreSqlConnectionStringVM source,
+            PostgreSqlConnectionStringVM target)
+        {
+            target.Host = source.Host;
+            target.Port = source.Port;
+            target.Database = source.Database;
+            target.Username = source.Username;
+            target.Password = source.Password;
+            target.AdditionalParameters.Clear();
+            foreach (var parameter in source.AdditionalParameters)
+                target.AdditionalParameters.Add(new(parameter.Key, parameter.Value));
+        }
+
+        private string BuildDistinctSqlitePath(string sourcePath)
+        {
+            if (string.IsNullOrWhiteSpace(sourcePath))
+                return string.Empty;
+
+            var suffix = EntityGroup == InfrastructureEntityGroups.ShrubMembers
+                ? "-shrub-members"
+                : "-reports";
+            if (sourcePath == ":memory:")
+                return $"file:philadelphus{suffix}?mode=memory&cache=shared";
+
+            var directory = Path.GetDirectoryName(sourcePath);
+            var fileName = Path.GetFileNameWithoutExtension(sourcePath) + suffix + Path.GetExtension(sourcePath);
+            return string.IsNullOrEmpty(directory) ? fileName : Path.Combine(directory, fileName);
         }
     }
 }

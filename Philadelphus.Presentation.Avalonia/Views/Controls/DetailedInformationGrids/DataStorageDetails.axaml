@@ -60,6 +60,28 @@
                                 <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                                         BorderThickness="1,0,1,1"
                                         Padding="8">
+                                <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                    <Button Content="Заполнить как для репозитория"
+                                            IsVisible="{Binding CanFillFromRepositories}"
+                                            IsEnabled="{Binding !$parent[UserControl].IsReadOnly}"
+                                            Command="{Binding $parent[UserControl].DataContext.FillConnectionStringFromRepositoriesCommand}"
+                                            CommandParameter="{Binding}" />
+                                    <Button Content="Добавить параметр"
+                                            IsVisible="{Binding $parent[UserControl].DataContext.IsSqliteInfrastructure}"
+                                            IsEnabled="{Binding !$parent[UserControl].IsReadOnly}"
+                                            Command="{Binding SqliteEditor.AddAdditionalParameterCommand}" />
+                                    <Button Content="Справка по параметрам"
+                                            IsVisible="{Binding $parent[UserControl].DataContext.IsSqliteInfrastructure}"
+                                            Command="{Binding SqliteEditor.OpenDocumentationCommand}" />
+                                    <Button Content="Добавить параметр"
+                                            IsVisible="{Binding $parent[UserControl].DataContext.IsPostgreSqlInfrastructure}"
+                                            IsEnabled="{Binding !$parent[UserControl].IsReadOnly}"
+                                            Command="{Binding PostgreSqlEditor.AddAdditionalParameterCommand}" />
+                                    <Button Content="Справка по параметрам"
+                                            IsVisible="{Binding $parent[UserControl].DataContext.IsPostgreSqlInfrastructure}"
+                                            Command="{Binding PostgreSqlEditor.OpenDocumentationCommand}" />
+                                </StackPanel>
                                 <Grid>
                                 <TextBox Text="{Binding ConnectionString}"
                                          MinWidth="0"
@@ -75,6 +97,7 @@
                                     IsReadOnly="{Binding $parent[UserControl].IsReadOnly}"
                                     DataContext="{Binding PostgreSqlEditor}" />
                                 </Grid>
+                                </StackPanel>
                                 </Border>
                             </Expander>
                         </DataTemplate>

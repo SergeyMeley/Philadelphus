@@ -57,6 +57,43 @@ public class DataStorageVMTests
     }
 
     [Fact]
+    public void FillFromRepositories_ForSqlite_CopiesParametersAndBuildsDistinctPath()
+    {
+        var source = new DataStorageConnectionStringVM(
+            InfrastructureEntityGroups.PhiladelphusRepositories,
+            "Data Source=C:\\data\\repository.db;Cache=Shared",
+            createSqliteEditor: true);
+        var target = new DataStorageConnectionStringVM(
+            InfrastructureEntityGroups.ShrubMembers,
+            string.Empty,
+            createSqliteEditor: true);
+
+        target.FillFromRepositories(source, InfrastructureTypes.SQLiteEf);
+
+        target.SqliteEditor!.DataSource.Should().Be("C:\\data\\repository-shrub-members.db");
+        target.SqliteEditor.AdditionalParameters.Should().ContainSingle(x => x.Key == "Cache" && x.Value == "Shared");
+    }
+
+    [Fact]
+    public void FillFromRepositories_ForPostgreSql_CopiesAllSettings()
+    {
+        var source = new DataStorageConnectionStringVM(
+            InfrastructureEntityGroups.PhiladelphusRepositories,
+            "Host=db.local;Database=main;Username=user;Pooling=false",
+            createPostgreSqlEditor: true);
+        var target = new DataStorageConnectionStringVM(
+            InfrastructureEntityGroups.Reports,
+            string.Empty,
+            createPostgreSqlEditor: true);
+
+        target.FillFromRepositories(source, InfrastructureTypes.PostgreSqlEf);
+
+        target.PostgreSqlEditor!.Host.Should().Be("db.local");
+        target.PostgreSqlEditor.Database.Should().Be("main");
+        target.PostgreSqlEditor.AdditionalParameters.Should().ContainSingle(x => x.Key == "Pooling");
+    }
+
+    [Fact]
     public void ProviderName_Set_UpdatesModel()
     {
         // Arrange

@@ -205,6 +205,18 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 });
             }
         }
+        public RelayCommand FillConnectionStringFromRepositoriesCommand
+        {
+            get
+            {
+                return new RelayCommand(target =>
+                {
+                    var source = ConnectionStrings.Single(x =>
+                        x.EntityGroup == InfrastructureEntityGroups.PhiladelphusRepositories);
+                    ((DataStorageConnectionStringVM)target).FillFromRepositories(source, InfrastructureType);
+                }, target => target is DataStorageConnectionStringVM vm && vm.CanFillFromRepositories);
+            }
+        }
 
     }
 }

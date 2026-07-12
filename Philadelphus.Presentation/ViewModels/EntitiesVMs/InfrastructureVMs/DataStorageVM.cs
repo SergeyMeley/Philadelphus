@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Common.Enums;
 using Philadelphus.Presentation.Helpers;
+using Philadelphus.Presentation.Infrastructure;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Timers;
@@ -226,6 +227,20 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs
                 return;
 
             _model.ConnectionStrings[connectionString.EntityGroup] = connectionString.ConnectionString;
+        }
+        public RelayCommand FillConnectionStringFromRepositoriesCommand
+        {
+            get
+            {
+                return new RelayCommand(target =>
+                {
+                    var source = ConnectionStrings.Single(x =>
+                        x.EntityGroup == InfrastructureEntityGroups.PhiladelphusRepositories);
+                    ((DataStorageConnectionStringVM)target).FillFromRepositories(source, InfrastructureType);
+                }, target => target is DataStorageConnectionStringVM vm
+                    && vm.CanFillFromRepositories
+                    && IsMainDataStorage == false);
+            }
         }
         private bool TryRejectMainDataStorageSettingsChange(params string[] propertyNames)
         {

@@ -32,10 +32,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Добавить параметр" IsVisible="{Binding !$parent[UserControl].IsReadOnly}"
-                    Command="{Binding AddAdditionalParameterCommand}" />
-            <Button Content="Справка по параметрам" Command="{Binding OpenDocumentationCommand}" />
-        </StackPanel>
     </StackPanel>
 </UserControl>
