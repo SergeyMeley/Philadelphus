@@ -1,4 +1,5 @@
 using global::Avalonia;
+using global::Avalonia.Controls;
 using global::Avalonia.Controls.ApplicationLifetimes;
 
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
@@ -23,8 +24,21 @@ namespace Philadelphus.Presentation.Avalonia.Services
             if (storages.Count == 0)
                 return Task.FromResult<IDataStorageModel?>(null);
 
-            var owner = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+            var owner = ResolveVisibleOwner();
             return DataStorageSelectionDialog.ShowAsync(owner, storages, message, title);
+        }
+
+        /// <summary>
+        /// Возвращает видимое окно-владельца, не используя скрытое стартовое окно приложения.
+        /// </summary>
+        private static Window? ResolveVisibleOwner()
+        {
+            var desktop = Application.Current?.ApplicationLifetime
+                as IClassicDesktopStyleApplicationLifetime;
+            if (desktop?.MainWindow is { IsVisible: true } mainWindow)
+                return mainWindow;
+
+            return desktop?.Windows.LastOrDefault(window => window.IsVisible);
         }
     }
 }
