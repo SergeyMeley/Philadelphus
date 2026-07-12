@@ -319,7 +319,18 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 obj =>
                 {
                     var repo = _philadelphusRepositoryVM.Model;
-                    _service.SaveChanges(ref repo, SaveMode.WithContentAndMembers);
+                    try
+                    {
+                        _service.SaveChanges(ref repo, SaveMode.WithContentAndMembers);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Ошибка сохранения изменений в БД.");
+                        OnPropertyChanged(nameof(State));
+                        NotifyChildsPropertyChangedRecursive();
+                        return;
+                    }
+
                     UpdateChildsCollection(_philadelphusRepositoryVM);   // TODO
                     OnPropertyChanged(nameof(State));
                     NotifyChildsPropertyChangedRecursive();

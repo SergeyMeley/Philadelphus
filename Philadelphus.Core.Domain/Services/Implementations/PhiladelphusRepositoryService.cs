@@ -194,7 +194,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 SetModelState(repository, originalState);
                 _logger.Error(ex, $"Ошибка сохранения репозитория '{repository.Name}'");
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Ошибка сохранения репозитория: {ex.Message}",
+                    $"Ошибка сохранения изменений в БД. Подробнее:\r\n{ex.Message}",
                     criticalLevel: NotificationCriticalLevelModel.Error);
                 throw;
             }
