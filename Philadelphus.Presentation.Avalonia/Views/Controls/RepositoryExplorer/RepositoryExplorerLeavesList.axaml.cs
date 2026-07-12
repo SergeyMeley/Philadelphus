@@ -11,7 +11,7 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer
     /// </summary>
     public partial class RepositoryExplorerLeavesList : UserControl
     {
-        private RepositoryExplorerControlVM ViewModel => (RepositoryExplorerControlVM)DataContext!;
+        private RepositoryExplorerControlVM? ViewModel => DataContext as RepositoryExplorerControlVM;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="RepositoryExplorerLeavesList" />.
@@ -23,9 +23,10 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer
 
         private void SelectedElementLeavesDataGrid_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (SelectedElementLeavesDataGrid.SelectedItem is IMainEntityVM<IMainEntityModel> selectedLeave)
+            if (ViewModel is { } viewModel
+                && SelectedElementLeavesDataGrid.SelectedItem is IMainEntityVM<IMainEntityModel> selectedLeave)
             {
-                ViewModel.SelectedRepositoryMember = selectedLeave;
+                viewModel.SelectedRepositoryMember = selectedLeave;
             }
         }
     }

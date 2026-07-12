@@ -14,7 +14,7 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer
         /// <summary>
         /// Модель представления обозревателя репозитория.
         /// </summary>
-        public RepositoryExplorerControlVM ViewModel => (RepositoryExplorerControlVM)DataContext!;
+        public RepositoryExplorerControlVM? ViewModel => DataContext as RepositoryExplorerControlVM;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="RepositoryExplorerShrub" />.
@@ -26,7 +26,10 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer
 
         private void MainTreeView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            ViewModel.SelectedRepositoryMember = MainTreeView.SelectedItem as IMainEntityVM<IMainEntityModel>;
+            if (ViewModel is { } viewModel)
+            {
+                viewModel.SelectedRepositoryMember = MainTreeView.SelectedItem as IMainEntityVM<IMainEntityModel>;
+            }
         }
     }
 }

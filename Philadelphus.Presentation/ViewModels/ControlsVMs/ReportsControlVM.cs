@@ -11,7 +11,9 @@ using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Serilog;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 
@@ -29,7 +31,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
         private readonly IRelayCommandFactory _commandFactory;
 
-        private DataStorageVM _selectedDataStorageVM;
+        private DataStorageVM? _selectedDataStorageVM;
+        private PhiladelphusRepositoryVM? _repositoryVM;
         private ReportInfoModel _selectedReportInfo;
         private IEnumerable<ReportInfoModel> _reportInfos;
         private Dictionary<string, object> _parametersValues;
@@ -39,10 +42,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             get
             {
-                return _dataStoragesCollectionVM.DataStoragesVMs.Where(x => x.Model.HasReportsInfrastructureRepository);
+                return _dataStoragesCollectionVM.DataStoragesVMs?
+                    .Where(x => x.Model?.HasReportsInfrastructureRepository == true)
+                    ?? Enumerable.Empty<DataStorageVM>();
             }
         }
-        public DataStorageVM SelectedDataStorageVM
+        public DataStorageVM? SelectedDataStorageVM
         {
             get
             {
@@ -54,6 +59,20 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 OnPropertyChanged(nameof(SelectedDataStorageVM));
                 UpdateReportInfos();
             }
+        }
+
+        /// <summary>
+        /// Привязывает выбор хранилища отчётов к настройкам открытого репозитория.
+        /// </summary>
+        public void BindToRepository(PhiladelphusRepositoryVM repositoryVM)
+        {
+            ArgumentNullException.ThrowIfNull(repositoryVM);
+            if (_repositoryVM != null)
+                _repositoryVM.PropertyChanged -= RepositoryPropertyChanged;
+
+            _repositoryVM = repositoryVM;
+            _repositoryVM.PropertyChanged += RepositoryPropertyChanged;
+            ApplyRepositoryDefaultDataStorage();
         }
         public IEnumerable<ReportInfoModel> ReportInfos 
         { 
@@ -262,12 +281,32 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 var storages = new[] { SelectedDataStorageVM.Model };
                 ReportInfos = await _reportService.GetReportsListAsync(storages);
+                return;
             }
+
+            ReportInfos = Enumerable.Empty<ReportInfoModel>();
+            SelectedReportInfo = null;
+        }
+
+        private void RepositoryPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PhiladelphusRepositoryVM.DefaultReportsDataStorage))
+                ApplyRepositoryDefaultDataStorage();
+        }
+
+        private void ApplyRepositoryDefaultDataStorage()
+        {
+            var defaultStorageUuid = _repositoryVM?.DefaultReportsDataStorage?.Uuid;
+            SelectedDataStorageVM = defaultStorageUuid.HasValue
+                ? DataStoragesVMs.SingleOrDefault(x => x.Uuid == defaultStorageUuid.Value)
+                : null;
         }
 
         private async Task ExecuteReportAsync()
         {
             if (SelectedReportInfo == null) 
+                return;
+            if (SelectedDataStorageVM?.Model == null)
                 return;
 
             ReportResult = null;

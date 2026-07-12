@@ -174,6 +174,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _extensionsControlVM = extensionVMFactory.Create(repositoryExplorerControlVM);
             _applicationSettingsControlVM = applicationSettingsControlVM;
             _reportsControlVM = reportsControlVM;
+            _reportsControlVM.BindToRepository(_repositoryExplorerControlVM.PhiladelphusRepositoryVM);
             _mainWindowNotificationsVM = mainWindowNotificationsVM;
             _commandFactory = commandFactory;
             _windowService = windowService;
