@@ -33,6 +33,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
+        private readonly IRelationDeletionGuard? _relationDeletionGuard;
 
         #endregion
 
@@ -48,7 +49,8 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         public PhiladelphusRepositoryService(
             IMapper mapper,
             ILogger logger,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IRelationDeletionGuard? relationDeletionGuard = null)
         {
             ArgumentNullException.ThrowIfNull(mapper);
             ArgumentNullException.ThrowIfNull(logger);
@@ -57,6 +59,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
+            _relationDeletionGuard = relationDeletionGuard;
         }
 
         #endregion
@@ -976,6 +979,16 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     return false;
                 }
 
+                if (element is IMainEntityModel referencedElement
+                    && _relationDeletionGuard?.TryFindBlockingAttribute(referencedElement, out var blockingAttribute) == true)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление элемента '{referencedElement.Name}' невозможно: на него ссылается атрибут " +
+                        $"'{blockingAttribute.Name}' [{blockingAttribute.Uuid}].",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
                 long result = 0;
                 if (element is IMainEntityWritableModel me)
                 {
@@ -1018,6 +1031,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #endregion
 
         #region [ Private methods ]
+
 
         /// <summary>
         /// Отправить уведомление о получении содержимого

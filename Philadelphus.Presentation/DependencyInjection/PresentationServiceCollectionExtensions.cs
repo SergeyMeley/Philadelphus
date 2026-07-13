@@ -59,6 +59,8 @@ namespace Microsoft.Extensions.DependencyInjection
             // Регистрация фабрик
             services.AddTransient<IMainWindowVMFactory, MainWindowVMFactory>();
             services.AddTransient<IRepositoryExplorerControlVMFactory, RepositoryExplorerControlVMFactory>();
+            services.AddTransient<IRepositoryNavigationVMFactory, RepositoryNavigationVMFactory>();
+            services.AddTransient<IRepositoryRelationsControlVMFactory, RepositoryRelationsControlVMFactory>();
             services.AddTransient<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
             services.AddTransient<IExcelImportDesignerVMFactory, ExcelImportDesignerVMFactory>();
 

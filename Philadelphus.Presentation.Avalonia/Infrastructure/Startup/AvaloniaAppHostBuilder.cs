@@ -15,6 +15,7 @@ using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.Relations;
 using Philadelphus.Core.Domain.TablesExport.Factories;
 using Philadelphus.Infrastructure.Cache.Redis.Implementations;
 using Philadelphus.Infrastructure.Cache.RepositoryInterfaces;
@@ -174,6 +175,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
                     services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();
                     services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
+                    services.AddTransient<IRelationDeletionGuard, RepositoryRelationsService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
                     services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();

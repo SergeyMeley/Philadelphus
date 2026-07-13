@@ -5,6 +5,7 @@
       "Philadelphus.Core.Domain\\Philadelphus.Core.Domain.csproj",
       "Philadelphus.Core.Domain.ExtensionSystem\\Philadelphus.Core.Domain.ExtensionSystem.csproj",
       "Philadelphus.Core.Domain.FormulaEngine\\Philadelphus.Core.Domain.FormulaEngine.csproj",
+      "Philadelphus.Core.Domain.Relations\\Philadelphus.Core.Domain.Relations.csproj",
       "Philadelphus.Core.Domain.ImportExport\\Philadelphus.Core.Domain.ImportExport.csproj",
       "Philadelphus.Core.Domain.Reports\\Philadelphus.Core.Domain.Reports.csproj",
       "Philadelphus.Core.Domain.TablesExport\\Philadelphus.Core.Domain.TablesExport.csproj",

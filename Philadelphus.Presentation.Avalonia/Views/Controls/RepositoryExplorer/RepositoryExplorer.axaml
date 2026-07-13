@@ -89,7 +89,7 @@
                     </StackPanel>
                 </StackPanel>
             </HeaderedContentControl.Header>
-            <TabControl x:Name="CurrentElementTabs" Classes="compact" SelectedIndex="0">
+            <TabControl x:Name="CurrentElementTabs" Classes="compact" SelectedIndex="{Binding CurrentElementTabIndex, Mode=TwoWay}">
                 <!-- Значение -->
                 <TabItem Classes="compact" Header="Значение" IsVisible="{Binding IsSystemBaseLeaveControlVisible}">
                     <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto">
@@ -194,6 +194,11 @@
                         <TabItem Classes="compact" Header="Плоская таблица допустимых значений" IsVisible="False" />
                         <TabItem Classes="compact" Header="Перекрестная таблица допустимых значений" IsVisible="False" />
                     </TabControl>
+                </TabItem>
+
+                <!-- Свойства -->
+                <TabItem Classes="compact" Header="Связи">
+                    <local:RepositoryRelations DataContext="{Binding RelationsVM}" />
                 </TabItem>
 
                 <!-- Свойства -->

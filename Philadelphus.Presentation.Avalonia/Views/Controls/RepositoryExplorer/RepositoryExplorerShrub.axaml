@@ -43,6 +43,7 @@
         <TreeView Name="MainTreeView"
                   DataContext="{Binding PhiladelphusRepositoryVM}"
                   ItemsSource="{Binding TreeItems}"
+                  SelectedItem="{Binding $parent[UserControl].DataContext.SelectedRepositoryMember, Mode=TwoWay}"
                   SelectionChanged="MainTreeView_SelectionChanged">
             <TreeView.Styles>
                 <Style Selector="TreeViewItem">

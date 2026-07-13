@@ -110,6 +110,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 _softDeleteRepositoryMemberCommand?.RaiseCanExecuteChanged();
                 FormulaBarVM.SelectedFormulaAttribute = null;
                 FormulaBarVM.NotifySelectedRepositoryMemberChanged();
+                RelationsVM.Reset();
             }
         }
 
@@ -163,6 +164,23 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             get => _childCollectionTableRows;
         }
+
+        private int _currentElementTabIndex;
+
+        /// <summary>
+        /// Индекс выбранной вкладки сведений о текущем элементе.
+        /// </summary>
+        public int CurrentElementTabIndex { get => _currentElementTabIndex; set => SetProperty(ref _currentElementTabIndex, value); }
+
+        /// <summary>
+        /// Модель представления навигации по репозиторию.
+        /// </summary>
+        public RepositoryNavigationVM NavigationVM { get; }
+
+        /// <summary>
+        /// Модель представления дерева связей.
+        /// </summary>
+        public RepositoryRelationsControlVM RelationsVM { get; }
 
         private ExtensionsControlVM _extensionsControlVM;
 
@@ -239,6 +257,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="dataStoragesCollectionVM">Коллекция моделей представления хранилищ данных.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
         /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
+        /// <param name="navigationVMFactory">Фабрика модели навигации по репозиторию.</param>
+        /// <param name="relationsVMFactory">Фабрика модели дерева связей.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
             IServiceProvider serviceProvider,
@@ -259,6 +279,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IAsyncRelayCommandFactory asyncCommandFactory,
             IWindowService windowService,
             IDataStorageSelectionDialogService dataStorageSelectionDialogService,
+            IRepositoryNavigationVMFactory navigationVMFactory,
+            IRepositoryRelationsControlVMFactory relationsVMFactory,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -276,6 +298,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(asyncCommandFactory);
             ArgumentNullException.ThrowIfNull(windowService);
             ArgumentNullException.ThrowIfNull(dataStorageSelectionDialogService);
+            ArgumentNullException.ThrowIfNull(navigationVMFactory);
+            ArgumentNullException.ThrowIfNull(relationsVMFactory);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -286,6 +310,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
+            NavigationVM = navigationVMFactory.Create(this);
+            RelationsVM = relationsVMFactory.Create(this, NavigationVM);
             FormulaBarVM = new RepositoryFormulaBarVM(
                 this,
                 service,
