@@ -17,7 +17,7 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     private readonly RepositoryExplorerControlVM _repositoryExplorerVM;
     private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
     private readonly IRelayCommandFactory _commandFactory;
-    private readonly RepositoryRelationsService _relationsService = new();
+    private readonly IRepositoryRelationsService _relationsService;
     private IAsyncRelayCommand? _calculateCommand;
 
     /// <summary>
@@ -32,6 +32,7 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     /// <param name="navigationVM">Модель навигации по репозиторию.</param>
     /// <param name="commandFactory">Фабрика синхронных команд.</param>
     /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
+    /// <param name="relationsService">Сервис вычисления связей репозитория.</param>
     public RepositoryRelationsControlVM(
         IServiceProvider serviceProvider,
         IMapper mapper,
@@ -41,14 +42,22 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
         RepositoryExplorerControlVM repositoryExplorerVM, 
         RepositoryNavigationVM navigationVM,
         IRelayCommandFactory commandFactory,
-        IAsyncRelayCommandFactory asyncCommandFactory)
-        : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
-    {
-        _repositoryExplorerVM = repositoryExplorerVM ?? throw new ArgumentNullException(nameof(repositoryExplorerVM));
-        NavigationVM = navigationVM ?? throw new ArgumentNullException(nameof(navigationVM));
-        _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
-        _asyncCommandFactory = asyncCommandFactory ?? throw new ArgumentNullException(nameof(asyncCommandFactory));
-    }
+    IAsyncRelayCommandFactory asyncCommandFactory,
+    IRepositoryRelationsService relationsService)
+    : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
+{
+        ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
+        ArgumentNullException.ThrowIfNull(navigationVM);
+        ArgumentNullException.ThrowIfNull(commandFactory);
+        ArgumentNullException.ThrowIfNull(asyncCommandFactory);
+        ArgumentNullException.ThrowIfNull(relationsService);
+
+        _repositoryExplorerVM = repositoryExplorerVM;
+        NavigationVM = navigationVM;
+        _commandFactory = commandFactory;
+        _asyncCommandFactory = asyncCommandFactory;
+        _relationsService = relationsService;
+}
 
     /// <summary>
     /// Сервис навигации по объектам дерева связей.

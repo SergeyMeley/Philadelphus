@@ -175,7 +175,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
                     services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();
                     services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
-                    services.AddTransient<IRelationDeletionGuard, RepositoryRelationsService>();
+                    services.AddTransient<IRepositoryRelationsService, RepositoryRelationsService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
                     services.AddSingleton<ITablesExportServiceFactory, TablesExportServiceFactory>();
@@ -184,6 +184,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
                     // Слой Presentation (платформенные реализации Avalonia)
                     services.AddSingleton<IDialogService, AvaloniaDialogService>();
                     services.AddSingleton<IDataStorageSelectionDialogService, AvaloniaDataStorageSelectionDialogService>();
+                    services.AddSingleton<IRelationDeletionConfirmationService, AvaloniaRelationDeletionConfirmationService>();
                     services.AddSingleton<IDispatcherService, AvaloniaDispatcherService>();
                     services.AddSingleton<AvaloniaWindowService>();
                     services.AddSingleton<IWindowService>(sp => sp.GetRequiredService<AvaloniaWindowService>());

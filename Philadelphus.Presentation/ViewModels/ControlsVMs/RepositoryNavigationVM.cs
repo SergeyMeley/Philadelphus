@@ -31,7 +31,9 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
         RepositoryExplorerControlVM repositoryExplorerVM)
         : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
     {
-        _repositoryExplorerVM = repositoryExplorerVM ?? throw new ArgumentNullException(nameof(repositoryExplorerVM));
+        ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
+
+        _repositoryExplorerVM = repositoryExplorerVM;
     }
 
     /// <summary>

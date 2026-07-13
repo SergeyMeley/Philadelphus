@@ -12,6 +12,8 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Models.Dialogs;
+using Philadelphus.Core.Domain.Relations;
 using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Services.Tables;
@@ -43,6 +45,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
         private readonly IWindowService _windowService;
         private readonly IDataStorageSelectionDialogService _dataStorageSelectionDialogService;
+        private readonly IRelationDeletionConfirmationService _relationDeletionConfirmationService;
+        private readonly IRepositoryRelationsService _relationsService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -65,8 +69,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private IRelayCommand? _createNodeCommand;
         private IRelayCommand? _createLeaveCommand;
         private IRelayCommand? _createAttributeCommand;
-        private IRelayCommand? _softDeleteRepositoryMemberCommand;
-        private IRelayCommand? _softDeleteRepositoryMemberAttributeCommand;
+        private IAsyncRelayCommand? _softDeleteRepositoryMemberCommand;
+        private IAsyncRelayCommand? _softDeleteRepositoryMemberAttributeCommand;
         private IRelayCommand? _openModifyAttributesListWindowCommand;
         private IRelayCommand? _addAttributeValueCommand;
         private IRelayCommand? _removeAttributeValueCommand;
@@ -259,6 +263,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
         /// <param name="navigationVMFactory">Фабрика модели навигации по репозиторию.</param>
         /// <param name="relationsVMFactory">Фабрика модели дерева связей.</param>
+        /// <param name="relationsService">Сервис вычисления связей репозитория.</param>
+        /// <param name="relationDeletionConfirmationService">Сервис подтверждения удаления связанных элементов.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
             IServiceProvider serviceProvider,
@@ -281,6 +287,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IDataStorageSelectionDialogService dataStorageSelectionDialogService,
             IRepositoryNavigationVMFactory navigationVMFactory,
             IRepositoryRelationsControlVMFactory relationsVMFactory,
+            IRepositoryRelationsService relationsService,
+            IRelationDeletionConfirmationService relationDeletionConfirmationService,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -300,6 +308,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(dataStorageSelectionDialogService);
             ArgumentNullException.ThrowIfNull(navigationVMFactory);
             ArgumentNullException.ThrowIfNull(relationsVMFactory);
+            ArgumentNullException.ThrowIfNull(relationsService);
+            ArgumentNullException.ThrowIfNull(relationDeletionConfirmationService);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -307,6 +317,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _asyncCommandFactory = asyncCommandFactory;
             _windowService = windowService;
             _dataStorageSelectionDialogService = dataStorageSelectionDialogService;
+            _relationsService = relationsService;
+            _relationDeletionConfirmationService = relationDeletionConfirmationService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -436,15 +448,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     return CanModifyRepository();
                 });
 
-        public IRelayCommand SoftDeleteRepositoryMemberCommand =>
-            _softDeleteRepositoryMemberCommand ??= _commandFactory.Create(
-                obj =>
+        public IAsyncRelayCommand SoftDeleteRepositoryMemberCommand =>
+            _softDeleteRepositoryMemberCommand ??= _asyncCommandFactory.Create(
+                async obj =>
                 {
                     if (CanSoftDeleteSelectedRepositoryMember()
                         && _selectedRepositoryMember?.Model is IContentModel c)
                     {
-                        _service.SoftDeleteShrubMember(c);
-                        NotifyRepositoryTreeChanged();
+                        await SoftDeleteAsync(c);
                     }
                 },
                 ce =>
@@ -453,20 +464,52 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                         && CanSoftDeleteSelectedRepositoryMember();
                 });
 
-        public IRelayCommand SoftDeleteRepositoryMemberAttributeCommand =>
-            _softDeleteRepositoryMemberAttributeCommand ??= _commandFactory.Create(
-                obj =>
+        public IAsyncRelayCommand SoftDeleteRepositoryMemberAttributeCommand =>
+            _softDeleteRepositoryMemberAttributeCommand ??= _asyncCommandFactory.Create(
+                async obj =>
                 {
                     if (_selectedRepositoryMember?.SelectedAttributeVM?.Model is IContentModel c)
                     {
-                        _service.SoftDeleteShrubMember(c);
-                        NotifyRepositoryTreeChanged();
+                        await SoftDeleteAsync(c);
                     }
                 },
                 ce =>
                 {
                     return CanModifyRepository();
                 });
+
+        /// <summary>
+        /// Удаляет элемент после подтверждения сброса блокирующих связей.
+        /// </summary>
+        /// <param name="element">Удаляемый элемент.</param>
+        /// <returns>Задача выполнения удаления.</returns>
+        private async Task SoftDeleteAsync(IContentModel element)
+        {
+            if (element is not IMainEntityModel mainEntity)
+                return;
+
+            var blockingRelations = await Task.Run(() => _relationsService
+                .GetDirectRelations(PhiladelphusRepositoryVM.Model, mainEntity)
+                .Where(x => x.BlocksSourceDeletion)
+                .ToList());
+
+            if (blockingRelations.Count > 0)
+            {
+                var rows = blockingRelations
+                    .GroupBy(x => x.Target.Uuid)
+                    .Select(group => new RelationDeletionWarningRow(
+                        group.First().DisplayName,
+                        string.Join(", ", group.Select(x => x.TypeDisplayName).Distinct())))
+                    .ToList();
+                var confirmed = await _relationDeletionConfirmationService.ConfirmAsync(
+                    $"'{mainEntity.Name}' [{mainEntity.Uuid}]", rows);
+                if (!confirmed)
+                    return;
+            }
+
+            if (_service.SoftDeleteShrubMember(element))
+                NotifyRepositoryTreeChanged();
+        }
 
         public IRelayCommand OpenModifyAttributesListWindowCommand =>
             _openModifyAttributesListWindowCommand ??= _commandFactory.Create(

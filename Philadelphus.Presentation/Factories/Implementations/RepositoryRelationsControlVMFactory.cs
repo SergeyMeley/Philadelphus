@@ -17,7 +17,9 @@ public sealed class RepositoryRelationsControlVMFactory : IRepositoryRelationsCo
     /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
     public RepositoryRelationsControlVMFactory(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+
+        _serviceProvider = serviceProvider;
     }
 
     /// <summary>

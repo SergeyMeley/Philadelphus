@@ -17,7 +17,9 @@ public sealed class RepositoryNavigationVMFactory : IRepositoryNavigationVMFacto
     /// <param name="serviceProvider">Поставщик сервисов приложения.</param>
     public RepositoryNavigationVMFactory(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+
+        _serviceProvider = serviceProvider;
     }
 
     /// <summary>

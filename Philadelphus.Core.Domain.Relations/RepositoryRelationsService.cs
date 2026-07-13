@@ -1,14 +1,13 @@
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
-using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.Relations;
 
 /// <summary>
 /// Вычисляет непосредственные структурные и предметные связи объектов репозитория.
 /// </summary>
-public sealed class RepositoryRelationsService : IRelationDeletionGuard
+public sealed class RepositoryRelationsService : IRepositoryRelationsService
 {
     /// <summary>
     /// Возвращает непосредственные исходящие и входящие связи указанного объекта.
@@ -49,7 +48,7 @@ public sealed class RepositoryRelationsService : IRelationDeletionGuard
                     result.Add(new(target, RepositoryRelationType.FormulaReference, false));
         }
 
-        foreach (var candidate in repository.AllContentRecursive.Values.OfType<ElementAttributeModel>())
+        foreach (var candidate in GetAttributes(repository))
             AddIncomingAttributeRelations(result, source, candidate);
 
         return result
@@ -73,9 +72,32 @@ public sealed class RepositoryRelationsService : IRelationDeletionGuard
     {
         var repository = target as PhiladelphusRepositoryModel
             ?? (target as IContentModel)?.AllOwnersRecursive.Values.OfType<PhiladelphusRepositoryModel>().FirstOrDefault();
-        blockingAttribute = repository?.AllContentRecursive.Values.OfType<ElementAttributeModel>()
+        blockingAttribute = repository == null
+            ? null
+            : GetAttributes(repository)
             .FirstOrDefault(x => IsBlockingReference(x, target));
         return blockingAttribute != null;
+    }
+
+    /// <summary>
+    /// Возвращает все атрибуты элементов репозитория.
+    /// </summary>
+    /// <param name="repository">Репозиторий, атрибуты которого необходимо получить.</param>
+    /// <returns>Коллекция атрибутов без повторов по UUID.</returns>
+    private static IEnumerable<ElementAttributeModel> GetAttributes(
+        PhiladelphusRepositoryModel repository)
+    {
+        ArgumentNullException.ThrowIfNull(repository);
+
+        return repository.AllContentRecursive.Values
+            .OfType<ElementAttributeModel>()
+            .Concat(repository.ContentShrub.ContentWorkingTrees
+                .SelectMany(x => x.ContentAttributes))
+            .Concat(repository.ContentShrub.ContentWorkingTrees
+                .SelectMany(x => x.Content.Values)
+                .OfType<IAttributeOwnerModel>()
+                .SelectMany(x => x.Attributes))
+            .DistinctBy(x => x.Uuid);
     }
 
     /// <summary>
