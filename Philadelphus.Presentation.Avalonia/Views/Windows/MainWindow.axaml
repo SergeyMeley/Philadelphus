@@ -18,9 +18,9 @@
 
     <Window.Resources>
         <!-- Иконки для RibbonButton: свойство Icon/LargeIcon имеет тип IControlTemplate,
-             поэтому иконку оборачиваем в ControlTemplate. Root/Node/Leave — PNG→SVG-spike с файлами в Assets/Icons. -->
-        <ControlTemplate x:Key="IcoRoot">
-            <localControls:ThemedSvg Icon="root"
+             поэтому иконку оборачиваем в ControlTemplate. WorkingTree/Node/Leave — SVG-файлы из Assets/Icons. -->
+        <ControlTemplate x:Key="IcoWorkingTree">
+            <localControls:ThemedSvg Icon="tree"
                                      Width="22"
                                      Height="22" />
         </ControlTemplate>
@@ -153,10 +153,10 @@
                                  (иконка-only при нехватке места), MaxSize=Large (иконка сверху + подпись).
                                  Иконка — Icon=ControlTemplate (тип IControlTemplate, не растр). -->
                             <ribbon:RibbonGroupBox Header="Иерархия репозитория">
-                                <ribbon:RibbonButton Content="Добавить корень" Size="Medium" MinSize="Small" MaxSize="Large"
-                                                     Icon="{StaticResource IcoRoot}"
-                                                     Command="{Binding RepositoryExplorerVM.CreateRootCommand}"
-                                                     ToolTip.Tip="Добавить корень" />
+                                <ribbon:RibbonButton Content="Добавить рабочее дерево" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoWorkingTree}"
+                                                     Command="{Binding RepositoryExplorerVM.CreateWorkingTreeCommand}"
+                                                     ToolTip.Tip="Добавить рабочее дерево" />
                                 <ribbon:RibbonButton Content="Добавить узел" Size="Medium" MinSize="Small" MaxSize="Large"
                                                      Icon="{StaticResource IcoNode}"
                                                      Command="{Binding RepositoryExplorerVM.CreateNodeCommand}"

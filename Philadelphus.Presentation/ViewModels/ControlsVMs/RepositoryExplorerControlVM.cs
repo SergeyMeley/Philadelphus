@@ -66,7 +66,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
         private IAsyncRelayCommand? _getWorkCommand;
         private IRelayCommand? _saveCommand;
-        private IAsyncRelayCommand? _createRootCommand;
+        private IAsyncRelayCommand? _createWorkingTreeCommand;
         private IRelayCommand? _createNodeCommand;
         private IRelayCommand? _createLeaveCommand;
         private IRelayCommand? _createAttributeCommand;
@@ -402,12 +402,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     return CanModifyRepository();
                 });
 
-        public IAsyncRelayCommand CreateRootCommand
+        public IAsyncRelayCommand CreateWorkingTreeCommand
         {
             get
             {
-                return _createRootCommand ??= _asyncCommandFactory.Create(
-                    ExecuteCreateRootAsync,
+                return _createWorkingTreeCommand ??= _asyncCommandFactory.Create(
+                    ExecuteCreateWorkingTreeAsync,
                     ce =>
                     {
                         return CanModifyRepository();
@@ -712,7 +712,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             }
         }
 
-        private async Task ExecuteCreateRootAsync(object obj)
+        private async Task ExecuteCreateWorkingTreeAsync(object obj)
         {
             var repository = _philadelphusRepositoryVM.Model;
             var dataStorage = await WorkingTreeDataStorageSelector.SelectAsync(
@@ -1196,7 +1196,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             _getWorkCommand?.RaiseCanExecuteChanged();
             _saveCommand?.RaiseCanExecuteChanged();
-            _createRootCommand?.RaiseCanExecuteChanged();
+            _createWorkingTreeCommand?.RaiseCanExecuteChanged();
             _createNodeCommand?.RaiseCanExecuteChanged();
             _createLeaveCommand?.RaiseCanExecuteChanged();
             _createAttributeCommand?.RaiseCanExecuteChanged();
