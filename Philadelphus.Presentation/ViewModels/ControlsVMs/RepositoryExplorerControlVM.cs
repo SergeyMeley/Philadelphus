@@ -820,8 +820,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private void SynchronizeTreeSelection(
             IMainEntityVM<IMainEntityModel>? selectedRepositoryMember)
         {
-            var treeMember = selectedRepositoryMember is TreeLeaveVM leave
-                ? leave.Parent
+            var treeMember = selectedRepositoryMember is TreeLeaveVM
+                ? null
                 : selectedRepositoryMember;
 
             if (ReferenceEquals(_selectedRepositoryTreeMember, treeMember))

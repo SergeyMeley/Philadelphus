@@ -30,6 +30,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
         protected readonly T _model;
         private bool? _isTreeExpanded;
+        private readonly ObservableCollection<ElementAttributeVM> _attributesVMs = new();
         public T Model 
         { 
             get 
@@ -152,22 +153,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 }
             }
         }
-        public ObservableCollection<ElementAttributeVM> AttributesVMs 
-        { 
-            get
-            {
-                var result = new ObservableCollection<ElementAttributeVM>();
-                if (_model is IShrubMemberModel sm)
-                {
-                    foreach (var attribute in sm.Attributes)
-                    {
-                        var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService, notificationService: _notificationService);
-                        result.Add(attributeVM);
-                    }
-                }
-                return result;
-            }
-        }
+        public ObservableCollection<ElementAttributeVM> AttributesVMs => _attributesVMs;
 
         /// <summary>
         /// Выбранная модель представления атрибута.
@@ -210,6 +196,19 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             _model = IMainEntityModel;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _storageVM = dataStoragesCollectionVM?.DataStoragesVMs?.SingleOrDefault(x => x.Uuid == _model.DataStorage.Uuid) ?? throw new NullReferenceException();
+
+            if (_model is IShrubMemberModel shrubMember)
+            {
+                foreach (var attribute in shrubMember.Attributes)
+                {
+                    _attributesVMs.Add(new ElementAttributeVM(
+                        attribute,
+                        _dataStoragesCollectionVM,
+                        _service,
+                        fileDialogService: _fileDialogService,
+                        notificationService: _notificationService));
+                }
+            }
         }
        
         /// <summary>

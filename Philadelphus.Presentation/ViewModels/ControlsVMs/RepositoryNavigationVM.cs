@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Serilog;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 
 namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 
@@ -99,7 +100,7 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
         if (target == null) return false;
 
         ExpandPath(target);
-        _repositoryExplorerVM.SelectedRepositoryMember = target;
+        SelectTarget(target);
         if (ownerUuid.HasValue)
         {
             _repositoryExplorerVM.FormulaBarVM.SelectedFormulaAttribute =
@@ -109,6 +110,25 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
 
         TargetUuid = elementUuid;
         return true;
+    }
+
+    /// <summary>
+    /// Последовательно выделяет представленный в дереве элемент и целевой элемент репозитория.
+    /// Для листа сначала выбирается его родительский узел, а затем строка листа в таблице.
+    /// </summary>
+    /// <param name="target">Целевой элемент навигации.</param>
+    private void SelectTarget(IMainEntityVM<IMainEntityModel> target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+
+        if (target is TreeLeaveVM leave)
+        {
+            _repositoryExplorerVM.SelectedRepositoryTreeMember = leave.Parent;
+            _repositoryExplorerVM.SelectedRepositoryMember = leave;
+            return;
+        }
+
+        _repositoryExplorerVM.SelectedRepositoryTreeMember = target;
     }
 
     /// <summary>
