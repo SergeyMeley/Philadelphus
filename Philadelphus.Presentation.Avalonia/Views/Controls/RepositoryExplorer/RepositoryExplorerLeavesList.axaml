@@ -8,7 +8,7 @@
                   Margin="1"
                   MinHeight="50"
                   ItemsSource="{Binding CurrentLeavesOwner.ChildLeaves}"
-				  SelectedItem="{Binding CurrentLeave, Mode=OneWay}}"
+				  SelectedItem="{Binding CurrentLeave, Mode=OneWay}"
 				  SelectionChanged="SelectedElementLeavesDataGrid_SelectionChanged"
                   AutoGenerateColumns="False"
                   CanUserResizeColumns="True">

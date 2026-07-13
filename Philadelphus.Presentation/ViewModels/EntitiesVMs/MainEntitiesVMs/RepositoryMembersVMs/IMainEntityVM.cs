@@ -12,6 +12,10 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
     /// </summary>
     public interface IMainEntityVM
     {
+        /// <summary>
+        /// Признак раскрытия элемента в дереве обозревателя репозитория.
+        /// </summary>
+        bool IsTreeExpanded { get; set; }
     }
 
     /// <summary>

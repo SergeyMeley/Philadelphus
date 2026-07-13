@@ -5,15 +5,29 @@
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.Attributes">
     <Grid RowDefinitions="Auto,Auto,*,Auto">
         <!-- Тулбар атрибутов -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" IsEnabled="{Binding !IsReadOnly}">
-            <Button Command="{Binding CreateAttributeCommand}" ToolTip.Tip="Добавить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                <localControls:ThemedSvg Icon="add" />
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" IsEnabled="{Binding !IsReadOnly}">
+                <Button Command="{Binding CreateAttributeCommand}" ToolTip.Tip="Добавить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                    <localControls:ThemedSvg Icon="add" />
+                </Button>
+                <Button Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" ToolTip.Tip="Удалить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                    <localControls:ThemedSvg Icon="remove" />
+                </Button>
+                <Button Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip.Tip="Открыть настройки списка" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                    <localControls:ThemedSvg Icon="list" />
+                </Button>
+            </StackPanel>
+            <Button Command="{Binding NavigationVM.NavigateToAttributeDataTypeCommand}"
+                    CommandParameter="{Binding FormulaBarVM.SelectedFormulaAttribute}"
+                    ToolTip.Tip="Перейти к узлу типа данных"
+                    Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                <localControls:ThemedSvg Icon="navigate-node" />
             </Button>
-            <Button Command="{Binding SoftDeleteRepositoryMemberAttributeCommand}" ToolTip.Tip="Удалить атрибут" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                <localControls:ThemedSvg Icon="remove" />
-            </Button>
-            <Button Command="{Binding OpenModifyAttributesListWindowCommand}" ToolTip.Tip="Открыть настройки списка" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
-                <localControls:ThemedSvg Icon="list" />
+            <Button Command="{Binding NavigationVM.NavigateToAttributeValueCommand}"
+                    CommandParameter="{Binding FormulaBarVM.SelectedFormulaAttribute}"
+                    ToolTip.Tip="Перейти к листу значения"
+                    Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                <localControls:ThemedSvg Icon="navigate-leave" />
             </Button>
         </StackPanel>
 

@@ -28,7 +28,7 @@ namespace Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer
         {
             if (ViewModel is { } viewModel)
             {
-                viewModel.SelectedRepositoryMember = MainTreeView.SelectedItem as IMainEntityVM<IMainEntityModel>;
+                viewModel.SelectedRepositoryTreeMember = MainTreeView.SelectedItem as IMainEntityVM<IMainEntityModel>;
             }
         }
     }

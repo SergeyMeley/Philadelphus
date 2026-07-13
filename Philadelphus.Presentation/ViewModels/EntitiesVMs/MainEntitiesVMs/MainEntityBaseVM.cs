@@ -29,6 +29,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         protected readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
 
         protected readonly T _model;
+        private bool? _isTreeExpanded;
         public T Model 
         { 
             get 
@@ -123,6 +124,15 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         /// Нужно ли раскрыть элемент в TreeView при первичном отображении.
         /// </summary>
         public virtual bool IsTreeExpandedByDefault => false;
+
+        /// <summary>
+        /// Признак раскрытия элемента в дереве обозревателя репозитория.
+        /// </summary>
+        public bool IsTreeExpanded
+        {
+            get => _isTreeExpanded ?? IsTreeExpandedByDefault;
+            set => SetProperty(ref _isTreeExpanded, value);
+        }
 
         public long Sequence 
         { 

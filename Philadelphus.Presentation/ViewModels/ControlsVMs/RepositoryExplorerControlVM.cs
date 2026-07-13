@@ -54,6 +54,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private int _repositoryLoadVersion;
 
         private IMainEntityVM<IMainEntityModel>? _selectedRepositoryMember;
+        private IMainEntityVM<IMainEntityModel>? _selectedRepositoryTreeMember;
         private TreeLeaveVM? _currentLeave;
         private ILeaveParent? _currentLeavesOwner;
         private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
@@ -105,6 +106,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             set
             {
                 _selectedRepositoryMember = value;
+                SynchronizeTreeSelection(value);
                 UpdateCurrentLeavesOwner(value);
                 RebuildChildCollectionTable();
                 OnPropertyChanged(nameof(PropertyList));
@@ -115,6 +117,23 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 FormulaBarVM.SelectedFormulaAttribute = null;
                 FormulaBarVM.NotifySelectedRepositoryMemberChanged();
                 RelationsVM.Reset();
+            }
+        }
+
+        /// <summary>
+        /// Элемент, выделенный непосредственно в дереве обозревателя репозитория.
+        /// </summary>
+        public IMainEntityVM<IMainEntityModel>? SelectedRepositoryTreeMember
+        {
+            get => _selectedRepositoryTreeMember;
+            set
+            {
+                if (ReferenceEquals(_selectedRepositoryTreeMember, value))
+                    return;
+
+                _selectedRepositoryTreeMember = value;
+                OnPropertyChanged(nameof(SelectedRepositoryTreeMember));
+                SelectedRepositoryMember = value;
             }
         }
 
@@ -792,6 +811,24 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 CurrentLeave = null;
             }
+        }
+
+        /// <summary>
+        /// Синхронизирует выделение дерева с выбранным элементом репозитория.
+        /// </summary>
+        /// <param name="selectedRepositoryMember">Выбранный элемент репозитория.</param>
+        private void SynchronizeTreeSelection(
+            IMainEntityVM<IMainEntityModel>? selectedRepositoryMember)
+        {
+            var treeMember = selectedRepositoryMember is TreeLeaveVM leave
+                ? leave.Parent
+                : selectedRepositoryMember;
+
+            if (ReferenceEquals(_selectedRepositoryTreeMember, treeMember))
+                return;
+
+            _selectedRepositoryTreeMember = treeMember;
+            OnPropertyChanged(nameof(SelectedRepositoryTreeMember));
         }
 
         internal IMainEntityVM<IMainEntityModel>? FindRepositoryMemberByUuid(Guid uuid)

@@ -43,11 +43,11 @@
         <TreeView Name="MainTreeView"
                   DataContext="{Binding PhiladelphusRepositoryVM}"
                   ItemsSource="{Binding TreeItems}"
-                  SelectedItem="{Binding $parent[UserControl].DataContext.SelectedRepositoryMember, Mode=TwoWay}"
+                  SelectedItem="{Binding $parent[UserControl].DataContext.SelectedRepositoryTreeMember, Mode=TwoWay}"
                   SelectionChanged="MainTreeView_SelectionChanged">
             <TreeView.Styles>
                 <Style Selector="TreeViewItem">
-                    <Setter Property="IsExpanded" Value="{Binding IsTreeExpandedByDefault}" />
+                    <Setter Property="IsExpanded" Value="{Binding IsTreeExpanded, Mode=TwoWay}" />
                 </Style>
             </TreeView.Styles>
             <TreeView.DataTemplates>
