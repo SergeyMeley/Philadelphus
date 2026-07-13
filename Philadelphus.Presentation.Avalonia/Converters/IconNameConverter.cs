@@ -33,7 +33,7 @@ namespace Philadelphus.Presentation.Avalonia.Converters
                 AppIcon.StatusAlarm => "status-alarm",
                 AppIcon.RepositoryLogo => "repository-logo",
                 AppIcon.Shrub => "repository-logo",
-                AppIcon.WorkingTree => "root",
+                AppIcon.WorkingTree => "tree",
                 AppIcon.TreeRoot => "root",
                 AppIcon.TreeNode => "node",
                 AppIcon.TreeLeaf => "leave",
