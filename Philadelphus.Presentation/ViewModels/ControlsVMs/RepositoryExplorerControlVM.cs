@@ -152,7 +152,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         public ILeaveParent? CurrentLeavesOwner
         {
             get => _currentLeavesOwner;
-            private set => SetProperty(ref _currentLeavesOwner, value);
+            private set
+            {
+                if (SetProperty(ref _currentLeavesOwner, value))
+                    NavigationVM.NotifyCurrentElementChanged();
+            }
         }
 
         //public List<InfrastructureTypes> InfrastructureTypes

@@ -22,6 +22,7 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
     private Guid? _targetUuid;
     private IRelayCommand? _navigateToAttributeDataTypeCommand;
     private IRelayCommand? _navigateToAttributeValueCommand;
+    private IRelayCommand? _navigateToLeavesOwnerCommand;
 
     /// <summary>
     /// Инициализирует модель представления навигации по репозиторию.
@@ -77,6 +78,29 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
                 IsCollectionValue: false,
                 AssignedValue: not null
             });
+
+    /// <summary>
+    /// Команда перехода к родительскому узлу отображаемой таблицы листов.
+    /// </summary>
+    public IRelayCommand NavigateToLeavesOwnerCommand =>
+        _navigateToLeavesOwnerCommand ??= _commandFactory.Create(
+            obj =>
+            {
+                if (_repositoryExplorerVM.CurrentLeavesOwner is IMainEntityVM<IMainEntityModel> owner)
+                    Navigate(owner.Uuid);
+            },
+            ce =>
+            {
+                return _repositoryExplorerVM.CurrentLeavesOwner is IMainEntityVM<IMainEntityModel>;
+            });
+
+    /// <summary>
+    /// Обновляет доступность команд навигации, зависящих от текущего элемента обозревателя.
+    /// </summary>
+    internal void NotifyCurrentElementChanged()
+    {
+        _navigateToLeavesOwnerCommand?.RaiseCanExecuteChanged();
+    }
 
     /// <summary>
     /// UUID элемента, к которому был запрошен последний переход.
