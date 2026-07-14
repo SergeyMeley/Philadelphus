@@ -965,7 +965,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
         private bool CanSoftDeleteSelectedRepositoryMember()
         {
-            return _selectedRepositoryMember is TreeRootVM
+            return _selectedRepositoryMember
+                is WorkingTreeVM
+                or TreeRootVM
                 or TreeNodeVM
                 or TreeLeaveVM;
         }

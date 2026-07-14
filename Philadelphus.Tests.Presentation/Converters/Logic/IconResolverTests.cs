@@ -34,6 +34,7 @@ namespace Philadelphus.Tests.Presentation.Converters.Logic
 
         private sealed class FakeMainEntityVM : IMainEntityVM
         {
+            public bool IsTreeExpanded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         }
     }
 }

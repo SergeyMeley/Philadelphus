@@ -40,7 +40,7 @@ namespace Philadelphus.Presentation.Avalonia.Views.Dialogs
                 PlaceholderText = "Выберите хранилище",
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 ItemTemplate = new FuncDataTemplate<IDataStorageModel>(
-                    (storage, _) => new TextBlock { Text = storage.Name })
+                    (storage, _) => new TextBlock { Text = storage?.Name ?? string.Empty })
             };
 
             var selectButton = new Button
