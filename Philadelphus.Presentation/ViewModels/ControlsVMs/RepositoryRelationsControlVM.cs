@@ -1,4 +1,5 @@
 using AutoMapper;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Core.Domain.Relations;
@@ -15,10 +16,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 public sealed class RepositoryRelationsControlVM : ControlBaseVM
 {
     private readonly RepositoryExplorerControlVM _repositoryExplorerVM;
-    private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
     private readonly IRelayCommandFactory _commandFactory;
     private readonly IRepositoryRelationsService _relationsService;
-    private IAsyncRelayCommand? _calculateCommand;
+    private int _calculationVersion;
+    private bool _isLoading;
 
     /// <summary>
     /// Инициализирует модель представления дерева связей.
@@ -31,7 +32,6 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     /// <param name="repositoryExplorerVM">Родительская модель обозревателя репозитория.</param>
     /// <param name="navigationVM">Модель навигации по репозиторию.</param>
     /// <param name="commandFactory">Фабрика синхронных команд.</param>
-    /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
     /// <param name="relationsService">Сервис вычисления связей репозитория.</param>
     public RepositoryRelationsControlVM(
         IServiceProvider serviceProvider,
@@ -42,20 +42,17 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
         RepositoryExplorerControlVM repositoryExplorerVM, 
         RepositoryNavigationVM navigationVM,
         IRelayCommandFactory commandFactory,
-    IAsyncRelayCommandFactory asyncCommandFactory,
-    IRepositoryRelationsService relationsService)
+        IRepositoryRelationsService relationsService)
     : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
 {
         ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
         ArgumentNullException.ThrowIfNull(navigationVM);
         ArgumentNullException.ThrowIfNull(commandFactory);
-        ArgumentNullException.ThrowIfNull(asyncCommandFactory);
         ArgumentNullException.ThrowIfNull(relationsService);
 
         _repositoryExplorerVM = repositoryExplorerVM;
         NavigationVM = navigationVM;
         _commandFactory = commandFactory;
-        _asyncCommandFactory = asyncCommandFactory;
         _relationsService = relationsService;
 }
 
@@ -70,31 +67,88 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     public ObservableCollection<RepositoryRelationVM> Roots { get; } = new();
 
     /// <summary>
-    /// Команда пересчета непосредственных связей текущего элемента.
+    /// Признак выполняющегося расчёта дерева связей.
     /// </summary>
-    public IAsyncRelayCommand CalculateCommand => _calculateCommand ??= _asyncCommandFactory.Create(CalculateAsync,
-        _ => _repositoryExplorerVM.SelectedRepositoryMember != null);
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set => SetProperty(ref _isLoading, value);
+    }
 
     /// <summary>
     /// Очищает рассчитанное дерево связей.
     /// </summary>
-    public void Reset() => Roots.Clear();
+    public void Reset()
+    {
+        Interlocked.Increment(ref _calculationVersion);
+        Roots.Clear();
+        IsLoading = false;
+    }
 
     /// <summary>
-    /// Пересчитывает корневой уровень дерева для выбранного элемента.
+    /// Автоматически запускает расчёт дерева связей для выбранного элемента.
     /// </summary>
-    /// <param name="parameter">Параметр команды.</param>
-    /// <returns>Задача, представляющая асинхронный пересчет.</returns>
-    private async Task CalculateAsync(object parameter)
+    public void Refresh()
+    {
+        _ = StartRefresh();
+    }
+
+    /// <summary>
+    /// Запускает новую версию расчёта для текущего выбранного элемента.
+    /// </summary>
+    /// <returns>Задача, представляющая асинхронный расчёт.</returns>
+    private Task StartRefresh()
     {
         var selected = _repositoryExplorerVM.SelectedRepositoryMember?.Model;
-        if (selected == null) return;
-        var selectedUuid = selected.Uuid;
-        var relations = await Task.Run(() => _relationsService.GetDirectRelations(
-            _repositoryExplorerVM.PhiladelphusRepositoryVM.Model, selected));
-        if (_repositoryExplorerVM.SelectedRepositoryMember?.Uuid != selectedUuid) return;
+        var version = Interlocked.Increment(ref _calculationVersion);
         Roots.Clear();
-        foreach (var relation in relations) Roots.Add(CreateNode(relation));
+
+        if (selected == null)
+        {
+            IsLoading = false;
+            return Task.CompletedTask;
+        }
+
+        IsLoading = true;
+        return RefreshAsync(version, selected);
+    }
+
+    /// <summary>
+    /// Рассчитывает корневые связи и заранее загружает их непосредственных потомков.
+    /// </summary>
+    /// <param name="version">Версия расчёта для защиты от устаревшего результата.</param>
+    /// <param name="selected">Элемент, для которого рассчитываются связи.</param>
+    /// <returns>Задача, представляющая асинхронный расчёт.</returns>
+    private async Task RefreshAsync(int version, IMainEntityModel selected)
+    {
+        try
+        {
+            await Task.Yield();
+            if (version != Volatile.Read(ref _calculationVersion))
+                return;
+
+            var relations = await Task.Run(() => _relationsService.GetDirectRelations(
+                _repositoryExplorerVM.PhiladelphusRepositoryVM.Model, selected));
+            var nodes = relations.Select(CreateNode).ToList();
+            await Task.WhenAll(nodes.Select(x => x.EnsureChildrenLoadedAsync()));
+
+            if (version != Volatile.Read(ref _calculationVersion)
+                || _repositoryExplorerVM.SelectedRepositoryMember?.Uuid != selected.Uuid)
+                return;
+
+            foreach (var node in nodes)
+                Roots.Add(node);
+        }
+        catch (Exception ex)
+        {
+            if (version == Volatile.Read(ref _calculationVersion))
+                _logger.Error(ex, "Ошибка расчёта дерева связей элемента {ElementUuid}.", selected.Uuid);
+        }
+        finally
+        {
+            if (version == Volatile.Read(ref _calculationVersion))
+                IsLoading = false;
+        }
     }
 
     /// <summary>
@@ -106,10 +160,18 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     {
         return new RepositoryRelationVM(relation, async node =>
         {
-            var relations = await Task.Run(() => _relationsService.GetDirectRelations(
-                _repositoryExplorerVM.PhiladelphusRepositoryVM.Model, node.Relation.Target));
-            foreach (var child in relations) node.Children.Add(CreateNode(child));
-        }, _asyncCommandFactory, _commandFactory.Create(_ =>
+            try
+            {
+                var relations = await Task.Run(() => _relationsService.GetDirectRelations(
+                    _repositoryExplorerVM.PhiladelphusRepositoryVM.Model, node.Relation.Target));
+                foreach (var child in relations)
+                    node.Children.Add(CreateNode(child));
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Ошибка расчёта дочерних связей элемента {ElementUuid}.", node.Relation.Target.Uuid);
+            }
+        }, _commandFactory.Create(_ =>
             NavigationVM.Navigate(relation.Target.Uuid, relation.NavigationOwnerUuid)));
     }
 }

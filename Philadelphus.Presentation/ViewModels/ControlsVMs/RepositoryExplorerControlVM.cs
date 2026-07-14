@@ -116,7 +116,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 _softDeleteRepositoryMemberCommand?.RaiseCanExecuteChanged();
                 FormulaBarVM.SelectedFormulaAttribute = null;
                 FormulaBarVM.NotifySelectedRepositoryMemberChanged();
-                RelationsVM.Reset();
+                RelationsVM.Refresh();
                 NavigationVM.NotifySelectedRepositoryMemberChanged(value);
             }
         }
