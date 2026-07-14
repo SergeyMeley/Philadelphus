@@ -49,6 +49,21 @@
         <ControlTemplate x:Key="IcoHome">
             <localControls:ThemedSvg Icon="home" Width="22" Height="22" />
         </ControlTemplate>
+        <ControlTemplate x:Key="IcoNavigateBack">
+            <localControls:ThemedSvg Icon="navigate-back" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoNavigateForward">
+            <localControls:ThemedSvg Icon="navigate-forward" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoNavigateNode">
+            <localControls:ThemedSvg Icon="navigate-node" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoNavigateLeave">
+            <localControls:ThemedSvg Icon="navigate-leave" Width="22" Height="22" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="IcoNavigateTarget">
+            <localControls:ThemedSvg Icon="navigate-target" Width="22" Height="22" />
+        </ControlTemplate>
         <ControlTemplate x:Key="IcoFormula">
             <localControls:ThemedSvg Icon="formula" Width="22" Height="22" />
         </ControlTemplate>
@@ -127,7 +142,6 @@
                             <ribbon:RibbonGroupBox Header="Текущий репозиторий">
                                 <StackPanel Spacing="2">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Наименование: " />
                                         <TextBlock Text="{Binding RepositoryExplorerVM.PhiladelphusRepositoryVM.Name}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
@@ -136,11 +150,13 @@
                                     </StackPanel>
                                 </StackPanel>
                             </ribbon:RibbonGroupBox>
-                            <ribbon:RibbonGroupBox Header="Текущий элемент">
+                            <ribbon:RibbonGroupBox Header="Текущий элемент" Width="320">
                                 <StackPanel Spacing="2">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Текущий элемент: " />
-                                        <TextBlock Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name, FallbackValue='&lt;не выбран&gt;', TargetNullValue='&lt;не выбран&gt;'}" />
+                                        <TextBlock MaxWidth="185"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Text="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name, FallbackValue='&lt;не выбран&gt;', TargetNullValue='&lt;не выбран&gt;'}"
+                                                   ToolTip.Tip="{Binding RepositoryExplorerVM.SelectedRepositoryMember.Name}" />
                                     </StackPanel>
                                     <ribbon:RibbonButton Content="Подробнее" Size="Medium" MinSize="Small" MaxSize="Large"
                                         Icon="{StaticResource IcoDetails}"
@@ -179,6 +195,34 @@
                                                      Icon="{StaticResource IcoRemove}"
                                                      Command="{Binding RepositoryExplorerVM.SoftDeleteRepositoryMemberAttributeCommand}"
                                                      ToolTip.Tip="Удалить атрибут" />
+                            </ribbon:RibbonGroupBox>
+                            <ribbon:RibbonGroupBox Header="Навигация">
+                                <ribbon:RibbonButton Content="Назад" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoNavigateBack}"
+                                                     Command="{Binding RepositoryExplorerVM.NavigationVM.NavigateBackCommand}"
+                                                     ToolTip.Tip="Перейти к предыдущей позиции" />
+                                <ribbon:RibbonButton Content="Вперёд" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoNavigateForward}"
+                                                     Command="{Binding RepositoryExplorerVM.NavigationVM.NavigateForwardCommand}"
+                                                     ToolTip.Tip="Перейти к следующей позиции" />
+                                <ribbon:RibbonButton Content="Родительский узел" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoNavigateNode}"
+                                                     Command="{Binding RepositoryExplorerVM.NavigationVM.NavigateToLeavesOwnerCommand}"
+                                                     ToolTip.Tip="Перейти к родительскому узлу листа" />
+                                <ribbon:RibbonButton Content="Узел типа данных" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoNavigateNode}"
+                                                     Command="{Binding RepositoryExplorerVM.NavigationVM.NavigateToAttributeDataTypeCommand}"
+                                                     CommandParameter="{Binding RepositoryExplorerVM.FormulaBarVM.SelectedFormulaAttribute}"
+                                                     ToolTip.Tip="Перейти к узлу типа данных атрибута" />
+                                <ribbon:RibbonButton Content="Лист значения" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoNavigateLeave}"
+                                                     Command="{Binding RepositoryExplorerVM.NavigationVM.NavigateToAttributeValueCommand}"
+                                                     CommandParameter="{Binding RepositoryExplorerVM.FormulaBarVM.SelectedFormulaAttribute}"
+                                                     ToolTip.Tip="Перейти к листу значения атрибута" />
+                                <ribbon:RibbonButton Content="Элемент связи" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoNavigateTarget}"
+                                                     Command="{Binding RepositoryExplorerVM.RelationsVM.NavigateToSelectedRelationCommand}"
+                                                     ToolTip.Tip="Перейти к выбранному связанному элементу" />
                             </ribbon:RibbonGroupBox>
                         </ribbon:RibbonTab.Groups>
                     </ribbon:RibbonTab>
