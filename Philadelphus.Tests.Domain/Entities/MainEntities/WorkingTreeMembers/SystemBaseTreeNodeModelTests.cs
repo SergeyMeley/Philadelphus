@@ -482,6 +482,157 @@ public class SystemBaseTreeNodeModelTests
             && x.Contains("Истина"));
     }
 
+    [Theory]
+    [InlineData(ProtectedSystemElement.WorkingTree)]
+    [InlineData(ProtectedSystemElement.Root)]
+    [InlineData(ProtectedSystemElement.Node)]
+    [InlineData(ProtectedSystemElement.Leave)]
+    public void SoftDeleteShrubMember_SystemElement_BlocksDeleting(
+        ProtectedSystemElement elementKind)
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new TestSystemBaseWorkingTreeModel(notificationService);
+        var root = new TreeRootModel(
+            TreeRootModel.SystemBaseUuid,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.BOOL,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var leave = new SystemBaseTreeLeaveModel(
+            node,
+            tree,
+            "Истина",
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var element = elementKind switch
+        {
+            ProtectedSystemElement.WorkingTree => (IContentModel)tree,
+            ProtectedSystemElement.Root => root,
+            ProtectedSystemElement.Node => node,
+            ProtectedSystemElement.Leave => leave,
+            _ => throw new ArgumentOutOfRangeException(nameof(elementKind)),
+        };
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+
+        var result = service.SoftDeleteShrubMember(element);
+
+        result.Should().BeFalse();
+        ((IMainEntityWritableModel)element).State.Should().NotBe(State.ForSoftDelete);
+        notificationService.Messages.Should().Contain(x =>
+            x.Contains("Удаление")
+            && x.Contains("запрещено"));
+    }
+
+    [Fact]
+    public void SoftDeleteShrubMember_UserNodeInheritedFromSystemNode_AllowsDeleting()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new TestSystemBaseWorkingTreeModel(notificationService);
+        var root = new TreeRootModel(
+            TreeRootModel.SystemBaseUuid,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var systemNode = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var userNode = new TreeNodeModel(
+            Guid.NewGuid(),
+            systemNode,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        ((IMainEntityWritableModel)userNode).SetState(State.SavedOrLoaded);
+
+        var result = service.SoftDeleteShrubMember(userNode);
+
+        result.Should().BeTrue();
+        userNode.State.Should().Be(State.ForSoftDelete);
+    }
+
+    [Fact]
+    public void SoftDeleteShrubMember_UserValueWithSystemType_BlocksDeleting()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new TestSystemBaseWorkingTreeModel(notificationService);
+        var root = new TreeRootModel(
+            TreeRootModel.SystemBaseUuid,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var systemNode = new SystemBaseTreeNodeModel(
+            root,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var userValue = new SystemBaseTreeLeaveModel(
+            Guid.NewGuid(),
+            systemNode,
+            tree,
+            SystemBaseType.INTEGER,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+
+        var result = service.SoftDeleteShrubMember(userValue);
+
+        result.Should().BeFalse();
+        userValue.State.Should().NotBe(State.ForSoftDelete);
+    }
+
+    [Fact]
+    public void SoftDeleteShrubMember_UserLeave_AllowsDeleting()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var userLeave = new TreeLeaveModel(
+            Guid.NewGuid(),
+            node,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        ((IMainEntityWritableModel)userLeave).SetState(State.SavedOrLoaded);
+
+        var result = service.SoftDeleteShrubMember(userLeave);
+
+        result.Should().BeTrue();
+        userLeave.State.Should().Be(State.ForSoftDelete);
+    }
+
     [Fact]
     public void SoftDeleteShrubMember_AttributeWithInheritedDescendants_BlocksDeleting()
     {
@@ -779,6 +930,14 @@ public class SystemBaseTreeNodeModelTests
                 new EmptyPropertiesPolicy<WorkingTreeModel>())
         {
         }
+    }
+
+    public enum ProtectedSystemElement
+    {
+        WorkingTree,
+        Root,
+        Node,
+        Leave,
     }
 
     private static string GetNonInvariantTemporalValue(SystemBaseType type)

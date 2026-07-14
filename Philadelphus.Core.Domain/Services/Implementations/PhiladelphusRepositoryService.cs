@@ -976,6 +976,17 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     return false;
                 }
 
+                if (element is WorkingTreeModel { IsSystemBase: true }
+                    || element is TreeRootModel { IsSystemBase: true }
+                    || element is SystemBaseTreeNodeModel
+                    || element is SystemBaseTreeLeaveModel)
+                {
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Удаление системного элемента '{(element as IMainEntityModel).Name}' [{(element as IMainEntityModel).Uuid}] запрещено.",
+                        criticalLevel: NotificationCriticalLevelModel.Warning);
+                    return false;
+                }
+
                 long result = 0;
                 if (element is IMainEntityWritableModel me)
                 {
