@@ -24,6 +24,18 @@
                   IsVisible="{Binding #shrubToggle.IsChecked}">
                 <!-- Тулбар -->
                 <DockPanel Grid.Row="0">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1" Classes="toolbar">
+                        <Button Command="{Binding NavigationVM.NavigateBackCommand}"
+                                ToolTip.Tip="Назад"
+                                Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <localControls:ThemedSvg Icon="navigate-back" />
+                        </Button>
+                        <Button Command="{Binding NavigationVM.NavigateForwardCommand}"
+                                ToolTip.Tip="Вперёд"
+                                Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                            <localControls:ThemedSvg Icon="navigate-forward" />
+                        </Button>
+                    </StackPanel>
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="1" Classes="toolbar"
                                 IsEnabled="{Binding !IsReadOnly}">
 						<Button Command="{Binding SaveCommand}" ToolTip.Tip="Сохранить изменения" Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">

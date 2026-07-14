@@ -117,6 +117,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 FormulaBarVM.SelectedFormulaAttribute = null;
                 FormulaBarVM.NotifySelectedRepositoryMemberChanged();
                 RelationsVM.Reset();
+                NavigationVM.NotifySelectedRepositoryMemberChanged(value);
             }
         }
 
@@ -746,6 +747,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             }
 
             NotifyRepositoryTreeChanged();
+            NavigationVM.ResetHistory();
         }
 
         /// <summary>

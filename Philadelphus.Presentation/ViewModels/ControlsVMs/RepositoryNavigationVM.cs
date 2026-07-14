@@ -19,7 +19,13 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
 {
     private readonly RepositoryExplorerControlVM _repositoryExplorerVM;
     private readonly IRelayCommandFactory _commandFactory;
+    private readonly Stack<NavigationLocation> _backHistory = new();
+    private readonly Stack<NavigationLocation> _forwardHistory = new();
+    private NavigationLocation? _currentLocation;
+    private bool _isNavigationInProgress;
     private Guid? _targetUuid;
+    private IRelayCommand? _navigateBackCommand;
+    private IRelayCommand? _navigateForwardCommand;
     private IRelayCommand? _navigateToAttributeDataTypeCommand;
     private IRelayCommand? _navigateToAttributeValueCommand;
     private IRelayCommand? _navigateToLeavesOwnerCommand;
@@ -50,6 +56,34 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
         _repositoryExplorerVM = repositoryExplorerVM;
         _commandFactory = commandFactory;
     }
+
+    /// <summary>
+    /// Команда перехода к предыдущей позиции в истории навигации.
+    /// </summary>
+    public IRelayCommand NavigateBackCommand =>
+        _navigateBackCommand ??= _commandFactory.Create(
+            obj =>
+            {
+                NavigateThroughHistory(_backHistory, _forwardHistory);
+            },
+            ce =>
+            {
+                return _backHistory.Count > 0;
+            });
+
+    /// <summary>
+    /// Команда перехода к следующей позиции в истории навигации.
+    /// </summary>
+    public IRelayCommand NavigateForwardCommand =>
+        _navigateForwardCommand ??= _commandFactory.Create(
+            obj =>
+            {
+                NavigateThroughHistory(_forwardHistory, _backHistory);
+            },
+            ce =>
+            {
+                return _forwardHistory.Count > 0;
+            });
 
     /// <summary>
     /// Команда перехода к узлу, выбранному в качестве типа данных атрибута.
@@ -103,6 +137,46 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
     }
 
     /// <summary>
+    /// Регистрирует выбранный элемент репозитория как текущую позицию навигации.
+    /// </summary>
+    /// <param name="repositoryMember">Выбранный элемент репозитория.</param>
+    internal void NotifySelectedRepositoryMemberChanged(
+        IMainEntityVM<IMainEntityModel>? repositoryMember)
+    {
+        if (_isNavigationInProgress || repositoryMember == null)
+            return;
+
+        RegisterLocation(new NavigationLocation(repositoryMember.Uuid, null));
+    }
+
+    /// <summary>
+    /// Регистрирует выбранный атрибут либо его владельца как текущую позицию навигации.
+    /// </summary>
+    /// <param name="attribute">Выбранный атрибут либо null.</param>
+    internal void NotifySelectedAttributeChanged(ElementAttributeVM? attribute)
+    {
+        if (_isNavigationInProgress
+            || _repositoryExplorerVM.SelectedRepositoryMember is not { } owner)
+            return;
+
+        var location = attribute == null
+            ? new NavigationLocation(owner.Uuid, null)
+            : new NavigationLocation(attribute.Uuid, owner.Uuid);
+        RegisterLocation(location);
+    }
+
+    /// <summary>
+    /// Очищает историю переходов и сохраняет текущий выбранный элемент как начальную позицию.
+    /// </summary>
+    internal void ResetHistory()
+    {
+        _backHistory.Clear();
+        _forwardHistory.Clear();
+        _currentLocation = GetCurrentLocation();
+        RaiseHistoryCanExecuteChanged();
+    }
+
+    /// <summary>
     /// UUID элемента, к которому был запрошен последний переход.
     /// </summary>
     public Guid? TargetUuid
@@ -119,21 +193,120 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
     /// <returns>true, если целевой элемент найден и переход инициирован; иначе false.</returns>
     public bool Navigate(Guid targetUuid, Guid? ownerUuid = null)
     {
-        var elementUuid = ownerUuid ?? targetUuid;
-        var target = _repositoryExplorerVM.FindRepositoryMemberByUuid(elementUuid);
-        if (target == null) return false;
+        _currentLocation ??= GetCurrentLocation();
 
-        ExpandPath(target);
-        SelectTarget(target);
-        if (ownerUuid.HasValue)
+        var location = new NavigationLocation(targetUuid, ownerUuid);
+        if (TryNavigate(location) == false)
+            return false;
+
+        RegisterLocation(location);
+        return true;
+    }
+
+    /// <summary>
+    /// Выполняет переход без изменения стеков истории.
+    /// </summary>
+    /// <param name="location">Целевая позиция навигации.</param>
+    /// <returns>true, если целевая позиция найдена и выбрана; иначе false.</returns>
+    private bool TryNavigate(NavigationLocation location)
+    {
+        var elementUuid = location.OwnerUuid ?? location.TargetUuid;
+        var target = _repositoryExplorerVM.FindRepositoryMemberByUuid(elementUuid);
+        if (target == null)
+            return false;
+
+        var attribute = location.OwnerUuid.HasValue
+            ? target.AttributesVMs.FirstOrDefault(x => x.Uuid == location.TargetUuid)
+            : null;
+        if (location.OwnerUuid.HasValue && attribute == null)
+            return false;
+
+        _isNavigationInProgress = true;
+        try
         {
-            _repositoryExplorerVM.FormulaBarVM.SelectedFormulaAttribute =
-                target.AttributesVMs.FirstOrDefault(x => x.Uuid == targetUuid);
-            _repositoryExplorerVM.CurrentElementTabIndex = 1;
+            ExpandPath(target);
+            SelectTarget(target);
+            if (attribute != null)
+            {
+                _repositoryExplorerVM.FormulaBarVM.SelectedFormulaAttribute = attribute;
+                _repositoryExplorerVM.CurrentElementTabIndex = 1;
+            }
+        }
+        finally
+        {
+            _isNavigationInProgress = false;
         }
 
         TargetUuid = elementUuid;
         return true;
+    }
+
+    /// <summary>
+    /// Выполняет переход между стеками истории, пропуская более недоступные позиции.
+    /// </summary>
+    /// <param name="sourceHistory">Стек, из которого извлекается целевая позиция.</param>
+    /// <param name="destinationHistory">Стек, в который помещается текущая позиция.</param>
+    private void NavigateThroughHistory(
+        Stack<NavigationLocation> sourceHistory,
+        Stack<NavigationLocation> destinationHistory)
+    {
+        _currentLocation ??= GetCurrentLocation();
+
+        while (sourceHistory.TryPop(out var location))
+        {
+            if (TryNavigate(location) == false)
+                continue;
+
+            if (_currentLocation.HasValue)
+                destinationHistory.Push(_currentLocation.Value);
+
+            _currentLocation = location;
+            RaiseHistoryCanExecuteChanged();
+            return;
+        }
+
+        RaiseHistoryCanExecuteChanged();
+    }
+
+    /// <summary>
+    /// Добавляет новую позицию в историю и очищает историю переходов вперёд.
+    /// </summary>
+    /// <param name="location">Новая текущая позиция.</param>
+    private void RegisterLocation(NavigationLocation location)
+    {
+        if (_currentLocation == location)
+            return;
+
+        if (_currentLocation.HasValue)
+            _backHistory.Push(_currentLocation.Value);
+
+        _currentLocation = location;
+        _forwardHistory.Clear();
+        RaiseHistoryCanExecuteChanged();
+    }
+
+    /// <summary>
+    /// Возвращает позицию, выбранную в обозревателе в настоящий момент.
+    /// </summary>
+    /// <returns>Текущая позиция либо null, если элемент не выбран.</returns>
+    private NavigationLocation? GetCurrentLocation()
+    {
+        if (_repositoryExplorerVM.SelectedRepositoryMember is not { } owner)
+            return null;
+
+        var attribute = _repositoryExplorerVM.FormulaBarVM.SelectedFormulaAttribute;
+        return attribute == null
+            ? new NavigationLocation(owner.Uuid, null)
+            : new NavigationLocation(attribute.Uuid, owner.Uuid);
+    }
+
+    /// <summary>
+    /// Обновляет доступность команд перехода назад и вперёд.
+    /// </summary>
+    private void RaiseHistoryCanExecuteChanged()
+    {
+        _navigateBackCommand?.RaiseCanExecuteChanged();
+        _navigateForwardCommand?.RaiseCanExecuteChanged();
     }
 
     /// <summary>
@@ -185,4 +358,11 @@ public sealed class RepositoryNavigationVM : ControlBaseVM
         if (_repositoryExplorerVM.FindRepositoryMemberByUuid(uuid) is IMainEntityVM entity)
             entity.IsTreeExpanded = true;
     }
+
+    /// <summary>
+    /// Позиция в истории навигации по репозиторию.
+    /// </summary>
+    /// <param name="TargetUuid">UUID элемента либо атрибута.</param>
+    /// <param name="OwnerUuid">UUID владельца атрибута либо null для элемента.</param>
+    private readonly record struct NavigationLocation(Guid TargetUuid, Guid? OwnerUuid);
 }

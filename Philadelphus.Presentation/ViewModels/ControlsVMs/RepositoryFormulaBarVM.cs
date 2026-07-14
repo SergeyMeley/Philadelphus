@@ -153,6 +153,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     }
 
                     SelectAttributeFormulaCell(value);
+                    _repositoryExplorerVM.NavigationVM.NotifySelectedAttributeChanged(value);
                 }
             }
         }
