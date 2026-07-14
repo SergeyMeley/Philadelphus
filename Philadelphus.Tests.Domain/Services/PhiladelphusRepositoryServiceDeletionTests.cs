@@ -10,6 +10,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Implementations;
+using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Infrastructure.Persistence.RepositoryInterfaces;
 using Philadelphus.Tests.Common.Fakes.Entities;
@@ -118,6 +119,72 @@ public class PhiladelphusRepositoryServiceDeletionTests
 
         result.Should().BeTrue();
         node.State.Should().Be(State.ForSoftDelete);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void HardDeleteShrubMember_WorkingTreeOrItsRoot_DeletesTreeDuringSave(
+        bool deleteViaRoot)
+    {
+        var infrastructure = new Mock<IShrubMembersInfrastructureRepository>();
+        infrastructure
+            .Setup(x => x.HardDeleteTrees(It.IsAny<IEnumerable<WorkingTree>>()))
+            .Returns(1);
+        var dataStorage = new Mock<IDataStorageModel>();
+        dataStorage.SetupGet(x => x.Uuid).Returns(Guid.CreateVersion7());
+        dataStorage.SetupGet(x => x.Name).Returns("Тестовое хранилище");
+        dataStorage.SetupGet(x => x.HasShrubMembersInfrastructureRepository).Returns(true);
+        dataStorage.SetupGet(x => x.ShrubMembersInfrastructureRepository).Returns(infrastructure.Object);
+        var notificationService = new FakeNotificationService();
+        var repository = new PhiladelphusRepositoryModel(
+            Guid.CreateVersion7(),
+            dataStorage.Object,
+            notificationService,
+            new EmptyPropertiesPolicy<PhiladelphusRepositoryModel>(),
+            new EmptyPropertiesPolicy<ShrubModel>());
+        var workingTree = new WorkingTreeModel(
+            Guid.CreateVersion7(),
+            dataStorage.Object,
+            repository.ContentShrub,
+            notificationService,
+            new EmptyPropertiesPolicy<WorkingTreeModel>());
+        var root = new TreeRootModel(
+            Guid.CreateVersion7(),
+            workingTree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        repository.ContentShrub.AddContent(workingTree).Should().BeTrue();
+        ((IMainEntityWritableModel)workingTree).SetState(State.SavedOrLoaded);
+        ((IMainEntityWritableModel)root).SetState(State.SavedOrLoaded);
+        ((IMainEntityWritableModel)repository).SetState(State.SavedOrLoaded);
+        var mapper = new Mock<IMapper>();
+        mapper
+            .Setup(x => x.Map<List<WorkingTree>>(It.IsAny<object>()))
+            .Returns(new List<WorkingTree> { new WorkingTree() });
+        var service = new PhiladelphusRepositoryService(
+            mapper.Object,
+            Mock.Of<ILogger>(),
+            notificationService);
+        IContentModel deletionEntryPoint = deleteViaRoot ? root : workingTree;
+
+        var result = service.HardDeleteShrubMember(deletionEntryPoint);
+
+        result.Should().BeTrue();
+        workingTree.State.Should().Be(State.ForHardDelete);
+        root.State.Should().Be(State.ForHardDelete);
+        repository.ContentShrub.ContentWorkingTrees.Should().Contain(workingTree);
+        repository.ContentShrub.ContentWorkingTreesUuids.Should().NotContain(workingTree.Uuid);
+        infrastructure.Verify(
+            x => x.HardDeleteTrees(It.IsAny<IEnumerable<WorkingTree>>()),
+            Times.Never);
+
+        service.SaveChanges(new[] { workingTree }, SaveMode.OnlyHeader);
+
+        repository.ContentShrub.ContentWorkingTrees.Should().NotContain(workingTree);
+        infrastructure.Verify(
+            x => x.HardDeleteTrees(It.IsAny<IEnumerable<WorkingTree>>()),
+            Times.Once);
     }
 
     [Fact]

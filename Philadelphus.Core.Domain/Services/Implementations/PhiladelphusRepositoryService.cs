@@ -250,6 +250,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     State.ForSoftDelete,
                     dbCollection => deletedCount = infrastructure.SoftDeleteTrees(dbCollection),
                     ref result);
+
+                SaveAndReturnAuditInfo<WorkingTreeModel, WorkingTree>(
+                    fullCollection,
+                    State.ForHardDelete,
+                    dbCollection => deletedCount = infrastructure.HardDeleteTrees(dbCollection),
+                    ref result);
             }
 
             // Постобработка сохраненных элементов
@@ -327,6 +333,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     State.ForSoftDelete,
                     dbCollection => deletedCount = infrastructure.SoftDeleteRoots(dbCollection),
                     ref result);
+
+                SaveAndReturnAuditInfo<TreeRootModel, TreeRoot>(
+                    fullCollection,
+                    State.ForHardDelete,
+                    dbCollection => deletedCount = infrastructure.HardDeleteRoots(dbCollection),
+                    ref result);
             }
 
             // Постобработка сохраненных элементов
@@ -397,6 +409,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     fullCollection,
                     State.ForSoftDelete,
                     dbCollection => deletedCount = infrastructure.SoftDeleteNodes(dbCollection),
+                    ref result);
+
+                SaveAndReturnAuditInfo<TreeNodeModel, TreeNode>(
+                    fullCollection,
+                    State.ForHardDelete,
+                    dbCollection => deletedCount = infrastructure.HardDeleteNodes(dbCollection),
                     ref result);
             }
 
@@ -470,6 +488,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     State.ForSoftDelete,
                     dbCollection => deletedCount = infrastructure.SoftDeleteLeaves(dbCollection),
                     ref result);
+
+                SaveAndReturnAuditInfo<TreeLeaveModel, TreeLeave>(
+                    fullCollection,
+                    State.ForHardDelete,
+                    dbCollection => deletedCount = infrastructure.HardDeleteLeaves(dbCollection),
+                    ref result);
             }
 
             // Постобработка сохраненных элементов
@@ -536,6 +560,12 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     fullCollection,
                     State.ForSoftDelete,
                     dbCollection => deletedCount = infrastructure.SoftDeleteAttributes(dbCollection),
+                    ref result);
+
+                SaveAndReturnAuditInfo<ElementAttributeModel, ElementAttribute>(
+                    fullCollection,
+                    State.ForHardDelete,
+                    dbCollection => deletedCount = infrastructure.HardDeleteAttributes(dbCollection),
                     ref result);
             }
 
@@ -936,27 +966,45 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Результат выполнения операции.</returns>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public bool SoftDeleteShrubMember(IContentModel element)
+            => DeleteShrubMember(element, State.ForSoftDelete);
+
+        /// <summary>
+        /// Пометить элемент репозитория для физического удаления из хранилища данных.
+        /// </summary>
+        public bool HardDeleteShrubMember(IContentModel element)
+            => DeleteShrubMember(element, State.ForHardDelete);
+
+        /// <summary>
+        /// Пометить элемент репозитория для удаления.
+        /// </summary>
+        /// <param name="element">Удаляемый элемент.</param>
+        /// <param name="deletionState">Вид удаления.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        /// <exception cref="ArgumentNullException">Если элемент не задан.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Если передано состояние, не являющееся видом удаления.</exception>
+        private bool DeleteShrubMember(
+            IContentModel element,
+            State deletionState)
         {
             ArgumentNullException.ThrowIfNull(element);
+            if (deletionState is not State.ForSoftDelete and not State.ForHardDelete)
+                throw new ArgumentOutOfRangeException(nameof(deletionState));
+
+            var hardDelete = deletionState == State.ForHardDelete;
 
             try
             {
+                var mainEntity = (IMainEntityModel)element;
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Начало удаления элемента. Элемент - '{(element as IMainEntityModel).Name}' [{(element as IMainEntityModel).Uuid}].",
+                    hardDelete
+                        ? $"Начало безвозвратного удаления элемента. Элемент - '{mainEntity.Name}' [{mainEntity.Uuid}]."
+                        : $"Начало удаления элемента. Элемент - '{mainEntity.Name}' [{mainEntity.Uuid}].",
                     criticalLevel: NotificationCriticalLevelModel.Warning);
-
-                if (element == null)
-                {
-                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        $"Удаление элемента невозможно, элемент не выбран, операция не выполнена. Выберите элемент для удаления и повторите попытку.",
-                        criticalLevel: NotificationCriticalLevelModel.Warning);
-                    return false;
-                }
 
                 if (element is ElementAttributeModel ea && ea.Owner is TreeLeaveModel)
                 {
                     _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        $"Удаление элемента невозможно. Изменение перечня атрибутов листов не допускается.",
+                        "Удаление элемента невозможно. Изменение перечня атрибутов листов не допускается.",
                         criticalLevel: NotificationCriticalLevelModel.Warning);
                     return false;
                 }
@@ -988,7 +1036,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                     || element is SystemBaseTreeLeaveModel)
                 {
                     _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                        $"Удаление системного элемента '{(element as IMainEntityModel).Name}' [{(element as IMainEntityModel).Uuid}] запрещено.",
+                        $"Удаление системного элемента '{mainEntity.Name}' [{mainEntity.Uuid}] запрещено.",
                         criticalLevel: NotificationCriticalLevelModel.Warning);
                     return false;
                 }
@@ -999,31 +1047,42 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                         ? tree
                         : ((TreeRootModel)element).OwningWorkingTree;
 
-                    SetModelState(workingTree, State.ForSoftDelete);
+                    SetModelState(workingTree, deletionState);
                     if (workingTree.ContentRoot != null)
                     {
-                        SetModelState(workingTree.ContentRoot, State.ForSoftDelete);
+                        SetModelState(workingTree.ContentRoot, deletionState);
                     }
 
                     workingTree.OwningShrub.ContentWorkingTreesUuids.Remove(workingTree.Uuid);
                     SetModelState(workingTree.OwningShrub.OwningRepository, State.Changed);
                 }
-                else if (element is IMainEntityWritableModel mainEntity)
+                else if (element is IMainEntityWritableModel writableModel)
                 {
-                    SetModelState(mainEntity, State.ForSoftDelete);
+                    SetModelState(writableModel, deletionState);
                 }
 
                 _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Удаление элемента успешно выполнено. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
+                    hardDelete
+                        ? $"Элемент '{mainEntity.Name}' [{mainEntity.Uuid}] помечен для безвозвратного удаления. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища."
+                        : $"Элемент '{mainEntity.Name}' [{mainEntity.Uuid}] помечен для мягкого удаления. Изменения применяются после сохранения, если удаление не требуется - выполните обновление данных из хранилища.",
                     criticalLevel: NotificationCriticalLevelModel.Ok);
-
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.Error("Ошибка удаления элемента.", ex);
-                _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                    $"Ошибка удаления элемента. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                if (hardDelete)
+                {
+                    _logger.Error(ex, "Ошибка безвозвратного удаления элемента.");
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Ошибка безвозвратного удаления элемента. Подробнее: {ex.Message}",
+                        criticalLevel: NotificationCriticalLevelModel.Error);
+                }
+                else
+                {
+                    _logger.Error(ex, "Ошибка удаления элемента.");
+                    _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
+                        $"Ошибка удаления элемента. Произошла непредвиденная ошибка, обратитесь к разработчику. \r\nПодробности: \r\n{ex.StackTrace}");
+                }
                 throw;
             }
         }
@@ -1037,7 +1096,6 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         #endregion
 
         #region [ Private methods ]
-
 
         /// <summary>
         /// Отправить уведомление о получении содержимого

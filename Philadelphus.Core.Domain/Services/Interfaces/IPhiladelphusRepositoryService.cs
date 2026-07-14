@@ -161,11 +161,19 @@ namespace Philadelphus.Core.Domain.Services.Interfaces
         #region [ Delete + Remove ]
 
         /// <summary>
-        /// Удалить элемент рабочего кустарника (мягко)
+        /// Пометить элемент рабочего кустарника для мягкого удаления
         /// </summary>
         /// <param name="element">Элемент.</param>
         /// <returns>Результат выполнения операции.</returns>
         public bool SoftDeleteShrubMember(
+            IContentModel element);
+
+        /// <summary>
+        /// Пометить элемент рабочего кустарника для жесткого (физического) удаления.
+        /// </summary>
+        /// <param name="element">Элемент.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        public bool HardDeleteShrubMember(
             IContentModel element);
 
         #endregion

@@ -135,6 +135,31 @@ namespace Philadelphus.Infrastructure.Persistence.RepositoryInterfaces
         /// <returns>Результат выполнения операции.</returns>
         public long SoftDeleteAttributes(IEnumerable<ElementAttribute> items);
 
+        /// <summary>
+        /// Удалить физически рабочие деревья.
+        /// </summary>
+        public long HardDeleteTrees(IEnumerable<WorkingTree> items);
+
+        /// <summary>
+        /// Удалить физически корни.
+        /// </summary>
+        public long HardDeleteRoots(IEnumerable<TreeRoot> items);
+
+        /// <summary>
+        /// Удалить физически узлы.
+        /// </summary>
+        public long HardDeleteNodes(IEnumerable<TreeNode> items);
+
+        /// <summary>
+        /// Удалить физически листья.
+        /// </summary>
+        public long HardDeleteLeaves(IEnumerable<TreeLeave> items);
+
+        /// <summary>
+        /// Удалить физически атрибуты.
+        /// </summary>
+        public long HardDeleteAttributes(IEnumerable<ElementAttribute> items);
+
         #endregion
     }
 } 

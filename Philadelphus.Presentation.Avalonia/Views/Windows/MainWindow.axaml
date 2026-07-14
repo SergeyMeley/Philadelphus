@@ -37,6 +37,9 @@
         <ControlTemplate x:Key="IcoDelete">
             <localControls:ThemedSvg Icon="delete" Width="22" Height="22" />
         </ControlTemplate>
+        <ControlTemplate x:Key="IcoHardDelete">
+            <localControls:ThemedSvg Icon="hard-delete" Width="22" Height="22" />
+        </ControlTemplate>
         <ControlTemplate x:Key="IcoAdd">
             <localControls:ThemedSvg Icon="add" Width="22" Height="22" />
         </ControlTemplate>
@@ -185,6 +188,10 @@
                                                      Icon="{StaticResource IcoDelete}"
                                                      Command="{Binding RepositoryExplorerVM.SoftDeleteRepositoryMemberCommand}"
                                                      ToolTip.Tip="Удалить выбранный элемент репозитория" />
+                                <ribbon:RibbonButton Content="Удалить безвозвратно" Size="Medium" MinSize="Small" MaxSize="Large"
+                                                     Icon="{StaticResource IcoHardDelete}"
+                                                     Command="{Binding RepositoryExplorerVM.HardDeleteRepositoryMemberCommand}"
+                                                     ToolTip.Tip="Безвозвратно удалить выбранный элемент из хранилища данных" />
                             </ribbon:RibbonGroupBox>
                             <ribbon:RibbonGroupBox Header="Атрибуты">
                                 <ribbon:RibbonButton Content="Добавить атрибут" Size="Medium" MinSize="Small" MaxSize="Large"

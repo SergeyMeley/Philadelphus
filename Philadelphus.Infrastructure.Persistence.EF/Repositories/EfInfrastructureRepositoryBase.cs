@@ -223,6 +223,19 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
             });
         }
 
+        protected long HardDelete<TEntity>(IEnumerable<TEntity> items) where TEntity : class, IMainEntity
+        {
+            return ExecuteWithContext<TEntity, long>((context, dbSet) =>
+            {
+                var existingItems = GetExistingItems(dbSet, items);
+                if (existingItems.Count == 0)
+                    return 0;
+
+                dbSet.RemoveRange(existingItems);
+                return context.SaveChanges();
+            });
+        }
+
         private static List<TEntity> GetExistingItems<TEntity>(
             DbSet<TEntity> dbSet,
             IEnumerable<TEntity> items)

@@ -189,6 +189,21 @@ namespace Philadelphus.Infrastructure.Persistence.EF.PostgreSQL.Repositories
         public long SoftDeleteAttributes(IEnumerable<ElementAttribute> items)
             => SoftDelete(items);
 
+        public long HardDeleteTrees(IEnumerable<WorkingTree> items)
+            => HardDelete(items);
+
+        public long HardDeleteRoots(IEnumerable<TreeRoot> items)
+            => HardDelete(items);
+
+        public long HardDeleteNodes(IEnumerable<TreeNode> items)
+            => HardDelete(items);
+
+        public long HardDeleteLeaves(IEnumerable<TreeLeave> items)
+            => HardDelete(items);
+
+        public long HardDeleteAttributes(IEnumerable<ElementAttribute> items)
+            => HardDelete(items);
+
         #endregion
     }
 }

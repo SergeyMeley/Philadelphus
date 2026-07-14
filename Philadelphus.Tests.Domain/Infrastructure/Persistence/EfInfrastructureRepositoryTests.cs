@@ -40,9 +40,11 @@ public class EfInfrastructureRepositoryTests
 
             var update = () => repository.UpdateRoots(new[] { missingRoot });
             var softDelete = () => repository.SoftDeleteRoots(new[] { missingRoot });
+            var hardDelete = () => repository.HardDeleteRoots(new[] { missingRoot });
 
             update.Should().NotThrow().Which.Should().Be(0);
             softDelete.Should().NotThrow().Which.Should().Be(0);
+            hardDelete.Should().NotThrow().Which.Should().Be(0);
             using var context = new SqliteEfShrubMembersContext(connectionString);
             context.TreeRoots
                 .AsNoTracking()
@@ -77,6 +79,7 @@ public class EfInfrastructureRepositoryTests
 
             var update = () => repository.UpdateTrees(new[] { existingTree, missingTree });
             var softDelete = () => repository.SoftDeleteTrees(new[] { existingTree, missingTree });
+            var hardDelete = () => repository.HardDeleteTrees(new[] { existingTree, missingTree });
 
             update.Should().NotThrow().Which.Should().BeGreaterThan(0);
             softDelete.Should().NotThrow().Which.Should().BeGreaterThan(0);
@@ -89,6 +92,12 @@ public class EfInfrastructureRepositoryTests
             context.WorkingTrees
                 .AsNoTracking()
                 .Any(x => x.Uuid == missingTree.Uuid)
+                .Should().BeFalse();
+            hardDelete.Should().NotThrow().Which.Should().BeGreaterThan(0);
+            context.ChangeTracker.Clear();
+            context.WorkingTrees
+                .AsNoTracking()
+                .Any(x => x.Uuid == existingTree.Uuid)
                 .Should().BeFalse();
         }
         finally
