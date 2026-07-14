@@ -32,7 +32,14 @@ public sealed class RepositoryRelationsService : IRepositoryRelationsService
             result.Add(new(ownerEntity, RepositoryRelationType.Owner, false));
         if (source is IOwnerModel owner)
             result.AddRange(owner.Content.Values.OfType<IMainEntityModel>()
-                .Select(x => new RepositoryRelationModel(x, RepositoryRelationType.Content, false, source.Uuid)));
+                .Select(x => new RepositoryRelationModel(
+                    x,
+                    RepositoryRelationType.Content,
+                    false,
+                    x is ElementAttributeModel attribute
+                    && attribute.Owner is IMainEntityModel attributeOwner
+                        ? attributeOwner.Uuid
+                        : null)));
 
         if (source is ElementAttributeModel attribute)
         {
