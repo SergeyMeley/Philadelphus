@@ -22,13 +22,16 @@ namespace Philadelphus.Presentation.Avalonia.Views.Dialogs
         {
             var result = false;
             var tcs = new TaskCompletionSource<bool>();
+            var visibleOwner = owner is { IsVisible: true }
+                ? owner
+                : null;
 
             var window = new Window
             {
                 Title = title,
                 SizeToContent = SizeToContent.WidthAndHeight,
                 CanResize = false,
-                WindowStartupLocation = owner is null
+                WindowStartupLocation = visibleOwner is null
                     ? WindowStartupLocation.CenterScreen
                     : WindowStartupLocation.CenterOwner,
                 MinWidth = 320,
@@ -74,9 +77,9 @@ namespace Philadelphus.Presentation.Avalonia.Views.Dialogs
 
             window.Closed += (_, _) => tcs.TrySetResult(result);
 
-            if (owner is not null)
+            if (visibleOwner is not null)
             {
-                _ = window.ShowDialog(owner);
+                _ = window.ShowDialog(visibleOwner);
             }
             else
             {

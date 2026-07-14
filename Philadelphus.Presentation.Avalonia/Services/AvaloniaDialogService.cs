@@ -40,7 +40,17 @@ namespace Philadelphus.Presentation.Avalonia.Services
             => MessageBox.ConfirmAsync(Owner, title, message);
 
         private static Window? Owner
-            => (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        {
+            get
+            {
+                var desktop = Application.Current?.ApplicationLifetime
+                    as IClassicDesktopStyleApplicationLifetime;
+                if (desktop?.MainWindow is { IsVisible: true } mainWindow)
+                    return mainWindow;
+
+                return desktop?.Windows.LastOrDefault(window => window.IsVisible);
+            }
+        }
 
         private static void ThrowSyncNotSupported()
             => throw new NotSupportedException("Avalonia message dialogs are asynchronous. Use IDialogService.*Async methods.");
