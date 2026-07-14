@@ -199,7 +199,11 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         {
             return ExecuteWithContext<TEntity, long>((context, dbSet) =>
             {
-                dbSet.UpdateRange(items);
+                var existingItems = GetExistingItems(dbSet, items);
+                if (existingItems.Count == 0)
+                    return 0;
+
+                dbSet.UpdateRange(existingItems);
                 AssignAuditInfoToTrackedGraph(context, AuditOperation.Update);
                 return context.SaveChanges();
             });
@@ -209,10 +213,40 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Repositories
         {
             return ExecuteWithContext<TEntity, long>((context, dbSet) =>
             {
-                dbSet.UpdateRange(items);
+                var existingItems = GetExistingItems(dbSet, items);
+                if (existingItems.Count == 0)
+                    return 0;
+
+                dbSet.UpdateRange(existingItems);
                 AssignAuditInfoToTrackedGraph(context, AuditOperation.SoftDelete);
                 return context.SaveChanges();
             });
+        }
+
+        private static List<TEntity> GetExistingItems<TEntity>(
+            DbSet<TEntity> dbSet,
+            IEnumerable<TEntity> items)
+            where TEntity : class, IMainEntity
+        {
+            var itemsList = items
+                .Where(x => x != null)
+                .ToList();
+            if (itemsList.Count == 0)
+                return itemsList;
+
+            var requestedUuids = itemsList
+                .Select(x => x.Uuid)
+                .Distinct()
+                .ToArray();
+            var existingUuids = dbSet
+                .AsNoTracking()
+                .Where(x => requestedUuids.Contains(x.Uuid))
+                .Select(x => x.Uuid)
+                .ToHashSet();
+
+            return itemsList
+                .Where(x => existingUuids.Contains(x.Uuid))
+                .ToList();
         }
 
         private void AssignAuditInfoToTrackedGraph(DbContext context, AuditOperation operation)

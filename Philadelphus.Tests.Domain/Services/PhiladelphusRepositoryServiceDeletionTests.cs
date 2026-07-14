@@ -21,6 +21,20 @@ namespace Philadelphus.Tests.Domain.Services;
 public class PhiladelphusRepositoryServiceDeletionTests
 {
     [Theory]
+    [InlineData(State.ForSoftDelete)]
+    [InlineData(State.ForHardDelete)]
+    public void SetState_NewEntity_AllowsDeletionStates(State deletionState)
+    {
+        var workingTree = new FakeWorkingTreeModel();
+        var writableTree = (IMainEntityWritableModel)workingTree;
+
+        var result = writableTree.SetState(deletionState);
+
+        result.Should().BeTrue();
+        workingTree.State.Should().Be(deletionState);
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void SoftDeleteShrubMember_WorkingTreeOrItsRoot_DeletesWholeWorkingTree(
@@ -50,6 +64,60 @@ public class PhiladelphusRepositoryServiceDeletionTests
         root.State.Should().Be(State.ForSoftDelete);
         workingTree.OwningShrub.ContentWorkingTreesUuids.Should().NotContain(workingTree.Uuid);
         workingTree.OwningShrub.OwningRepository.State.Should().Be(State.Changed);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SoftDeleteShrubMember_NewWorkingTreeOrItsRoot_MarksWholeTreeForSoftDelete(
+        bool deleteViaRoot)
+    {
+        var notificationService = new FakeNotificationService();
+        var workingTree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            workingTree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        workingTree.OwningShrub.AddContent(workingTree).Should().BeTrue();
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+        IContentModel deletionEntryPoint = deleteViaRoot ? root : workingTree;
+
+        var result = service.SoftDeleteShrubMember(deletionEntryPoint);
+
+        result.Should().BeTrue();
+        workingTree.State.Should().Be(State.ForSoftDelete);
+        root.State.Should().Be(State.ForSoftDelete);
+    }
+
+    [Fact]
+    public void SoftDeleteShrubMember_NewNode_MarksItForSoftDelete()
+    {
+        var notificationService = new FakeNotificationService();
+        var workingTree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            workingTree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var node = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            workingTree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var service = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(),
+            Mock.Of<ILogger>(),
+            notificationService);
+
+        var result = service.SoftDeleteShrubMember(node);
+
+        result.Should().BeTrue();
+        node.State.Should().Be(State.ForSoftDelete);
     }
 
     [Fact]
@@ -83,8 +151,9 @@ public class PhiladelphusRepositoryServiceDeletionTests
             notificationService,
             new EmptyPropertiesPolicy<TreeRootModel>());
         workingTree.ContentRoot = root;
-        ((IMainEntityWritableModel)root).SetState(State.SavedOrLoaded);
-        ((IMainEntityWritableModel)root).SetState(State.ForSoftDelete);
+        var writableRoot = (IMainEntityWritableModel)root;
+        writableRoot.SetState(State.SavedOrLoaded).Should().BeTrue();
+        writableRoot.SetState(State.ForSoftDelete).Should().BeTrue();
         var mapper = new Mock<IMapper>();
         mapper
             .Setup(x => x.Map<List<TreeRoot>>(It.IsAny<object>()))
