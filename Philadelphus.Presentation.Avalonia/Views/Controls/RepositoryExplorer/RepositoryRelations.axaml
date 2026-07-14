@@ -3,11 +3,20 @@
              xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              xmlns:other="clr-namespace:Philadelphus.Presentation.ViewModels.EntitiesVMs.OtherEntitiesVMs;assembly=Philadelphus.Presentation"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.RepositoryRelations">
-    <Grid RowDefinitions="Auto,*">
-        <TextBlock Grid.Row="0" Margin="4"
+    <Grid RowDefinitions="Auto,Auto,*">
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Command="{Binding NavigateToSelectedRelationCommand}"
+                    ToolTip.Tip="Перейти к выбранному связанному элементу"
+                    Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
+                <localControls:ThemedSvg Icon="navigate-target" />
+            </Button>
+        </StackPanel>
+        <TextBlock Grid.Row="1" Margin="4"
                    Text="Вычисление связей..."
                    IsVisible="{Binding IsLoading}" />
-        <TreeView Grid.Row="1" ItemsSource="{Binding Roots}">
+        <TreeView Grid.Row="2"
+                  ItemsSource="{Binding Roots}"
+                  SelectedItem="{Binding SelectedRelation, Mode=TwoWay}">
             <TreeView.Styles>
                 <Style Selector="TreeViewItem">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -28,33 +37,57 @@
                             <Rectangle Grid.Row="2"
                                        Fill="{Binding ChildContentAggregateState, Converter={StaticResource stateToColorConverter}}" />
                         </Grid>
-                        <Button Grid.Row="0" Grid.Column="1"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Left"
-                                Padding="0" BorderThickness="0" Background="Transparent"
-                                Command="{Binding NavigateCommand}">
-                            <StackPanel Orientation="Horizontal">
-                                <localControls:ThemedSvg Icon="{Binding Relation.Target, Converter={StaticResource iconNameConverter}}"
-                                                         Width="24" Height="24" Margin="10,0,10,0" />
-                                <TextBlock Margin="0,0,16,0" VerticalAlignment="Center">
-                                    <Run Text="Этот элемент: " FontWeight="Light"
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <localControls:ThemedSvg Icon="{Binding DisplayedElement, Converter={StaticResource iconNameConverter}}"
+                                                     Width="24" Height="24" Margin="10,0,10,0" />
+                            <StackPanel Margin="0,1,10,1"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding !IsAttributeReference}">
+                                <TextBlock>
+                                    <Run Text="Элемент" FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding SourceName}" FontStyle="Italic" />
+                                    <Run Text=" имеет" FontWeight="Light"
                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                                     <Run Text="{Binding RelationType}" FontStyle="Italic" />
-									<Run Text=" для: " FontWeight="Light"
+                                    <Run Text=":" FontWeight="Light"
                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                                 </TextBlock>
-                                <TextBlock Margin="0,0,16,0" VerticalAlignment="Center">
-                                    <Run Text="Наименование: " FontSize="10" FontWeight="Light"
+                                <TextBlock>
+                                    <Run Text="Наименование:" FontSize="10" FontWeight="Light"
                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                                    <Run Text="{Binding Element}" FontStyle="Italic" />
-                                </TextBlock>
-                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">
-                                    <Run Text="Uuid: " FontSize="10" FontWeight="Light"
+                                    <Run Text="{Binding ElementName}" FontStyle="Italic" />
+                                    <Run Text="  UUID: " FontSize="10" FontWeight="Light"
                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                                    <Run Text="{Binding Relation.Target.Uuid, Mode=OneWay}" FontStyle="Italic" />
+                                    <Run Text="{Binding DisplayedElement.Uuid, Mode=OneWay}" FontStyle="Italic" />
                                 </TextBlock>
                             </StackPanel>
-                        </Button>
+                            <StackPanel Margin="0,1,10,1"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding IsAttributeReference}">
+                                <TextBlock>
+                                    <Run Text="Элемент" FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding SourceName}" FontStyle="Italic" />
+                                    <Run Text=" является" FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding AttributeRelationType}" FontStyle="Italic" />
+                                    <Run Text=" атрибута " FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding AttributeName}" FontStyle="Italic" />
+                                    <Run Text=" элемента:" FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Наименование: " FontSize="10" FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding DisplayedElement.Name}" FontStyle="Italic" />
+                                    <Run Text="  UUID: " FontSize="10" FontWeight="Light"
+                                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <Run Text="{Binding DisplayedElement.Uuid, Mode=OneWay}" FontStyle="Italic" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
                         <localControls:ThemedSvg Grid.Row="0" Grid.Column="2"
                                                  Icon="lock" Width="18" Height="18" Margin="4,0,8,0"
                                                  IsVisible="{Binding BlocksDeletion}"

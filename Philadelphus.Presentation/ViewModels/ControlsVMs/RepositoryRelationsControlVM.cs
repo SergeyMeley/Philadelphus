@@ -20,6 +20,8 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     private readonly IRepositoryRelationsService _relationsService;
     private int _calculationVersion;
     private bool _isLoading;
+    private RepositoryRelationVM? _selectedRelation;
+    private IRelayCommand? _navigateToSelectedRelationCommand;
 
     /// <summary>
     /// Инициализирует модель представления дерева связей.
@@ -43,8 +45,8 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
         RepositoryNavigationVM navigationVM,
         IRelayCommandFactory commandFactory,
         IRepositoryRelationsService relationsService)
-    : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
-{
+        : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
+    {
         ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
         ArgumentNullException.ThrowIfNull(navigationVM);
         ArgumentNullException.ThrowIfNull(commandFactory);
@@ -54,7 +56,7 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
         NavigationVM = navigationVM;
         _commandFactory = commandFactory;
         _relationsService = relationsService;
-}
+    }
 
     /// <summary>
     /// Сервис навигации по объектам дерева связей.
@@ -65,6 +67,37 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     /// Корневые узлы рассчитанного дерева связей.
     /// </summary>
     public ObservableCollection<RepositoryRelationVM> Roots { get; } = new();
+
+    /// <summary>
+    /// Выбранный узел дерева связей.
+    /// </summary>
+    public RepositoryRelationVM? SelectedRelation
+    {
+        get => _selectedRelation;
+        set
+        {
+            if (SetProperty(ref _selectedRelation, value))
+                _navigateToSelectedRelationCommand?.RaiseCanExecuteChanged();
+        }
+    }
+
+    /// <summary>
+    /// Команда перехода к элементу выбранной связи.
+    /// </summary>
+    public IRelayCommand NavigateToSelectedRelationCommand =>
+        _navigateToSelectedRelationCommand ??= _commandFactory.Create(
+            obj =>
+            {
+                if (SelectedRelation == null)
+                    return;
+
+                var relation = SelectedRelation.Relation;
+                NavigationVM.Navigate(relation.Target.Uuid, relation.NavigationOwnerUuid);
+            },
+            ce =>
+            {
+                return SelectedRelation != null;
+            });
 
     /// <summary>
     /// Признак выполняющегося расчёта дерева связей.
@@ -81,6 +114,7 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     public void Reset()
     {
         Interlocked.Increment(ref _calculationVersion);
+        SelectedRelation = null;
         Roots.Clear();
         IsLoading = false;
     }
@@ -101,6 +135,7 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     {
         var selected = _repositoryExplorerVM.SelectedRepositoryMember?.Model;
         var version = Interlocked.Increment(ref _calculationVersion);
+        SelectedRelation = null;
         Roots.Clear();
 
         if (selected == null)
@@ -129,7 +164,7 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
 
             var relations = await Task.Run(() => _relationsService.GetDirectRelations(
                 _repositoryExplorerVM.PhiladelphusRepositoryVM.Model, selected));
-            var nodes = relations.Select(CreateNode).ToList();
+            var nodes = relations.Select(x => CreateNode(x, selected.Name)).ToList();
             await Task.WhenAll(nodes.Select(x => x.EnsureChildrenLoadedAsync()));
 
             if (version != Volatile.Read(ref _calculationVersion)
@@ -152,26 +187,27 @@ public sealed class RepositoryRelationsControlVM : ControlBaseVM
     }
 
     /// <summary>
-    /// Создает узел с командами ленивой загрузки и навигации.
+    /// Создает узел с ленивой загрузкой дочерних связей.
     /// </summary>
     /// <param name="relation">Связь, для которой создается узел.</param>
+    /// <param name="sourceName">Наименование исходного элемента связи.</param>
     /// <returns>Новый узел дерева связей.</returns>
-    private RepositoryRelationVM CreateNode(RepositoryRelationModel relation)
+    private RepositoryRelationVM CreateNode(RepositoryRelationModel relation, string sourceName)
     {
-        return new RepositoryRelationVM(relation, async node =>
+        return new RepositoryRelationVM(relation, sourceName, async node =>
         {
             try
             {
                 var relations = await Task.Run(() => _relationsService.GetDirectRelations(
                     _repositoryExplorerVM.PhiladelphusRepositoryVM.Model, node.Relation.Target));
                 foreach (var child in relations)
-                    node.Children.Add(CreateNode(child));
+                    node.Children.Add(CreateNode(child, node.Relation.Target.Name));
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "Ошибка расчёта дочерних связей элемента {ElementUuid}.", node.Relation.Target.Uuid);
             }
-        }, _commandFactory.Create(_ =>
-            NavigationVM.Navigate(relation.Target.Uuid, relation.NavigationOwnerUuid)));
+        });
     }
+
 }

@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Core.Domain.Relations;
 using Philadelphus.Presentation.Services.StateVisibility;
@@ -21,14 +23,16 @@ public sealed class RepositoryRelationVM : ViewModelBase
     /// Инициализирует модель представления связи объекта репозитория.
     /// </summary>
     /// <param name="relation">Доменная модель связи.</param>
+    /// <param name="sourceName">Наименование исходного элемента связи.</param>
     /// <param name="loader">Функция загрузки дочерних связей.</param>
-    /// <param name="navigateCommand">Команда перехода к связанному объекту.</param>
-    public RepositoryRelationVM(RepositoryRelationModel relation, Func<RepositoryRelationVM, Task> loader,
-        IRelayCommand navigateCommand)
+    public RepositoryRelationVM(
+        RepositoryRelationModel relation,
+        string sourceName,
+        Func<RepositoryRelationVM, Task> loader)
     {
         Relation = relation;
+        SourceName = sourceName;
         _loader = loader;
-        NavigateCommand = navigateCommand;
     }
 
     /// <summary>
@@ -37,14 +41,62 @@ public sealed class RepositoryRelationVM : ViewModelBase
     public RepositoryRelationModel Relation { get; }
 
     /// <summary>
+    /// Наименование исходного элемента связи.
+    /// </summary>
+    public string SourceName { get; }
+
+    /// <summary>
     /// Отображаемое наименование связанного объекта.
     /// </summary>
     public string Element => Relation.DisplayName;
 
     /// <summary>
+    /// Наименование связанного объекта.
+    /// </summary>
+    public string ElementName => Relation.Target.Name;
+
+    /// <summary>
     /// Отображаемое наименование типа связи.
     /// </summary>
-    public string RelationType => Relation.TypeDisplayName;
+    public string RelationType =>
+        Relation.Type == RepositoryRelationType.Content
+        && Relation.Target is ElementAttributeModel
+            ? $"{Relation.TypeDisplayName} (атрибут)"
+            : Relation.TypeDisplayName;
+
+    /// <summary>
+    /// Признак входящей ссылки на текущий элемент из атрибута.
+    /// </summary>
+    public bool IsAttributeReference =>
+        Relation.Target is ElementAttributeModel && Relation.BlocksSourceDeletion;
+
+    /// <summary>
+    /// Наименование типа атрибутной связи в форме, согласованной со словом «является».
+    /// </summary>
+    public string AttributeRelationType => Relation.Type switch
+    {
+        RepositoryRelationType.AttributeDataType => "типом данных",
+        RepositoryRelationType.AttributeValue => "значением",
+        RepositoryRelationType.AttributeCollectionValue => "одним из значений",
+        RepositoryRelationType.FormulaReference => "ссылкой из формулы",
+        _ => RelationType
+    };
+
+    /// <summary>
+    /// Наименование атрибута, содержащего входящую ссылку.
+    /// </summary>
+    public string AttributeName =>
+        Relation.Target is ElementAttributeModel attribute ? attribute.Name : string.Empty;
+
+    /// <summary>
+    /// Элемент, отображаемый как цель связи. Для входящей атрибутной ссылки — владелец атрибута.
+    /// </summary>
+    public IMainEntityModel DisplayedElement =>
+        IsAttributeReference
+        && Relation.Target is ElementAttributeModel attribute
+        && attribute.Owner is IMainEntityModel owner
+            ? owner
+            : Relation.Target;
 
     /// <summary>
     /// Признак блокировки удаления исходного объекта.
@@ -55,33 +107,28 @@ public sealed class RepositoryRelationVM : ViewModelBase
     /// Агрегированное состояние родителей и владельцев связанного элемента.
     /// </summary>
     public State ParentOwnerAggregateState =>
-        StateVisibilityInfoBuilder.Build(Relation.Target).ParentOwnerState ?? State.SavedOrLoaded;
+        StateVisibilityInfoBuilder.Build(DisplayedElement).ParentOwnerState ?? State.SavedOrLoaded;
 
     /// <summary>
     /// Состояние связанного элемента.
     /// </summary>
-    public State State => Relation.Target.State;
+    public State State => DisplayedElement.State;
 
     /// <summary>
     /// Агрегированное состояние дочерних элементов и содержимого связанного элемента.
     /// </summary>
     public State ChildContentAggregateState =>
-        StateVisibilityInfoBuilder.Build(Relation.Target).ChildContentState ?? State.SavedOrLoaded;
+        StateVisibilityInfoBuilder.Build(DisplayedElement).ChildContentState ?? State.SavedOrLoaded;
 
     /// <summary>
     /// Подсказка с расшифровкой состояний связанного элемента.
     /// </summary>
-    public string StateVisibilityToolTip => StateVisibilityInfoBuilder.Build(Relation.Target).ToolTip;
+    public string StateVisibilityToolTip => StateVisibilityInfoBuilder.Build(DisplayedElement).ToolTip;
 
     /// <summary>
     /// Лениво загруженные дочерние связи.
     /// </summary>
     public ObservableCollection<RepositoryRelationVM> Children { get; } = new();
-
-    /// <summary>
-    /// Команда перехода к связанному объекту.
-    /// </summary>
-    public IRelayCommand NavigateCommand { get; }
 
     /// <summary>
     /// Признак раскрытия узла в дереве связей.
