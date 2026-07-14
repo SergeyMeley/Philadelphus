@@ -1,4 +1,9 @@
 ﻿using Philadelphus.Presentation.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
+using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
@@ -22,6 +27,13 @@ namespace Philadelphus.Presentation.Converters.Logic
                 TreeRootVM => AppIcon.TreeRoot,
                 TreeNodeVM => AppIcon.TreeNode,
                 TreeLeaveVM => AppIcon.TreeLeaf,
+                PhiladelphusRepositoryModel => AppIcon.RepositoryLogo,
+                ShrubModel => AppIcon.Shrub,
+                WorkingTreeModel => AppIcon.WorkingTree,
+                TreeRootModel => AppIcon.TreeRoot,
+                TreeNodeModel => AppIcon.TreeNode,
+                TreeLeaveModel => AppIcon.TreeLeaf,
+                ElementAttributeModel => AppIcon.Attribute,
                 _ => AppIcon.Empty
             };
     }

@@ -37,6 +37,7 @@ namespace Philadelphus.Presentation.Avalonia.Converters
                 AppIcon.TreeRoot => "root",
                 AppIcon.TreeNode => "node",
                 AppIcon.TreeLeaf => "leave",
+                AppIcon.Attribute => "attribute",
                 AppIcon.Add => "add",
                 AppIcon.Open => "open",
                 AppIcon.Storage => "storage",

@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Core.Domain.Relations;
+using Philadelphus.Presentation.Services.StateVisibility;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.OtherEntitiesVMs;
 
@@ -50,9 +52,26 @@ public sealed class RepositoryRelationVM : ViewModelBase
     public bool BlocksDeletion => Relation.BlocksSourceDeletion;
 
     /// <summary>
-    /// Наименование группы блокировки удаления.
+    /// Агрегированное состояние родителей и владельцев связанного элемента.
     /// </summary>
-    public string Group => BlocksDeletion ? "Блокирующие удаление" : "Не блокирующие удаление";
+    public State ParentOwnerAggregateState =>
+        StateVisibilityInfoBuilder.Build(Relation.Target).ParentOwnerState ?? State.SavedOrLoaded;
+
+    /// <summary>
+    /// Состояние связанного элемента.
+    /// </summary>
+    public State State => Relation.Target.State;
+
+    /// <summary>
+    /// Агрегированное состояние дочерних элементов и содержимого связанного элемента.
+    /// </summary>
+    public State ChildContentAggregateState =>
+        StateVisibilityInfoBuilder.Build(Relation.Target).ChildContentState ?? State.SavedOrLoaded;
+
+    /// <summary>
+    /// Подсказка с расшифровкой состояний связанного элемента.
+    /// </summary>
+    public string StateVisibilityToolTip => StateVisibilityInfoBuilder.Build(Relation.Target).ToolTip;
 
     /// <summary>
     /// Лениво загруженные дочерние связи.
