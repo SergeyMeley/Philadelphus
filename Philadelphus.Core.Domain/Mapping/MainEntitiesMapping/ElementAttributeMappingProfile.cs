@@ -51,8 +51,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.ValueFormula, opt => opt.MapFrom(src => src.ValueFormula))
                 .ForSourceMember(src => src.ValueFormulaErrorCode, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ValueTypeReferenceErrorCode, opt => opt.DoNotValidate())
-                .ForSourceMember(src => src.ValueReferenceErrorCode, opt => opt.DoNotValidate())
-                .ForSourceMember(src => src.UnresolvedValueUuid, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.ValuesReferenceErrorCode, opt => opt.DoNotValidate())
                 .ForMember(dest => dest.IsCollectionValue, opt => opt.MapFrom(src => src.IsCollectionValue))
                 .ForMember(dest => dest.ValuesUuids, opt => opt.Ignore())       // Сложная логика
                 .ForMember(dest => dest.VisibilityId, opt => opt.MapFrom(src => (int)src.Visibility))
@@ -68,7 +67,9 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         {
                             dest.ValuesUuids = null;
 
-                            dest.ValueUuid = src.ValueReferenceUuid;
+                            // ValueUuid — материализованный результат для SQL-запросов и отчетов.
+                            // Формула остается единственным источником значения в приложении.
+                            dest.ValueUuid = src.Value?.Uuid;
                         }
                         else
                         {
@@ -145,22 +146,19 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                     if (src.IsCollectionValue == false)
                     {
                         dest.LoadValues(Array.Empty<TreeLeaveModel>(), Array.Empty<Guid>());
+                        dest.LoadPersistedMaterializedValueUuid(src.ValueUuid);
 
-                        if (src.ValueUuid != null)
-                        {
-                            TreeLeaveModel? value = null;
-                            valuesByUuid?.TryGetValue(src.ValueUuid.Value, out value);
-                            dest.LoadValue(value, src.ValueUuid);
-                        }
-                        else
-                        {
-                            dest.LoadValue(null, null);
-                        }
+                        // Никогда не восстанавливаем Value из материализованного ValueUuid: сохраненный
+                        // результат мог устареть. Runtime-значение будет вычислено только по ValueFormula.
+                        // Если формулы нет, значение после загрузки намеренно остается пустым.
+                        dest.LoadValueFormula(src.ValueFormula);
                     }
                     else
                     {
-                        dest.LoadValue(null, null);
+                        dest.LoadPersistedMaterializedValueUuid(null);
 
+                        // Коллекционные формулы пока отсутствуют, поэтому ValuesUuids остается временным
+                        // исключением из правила formula-only и продолжает загружаться в доменную модель.
                         var values = new List<TreeLeaveModel>();
                         var unresolvedValuesUuids = new List<Guid>();
                         if (src.ValuesUuids != null)
@@ -179,9 +177,8 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         }
 
                         dest.LoadValues(values, unresolvedValuesUuids);
+                        dest.LoadValueFormula(src.ValueFormula);
                     }
-
-                    dest.LoadValueFormula(src.ValueFormula);
                 });
         }
     }

@@ -90,6 +90,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
             builder.Property(x => x.ValueTypeUuid)
                 .HasColumnName("value_type_uuid");
 
+            // value_uuid — материализованный результат только для запросов и отчетов.
+            // При загрузке приложения значение восстанавливается из value_formula, а не из value_uuid.
             builder.Property(x => x.ValueUuid)
                 .HasColumnName("value_uuid");
 
@@ -101,6 +103,8 @@ namespace Philadelphus.Infrastructure.Persistence.EF.Configurations
                 IsRequired().
                 HasDefaultValue(false);
 
+            // values_uuids пока остается источником коллекционных значений: отдельного поля
+            // формулы коллекции в модели хранения еще нет.
             builder.Property(x => x.ValuesUuids)
                 .HasColumnName("values_uuids");
 

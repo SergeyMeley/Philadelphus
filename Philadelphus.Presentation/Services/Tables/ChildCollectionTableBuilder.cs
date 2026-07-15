@@ -641,17 +641,12 @@ namespace Philadelphus.Presentation.Services.Tables
                     .Select(x => x.Name)
                     .Where(x => string.IsNullOrWhiteSpace(x) == false)
                     .ToList();
-                if (string.IsNullOrWhiteSpace(attribute.ValueReferenceErrorCode) == false)
+                if (string.IsNullOrWhiteSpace(attribute.ValuesReferenceErrorCode) == false)
                 {
-                    values.Add(attribute.ValueReferenceErrorCode);
+                    values.Add(attribute.ValuesReferenceErrorCode);
                 }
 
                 return values.Count == 0 ? null : string.Join("; ", values);
-            }
-
-            if (string.IsNullOrWhiteSpace(attribute.ValueReferenceErrorCode) == false)
-            {
-                return attribute.ValueReferenceErrorCode;
             }
 
             if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false

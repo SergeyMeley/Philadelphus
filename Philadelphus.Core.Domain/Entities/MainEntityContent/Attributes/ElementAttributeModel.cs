@@ -6,15 +6,10 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
-using Philadelphus.Core.Domain.Policies.Attributes.Builders;
-using Philadelphus.Core.Domain.Policies.Attributes.Rules;
 using Philadelphus.Core.Domain.Policies.Builders;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Attributes;
 using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
 {
@@ -38,7 +33,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeNodeModel _valueType;
         private Guid? _unresolvedValueTypeUuid;
         private TreeLeaveModel _value;
-        private Guid? _unresolvedValueUuid;
+        private Guid? _persistedMaterializedValueUuid;
         private string _valueFormula = string.Empty;
         private string _valueFormulaErrorCode = string.Empty;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
@@ -114,11 +109,27 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             {
                 var inheritedValue = _inheritedAttributeFromParent?.Value;
                 var alreadyLocalValue = SameValue(value, _value);
-                var valueChanged = SetValue(ref _value, value);
+                bool valueChanged;
 
-                if (ReferenceEquals(_value, value))
+                // ValueUuid в БД — лишь материализованный результат для отчетов, поэтому при загрузке
+                // сам лист в Value не восстанавливается. Если вычисленная по формуле ссылка совпала с
+                // сохраненным результатом, заполняем runtime-значение без перевода атрибута в Changed.
+                if (_value == null
+                    && value?.Uuid == _persistedMaterializedValueUuid
+                    && State == State.SavedOrLoaded)
                 {
-                    _unresolvedValueUuid = null;
+                    _value = value;
+                    _persistedMaterializedValueUuid = null;
+                    valueChanged = false;
+                }
+                else
+                {
+                    valueChanged = SetValue(ref _value, value);
+
+                    if (ReferenceEquals(_value, value))
+                    {
+                        _persistedMaterializedValueUuid = null;
+                    }
                 }
 
                 if (_isOwn == false
@@ -143,12 +154,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 var alreadyLocalFormula = string.Equals(value, _valueFormula, StringComparison.Ordinal);
                 var formulaChanged = SetValue(ref _valueFormula, value);
 
-                if (string.IsNullOrWhiteSpace(value) == false
-                    && string.Equals(_valueFormula, value, StringComparison.Ordinal))
-                {
-                    _unresolvedValueUuid = null;
-                }
-
                 if (_isOwn == false
                     && (formulaChanged || alreadyLocalFormula))
                 {
@@ -160,31 +165,38 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Код ошибки последнего вычисления формулы одиночного значения.
         /// </summary>
+        /// <remarks>
+        /// Runtime-диагностика не сохраняется в БД, поэтому ее изменение не должно переводить
+        /// загруженный атрибут в состояние <see cref="State.Changed" />.
+        /// </remarks>
         public string ValueFormulaErrorCode
         {
             get => GetValue(GetEffectiveValueFormulaErrorCode());
-            set => SetValue(ref _valueFormulaErrorCode, value ?? string.Empty);
+            set => _valueFormulaErrorCode = value ?? string.Empty;
         }
 
         /// <summary>
-        /// Код ошибки привязки значения атрибута.
+        /// Код ошибки привязки значения коллекционного атрибута.
         /// </summary>
-        public string ValueReferenceErrorCode => _isCollectionValue
-            ? _unresolvedValuesUuids.Count > 0
-                ? AttributeReferenceErrorCodes.ValueNotFound
-                : string.Empty
-            : _unresolvedValueUuid.HasValue
+        /// <remarks>
+        /// Для одиночного значения аналогичная ошибка возвращается вычислителем формулы.
+        /// Коллекции пока загружаются из ValuesUuids, так как формулы коллекций не реализованы.
+        /// </remarks>
+        public string ValuesReferenceErrorCode => _isCollectionValue
+            && _unresolvedValuesUuids.Count > 0
                 ? AttributeReferenceErrorCodes.ValueNotFound
                 : string.Empty;
 
         /// <summary>
-        /// Идентификатор отсутствующего одиночного значения.
-        /// </summary>
-        public Guid? UnresolvedValueUuid => _unresolvedValueUuid;
-
-        /// <summary>
         /// Значения (листы выбранного узла дерева репозитория Чубушника)
         /// </summary>
+        /// <remarks>
+        /// TODO: реализовать формулу массива с синтаксисом <c>={[uuid1],[uuid2],...,[uuidn]}</c>.
+        /// Каждый элемент внутри фигурных скобок должен быть самостоятельным выражением формулы,
+        /// возвращающим лист; UUID-ссылка <c>[uuid]</c> является только простейшим таким выражением.
+        /// После этого ValuesUuids должен стать лишь материализованным результатом для запросов и отчетов
+        /// и, аналогично ValueUuid одиночного значения, не должен использоваться как источник при загрузке.
+        /// </remarks>
         public IReadOnlyList<TreeLeaveModel> Values
         {
             get => GetValue(GetEffectiveValues());
@@ -565,7 +577,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _unresolvedValueTypeUuid = this._unresolvedValueTypeUuid,
                 _isCollectionValue = this._isCollectionValue,
                 _value = this._value,
-                _unresolvedValueUuid = this._unresolvedValueUuid,
+                _persistedMaterializedValueUuid = this._persistedMaterializedValueUuid,
                 _valueFormula = this._valueFormula,
                 _valueFormulaErrorCode = this._valueFormulaErrorCode,
                 _values = new List<TreeLeaveModel>(this._values),
@@ -617,12 +629,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
-        /// Загрузить одиночное значение и сохранить исходную ссылку, если значение не найдено.
+        /// Запомнить идентификатор материализованного результата, не загружая его в runtime-значение.
         /// </summary>
-        internal void LoadValue(TreeLeaveModel? value, Guid? valueUuid)
+        /// <remarks>
+        /// Идентификатор используется только для сравнения результата последующего вычисления формулы,
+        /// чтобы неизменившийся результат не помечал только что загруженный атрибут как Changed.
+        /// Источником Value он не является.
+        /// </remarks>
+        internal void LoadPersistedMaterializedValueUuid(Guid? valueUuid)
         {
-            _value = value!;
-            _unresolvedValueUuid = value == null ? valueUuid : null;
+            _value = null!;
+            _persistedMaterializedValueUuid = valueUuid;
         }
 
         /// <summary>
@@ -640,11 +657,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// Получить ссылку на тип данных, включая отсутствующий тип.
         /// </summary>
         internal Guid? ValueTypeReferenceUuid => _valueType?.Uuid ?? _unresolvedValueTypeUuid;
-
-        /// <summary>
-        /// Получить ссылку на одиночное значение, включая отсутствующее значение.
-        /// </summary>
-        internal Guid? ValueReferenceUuid => _value?.Uuid ?? _unresolvedValueUuid;
 
         /// <summary>
         /// Получить ссылки на значения коллекции, включая отсутствующие значения.

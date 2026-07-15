@@ -17,6 +17,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
@@ -459,6 +460,35 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         }
 
         /// <summary>
+        /// Пересчитать формулы после загрузки репозитория из БД.
+        /// </summary>
+        /// <remarks>
+        /// ValueUuid в БД является только материализованным результатом для запросов и отчетов.
+        /// Этот проход восстанавливает runtime-значения исключительно из ValueFormula и не зависит
+        /// от выбранного пользователем режима автоматического пересчета.
+        /// </remarks>
+        internal void RecalculateLoadedFormulas()
+        {
+            var recalculated = new HashSet<Guid>();
+
+            foreach (var attribute in GetAllRepositoryFormulaAttributes())
+            {
+                _attributeFormulaService.RecalculateAttribute(
+                    attribute,
+                    formulaOverride: null,
+                    new HashSet<Guid>(),
+                    recalculated,
+                    CreateFormulaExecutionContext,
+                    _ => { });
+            }
+
+            // Во время массовой загрузки не обновляем UI для каждого атрибута отдельно.
+            _repositoryExplorerVM.NotifyFormulaPropertyListChanged();
+            _repositoryExplorerVM.RebuildChildCollectionTable();
+            _repositoryExplorerVM.NotifyRepositoryStateChanged();
+        }
+
+        /// <summary>
         /// Обрабатывает изменение значения атрибута и запускает пересчет зависимых формул согласно выбранному режиму.
         /// </summary>
         public void NotifyAttributeValueChanged(ElementAttributeModel attribute)
@@ -715,6 +745,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             if (sourceAttribute.IsCollectionValue)
             {
+                // TODO: поддержать формулу массива ={expr1,expr2,...,exprN}, где каждое выражение
+                // (в том числе [uuid]) возвращает лист допустимого для атрибута типа.
                 return CreateBlockedFormulaTarget(address, "Формулы для коллекционных значений атрибутов пока не поддерживаются.");
             }
 
@@ -867,10 +899,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             if (TryGetLeafUuidReference(trimmedText, out var valueUuid)
                 && targetAttribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
             {
-                targetAttribute.Value = referencedValue;
-                targetAttribute.ValueFormula = string.Empty;
-                targetAttribute.ValueFormulaErrorCode = string.Empty;
-                return true;
+                return RecalculateFormulaAttribute(
+                    targetAttribute,
+                    AttributeValueText.CreateTreeLeaveReferenceFormula(referencedValue.Uuid),
+                    new HashSet<Guid>(),
+                    new HashSet<Guid>());
             }
 
             if (targetAttribute.ValueType is SystemBaseTreeNodeModel)
@@ -880,9 +913,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                     return false;
                 }
 
-                targetAttribute.ValueFormula = string.Empty;
-                targetAttribute.ValueFormulaErrorCode = string.Empty;
-                return true;
+                var generatedValue = targetAttribute.Value;
+                return RecalculateFormulaAttribute(
+                    targetAttribute,
+                    AttributeValueText.CreateTreeLeaveReferenceFormula(generatedValue.Uuid),
+                    new HashSet<Guid>(),
+                    new HashSet<Guid>());
             }
 
             var value = targetAttribute.ValuesList?.FirstOrDefault(x =>
@@ -895,21 +931,30 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 return false;
             }
 
-            targetAttribute.Value = value;
-            targetAttribute.ValueFormula = string.Empty;
-            targetAttribute.ValueFormulaErrorCode = string.Empty;
-            return true;
+            return RecalculateFormulaAttribute(
+                targetAttribute,
+                AttributeValueText.CreateTreeLeaveReferenceFormula(value.Uuid),
+                new HashSet<Guid>(),
+                new HashSet<Guid>());
         }
 
         private FormulaExecutionContext CreateFormulaExecutionContext(ElementAttributeModel? targetAttribute = null)
         {
-            var workingTree = ResolveWorkingTree();
+            // При массовом пересчете после загрузки выделенного элемента может не быть. Контекст обязан
+            // строиться по дереву владельца атрибута, а не по текущему выделению.
+            var workingTree = targetAttribute?.OwningWorkingTree ?? ResolveWorkingTree();
             var systemBaseWorkingTree = _repositoryExplorerVM.PhiladelphusRepositoryVM.Model.ContentShrub.SystemBaseWorkingTree;
 
             return new FormulaExecutionContext
             {
                 WorkingTree = workingTree,
-                TreeLeaveResolver = workingTree is null ? null : new WorkingTreeTreeLeaveResolver(workingTree),
+                // Значение атрибута может находиться в другом рабочем дереве, но всегда является
+                // дочерним листом его ValueType, поэтому поиск ограничиваем этим узлом.
+                TreeLeaveResolver = targetAttribute?.ValueType != null
+                    ? new TreeNodeTreeLeaveResolver(targetAttribute.ValueType)
+                    : workingTree is null
+                        ? null
+                        : new WorkingTreeTreeLeaveResolver(workingTree),
                 SystemBaseWorkingTree = systemBaseWorkingTree,
                 CurrentAttributeOwner = targetAttribute?.Owner as IAttributeOwnerModel,
                 RepositoryService = _service,

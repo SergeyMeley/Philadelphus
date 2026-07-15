@@ -4,6 +4,8 @@ using FluentAssertions;
 
 using Microsoft.Extensions.Logging.Abstractions;
 
+using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Mapping;
@@ -18,13 +20,81 @@ namespace Philadelphus.Tests.Domain.Mapping;
 public class ElementAttributeMappingProfileTests
 {
     [Fact]
-    public void Map_MissingValueTypeAndValue_SetsErrorsAndPreservesReferences()
+    public void Map_FormulaValue_IgnoresMaterializedValueFromDatabase()
+    {
+        // Arrange
+        var tree = new FakeWorkingTreeModel();
+        var notificationService = new FakeNotificationService();
+        var root = new TreeRootModel(
+            Guid.CreateVersion7(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var valueType = new TreeNodeModel(
+            Guid.CreateVersion7(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var materializedValue = new TreeLeaveModel(
+            Guid.CreateVersion7(),
+            valueType,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var entity = CreateAttribute(tree, valueType.Uuid, materializedValue.Uuid);
+        entity.ValueFormula = $"=[{materializedValue.Uuid}]";
+        var mapper = CreateMapper();
+
+        // Act
+        var model = MapAttribute(
+            mapper,
+            entity,
+            tree,
+            new Dictionary<Guid, TreeNodeModel> { [valueType.Uuid] = valueType },
+            new Dictionary<Guid, TreeLeaveModel> { [materializedValue.Uuid] = materializedValue });
+
+        // Assert
+        model.ValueType.Should().BeSameAs(valueType);
+        model.Value.Should().BeNull();
+        model.ValueFormula.Should().Be(entity.ValueFormula);
+
+        // Имитируем вычисление той же формулы после завершения загрузки. Совпавший с сохраненным
+        // материализованный результат не должен делать только что загруженный атрибут измененным.
+        ((IMainEntityWritableModel)model).SetState(State.SavedOrLoaded);
+        model.Value = materializedValue;
+        var mappedBackEntity = mapper.Map<ElementAttribute>(model);
+
+        model.State.Should().Be(State.SavedOrLoaded);
+        mappedBackEntity.ValueTypeUuid.Should().Be(valueType.Uuid);
+        mappedBackEntity.ValueUuid.Should().Be(materializedValue.Uuid);
+        mappedBackEntity.ValueFormula.Should().Be(entity.ValueFormula);
+    }
+
+    [Fact]
+    public void Map_ValueWithoutFormula_DoesNotUseMaterializedValueAsSource()
+    {
+        // Arrange
+        var tree = new FakeWorkingTreeModel();
+        var valueUuid = Guid.CreateVersion7();
+        var entity = CreateAttribute(tree, Guid.CreateVersion7(), valueUuid);
+        var mapper = CreateMapper();
+
+        // Act
+        var model = MapAttribute(mapper, entity, tree);
+
+        // Assert
+        model.Value.Should().BeNull();
+        model.ValueFormula.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Map_MissingValueType_SetsErrorAndPreservesReference()
     {
         // Arrange
         var tree = new FakeWorkingTreeModel();
         var valueTypeUuid = Guid.CreateVersion7();
-        var valueUuid = Guid.CreateVersion7();
-        var entity = CreateAttribute(tree, valueTypeUuid, valueUuid);
+        var entity = CreateAttribute(tree, valueTypeUuid, valueUuid: null);
         var mapper = CreateMapper();
 
         // Act
@@ -33,12 +103,8 @@ public class ElementAttributeMappingProfileTests
 
         // Assert
         model.ValueType.Should().BeNull();
-        model.Value.Should().BeNull();
         model.ValueTypeReferenceErrorCode.Should().Be(AttributeReferenceErrorCodes.ValueTypeNotFound);
-        model.ValueReferenceErrorCode.Should().Be(AttributeReferenceErrorCodes.ValueNotFound);
-        model.UnresolvedValueUuid.Should().Be(valueUuid);
         mappedBackEntity.ValueTypeUuid.Should().Be(valueTypeUuid);
-        mappedBackEntity.ValueUuid.Should().Be(valueUuid);
     }
 
     [Fact]
@@ -60,7 +126,7 @@ public class ElementAttributeMappingProfileTests
 
         // Assert
         model.Values.Should().BeEmpty();
-        model.ValueReferenceErrorCode.Should().Be(AttributeReferenceErrorCodes.ValueNotFound);
+        model.ValuesReferenceErrorCode.Should().Be(AttributeReferenceErrorCodes.ValueNotFound);
         mappedBackEntity.ValuesUuids.Should().Equal(firstValueUuid, secondValueUuid);
     }
 
@@ -86,13 +152,15 @@ public class ElementAttributeMappingProfileTests
     private static ElementAttributeModel MapAttribute(
         IMapper mapper,
         ElementAttribute entity,
-        FakeWorkingTreeModel tree)
+        FakeWorkingTreeModel tree,
+        IReadOnlyDictionary<Guid, TreeNodeModel>? valueTypesByUuid = null,
+        IReadOnlyDictionary<Guid, TreeLeaveModel>? valuesByUuid = null)
     {
         return mapper.MapAttributes(
                 [entity],
                 [tree],
-                new Dictionary<Guid, TreeNodeModel>(),
-                new Dictionary<Guid, TreeLeaveModel>(),
+                valueTypesByUuid ?? new Dictionary<Guid, TreeNodeModel>(),
+                valuesByUuid ?? new Dictionary<Guid, TreeLeaveModel>(),
                 tree,
                 new FakeNotificationService(),
                 new EmptyPropertiesPolicy<ElementAttributeModel>())

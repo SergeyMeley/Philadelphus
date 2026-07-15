@@ -110,9 +110,18 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             {
                 if (IsCollectionValue == false)
                 {
-                    _model.ValueFormula = string.Empty;
-                    _model.ValueFormulaErrorCode = string.Empty;
-                    _model.Value = value;
+                    if (value == null)
+                    {
+                        _model.ValueFormula = string.Empty;
+                        _model.ValueFormulaErrorCode = string.Empty;
+                        _model.Value = null!;
+                    }
+                    else
+                    {
+                        // Прямой выбор значения тоже хранится как формула-ссылка. Value здесь — только
+                        // материализованный результат для UI и последующего сохранения отчетного ValueUuid.
+                        AttributeValueText.AssignValueAsFormula(_model, value);
+                    }
                 }
                 NotifyStateVisibilityPropertiesChanged();
                 OnPropertyChanged(nameof(AssignedValue));
@@ -211,9 +220,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             get
             {
                 var values = _assignedValues?.Select(x => x.Name).ToList() ?? new List<string>();
-                if (string.IsNullOrWhiteSpace(_model.ValueReferenceErrorCode) == false)
+                if (string.IsNullOrWhiteSpace(_model.ValuesReferenceErrorCode) == false)
                 {
-                    values.Add(_model.ValueReferenceErrorCode);
+                    values.Add(_model.ValuesReferenceErrorCode);
                 }
 
                 return string.Join("; ", values);

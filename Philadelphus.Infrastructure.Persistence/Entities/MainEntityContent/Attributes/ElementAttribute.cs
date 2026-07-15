@@ -29,12 +29,16 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Att
         public Guid? ValueTypeUuid { get; set; }
        
         /// <summary>
-        /// Уникальный идентификатор значения.
+        /// Уникальный идентификатор материализованного результата вычисления формулы.
         /// </summary>
+        /// <remarks>
+        /// Поле хранится только для запросов к БД и построения отчетов. При загрузке доменной модели
+        /// оно не является источником значения: приложение вычисляет <see cref="ValueFormula" /> заново.
+        /// </remarks>
         public Guid? ValueUuid { get; set; }
 
         /// <summary>
-        /// Формула одиночного значения.
+        /// Формула одиночного значения — единственный источник значения в приложении.
         /// </summary>
         public string? ValueFormula { get; set; }
        
@@ -44,8 +48,15 @@ namespace Philadelphus.Infrastructure.Persistence.Entities.MainEntityContent.Att
         public bool IsCollectionValue { get; set; }
        
         /// <summary>
-        /// Уникальные идентификаторы значений.
+        /// Уникальные идентификаторы значений коллекционного атрибута.
         /// </summary>
+        /// <remarks>
+        /// В отличие от одиночного значения, коллекции пока не имеют формульного представления.
+        /// Поэтому до реализации формул коллекций это поле остается источником их значений и загружается в модель.
+        /// Планируемый синтаксис формулы массива: <c>={[uuid1],[uuid2],...,[uuidn]}</c>, где каждый
+        /// элемент массива может быть произвольной формулой, возвращающей лист. После реализации
+        /// <see cref="ValuesUuids" /> останется только материализованным значением для запросов и отчетов.
+        /// </remarks>
         public Guid[]? ValuesUuids { get; set; }
         
         /// <summary>

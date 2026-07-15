@@ -23,11 +23,6 @@ namespace Philadelphus.Presentation.Services.Tables
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
-            if (string.IsNullOrWhiteSpace(attribute.ValueReferenceErrorCode) == false)
-            {
-                return attribute.ValueReferenceErrorCode;
-            }
-
             if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false
                 && string.IsNullOrWhiteSpace(attribute.ValueFormulaErrorCode) == false)
             {
@@ -50,11 +45,9 @@ namespace Philadelphus.Presentation.Services.Tables
                 return attribute.ValueFormula;
             }
 
-            var valueUuid = attribute.Value?.Uuid ?? attribute.UnresolvedValueUuid;
-
-            return valueUuid == null
+            return attribute.Value?.Uuid == null
                 ? string.Empty
-                : $"=[{valueUuid}]";
+                : CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);
         }
 
         /// <summary>
@@ -87,7 +80,7 @@ namespace Philadelphus.Presentation.Services.Tables
             if (TryGetLeafUuidReference(trimmedValue, out var valueUuid)
                 && attribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
             {
-                AssignValue(attribute, referencedValue);
+                AssignValueAsFormula(attribute, referencedValue);
                 return;
             }
 
@@ -100,9 +93,7 @@ namespace Philadelphus.Presentation.Services.Tables
                 // формулу и ПЕРЕ-присваиваем значение последним действием, чтобы вернуть признак
                 // переопределения (как в AssignValue, где значение ставится ПОСЛЕ очистки формулы).
                 var assignedValue = attribute.Value;
-                attribute.ValueFormula = string.Empty;
-                attribute.ValueFormulaErrorCode = string.Empty;
-                attribute.Value = assignedValue;
+                AssignValueAsFormula(attribute, assignedValue);
             }
         }
 
@@ -117,12 +108,25 @@ namespace Philadelphus.Presentation.Services.Tables
                 : attribute.Value?.Name ?? string.Empty;
         }
 
-        private static void AssignValue(ElementAttributeModel attribute, TreeLeaveModel value)
+        /// <summary>
+        /// Назначить выбранный лист через формулу-ссылку. Value заполняется только как материализованный
+        /// runtime-результат; при следующей загрузке он будет проигнорирован и вычислен заново.
+        /// </summary>
+        internal static void AssignValueAsFormula(ElementAttributeModel attribute, TreeLeaveModel value)
         {
-            attribute.ValueFormula = string.Empty;
+            ArgumentNullException.ThrowIfNull(attribute);
+            ArgumentNullException.ThrowIfNull(value);
+
+            attribute.ValueFormula = CreateTreeLeaveReferenceFormula(value.Uuid);
             attribute.ValueFormulaErrorCode = string.Empty;
             attribute.Value = value;
         }
+
+        /// <summary>
+        /// Сформировать formula-only представление прямой ссылки на лист.
+        /// </summary>
+        internal static string CreateTreeLeaveReferenceFormula(Guid valueUuid) 
+            => $"=[{valueUuid}]";
 
         private static void ClearValue(ElementAttributeModel attribute)
         {

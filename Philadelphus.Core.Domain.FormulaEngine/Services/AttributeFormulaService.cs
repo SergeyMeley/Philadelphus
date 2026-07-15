@@ -34,7 +34,19 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             _notificationService = notificationService;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Рекурсивно пересчитывает формулу атрибута вместе с формулами, от которых она зависит.
+        /// </summary>
+        /// <param name="attribute">Пересчитываемый атрибут.</param>
+        /// <param name="formulaOverride">Формула, временно используемая вместо сохраненной формулы атрибута.</param>
+        /// <param name="stack">Стек текущего рекурсивного обхода для обнаружения циклических зависимостей.</param>
+        /// <param name="recalculated">UUID уже пересчитанных в текущем проходе атрибутов.</param>
+        /// <param name="contextFactory">Фабрика контекста вычисления для конкретного атрибута.</param>
+        /// <param name="onAttributeChanged">Обработчик обновления представления изменившегося атрибута.</param>
+        /// <returns>
+        /// <see langword="true" />, если атрибут не блокирует дальнейший пересчет зависимых формул;
+        /// иначе <see langword="false" />.
+        /// </returns>
         public bool RecalculateAttribute(
             ElementAttributeModel attribute,
             string? formulaOverride,
@@ -62,6 +74,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
 
             if (stack.Add(attribute.Uuid) == false)
             {
+                // Вычисленное Value — лишь материализованный результат. При ошибке старый результат
+                // необходимо удалить, иначе в БД и отчетах останется значение от предыдущей формулы.
+                attribute.Value = null!;
                 attribute.ValueFormula = formulaText;
                 attribute.ValueFormulaErrorCode = "#CYCLE!";
                 onAttributeChanged(attribute);
@@ -77,6 +92,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             {
                 if (RecalculateAttribute(dependency, null, stack, recalculated, contextFactory, onAttributeChanged) == false)
                 {
+                    attribute.Value = null!;
                     attribute.ValueFormula = formulaText;
                     attribute.ValueFormulaErrorCode = "#DEPENDENCY!";
                     onAttributeChanged(attribute);
@@ -88,6 +104,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             var result = _formulaEvaluator.Evaluate(formulaText, contextFactory(attribute));
             if (result.IsSuccess == false)
             {
+                attribute.Value = null!;
                 attribute.ValueFormula = formulaText;
                 attribute.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
                 onAttributeChanged(attribute);
@@ -110,7 +127,12 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             return isApplied;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Возвращает формульные атрибуты того же владельца, на которые ссылается указанная формула.
+        /// </summary>
+        /// <param name="targetAttribute">Атрибут, для которого анализируется формула.</param>
+        /// <param name="formulaText">Текст анализируемой формулы.</param>
+        /// <returns>Список найденных зависимостей без повторяющихся UUID.</returns>
         public IReadOnlyList<ElementAttributeModel> GetReferencedFormulaAttributes(
             ElementAttributeModel targetAttribute,
             string formulaText)
@@ -129,13 +151,22 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
                 .ToList();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Проверяет наличие относительной ссылки на указанный атрибут в тексте формулы.
+        /// </summary>
+        /// <param name="formula">Текст проверяемой формулы.</param>
+        /// <param name="attribute">Атрибут, ссылку на который необходимо найти.</param>
+        /// <returns><see langword="true" />, если ссылка найдена; иначе <see langword="false" />.</returns>
         public bool FormulaReferencesAttribute(string formula, ElementAttributeModel attribute)
         {
             return formula.Contains(CreateRelativeAttributeReference(attribute), StringComparison.OrdinalIgnoreCase);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Создает относительную формульную ссылку на атрибут по его наименованию.
+        /// </summary>
+        /// <param name="attribute">Атрибут, для которого создается ссылка.</param>
+        /// <returns>Выражение вида <c>АТРИБУТ("Наименование")</c>.</returns>
         public string CreateRelativeAttributeReference(ElementAttributeModel attribute)
         {
             var escapedName = (attribute.Name ?? string.Empty).Replace("\"", "\"\"", StringComparison.Ordinal);
