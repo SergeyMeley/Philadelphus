@@ -44,6 +44,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 {
                     _model.ValueType = value;
                     OnPropertyChanged(nameof(SelectedValueType));
+                    OnPropertyChanged(nameof(ValueTypeReferenceErrorCode));
                     OnPropertyChanged(nameof(ValuesList));
                     SelectedValue = null;
                     OnPropertyChanged(nameof(SelectedValue));
@@ -64,6 +65,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         /// Список типов значений.
         /// </summary>
         public IEnumerable<TreeNodeModel>? ValueTypesList { get => _model.ValueTypesList; }
+
+        /// <summary>
+        /// Код ошибки привязки типа данных.
+        /// </summary>
+        public string ValueTypeReferenceErrorCode => _model.ValueTypeReferenceErrorCode;
 
         public bool IsCollectionValue
         {
@@ -202,7 +208,16 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         }
         public string AssignedValuesString
         {
-            get => string.Join("; ", _assignedValues?.Select(x => x.Name) ?? new List<string>());
+            get
+            {
+                var values = _assignedValues?.Select(x => x.Name).ToList() ?? new List<string>();
+                if (string.IsNullOrWhiteSpace(_model.ValueReferenceErrorCode) == false)
+                {
+                    values.Add(_model.ValueReferenceErrorCode);
+                }
+
+                return string.Join("; ", values);
+            }
         }
 
         /// <summary>

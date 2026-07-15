@@ -637,9 +637,21 @@ namespace Philadelphus.Presentation.Services.Tables
 
             if (attribute.IsCollectionValue)
             {
-                return attribute.Values == null || attribute.Values.Count == 0
-                    ? null
-                    : string.Join("; ", attribute.Values.Select(x => x.Name).Where(x => string.IsNullOrWhiteSpace(x) == false));
+                var values = attribute.Values
+                    .Select(x => x.Name)
+                    .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                    .ToList();
+                if (string.IsNullOrWhiteSpace(attribute.ValueReferenceErrorCode) == false)
+                {
+                    values.Add(attribute.ValueReferenceErrorCode);
+                }
+
+                return values.Count == 0 ? null : string.Join("; ", values);
+            }
+
+            if (string.IsNullOrWhiteSpace(attribute.ValueReferenceErrorCode) == false)
+            {
+                return attribute.ValueReferenceErrorCode;
             }
 
             if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false

@@ -23,6 +23,11 @@ namespace Philadelphus.Presentation.Services.Tables
         {
             ArgumentNullException.ThrowIfNull(attribute);
 
+            if (string.IsNullOrWhiteSpace(attribute.ValueReferenceErrorCode) == false)
+            {
+                return attribute.ValueReferenceErrorCode;
+            }
+
             if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false
                 && string.IsNullOrWhiteSpace(attribute.ValueFormulaErrorCode) == false)
             {
@@ -45,9 +50,11 @@ namespace Philadelphus.Presentation.Services.Tables
                 return attribute.ValueFormula;
             }
 
-            return attribute.Value?.Uuid == null
+            var valueUuid = attribute.Value?.Uuid ?? attribute.UnresolvedValueUuid;
+
+            return valueUuid == null
                 ? string.Empty
-                : $"=[{attribute.Value.Uuid}]";
+                : $"=[{valueUuid}]";
         }
 
         /// <summary>

@@ -50,6 +50,9 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.ValueUuid, opt => opt.Ignore())         // Сложная логика
                 .ForMember(dest => dest.ValueFormula, opt => opt.MapFrom(src => src.ValueFormula))
                 .ForSourceMember(src => src.ValueFormulaErrorCode, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.ValueTypeReferenceErrorCode, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.ValueReferenceErrorCode, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.UnresolvedValueUuid, opt => opt.DoNotValidate())
                 .ForMember(dest => dest.IsCollectionValue, opt => opt.MapFrom(src => src.IsCollectionValue))
                 .ForMember(dest => dest.ValuesUuids, opt => opt.Ignore())       // Сложная логика
                 .ForMember(dest => dest.VisibilityId, opt => opt.MapFrom(src => (int)src.Visibility))
@@ -57,7 +60,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                 .AfterMap((src, dest, ctx) =>
                 {
-                    dest.ValueTypeUuid = src.ValueType?.Uuid;
+                    dest.ValueTypeUuid = src.ValueTypeReferenceUuid;
 
                     if (dest.ValueTypeUuid != null)
                     {
@@ -65,19 +68,13 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         {
                             dest.ValuesUuids = null;
 
-                            if (src.Value != null)
-                            {
-                                dest.ValueUuid = src.Value.Uuid;
-                            }
+                            dest.ValueUuid = src.ValueReferenceUuid;
                         }
                         else
                         {
                             dest.ValueUuid = null;
 
-                            if (src.Values != null)
-                            {
-                                dest.ValuesUuids = src.Values.Select(x => x.Uuid).ToArray();
-                            }
+                            dest.ValuesUuids = src.ValuesReferenceUuids.ToArray();
                         }
                     }
                 });
@@ -137,36 +134,51 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                     {
                         TreeNodeModel? valueType = null;
                         valueTypesByUuid?.TryGetValue(src.ValueTypeUuid.Value, out valueType);
-                        dest.ValueType = valueType;
+                        dest.LoadValueType(valueType, src.ValueTypeUuid);
+                    }
+                    else
+                    {
+                        dest.LoadValueType(null, null);
                     }
 
                     // Value или Values
                     if (src.IsCollectionValue == false)
                     {
-                        dest.ClearValuesCollection();
+                        dest.LoadValues(Array.Empty<TreeLeaveModel>(), Array.Empty<Guid>());
 
                         if (src.ValueUuid != null)
                         {
                             TreeLeaveModel? value = null;
                             valuesByUuid?.TryGetValue(src.ValueUuid.Value, out value);
-                            dest.Value = value;
+                            dest.LoadValue(value, src.ValueUuid);
+                        }
+                        else
+                        {
+                            dest.LoadValue(null, null);
                         }
                     }
                     else
                     {
-                        dest.Value = null;
+                        dest.LoadValue(null, null);
 
-                        dest.ClearValuesCollection();
+                        var values = new List<TreeLeaveModel>();
+                        var unresolvedValuesUuids = new List<Guid>();
                         if (src.ValuesUuids != null)
                         {
                             foreach (var valueUuid in src.ValuesUuids)
                             {
                                 if (valuesByUuid != null && valuesByUuid.TryGetValue(valueUuid, out var value))
                                 {
-                                    dest.TryAddValueToValuesCollection(value);
+                                    values.Add(value);
+                                }
+                                else
+                                {
+                                    unresolvedValuesUuids.Add(valueUuid);
                                 }
                             }
                         }
+
+                        dest.LoadValues(values, unresolvedValuesUuids);
                     }
 
                     dest.LoadValueFormula(src.ValueFormula);

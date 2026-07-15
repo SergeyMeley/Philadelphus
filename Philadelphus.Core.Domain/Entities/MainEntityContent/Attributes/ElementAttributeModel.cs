@@ -36,10 +36,13 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private readonly bool _isOwn;
         private bool _isCollectionValue = false;
         private TreeNodeModel _valueType;
+        private Guid? _unresolvedValueTypeUuid;
         private TreeLeaveModel _value;
+        private Guid? _unresolvedValueUuid;
         private string _valueFormula = string.Empty;
         private string _valueFormulaErrorCode = string.Empty;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
+        private List<Guid> _unresolvedValuesUuids = new List<Guid>();
         private bool _isValueOverridden;    // Признак того, что одиночное значение унаследованного атрибута было переопределено локально.
         private bool _areValuesOverridden;  // Признак того, что коллекция значений унаследованного атрибута была переопределена локально.
         private VisibilityScope _visibility;
@@ -58,8 +61,23 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         public TreeNodeModel ValueType
         {
             get => GetValue(_valueType);
-            set => SetValue(ref _valueType, value);
+            set
+            {
+                SetValue(ref _valueType, value);
+
+                if (ReferenceEquals(_valueType, value))
+                {
+                    _unresolvedValueTypeUuid = null;
+                }
+            }
         }
+
+        /// <summary>
+        /// Код ошибки привязки типа данных.
+        /// </summary>
+        public string ValueTypeReferenceErrorCode => _unresolvedValueTypeUuid.HasValue
+            ? AttributeReferenceErrorCodes.ValueTypeNotFound
+            : string.Empty;
 
         /// <summary>
         /// Коллекция типов данных (узлы дерева репозитория Чубушника)
@@ -98,6 +116,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 var alreadyLocalValue = SameValue(value, _value);
                 var valueChanged = SetValue(ref _value, value);
 
+                if (ReferenceEquals(_value, value))
+                {
+                    _unresolvedValueUuid = null;
+                }
+
                 if (_isOwn == false
                     && (valueChanged || alreadyLocalValue))
                 {
@@ -120,6 +143,12 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 var alreadyLocalFormula = string.Equals(value, _valueFormula, StringComparison.Ordinal);
                 var formulaChanged = SetValue(ref _valueFormula, value);
 
+                if (string.IsNullOrWhiteSpace(value) == false
+                    && string.Equals(_valueFormula, value, StringComparison.Ordinal))
+                {
+                    _unresolvedValueUuid = null;
+                }
+
                 if (_isOwn == false
                     && (formulaChanged || alreadyLocalFormula))
                 {
@@ -136,6 +165,22 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             get => GetValue(GetEffectiveValueFormulaErrorCode());
             set => SetValue(ref _valueFormulaErrorCode, value ?? string.Empty);
         }
+
+        /// <summary>
+        /// Код ошибки привязки значения атрибута.
+        /// </summary>
+        public string ValueReferenceErrorCode => _isCollectionValue
+            ? _unresolvedValuesUuids.Count > 0
+                ? AttributeReferenceErrorCodes.ValueNotFound
+                : string.Empty
+            : _unresolvedValueUuid.HasValue
+                ? AttributeReferenceErrorCodes.ValueNotFound
+                : string.Empty;
+
+        /// <summary>
+        /// Идентификатор отсутствующего одиночного значения.
+        /// </summary>
+        public Guid? UnresolvedValueUuid => _unresolvedValueUuid;
 
         /// <summary>
         /// Значения (листы выбранного узла дерева репозитория Чубушника)
@@ -489,6 +534,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (_values == null)
                 return false;
             _values?.Clear();
+            _unresolvedValuesUuids.Clear();
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
@@ -516,11 +562,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _name = this._name,
                 _description = this._description,
                 _valueType = this._valueType,
+                _unresolvedValueTypeUuid = this._unresolvedValueTypeUuid,
                 _isCollectionValue = this._isCollectionValue,
                 _value = this._value,
+                _unresolvedValueUuid = this._unresolvedValueUuid,
                 _valueFormula = this._valueFormula,
                 _valueFormulaErrorCode = this._valueFormulaErrorCode,
                 _values = new List<TreeLeaveModel>(this._values),
+                _unresolvedValuesUuids = new List<Guid>(this._unresolvedValuesUuids),
                 _visibility = this._visibility,
                 _inheritedAttributeFromParent = this,
             };
@@ -557,6 +606,53 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                     StringComparison.Ordinal) == false;
             }
         }
+
+        /// <summary>
+        /// Загрузить тип данных и сохранить исходную ссылку, если тип не найден.
+        /// </summary>
+        internal void LoadValueType(TreeNodeModel? valueType, Guid? valueTypeUuid)
+        {
+            _valueType = valueType!;
+            _unresolvedValueTypeUuid = valueType == null ? valueTypeUuid : null;
+        }
+
+        /// <summary>
+        /// Загрузить одиночное значение и сохранить исходную ссылку, если значение не найдено.
+        /// </summary>
+        internal void LoadValue(TreeLeaveModel? value, Guid? valueUuid)
+        {
+            _value = value!;
+            _unresolvedValueUuid = value == null ? valueUuid : null;
+        }
+
+        /// <summary>
+        /// Загрузить коллекцию значений и сохранить ссылки на отсутствующие значения.
+        /// </summary>
+        internal void LoadValues(
+            IEnumerable<TreeLeaveModel> values,
+            IEnumerable<Guid> unresolvedValuesUuids)
+        {
+            _values = new List<TreeLeaveModel>(values);
+            _unresolvedValuesUuids = new List<Guid>(unresolvedValuesUuids);
+        }
+
+        /// <summary>
+        /// Получить ссылку на тип данных, включая отсутствующий тип.
+        /// </summary>
+        internal Guid? ValueTypeReferenceUuid => _valueType?.Uuid ?? _unresolvedValueTypeUuid;
+
+        /// <summary>
+        /// Получить ссылку на одиночное значение, включая отсутствующее значение.
+        /// </summary>
+        internal Guid? ValueReferenceUuid => _value?.Uuid ?? _unresolvedValueUuid;
+
+        /// <summary>
+        /// Получить ссылки на значения коллекции, включая отсутствующие значения.
+        /// </summary>
+        internal IReadOnlyList<Guid> ValuesReferenceUuids => _values
+            .Select(x => x.Uuid)
+            .Concat(_unresolvedValuesUuids)
+            .ToArray();
 
         protected override bool AddContentDetailed(IContentModel content)
         {
