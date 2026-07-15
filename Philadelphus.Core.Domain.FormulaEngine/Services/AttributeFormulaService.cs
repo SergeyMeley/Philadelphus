@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -159,18 +160,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
         /// <returns><see langword="true" />, если ссылка найдена; иначе <see langword="false" />.</returns>
         public bool FormulaReferencesAttribute(string formula, ElementAttributeModel attribute)
         {
-            return formula.Contains(CreateRelativeAttributeReference(attribute), StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Создает относительную формульную ссылку на атрибут по его наименованию.
-        /// </summary>
-        /// <param name="attribute">Атрибут, для которого создается ссылка.</param>
-        /// <returns>Выражение вида <c>АТРИБУТ("Наименование")</c>.</returns>
-        public string CreateRelativeAttributeReference(ElementAttributeModel attribute)
-        {
-            var escapedName = (attribute.Name ?? string.Empty).Replace("\"", "\"\"", StringComparison.Ordinal);
-            return $"АТРИБУТ(\"{escapedName}\")";
+            var reference = FormulaReferenceFormatter.CreateRelativeAttributeReference(attribute.Name);
+            return formula.Contains(reference, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryApplyFormulaResult(ElementAttributeModel targetAttribute, FormulaResult result, string formulaText)

@@ -49,10 +49,5 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
         /// Признак того, что формула ссылается на указанный атрибут (через <c>АТРИБУТ("имя")</c>).
         /// </summary>
         bool FormulaReferencesAttribute(string formula, ElementAttributeModel attribute);
-
-        /// <summary>
-        /// Относительная ссылка на атрибут для подстановки в формулу: <c>АТРИБУТ("имя")</c>.
-        /// </summary>
-        string CreateRelativeAttributeReference(ElementAttributeModel attribute);
     }
 }

@@ -1206,7 +1206,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 return true;
             }
 
-            var reference = _attributeFormulaService.CreateRelativeAttributeReference(referencedAttribute);
+            var reference = FormulaReferenceFormatter.CreateRelativeAttributeReference(referencedAttribute.Name);
             var text = FormulaBarText ?? string.Empty;
             if (text.TrimStart().StartsWith("=", StringComparison.Ordinal) == false)
             {

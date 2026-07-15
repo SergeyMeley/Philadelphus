@@ -21,4 +21,11 @@ public class FormulaReferenceFormatterTests
         FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(TreeLeaveUuid)
             .Should().Be($"=[{TreeLeaveUuid}]");
     }
+
+    [Fact]
+    public void CreateRelativeAttributeReference_EscapesQuotes()
+    {
+        FormulaReferenceFormatter.CreateRelativeAttributeReference("Цвет \"основной\"")
+            .Should().Be("АТРИБУТ(\"Цвет \"\"основной\"\"\")");
+    }
 }
