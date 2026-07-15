@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Editing;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.Services;
@@ -901,7 +902,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 return RecalculateFormulaAttribute(
                     targetAttribute,
-                    AttributeValueText.CreateTreeLeaveReferenceFormula(referencedValue.Uuid),
+                    FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(referencedValue.Uuid),
                     new HashSet<Guid>(),
                     new HashSet<Guid>());
             }
@@ -916,7 +917,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 var generatedValue = targetAttribute.Value;
                 return RecalculateFormulaAttribute(
                     targetAttribute,
-                    AttributeValueText.CreateTreeLeaveReferenceFormula(generatedValue.Uuid),
+                    FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(generatedValue.Uuid),
                     new HashSet<Guid>(),
                     new HashSet<Guid>());
             }
@@ -933,7 +934,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             return RecalculateFormulaAttribute(
                 targetAttribute,
-                AttributeValueText.CreateTreeLeaveReferenceFormula(value.Uuid),
+                FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(value.Uuid),
                 new HashSet<Guid>(),
                 new HashSet<Guid>());
         }
@@ -1900,7 +1901,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             return attribute.Value?.Uuid == null
                 ? string.Empty
-                : $"=[{attribute.Value.Uuid}]";
+                : FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);
         }
 
         private static bool TryGetLeafUuidReference(string text, out Guid uuid)

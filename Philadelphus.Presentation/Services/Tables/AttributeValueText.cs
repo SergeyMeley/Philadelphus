@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 
 namespace Philadelphus.Presentation.Services.Tables
 {
@@ -47,7 +48,7 @@ namespace Philadelphus.Presentation.Services.Tables
 
             return attribute.Value?.Uuid == null
                 ? string.Empty
-                : CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);
+                : FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);
         }
 
         /// <summary>
@@ -117,16 +118,10 @@ namespace Philadelphus.Presentation.Services.Tables
             ArgumentNullException.ThrowIfNull(attribute);
             ArgumentNullException.ThrowIfNull(value);
 
-            attribute.ValueFormula = CreateTreeLeaveReferenceFormula(value.Uuid);
+            attribute.ValueFormula = FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(value.Uuid);
             attribute.ValueFormulaErrorCode = string.Empty;
             attribute.Value = value;
         }
-
-        /// <summary>
-        /// Сформировать formula-only представление прямой ссылки на лист.
-        /// </summary>
-        internal static string CreateTreeLeaveReferenceFormula(Guid valueUuid) 
-            => $"=[{valueUuid}]";
 
         private static void ClearValue(ElementAttributeModel attribute)
         {
