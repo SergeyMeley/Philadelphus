@@ -8,12 +8,12 @@ namespace Philadelphus.Tests.Presentation.Converters.Logic
     public class StateToColorLogicTests
     {
         [Theory]
-        [InlineData(State.Initialized, ConverterColor.DeepPink)]
-        [InlineData(State.Changed, ConverterColor.Cyan)]
-        [InlineData(State.SavedOrLoaded, ConverterColor.YellowGreen)]
-        [InlineData(State.ForSoftDelete, ConverterColor.OrangeRed)]
-        [InlineData(State.ForHardDelete, ConverterColor.Red)]
-        [InlineData(State.SoftDeleted, ConverterColor.IndianRed)]
+        [InlineData(State.Initialized, ConverterColor.StateInitialized)]
+        [InlineData(State.Changed, ConverterColor.StateChanged)]
+        [InlineData(State.SavedOrLoaded, ConverterColor.StateSavedOrLoaded)]
+        [InlineData(State.ForSoftDelete, ConverterColor.StateForSoftDelete)]
+        [InlineData(State.ForHardDelete, ConverterColor.StateForHardDelete)]
+        [InlineData(State.SoftDeleted, ConverterColor.StateSoftDeleted)]
         public void ResolveColor_Maps_State(State state, ConverterColor expected)
             => StateToColorLogic.ResolveColor(state).Should().Be(expected);
 

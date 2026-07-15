@@ -3,7 +3,9 @@
              xmlns:controls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Controls.StateVisibilityStripe"
              ToolTip.Tip="{Binding StateVisibilityToolTip, RelativeSource={RelativeSource Self}}">
-    <Grid RowDefinitions="*,*,*">
+    <Grid RowDefinitions="*,*,*"
+          RowSpacing="1"
+          Background="{DynamicResource SystemRegionBrush}">
         <Rectangle Grid.Row="0"
                    Fill="{Binding ParentOwnerState, RelativeSource={RelativeSource AncestorType=controls:StateVisibilityStripe}, Converter={StaticResource stateToColorConverter}}" />
         <Rectangle Grid.Row="1"

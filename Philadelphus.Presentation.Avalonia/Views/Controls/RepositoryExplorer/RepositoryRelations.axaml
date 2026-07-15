@@ -26,10 +26,14 @@
                 <TreeDataTemplate DataType="other:RepositoryRelationVM" ItemsSource="{Binding Children}">
                     <Grid Margin="1"
                           HorizontalAlignment="Stretch"
-                          ColumnDefinitions="4,*,Auto"
+                          ColumnDefinitions="7,*,Auto"
                           RowDefinitions="*,Auto"
                           ToolTip.Tip="{Binding StateVisibilityToolTip}">
-                        <Grid Grid.RowSpan="2" Grid.Column="0" RowDefinitions="*,*,*">
+                        <Grid Grid.RowSpan="2"
+                              Grid.Column="0"
+                              RowDefinitions="*,*,*"
+                              RowSpacing="1"
+                              Background="{DynamicResource SystemRegionBrush}">
                             <Rectangle Grid.Row="0"
                                        Fill="{Binding ParentOwnerAggregateState, Converter={StaticResource stateToColorConverter}}" />
                             <Rectangle Grid.Row="1"

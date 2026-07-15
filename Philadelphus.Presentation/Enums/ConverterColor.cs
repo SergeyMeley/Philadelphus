@@ -15,6 +15,12 @@
         OrangeRed,
         DeepPink,
         Cyan,
-        YellowGreen
+        YellowGreen,
+        StateInitialized,
+        StateChanged,
+        StateSavedOrLoaded,
+        StateForSoftDelete,
+        StateForHardDelete,
+        StateSoftDeleted
     }
 }
