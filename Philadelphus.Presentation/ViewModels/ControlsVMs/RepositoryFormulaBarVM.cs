@@ -897,7 +897,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private bool TryApplyPlainFormulaBarText(ElementAttributeModel targetAttribute, string text)
         {
             var trimmedText = text.Trim();
-            if (TryGetLeafUuidReference(trimmedText, out var valueUuid)
+            if (FormulaReferenceParser.TryParseTreeLeaveReference(trimmedText, out var valueUuid)
                 && targetAttribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
             {
                 return RecalculateFormulaAttribute(
@@ -1902,16 +1902,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             return attribute.Value?.Uuid == null
                 ? string.Empty
                 : FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);
-        }
-
-        private static bool TryGetLeafUuidReference(string text, out Guid uuid)
-        {
-            uuid = Guid.Empty;
-
-            return text.Length == 38
-                && text.StartsWith("[", StringComparison.Ordinal)
-                && text.EndsWith("]", StringComparison.Ordinal)
-                && Guid.TryParse(text[1..^1], out uuid);
         }
 
         private sealed record FormulaBarTarget(

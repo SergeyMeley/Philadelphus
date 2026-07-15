@@ -78,7 +78,7 @@ namespace Philadelphus.Presentation.Services.Tables
                 return;
             }
 
-            if (TryGetLeafUuidReference(trimmedValue, out var valueUuid)
+            if (FormulaReferenceParser.TryParseTreeLeaveReference(trimmedValue, out var valueUuid)
                 && attribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
             {
                 AssignValueAsFormula(attribute, referencedValue);
@@ -130,14 +130,5 @@ namespace Philadelphus.Presentation.Services.Tables
             attribute.Value = null!;
         }
 
-        private static bool TryGetLeafUuidReference(string text, out Guid uuid)
-        {
-            uuid = Guid.Empty;
-
-            return text.Length == 38
-                && text.StartsWith("[", StringComparison.Ordinal)
-                && text.EndsWith("]", StringComparison.Ordinal)
-                && Guid.TryParse(text[1..^1], out uuid);
-        }
     }
 }
