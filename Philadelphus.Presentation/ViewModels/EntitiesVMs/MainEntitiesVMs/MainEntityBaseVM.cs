@@ -153,7 +153,14 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 }
             }
         }
-        public ObservableCollection<ElementAttributeVM> AttributesVMs => _attributesVMs;
+        public ObservableCollection<ElementAttributeVM> AttributesVMs
+        {
+            get
+            {
+                SynchronizeAttributesVMs();
+                return _attributesVMs;
+            }
+        }
 
         /// <summary>
         /// Выбранная модель представления атрибута.
@@ -197,18 +204,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
             _storageVM = dataStoragesCollectionVM?.DataStoragesVMs?.SingleOrDefault(x => x.Uuid == _model.DataStorage.Uuid) ?? throw new NullReferenceException();
 
-            if (_model is IShrubMemberModel shrubMember)
-            {
-                foreach (var attribute in shrubMember.Attributes)
-                {
-                    _attributesVMs.Add(new ElementAttributeVM(
-                        attribute,
-                        _dataStoragesCollectionVM,
-                        _service,
-                        fileDialogService: _fileDialogService,
-                        notificationService: _notificationService));
-                }
-            }
+            SynchronizeAttributesVMs();
         }
        
         /// <summary>
@@ -224,14 +220,65 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
                 if (attribute != null)
                 {
                     attributeOwnerModel.AddAttribute(attribute);
-                    var attributeVM = new ElementAttributeVM(attribute, _dataStoragesCollectionVM, _service, fileDialogService: _fileDialogService, notificationService: _notificationService);
-                    AttributesVMs.Add(attributeVM);
+                    SynchronizeAttributesVMs();
+                    var attributeVM = _attributesVMs.Single(x => x.Uuid == attribute.Uuid);
                     OnPropertyChanged(nameof(AttributesVMs));
                     NotifyStateVisibilityPropertiesChanged();
                     return attributeVM;
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Синхронизирует стабильную UI-коллекцию атрибутов с актуальным доменным списком.
+        /// Существующие модели представления сохраняются, чтобы не сбрасывать выделение и состояние редакторов.
+        /// </summary>
+        private void SynchronizeAttributesVMs()
+        {
+            if (_model is not IShrubMemberModel shrubMember)
+            {
+                return;
+            }
+
+            var attributes = shrubMember.Attributes;
+            var actualUuids = attributes.Select(x => x.Uuid).ToHashSet();
+
+            for (var index = _attributesVMs.Count - 1; index >= 0; index--)
+            {
+                if (actualUuids.Contains(_attributesVMs[index].Uuid) == false)
+                {
+                    _attributesVMs.RemoveAt(index);
+                }
+            }
+
+            for (var targetIndex = 0; targetIndex < attributes.Count; targetIndex++)
+            {
+                var attribute = attributes[targetIndex];
+                var currentIndex = -1;
+                for (var index = 0; index < _attributesVMs.Count; index++)
+                {
+                    if (_attributesVMs[index].Uuid == attribute.Uuid)
+                    {
+                        currentIndex = index;
+                        break;
+                    }
+                }
+
+                if (currentIndex < 0)
+                {
+                    _attributesVMs.Insert(targetIndex, new ElementAttributeVM(
+                        attribute,
+                        _dataStoragesCollectionVM,
+                        _service,
+                        fileDialogService: _fileDialogService,
+                        notificationService: _notificationService));
+                }
+                else if (currentIndex != targetIndex)
+                {
+                    _attributesVMs.Move(currentIndex, targetIndex);
+                }
+            }
         }
 
         protected void NotifyStateVisibilityPropertiesChanged()
