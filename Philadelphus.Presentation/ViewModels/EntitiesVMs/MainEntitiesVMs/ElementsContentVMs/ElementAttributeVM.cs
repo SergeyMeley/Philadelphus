@@ -142,10 +142,8 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 : AssignedValue?.Name ?? string.Empty;
             set
             {
-                if (_model.TrySetSystemBaseValueFromString(value))
+                if (_model.TrySetSystemBaseValueAsFormula(value))
                 {
-                    _model.ValueFormula = string.Empty;
-                    _model.ValueFormulaErrorCode = string.Empty;
                     NotifyStateVisibilityPropertiesChanged();
                     OnPropertyChanged(nameof(AssignedValue));
                     OnPropertyChanged(nameof(AssignedValueText));

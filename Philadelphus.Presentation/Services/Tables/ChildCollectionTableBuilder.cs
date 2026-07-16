@@ -731,7 +731,7 @@ namespace Philadelphus.Presentation.Services.Tables
             return value =>
             {
                 if (value is string stringValue
-                    && attribute.TrySetSystemBaseValueFromString(stringValue))
+                    && attribute.TrySetSystemBaseValueAsFormula(stringValue))
                 {
                     return attribute.Value;
                 }
@@ -741,7 +741,7 @@ namespace Philadelphus.Presentation.Services.Tables
                     return attribute.Value;
                 }
 
-                attribute.Value = treeLeave;
+                attribute.AssignValueAsFormula(treeLeave);
                 return attribute.Value;
             };
         }

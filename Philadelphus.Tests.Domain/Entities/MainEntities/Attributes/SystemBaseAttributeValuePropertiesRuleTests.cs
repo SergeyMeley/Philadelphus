@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Policies.Attributes.Rules;
@@ -279,6 +280,23 @@ public class SystemBaseAttributeValuePropertiesRuleTests
             .Count(x => x.StringValue == "42")
             .Should().Be(1);
         notificationService.Messages.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void TrySetSystemBaseValueAsFormula_AssignsCreatedLeaveThroughFormula()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = CreateTreeWithRoot(notificationService, out var root);
+        var attribute = CreateAttribute(tree, notificationService);
+        var integerNode = CreateSystemNode(SystemBaseType.INTEGER, tree, root, notificationService);
+        attribute.ValueType = integerNode;
+
+        var result = attribute.TrySetSystemBaseValueAsFormula("42");
+
+        result.Should().BeTrue();
+        attribute.Value.Should().BeOfType<SystemBaseTreeLeaveModel>();
+        attribute.ValueFormula.Should().Be($"=[{attribute.Value.Uuid}]");
+        attribute.ValueFormulaErrorCode.Should().BeEmpty();
     }
 
     [Theory]

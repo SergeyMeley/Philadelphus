@@ -24,6 +24,31 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
         }
 
         /// <summary>
+        /// Пытается назначить строковое значение системного базового типа через формулу-ссылку.
+        /// </summary>
+        public static bool TrySetSystemBaseValueAsFormula(
+            this ElementAttributeModel attribute,
+            string? value)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            if (attribute.TrySetSystemBaseValueFromString(value) == false)
+            {
+                return false;
+            }
+
+            // TrySet уже присвоил Value и выставил признак переопределения. Но очистка формулы
+            // у УНАСЛЕДОВАННОГО атрибута сбрасывает _isValueOverridden (сеттер ValueFormula
+            // сравнивает с формулой родителя: "" == "" → переопределение снимается), и эффективное
+            // значение откатывалось к унаследованному — значение «обнулялось». Поэтому очищаем
+            // формулу и ПЕРЕ-присваиваем значение последним действием, чтобы вернуть признак
+            // переопределения (как в AssignValue, где значение ставится ПОСЛЕ очистки формулы).
+            var assignedValue = attribute.Value;
+            attribute.AssignValueAsFormula(assignedValue);
+            return true;
+        }
+
+        /// <summary>
         /// Очищает формулу, ошибку её вычисления и материализованное значение атрибута.
         /// </summary>
         public static void ClearFormulaValue(this ElementAttributeModel attribute)
@@ -69,17 +94,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
                 return;
             }
 
-            if (attribute.TrySetSystemBaseValueFromString(trimmedValue))
-            {
-                // TrySet уже присвоил Value и выставил признак переопределения. Но очистка формулы
-                // ниже у УНАСЛЕДОВАННОГО атрибута сбрасывает _isValueOverridden (сеттер ValueFormula
-                // сравнивает с формулой родителя: "" == "" → переопределение снимается), и эффективное
-                // значение откатывалось к унаследованному — значение «обнулялось». Поэтому очищаем
-                // формулу и ПЕРЕ-присваиваем значение последним действием, чтобы вернуть признак
-                // переопределения (как в AssignValue, где значение ставится ПОСЛЕ очистки формулы).
-                var assignedValue = attribute.Value;
-                attribute.AssignValueAsFormula(assignedValue);
-            }
+            attribute.TrySetSystemBaseValueAsFormula(trimmedValue);
         }
 
         /// <summary>
