@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.Services;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
@@ -19,6 +20,33 @@ namespace Philadelphus.Tests.Domain.FormulaEngine;
 
 public class AttributeFormulaServiceTests
 {
+    [Fact]
+    public void AssignValueAsFormula_SetsFormulaAndMaterializedValue()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.ValueFormulaErrorCode = "#ERROR!";
+
+        fixture.Attribute.AssignValueAsFormula(fixture.Value);
+
+        fixture.Attribute.ValueFormula.Should().Be($"=[{fixture.Value.Uuid}]");
+        fixture.Attribute.ValueFormulaErrorCode.Should().BeEmpty();
+        fixture.Attribute.Value.Should().BeSameAs(fixture.Value);
+    }
+
+    [Fact]
+    public void ClearFormulaValue_ClearsFormulaErrorAndMaterializedValue()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.AssignValueAsFormula(fixture.Value);
+        fixture.Attribute.ValueFormulaErrorCode = "#ERROR!";
+
+        fixture.Attribute.ClearFormulaValue();
+
+        fixture.Attribute.ValueFormula.Should().BeEmpty();
+        fixture.Attribute.ValueFormulaErrorCode.Should().BeEmpty();
+        fixture.Attribute.Value.Should().BeNull();
+    }
+
     [Fact]
     public void RecalculateAttribute_MaterializesValueFromFormulaReference()
     {

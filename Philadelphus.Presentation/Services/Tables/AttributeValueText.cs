@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 
 namespace Philadelphus.Presentation.Services.Tables
@@ -66,7 +67,7 @@ namespace Philadelphus.Presentation.Services.Tables
 
             if (string.IsNullOrWhiteSpace(value))
             {
-                ClearValue(attribute);
+                attribute.ClearFormulaValue();
                 return;
             }
 
@@ -81,7 +82,7 @@ namespace Philadelphus.Presentation.Services.Tables
             if (FormulaReferenceParser.TryParseTreeLeaveReference(trimmedValue, out var valueUuid)
                 && attribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
             {
-                AssignValueAsFormula(attribute, referencedValue);
+                attribute.AssignValueAsFormula(referencedValue);
                 return;
             }
 
@@ -94,7 +95,7 @@ namespace Philadelphus.Presentation.Services.Tables
                 // формулу и ПЕРЕ-присваиваем значение последним действием, чтобы вернуть признак
                 // переопределения (как в AssignValue, где значение ставится ПОСЛЕ очистки формулы).
                 var assignedValue = attribute.Value;
-                AssignValueAsFormula(attribute, assignedValue);
+                attribute.AssignValueAsFormula(assignedValue);
             }
         }
 
@@ -107,27 +108,6 @@ namespace Philadelphus.Presentation.Services.Tables
             return attribute.Value is SystemBaseTreeLeaveModel systemBaseValue
                 ? systemBaseValue.StringValue
                 : attribute.Value?.Name ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Назначить выбранный лист через формулу-ссылку. Value заполняется только как материализованный
-        /// runtime-результат; при следующей загрузке он будет проигнорирован и вычислен заново.
-        /// </summary>
-        internal static void AssignValueAsFormula(ElementAttributeModel attribute, TreeLeaveModel value)
-        {
-            ArgumentNullException.ThrowIfNull(attribute);
-            ArgumentNullException.ThrowIfNull(value);
-
-            attribute.ValueFormula = FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(value.Uuid);
-            attribute.ValueFormulaErrorCode = string.Empty;
-            attribute.Value = value;
-        }
-
-        private static void ClearValue(ElementAttributeModel attribute)
-        {
-            attribute.ValueFormula = string.Empty;
-            attribute.ValueFormulaErrorCode = string.Empty;
-            attribute.Value = null!;
         }
 
     }

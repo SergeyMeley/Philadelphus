@@ -2,6 +2,7 @@
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
@@ -112,15 +113,13 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 {
                     if (value == null)
                     {
-                        _model.ValueFormula = string.Empty;
-                        _model.ValueFormulaErrorCode = string.Empty;
-                        _model.Value = null!;
+                        _model.ClearFormulaValue();
                     }
                     else
                     {
                         // Прямой выбор значения тоже хранится как формула-ссылка. Value здесь — только
                         // материализованный результат для UI и последующего сохранения отчетного ValueUuid.
-                        AttributeValueText.AssignValueAsFormula(_model, value);
+                        _model.AssignValueAsFormula(value);
                     }
                 }
                 NotifyStateVisibilityPropertiesChanged();
