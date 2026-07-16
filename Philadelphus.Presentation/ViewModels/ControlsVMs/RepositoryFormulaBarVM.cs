@@ -1197,7 +1197,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 return true;
             }
 
-            if (CanUseRelativeAttributeReference(_formulaBarTarget.TargetAttribute, referencedAttribute) == false)
+            if (FormulaReferenceRules.CanUseRelativeAttributeReference(
+                _formulaBarTarget.TargetAttribute,
+                referencedAttribute) == false)
             {
                 _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
                     "Относительная ссылка АТРИБУТ доступна только для атрибутов одного и того же элемента.",
@@ -1248,13 +1250,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private void RequestFormulaValueCellFocus()
         {
             FormulaValueCellFocusRequestId++;
-        }
-
-        private static bool CanUseRelativeAttributeReference(
-            ElementAttributeModel targetAttribute,
-            ElementAttributeModel referencedAttribute)
-        {
-            return targetAttribute.Owner?.Uuid == referencedAttribute.Owner?.Uuid;
         }
 
         private static bool TryFindAttributeReferenceAtCaret(

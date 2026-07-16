@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Extensions;
+using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
 using Philadelphus.Core.Domain.FormulaEngine.Services;
 using Philadelphus.Core.Domain.FormulaEngine.SystemFormulas;
@@ -20,6 +21,35 @@ namespace Philadelphus.Tests.Domain.FormulaEngine;
 
 public class AttributeFormulaServiceTests
 {
+    [Fact]
+    public void CanUseRelativeAttributeReference_SameOwner_ReturnsTrue()
+    {
+        var fixture = CreateFixture();
+        var owner = (IAttributeOwnerModel)fixture.Attribute.Owner;
+        var referencedUuid = Guid.CreateVersion7();
+        var referencedAttribute = new ElementAttributeModel(
+            referencedUuid,
+            owner,
+            referencedUuid,
+            owner,
+            fixture.Attribute.OwningWorkingTree,
+            new FakeNotificationService(),
+            new EmptyPropertiesPolicy<ElementAttributeModel>());
+
+        FormulaReferenceRules.CanUseRelativeAttributeReference(fixture.Attribute, referencedAttribute)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanUseRelativeAttributeReference_DifferentOwners_ReturnsFalse()
+    {
+        var targetAttribute = CreateFixture().Attribute;
+        var referencedAttribute = CreateFixture().Attribute;
+
+        FormulaReferenceRules.CanUseRelativeAttributeReference(targetAttribute, referencedAttribute)
+            .Should().BeFalse();
+    }
+
     [Fact]
     public void AssignValueAsFormula_SetsFormulaAndMaterializedValue()
     {
