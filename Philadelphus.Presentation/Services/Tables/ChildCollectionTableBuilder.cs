@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Services.StateVisibility;
@@ -785,7 +786,7 @@ namespace Philadelphus.Presentation.Services.Tables
                 return;
             }
 
-            AttributeValueText.SetFormulaText(attribute, value);
+            attribute.SetFormulaText(value);
         }
 
         private static ElementAttributeModel? GetAttribute(IChildrenModel child, string attributeName)

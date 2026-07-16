@@ -176,7 +176,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             get => AttributeValueText.GetFormulaText(_model);
             set
             {
-                AttributeValueText.SetFormulaText(_model, value);
+                _model.SetFormulaText(value);
                 NotifyStateVisibilityPropertiesChanged();
                 OnPropertyChanged(nameof(AssignedValue));
                 OnPropertyChanged(nameof(AssignedValueText));

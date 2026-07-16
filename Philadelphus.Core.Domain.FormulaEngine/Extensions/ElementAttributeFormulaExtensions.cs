@@ -34,5 +34,52 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
             attribute.ValueFormulaErrorCode = string.Empty;
             attribute.Value = null!;
         }
+
+        /// <summary>
+        /// Разбирает введённый в ячейку текст и присваивает значение/формулу модели.
+        /// Эквивалент сеттера <c>ElementAttributeVM.FormulaValueText</c>.
+        /// </summary>
+        public static void SetFormulaText(this ElementAttributeModel attribute, string? value)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            if (attribute.IsCollectionValue)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                attribute.ClearFormulaValue();
+                return;
+            }
+
+            var trimmedValue = value.Trim();
+            if (trimmedValue.StartsWith("=", StringComparison.Ordinal))
+            {
+                attribute.ValueFormula = trimmedValue;
+                attribute.ValueFormulaErrorCode = string.Empty;
+                return;
+            }
+
+            if (FormulaReferenceParser.TryParseTreeLeaveReference(trimmedValue, out var valueUuid)
+                && attribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
+            {
+                attribute.AssignValueAsFormula(referencedValue);
+                return;
+            }
+
+            if (attribute.TrySetSystemBaseValueFromString(trimmedValue))
+            {
+                // TrySet уже присвоил Value и выставил признак переопределения. Но очистка формулы
+                // ниже у УНАСЛЕДОВАННОГО атрибута сбрасывает _isValueOverridden (сеттер ValueFormula
+                // сравнивает с формулой родителя: "" == "" → переопределение снимается), и эффективное
+                // значение откатывалось к унаследованному — значение «обнулялось». Поэтому очищаем
+                // формулу и ПЕРЕ-присваиваем значение последним действием, чтобы вернуть признак
+                // переопределения (как в AssignValue, где значение ставится ПОСЛЕ очистки формулы).
+                var assignedValue = attribute.Value;
+                attribute.AssignValueAsFormula(assignedValue);
+            }
+        }
     }
 }

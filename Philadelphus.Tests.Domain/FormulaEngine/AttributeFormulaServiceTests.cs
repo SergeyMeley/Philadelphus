@@ -22,6 +22,29 @@ namespace Philadelphus.Tests.Domain.FormulaEngine;
 public class AttributeFormulaServiceTests
 {
     [Fact]
+    public void SetFormulaText_Formula_SetsTrimmedFormulaAndClearsError()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.ValueFormulaErrorCode = "#ERROR!";
+
+        fixture.Attribute.SetFormulaText("  =[019f6c74-6a97-7ea8-a24c-24f284b636c9]  ");
+
+        fixture.Attribute.ValueFormula.Should().Be("=[019f6c74-6a97-7ea8-a24c-24f284b636c9]");
+        fixture.Attribute.ValueFormulaErrorCode.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SetFormulaText_TreeLeaveReference_AssignsReferencedValue()
+    {
+        var fixture = CreateFixture();
+
+        fixture.Attribute.SetFormulaText($"[{fixture.Value.Uuid}]");
+
+        fixture.Attribute.ValueFormula.Should().Be($"=[{fixture.Value.Uuid}]");
+        fixture.Attribute.Value.Should().BeSameAs(fixture.Value);
+    }
+
+    [Fact]
     public void CanUseRelativeAttributeReference_SameOwner_ReturnsTrue()
     {
         var fixture = CreateFixture();
