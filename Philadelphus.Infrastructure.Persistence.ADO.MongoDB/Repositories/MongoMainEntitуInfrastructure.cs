@@ -184,6 +184,31 @@ namespace Philadelphus.Infrastructure.Persistence.ADO.MongoDB.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public long HardDeleteTrees(IEnumerable<WorkingTree> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long HardDeleteRoots(IEnumerable<TreeRoot> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long HardDeleteNodes(IEnumerable<TreeNode> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long HardDeleteLeaves(IEnumerable<TreeLeave> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long HardDeleteAttributes(IEnumerable<ElementAttribute> items)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
 
