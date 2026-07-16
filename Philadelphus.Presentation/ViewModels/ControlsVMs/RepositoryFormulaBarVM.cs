@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.FormulaEngine.Editing;
 using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 using Philadelphus.Core.Domain.FormulaEngine.Parsing;
 using Philadelphus.Core.Domain.FormulaEngine.Registry;
@@ -896,47 +897,24 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
         private bool TryApplyPlainFormulaBarText(ElementAttributeModel targetAttribute, string text)
         {
-            var trimmedText = text.Trim();
-            if (FormulaReferenceParser.TryParseTreeLeaveReference(trimmedText, out var valueUuid)
-                && targetAttribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
+            if (targetAttribute.TryCreateValueFormulaFromText(text, out var valueFormula))
             {
                 return RecalculateFormulaAttribute(
                     targetAttribute,
-                    FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(referencedValue.Uuid),
+                    valueFormula,
                     new HashSet<Guid>(),
                     new HashSet<Guid>());
             }
 
             if (targetAttribute.ValueType is SystemBaseTreeNodeModel)
             {
-                if (targetAttribute.TrySetSystemBaseValueFromString(text) == false)
-                {
-                    return false;
-                }
-
-                var generatedValue = targetAttribute.Value;
-                return RecalculateFormulaAttribute(
-                    targetAttribute,
-                    FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(generatedValue.Uuid),
-                    new HashSet<Guid>(),
-                    new HashSet<Guid>());
-            }
-
-            var value = targetAttribute.ValuesList?.FirstOrDefault(x =>
-                string.Equals(x.Name, text, StringComparison.Ordinal));
-            if (value == null)
-            {
-                _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
-                    $"Значение '{text}' не найдено среди допустимых значений атрибута '{targetAttribute.Name}'.",
-                    NotificationCriticalLevelModel.Warning);
                 return false;
             }
 
-            return RecalculateFormulaAttribute(
-                targetAttribute,
-                FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(value.Uuid),
-                new HashSet<Guid>(),
-                new HashSet<Guid>());
+            _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                $"Значение '{text}' не найдено среди допустимых значений атрибута '{targetAttribute.Name}'.",
+                NotificationCriticalLevelModel.Warning);
+            return false;
         }
 
         private FormulaExecutionContext CreateFormulaExecutionContext(ElementAttributeModel? targetAttribute = null)

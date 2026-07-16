@@ -81,5 +81,53 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
                 attribute.AssignValueAsFormula(assignedValue);
             }
         }
+
+        /// <summary>
+        /// Пытается преобразовать обычный текст значения в формулу-ссылку на допустимый лист атрибута.
+        /// </summary>
+        /// <param name="attribute">Атрибут, для которого разрешается значение.</param>
+        /// <param name="text">Ссылка <c>[uuid]</c>, строковое системное значение или имя листа.</param>
+        /// <param name="formula">Сформированная формула вида <c>=[uuid]</c>.</param>
+        /// <returns><see langword="true"/>, если значение найдено или создано; иначе <see langword="false"/>.</returns>
+        public static bool TryCreateValueFormulaFromText(
+            this ElementAttributeModel attribute,
+            string text,
+            out string formula)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+            ArgumentNullException.ThrowIfNull(text);
+
+            formula = string.Empty;
+            TreeLeaveModel? resolvedValue = null;
+            var trimmedText = text.Trim();
+
+            if (FormulaReferenceParser.TryParseTreeLeaveReference(trimmedText, out var valueUuid)
+                && attribute.ValuesList?.FirstOrDefault(x => x.Uuid == valueUuid) is TreeLeaveModel referencedValue)
+            {
+                resolvedValue = referencedValue;
+            }
+            else if (attribute.ValueType is SystemBaseTreeNodeModel)
+            {
+                if (attribute.TrySetSystemBaseValueFromString(text) == false)
+                {
+                    return false;
+                }
+
+                resolvedValue = attribute.Value;
+            }
+            else
+            {
+                resolvedValue = attribute.ValuesList?.FirstOrDefault(x =>
+                    string.Equals(x.Name, text, StringComparison.Ordinal));
+            }
+
+            if (resolvedValue == null)
+            {
+                return false;
+            }
+
+            formula = FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(resolvedValue.Uuid);
+            return true;
+        }
     }
 }

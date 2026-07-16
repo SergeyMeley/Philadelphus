@@ -22,6 +22,42 @@ namespace Philadelphus.Tests.Domain.FormulaEngine;
 public class AttributeFormulaServiceTests
 {
     [Fact]
+    public void TryCreateValueFormulaFromText_TreeLeaveReference_ReturnsFormula()
+    {
+        var fixture = CreateFixture();
+
+        var result = fixture.Attribute.TryCreateValueFormulaFromText(
+            $"  [{fixture.Value.Uuid}]  ",
+            out var formula);
+
+        result.Should().BeTrue();
+        formula.Should().Be($"=[{fixture.Value.Uuid}]");
+    }
+
+    [Fact]
+    public void TryCreateValueFormulaFromText_TreeLeaveName_ReturnsFormula()
+    {
+        var fixture = CreateFixture();
+        fixture.Value.Name = "Допустимое значение";
+
+        var result = fixture.Attribute.TryCreateValueFormulaFromText(fixture.Value.Name, out var formula);
+
+        result.Should().BeTrue();
+        formula.Should().Be($"=[{fixture.Value.Uuid}]");
+    }
+
+    [Fact]
+    public void TryCreateValueFormulaFromText_UnknownValue_ReturnsFalse()
+    {
+        var fixture = CreateFixture();
+
+        var result = fixture.Attribute.TryCreateValueFormulaFromText("Неизвестное значение", out var formula);
+
+        result.Should().BeFalse();
+        formula.Should().BeEmpty();
+    }
+
+    [Fact]
     public void SetFormulaText_Formula_SetsTrimmedFormulaAndClearsError()
     {
         var fixture = CreateFixture();
