@@ -1,8 +1,8 @@
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
-using Philadelphus.Core.Domain.Services.Models.LeavePolymorphism;
+using Philadelphus.Core.Domain.LeavePolymorphism.Models;
 
-namespace Philadelphus.Core.Domain.Services.Implementations;
+namespace Philadelphus.Core.Domain.LeavePolymorphism.Services;
 
 public sealed partial class LeavePolymorphismService
 {

@@ -5,7 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
-namespace Philadelphus.Core.Domain.Services.Implementations;
+namespace Philadelphus.Core.Domain.LeavePolymorphism.Services;
 
 /// <summary>
 /// Вычисляет полиморфного родителя по значениям эффективных атрибутов

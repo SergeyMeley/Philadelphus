@@ -1,6 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 
-namespace Philadelphus.Core.Domain.Services.Models.LeavePolymorphism;
+namespace Philadelphus.Core.Domain.LeavePolymorphism.Models;
 
 /// <summary>
 /// Хранит нормализованный снимок материализованного значения атрибута.

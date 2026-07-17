@@ -1,7 +1,7 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 
-namespace Philadelphus.Core.Domain.Services.Models.LeavePolymorphism;
+namespace Philadelphus.Core.Domain.LeavePolymorphism.Models;
 
 /// <summary>
 /// Описывает один предварительно проверенный уровень создаваемой цепочки.
