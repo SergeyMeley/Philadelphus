@@ -1,7 +1,9 @@
+using AutoMapper;
 using FluentAssertions;
 using Moq;
 
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -13,6 +15,7 @@ using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
+using Serilog;
 
 namespace Philadelphus.Tests.Domain.Services;
 
@@ -30,7 +33,7 @@ public class LeavePolymorphismServiceTests
         SetValue(graph.FirstChild, graph, graph.FirstValue);
         graph.SecondParent.AuditInfo.IsDeleted = true;
 
-        var result = CreateService().ResolveParent(graph.FirstChild);
+        var result = CreateService(graph).ResolveParent(graph.FirstChild);
 
         result.Status.Should().Be(LeavePolymorphismStatus.Resolved);
         result.ParentLeave.Should().BeSameAs(graph.FirstParent);
@@ -45,7 +48,7 @@ public class LeavePolymorphismServiceTests
         SetValue(graph.FirstParent, graph, graph.FirstValue);
         SetValue(graph.SecondParent, graph, graph.SecondValue);
         SetValue(graph.FirstChild, graph, graph.FirstValue);
-        var service = CreateService();
+        var service = CreateService(graph);
         service.ResolveParent(graph.FirstChild);
         SetValue(graph.SecondParent, graph, graph.FirstValue);
 
@@ -64,7 +67,7 @@ public class LeavePolymorphismServiceTests
         SetValue(graph.FirstParent, graph, graph.FirstValue);
         SetValue(graph.SecondParent, graph, graph.FirstValue);
         SetValue(graph.FirstChild, graph, graph.SecondValue);
-        var service = CreateService();
+        var service = CreateService(graph);
 
         service.ResolveParent(graph.FirstChild).Status
             .Should().Be(LeavePolymorphismStatus.NotFound);
@@ -82,7 +85,7 @@ public class LeavePolymorphismServiceTests
         SetValue(graph.FirstChild, graph, graph.FirstValue);
         SetValue(graph.SecondChild, graph, graph.SecondValue);
 
-        var results = CreateService().RefreshLinks([graph.FirstChild, graph.SecondChild]);
+        var results = CreateService(graph).RefreshLinks([graph.FirstChild, graph.SecondChild]);
 
         results.Select(x => x.Status).Should().OnlyContain(x =>
             x == LeavePolymorphismStatus.Resolved);
@@ -90,26 +93,101 @@ public class LeavePolymorphismServiceTests
         graph.SecondChild.PolymorphicParentLeave.Should().BeSameAs(graph.SecondParent);
     }
 
-    private static LeavePolymorphismService CreateService() =>
-        new(new LeaveAttributeValueService(Mock.Of<IPhiladelphusRepositoryService>()));
+    [Fact]
+    public void CreateParentChain_CreatesAndLinksEveryMissingLevel()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
 
-    private static TestGraph CreateGraph()
+        var created = CreateService(graph).CreateParentChain(graph.FirstChild);
+
+        created.Should().HaveCount(2);
+        created[0].ParentNode.Should().BeSameAs(graph.ParentNode);
+        created[1].ParentNode.Should().BeSameAs(graph.GrandParentNode);
+        created.Should().OnlyContain(x => x.State == State.Initialized);
+        graph.FirstChild.PolymorphicParentLeave.Should().BeSameAs(created[0]);
+        created[0].PolymorphicParentLeave.Should().BeSameAs(created[1]);
+        GetAttribute(created[0], graph).Value.Should().BeSameAs(graph.FirstValue);
+        GetAttribute(created[1], graph).Value.Should().BeSameAs(graph.FirstValue);
+    }
+
+    [Fact]
+    public void CreateParentChain_ReusesUniqueExistingAncestor()
+    {
+        var graph = CreateGraph();
+        var existingAncestor = CreateLeave(
+            graph.GrandParentNode, graph.Tree, graph.Notifications);
+        SetValue(existingAncestor, graph, graph.FirstValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+
+        var created = CreateService(graph).CreateParentChain(graph.FirstChild);
+
+        created.Should().ContainSingle();
+        graph.FirstChild.PolymorphicParentLeave.Should().BeSameAs(created.Single());
+        created.Single().PolymorphicParentLeave.Should().BeSameAs(existingAncestor);
+    }
+
+    [Fact]
+    public void CreateParentChain_DoesNotCreatePartialChainWhenUpperLevelIsAmbiguous()
+    {
+        var graph = CreateGraph();
+        var firstAncestor = CreateLeave(
+            graph.GrandParentNode, graph.Tree, graph.Notifications);
+        var secondAncestor = CreateLeave(
+            graph.GrandParentNode, graph.Tree, graph.Notifications);
+        SetValue(firstAncestor, graph, graph.FirstValue);
+        SetValue(secondAncestor, graph, graph.FirstValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var childLeavesBefore = graph.ParentNode.ChildLeaves.ToList();
+
+        var action = () => CreateService(graph).CreateParentChain(graph.FirstChild);
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Ambiguous*");
+        graph.ParentNode.ChildLeaves.Should().Equal(childLeavesBefore);
+        graph.FirstChild.PolymorphicParentLeave.Should().BeNull();
+    }
+
+    [Fact]
+    public void CreateParentChain_DoesNotCreateLeavesForInvalidValues()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        GetAttribute(graph.FirstChild, graph).ValueFormulaErrorCode = "FORMULA_ERROR";
+        var childLeavesBefore = graph.ParentNode.ChildLeaves.ToList();
+
+        var action = () => CreateService(graph).CreateParentChain(graph.FirstChild);
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Invalid*");
+        graph.ParentNode.ChildLeaves.Should().Equal(childLeavesBefore);
+    }
+
+    private static LeavePolymorphismService CreateService(LeavePolymorphismTestGraph graph)
+    {
+        var repositoryService = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(), Mock.Of<ILogger>(), graph.Notifications);
+        return new(new LeaveAttributeValueService(repositoryService));
+    }
+
+    private static LeavePolymorphismTestGraph CreateGraph()
     {
         var notifications = new FakeNotificationService();
         var tree = new FakeWorkingTreeModel();
         var root = new TreeRootModel(Guid.NewGuid(), tree, notifications,
             new EmptyPropertiesPolicy<TreeRootModel>());
-        var parentNode = CreateNode(root, tree, notifications);
+        var grandParentNode = CreateNode(root, tree, notifications);
+        var parentNode = CreateNode(grandParentNode, tree, notifications);
         var childNode = CreateNode(parentNode, tree, notifications);
         var valueType = CreateNode(root, tree, notifications);
         var declarationUuid = Guid.NewGuid();
-        _ = new ElementAttributeModel(declarationUuid, parentNode, declarationUuid,
-            parentNode, tree, notifications, new EmptyPropertiesPolicy<ElementAttributeModel>())
+        _ = new ElementAttributeModel(declarationUuid, grandParentNode, declarationUuid,
+            grandParentNode, tree, notifications, new EmptyPropertiesPolicy<ElementAttributeModel>())
         {
             ValueType = valueType
         };
 
-        return new(tree, declarationUuid,
+        return new(tree, notifications, grandParentNode, parentNode, childNode, declarationUuid,
             CreateLeave(parentNode, tree, notifications), CreateLeave(parentNode, tree, notifications),
             CreateLeave(childNode, tree, notifications), CreateLeave(childNode, tree, notifications),
             CreateLeave(valueType, tree, notifications), CreateLeave(valueType, tree, notifications));
@@ -123,14 +201,14 @@ public class LeavePolymorphismServiceTests
         FakeNotificationService notifications) =>
         new(Guid.NewGuid(), parent, tree, notifications, new EmptyPropertiesPolicy<TreeLeaveModel>());
 
-    private static ElementAttributeModel GetAttribute(TreeLeaveModel leave, TestGraph graph) =>
+    private static ElementAttributeModel GetAttribute(
+        TreeLeaveModel leave,
+        LeavePolymorphismTestGraph graph) =>
         leave.Attributes.Single(x => x.DeclaringUuid == graph.DeclarationUuid);
 
-    private static void SetValue(TreeLeaveModel leave, TestGraph graph, TreeLeaveModel value) =>
+    private static void SetValue(
+        TreeLeaveModel leave,
+        LeavePolymorphismTestGraph graph,
+        TreeLeaveModel value) =>
         GetAttribute(leave, graph).Value = value;
-
-    private sealed record TestGraph(WorkingTreeModel Tree, Guid DeclarationUuid,
-        TreeLeaveModel FirstParent, TreeLeaveModel SecondParent,
-        TreeLeaveModel FirstChild, TreeLeaveModel SecondChild,
-        TreeLeaveModel FirstValue, TreeLeaveModel SecondValue);
 }

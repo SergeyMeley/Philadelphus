@@ -16,6 +16,16 @@ public interface ILeavePolymorphismService
     LeavePolymorphismResolution ResolveParent(TreeLeaveModel childLeave);
 
     /// <summary>
+    /// Создаёт отсутствующие листья полиморфных родителей по всей цепочке узлов.
+    /// </summary>
+    /// <param name="childLeave">Лист, значения которого используются для создания родителей.</param>
+    /// <returns>Созданные листья в порядке от непосредственного родителя к верхнему.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Если хотя бы на одном уровне связь невалидна или неоднозначна.
+    /// </exception>
+    IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeLeaveModel childLeave);
+
+    /// <summary>
     /// Последовательно перестраивает runtime-связи переданных листов.
     /// </summary>
     /// <param name="leaves">Листы для восстановления связей.</param>

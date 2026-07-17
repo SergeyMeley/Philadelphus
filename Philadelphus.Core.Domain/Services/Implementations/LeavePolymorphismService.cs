@@ -1,6 +1,8 @@
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
 
 namespace Philadelphus.Core.Domain.Services.Implementations;
@@ -9,7 +11,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations;
 /// Вычисляет полиморфного родителя по значениям эффективных атрибутов
 /// прямого родительского узла.
 /// </summary>
-public sealed class LeavePolymorphismService : ILeavePolymorphismService
+public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
 {
     private readonly ILeaveAttributeValueService _attributeValueService;
 
@@ -34,15 +36,7 @@ public sealed class LeavePolymorphismService : ILeavePolymorphismService
         if (parentNode == null || IsDeleted(childLeave))
             return Complete(childLeave, LeavePolymorphismStatus.Invalid, []);
 
-        var declaringUuids = parentNode.Attributes
-            .Select(x => x.DeclaringUuid)
-            .ToHashSet();
-        var expectedAttributes = childLeave.Attributes
-            .Where(x => declaringUuids.Contains(x.DeclaringUuid));
-        var candidates = parentNode.ChildLeaves
-            .Where(x => IsDeleted(x) == false);
-
-        var matchResult = _attributeValueService.FindMatches(expectedAttributes, candidates);
+        var matchResult = FindParentCandidates(childLeave, parentNode);
         if (matchResult.IsValid == false)
             return Complete(childLeave, LeavePolymorphismStatus.Invalid, []);
 
@@ -92,4 +86,34 @@ public sealed class LeavePolymorphismService : ILeavePolymorphismService
     private static bool IsDeleted(TreeLeaveModel leave) =>
         leave.AuditInfo.IsDeleted
         || leave.State is State.ForSoftDelete or State.ForHardDelete or State.SoftDeleted;
+
+    /// <summary>
+    /// Ищет активные листья заданного родительского узла по его полному набору атрибутов.
+    /// </summary>
+    private LeaveAttributeMatchResult FindParentCandidates(
+        TreeLeaveModel sourceLeave,
+        TreeNodeModel parentNode)
+    {
+        var declaringUuids = parentNode.Attributes
+            .Select(x => x.DeclaringUuid)
+            .ToHashSet();
+        var expectedAttributes = GetExpectedParentAttributes(sourceLeave, declaringUuids);
+
+        if (expectedAttributes.Count != declaringUuids.Count)
+            return new(false, []);
+
+        return _attributeValueService.FindMatches(
+            expectedAttributes,
+            parentNode.ChildLeaves.Where(x => IsDeleted(x) == false));
+    }
+
+    /// <summary>
+    /// Выбирает из листа материализованные атрибуты указанного родительского уровня.
+    /// </summary>
+    private static IReadOnlyList<ElementAttributeModel> GetExpectedParentAttributes(
+        TreeLeaveModel sourceLeave,
+        IReadOnlySet<Guid> declaringUuids) =>
+        sourceLeave.Attributes
+            .Where(x => declaringUuids.Contains(x.DeclaringUuid))
+            .ToList();
 }
