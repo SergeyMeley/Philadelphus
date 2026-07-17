@@ -1,14 +1,20 @@
+using AutoMapper;
 using FluentAssertions;
+using Moq;
 
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.LeaveAttributeValues.Services;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Implementations;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
+using Serilog;
 
 namespace Philadelphus.Tests.Domain.LeaveAttributeValues;
 
@@ -33,7 +39,7 @@ public class LeaveAttributeValueServiceTests
         SetValue(expected, ignoredDeclaration, graph.FirstValue);
         SetValue(matching, ignoredDeclaration, graph.SecondValue);
 
-        var result = new LeaveAttributeValueService().FindMatches(
+        var result = CreateService().FindMatches(
             [GetAttribute(expected, comparedDeclaration)],
             [different, matching]);
 
@@ -52,7 +58,7 @@ public class LeaveAttributeValueServiceTests
         SetValue(candidate, declaration, graph.FirstValue);
         GetAttribute(candidate, declaration).ValueFormulaErrorCode = "FORMULA_ERROR";
 
-        var result = new LeaveAttributeValueService().FindMatches(
+        var result = CreateService().FindMatches(
             [GetAttribute(expected, declaration)],
             [candidate]);
 
@@ -72,7 +78,7 @@ public class LeaveAttributeValueServiceTests
         SetValue(target, replacedDeclaration, graph.FirstValue);
         SetValue(target, clearedDeclaration, graph.FirstValue);
 
-        var result = new LeaveAttributeValueService().FillFromLeave(
+        var result = CreateService().FillFromLeave(
             target, source, [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid]);
 
         var replaced = GetAttribute(target, replacedDeclaration);
@@ -99,7 +105,7 @@ public class LeaveAttributeValueServiceTests
         AddValues(target, unchangedDeclaration, graph.FirstValue, graph.SecondValue);
         AddValues(source, unchangedDeclaration, graph.SecondValue, graph.FirstValue);
 
-        var service = new LeaveAttributeValueService();
+        var service = CreateService();
         var result = service.FillFromLeave(target, source,
             [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid,
                 unchangedDeclaration.DeclaringUuid]);
@@ -113,6 +119,35 @@ public class LeaveAttributeValueServiceTests
                 [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid])
             .ChangedAttributes.Should().BeEmpty();
     }
+
+    [Fact]
+    public void CreateLeave_CreatesInitializedAutoNamedLeaveWithSourceValues()
+    {
+        var graph = CreateGraph();
+        var scalarDeclaration = CreateDeclaration(graph);
+        var collectionDeclaration = CreateDeclaration(graph, isCollection: true);
+        var source = CreateLeave(graph);
+        SetValue(source, scalarDeclaration, graph.FirstValue);
+        AddValues(source, collectionDeclaration, graph.FirstValue, graph.SecondValue);
+        var repositoryService = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(), Mock.Of<ILogger>(), graph.NotificationService);
+
+        var created = new LeaveAttributeValueService(repositoryService).CreateLeave(
+            graph.CandidateNode,
+            [GetAttribute(source, scalarDeclaration), GetAttribute(source, collectionDeclaration)]);
+
+        created.ParentNode.Should().BeSameAs(graph.CandidateNode);
+        created.Name.Should().NotBeNullOrWhiteSpace();
+        created.State.Should().Be(State.Initialized);
+        GetAttribute(created, scalarDeclaration).Value.Should().BeSameAs(graph.FirstValue);
+        GetAttribute(created, scalarDeclaration).ValueFormula
+            .Should().Be($"=[{graph.FirstValue.Uuid}]");
+        GetAttribute(created, collectionDeclaration).Values
+            .Should().Equal(graph.FirstValue, graph.SecondValue);
+    }
+
+    private static LeaveAttributeValueService CreateService() =>
+        new(Mock.Of<IPhiladelphusRepositoryService>());
 
     private static ElementAttributeModel CreateDeclaration(
         TestGraph graph,

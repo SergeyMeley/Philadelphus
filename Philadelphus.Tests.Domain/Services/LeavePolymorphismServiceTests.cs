@@ -1,6 +1,6 @@
 using FluentAssertions;
+using Moq;
 
-using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
@@ -91,7 +91,7 @@ public class LeavePolymorphismServiceTests
     }
 
     private static LeavePolymorphismService CreateService() =>
-        new(new MatchOnlyAttributeValueService());
+        new(new LeaveAttributeValueService(Mock.Of<IPhiladelphusRepositoryService>()));
 
     private static TestGraph CreateGraph()
     {
@@ -128,30 +128,6 @@ public class LeavePolymorphismServiceTests
 
     private static void SetValue(TreeLeaveModel leave, TestGraph graph, TreeLeaveModel value) =>
         GetAttribute(leave, graph).Value = value;
-
-    /// <summary>
-    /// Адаптирует уже реализованный поиск к полному контракту до появления
-    /// операций заполнения и создания листов.
-    /// </summary>
-    private sealed class MatchOnlyAttributeValueService : ILeaveAttributeValueService
-    {
-        private readonly LeaveAttributeValueService _service = new();
-
-        /// <inheritdoc />
-        public LeaveAttributeMatchResult FindMatches(IEnumerable<ElementAttributeModel> expectedAttributes,
-            IEnumerable<TreeLeaveModel> candidates) =>
-            _service.FindMatches(expectedAttributes, candidates);
-
-        /// <inheritdoc />
-        public LeaveAttributeFillResult FillFromLeave(TreeLeaveModel targetLeave,
-            TreeLeaveModel sourceLeave, IEnumerable<Guid> declaringUuids) =>
-            _service.FillFromLeave(targetLeave, sourceLeave, declaringUuids);
-
-        /// <inheritdoc />
-        public TreeLeaveModel CreateLeave(TreeNodeModel parentNode,
-            IEnumerable<ElementAttributeModel> sourceAttributes) =>
-            throw new NotSupportedException();
-    }
 
     private sealed record TestGraph(WorkingTreeModel Tree, Guid DeclarationUuid,
         TreeLeaveModel FirstParent, TreeLeaveModel SecondParent,

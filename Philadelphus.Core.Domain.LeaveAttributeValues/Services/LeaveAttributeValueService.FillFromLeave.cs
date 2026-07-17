@@ -30,7 +30,18 @@ public sealed partial class LeaveAttributeValueService
             return new([]);
 
         var requestedUuids = declaringUuids.ToHashSet();
-        var sourceAttributes = sourceLeave.Attributes
+        return FillAttributes(targetLeave, sourceLeave.Attributes, requestedUuids);
+    }
+
+    /// <summary>
+    /// Заполняет целевой лист из произвольного набора исходных атрибутов.
+    /// </summary>
+    private static LeaveAttributeFillResult FillAttributes(
+        TreeLeaveModel targetLeave,
+        IEnumerable<ElementAttributeModel> sourceAttributes,
+        IReadOnlySet<Guid> requestedUuids)
+    {
+        var sourceAttributesByUuid = sourceAttributes
             .Where(x => requestedUuids.Contains(x.DeclaringUuid))
             .ToDictionary(x => x.DeclaringUuid);
         var changedAttributes = new List<ElementAttributeModel>();
@@ -38,8 +49,12 @@ public sealed partial class LeaveAttributeValueService
         foreach (var targetAttribute in targetLeave.Attributes
                      .Where(x => requestedUuids.Contains(x.DeclaringUuid)))
         {
-            if (sourceAttributes.TryGetValue(targetAttribute.DeclaringUuid, out var sourceAttribute) == false)
+            if (sourceAttributesByUuid.TryGetValue(
+                    targetAttribute.DeclaringUuid,
+                    out var sourceAttribute) == false)
+            {
                 continue;
+            }
 
             EnsureCompatibleSource(targetAttribute, sourceAttribute);
             var changed = targetAttribute.IsCollectionValue
@@ -134,12 +149,15 @@ public sealed partial class LeaveAttributeValueService
         if (targetAttribute.IsCollectionValue != sourceAttribute.IsCollectionValue)
             throw CreateFillException(targetAttribute, "вид значения источника не совпадает с целевым");
 
+        if (targetAttribute.ValueType?.Uuid != sourceAttribute.ValueType?.Uuid)
+            throw CreateFillException(targetAttribute, "тип значения источника не совпадает с целевым");
+
         if (LeaveAttributeValueSignature.Create([sourceAttribute]).IsValid == false)
             throw CreateFillException(targetAttribute, "значение источника не разрешено");
     }
 
     /// <summary>
-    /// Создаёт диагностическое исключение с идентификатором объявления атрибута.
+    /// Создаёт диагностическое исключение с локальным идентификатором атрибута.
     /// </summary>
     private static InvalidOperationException CreateFillException(
         ElementAttributeModel attribute,
