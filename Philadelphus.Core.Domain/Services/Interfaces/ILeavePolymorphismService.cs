@@ -26,6 +26,14 @@ public interface ILeavePolymorphismService
     IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeLeaveModel childLeave);
 
     /// <summary>
+    /// Без мутаций рассчитывает транзитивное обновление текущих разрешённых наследников.
+    /// </summary>
+    /// <param name="changedParentLeave">Изменённый родительский лист.</param>
+    /// <returns>Неизменяемый план обновления сверху вниз.</returns>
+    LeavePolymorphismPropagationPlan BuildPropagationPlan(
+        TreeLeaveModel changedParentLeave);
+
+    /// <summary>
     /// Последовательно перестраивает runtime-связи переданных листов.
     /// </summary>
     /// <param name="leaves">Листы для восстановления связей.</param>

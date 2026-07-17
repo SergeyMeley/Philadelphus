@@ -163,6 +163,38 @@ public class LeavePolymorphismServiceTests
         graph.ParentNode.ChildLeaves.Should().Equal(childLeavesBefore);
     }
 
+    [Fact]
+    public void BuildPropagationPlan_CalculatesTransitiveChangesWithoutMutation()
+    {
+        var graph = CreateGraph();
+        var ancestor = CreateLeave(
+            graph.GrandParentNode, graph.Tree, graph.Notifications);
+        SetValue(ancestor, graph, graph.FirstValue);
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.SecondParent, graph, graph.SecondValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        SetValue(graph.SecondChild, graph, graph.SecondValue);
+        var service = CreateService(graph);
+        service.ResolveParent(graph.FirstParent);
+        service.ResolveParent(graph.FirstChild);
+        SetValue(ancestor, graph, graph.SecondValue);
+
+        var plan = service.BuildPropagationPlan(ancestor);
+
+        plan.ChangedParentLeave.Should().BeSameAs(ancestor);
+        plan.AffectedLeaveCount.Should().Be(2);
+        plan.ChangedAttributeCount.Should().Be(2);
+        plan.Items.Select(x => x.SourceLeave)
+            .Should().Equal(ancestor, graph.FirstParent);
+        plan.Items.Select(x => x.TargetLeave)
+            .Should().Equal(graph.FirstParent, graph.FirstChild);
+        plan.Items.Should().OnlyContain(x => x.ChangedAttributeCount == 1);
+        GetAttribute(graph.FirstParent, graph).Value.Should().BeSameAs(graph.FirstValue);
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
+        ancestor.PolymorphicChildLeaves.Should().Equal(graph.FirstParent);
+        graph.FirstParent.PolymorphicChildLeaves.Should().Equal(graph.FirstChild);
+    }
+
     private static LeavePolymorphismService CreateService(LeavePolymorphismTestGraph graph)
     {
         var repositoryService = new PhiladelphusRepositoryService(

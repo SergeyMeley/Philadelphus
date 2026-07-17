@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Services.Models.LeavePolymorphism;
 
 namespace Philadelphus.Core.Domain.Services.Implementations;
 
