@@ -13,17 +13,19 @@ namespace Philadelphus.Tests.Domain.Helpers
     internal static class EntitiesCreationHelper
     {
         public static ElementAttributeModel CreateAttribute(
-            IPropertiesPolicy<ElementAttributeModel>? policy = null)
+            IPropertiesPolicy<ElementAttributeModel>? policy = null,
+            bool isOwn = false)
         {
             var notification = new FakeNotificationService();
             var owner = new FakeWorkingTreeModel();
+            var localUuid = Guid.NewGuid();
 
             return new ElementAttributeModel(
-                Guid.NewGuid(),
+                localUuid,
                 owner,
-                Guid.NewGuid(),
+                isOwn ? localUuid : Guid.NewGuid(),
                 owner,
-                new FakeWorkingTreeModel(),
+                owner,
                 notification,
                 policy ?? new FakeAllowAllPolicy<ElementAttributeModel>()
             );

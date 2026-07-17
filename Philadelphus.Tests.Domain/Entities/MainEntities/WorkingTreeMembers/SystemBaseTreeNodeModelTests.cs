@@ -111,16 +111,16 @@ public class SystemBaseTreeNodeModelTests
     }
 
     [Theory]
-    [InlineData(SystemBaseType.INTEGER, "0", typeof(long))]
-    [InlineData(SystemBaseType.STRING, TreeLeaveModel.EmptyStringValue, typeof(string))]
-    [InlineData(SystemBaseType.OBJECT, TreeLeaveModel.EmptyStringValue, typeof(string))]
-    [InlineData(SystemBaseType.NUMERIC, "0.0", typeof(double))]
-    [InlineData(SystemBaseType.FLOAT, "0.0", typeof(double))]
-    [InlineData(SystemBaseType.MONEY, "0.0", typeof(decimal))]
-    [InlineData(SystemBaseType.DATETIME, "1970-01-01T00:00:00+00:00", typeof(DateTimeOffset))]
-    [InlineData(SystemBaseType.DATE, "1970-01-01", typeof(DateOnly))]
-    [InlineData(SystemBaseType.TIME, "00:00:00", typeof(TimeOnly))]
-    public void CreateTreeLeave_SystemBaseNode_AppliesDefaultTypedValue(SystemBaseType type, string expectedValue, Type expectedTypedValueType)
+    [InlineData(SystemBaseType.INTEGER)]
+    [InlineData(SystemBaseType.STRING)]
+    [InlineData(SystemBaseType.OBJECT)]
+    [InlineData(SystemBaseType.NUMERIC)]
+    [InlineData(SystemBaseType.FLOAT)]
+    [InlineData(SystemBaseType.MONEY)]
+    [InlineData(SystemBaseType.DATETIME)]
+    [InlineData(SystemBaseType.DATE)]
+    [InlineData(SystemBaseType.TIME)]
+    public void CreateTreeLeave_SystemBaseNode_LeavesValueEmpty(SystemBaseType type)
     {
         var notificationService = new FakeNotificationService();
         var tree = new FakeWorkingTreeModel();
@@ -144,9 +144,9 @@ public class SystemBaseTreeNodeModelTests
 
         leave.Should().BeOfType<SystemBaseTreeLeaveModel>();
         var systemBaseLeave = (SystemBaseTreeLeaveModel)leave;
-        systemBaseLeave.StringValue.Should().Be(expectedValue);
-        systemBaseLeave.TypedValue.Should().BeOfType(expectedTypedValueType);
-        leave.Name.Should().Be(expectedValue);
+        systemBaseLeave.StringValue.Should().Be(TreeLeaveModel.EmptyStringValue);
+        systemBaseLeave.TypedValue.Should().BeNull();
+        leave.Name.Should().Be(TreeLeaveModel.EmptyStringValue);
     }
 
     [Fact]
@@ -173,9 +173,9 @@ public class SystemBaseTreeNodeModelTests
 
         leave.Name = "abc";
 
-        leave.Name.Should().Be("0");
-        leave.StringValue.Should().Be("0");
-        leave.TypedValue.Should().Be(0L);
+        leave.Name.Should().Be(TreeLeaveModel.EmptyStringValue);
+        leave.StringValue.Should().Be(TreeLeaveModel.EmptyStringValue);
+        leave.TypedValue.Should().BeNull();
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public class SystemBaseTreeNodeModelTests
 
         leave.StringValue = "not integer";
 
-        leave.StringValue.Should().Be("0");
+        leave.StringValue.Should().Be(TreeLeaveModel.EmptyStringValue);
         notificationService.Messages.Should().Contain(x =>
             x.Contains("not integer")
             && x.Contains(SystemBaseType.INTEGER.ToString())

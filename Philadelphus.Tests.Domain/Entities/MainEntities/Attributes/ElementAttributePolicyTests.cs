@@ -38,7 +38,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         {
             var policy = AttributePolicyBuilder.CreateDefault(new FakeNotificationService());
 
-            var model = EntitiesCreationHelper.CreateAttribute(policy);
+            var model = EntitiesCreationHelper.CreateAttribute(policy, isOwn: true);
 
             model.Override = OverrideType.Abstract;
 

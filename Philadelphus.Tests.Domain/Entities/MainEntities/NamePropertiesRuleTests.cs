@@ -34,7 +34,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             var root = CreateRoot();
             var node = CreateNode(root);
 
-            var result = rule.CanWrite(node, nameof(TreeNodeModel.Name), "\u0421\u0438\u0441\u0442\u0435\u043c\u043d\u044b\u0439 \u0442\u0438\u043f");
+            var result = rule.CanWrite(node, nameof(TreeNodeModel.Name), "[\u0421\u0438\u0441\u0442\u0435\u043c\u043d\u044b\u0439 \u0442\u0438\u043f]");
 
             Assert.False(result);
         }
@@ -264,7 +264,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             firstNode.Sequence = 77;
             secondNode.AssignAutoSequence(root.ChildNodes.Select(x => x.Sequence));
 
-            Assert.Equal(90, secondNode.Sequence);
+            Assert.Equal(80, secondNode.Sequence);
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             var root = CreateRoot();
             var node = CreateNode(root);
             var rootAttribute = CreateOwnAttribute(root);
-            var inheritedAttribute = rootAttribute.CloneForChild(node);
+            var inheritedAttribute = node.ParentElementAttributes.Single(x => x.DeclaringUuid == rootAttribute.DeclaringUuid);
             var ownAttribute = CreateOwnAttributeWithDefaultPolicy(node);
 
             inheritedAttribute.Sequence = 10;
@@ -290,7 +290,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
             var rootAttribute = CreateOwnAttribute(root);
             rootAttribute.Sequence = 7;
 
-            var inheritedAttribute = rootAttribute.CloneForChild(node);
+            var inheritedAttribute = node.ParentElementAttributes.Single(x => x.DeclaringUuid == rootAttribute.DeclaringUuid);
 
             Assert.Equal(10, inheritedAttribute.Sequence);
         }

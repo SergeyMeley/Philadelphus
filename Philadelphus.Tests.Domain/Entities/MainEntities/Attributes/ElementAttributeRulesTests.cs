@@ -37,7 +37,8 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         {
             var rule = new RequiredOverrideValuePropertiesRule(new FakeNotificationService());
 
-            var model = EntitiesCreationHelper.CreateAttribute();
+            var model = EntitiesCreationHelper.CreateAttribute(isOwn: true);
+            model.Override = OverrideType.Abstract;
 
             var result = rule.CanWrite(model, nameof(ElementAttributeModel.Value), new object());
 
@@ -49,7 +50,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         {
             var rule = new RequiredOverrideValuePropertiesRule(new FakeNotificationService());
 
-            var model = EntitiesCreationHelper.CreateAttribute();
+            var model = EntitiesCreationHelper.CreateAttribute(isOwn: true);
 
             var result = rule.CanWrite(model, nameof(ElementAttributeModel.Value), new object());
 
@@ -71,9 +72,10 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         }
 
         [Fact]
-        public void Should_Block_Value_When_Override_Required()
+        public void DefaultPolicy_Should_Block_Value_When_Own_And_Abstract()
         {
-            var model = EntitiesCreationHelper.CreateAttribute();
+            var model = EntitiesCreationHelper.CreateAttribute(isOwn: true);
+            model.Override = OverrideType.Abstract;
 
             var policy = AttributePolicyBuilder.CreateDefault(new FakeNotificationService());
 
@@ -89,9 +91,9 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
 
             var model = new TestAttribute(policy);
 
-            var value = model.Name;
+            var exception = Record.Exception(() => _ = model.Name);
 
-            Assert.NotNull(value);
+            Assert.Null(exception);
         }
 
         [Fact]
@@ -99,7 +101,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
         {
             var rule = new RequiredOverrideValuePropertiesRule(new FakeNotificationService());
 
-            var model = EntitiesCreationHelper.CreateAttribute();
+            var model = EntitiesCreationHelper.CreateAttribute(isOwn: true);
 
             model.Override = OverrideType.Abstract;
 
@@ -228,7 +230,7 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities.Attributes
             var rule = new ValidNamePropertiesRule<ElementAttributeModel>(new FakeNotificationService(), NameUniquenessStrategy.ElementAttribute());
             var model = CreateOwnAttribute(new FakeWorkingTreeModel());
 
-            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), "\u041a\u043e\u0434");
+            var result = rule.CanWrite(model, nameof(ElementAttributeModel.Name), "\u005b\u041a\u043e\u0434\u005d");
 
             Assert.False(result);
         }

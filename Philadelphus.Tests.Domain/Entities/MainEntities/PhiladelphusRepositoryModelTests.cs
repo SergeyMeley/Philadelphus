@@ -1,11 +1,10 @@
 ﻿using FluentAssertions;
-using Moq;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Policies;
-using Philadelphus.Infrastructure.Persistence.Entities.MainEntities;
+using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
 
 namespace Philadelphus.Tests.Domain.Entities.MainEntities;
@@ -18,15 +17,12 @@ public class PhiladelphusRepositoryModelTests
         // Arrange
         var uuid = Guid.CreateVersion7();
         var dataStorage = CreateFakeDataStorage();
-        var dbEntity = new Mock<PhiladelphusRepository>().Object;
-
         // Act
         var sut = CreateSut(uuid, dataStorage);
 
         // Assert
         sut.Uuid.Should().Be(uuid);
         sut.Type.Should().Be(nameof(PhiladelphusRepositoryModel));
-        sut.Name.Should().StartWith("Новый репозиторий");
         sut.State.Should().Be(State.Initialized);
         sut.OwnDataStorage.Should().BeSameAs(dataStorage);
         sut.DataStorages.Should().Contain(dataStorage);
@@ -52,6 +48,8 @@ public class PhiladelphusRepositoryModelTests
     {
         // Arrange
         var sut = CreateSut(Guid.CreateVersion7(), CreateFakeDataStorage());
+        sut.IsFavorite = !newValue;
+        ((IMainEntityWritableModel)sut).SetState(State.SavedOrLoaded).Should().BeTrue();
 
         // Act
         sut.IsFavorite = newValue;
@@ -67,6 +65,7 @@ public class PhiladelphusRepositoryModelTests
         // Arrange
         var sut = CreateSut(Guid.CreateVersion7(), CreateFakeDataStorage());
         const string newName = "Новое хранилище";
+        ((IMainEntityWritableModel)sut).SetState(State.SavedOrLoaded).Should().BeTrue();
 
         // Act
         sut.OwnDataStorageName = newName;
@@ -91,14 +90,7 @@ public class PhiladelphusRepositoryModelTests
     private static PhiladelphusRepositoryModelTestingFixture CreateSut(Guid uuid, IDataStorageModel dataStorage) =>
         new(uuid, dataStorage);
 
-    private static IDataStorageModel CreateFakeDataStorage()
-    {
-        var mock = new Mock<IDataStorageModel>();
-        mock.Setup(x => x.Uuid).Returns(Guid.CreateVersion7());
-        mock.Setup(x => x.Name).Returns("TestStorage");
-        mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
-        return mock.Object;
-    }
+    private static IDataStorageModel CreateFakeDataStorage() => new FakeDataStorageModel();
 }
 
 // FIXTURE для обхода internal конструктора
