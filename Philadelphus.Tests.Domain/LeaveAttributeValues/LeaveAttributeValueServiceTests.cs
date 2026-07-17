@@ -60,13 +60,70 @@ public class LeaveAttributeValueServiceTests
         result.Matches.Should().BeEmpty();
     }
 
-    private static ElementAttributeModel CreateDeclaration(TestGraph graph)
+    [Fact]
+    public void FillFromLeave_ReplacesScalarWithReferenceAndClearsEmptyValue()
+    {
+        var graph = CreateGraph();
+        var replacedDeclaration = CreateDeclaration(graph);
+        var clearedDeclaration = CreateDeclaration(graph);
+        var source = CreateLeave(graph);
+        var target = CreateLeave(graph);
+        SetValue(source, replacedDeclaration, graph.SecondValue);
+        SetValue(target, replacedDeclaration, graph.FirstValue);
+        SetValue(target, clearedDeclaration, graph.FirstValue);
+
+        var result = new LeaveAttributeValueService().FillFromLeave(
+            target, source, [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid]);
+
+        var replaced = GetAttribute(target, replacedDeclaration);
+        var cleared = GetAttribute(target, clearedDeclaration);
+        result.ChangedAttributes.Should().Equal(replaced, cleared);
+        replaced.Value.Should().BeSameAs(graph.SecondValue);
+        replaced.ValueFormula.Should().Be($"=[{graph.SecondValue.Uuid}]");
+        cleared.Value.Should().BeNull();
+        cleared.ValueFormula.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void FillFromLeave_ReplacesAndClearsCollectionsAndIgnoresOrder()
+    {
+        var graph = CreateGraph();
+        var replacedDeclaration = CreateDeclaration(graph, isCollection: true);
+        var clearedDeclaration = CreateDeclaration(graph, isCollection: true);
+        var unchangedDeclaration = CreateDeclaration(graph, isCollection: true);
+        var source = CreateLeave(graph);
+        var target = CreateLeave(graph);
+        AddValues(target, replacedDeclaration, graph.FirstValue);
+        AddValues(source, replacedDeclaration, graph.SecondValue);
+        AddValues(target, clearedDeclaration, graph.FirstValue);
+        AddValues(target, unchangedDeclaration, graph.FirstValue, graph.SecondValue);
+        AddValues(source, unchangedDeclaration, graph.SecondValue, graph.FirstValue);
+
+        var service = new LeaveAttributeValueService();
+        var result = service.FillFromLeave(target, source,
+            [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid,
+                unchangedDeclaration.DeclaringUuid]);
+
+        var replaced = GetAttribute(target, replacedDeclaration);
+        var cleared = GetAttribute(target, clearedDeclaration);
+        result.ChangedAttributes.Should().Equal(replaced, cleared);
+        replaced.Values.Should().Equal(graph.SecondValue);
+        cleared.Values.Should().BeEmpty();
+        service.FillFromLeave(target, source,
+                [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid])
+            .ChangedAttributes.Should().BeEmpty();
+    }
+
+    private static ElementAttributeModel CreateDeclaration(
+        TestGraph graph,
+        bool isCollection = false)
     {
         var uuid = Guid.NewGuid();
         return new(uuid, graph.CandidateNode, uuid, graph.CandidateNode, graph.Tree,
             graph.NotificationService, new EmptyPropertiesPolicy<ElementAttributeModel>())
         {
-            ValueType = graph.ValueType
+            ValueType = graph.ValueType,
+            IsCollectionValue = isCollection
         };
     }
 
@@ -84,6 +141,15 @@ public class LeaveAttributeValueServiceTests
         ElementAttributeModel declaration,
         TreeLeaveModel value) =>
         GetAttribute(leave, declaration).Value = value;
+
+    private static void AddValues(
+        TreeLeaveModel leave,
+        ElementAttributeModel declaration,
+        params TreeLeaveModel[] values)
+    {
+        foreach (var value in values)
+            GetAttribute(leave, declaration).TryAddValueToValuesCollection(value).Should().BeTrue();
+    }
 
     private static TestGraph CreateGraph()
     {

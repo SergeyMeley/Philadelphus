@@ -145,7 +145,7 @@ public class LeavePolymorphismServiceTests
         /// <inheritdoc />
         public LeaveAttributeFillResult FillFromLeave(TreeLeaveModel targetLeave,
             TreeLeaveModel sourceLeave, IEnumerable<Guid> declaringUuids) =>
-            throw new NotSupportedException();
+            _service.FillFromLeave(targetLeave, sourceLeave, declaringUuids);
 
         /// <inheritdoc />
         public TreeLeaveModel CreateLeave(TreeNodeModel parentNode,
