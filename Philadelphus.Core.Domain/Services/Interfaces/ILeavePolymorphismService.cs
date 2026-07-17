@@ -9,6 +9,15 @@ namespace Philadelphus.Core.Domain.Services.Interfaces;
 public interface ILeavePolymorphismService
 {
     /// <summary>
+    /// Указывает, что сервис в данный момент применяет каскадное обновление.
+    /// </summary>
+    /// <remarks>
+    /// Обработчики изменений атрибутов используют признак, чтобы не запускать
+    /// повторный каскад для уведомлений, возникших внутри текущей операции.
+    /// </remarks>
+    bool IsPropagationInProgress { get; }
+
+    /// <summary>
     /// Вычисляет родителя одного листа и обновляет его runtime-связь.
     /// </summary>
     /// <param name="childLeave">Лист, для которого выполняется поиск.</param>
@@ -32,6 +41,15 @@ public interface ILeavePolymorphismService
     /// <returns>Неизменяемый план обновления сверху вниз.</returns>
     LeavePolymorphismPropagationPlan BuildPropagationPlan(
         TreeLeaveModel changedParentLeave);
+
+    /// <summary>
+    /// Применяет подтверждённый план обновления сверху вниз и перестраивает runtime-связи.
+    /// </summary>
+    /// <param name="plan">Предварительно рассчитанный неизменяемый план.</param>
+    /// <exception cref="InvalidOperationException">
+    /// Если операция вызвана повторно до завершения предыдущего применения.
+    /// </exception>
+    void ApplyPropagation(LeavePolymorphismPropagationPlan plan);
 
     /// <summary>
     /// Последовательно перестраивает runtime-связи переданных листов.

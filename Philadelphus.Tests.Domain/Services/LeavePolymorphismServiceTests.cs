@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentAssertions;
 using Moq;
 
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -194,6 +195,82 @@ public class LeavePolymorphismServiceTests
         GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
         ancestor.PolymorphicChildLeaves.Should().Equal(graph.FirstParent);
         graph.FirstParent.PolymorphicChildLeaves.Should().Equal(graph.FirstChild);
+    }
+
+    [Fact]
+    public void ApplyPropagation_UpdatesResolvedDescendantsFromTopToBottom()
+    {
+        var graph = CreateGraph();
+        var ancestor = CreateLeave(
+            graph.GrandParentNode, graph.Tree, graph.Notifications);
+        SetValue(ancestor, graph, graph.FirstValue);
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var service = CreateService(graph);
+        service.ResolveParent(graph.FirstParent);
+        service.ResolveParent(graph.FirstChild);
+        SetValue(ancestor, graph, graph.SecondValue);
+        var plan = service.BuildPropagationPlan(ancestor);
+
+        service.ApplyPropagation(plan);
+
+        GetAttribute(graph.FirstParent, graph).Value.Should().BeSameAs(graph.SecondValue);
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.SecondValue);
+        graph.FirstParent.PolymorphicParentLeave.Should().BeSameAs(ancestor);
+        graph.FirstChild.PolymorphicParentLeave.Should().BeSameAs(graph.FirstParent);
+        service.IsPropagationInProgress.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ApplyPropagation_RejectsReentryAndResetsGuard()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var planningService = CreateService(graph);
+        planningService.ResolveParent(graph.FirstChild);
+        SetValue(graph.FirstParent, graph, graph.SecondValue);
+        var plan = planningService.BuildPropagationPlan(graph.FirstParent);
+        var attributeValueService = new Mock<ILeaveAttributeValueService>();
+        LeavePolymorphismService? service = null;
+        attributeValueService
+            .Setup(x => x.FillFromLeave(
+                It.IsAny<TreeLeaveModel>(),
+                It.IsAny<TreeLeaveModel>(),
+                It.IsAny<IEnumerable<Guid>>()))
+            .Callback(() => service!.ApplyPropagation(plan))
+            .Returns(new LeaveAttributeFillResult([]));
+        service = new(attributeValueService.Object);
+
+        var action = () => service.ApplyPropagation(plan);
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("*уже выполняется*");
+        service.IsPropagationInProgress.Should().BeFalse();
+        attributeValueService.Verify(x => x.FillFromLeave(
+            graph.FirstChild,
+            graph.FirstParent,
+            It.IsAny<IEnumerable<Guid>>()), Times.Once);
+    }
+
+    [Fact]
+    public void ApplyPropagation_RejectsPlanWhenRuntimeLinkHasChanged()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var service = CreateService(graph);
+        service.ResolveParent(graph.FirstChild);
+        SetValue(graph.FirstParent, graph, graph.SecondValue);
+        var plan = service.BuildPropagationPlan(graph.FirstParent);
+        service.ResolveParent(graph.FirstChild);
+
+        var action = () => service.ApplyPropagation(plan);
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("*изменилась после расчёта*");
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
+        service.IsPropagationInProgress.Should().BeFalse();
     }
 
     private static LeavePolymorphismService CreateService(LeavePolymorphismTestGraph graph)
