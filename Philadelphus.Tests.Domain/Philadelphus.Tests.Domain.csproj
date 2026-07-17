@@ -34,6 +34,7 @@
     <ProjectReference Include="..\Philadelphus.Infrastructure.ImportExport.Excel\Philadelphus.Infrastructure.ImportExport.Excel.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.ImportExport\Philadelphus.Core.Domain.ImportExport.csproj" />
     <ProjectReference Include="..\Philadelphus.Core.Domain.FormulaEngine\Philadelphus.Core.Domain.FormulaEngine.csproj" />
+    <ProjectReference Include="..\Philadelphus.Core.Domain.LeaveAttributeValues\Philadelphus.Core.Domain.LeaveAttributeValues.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.AssemblyAdapters\Philadelphus.Infrastructure.AssemblyAdapters.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.AssemblyAdapters.CSharp\Philadelphus.Infrastructure.AssemblyAdapters.CSharp.csproj" />
     <ProjectReference Include="..\Philadelphus.Infrastructure.AssemblyAdapters.Python\Philadelphus.Infrastructure.AssemblyAdapters.Python.csproj" />
