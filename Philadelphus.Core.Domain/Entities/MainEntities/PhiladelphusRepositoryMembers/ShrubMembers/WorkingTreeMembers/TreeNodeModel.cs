@@ -23,6 +23,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private readonly List<TreeLeaveModel> _childLeaves;
         private readonly HashSet<Guid> _childNodeUuids = new();
         private readonly HashSet<Guid> _childLeaveUuids = new();
+        private TreeLeaveModel? _polymorphicParentLeave;
 
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
@@ -50,6 +51,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         [Display(Name = "[Родитель]", Description = "Родительский узел")]
         public TreeNodeModel ParentNode { get; }
+
+        /// <summary>
+        /// Runtime-only лист родительского узла, соответствующий текущему узлу.
+        /// </summary>
+        public TreeLeaveModel? PolymorphicParentLeave => _polymorphicParentLeave;
 
         /// <summary>
         /// Родитель
@@ -178,6 +184,26 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             ArgumentNullException.ThrowIfNull(newParent);
 
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Устанавливает вычисленную полиморфную связь с листом прямого родительского узла.
+        /// </summary>
+        internal bool SetPolymorphicParentLeave(TreeLeaveModel? parentLeave)
+        {
+            if (_polymorphicParentLeave?.Uuid == parentLeave?.Uuid)
+                return false;
+
+            if (parentLeave != null
+                && (parentLeave.Uuid == Uuid
+                    || ParentNode == null
+                    || parentLeave.ParentNode.Uuid != ParentNode.Uuid))
+            {
+                return false;
+            }
+
+            _polymorphicParentLeave = parentLeave;
+            return true;
         }
 
         /// <summary>

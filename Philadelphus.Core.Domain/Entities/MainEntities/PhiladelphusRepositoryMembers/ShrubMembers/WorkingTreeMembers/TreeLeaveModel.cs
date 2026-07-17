@@ -28,6 +28,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
         private string _stringValue = EmptyStringValue;
         private readonly IDataStorageModel _dataStorage;
+        private TreeLeaveModel? _polymorphicParentLeave;
+        private readonly List<TreeLeaveModel> _polymorphicChildLeaves = new();
+        private readonly HashSet<Guid> _polymorphicChildLeaveUuids = new();
 
         /// <summary>
         /// Техническое значение пустого листа для хранения в не-null поле.
@@ -77,6 +80,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         /// </summary>
         [Display(Name = "[Родитель]", Description = "Родительский узел")]
         public TreeNodeModel ParentNode { get; }
+
+        /// <summary>
+        /// Runtime-only лист прямого родительского узла с тем же набором атрибутов.
+        /// </summary>
+        public TreeLeaveModel? PolymorphicParentLeave => _polymorphicParentLeave;
+
+        /// <summary>
+        /// Runtime-only листья дочерних узлов, разрешённые в текущий лист.
+        /// </summary>
+        public IReadOnlyList<TreeLeaveModel> PolymorphicChildLeaves => _polymorphicChildLeaves;
 
         /// <summary>
         /// Родитель.
@@ -157,6 +170,45 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
             ArgumentNullException.ThrowIfNull(newParent);
 
             return false;
+        }
+
+        /// <summary>
+        /// Атомарно обновляет обе стороны вычисленной полиморфной связи.
+        /// </summary>
+        internal bool SetPolymorphicParentLeave(TreeLeaveModel? parentLeave)
+        {
+            if (_polymorphicParentLeave?.Uuid == parentLeave?.Uuid)
+                return false;
+
+            if (parentLeave != null
+                && (parentLeave.Uuid == Uuid
+                    || ParentNode.ParentNode == null
+                    || parentLeave.ParentNode.Uuid != ParentNode.ParentNode.Uuid
+                    || parentLeave.AddPolymorphicChildLeave(this) == false))
+            {
+                return false;
+            }
+
+            _polymorphicParentLeave?.RemovePolymorphicChildLeave(this);
+            _polymorphicParentLeave = parentLeave;
+            return true;
+        }
+
+        private bool AddPolymorphicChildLeave(TreeLeaveModel childLeave)
+        {
+            if (_polymorphicChildLeaveUuids.Add(childLeave.Uuid) == false)
+                return false;
+
+            _polymorphicChildLeaves.Add(childLeave);
+            return true;
+        }
+
+        private void RemovePolymorphicChildLeave(TreeLeaveModel childLeave)
+        {
+            if (_polymorphicChildLeaveUuids.Remove(childLeave.Uuid) == false)
+                return;
+
+            _polymorphicChildLeaves.RemoveAll(x => x.Uuid == childLeave.Uuid);
         }
 
         /// <summary>
