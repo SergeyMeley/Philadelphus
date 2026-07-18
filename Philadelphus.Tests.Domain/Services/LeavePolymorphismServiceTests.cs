@@ -273,6 +273,81 @@ public class LeavePolymorphismServiceTests
         service.IsPropagationInProgress.Should().BeFalse();
     }
 
+    [Fact]
+    public void PreserveChildren_ReusesExistingReplacement()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.SecondParent, graph, graph.SecondValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var service = CreateService(graph);
+        service.ResolveParent(graph.FirstChild);
+        SetValue(graph.FirstParent, graph, graph.SecondValue);
+        SetValue(graph.SecondParent, graph, graph.FirstValue);
+        var plan = service.BuildPropagationPlan(graph.FirstParent);
+
+        var result = service.PreserveChildrenAndResolveReplacement(plan);
+
+        result.CreatedLeaves.Should().BeEmpty();
+        result.Resolutions.Should().ContainSingle()
+            .Which.Status.Should().Be(LeavePolymorphismStatus.Resolved);
+        graph.FirstChild.PolymorphicParentLeave.Should().BeSameAs(graph.SecondParent);
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
+    }
+
+    [Fact]
+    public void PreserveChildren_CreatesOneReplacementChainForEqualSignatures()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.SecondParent, graph, graph.SecondValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        SetValue(graph.SecondChild, graph, graph.FirstValue);
+        var service = CreateService(graph);
+        service.ResolveParent(graph.FirstChild);
+        service.ResolveParent(graph.SecondChild);
+        SetValue(graph.FirstParent, graph, graph.SecondValue);
+        var plan = service.BuildPropagationPlan(graph.FirstParent);
+
+        var result = service.PreserveChildrenAndResolveReplacement(plan);
+
+        var replacement = result.CreatedLeaves
+            .Should().ContainSingle(x => ReferenceEquals(x.ParentNode, graph.ParentNode))
+            .Which;
+        result.CreatedLeaves.Should().HaveCount(2);
+        result.Resolutions.Should().HaveCount(2)
+            .And.OnlyContain(x => x.Status == LeavePolymorphismStatus.Resolved);
+        graph.FirstChild.PolymorphicParentLeave.Should().BeSameAs(replacement);
+        graph.SecondChild.PolymorphicParentLeave.Should().BeSameAs(replacement);
+        GetAttribute(replacement, graph).Value.Should().BeSameAs(graph.FirstValue);
+    }
+
+    [Fact]
+    public void PreserveChildren_LeavesAmbiguityWithoutCreatingDuplicate()
+    {
+        var graph = CreateGraph();
+        var duplicateParent = CreateLeave(
+            graph.ParentNode, graph.Tree, graph.Notifications);
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.SecondParent, graph, graph.SecondValue);
+        SetValue(duplicateParent, graph, graph.SecondValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var service = CreateService(graph);
+        service.ResolveParent(graph.FirstChild);
+        SetValue(graph.FirstParent, graph, graph.SecondValue);
+        SetValue(graph.SecondParent, graph, graph.FirstValue);
+        SetValue(duplicateParent, graph, graph.FirstValue);
+        var plan = service.BuildPropagationPlan(graph.FirstParent);
+
+        var result = service.PreserveChildrenAndResolveReplacement(plan);
+
+        result.CreatedLeaves.Should().BeEmpty();
+        result.Resolutions.Should().ContainSingle()
+            .Which.Status.Should().Be(LeavePolymorphismStatus.Ambiguous);
+        graph.FirstChild.PolymorphicParentLeave.Should().BeNull();
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
+    }
+
     private static LeavePolymorphismService CreateService(LeavePolymorphismTestGraph graph)
     {
         var repositoryService = new PhiladelphusRepositoryService(

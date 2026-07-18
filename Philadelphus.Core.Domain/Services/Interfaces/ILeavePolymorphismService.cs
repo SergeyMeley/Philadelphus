@@ -52,6 +52,14 @@ public interface ILeavePolymorphismService
     void ApplyPropagation(LeavePolymorphismPropagationPlan plan);
 
     /// <summary>
+    /// Сохраняет прежние значения наследников и разрешает для них заменяющих родителей.
+    /// </summary>
+    /// <param name="plan">Отклонённый пользователем план каскадного обновления.</param>
+    /// <returns>Итоговые статусы непосредственных наследников и созданные листы.</returns>
+    LeavePolymorphismPreservationResult PreserveChildrenAndResolveReplacement(
+        LeavePolymorphismPropagationPlan plan);
+
+    /// <summary>
     /// Последовательно перестраивает runtime-связи переданных листов.
     /// </summary>
     /// <param name="leaves">Листы для восстановления связей.</param>

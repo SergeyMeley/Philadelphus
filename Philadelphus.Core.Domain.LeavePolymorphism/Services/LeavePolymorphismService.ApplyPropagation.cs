@@ -20,11 +20,7 @@ public sealed partial class LeavePolymorphismService
     {
         ArgumentNullException.ThrowIfNull(plan);
 
-        if (Interlocked.CompareExchange(ref _propagationInProgress, 1, 0) != 0)
-        {
-            throw new InvalidOperationException(
-                "Каскадное обновление полиморфных наследников уже выполняется.");
-        }
+        BeginPropagation();
 
         try
         {
@@ -44,9 +40,27 @@ public sealed partial class LeavePolymorphismService
         }
         finally
         {
-            Volatile.Write(ref _propagationInProgress, 0);
+            EndPropagation();
         }
     }
+
+    /// <summary>
+    /// Атомарно начинает операцию над снимком полиморфных связей.
+    /// </summary>
+    private void BeginPropagation()
+    {
+        if (Interlocked.CompareExchange(ref _propagationInProgress, 1, 0) != 0)
+        {
+            throw new InvalidOperationException(
+                "Операция над полиморфными наследниками уже выполняется.");
+        }
+    }
+
+    /// <summary>
+    /// Снимает защиту после завершения или прерывания операции.
+    /// </summary>
+    private void EndPropagation() =>
+        Volatile.Write(ref _propagationInProgress, 0);
 
     /// <summary>
     /// Проверяет, что сохранённая runtime-топология не изменилась после расчёта плана.
