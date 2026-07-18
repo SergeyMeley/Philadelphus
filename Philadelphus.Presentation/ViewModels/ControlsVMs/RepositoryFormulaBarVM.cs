@@ -19,6 +19,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
@@ -27,6 +28,7 @@ using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repositor
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using IApplicationCommandsVM = Philadelphus.Presentation.Services.Interfaces.IApplicationCommandsVM;
+using IAsyncRelayCommand = Philadelphus.Presentation.Infrastructure.IAsyncRelayCommand;
 using IRelayCommand = Philadelphus.Presentation.Infrastructure.IRelayCommand;
 
 namespace Philadelphus.Presentation.ViewModels.ControlsVMs
@@ -45,6 +47,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly INotificationService _notificationService;
         private readonly IApplicationCommandsVM _applicationCommandsVM;
         private readonly IRelayCommandFactory _commandFactory;
+        private readonly IAsyncRelayCommandFactory _asyncCommandFactory;
+        private readonly ILeavePolymorphismChangeCoordinator _leavePolymorphismChangeCoordinator;
 
         private ElementAttributeVM? _selectedFormulaAttribute;
         private FormulaBarTarget? _formulaBarTarget;
@@ -68,7 +72,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private bool _isFormulaAttributeNotificationInProgress;
 
         private IRelayCommand? _selectChildFormulaCellCommand;
-        private IRelayCommand? _applyFormulaBarCommand;
+        private IAsyncRelayCommand? _applyFormulaBarCommand;
         private IRelayCommand? _cancelFormulaBarCommand;
         private IRelayCommand? _openFormulaEditorFromFormulaBarCommand;
         private IRelayCommand? _recalculateCurrentFormulaCommand;
@@ -85,6 +89,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="notificationService">Сервис пользовательских уведомлений.</param>
         /// <param name="applicationCommandsVM">Команды приложения, включая открытие редактора формул.</param>
         /// <param name="commandFactory">Фабрика синхронных команд.</param>
+        /// <param name="asyncCommandFactory">Фабрика асинхронных команд.</param>
+        /// <param name="leavePolymorphismChangeCoordinator">Координатор изменений полиморфных листов.</param>
         public RepositoryFormulaBarVM(
             RepositoryExplorerControlVM repositoryExplorerVM,
             IPhiladelphusRepositoryService service,
@@ -93,7 +99,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IFormulaDiagnosticsReporter formulaDiagnosticsReporter,
             INotificationService notificationService,
             IApplicationCommandsVM applicationCommandsVM,
-            IRelayCommandFactory commandFactory)
+            IRelayCommandFactory commandFactory,
+            IAsyncRelayCommandFactory asyncCommandFactory,
+            ILeavePolymorphismChangeCoordinator leavePolymorphismChangeCoordinator)
         {
             ArgumentNullException.ThrowIfNull(repositoryExplorerVM);
             ArgumentNullException.ThrowIfNull(service);
@@ -103,6 +111,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(notificationService);
             ArgumentNullException.ThrowIfNull(applicationCommandsVM);
             ArgumentNullException.ThrowIfNull(commandFactory);
+            ArgumentNullException.ThrowIfNull(asyncCommandFactory);
+            ArgumentNullException.ThrowIfNull(leavePolymorphismChangeCoordinator);
 
             _repositoryExplorerVM = repositoryExplorerVM;
             _service = service;
@@ -113,6 +123,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _notificationService = notificationService;
             _applicationCommandsVM = applicationCommandsVM;
             _commandFactory = commandFactory;
+            _asyncCommandFactory = asyncCommandFactory;
+            _leavePolymorphismChangeCoordinator = leavePolymorphismChangeCoordinator;
 
             FormulaRecalculationModes = new List<FormulaRecalculationModeVM>
             {
@@ -378,12 +390,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <summary>
         /// Команда применения текста строки формул к активной ячейке.
         /// </summary>
-        public IRelayCommand ApplyFormulaBarCommand =>
-            _applyFormulaBarCommand ??= _commandFactory.Create(
-                _ =>
-                {
-                    ApplyFormulaBar();
-                },
+        public IAsyncRelayCommand ApplyFormulaBarCommand =>
+            _applyFormulaBarCommand ??= _asyncCommandFactory.Create(
+                _ => ApplyFormulaBarAsync(),
                 _ =>
                 {
                     return CanApplyFormulaBar();
@@ -491,10 +500,13 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         }
 
         /// <summary>
-        /// Обрабатывает изменение значения атрибута и запускает пересчет зависимых формул согласно выбранному режиму.
+        /// Обрабатывает изменение значения атрибута, пересчитывает зависимые формулы
+        /// и координирует изменение полиморфных связей листа.
         /// </summary>
-        public void NotifyAttributeValueChanged(ElementAttributeModel attribute)
+        public async Task NotifyAttributeValueChangedAsync(ElementAttributeModel attribute)
         {
+            ArgumentNullException.ThrowIfNull(attribute);
+
             if (_repositoryExplorerVM.IsRepositoryLoading)
             {
                 return;
@@ -506,7 +518,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 NotifyFormulaAttributeChanged(attribute);
             }
 
-            RecalculateFormulasAfterChange(attribute);
+            await CompleteAttributeValueChangeAsync(attribute);
         }
 
         /// <summary>
@@ -671,7 +683,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             return selectionLength > 0;
         }
 
-        private void OnSelectedFormulaAttributePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private async void OnSelectedFormulaAttributePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (_isFormulaAttributeNotificationInProgress
                 || sender is not ElementAttributeVM attributeVM)
@@ -682,7 +694,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             if (e.PropertyName is nameof(ElementAttributeVM.AssignedValue)
                 or nameof(ElementAttributeVM.FormulaValueText))
             {
-                NotifyAttributeValueChanged(attributeVM.Model);
+                await NotifyAttributeValueChangedAsync(attributeVM.Model);
             }
         }
 
@@ -856,7 +868,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 && _formulaBarTarget?.TargetAttribute != null;
         }
 
-        private void ApplyFormulaBar()
+        private async Task ApplyFormulaBarAsync()
         {
             if (_formulaBarTarget?.TargetAttribute == null)
             {
@@ -877,7 +889,29 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IsFormulaBarEditing = false;
             RequestFormulaValueCellFocus();
             NotifyFormulaAttributeChanged(targetAttribute);
-            RecalculateFormulasAfterChange(targetAttribute);
+            await CompleteAttributeValueChangeAsync(targetAttribute);
+        }
+
+        /// <summary>
+        /// Завершает обработку изменения: пересчитывает формулы и обновляет
+        /// полиморфных наследников, если атрибут принадлежит листу.
+        /// </summary>
+        private async Task CompleteAttributeValueChangeAsync(ElementAttributeModel attribute)
+        {
+            // План каскада должен видеть уже пересчитанные значения формул изменённого листа,
+            // но ещё использовать прежнюю runtime-топологию для поиска разрешённых наследников.
+            RecalculateFormulasAfterChange(attribute);
+
+            if (attribute.IsRuntime || attribute.Owner is not TreeLeaveModel changedLeave)
+                return;
+
+            var polymorphismResult = await _leavePolymorphismChangeCoordinator
+                .HandleChangedLeaveAsync(changedLeave);
+
+            if (polymorphismResult.CascadeProcessed)
+                RecalculateLoadedFormulas();
+
+            _repositoryExplorerVM.RefreshLeavePolymorphismView(polymorphismResult);
         }
 
         private bool TryApplyFormulaBarText(ElementAttributeModel targetAttribute, string text)

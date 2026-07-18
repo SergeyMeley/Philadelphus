@@ -12,6 +12,7 @@ using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Models.LeavePolymorphism;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Models.Dialogs;
 using Philadelphus.Core.Domain.Relations;
@@ -295,6 +296,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="relationsService">Сервис вычисления связей репозитория.</param>
         /// <param name="relationDeletionConfirmationService">Сервис подтверждения удаления связанных элементов.</param>
         /// <param name="leavePolymorphismService">Сервис runtime-связей полиморфных листов.</param>
+        /// <param name="leavePolymorphismChangeCoordinator">Координатор интерактивных полиморфных изменений.</param>
         /// <param name="dialogService">Сервис диалогов подтверждения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
@@ -322,6 +324,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IRepositoryRelationsService relationsService,
             IRelationDeletionConfirmationService relationDeletionConfirmationService,
             ILeavePolymorphismService leavePolymorphismService,
+            ILeavePolymorphismChangeCoordinator leavePolymorphismChangeCoordinator,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -345,6 +348,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(relationsService);
             ArgumentNullException.ThrowIfNull(relationDeletionConfirmationService);
             ArgumentNullException.ThrowIfNull(leavePolymorphismService);
+            ArgumentNullException.ThrowIfNull(leavePolymorphismChangeCoordinator);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -369,7 +373,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 formulaDiagnosticsReporter,
                 notificationService,
                 applicationCommandsVM,
-                commandFactory);
+                commandFactory,
+                asyncCommandFactory,
+                leavePolymorphismChangeCoordinator);
 
             if (loadOnStartup)
             {
@@ -1074,7 +1080,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// Для Sequence пересортировка откладывается до потери фокуса таблицей, чтобы строка не прыгала
         /// во время редактирования. Остальные изменения сразу пробрасывают уведомления в соответствующую VM.
         /// </remarks>
-        private void OnChildCollectionTableCellChanged(Guid sourceUuid, string columnKey)
+        private async void OnChildCollectionTableCellChanged(Guid sourceUuid, string columnKey)
         {
             if (sourceUuid == Guid.Empty || string.IsNullOrWhiteSpace(columnKey))
             {
@@ -1095,7 +1101,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 && attributeOwner.Attributes?.Any(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal)) == true)
             {
                 var changedAttribute = attributeOwner.Attributes.First(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal));
-                FormulaBarVM.NotifyAttributeValueChanged(changedAttribute);
+                await FormulaBarVM.NotifyAttributeValueChangedAsync(changedAttribute);
                 targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
             }
 
@@ -1302,6 +1308,34 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         internal void NotifyRepositoryStateChanged()
         {
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
+        }
+
+        /// <summary>
+        /// Обновляет runtime-связи и элементы интерфейса после интерактивной операции.
+        /// </summary>
+        /// <param name="result">Результат обработки изменённого листа.</param>
+        internal void RefreshLeavePolymorphismView(LeavePolymorphismChangeResult result)
+        {
+            ArgumentNullException.ThrowIfNull(result);
+
+            if (result.CreatedLeaves.Count > 0)
+            {
+                var selectedUuid = SelectedRepositoryMember?.Uuid;
+                _philadelphusRepositoryVM.RebuildTreeItems();
+                SelectedRepositoryMember = selectedUuid.HasValue
+                    ? FindRepositoryMemberByUuid(selectedUuid.Value)
+                    : null;
+            }
+
+            if (result.CascadeProcessed)
+            {
+                RefreshLoadedLeavePolymorphismLinks();
+                NotifyRepositoryTreeChanged();
+            }
+
+            RebuildChildCollectionTable();
+            NotifyFormulaPropertyListChanged();
+            NotifyRepositoryStateChanged();
         }
 
         #endregion

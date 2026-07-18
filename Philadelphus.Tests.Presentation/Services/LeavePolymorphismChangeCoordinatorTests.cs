@@ -23,8 +23,10 @@ public sealed class LeavePolymorphismChangeCoordinatorTests
         var confirmation = new FakeLeavePolymorphismConfirmationService(true);
         var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
 
-        await coordinator.HandleChangedLeaveAsync(parentLeave);
+        var result = await coordinator.HandleChangedLeaveAsync(parentLeave);
 
+        result.CascadeProcessed.Should().BeFalse();
+        result.CreatedLeaves.Should().BeEmpty();
         confirmation.PropagationCallCount.Should().Be(0);
         polymorphism.ApplyCount.Should().Be(0);
         polymorphism.PreserveCount.Should().Be(0);
@@ -32,12 +34,13 @@ public sealed class LeavePolymorphismChangeCoordinatorTests
     }
 
     [Theory]
-    [InlineData(true, 1, 0)]
-    [InlineData(false, 0, 1)]
+    [InlineData(true, 1, 0, 0)]
+    [InlineData(false, 0, 1, 1)]
     public async Task HandleChangedLeaveAsync_WithAffectedLeaves_AppliesSelectedBranch(
         bool confirmed,
         int expectedApplyCount,
-        int expectedPreserveCount)
+        int expectedPreserveCount,
+        int expectedCreatedLeaveCount)
     {
         var (parentLeave, childLeave) = CreateLeaves();
         var item = new LeavePolymorphismPropagationItem(
@@ -46,12 +49,17 @@ public sealed class LeavePolymorphismChangeCoordinatorTests
             [],
             changedAttributeCount: 2);
         var plan = new LeavePolymorphismPropagationPlan(parentLeave, [item]);
-        var polymorphism = new FakeLeavePolymorphismService(plan);
+        var polymorphism = new FakeLeavePolymorphismService(plan)
+        {
+            PreservedCreatedLeaves = confirmed ? [] : [childLeave]
+        };
         var confirmation = new FakeLeavePolymorphismConfirmationService(confirmed);
         var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
 
-        await coordinator.HandleChangedLeaveAsync(parentLeave);
+        var result = await coordinator.HandleChangedLeaveAsync(parentLeave);
 
+        result.CascadeProcessed.Should().BeTrue();
+        result.CreatedLeaves.Should().HaveCount(expectedCreatedLeaveCount);
         confirmation.PropagationCallCount.Should().Be(1);
         polymorphism.ApplyCount.Should().Be(expectedApplyCount);
         polymorphism.PreserveCount.Should().Be(expectedPreserveCount);

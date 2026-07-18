@@ -29,6 +29,9 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
     /// <summary>Количество пересчётов связи изменённого листа.</summary>
     internal int ResolveCount { get; private set; }
 
+    /// <summary>Листы, которые fake-сервис возвращает из ветки сохранения.</summary>
+    internal IReadOnlyList<TreeLeaveModel> PreservedCreatedLeaves { get; init; } = [];
+
     /// <inheritdoc />
     public LeavePolymorphismResolution ResolveParent(TreeLeaveModel childLeave)
     {
@@ -52,7 +55,7 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
         LeavePolymorphismPropagationPlan plan)
     {
         PreserveCount++;
-        return new([], []);
+        return new([], PreservedCreatedLeaves);
     }
 
     /// <inheritdoc />

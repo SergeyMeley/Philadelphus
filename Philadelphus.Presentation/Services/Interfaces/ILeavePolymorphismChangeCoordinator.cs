@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Presentation.Models.LeavePolymorphism;
 
 namespace Philadelphus.Presentation.Services.Interfaces;
 
@@ -13,5 +14,6 @@ public interface ILeavePolymorphismChangeCoordinator
     /// и пересчитывает runtime-связь самого изменённого листа.
     /// </summary>
     /// <param name="changedLeave">Изменённый лист.</param>
-    Task HandleChangedLeaveAsync(TreeLeaveModel changedLeave);
+    /// <returns>Результат каскада и список созданных заменяющих листов.</returns>
+    Task<LeavePolymorphismChangeResult> HandleChangedLeaveAsync(TreeLeaveModel changedLeave);
 }

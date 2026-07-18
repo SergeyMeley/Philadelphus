@@ -2,6 +2,7 @@ using System.Threading;
 
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Models.LeavePolymorphism;
 using Philadelphus.Presentation.Services.Interfaces;
 
 namespace Philadelphus.Presentation.Services;
@@ -34,18 +35,20 @@ public sealed class LeavePolymorphismChangeCoordinator
     }
 
     /// <inheritdoc />
-    public async Task HandleChangedLeaveAsync(TreeLeaveModel changedLeave)
+    public async Task<LeavePolymorphismChangeResult> HandleChangedLeaveAsync(
+        TreeLeaveModel changedLeave)
     {
         ArgumentNullException.ThrowIfNull(changedLeave);
 
         // Модальный диалог оставляет async-операцию незавершённой. Защита не даёт
         // программным уведомлениям открыть второй каскад до ответа пользователя.
         if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) != 0)
-            return;
+            return new(false, []);
 
         try
         {
             var plan = _leavePolymorphismService.BuildPropagationPlan(changedLeave);
+            IReadOnlyList<TreeLeaveModel> createdLeaves = [];
             if (plan.AffectedLeaveCount > 0)
             {
                 var confirmed = await _confirmationService.ConfirmPropagationAsync(
@@ -56,11 +59,14 @@ public sealed class LeavePolymorphismChangeCoordinator
                 if (confirmed)
                     _leavePolymorphismService.ApplyPropagation(plan);
                 else
-                    _leavePolymorphismService.PreserveChildrenAndResolveReplacement(plan);
+                    createdLeaves = _leavePolymorphismService
+                        .PreserveChildrenAndResolveReplacement(plan)
+                        .CreatedLeaves;
             }
 
             // Изменённый лист сам может быть наследником другого уровня.
             _leavePolymorphismService.ResolveParent(changedLeave);
+            return new(plan.AffectedLeaveCount > 0, createdLeaves);
         }
         finally
         {
