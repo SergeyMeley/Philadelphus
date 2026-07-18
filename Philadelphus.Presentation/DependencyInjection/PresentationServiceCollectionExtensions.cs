@@ -31,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // Сервисы презентации
             services.AddSingleton<IConfigurationService, ConfigurationService>();
             services.AddSingleton<LeavePolymorphismConfirmationSessionState>();
+            services.AddTransient<ILeavePolymorphismChangeCoordinator, LeavePolymorphismChangeCoordinator>();
 
             // Регистрация ViewModel
             // Общие ViewModel
