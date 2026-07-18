@@ -338,6 +338,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private string BuildAttributesStringValue()
         {
             var attributes = Attributes?
+                .Where(x => x.IsRuntime == false)
                 .ToDictionary(x => x.Name, GetAttributeStringValue)
                 ?? new Dictionary<string, string>();
 

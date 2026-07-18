@@ -80,6 +80,21 @@ namespace Philadelphus.Tests.Domain.Entities.MainEntities
         }
 
         [Fact]
+        public void ElementAttributeName_Should_Block_PolymorphicParentNodeName()
+        {
+            var root = CreateRoot();
+            var parent = CreateNode(root);
+            parent.Name = "Parent";
+            var child = CreateNode(parent);
+            var attribute = CreateOwnAttributeWithDefaultPolicy(child);
+            attribute.Name = "Allowed";
+
+            attribute.Name = parent.Name;
+
+            Assert.Equal("Allowed", attribute.Name);
+        }
+
+        [Fact]
         public void Name_Should_Remove_Special_Characters()
         {
             var root = CreateRoot();

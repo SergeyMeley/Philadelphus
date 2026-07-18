@@ -328,6 +328,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
+        /// Признак вычисляемого атрибута, который существует только во время работы приложения.
+        /// </summary>
+        public virtual bool IsRuntime => false;
+
+        /// <summary>
         /// Все владельцы (рекурсивно)
         /// </summary>
         public override ReadOnlyDictionary<Guid, IOwnerModel> AllOwnersRecursive 

@@ -526,13 +526,18 @@ namespace Philadelphus.Core.Domain.Services.Implementations
         /// <returns>Количество сохраненных изменений</returns>
         public long SaveContentChanges(IEnumerable<ElementAttributeModel> elementAttributes)
         {
+            // Runtime-атрибуты вычисляются заново и не имеют представления в хранилище.
+            var persistentAttributes = elementAttributes?
+                .Where(x => x is { IsRuntime: false })
+                .ToList() ?? [];
+
             // Проверка исходных данных
-            if (elementAttributes == null || elementAttributes.Count() == 0)
+            if (persistentAttributes.Count == 0)
                 return 0;
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(
-                $"Начало сохранения атрибутов. Рабочие деревья: {string.Join(", ", elementAttributes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
+                $"Начало сохранения атрибутов. Рабочие деревья: {string.Join(", ", persistentAttributes.Select(x => $"'{x.OwningWorkingTree.Name}' [{x.OwningWorkingTree.Uuid}].").Distinct())}",
                 criticalLevel: NotificationCriticalLevelModel.Info);
 
             // Сохранение изменений
@@ -540,9 +545,9 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             long initCount = 0;
             long changedCount = 0;
             long deletedCount = 0;
-            foreach (var infrastructure in elementAttributes.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
+            foreach (var infrastructure in persistentAttributes.Select(x => x.DataStorage).Distinct().Select(x => x.ShrubMembersInfrastructureRepository))
             {
-                var fullCollection = elementAttributes.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
+                var fullCollection = persistentAttributes.Where(x => x.DataStorage.ShrubMembersInfrastructureRepository == infrastructure).ToList();
 
                 SaveAndReturnAuditInfo<ElementAttributeModel, ElementAttribute>(
                     fullCollection,
@@ -570,7 +575,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             }
 
             // Постобработка сохраненных элементов
-            PostProcessSavedEntities(elementAttributes);
+            PostProcessSavedEntities(persistentAttributes);
 
             // Уведомление
             _notificationService.SendTextMessage<PhiladelphusRepositoryService>(

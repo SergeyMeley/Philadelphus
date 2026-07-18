@@ -1,5 +1,6 @@
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
@@ -11,6 +12,8 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
+using Philadelphus.Core.Domain.ImportExport.Entities.DTOs;
+using Philadelphus.Core.Domain.ImportExport.Mapping;
 using Philadelphus.Core.Domain.LeaveAttributeValues.Services;
 using Philadelphus.Core.Domain.LeavePolymorphism.Services;
 using Philadelphus.Core.Domain.Policies;
@@ -412,6 +415,61 @@ public class LeavePolymorphismServiceTests
             .Should().NotContain(x => x is LeavePolymorphismAttributeModel);
         systemNode.Attributes
             .Should().NotContain(x => x is LeavePolymorphismAttributeModel);
+    }
+
+    [Fact]
+    public void RuntimeAttribute_DoesNotParticipateInPersistenceOrDirtyState()
+    {
+        var graph = CreateGraph();
+        var attribute = graph.ChildNode.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .Should().ContainSingle().Which;
+        var repositoryService = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(), Mock.Of<ILogger>(), graph.Notifications);
+
+        var savedCount = repositoryService.SaveContentChanges([attribute]);
+
+        savedCount.Should().Be(0);
+        attribute.State.Should().Be(State.SavedOrLoaded);
+        graph.Tree.ContentAttributes.Should().NotContain(x => x.IsRuntime);
+    }
+
+    [Fact]
+    public void RuntimeAttribute_IsExcludedFromImportExportDto()
+    {
+        var notifications = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(Guid.NewGuid(), tree, notifications,
+            new EmptyPropertiesPolicy<TreeRootModel>()) { Name = "Root" };
+        var parent = CreateNode(root, tree, notifications);
+        parent.Name = "Parent";
+        var child = CreateNode(parent, tree, notifications);
+        child.Name = "Child";
+        var runtimeAttribute = child.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .Should().ContainSingle().Which;
+        var configuration = new MapperConfiguration(
+            cfg => cfg.AddProfile<ImportExportDtoMappingProfile>(),
+            NullLoggerFactory.Instance);
+
+        var dto = configuration.CreateMapper().Map<TreeNodeExportDTO>(child);
+
+        dto.Attributes.Should().NotContain(x => x.Name == runtimeAttribute.Name);
+    }
+
+    [Fact]
+    public void RuntimeAttribute_IsExcludedFromLeaveStringValueJson()
+    {
+        var notifications = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(Guid.NewGuid(), tree, notifications,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var parent = CreateNode(root, tree, notifications);
+        parent.Name = "Parent";
+        var child = CreateNode(parent, tree, notifications);
+        var leave = CreateLeave(child, tree, notifications);
+
+        leave.StringValue.Should().Be("{}");
     }
 
     private static LeavePolymorphismService CreateService(LeavePolymorphismTestGraph graph)

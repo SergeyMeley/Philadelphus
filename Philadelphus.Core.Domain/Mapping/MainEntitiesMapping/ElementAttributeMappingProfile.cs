@@ -49,6 +49,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForMember(dest => dest.ValueTypeUuid, opt => opt.Ignore())     // Сложная логика
                 .ForMember(dest => dest.ValueUuid, opt => opt.Ignore())         // Сложная логика
                 .ForMember(dest => dest.ValueFormula, opt => opt.MapFrom(src => src.ValueFormula))
+                .ForSourceMember(src => src.IsRuntime, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ValueFormulaErrorCode, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ValueTypeReferenceErrorCode, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ValuesReferenceErrorCode, opt => opt.DoNotValidate())

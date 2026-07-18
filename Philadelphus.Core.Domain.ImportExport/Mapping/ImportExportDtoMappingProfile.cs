@@ -28,17 +28,20 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
 
             CreateMap<TreeRootModel, TreeRootExportDTO>()
                 .ForMember(dest => dest.ChildNodes, opt => opt.MapFrom(src => src.ChildNodes))
-                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes));
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src =>
+                    src.Attributes.Where(x => x.IsRuntime == false)));
 
             CreateMap<TreeNodeModel, TreeNodeExportDTO>()
                 .ForMember(dest => dest.OwningRootName, opt => opt.MapFrom(src => GetOwningRootName(src)))
                 .ForMember(dest => dest.ChildNodes, opt => opt.MapFrom(src => src.ChildNodes))
                 .ForMember(dest => dest.ChildLeaves, opt => opt.MapFrom(src => src.ChildLeaves))
-                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes));
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src =>
+                    src.Attributes.Where(x => x.IsRuntime == false)));
 
             CreateMap<TreeLeaveModel, TreeLeaveExportDTO>()
                 .ForMember(dest => dest.OwningNodeName, opt => opt.MapFrom(src => GetOwningNodeName(src)))
-                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src => src.Attributes));
+                .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src =>
+                    src.Attributes.Where(x => x.IsRuntime == false)));
 
             CreateMap<ElementAttributeModel, AttributeExportDTO>()
                 .ForMember(dest => dest.DataTypeNodeName, opt => opt.MapFrom(src => GetDataTypeNodeName(src)))

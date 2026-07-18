@@ -36,17 +36,26 @@ public sealed class LeavePolymorphismAttributeModel : ElementAttributeModel
             notificationService,
             propertiesPolicy)
     {
+        // Базовый конструктор регистрирует обычные атрибуты для сохранения.
+        // Служебная строка хранится только в Attributes локального владельца.
+        OwningWorkingTree.ContentAttributes.Remove(this);
     }
 
     /// <summary>
     /// Признак атрибута, существующего только во время работы приложения.
     /// </summary>
-    public bool IsRuntime => true;
+    public override bool IsRuntime => true;
 
     /// <summary>
     /// Признак служебного атрибута полиморфной связи.
     /// </summary>
     public bool IsPolymorphic => true;
+
+    /// <summary>
+    /// Runtime-атрибут не участвует в определении несохранённых изменений.
+    /// </summary>
+    public override State State =>
+        global::Philadelphus.Core.Domain.Entities.Enums.State.SavedOrLoaded;
 
     /// <summary>
     /// Имя всегда совпадает с актуальным именем прямого родительского узла.
