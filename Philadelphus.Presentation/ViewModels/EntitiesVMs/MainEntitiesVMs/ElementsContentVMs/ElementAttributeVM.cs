@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Extensions;
@@ -23,6 +24,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
         private readonly ElementAttributeModel _model;
         private ObservableCollection<TreeLeaveModel> _assignedValues = new ObservableCollection<TreeLeaveModel>();
+
+        /// <summary>
+        /// Специализированное UI-состояние runtime-атрибута полиморфного родителя.
+        /// </summary>
+        public LeavePolymorphismAttributeVM? LeavePolymorphism { get; }
 
         /// <summary>
         /// Владелец.
@@ -347,6 +353,9 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             _service = service;
 
             _model = elementAttribute;
+            LeavePolymorphism = elementAttribute is LeavePolymorphismAttributeModel polymorphismAttribute
+                ? new LeavePolymorphismAttributeVM(polymorphismAttribute)
+                : null;
 
             foreach (var item in _model.Values)
             {
