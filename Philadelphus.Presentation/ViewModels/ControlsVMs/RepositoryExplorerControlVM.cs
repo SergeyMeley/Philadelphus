@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Philadelphus.Core.Domain.Configurations;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Diagnostics;
@@ -48,6 +49,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IDataStorageSelectionDialogService _dataStorageSelectionDialogService;
         private readonly IRelationDeletionConfirmationService _relationDeletionConfirmationService;
         private readonly IRepositoryRelationsService _relationsService;
+        private readonly ILeavePolymorphismService _leavePolymorphismService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -292,6 +294,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="relationsVMFactory">Фабрика модели дерева связей.</param>
         /// <param name="relationsService">Сервис вычисления связей репозитория.</param>
         /// <param name="relationDeletionConfirmationService">Сервис подтверждения удаления связанных элементов.</param>
+        /// <param name="leavePolymorphismService">Сервис runtime-связей полиморфных листов.</param>
         /// <param name="dialogService">Сервис диалогов подтверждения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
@@ -318,6 +321,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IRepositoryRelationsControlVMFactory relationsVMFactory,
             IRepositoryRelationsService relationsService,
             IRelationDeletionConfirmationService relationDeletionConfirmationService,
+            ILeavePolymorphismService leavePolymorphismService,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -340,6 +344,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(relationsVMFactory);
             ArgumentNullException.ThrowIfNull(relationsService);
             ArgumentNullException.ThrowIfNull(relationDeletionConfirmationService);
+            ArgumentNullException.ThrowIfNull(leavePolymorphismService);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -350,6 +355,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _dataStorageSelectionDialogService = dataStorageSelectionDialogService;
             _relationsService = relationsService;
             _relationDeletionConfirmationService = relationDeletionConfirmationService;
+            _leavePolymorphismService = leavePolymorphismService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -792,6 +798,24 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             // для SQL-запросов и отчетов. После перестроения модели представления восстанавливаем
             // runtime-значения вычислением ValueFormula.
             FormulaBarVM.RecalculateLoadedFormulas();
+            RefreshLoadedLeavePolymorphismLinks();
+        }
+
+        /// <summary>
+        /// Восстанавливает вычисляемые полиморфные связи после загрузки репозитория.
+        /// </summary>
+        /// <remarks>
+        /// При загрузке связи только пересчитываются: значения атрибутов не перезаписываются,
+        /// а подтверждение пользователя не запрашивается.
+        /// </remarks>
+        private void RefreshLoadedLeavePolymorphismLinks()
+        {
+            var polymorphicLeaves = _philadelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees
+                .SelectMany(x => x.ContentLeaves)
+                .Where(x => x.Attributes.Any(attribute =>
+                    attribute is LeavePolymorphismAttributeModel));
+
+            _leavePolymorphismService.RefreshLinks(polymorphicLeaves);
         }
 
         /// <summary>

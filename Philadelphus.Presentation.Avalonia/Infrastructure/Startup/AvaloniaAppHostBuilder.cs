@@ -12,6 +12,8 @@ using Philadelphus.Core.Domain.Identity.Configurations;
 using Philadelphus.Core.Domain.Identity.Services.Implementations;
 using Philadelphus.Core.Domain.Identity.Services.Interfaces;
 using Philadelphus.Core.Domain.Infrastructure.Messaging.Messages;
+using Philadelphus.Core.Domain.LeaveAttributeValues.Services;
+using Philadelphus.Core.Domain.LeavePolymorphism.Services;
 using Philadelphus.Core.Domain.Reports.Services;
 using Philadelphus.Core.Domain.Services.Implementations;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -175,6 +177,8 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
                     services.AddSingleton<IDataStoragesService, DataStoragesService>();
                     services.AddTransient<IPhiladelphusRepositoryCollectionService, PhiladelphusRepositoryCollectionService>();
                     services.AddTransient<IPhiladelphusRepositoryService, PhiladelphusRepositoryService>();
+                    services.AddTransient<ILeaveAttributeValueService, LeaveAttributeValueService>();
+                    services.AddTransient<ILeavePolymorphismService, LeavePolymorphismService>();
                     services.AddTransient<IRepositoryRelationsService, RepositoryRelationsService>();
                     services.AddTransient<IExtensionManager, ExtensionManager>();
                     services.AddSingleton<IReportService, ReportService>();
