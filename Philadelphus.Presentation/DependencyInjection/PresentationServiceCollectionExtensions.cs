@@ -1,5 +1,6 @@
 ﻿using Philadelphus.Presentation.Factories.Implementations;
 using Philadelphus.Presentation.Factories.Interfaces;
+using Philadelphus.Presentation.Models.LeavePolymorphism;
 using Philadelphus.Presentation.Services;
 using Philadelphus.Presentation.Services.Implementations;
 using Philadelphus.Presentation.Services.Interfaces;
@@ -29,6 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Сервисы презентации
             services.AddSingleton<IConfigurationService, ConfigurationService>();
+            services.AddSingleton<LeavePolymorphismConfirmationSessionState>();
 
             // Регистрация ViewModel
             // Общие ViewModel
