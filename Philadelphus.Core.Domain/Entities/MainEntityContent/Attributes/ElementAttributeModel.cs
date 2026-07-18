@@ -53,7 +53,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Тип данных (узел дерева репозитория Чубушника)
         /// </summary>
-        public TreeNodeModel ValueType
+        public virtual TreeNodeModel ValueType
         {
             get => GetValue(_valueType);
             set
@@ -93,7 +93,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Допускается коллекция значений
         /// </summary>
-        public bool IsCollectionValue
+        public virtual bool IsCollectionValue
         {
             get => GetValue(_isCollectionValue);
             set => SetValue(ref _isCollectionValue, value);
@@ -102,7 +102,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Значение (лист выбранного узла дерева репозитория Чубушника)
         /// </summary>
-        public TreeLeaveModel Value
+        public virtual TreeLeaveModel Value
         {
             get => GetValue(GetEffectiveValue());
             set
@@ -240,7 +240,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Область видимости
         /// </summary>
-        public VisibilityScope Visibility
+        public virtual VisibilityScope Visibility
         {
             get => GetValue(_visibility);
             set => SetValue(ref _visibility, value);
@@ -558,7 +558,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <param name="newOwner">Новый владелец.</param>
         /// <returns>Результат выполнения операции.</returns>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
-        public ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
+        public virtual ElementAttributeModel CloneForChild(IAttributeOwnerModel newOwner)
         {
             ArgumentNullException.ThrowIfNull(newOwner);
 

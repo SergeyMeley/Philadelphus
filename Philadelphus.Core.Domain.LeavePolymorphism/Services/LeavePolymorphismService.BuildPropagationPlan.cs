@@ -43,6 +43,7 @@ public sealed partial class LeavePolymorphismService
 
                 var targetProjection = CreateProjection(targetLeave);
                 var declaringUuids = sourceLeave.ParentNode.Attributes
+                    .Where(x => IsPolymorphismAttribute(x) == false)
                     .Select(x => x.DeclaringUuid)
                     .ToList();
                 var changedAttributeCount = ApplyProjection(
@@ -78,6 +79,9 @@ public sealed partial class LeavePolymorphismService
         var result = new Dictionary<Guid, LeavePolymorphismProjectedAttributeValue>();
         foreach (var attribute in leave.Attributes)
         {
+            if (IsPolymorphismAttribute(attribute))
+                continue;
+
             if (result.TryAdd(
                     attribute.DeclaringUuid,
                     new LeavePolymorphismProjectedAttributeValue(attribute)) == false)

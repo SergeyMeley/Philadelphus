@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Helpers;
@@ -115,6 +116,8 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         {
             lock (_lockObject)
             {
+                EnsureRuntimeAttributes();
+
                 var attributes = _attributes?.Where(x => x.IsOwn).ToList();
 
                 var oldParentAttributes = _attributes?.Where(x => x.IsOwn == false).ToList();
@@ -129,6 +132,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
                             var allCurrentParentAttributes = ao.GetVisibleAttributesRecursive(wtm).ToList();
                             foreach (var attribute in allCurrentParentAttributes)
                             {
+                                // Системные узлы и их листья не участвуют в пользовательском полиморфизме.
+                                if (attribute is LeavePolymorphismAttributeModel
+                                    && (this is SystemBaseTreeNodeModel
+                                        || this is TreeLeaveModel
+                                        {
+                                            ParentNode: SystemBaseTreeNodeModel
+                                        }))
+                                {
+                                    continue;
+                                }
+
                                 if (newParentAttributes.Any(x => x.DeclaringUuid == attribute.DeclaringUuid) == false)   // Пропускаем атрибуты, которые уже унаследованы с ближайшегго родителя
                                 {
                                     var oldParentAttribute = oldParentAttributes.SingleOrDefault(x => x.DeclaringUuid == attribute.DeclaringUuid);
@@ -156,6 +170,17 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
                 return attributes.AsReadOnly();
             }
+        }
+
+        /// <summary>
+        /// Создаёт отсутствующие вычисляемые атрибуты перед обновлением кеша.
+        /// </summary>
+        /// <remarks>
+        /// Базовые сущности не имеют runtime-атрибутов; специализированные владельцы
+        /// переопределяют метод и добавляют их в общую коллекцию атрибутов.
+        /// </remarks>
+        protected virtual void EnsureRuntimeAttributes()
+        {
         }
 
         /// <summary>

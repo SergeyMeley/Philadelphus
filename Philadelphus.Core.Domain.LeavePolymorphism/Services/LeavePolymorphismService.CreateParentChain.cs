@@ -56,6 +56,7 @@ public sealed partial class LeavePolymorphismService
         while (parentNode != null)
         {
             var declaringUuids = parentNode.Attributes
+                .Where(x => IsPolymorphismAttribute(x) == false)
                 .Select(x => x.DeclaringUuid)
                 .ToHashSet();
             var sourceAttributes = GetExpectedParentAttributes(childLeave, declaringUuids);

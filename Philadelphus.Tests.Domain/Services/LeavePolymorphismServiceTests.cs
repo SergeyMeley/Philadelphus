@@ -5,6 +5,7 @@ using Moq;
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -346,6 +347,71 @@ public class LeavePolymorphismServiceTests
             .Which.Status.Should().Be(LeavePolymorphismStatus.Ambiguous);
         graph.FirstChild.PolymorphicParentLeave.Should().BeNull();
         GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
+    }
+
+    [Fact]
+    public void RuntimeAttribute_IsCachedAndSynchronizesParentDefinition()
+    {
+        var graph = CreateGraph();
+
+        var runtimeAttributes = graph.ChildNode.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .ToList();
+        runtimeAttributes.Should().HaveCount(1);
+        var attribute = runtimeAttributes.Single();
+        var parentAttribute = graph.ParentNode.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .Should().ContainSingle().Which;
+        graph.ParentNode.Name = "Переименованный родитель";
+
+        attribute.IsRuntime.Should().BeTrue();
+        attribute.IsPolymorphic.Should().BeTrue();
+        attribute.Name.Should().Be(graph.ParentNode.Name);
+        attribute.ValueType.Should().BeSameAs(graph.ParentNode);
+        attribute.IsCollectionValue.Should().BeFalse();
+        attribute.Visibility.Should().Be(VisibilityScope.Protected);
+        attribute.DeclaringUuid.Should().Be(parentAttribute.DeclaringUuid);
+        attribute.LocalUuid.Should().NotBe(parentAttribute.LocalUuid);
+        graph.ChildNode.Attributes.OfType<LeavePolymorphismAttributeModel>()
+            .Should().ContainSingle().Which.Should().BeSameAs(attribute);
+    }
+
+    [Fact]
+    public void RuntimeAttribute_MaterializesForDirectLeaveAndReflectsResolution()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.FirstParent, graph, graph.FirstValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+
+        var resolution = CreateService(graph).ResolveParent(graph.FirstChild);
+
+        var attribute = graph.FirstChild.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .Should().ContainSingle().Which;
+        attribute.DeclaringUuid.Should().Be(graph.ParentNode.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .Should().ContainSingle().Which.DeclaringUuid);
+        attribute.Status.Should().Be(LeavePolymorphismStatus.Resolved);
+        attribute.Candidates.Should().Equal(graph.FirstParent);
+        attribute.Value.Should().BeSameAs(graph.FirstParent);
+        resolution.ParentLeave.Should().BeSameAs(attribute.Value);
+    }
+
+    [Fact]
+    public void RuntimeAttribute_IsNotCreatedForRootLevelOrSystemNode()
+    {
+        var graph = CreateGraph();
+        var systemNode = new SystemBaseTreeNodeModel(
+            graph.ParentNode,
+            graph.Tree,
+            SystemBaseType.STRING,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+
+        graph.GrandParentNode.Attributes
+            .Should().NotContain(x => x is LeavePolymorphismAttributeModel);
+        systemNode.Attributes
+            .Should().NotContain(x => x is LeavePolymorphismAttributeModel);
     }
 
     private static LeavePolymorphismService CreateService(LeavePolymorphismTestGraph graph)

@@ -1,5 +1,7 @@
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
+using Philadelphus.Core.Domain.Policies.Attributes.Builders;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
@@ -24,6 +26,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
         private readonly HashSet<Guid> _childNodeUuids = new();
         private readonly HashSet<Guid> _childLeaveUuids = new();
         private TreeLeaveModel? _polymorphicParentLeave;
+        private LeavePolymorphismAttributeModel? _leavePolymorphismAttribute;
 
         /// <summary>
         /// Фиксированная часть наименования по умолчанию
@@ -204,6 +207,34 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryM
 
             _polymorphicParentLeave = parentLeave;
             return true;
+        }
+
+        /// <summary>
+        /// Добавляет служебный атрибут только пользовательскому узлу с родительским узлом.
+        /// </summary>
+        protected override void EnsureRuntimeAttributes()
+        {
+            if (_leavePolymorphismAttribute != null
+                || ParentNode == null
+                || this is SystemBaseTreeNodeModel)
+            {
+                return;
+            }
+
+            // Потомок получает существующее объявление обычным механизмом наследования,
+            // сохраняя его DeclaringUuid и создавая только новый LocalUuid.
+            if (ParentNode.Attributes.Any(x => x is LeavePolymorphismAttributeModel))
+                return;
+
+            var uuid = Guid.CreateVersion7();
+            _leavePolymorphismAttribute = new LeavePolymorphismAttributeModel(
+                uuid,
+                this,
+                uuid,
+                this,
+                OwningWorkingTree,
+                _notificationService,
+                AttributePolicyBuilder.CreateDefault(_notificationService));
         }
 
         /// <summary>

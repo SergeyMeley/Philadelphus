@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -77,6 +78,10 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
         // SetPolymorphicParentLeave атомарно удаляет старую обратную связь
         // и добавляет новую только для однозначно разрешённого результата.
         childLeave.SetPolymorphicParentLeave(parentLeave);
+        childLeave.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .SingleOrDefault()
+            ?.SetResolution(status, candidates);
         return new(childLeave, status, parentLeave, candidates);
     }
 
@@ -95,6 +100,7 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
         TreeNodeModel parentNode)
     {
         var declaringUuids = parentNode.Attributes
+            .Where(x => IsPolymorphismAttribute(x) == false)
             .Select(x => x.DeclaringUuid)
             .ToHashSet();
         var expectedAttributes = GetExpectedParentAttributes(sourceLeave, declaringUuids);
@@ -116,4 +122,10 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
         sourceLeave.Attributes
             .Where(x => declaringUuids.Contains(x.DeclaringUuid))
             .ToList();
+
+    /// <summary>
+    /// Проверяет принадлежность атрибута к вычисляемой полиморфной связи.
+    /// </summary>
+    private static bool IsPolymorphismAttribute(ElementAttributeModel attribute) =>
+        attribute is LeavePolymorphismAttributeModel;
 }
