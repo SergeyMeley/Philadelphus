@@ -121,6 +121,28 @@ public class LeaveAttributeValueServiceTests
     }
 
     [Fact]
+    public void CountFillChanges_DoesNotMutateTargetAndMatchesFillResult()
+    {
+        var graph = CreateGraph();
+        var declaration = CreateDeclaration(graph);
+        var source = CreateLeave(graph);
+        var target = CreateLeave(graph);
+        SetValue(source, declaration, graph.SecondValue);
+        SetValue(target, declaration, graph.FirstValue);
+        var service = CreateService();
+
+        var changedCount = service.CountFillChanges(
+            target,
+            source,
+            [declaration.DeclaringUuid]);
+
+        changedCount.Should().Be(1);
+        GetAttribute(target, declaration).Value.Should().BeSameAs(graph.FirstValue);
+        service.FillFromLeave(target, source, [declaration.DeclaringUuid])
+            .ChangedAttributes.Should().HaveCount(changedCount);
+    }
+
+    [Fact]
     public void CreateLeave_CreatesInitializedAutoNamedLeaveWithSourceValues()
     {
         var graph = CreateGraph();

@@ -1,3 +1,4 @@
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 
@@ -23,6 +24,29 @@ public interface ILeavePolymorphismService
     /// <param name="childLeave">Лист, для которого выполняется поиск.</param>
     /// <returns>Статус разрешения и найденные кандидаты.</returns>
     LeavePolymorphismResolution ResolveParent(TreeLeaveModel childLeave);
+
+    /// <summary>
+    /// Без изменения листа рассчитывает число унаследованных атрибутов,
+    /// которые будут заполнены выбранным полиморфным родителем.
+    /// </summary>
+    /// <param name="childLeave">Заполняемый лист-наследник.</param>
+    /// <param name="parentLeave">Выбранный лист прямого родительского узла.</param>
+    /// <returns>Количество изменяемых атрибутов.</returns>
+    int CountFillFromParentChanges(
+        TreeLeaveModel childLeave,
+        TreeLeaveModel parentLeave);
+
+    /// <summary>
+    /// Перезаписывает атрибуты прямого родительского уровня значениями выбранного листа.
+    /// Runtime-связь после операции должна быть отдельно пересчитана через
+    /// <see cref="ResolveParent" />.
+    /// </summary>
+    /// <param name="childLeave">Заполняемый лист-наследник.</param>
+    /// <param name="parentLeave">Выбранный лист прямого родительского узла.</param>
+    /// <returns>Сведения о фактически изменённых атрибутах.</returns>
+    LeaveAttributeFillResult FillFromParent(
+        TreeLeaveModel childLeave,
+        TreeLeaveModel parentLeave);
 
     /// <summary>
     /// Создаёт отсутствующие листья полиморфных родителей по всей цепочке узлов.

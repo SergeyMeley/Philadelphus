@@ -100,6 +100,30 @@ public class LeavePolymorphismServiceTests
     }
 
     [Fact]
+    public void FillFromParent_PreviewsAndFillsOnlyDirectParentAttributes()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.SecondParent, graph, graph.SecondValue);
+        SetValue(graph.FirstChild, graph, graph.FirstValue);
+        var service = CreateService(graph);
+
+        var changedCount = service.CountFillFromParentChanges(
+            graph.FirstChild,
+            graph.SecondParent);
+
+        changedCount.Should().Be(1);
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.FirstValue);
+
+        var result = service.FillFromParent(graph.FirstChild, graph.SecondParent);
+
+        result.ChangedAttributes.Should().ContainSingle()
+            .Which.Should().BeSameAs(GetAttribute(graph.FirstChild, graph));
+        GetAttribute(graph.FirstChild, graph).Value.Should().BeSameAs(graph.SecondValue);
+        GetAttribute(graph.FirstChild, graph).ValueFormula
+            .Should().Be($"=[{graph.SecondValue.Uuid}]");
+    }
+
+    [Fact]
     public void CreateParentChain_CreatesAndLinksEveryMissingLevel()
     {
         var graph = CreateGraph();

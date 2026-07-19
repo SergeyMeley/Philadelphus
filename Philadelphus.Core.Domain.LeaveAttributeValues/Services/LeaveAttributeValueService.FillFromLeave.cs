@@ -30,13 +30,38 @@ public sealed partial class LeaveAttributeValueService
             return new([]);
 
         var requestedUuids = declaringUuids.ToHashSet();
-        return FillAttributes(targetLeave, sourceLeave.Attributes, requestedUuids);
+        var changedAttributes = FindChangedAttributes(
+            targetLeave,
+            sourceLeave.Attributes,
+            requestedUuids);
+        return FillAttributes(changedAttributes, sourceLeave.Attributes);
+    }
+
+    /// <inheritdoc />
+    public int CountFillChanges(
+        TreeLeaveModel targetLeave,
+        TreeLeaveModel sourceLeave,
+        IEnumerable<Guid> declaringUuids)
+    {
+        ArgumentNullException.ThrowIfNull(targetLeave);
+        ArgumentNullException.ThrowIfNull(sourceLeave);
+        ArgumentNullException.ThrowIfNull(declaringUuids);
+
+        if (ReferenceEquals(targetLeave, sourceLeave))
+            return 0;
+
+        return FindChangedAttributes(
+                targetLeave,
+                sourceLeave.Attributes,
+                declaringUuids.ToHashSet())
+            .Count;
     }
 
     /// <summary>
-    /// Заполняет целевой лист из произвольного набора исходных атрибутов.
+    /// Находит атрибуты, которые заполнение действительно изменит, и заранее
+    /// проверяет совместимость всех источников до начала мутаций.
     /// </summary>
-    private static LeaveAttributeFillResult FillAttributes(
+    private static IReadOnlyList<ElementAttributeModel> FindChangedAttributes(
         TreeLeaveModel targetLeave,
         IEnumerable<ElementAttributeModel> sourceAttributes,
         IReadOnlySet<Guid> requestedUuids)
@@ -57,15 +82,53 @@ public sealed partial class LeaveAttributeValueService
             }
 
             EnsureCompatibleSource(targetAttribute, sourceAttribute);
-            var changed = targetAttribute.IsCollectionValue
-                ? FillCollection(targetAttribute, sourceAttribute)
-                : FillScalar(targetAttribute, sourceAttribute);
-
-            if (changed)
+            if (RequiresFill(targetAttribute, sourceAttribute))
                 changedAttributes.Add(targetAttribute);
         }
 
+        return changedAttributes;
+    }
+
+    /// <summary>
+    /// Заполняет предварительно проверенные целевые атрибуты.
+    /// </summary>
+    private static LeaveAttributeFillResult FillAttributes(
+        IReadOnlyList<ElementAttributeModel> changedAttributes,
+        IEnumerable<ElementAttributeModel> sourceAttributes)
+    {
+        var sourceAttributesByUuid = sourceAttributes
+            .ToDictionary(x => x.DeclaringUuid);
+
+        foreach (var targetAttribute in changedAttributes)
+        {
+            var sourceAttribute = sourceAttributesByUuid[targetAttribute.DeclaringUuid];
+            if (targetAttribute.IsCollectionValue)
+                FillCollection(targetAttribute, sourceAttribute);
+            else
+                FillScalar(targetAttribute, sourceAttribute);
+        }
+
         return new(changedAttributes);
+    }
+
+    /// <summary>
+    /// Проверяет, отличается ли текущее представление значения от результата заполнения.
+    /// </summary>
+    private static bool RequiresFill(
+        ElementAttributeModel targetAttribute,
+        ElementAttributeModel sourceAttribute)
+    {
+        if (targetAttribute.IsCollectionValue)
+        {
+            return string.IsNullOrEmpty(targetAttribute.ValuesReferenceErrorCode) == false
+                || ValuesMatch(targetAttribute.Values, sourceAttribute.Values) == false;
+        }
+
+        var sourceValue = sourceAttribute.Value;
+        var expectedFormula = sourceValue == null
+            ? string.Empty
+            : FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(sourceValue.Uuid);
+        return ScalarMatches(targetAttribute, sourceValue, expectedFormula) == false;
     }
 
     /// <summary>

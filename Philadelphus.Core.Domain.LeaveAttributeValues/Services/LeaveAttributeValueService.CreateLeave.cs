@@ -48,7 +48,11 @@ public sealed partial class LeaveAttributeValueService : ILeaveAttributeValueSer
         var declaringUuids = sourceAttributeList
             .Select(x => x.DeclaringUuid)
             .ToHashSet();
-        FillAttributes(createdLeave, sourceAttributeList, declaringUuids);
+        var changedAttributes = FindChangedAttributes(
+            createdLeave,
+            sourceAttributeList,
+            declaringUuids);
+        FillAttributes(changedAttributes, sourceAttributeList);
         return createdLeave;
     }
 

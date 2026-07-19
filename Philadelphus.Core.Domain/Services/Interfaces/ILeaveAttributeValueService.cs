@@ -32,6 +32,19 @@ public interface ILeaveAttributeValueService
         IEnumerable<Guid> declaringUuids);
 
     /// <summary>
+    /// Без изменения моделей рассчитывает число атрибутов, которые будут перезаписаны
+    /// операцией <see cref="FillFromLeave" />.
+    /// </summary>
+    /// <param name="targetLeave">Заполняемый лист.</param>
+    /// <param name="sourceLeave">Лист-источник.</param>
+    /// <param name="declaringUuids">Идентификаторы объявлений сравниваемых атрибутов.</param>
+    /// <returns>Точное количество изменяемых атрибутов.</returns>
+    int CountFillChanges(
+        TreeLeaveModel targetLeave,
+        TreeLeaveModel sourceLeave,
+        IEnumerable<Guid> declaringUuids);
+
+    /// <summary>
     /// Создаёт лист и переносит в него переданные значения атрибутов.
     /// </summary>
     /// <param name="parentNode">Узел создаваемого листа.</param>
