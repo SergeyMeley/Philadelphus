@@ -91,20 +91,48 @@ public sealed class RepositoryRelationsService : IRepositoryRelationsService
     /// </summary>
     /// <param name="repository">Репозиторий, атрибуты которого необходимо получить.</param>
     /// <returns>Коллекция атрибутов без повторов по UUID.</returns>
-    private static IEnumerable<ElementAttributeModel> GetAttributes(
+    private static IReadOnlyList<ElementAttributeModel> GetAttributes(
         PhiladelphusRepositoryModel repository)
     {
         ArgumentNullException.ThrowIfNull(repository);
 
-        return repository.AllContentRecursive.Values
-            .OfType<ElementAttributeModel>()
-            .Concat(repository.ContentShrub.ContentWorkingTrees
-                .SelectMany(x => x.ContentAttributes))
-            .Concat(repository.ContentShrub.ContentWorkingTrees
-                .SelectMany(x => x.Content.Values)
-                .OfType<IAttributeOwnerModel>()
-                .SelectMany(x => x.Attributes))
-            .DistinctBy(x => x.Uuid);
+        // Расчёт связей выполняется в фоне, а импорт изменяет списки в UI-потоке.
+        // Индексный снимок List<T> не использует версионный enumerator и поэтому
+        // не падает, если во время чтения в конец списка добавляется новый элемент.
+        var workingTrees = CreateCollectionSnapshot(
+            repository.ContentShrub.ContentWorkingTrees);
+        return workingTrees
+            .SelectMany(tree => CreateCollectionSnapshot(tree.ContentAttributes))
+            .DistinctBy(x => x.Uuid)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Создаёт моментальный снимок изменяемой коллекции без версионного
+    /// перечислителя <see cref="List{T}" />.
+    /// </summary>
+    private static IReadOnlyList<T> CreateCollectionSnapshot<T>(ICollection<T> source)
+    {
+        if (source is not IList<T> indexedSource)
+            return source.ToList();
+
+        var count = indexedSource.Count;
+        var result = new List<T>(count);
+        for (var i = 0; i < count; i++)
+        {
+            try
+            {
+                result.Add(indexedSource[i]);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // Удаление сократило список после чтения Count. Следующее
+                // обновление дерева связей получит уже окончательный снимок.
+                break;
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
