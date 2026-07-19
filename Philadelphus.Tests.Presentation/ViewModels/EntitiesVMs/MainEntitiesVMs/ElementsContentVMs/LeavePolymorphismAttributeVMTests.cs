@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -15,22 +16,29 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 public sealed class LeavePolymorphismAttributeVMTests
 {
     [Fact]
-    public void SelectedCandidate_AcceptsOnlyCurrentResolutionCandidate()
+    public void SelectedCandidate_AcceptsAnyActiveParentNodeLeave()
     {
         var (attribute, firstCandidate, secondCandidate, unrelatedLeave) = CreateFixture();
         attribute.SetResolution(
             LeavePolymorphismStatus.Ambiguous,
-            [firstCandidate, secondCandidate]);
+            [firstCandidate]);
         var viewModel = new LeavePolymorphismAttributeVM(attribute);
+        var selectionCallCount = 0;
+        viewModel.SetParentSelectionCommand(new AsyncRelayCommand(_ =>
+        {
+            selectionCallCount++;
+            return Task.CompletedTask;
+        }));
 
         viewModel.SelectedCandidate = unrelatedLeave;
         viewModel.SelectedCandidate.Should().BeNull();
         viewModel.CanApplyCandidate.Should().BeFalse();
 
-        viewModel.SelectedCandidate = secondCandidate;
+        viewModel.TrySelectCandidate($"=[{secondCandidate.Uuid}]").Should().BeTrue();
         viewModel.SelectedCandidate.Should().BeSameAs(secondCandidate);
         viewModel.CanApplyCandidate.Should().BeTrue();
         viewModel.DisplayText.Should().Be("Неоднозначно");
+        selectionCallCount.Should().Be(1);
     }
 
     [Fact]

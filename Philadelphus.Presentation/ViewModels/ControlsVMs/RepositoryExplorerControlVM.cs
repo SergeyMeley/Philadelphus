@@ -23,6 +23,7 @@ using Philadelphus.Presentation.ViewModels;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Presentation.Factories.Interfaces;
@@ -51,6 +52,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IRelationDeletionConfirmationService _relationDeletionConfirmationService;
         private readonly IRepositoryRelationsService _relationsService;
         private readonly ILeavePolymorphismService _leavePolymorphismService;
+        private readonly ILeavePolymorphismChangeCoordinator _leavePolymorphismChangeCoordinator;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -74,6 +76,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private IRelayCommand? _createNodeCommand;
         private IRelayCommand? _createLeaveCommand;
         private IRelayCommand? _createAttributeCommand;
+        private IAsyncRelayCommand? _applyPolymorphicParentCommand;
+        private IRelayCommand? _createPolymorphicParentCommand;
         private IAsyncRelayCommand? _softDeleteRepositoryMemberCommand;
         private IAsyncRelayCommand? _hardDeleteRepositoryMemberCommand;
         private IAsyncRelayCommand? _softDeleteRepositoryMemberAttributeCommand;
@@ -111,6 +115,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             set
             {
                 _selectedRepositoryMember = value;
+                ConfigureLeavePolymorphismCommands(value);
                 SynchronizeTreeSelection(value);
                 UpdateCurrentLeavesOwner(value);
                 RebuildChildCollectionTable();
@@ -360,6 +365,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _relationsService = relationsService;
             _relationDeletionConfirmationService = relationDeletionConfirmationService;
             _leavePolymorphismService = leavePolymorphismService;
+            _leavePolymorphismChangeCoordinator = leavePolymorphismChangeCoordinator;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -490,6 +496,32 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
+
+        /// <summary>
+        /// Подтверждает и применяет временно выбранный полиморфный родительский лист.
+        /// </summary>
+        public IAsyncRelayCommand ApplyPolymorphicParentCommand =>
+            _applyPolymorphicParentCommand ??= _asyncCommandFactory.Create(
+                async parameter =>
+                {
+                    if (parameter is LeavePolymorphismAttributeVM attribute)
+                        await ApplyPolymorphicParentAsync(attribute);
+                },
+                parameter => CanModifyRepository()
+                    && parameter is LeavePolymorphismAttributeVM);
+
+        /// <summary>
+        /// Создаёт отсутствующую цепочку полиморфных родителей без подтверждения.
+        /// </summary>
+        public IRelayCommand CreatePolymorphicParentCommand =>
+            _createPolymorphicParentCommand ??= _commandFactory.Create(
+                parameter =>
+                {
+                    if (parameter is LeavePolymorphismAttributeVM attribute)
+                        CreatePolymorphicParent(attribute);
+                },
+                parameter => CanModifyRepository()
+                    && parameter is LeavePolymorphismAttributeVM);
 
         public IAsyncRelayCommand SoftDeleteRepositoryMemberCommand =>
             _softDeleteRepositoryMemberCommand ??= _asyncCommandFactory.Create(
@@ -1311,6 +1343,66 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         }
 
         /// <summary>
+        /// Завершает ручное заполнение единым пересчётом формул и полиморфного каскада.
+        /// </summary>
+        private async Task ApplyPolymorphicParentAsync(
+            LeavePolymorphismAttributeVM attribute)
+        {
+            var recipientLeave = attribute.RecipientLeave;
+            var parentLeave = attribute.SelectedCandidate;
+            if (recipientLeave == null || parentLeave == null)
+                return;
+
+            var fillResult = await _leavePolymorphismChangeCoordinator
+                .FillFromParentAsync(recipientLeave, parentLeave);
+            attribute.NotifyResolutionChanged();
+            if (fillResult.Applied == false)
+                return;
+
+            var changeResult = new LeavePolymorphismChangeResult(false, []);
+            if (fillResult.ChangedAttributes.Count > 0)
+            {
+                // Массовый пересчёт выполняется один раз для всех заполненных атрибутов,
+                // после чего каскад видит окончательную сигнатуру листа.
+                FormulaBarVM.RecalculateLoadedFormulas();
+                changeResult = await _leavePolymorphismChangeCoordinator
+                    .HandleChangedLeaveAsync(recipientLeave);
+                if (changeResult.CascadeProcessed)
+                    FormulaBarVM.RecalculateLoadedFormulas();
+            }
+
+            RefreshLeavePolymorphismView(changeResult);
+        }
+
+        /// <summary>
+        /// Создаёт цепочку родителей и синхронизирует дерево, формулы и строку атрибута.
+        /// </summary>
+        private void CreatePolymorphicParent(LeavePolymorphismAttributeVM attribute)
+        {
+            if (attribute.RecipientLeave == null || attribute.CanCreateParent == false)
+                return;
+
+            var result = _leavePolymorphismChangeCoordinator
+                .CreateParentChain(attribute.RecipientLeave);
+            if (result.CreatedLeaves.Count > 0)
+                FormulaBarVM.RecalculateLoadedFormulas();
+            RefreshLeavePolymorphismView(result);
+        }
+
+        /// <summary>
+        /// Передаёт строкам runtime-атрибутов команду автоматической обработки выбора.
+        /// </summary>
+        private void ConfigureLeavePolymorphismCommands(
+            IMainEntityVM<IMainEntityModel>? repositoryMember)
+        {
+            foreach (var attribute in repositoryMember?.AttributesVMs ?? [])
+            {
+                attribute.LeavePolymorphism?
+                    .SetParentSelectionCommand(ApplyPolymorphicParentCommand);
+            }
+        }
+
+        /// <summary>
         /// Обновляет runtime-связи и элементы интерфейса после интерактивной операции.
         /// </summary>
         /// <param name="result">Результат обработки изменённого листа.</param>
@@ -1331,6 +1423,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             {
                 RefreshLoadedLeavePolymorphismLinks();
                 NotifyRepositoryTreeChanged();
+            }
+
+            foreach (var attribute in SelectedRepositoryMember?.AttributesVMs ?? [])
+            {
+                attribute.LeavePolymorphism?
+                    .SetParentSelectionCommand(ApplyPolymorphicParentCommand);
+                attribute.LeavePolymorphism?.NotifyResolutionChanged();
+                attribute.OnPropertyChanged(nameof(ElementAttributeVM.DisplayedValueText));
+                attribute.OnPropertyChanged(nameof(ElementAttributeVM.FormulaValueText));
             }
 
             RebuildChildCollectionTable();

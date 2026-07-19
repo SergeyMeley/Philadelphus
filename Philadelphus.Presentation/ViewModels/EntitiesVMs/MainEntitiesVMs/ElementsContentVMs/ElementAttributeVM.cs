@@ -31,6 +31,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         public LeavePolymorphismAttributeVM? LeavePolymorphism { get; }
 
         /// <summary>
+        /// Указывает, что атрибут существует только во время работы приложения.
+        /// </summary>
+        public bool IsRuntime => _model.IsRuntime;
+
+        /// <summary>
         /// Владелец.
         /// </summary>
         public IOwnerModel Owner { get => _model.Owner; }
@@ -180,6 +185,15 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             get => AttributeValueText.GetFormulaText(_model);
             set
             {
+                // Runtime-атрибут использует общий редактор значения, но выбранная ссылка
+                // запускает подтверждаемое заполнение и не записывается в служебную модель.
+                if (LeavePolymorphism != null)
+                {
+                    LeavePolymorphism.TrySelectCandidate(value);
+                    OnPropertyChanged(nameof(FormulaValueText));
+                    return;
+                }
+
                 _model.SetFormulaText(value);
                 NotifyStateVisibilityPropertiesChanged();
                 OnPropertyChanged(nameof(AssignedValue));

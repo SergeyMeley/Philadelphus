@@ -1,6 +1,9 @@
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.FormulaEngine.Formatting;
+using Philadelphus.Presentation.Infrastructure;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 
@@ -11,6 +14,7 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
 {
     private readonly LeavePolymorphismAttributeModel _model;
     private TreeLeaveModel? _selectedCandidate;
+    private IAsyncRelayCommand? _parentSelectionCommand;
 
     /// <summary>
     /// Инициализирует состояние runtime-атрибута.
@@ -45,9 +49,16 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
     };
 
     /// <summary>
-    /// Найденные кандидаты для ручного заполнения атрибутов.
+    /// Активные листья прямого родительского узла, доступные для ручного заполнения.
     /// </summary>
-    public IReadOnlyList<TreeLeaveModel> Candidates => _model.Candidates;
+    public IReadOnlyList<TreeLeaveModel> AvailableParents =>
+        _model.ValuesList?
+            .Where(x => x.AuditInfo.IsDeleted == false
+                && x.State is not State.ForSoftDelete
+                    and not State.ForHardDelete
+                    and not State.SoftDeleted)
+            .ToList()
+        ?? [];
 
     /// <summary>
     /// Временно выбранный кандидат; выбор не изменяет доменную модель.
@@ -59,10 +70,14 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
         {
             var candidate = value == null
                 ? null
-                : Candidates.FirstOrDefault(x => x.Uuid == value.Uuid);
+                : AvailableParents.FirstOrDefault(x => x.Uuid == value.Uuid);
 
             if (SetProperty(ref _selectedCandidate, candidate))
+            {
                 OnPropertyChanged(nameof(CanApplyCandidate));
+                if (candidate != null)
+                    _parentSelectionCommand?.Execute(this);
+            }
         }
     }
 
@@ -78,6 +93,38 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
         RecipientLeave != null && Status == LeavePolymorphismStatus.NotFound;
 
     /// <summary>
+    /// Выбирает родителя по ссылке, введённой стандартным редактором значения атрибута.
+    /// </summary>
+    /// <param name="text">Ссылка вида <c>[uuid]</c> или <c>=[uuid]</c>.</param>
+    /// <returns><see langword="true"/>, если ссылка указывает на допустимый родительский лист.</returns>
+    public bool TrySelectCandidate(string? text)
+    {
+        var reference = text?.Trim() ?? string.Empty;
+        if (reference.StartsWith("=", StringComparison.Ordinal))
+            reference = reference[1..].TrimStart();
+
+        if (FormulaReferenceParser.TryParseTreeLeaveReference(reference, out var uuid) == false)
+            return false;
+
+        var candidate = AvailableParents.FirstOrDefault(x => x.Uuid == uuid);
+        if (candidate == null)
+            return false;
+
+        SelectedCandidate = candidate;
+        return true;
+    }
+
+    /// <summary>
+    /// Назначает платформо-независимую команду, автоматически выполняемую после выбора родителя.
+    /// </summary>
+    /// <param name="command">Команда подтверждаемого заполнения атрибутов.</param>
+    internal void SetParentSelectionCommand(IAsyncRelayCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        _parentSelectionCommand = command;
+    }
+
+    /// <summary>
     /// Синхронизирует UI с повторно вычисленным результатом и сбрасывает временный выбор.
     /// </summary>
     public void NotifyResolutionChanged()
@@ -85,7 +132,7 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
         SelectedCandidate = null;
         OnPropertyChanged(nameof(Status));
         OnPropertyChanged(nameof(DisplayText));
-        OnPropertyChanged(nameof(Candidates));
+        OnPropertyChanged(nameof(AvailableParents));
         OnPropertyChanged(nameof(CanCreateParent));
     }
 }
