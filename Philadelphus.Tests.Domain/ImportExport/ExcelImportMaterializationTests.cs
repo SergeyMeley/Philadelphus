@@ -8,7 +8,7 @@ namespace Philadelphus.Tests.Domain.ImportExport
     public class ExcelImportMaterializationTests
     {
         [Fact]
-        public void ProcessSchema_Should_Materialize_Workbook_As_Root_Tables_As_Nodes_Rows_As_Leaves_And_Fk_As_ReferenceAttribute()
+        public void ProcessSchema_Should_Materialize_Fk_As_Temporary_Parent_Correlation()
         {
             var filePath = CreateWorkbook();
 
@@ -36,13 +36,6 @@ namespace Philadelphus.Tests.Domain.ImportExport
                 childNode["childLeaves"]!.AsArray().Select(x => x!["name"]!.GetValue<string>())
                     .Should().BeEquivalentTo("Child 1", "Child 2");
 
-                var parentIdDefinition = childNode["attributes"]!.AsArray()
-                    .Single(x => x!["name"]!.GetValue<string>() == "ParentId")!
-                    .AsObject();
-                parentIdDefinition["dataTypeNodeName"]!.GetValue<string>().Should().Be("ParentsNode");
-                parentIdDefinition["visibility"]!.GetValue<string>().Should().Be("Public");
-                parentIdDefinition["override"]!.GetValue<string>().Should().Be("Virtual");
-
                 var child1 = childNode["childLeaves"]!.AsArray()
                     .Single(x => x!["name"]!.GetValue<string>() == "Child 1")!
                     .AsObject();
@@ -55,17 +48,10 @@ namespace Philadelphus.Tests.Domain.ImportExport
                     .Should().NotBe(Guid.Empty);
                 child1["polymorphicParentImportCorrelationId"]!.GetValue<Guid>()
                     .Should().Be(parentCorrelationId);
-                var child1ParentReference = child1["attributes"]!.AsArray()
-                    .Single(x => x!["name"]!.GetValue<string>() == "ParentId")!
-                    .AsObject();
-
-                child1ParentReference["dataTypeNodeName"]!.GetValue<string>().Should().Be("ParentsNode");
-                child1ParentReference["valueLeaveName"]!.GetValue<string>().Should().Be("Parent A");
-                child1ParentReference["visibility"]!.GetValue<string>().Should().Be("Public");
-                child1ParentReference["override"]!.GetValue<string>().Should().Be("Virtual");
+                childNode["attributes"]!.AsArray()
+                    .Should().NotContain(x => x!["name"]!.GetValue<string>() == "ParentId");
                 child1["attributes"]!.AsArray()
-                    .Where(x => x!["name"]!.GetValue<string>() == "ParentId")
-                    .Should().HaveCount(1);
+                    .Should().NotContain(x => x!["name"]!.GetValue<string>() == "ParentId");
 
                 json.Should().NotContain("\"isCollectionValue\"");
             }

@@ -68,6 +68,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
 
             var repository = context.GetImportRepository();
             var service = context.GetImportRepositoryService();
+            var leavePolymorphismService = context.GetImportLeavePolymorphismService();
             var refreshProcess = context.GetImportRefreshProcess();
             var refreshProgress = context.GetImportRefreshProgress();
 
@@ -104,6 +105,8 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
                     : Enumerable.Empty<long>());
 
             var attributeLinkMap = new Dictionary<Guid, AttributeLink>();
+            var importedLeavesByCorrelationId = new Dictionary<Guid, TreeLeaveModel>();
+            var parentCorrelationIdByLeave = new Dictionary<TreeLeaveModel, Guid>();
 
             refreshProgress(1, 1);
 
@@ -117,12 +120,25 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
 
             for (var i = 0; i < source.ContentRoot.ChildNodes.Count; i++)
             {
-                CreateNodeRecursive(service, treeRoot, source.ContentRoot.ChildNodes[i], attributeLinkMap);
+                CreateNodeRecursive(
+                    service,
+                    treeRoot,
+                    source.ContentRoot.ChildNodes[i],
+                    attributeLinkMap,
+                    importedLeavesByCorrelationId,
+                    parentCorrelationIdByLeave);
                 refreshProgress(i + 1, source.ContentRoot.ChildNodes.Count);
             }
 
             refreshProcess("Привязываем значения к атрибутам");
             LinkAttributesToRealEntities(service, treeRoot, attributeLinkMap, refreshProgress);
+
+            refreshProcess("Заполняем унаследованные атрибуты");
+            FillImportedPolymorphicParents(
+                leavePolymorphismService,
+                importedLeavesByCorrelationId,
+                parentCorrelationIdByLeave,
+                refreshProgress);
 
             refreshProcess("Готово");
             refreshProgress(1, 1);
@@ -190,7 +206,9 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             IPhiladelphusRepositoryService service,
             IParentModel parent,
             TreeNodeExportDTO nodeDto,
-            Dictionary<Guid, AttributeLink> attributeLinkMap)
+            Dictionary<Guid, AttributeLink> attributeLinkMap,
+            Dictionary<Guid, TreeLeaveModel> importedLeavesByCorrelationId,
+            Dictionary<TreeLeaveModel, Guid> parentCorrelationIdByLeave)
         {
             var needName = string.IsNullOrWhiteSpace(nodeDto.Name);
             var node = service.CreateTreeNode(parent, needAutoName: needName, withoutInfoNotifications: true);
@@ -211,12 +229,24 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
 
             foreach (var childNodeDto in nodeDto.ChildNodes)
             {
-                CreateNodeRecursive(service, node, childNodeDto, attributeLinkMap);
+                CreateNodeRecursive(
+                    service,
+                    node,
+                    childNodeDto,
+                    attributeLinkMap,
+                    importedLeavesByCorrelationId,
+                    parentCorrelationIdByLeave);
             }
 
             foreach (var leaveDto in nodeDto.ChildLeaves)
             {
-                CreateLeave(service, node, leaveDto, attributeLinkMap);
+                CreateLeave(
+                    service,
+                    node,
+                    leaveDto,
+                    attributeLinkMap,
+                    importedLeavesByCorrelationId,
+                    parentCorrelationIdByLeave);
             }
         }
 
@@ -224,7 +254,9 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             IPhiladelphusRepositoryService service,
             TreeNodeModel node,
             TreeLeaveExportDTO leaveDto,
-            Dictionary<Guid, AttributeLink> attributeLinkMap)
+            Dictionary<Guid, AttributeLink> attributeLinkMap,
+            Dictionary<Guid, TreeLeaveModel> importedLeavesByCorrelationId,
+            Dictionary<TreeLeaveModel, Guid> parentCorrelationIdByLeave)
         {
             var needName = string.IsNullOrWhiteSpace(leaveDto.Name);
             var leaf = service.CreateTreeLeave(node, needAutoName: needName, withoutInfoNotifications: true);
@@ -248,6 +280,68 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             }
 
             CreateAttributesFromElement(service, leaf, leaveDto.Attributes, attributeLinkMap);
+
+            if (leaveDto.ImportCorrelationId is Guid correlationId
+                && importedLeavesByCorrelationId.TryAdd(correlationId, leaf) == false)
+            {
+                throw new InvalidOperationException(
+                    $"В данных импорта повторяется идентификатор корреляции '{correlationId}'.");
+            }
+
+            if (leaveDto.PolymorphicParentImportCorrelationId is Guid parentCorrelationId)
+                parentCorrelationIdByLeave.Add(leaf, parentCorrelationId);
+        }
+
+        /// <summary>
+        /// Разрешает временные FK-корреляции и сверху вниз заполняет листья
+        /// значениями унаследованных атрибутов их родительских листов.
+        /// </summary>
+        private static void FillImportedPolymorphicParents(
+            ILeavePolymorphismService service,
+            IReadOnlyDictionary<Guid, TreeLeaveModel> leavesByCorrelationId,
+            IReadOnlyDictionary<TreeLeaveModel, Guid> parentCorrelationIdByLeave,
+            Action<int, int> refreshProgress)
+        {
+            var links = parentCorrelationIdByLeave
+                .OrderBy(x => GetNodeDepth(x.Key.ParentNode))
+                .ToList();
+
+            // UI прогресса не допускает нулевой totalCount. Отсутствие FK-связей
+            // означает, что этап уже завершён, а не что у него нулевой диапазон.
+            if (links.Count == 0)
+            {
+                refreshProgress(1, 1);
+                return;
+            }
+
+            refreshProgress(0, links.Count);
+
+            for (var i = 0; i < links.Count; i++)
+            {
+                var (childLeave, parentCorrelationId) = links[i];
+                if (leavesByCorrelationId.TryGetValue(parentCorrelationId, out var parentLeave) == false)
+                {
+                    throw new InvalidOperationException(
+                        $"Для листа '{childLeave.Name}' [{childLeave.Uuid}] не найдена "
+                        + $"родительская строка импорта '{parentCorrelationId}'.");
+                }
+
+                service.FillFromParent(childLeave, parentLeave);
+                service.ResolveParent(childLeave);
+                refreshProgress(i + 1, links.Count);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает глубину узла для детерминированного заполнения связей сверху вниз.
+        /// </summary>
+        private static int GetNodeDepth(TreeNodeModel node)
+        {
+            var depth = 0;
+            for (var current = node.ParentNode; current != null; current = current.ParentNode)
+                depth++;
+
+            return depth;
         }
 
         private static void CreateAttributesFromElement(

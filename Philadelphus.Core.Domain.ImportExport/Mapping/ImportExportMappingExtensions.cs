@@ -11,6 +11,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
     {
         private const string RepositoryKey = "ImportExport.Repository";
         private const string RepositoryServiceKey = "ImportExport.RepositoryService";
+        private const string LeavePolymorphismServiceKey = "ImportExport.LeavePolymorphismService";
         private const string RefreshProcessKey = "ImportExport.RefreshProcess";
         private const string RefreshProgressKey = "ImportExport.RefreshProgress";
 
@@ -40,6 +41,21 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             ArgumentNullException.ThrowIfNull(repositoryService);
 
             items[RepositoryServiceKey] = repositoryService;
+        }
+
+        /// <summary>
+        /// Добавляет сервис полиморфизма листов в контекст маппинга импорта.
+        /// </summary>
+        /// <param name="items">Параметры контекста AutoMapper.</param>
+        /// <param name="service">Сервис заполнения и разрешения полиморфных связей.</param>
+        public static void SetImportLeavePolymorphismService(
+            this IDictionary<string, object> items,
+            ILeavePolymorphismService service)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(service);
+
+            items[LeavePolymorphismServiceKey] = service;
         }
 
         /// <summary>
@@ -86,6 +102,19 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
         public static IPhiladelphusRepositoryService GetImportRepositoryService(this ResolutionContext context)
         {
             return GetRequiredContextItem<IPhiladelphusRepositoryService>(context, RepositoryServiceKey);
+        }
+
+        /// <summary>
+        /// Возвращает сервис полиморфизма листов из контекста маппинга импорта.
+        /// </summary>
+        /// <param name="context">Контекст AutoMapper.</param>
+        /// <returns>Сервис заполнения и разрешения полиморфных связей.</returns>
+        public static ILeavePolymorphismService GetImportLeavePolymorphismService(
+            this ResolutionContext context)
+        {
+            return GetRequiredContextItem<ILeavePolymorphismService>(
+                context,
+                LeavePolymorphismServiceKey);
         }
 
         /// <summary>

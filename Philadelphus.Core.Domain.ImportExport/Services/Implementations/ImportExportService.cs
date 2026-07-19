@@ -17,21 +17,26 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Implementations
     {
         private readonly Dictionary<ImportExportAdapterKey, IImportExportAdapter> _adaptersByKey;
         private readonly IMapper _mapper;
+        private readonly ILeavePolymorphismService _leavePolymorphismService;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="ImportExportService" />.
         /// </summary>
         /// <param name="adapters">Зарегистрированные адаптеры импорта и экспорта.</param>
         /// <param name="mapper">Экземпляр AutoMapper.</param>
+        /// <param name="leavePolymorphismService">Сервис заполнения полиморфных связей листов.</param>
         public ImportExportService(
-            IEnumerable<IImportExportAdapter> adapters, 
-            IMapper mapper)
+            IEnumerable<IImportExportAdapter> adapters,
+            IMapper mapper,
+            ILeavePolymorphismService leavePolymorphismService)
         {
             ArgumentNullException.ThrowIfNull(adapters);
             ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(leavePolymorphismService);
 
             _adaptersByKey = BuildAdaptersMap(adapters);
             _mapper = mapper;
+            _leavePolymorphismService = leavePolymorphismService;
         }
 
         /// <summary>
@@ -162,6 +167,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Services.Implementations
             {
                 options.Items.SetImportRepository(repository);
                 options.Items.SetImportRepositoryService(repositoryService);
+                options.Items.SetImportLeavePolymorphismService(_leavePolymorphismService);
                 options.Items.SetImportRefreshProcess(refreshProcess);
                 options.Items.SetImportRefreshProgress(refreshProgress);
             });
