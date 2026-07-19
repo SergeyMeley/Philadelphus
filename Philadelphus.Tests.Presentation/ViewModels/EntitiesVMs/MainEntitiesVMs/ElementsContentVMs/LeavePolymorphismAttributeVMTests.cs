@@ -53,7 +53,7 @@ public sealed class LeavePolymorphismAttributeVMTests
             SelectedCandidate = firstCandidate
         };
 
-        viewModel.RecipientLeave!.SetPolymorphicParentLeave(secondCandidate);
+        ((TreeLeaveModel)viewModel.Recipient!).SetPolymorphicParentLeave(secondCandidate);
         attribute.SetResolution(LeavePolymorphismStatus.Resolved, [secondCandidate]);
         viewModel.NotifyResolutionChanged();
 
@@ -61,6 +61,25 @@ public sealed class LeavePolymorphismAttributeVMTests
         viewModel.Status.Should().Be(LeavePolymorphismStatus.Resolved);
         viewModel.DisplayText.Should().Be(secondCandidate.Name);
         viewModel.CanCreateParent.Should().BeFalse();
+    }
+
+    [Fact]
+    public void NodeAttribute_AcceptsParentSelection()
+    {
+        var (attribute, firstCandidate, _, _) = CreateNodeFixture();
+        var viewModel = new LeavePolymorphismAttributeVM(attribute);
+        var selectionCallCount = 0;
+        viewModel.SetParentSelectionCommand(new AsyncRelayCommand(_ =>
+        {
+            selectionCallCount++;
+            return Task.CompletedTask;
+        }));
+
+        viewModel.TrySelectCandidate($"[{firstCandidate.Uuid}]").Should().BeTrue();
+
+        viewModel.Recipient.Should().BeSameAs(attribute.Owner);
+        viewModel.CanApplyCandidate.Should().BeTrue();
+        selectionCallCount.Should().Be(1);
     }
 
     /// <summary>
@@ -92,6 +111,23 @@ public sealed class LeavePolymorphismAttributeVMTests
             .Single();
 
         return (attribute, firstCandidate, secondCandidate, unrelatedLeave);
+    }
+
+    /// <summary>
+    /// Создаёт runtime-атрибут узла и допустимые родительские листья.
+    /// </summary>
+    private static (
+        LeavePolymorphismAttributeModel Attribute,
+        TreeLeaveModel FirstCandidate,
+        TreeLeaveModel SecondCandidate,
+        TreeLeaveModel UnrelatedLeave) CreateNodeFixture()
+    {
+        var fixture = CreateFixture();
+        var childNode = ((TreeLeaveModel)fixture.Attribute.Owner).ParentNode;
+        var attribute = childNode.Attributes
+            .OfType<LeavePolymorphismAttributeModel>()
+            .Single();
+        return (attribute, fixture.FirstCandidate, fixture.SecondCandidate, fixture.UnrelatedLeave);
     }
 
     /// <summary>

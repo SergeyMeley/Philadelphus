@@ -2,6 +2,7 @@ using System.Threading;
 
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Models.LeavePolymorphism;
 using Philadelphus.Presentation.Services.Interfaces;
 
@@ -36,10 +37,10 @@ public sealed class LeavePolymorphismChangeCoordinator
 
     /// <inheritdoc />
     public async Task<LeavePolymorphismManualFillResult> FillFromParentAsync(
-        TreeLeaveModel recipientLeave,
+        IAttributeOwnerModel recipient,
         TreeLeaveModel parentLeave)
     {
-        ArgumentNullException.ThrowIfNull(recipientLeave);
+        ArgumentNullException.ThrowIfNull(recipient);
         ArgumentNullException.ThrowIfNull(parentLeave);
 
         if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) != 0)
@@ -48,19 +49,22 @@ public sealed class LeavePolymorphismChangeCoordinator
         try
         {
             var changedAttributeCount = _leavePolymorphismService
-                .CountFillFromParentChanges(recipientLeave, parentLeave);
+                .CountFillFromParentChanges(recipient, parentLeave);
             if (changedAttributeCount > 0
                 && await _confirmationService.ConfirmManualFillAsync(
-                    recipientLeave,
+                    recipient,
                     changedAttributeCount) == false)
             {
                 return new(false, []);
             }
 
             var fillResult = _leavePolymorphismService.FillFromParent(
-                recipientLeave,
+                recipient,
                 parentLeave);
-            _leavePolymorphismService.ResolveParent(recipientLeave);
+            if (recipient is TreeLeaveModel recipientLeave)
+                _leavePolymorphismService.ResolveParent(recipientLeave);
+            else if (recipient is TreeNodeModel recipientNode)
+                _leavePolymorphismService.ResolveParent(recipientNode);
             return new(true, fillResult.ChangedAttributes);
         }
         finally
@@ -81,6 +85,27 @@ public sealed class LeavePolymorphismChangeCoordinator
         {
             var createdLeaves = _leavePolymorphismService.CreateParentChain(childLeave);
             _leavePolymorphismService.RefreshLinks(createdLeaves.Prepend(childLeave));
+            return new(false, createdLeaves);
+        }
+        finally
+        {
+            Volatile.Write(ref _isProcessing, 0);
+        }
+    }
+
+    /// <inheritdoc />
+    public LeavePolymorphismChangeResult CreateParentChain(TreeNodeModel childNode)
+    {
+        ArgumentNullException.ThrowIfNull(childNode);
+
+        if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) != 0)
+            return new(false, []);
+
+        try
+        {
+            var createdLeaves = _leavePolymorphismService.CreateParentChain(childNode);
+            _leavePolymorphismService.RefreshLinks(createdLeaves);
+            _leavePolymorphismService.ResolveParent(childNode);
             return new(false, createdLeaves);
         }
         finally
@@ -122,6 +147,26 @@ public sealed class LeavePolymorphismChangeCoordinator
             // Изменённый лист сам может быть наследником другого уровня.
             _leavePolymorphismService.ResolveParent(changedLeave);
             return new(plan.AffectedLeaveCount > 0, createdLeaves);
+        }
+        finally
+        {
+            Volatile.Write(ref _isProcessing, 0);
+        }
+    }
+
+    /// <inheritdoc />
+    public LeavePolymorphismChangeResult HandleChangedNode(TreeNodeModel changedNode)
+    {
+        ArgumentNullException.ThrowIfNull(changedNode);
+
+        if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) != 0)
+            return new(false, []);
+
+        try
+        {
+            _leavePolymorphismService.ResolveParent(changedNode);
+            _leavePolymorphismService.RefreshLinks(changedNode.ChildLeaves);
+            return new(false, []);
         }
         finally
         {

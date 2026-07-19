@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.FormulaEngine.Formatting;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 
 namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
@@ -27,9 +28,9 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
     }
 
     /// <summary>
-    /// Лист, атрибуты которого можно заполнить по выбранному родителю.
+    /// Узел или лист, атрибуты которого можно заполнить по выбранному родителю.
     /// </summary>
-    public TreeLeaveModel? RecipientLeave => _model.Owner as TreeLeaveModel;
+    public IAttributeOwnerModel? Recipient => _model.Owner as IAttributeOwnerModel;
 
     /// <summary>
     /// Текущий статус вычисления связи.
@@ -84,13 +85,13 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
     /// <summary>
     /// Указывает, что выбранного кандидата можно применить к листу.
     /// </summary>
-    public bool CanApplyCandidate => RecipientLeave != null && SelectedCandidate != null;
+    public bool CanApplyCandidate => Recipient != null && SelectedCandidate != null;
 
     /// <summary>
     /// Указывает, что для листа можно создать отсутствующую цепочку родителей.
     /// </summary>
     public bool CanCreateParent =>
-        RecipientLeave != null && Status == LeavePolymorphismStatus.NotFound;
+        Recipient != null && Status == LeavePolymorphismStatus.NotFound;
 
     /// <summary>
     /// Выбирает родителя по ссылке, введённой стандартным редактором значения атрибута.

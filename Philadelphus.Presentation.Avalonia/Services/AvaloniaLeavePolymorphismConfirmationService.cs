@@ -4,6 +4,7 @@ using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Layout;
 using global::Avalonia.Media;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Models.LeavePolymorphism;
 using Philadelphus.Presentation.Services.Interfaces;
 
@@ -30,10 +31,10 @@ public sealed class AvaloniaLeavePolymorphismConfirmationService
 
     /// <inheritdoc />
     public async Task<bool> ConfirmManualFillAsync(
-        TreeLeaveModel recipientLeave,
+        IAttributeOwnerModel recipient,
         int changedAttributeCount)
     {
-        ArgumentNullException.ThrowIfNull(recipientLeave);
+        ArgumentNullException.ThrowIfNull(recipient);
         ArgumentOutOfRangeException.ThrowIfNegative(changedAttributeCount);
 
         if (_sessionState.IsManualFillAutoConfirmed)
@@ -41,7 +42,7 @@ public sealed class AvaloniaLeavePolymorphismConfirmationService
 
         var (confirmed, remember) = await ShowAsync(
             "Заполнение по родительскому листу",
-            $"Лист-получатель: '{recipientLeave.Name}' [{recipientLeave.Uuid}].\n" +
+            $"Элемент-получатель: '{recipient.Name}' [{recipient.Uuid}].\n" +
             $"Будут перезаписаны значения {changedAttributeCount} атрибутов. Продолжить?");
         _sessionState.RememberManualFillDecision(confirmed, remember);
         return confirmed;
@@ -77,7 +78,10 @@ public sealed class AvaloniaLeavePolymorphismConfirmationService
         string message)
     {
         var result = false;
-        var completion = new TaskCompletionSource<(bool, bool)>();
+        // Продолжение пересчёта не должно выполняться внутри события Window.Closed:
+        // иначе новое модальное действие может повторно войти в ещё закрывающееся окно.
+        var completion = new TaskCompletionSource<(bool, bool)>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
         var remember = new CheckBox { Content = "Не показывать до конца сессии" };
         var window = CreateWindow(title, message, remember, () => result = true);
         window.Closed += (_, _) => completion.TrySetResult((result, remember.IsChecked == true));

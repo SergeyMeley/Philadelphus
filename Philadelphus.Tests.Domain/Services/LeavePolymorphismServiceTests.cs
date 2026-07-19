@@ -124,6 +124,38 @@ public class LeavePolymorphismServiceTests
     }
 
     [Fact]
+    public void FillFromParent_FillsAndResolvesNodeRuntimeLink()
+    {
+        var graph = CreateGraph();
+        SetValue(graph.SecondParent, graph, graph.SecondValue);
+        GetAttribute(graph.ChildNode, graph).Value = graph.FirstValue;
+        var service = CreateService(graph);
+
+        service.CountFillFromParentChanges(graph.ChildNode, graph.SecondParent)
+            .Should().Be(1);
+        service.FillFromParent(graph.ChildNode, graph.SecondParent);
+        var status = service.ResolveParent(graph.ChildNode);
+
+        status.Should().Be(LeavePolymorphismStatus.Resolved);
+        graph.ChildNode.PolymorphicParentLeave.Should().BeSameAs(graph.SecondParent);
+        GetAttribute(graph.ChildNode, graph).Value.Should().BeSameAs(graph.SecondValue);
+    }
+
+    [Fact]
+    public void CreateParentChain_CreatesAndLinksNodeParents()
+    {
+        var graph = CreateGraph();
+        GetAttribute(graph.ChildNode, graph).Value = graph.FirstValue;
+
+        var created = CreateService(graph).CreateParentChain(graph.ChildNode);
+
+        created.Should().HaveCount(2);
+        created[0].ParentNode.Should().BeSameAs(graph.ParentNode);
+        graph.ChildNode.PolymorphicParentLeave.Should().BeSameAs(created[0]);
+        created[0].PolymorphicParentLeave.Should().BeSameAs(created[1]);
+    }
+
+    [Fact]
     public void CreateParentChain_CreatesAndLinksEveryMissingLevel()
     {
         var graph = CreateGraph();
@@ -538,6 +570,14 @@ public class LeavePolymorphismServiceTests
         TreeLeaveModel leave,
         LeavePolymorphismTestGraph graph) =>
         leave.Attributes.Single(x => x.DeclaringUuid == graph.DeclarationUuid);
+
+    /// <summary>
+    /// Возвращает материализованную копию тестового объявления у узла.
+    /// </summary>
+    private static ElementAttributeModel GetAttribute(
+        TreeNodeModel node,
+        LeavePolymorphismTestGraph graph) =>
+        node.Attributes.Single(x => x.DeclaringUuid == graph.DeclarationUuid);
 
     private static void SetValue(
         TreeLeaveModel leave,

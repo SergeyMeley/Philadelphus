@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Presentation.Models.LeavePolymorphism;
 
 namespace Philadelphus.Presentation.Services.Interfaces;
@@ -13,11 +14,11 @@ public interface ILeavePolymorphismChangeCoordinator
     /// Запрашивает подтверждение и заполняет унаследованные атрибуты
     /// значениями выбранного родительского листа.
     /// </summary>
-    /// <param name="recipientLeave">Лист-получатель.</param>
+    /// <param name="recipient">Узел или лист-получатель.</param>
     /// <param name="parentLeave">Выбранный родительский лист.</param>
     /// <returns>Результат подтверждения и список изменённых атрибутов.</returns>
     Task<LeavePolymorphismManualFillResult> FillFromParentAsync(
-        TreeLeaveModel recipientLeave,
+        IAttributeOwnerModel recipient,
         TreeLeaveModel parentLeave);
 
     /// <summary>
@@ -29,10 +30,24 @@ public interface ILeavePolymorphismChangeCoordinator
     LeavePolymorphismChangeResult CreateParentChain(TreeLeaveModel childLeave);
 
     /// <summary>
+    /// Создаёт отсутствующий родительский лист узла и цепочку его предков.
+    /// </summary>
+    /// <param name="childNode">Узел-получатель runtime-связи.</param>
+    /// <returns>Результат со списком созданных листьев.</returns>
+    LeavePolymorphismChangeResult CreateParentChain(TreeNodeModel childNode);
+
+    /// <summary>
     /// Запрашивает подтверждение, применяет выбранную ветку каскада
     /// и пересчитывает runtime-связь самого изменённого листа.
     /// </summary>
     /// <param name="changedLeave">Изменённый лист.</param>
     /// <returns>Результат каскада и список созданных заменяющих листов.</returns>
     Task<LeavePolymorphismChangeResult> HandleChangedLeaveAsync(TreeLeaveModel changedLeave);
+
+    /// <summary>
+    /// Пересчитывает runtime-связь изменённого узла и его непосредственных листьев.
+    /// </summary>
+    /// <param name="changedNode">Узел с изменёнными значениями атрибутов.</param>
+    /// <returns>Пустой результат каскада для унифицированного обновления UI.</returns>
+    LeavePolymorphismChangeResult HandleChangedNode(TreeNodeModel changedNode);
 }

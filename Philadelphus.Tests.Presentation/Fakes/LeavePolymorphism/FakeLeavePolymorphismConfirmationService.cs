@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Tests.Presentation.Fakes.LeavePolymorphism;
 
@@ -34,7 +35,7 @@ internal sealed class FakeLeavePolymorphismConfirmationService
 
     /// <inheritdoc />
     public Task<bool> ConfirmManualFillAsync(
-        TreeLeaveModel recipientLeave,
+        IAttributeOwnerModel recipient,
         int changedAttributeCount)
     {
         ManualFillCallCount++;

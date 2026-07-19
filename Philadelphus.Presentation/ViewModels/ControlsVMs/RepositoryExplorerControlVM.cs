@@ -848,11 +848,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </remarks>
         private void RefreshLoadedLeavePolymorphismLinks()
         {
-            var polymorphicLeaves = _philadelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees
-                .SelectMany(x => x.ContentLeaves)
+            var workingTrees = _philadelphusRepositoryVM.Model.ContentShrub.ContentWorkingTrees;
+            var polymorphicNodes = workingTrees.SelectMany(x => x.ContentNodes)
+                .Where(x => x.Attributes.Any(attribute =>
+                    attribute is LeavePolymorphismAttributeModel));
+            var polymorphicLeaves = workingTrees.SelectMany(x => x.ContentLeaves)
                 .Where(x => x.Attributes.Any(attribute =>
                     attribute is LeavePolymorphismAttributeModel));
 
+            _leavePolymorphismService.RefreshLinks(polymorphicNodes);
             _leavePolymorphismService.RefreshLinks(polymorphicLeaves);
         }
 
@@ -1348,13 +1352,13 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private async Task ApplyPolymorphicParentAsync(
             LeavePolymorphismAttributeVM attribute)
         {
-            var recipientLeave = attribute.RecipientLeave;
+            var recipient = attribute.Recipient;
             var parentLeave = attribute.SelectedCandidate;
-            if (recipientLeave == null || parentLeave == null)
+            if (recipient == null || parentLeave == null)
                 return;
 
             var fillResult = await _leavePolymorphismChangeCoordinator
-                .FillFromParentAsync(recipientLeave, parentLeave);
+                .FillFromParentAsync(recipient, parentLeave);
             attribute.NotifyResolutionChanged();
             if (fillResult.Applied == false)
                 return;
@@ -1365,10 +1369,18 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 // Массовый пересчёт выполняется один раз для всех заполненных атрибутов,
                 // после чего каскад видит окончательную сигнатуру листа.
                 FormulaBarVM.RecalculateLoadedFormulas();
-                changeResult = await _leavePolymorphismChangeCoordinator
-                    .HandleChangedLeaveAsync(recipientLeave);
-                if (changeResult.CascadeProcessed)
-                    FormulaBarVM.RecalculateLoadedFormulas();
+                if (recipient is TreeLeaveModel recipientLeave)
+                {
+                    changeResult = await _leavePolymorphismChangeCoordinator
+                        .HandleChangedLeaveAsync(recipientLeave);
+                    if (changeResult.CascadeProcessed)
+                        FormulaBarVM.RecalculateLoadedFormulas();
+                }
+                else if (recipient is TreeNodeModel recipientNode)
+                {
+                    _leavePolymorphismService.ResolveParent(recipientNode);
+                    _leavePolymorphismService.RefreshLinks(recipientNode.ChildLeaves);
+                }
             }
 
             RefreshLeavePolymorphismView(changeResult);
@@ -1379,11 +1391,17 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </summary>
         private void CreatePolymorphicParent(LeavePolymorphismAttributeVM attribute)
         {
-            if (attribute.RecipientLeave == null || attribute.CanCreateParent == false)
+            if (attribute.Recipient == null || attribute.CanCreateParent == false)
                 return;
 
-            var result = _leavePolymorphismChangeCoordinator
-                .CreateParentChain(attribute.RecipientLeave);
+            var result = attribute.Recipient switch
+            {
+                TreeLeaveModel recipientLeave => _leavePolymorphismChangeCoordinator
+                    .CreateParentChain(recipientLeave),
+                TreeNodeModel recipientNode => _leavePolymorphismChangeCoordinator
+                    .CreateParentChain(recipientNode),
+                _ => new LeavePolymorphismChangeResult(false, [])
+            };
             if (result.CreatedLeaves.Count > 0)
                 FormulaBarVM.RecalculateLoadedFormulas();
             RefreshLeavePolymorphismView(result);

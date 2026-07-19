@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Presentation.Services.Interfaces;
 
@@ -10,11 +11,11 @@ public interface ILeavePolymorphismConfirmationService
     /// <summary>
     /// Подтверждает заполнение унаследованных атрибутов выбранным родительским листом.
     /// </summary>
-    /// <param name="recipientLeave">Лист, значения которого будут перезаписаны.</param>
+    /// <param name="recipient">Узел или лист, значения которого будут перезаписаны.</param>
     /// <param name="changedAttributeCount">Количество изменяемых атрибутов.</param>
     /// <returns>true, если операция подтверждена; иначе false.</returns>
     Task<bool> ConfirmManualFillAsync(
-        TreeLeaveModel recipientLeave,
+        IAttributeOwnerModel recipient,
         int changedAttributeCount);
 
     /// <summary>

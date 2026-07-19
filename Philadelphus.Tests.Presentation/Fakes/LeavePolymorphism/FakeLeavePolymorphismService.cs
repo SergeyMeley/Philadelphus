@@ -2,6 +2,7 @@ using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Tests.Presentation.Fakes.LeavePolymorphism;
 
@@ -53,13 +54,20 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
     }
 
     /// <inheritdoc />
+    public LeavePolymorphismStatus ResolveParent(TreeNodeModel childNode)
+    {
+        ResolveCount++;
+        return LeavePolymorphismStatus.NotFound;
+    }
+
+    /// <inheritdoc />
     public int CountFillFromParentChanges(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave) => ManualFillChangedAttributeCount;
 
     /// <inheritdoc />
     public LeaveAttributeFillResult FillFromParent(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave)
     {
         ManualFillCount++;
@@ -68,6 +76,13 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
 
     /// <inheritdoc />
     public IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeLeaveModel childLeave)
+    {
+        CreateParentChainCount++;
+        return CreatedParentChainLeaves;
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeNodeModel childNode)
     {
         CreateParentChainCount++;
         return CreatedParentChainLeaves;
@@ -99,4 +114,8 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
         RefreshLinksCount++;
         return [];
     }
+
+    /// <inheritdoc />
+    public void RefreshLinks(IEnumerable<TreeNodeModel> nodes) =>
+        RefreshLinksCount++;
 }

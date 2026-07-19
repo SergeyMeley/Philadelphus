@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.FormulaEngine.Formatting;
+using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.LeaveAttributeValues.Signatures;
 
 namespace Philadelphus.Core.Domain.LeaveAttributeValues.Services;
@@ -10,28 +11,28 @@ namespace Philadelphus.Core.Domain.LeaveAttributeValues.Services;
 public sealed partial class LeaveAttributeValueService
 {
     /// <summary>
-    /// Полностью заменяет выбранные значения атрибутов целевого листа
+    /// Полностью заменяет выбранные значения атрибутов целевого элемента
     /// материализованными значениями исходного листа.
     /// </summary>
-    /// <param name="targetLeave">Заполняемый лист.</param>
+    /// <param name="targetOwner">Заполняемый узел или лист.</param>
     /// <param name="sourceLeave">Лист-источник значений.</param>
     /// <param name="declaringUuids">Идентификаторы объявлений заполняемых атрибутов.</param>
-    /// <returns>Атрибуты целевого листа, фактически изменённые операцией.</returns>
+    /// <returns>Атрибуты целевого элемента, фактически изменённые операцией.</returns>
     public LeaveAttributeFillResult FillFromLeave(
-        TreeLeaveModel targetLeave,
+        IAttributeOwnerModel targetOwner,
         TreeLeaveModel sourceLeave,
         IEnumerable<Guid> declaringUuids)
     {
-        ArgumentNullException.ThrowIfNull(targetLeave);
+        ArgumentNullException.ThrowIfNull(targetOwner);
         ArgumentNullException.ThrowIfNull(sourceLeave);
         ArgumentNullException.ThrowIfNull(declaringUuids);
 
-        if (ReferenceEquals(targetLeave, sourceLeave))
+        if (ReferenceEquals(targetOwner, sourceLeave))
             return new([]);
 
         var requestedUuids = declaringUuids.ToHashSet();
         var changedAttributes = FindChangedAttributes(
-            targetLeave,
+            targetOwner,
             sourceLeave.Attributes,
             requestedUuids);
         return FillAttributes(changedAttributes, sourceLeave.Attributes);
@@ -39,19 +40,19 @@ public sealed partial class LeaveAttributeValueService
 
     /// <inheritdoc />
     public int CountFillChanges(
-        TreeLeaveModel targetLeave,
+        IAttributeOwnerModel targetOwner,
         TreeLeaveModel sourceLeave,
         IEnumerable<Guid> declaringUuids)
     {
-        ArgumentNullException.ThrowIfNull(targetLeave);
+        ArgumentNullException.ThrowIfNull(targetOwner);
         ArgumentNullException.ThrowIfNull(sourceLeave);
         ArgumentNullException.ThrowIfNull(declaringUuids);
 
-        if (ReferenceEquals(targetLeave, sourceLeave))
+        if (ReferenceEquals(targetOwner, sourceLeave))
             return 0;
 
         return FindChangedAttributes(
-                targetLeave,
+                targetOwner,
                 sourceLeave.Attributes,
                 declaringUuids.ToHashSet())
             .Count;
@@ -62,7 +63,7 @@ public sealed partial class LeaveAttributeValueService
     /// проверяет совместимость всех источников до начала мутаций.
     /// </summary>
     private static IReadOnlyList<ElementAttributeModel> FindChangedAttributes(
-        TreeLeaveModel targetLeave,
+        IAttributeOwnerModel targetOwner,
         IEnumerable<ElementAttributeModel> sourceAttributes,
         IReadOnlySet<Guid> requestedUuids)
     {
@@ -71,7 +72,7 @@ public sealed partial class LeaveAttributeValueService
             .ToDictionary(x => x.DeclaringUuid);
         var changedAttributes = new List<ElementAttributeModel>();
 
-        foreach (var targetAttribute in targetLeave.Attributes
+        foreach (var targetAttribute in targetOwner.Attributes
                      .Where(x => requestedUuids.Contains(x.DeclaringUuid)))
         {
             if (sourceAttributesByUuid.TryGetValue(

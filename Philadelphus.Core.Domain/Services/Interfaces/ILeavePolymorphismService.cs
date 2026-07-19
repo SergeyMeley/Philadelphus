@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Contracts.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces;
 
@@ -26,14 +27,21 @@ public interface ILeavePolymorphismService
     LeavePolymorphismResolution ResolveParent(TreeLeaveModel childLeave);
 
     /// <summary>
-    /// Без изменения листа рассчитывает число унаследованных атрибутов,
+    /// Вычисляет родительский лист узла по значениям его унаследованных атрибутов.
+    /// </summary>
+    /// <param name="childNode">Узел, для которого выполняется поиск.</param>
+    /// <returns>Статус разрешения runtime-связи.</returns>
+    LeavePolymorphismStatus ResolveParent(TreeNodeModel childNode);
+
+    /// <summary>
+    /// Без изменения элемента рассчитывает число унаследованных атрибутов,
     /// которые будут заполнены выбранным полиморфным родителем.
     /// </summary>
-    /// <param name="childLeave">Заполняемый лист-наследник.</param>
+    /// <param name="childOwner">Заполняемый узел или лист-наследник.</param>
     /// <param name="parentLeave">Выбранный лист прямого родительского узла.</param>
     /// <returns>Количество изменяемых атрибутов.</returns>
     int CountFillFromParentChanges(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave);
 
     /// <summary>
@@ -41,11 +49,11 @@ public interface ILeavePolymorphismService
     /// Runtime-связь после операции должна быть отдельно пересчитана через
     /// <see cref="ResolveParent" />.
     /// </summary>
-    /// <param name="childLeave">Заполняемый лист-наследник.</param>
+    /// <param name="childOwner">Заполняемый узел или лист-наследник.</param>
     /// <param name="parentLeave">Выбранный лист прямого родительского узла.</param>
     /// <returns>Сведения о фактически изменённых атрибутах.</returns>
     LeaveAttributeFillResult FillFromParent(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave);
 
     /// <summary>
@@ -57,6 +65,13 @@ public interface ILeavePolymorphismService
     /// Если хотя бы на одном уровне связь невалидна или неоднозначна.
     /// </exception>
     IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeLeaveModel childLeave);
+
+    /// <summary>
+    /// Создаёт отсутствующий родительский лист узла и недостающую цепочку выше.
+    /// </summary>
+    /// <param name="childNode">Узел, значения атрибутов которого переносятся в новый лист.</param>
+    /// <returns>Созданные листья от непосредственного родителя к верхнему уровню.</returns>
+    IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeNodeModel childNode);
 
     /// <summary>
     /// Без мутаций рассчитывает транзитивное обновление текущих разрешённых наследников.
@@ -89,4 +104,10 @@ public interface ILeavePolymorphismService
     /// <param name="leaves">Листы для восстановления связей.</param>
     /// <returns>Результат разрешения каждого переданного листа.</returns>
     IReadOnlyList<LeavePolymorphismResolution> RefreshLinks(IEnumerable<TreeLeaveModel> leaves);
+
+    /// <summary>
+    /// Последовательно перестраивает runtime-связи переданных узлов.
+    /// </summary>
+    /// <param name="nodes">Узлы для восстановления связей.</param>
+    void RefreshLinks(IEnumerable<TreeNodeModel> nodes);
 }

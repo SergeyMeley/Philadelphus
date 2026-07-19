@@ -70,6 +70,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private bool _isFormulaHighlightOpen;
         private FormulaRecalculationModeVM _selectedFormulaRecalculationMode;
         private bool _isFormulaAttributeNotificationInProgress;
+        // Одно редактирование поднимает несколько PropertyChanged. Пока первое уведомление
+        // ожидает модальный ответ, повторное не должно запускать второй полиморфный каскад.
+        private readonly HashSet<Guid> _attributeValueChangesInProgress = [];
 
         private IRelayCommand? _selectChildFormulaCellCommand;
         private IAsyncRelayCommand? _applyFormulaBarCommand;
@@ -694,7 +697,17 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             if (e.PropertyName is nameof(ElementAttributeVM.AssignedValue)
                 or nameof(ElementAttributeVM.FormulaValueText))
             {
-                await NotifyAttributeValueChangedAsync(attributeVM.Model);
+                if (_attributeValueChangesInProgress.Add(attributeVM.Model.Uuid) == false)
+                    return;
+
+                try
+                {
+                    await NotifyAttributeValueChangedAsync(attributeVM.Model);
+                }
+                finally
+                {
+                    _attributeValueChangesInProgress.Remove(attributeVM.Model.Uuid);
+                }
             }
         }
 
@@ -902,7 +915,18 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             // но ещё использовать прежнюю runtime-топологию для поиска разрешённых наследников.
             RecalculateFormulasAfterChange(attribute);
 
-            if (attribute.IsRuntime || attribute.Owner is not TreeLeaveModel changedLeave)
+            if (attribute.IsRuntime)
+                return;
+
+            if (attribute.Owner is TreeNodeModel changedNode)
+            {
+                var nodePolymorphismResult = _leavePolymorphismChangeCoordinator
+                    .HandleChangedNode(changedNode);
+                _repositoryExplorerVM.RefreshLeavePolymorphismView(nodePolymorphismResult);
+                return;
+            }
+
+            if (attribute.Owner is not TreeLeaveModel changedLeave)
                 return;
 
             var polymorphismResult = await _leavePolymorphismChangeCoordinator

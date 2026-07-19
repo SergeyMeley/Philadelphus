@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Core.Domain.LeavePolymorphism.Services;
 
@@ -51,12 +52,40 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
     }
 
     /// <inheritdoc />
+    public LeavePolymorphismStatus ResolveParent(TreeNodeModel childNode)
+    {
+        ArgumentNullException.ThrowIfNull(childNode);
+
+        if (childNode.ParentNode == null || IsDeleted(childNode))
+            return Complete(childNode, LeavePolymorphismStatus.Invalid, []);
+
+        var matchResult = FindParentCandidates(childNode, childNode.ParentNode);
+        var status = matchResult.IsValid == false
+            ? LeavePolymorphismStatus.Invalid
+            : matchResult.Matches.Count switch
+            {
+                0 => LeavePolymorphismStatus.NotFound,
+                1 => LeavePolymorphismStatus.Resolved,
+                _ => LeavePolymorphismStatus.Ambiguous
+            };
+        return Complete(childNode, status, matchResult.Matches);
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<LeavePolymorphismResolution> RefreshLinks(
         IEnumerable<TreeLeaveModel> leaves)
     {
         ArgumentNullException.ThrowIfNull(leaves);
 
         return leaves.Select(ResolveParent).ToList();
+    }
+
+    /// <inheritdoc />
+    public void RefreshLinks(IEnumerable<TreeNodeModel> nodes)
+    {
+        ArgumentNullException.ThrowIfNull(nodes);
+        foreach (var node in nodes)
+            ResolveParent(node);
     }
 
     /// <summary>
@@ -86,6 +115,21 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
     }
 
     /// <summary>
+    /// Применяет результат поиска к runtime-связи узла и его служебному атрибуту.
+    /// </summary>
+    private static LeavePolymorphismStatus Complete(
+        TreeNodeModel childNode,
+        LeavePolymorphismStatus status,
+        IReadOnlyList<TreeLeaveModel> candidates)
+    {
+        childNode.SetPolymorphicParentLeave(
+            status == LeavePolymorphismStatus.Resolved ? candidates.Single() : null);
+        childNode.Attributes.OfType<LeavePolymorphismAttributeModel>()
+            .SingleOrDefault()?.SetResolution(status, candidates);
+        return status;
+    }
+
+    /// <summary>
     /// Проверяет как сохранённый признак удаления, так и несохранённые состояния модели.
     /// </summary>
     private static bool IsDeleted(TreeLeaveModel leave) =>
@@ -93,17 +137,24 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
         || leave.State is State.ForSoftDelete or State.ForHardDelete or State.SoftDeleted;
 
     /// <summary>
+    /// Проверяет удаление пользовательского узла с учётом runtime-состояния.
+    /// </summary>
+    private static bool IsDeleted(TreeNodeModel node) =>
+        node.AuditInfo.IsDeleted
+        || node.State is State.ForSoftDelete or State.ForHardDelete or State.SoftDeleted;
+
+    /// <summary>
     /// Ищет активные листья заданного родительского узла по его полному набору атрибутов.
     /// </summary>
     private LeaveAttributeMatchResult FindParentCandidates(
-        TreeLeaveModel sourceLeave,
+        IAttributeOwnerModel sourceOwner,
         TreeNodeModel parentNode)
     {
         var declaringUuids = parentNode.Attributes
             .Where(x => IsPolymorphismAttribute(x) == false)
             .Select(x => x.DeclaringUuid)
             .ToHashSet();
-        var expectedAttributes = GetExpectedParentAttributes(sourceLeave, declaringUuids);
+        var expectedAttributes = GetExpectedParentAttributes(sourceOwner, declaringUuids);
 
         if (expectedAttributes.Count != declaringUuids.Count)
             return new(false, []);
@@ -117,9 +168,9 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
     /// Выбирает из листа материализованные атрибуты указанного родительского уровня.
     /// </summary>
     private static IReadOnlyList<ElementAttributeModel> GetExpectedParentAttributes(
-        TreeLeaveModel sourceLeave,
+        IAttributeOwnerModel sourceOwner,
         IReadOnlySet<Guid> declaringUuids) =>
-        sourceLeave.Attributes
+        sourceOwner.Attributes
             .Where(x => declaringUuids.Contains(x.DeclaringUuid))
             .ToList();
 

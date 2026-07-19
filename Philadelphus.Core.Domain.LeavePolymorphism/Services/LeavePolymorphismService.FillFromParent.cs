@@ -1,5 +1,6 @@
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Core.Domain.LeavePolymorphism.Services;
 
@@ -7,24 +8,24 @@ public sealed partial class LeavePolymorphismService
 {
     /// <inheritdoc />
     public int CountFillFromParentChanges(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave)
     {
-        var declaringUuids = GetFillDeclaringUuids(childLeave, parentLeave);
+        var declaringUuids = GetFillDeclaringUuids(childOwner, parentLeave);
         return _attributeValueService.CountFillChanges(
-            childLeave,
+            childOwner,
             parentLeave,
             declaringUuids);
     }
 
     /// <inheritdoc />
     public LeaveAttributeFillResult FillFromParent(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave)
     {
-        var declaringUuids = GetFillDeclaringUuids(childLeave, parentLeave);
+        var declaringUuids = GetFillDeclaringUuids(childOwner, parentLeave);
         return _attributeValueService.FillFromLeave(
-            childLeave,
+            childOwner,
             parentLeave,
             declaringUuids);
     }
@@ -34,21 +35,27 @@ public sealed partial class LeavePolymorphismService
     /// непосредственного родительского уровня.
     /// </summary>
     private static IReadOnlySet<Guid> GetFillDeclaringUuids(
-        TreeLeaveModel childLeave,
+        IAttributeOwnerModel childOwner,
         TreeLeaveModel parentLeave)
     {
-        ArgumentNullException.ThrowIfNull(childLeave);
+        ArgumentNullException.ThrowIfNull(childOwner);
         ArgumentNullException.ThrowIfNull(parentLeave);
 
-        var expectedParentNode = childLeave.ParentNode.ParentNode;
+        var expectedParentNode = childOwner switch
+        {
+            TreeLeaveModel leave => leave.ParentNode.ParentNode,
+            TreeNodeModel node => node.ParentNode,
+            _ => null
+        };
         if (expectedParentNode == null
             || expectedParentNode.Uuid != parentLeave.ParentNode.Uuid
-            || IsDeleted(childLeave)
+            || childOwner is TreeLeaveModel childLeave && IsDeleted(childLeave)
+            || childOwner is TreeNodeModel childNode && IsDeleted(childNode)
             || IsDeleted(parentLeave))
         {
             throw new InvalidOperationException(
                 $"Лист '{parentLeave.Name}' [{parentLeave.Uuid}] не может быть "
-                + $"полиморфным родителем листа '{childLeave.Name}' [{childLeave.Uuid}].");
+                + $"полиморфным родителем элемента '{childOwner.Name}' [{childOwner.Uuid}].");
         }
 
         return expectedParentNode.Attributes

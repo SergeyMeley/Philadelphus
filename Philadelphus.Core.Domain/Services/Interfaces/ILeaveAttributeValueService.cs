@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Interfaces;
 
 namespace Philadelphus.Core.Domain.Services.Interfaces;
 
@@ -20,14 +21,14 @@ public interface ILeaveAttributeValueService
         IEnumerable<TreeLeaveModel> candidates);
 
     /// <summary>
-    /// Заполняет выбранные атрибуты целевого листа значениями исходного листа.
+    /// Заполняет выбранные атрибуты целевого элемента значениями исходного листа.
     /// </summary>
-    /// <param name="targetLeave">Заполняемый лист.</param>
+    /// <param name="targetOwner">Заполняемый узел или лист.</param>
     /// <param name="sourceLeave">Лист-источник.</param>
     /// <param name="declaringUuids">Идентификаторы объявлений заполняемых атрибутов.</param>
     /// <returns>Сведения об изменённых атрибутах.</returns>
     LeaveAttributeFillResult FillFromLeave(
-        TreeLeaveModel targetLeave,
+        IAttributeOwnerModel targetOwner,
         TreeLeaveModel sourceLeave,
         IEnumerable<Guid> declaringUuids);
 
@@ -35,12 +36,12 @@ public interface ILeaveAttributeValueService
     /// Без изменения моделей рассчитывает число атрибутов, которые будут перезаписаны
     /// операцией <see cref="FillFromLeave" />.
     /// </summary>
-    /// <param name="targetLeave">Заполняемый лист.</param>
+    /// <param name="targetOwner">Проверяемый узел или лист.</param>
     /// <param name="sourceLeave">Лист-источник.</param>
     /// <param name="declaringUuids">Идентификаторы объявлений сравниваемых атрибутов.</param>
     /// <returns>Точное количество изменяемых атрибутов.</returns>
     int CountFillChanges(
-        TreeLeaveModel targetLeave,
+        IAttributeOwnerModel targetOwner,
         TreeLeaveModel sourceLeave,
         IEnumerable<Guid> declaringUuids);
 
