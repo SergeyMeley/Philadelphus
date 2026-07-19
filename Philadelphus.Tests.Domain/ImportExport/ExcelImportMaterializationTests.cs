@@ -46,6 +46,15 @@ namespace Philadelphus.Tests.Domain.ImportExport
                 var child1 = childNode["childLeaves"]!.AsArray()
                     .Single(x => x!["name"]!.GetValue<string>() == "Child 1")!
                     .AsObject();
+                var parentA = parentNode["childLeaves"]!.AsArray()
+                    .Single(x => x!["name"]!.GetValue<string>() == "Parent A")!
+                    .AsObject();
+                var parentCorrelationId = parentA["importCorrelationId"]!.GetValue<Guid>();
+
+                child1["importCorrelationId"]!.GetValue<Guid>()
+                    .Should().NotBe(Guid.Empty);
+                child1["polymorphicParentImportCorrelationId"]!.GetValue<Guid>()
+                    .Should().Be(parentCorrelationId);
                 var child1ParentReference = child1["attributes"]!.AsArray()
                     .Single(x => x!["name"]!.GetValue<string>() == "ParentId")!
                     .AsObject();

@@ -25,10 +25,16 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
             root.Attributes.AddRange(_propertyResolver.ResolveRootAttributes(graph.EntitySets));
 
+            // Корреляция не зависит от имени листа: оно может быть пустым, автоматически
+            // изменённым или повторяться. Идентификатор живёт только в текущем импорте.
+            var correlationIdByRow = graph.EntitySets
+                .SelectMany(set => set.Rows)
+                .ToDictionary(row => row, _ => Guid.NewGuid());
+
             var nodeBySourceName = graph.EntitySets
                 .ToDictionary(
                     set => set.Definition.SourceName,
-                    set => BuildTableNode(set, graph, root.Name),
+                    set => BuildTableNode(set, graph, root.Name, correlationIdByRow),
                     StringComparer.OrdinalIgnoreCase);
 
             // Связи наследования Excel-таблиц переносятся в иерархию узлов чубушника.
@@ -66,7 +72,11 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             };
         }
 
-        private DomainNodePayload BuildTableNode(ImportedEntitySet entitySet, ImportGraph graph, string owningRootName)
+        private DomainNodePayload BuildTableNode(
+            ImportedEntitySet entitySet,
+            ImportGraph graph,
+            string owningRootName,
+            IReadOnlyDictionary<ImportedEntityRow, Guid> correlationIdByRow)
         {
             var definition = entitySet.Definition;
             var nodeName = string.IsNullOrWhiteSpace(definition.DisplayName)
@@ -80,7 +90,10 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                 OwningRootName = owningRootName
             };
 
-            var fkProperties = GetForeignKeyProperties(definition, graph).ToList();
+            var fkProperties = GetForeignKeyProperties(
+                definition,
+                graph,
+                correlationIdByRow).ToList();
             var fkPropertyIndexes = fkProperties
                 .Select(x => x.Property.ColumnIndex)
                 .ToHashSet();
@@ -114,7 +127,12 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
 
             foreach (var row in entitySet.Rows)
             {
-                node.ChildLeaves.Add(BuildLeaf(row, node.Name, fkProperties, fkPropertyIndexes));
+                node.ChildLeaves.Add(BuildLeaf(
+                    row,
+                    node.Name,
+                    fkProperties,
+                    fkPropertyIndexes,
+                    correlationIdByRow));
             }
 
             return node;
@@ -124,13 +142,15 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             ImportedEntityRow row,
             string owningNodeName,
             IReadOnlyCollection<ForeignKeyProperty> fkProperties,
-            IReadOnlySet<int> fkPropertyIndexes)
+            IReadOnlySet<int> fkPropertyIndexes,
+            IReadOnlyDictionary<ImportedEntityRow, Guid> correlationIdByRow)
         {
             var leaf = new DomainLeafPayload
             {
                 Name = ResolveName(row),
                 Description = ResolveDescription(row),
-                OwningNodeName = owningNodeName
+                OwningNodeName = owningNodeName,
+                ImportCorrelationId = correlationIdByRow[row]
             };
 
             foreach (var attribute in _propertyResolver.ResolveAttributes(
@@ -151,15 +171,17 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                     continue;
                 }
 
-                if (fkProperty.ParentLeafNameByKey.TryGetValue(childKeyValue, out var parentLeafName) == false)
+                if (fkProperty.ParentByKey.TryGetValue(childKeyValue, out var parent) == false)
                     continue;
+
+                leaf.PolymorphicParentImportCorrelationId = parent.CorrelationId;
 
                 leaf.Attributes.Add(new ExcelImportAttributePayload
                 {
                     Name = fkProperty.Property.PropertyName,
                     Description = $"Ссылка на строку таблицы «{fkProperty.ParentNodeName}»",
                     DataTypeNodeName = fkProperty.ParentNodeName,
-                    ValueLeaveName = parentLeafName,
+                    ValueLeaveName = parent.LeafName,
                     Visibility = fkProperty.Property.Visibility,
                     Override = fkProperty.Property.Override
                 });
@@ -168,7 +190,10 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
             return leaf;
         }
 
-        private IEnumerable<ForeignKeyProperty> GetForeignKeyProperties(ImportedEntityDefinition definition, ImportGraph graph)
+        private IEnumerable<ForeignKeyProperty> GetForeignKeyProperties(
+            ImportedEntityDefinition definition,
+            ImportGraph graph,
+            IReadOnlyDictionary<ImportedEntityRow, Guid> correlationIdByRow)
         {
             foreach (var relation in graph.Relations.Where(x =>
                          string.Equals(x.ChildSourceName, definition.SourceName, StringComparison.OrdinalIgnoreCase)))
@@ -191,20 +216,22 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
                     : parentSet.Definition.DisplayName;
 
                 // Индекс нужен для быстрого поиска родительского листа по значению внешнего ключа из дочерней строки.
-                var parentLeafNameByKey = parentSet.Rows
+                var parentByKey = parentSet.Rows
                     .Select(row => new
                     {
                         Key = GetValue(row, parentKeyProperty),
-                        LeafName = ResolveName(row)
+                        Parent = new ExcelImportCorrelatedParent(
+                            correlationIdByRow[row],
+                            ResolveName(row))
                     })
                     .Where(x => string.IsNullOrWhiteSpace(x.Key) == false)
                     .GroupBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
                     .ToDictionary(
                         group => group.Key,
-                        group => group.First().LeafName,
+                        group => group.First().Parent,
                         StringComparer.OrdinalIgnoreCase);
 
-                yield return new ForeignKeyProperty(childProperty, parentNodeName, parentLeafNameByKey);
+                yield return new ForeignKeyProperty(childProperty, parentNodeName, parentByKey);
             }
         }
 
@@ -271,7 +298,7 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
         private sealed record ForeignKeyProperty(
             PropertyDefinition Property,
             string ParentNodeName,
-            IReadOnlyDictionary<string, string> ParentLeafNameByKey);
+            IReadOnlyDictionary<string, ExcelImportCorrelatedParent> ParentByKey);
     }
 
     internal sealed class DomainWorkingTreePayload
@@ -316,6 +343,16 @@ namespace Philadelphus.Infrastructure.ImportExport.Excel
         public string OwningNodeName { get; set; } = string.Empty;
 
         public List<ExcelImportAttributePayload> Attributes { get; set; } = new();
+
+        /// <summary>
+        /// Временный идентификатор строки внутри текущего импорта.
+        /// </summary>
+        public Guid ImportCorrelationId { get; set; }
+
+        /// <summary>
+        /// Временный идентификатор строки, найденной по настроенному FK.
+        /// </summary>
+        public Guid? PolymorphicParentImportCorrelationId { get; set; }
     }
 
     internal sealed class ExcelImportAttributePayload

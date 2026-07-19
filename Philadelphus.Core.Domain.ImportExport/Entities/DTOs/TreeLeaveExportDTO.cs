@@ -1,4 +1,5 @@
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using System.Text.Json.Serialization;
 
 namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
 {
@@ -36,6 +37,26 @@ namespace Philadelphus.Core.Domain.ImportExport.Entities.DTOs
         /// Атрибуты листа.
         /// </summary>
         public List<AttributeExportDTO> Attributes { get; set; } = new();
+
+        /// <summary>
+        /// Временный идентификатор строки внутри одной операции импорта.
+        /// </summary>
+        /// <remarks>
+        /// Используется только для связывания уже созданной модели с исходной строкой
+        /// и не попадает в обычный JSON-экспорт рабочего дерева.
+        /// </remarks>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Guid? ImportCorrelationId { get; set; }
+
+        /// <summary>
+        /// Временный идентификатор строки полиморфного родителя внутри операции импорта.
+        /// </summary>
+        /// <remarks>
+        /// Значение формируется из настроенного Excel FK и не требует знать имя
+        /// создаваемого родительского листа.
+        /// </remarks>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Guid? PolymorphicParentImportCorrelationId { get; set; }
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TreeLeaveExportDTO" />.

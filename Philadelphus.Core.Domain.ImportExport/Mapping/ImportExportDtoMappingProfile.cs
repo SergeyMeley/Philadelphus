@@ -41,7 +41,9 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             CreateMap<TreeLeaveModel, TreeLeaveExportDTO>()
                 .ForMember(dest => dest.OwningNodeName, opt => opt.MapFrom(src => GetOwningNodeName(src)))
                 .ForMember(dest => dest.Attributes, opt => opt.MapFrom(src =>
-                    src.Attributes.Where(x => x.IsRuntime == false)));
+                    src.Attributes.Where(x => x.IsRuntime == false)))
+                .ForMember(dest => dest.ImportCorrelationId, opt => opt.Ignore())
+                .ForMember(dest => dest.PolymorphicParentImportCorrelationId, opt => opt.Ignore());
 
             CreateMap<ElementAttributeModel, AttributeExportDTO>()
                 .ForMember(dest => dest.DataTypeNodeName, opt => opt.MapFrom(src => GetDataTypeNodeName(src)))
