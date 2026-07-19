@@ -30,6 +30,18 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
     /// <summary>Количество пересчётов связи изменённого листа.</summary>
     internal int ResolveCount { get; private set; }
 
+    /// <summary>Число изменений, возвращаемое предварительным расчётом заполнения.</summary>
+    internal int ManualFillChangedAttributeCount { get; init; }
+
+    /// <summary>Количество применений ручного заполнения.</summary>
+    internal int ManualFillCount { get; private set; }
+
+    /// <summary>Количество запросов создания цепочки.</summary>
+    internal int CreateParentChainCount { get; private set; }
+
+    /// <summary>Количество массовых обновлений runtime-связей.</summary>
+    internal int RefreshLinksCount { get; private set; }
+
     /// <summary>Листы, которые fake-сервис возвращает из ветки сохранения.</summary>
     internal IReadOnlyList<TreeLeaveModel> PreservedCreatedLeaves { get; init; } = [];
 
@@ -43,15 +55,26 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
     /// <inheritdoc />
     public int CountFillFromParentChanges(
         TreeLeaveModel childLeave,
-        TreeLeaveModel parentLeave) => 0;
+        TreeLeaveModel parentLeave) => ManualFillChangedAttributeCount;
 
     /// <inheritdoc />
     public LeaveAttributeFillResult FillFromParent(
         TreeLeaveModel childLeave,
-        TreeLeaveModel parentLeave) => new([]);
+        TreeLeaveModel parentLeave)
+    {
+        ManualFillCount++;
+        return new([]);
+    }
 
     /// <inheritdoc />
-    public IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeLeaveModel childLeave) => [];
+    public IReadOnlyList<TreeLeaveModel> CreateParentChain(TreeLeaveModel childLeave)
+    {
+        CreateParentChainCount++;
+        return CreatedParentChainLeaves;
+    }
+
+    /// <summary>Листы, возвращаемые операцией создания цепочки.</summary>
+    internal IReadOnlyList<TreeLeaveModel> CreatedParentChainLeaves { get; init; } = [];
 
     /// <inheritdoc />
     public LeavePolymorphismPropagationPlan BuildPropagationPlan(TreeLeaveModel changedParentLeave) =>
@@ -71,5 +94,9 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
 
     /// <inheritdoc />
     public IReadOnlyList<LeavePolymorphismResolution> RefreshLinks(
-        IEnumerable<TreeLeaveModel> leaves) => [];
+        IEnumerable<TreeLeaveModel> leaves)
+    {
+        RefreshLinksCount++;
+        return [];
+    }
 }

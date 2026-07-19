@@ -14,6 +14,77 @@ namespace Philadelphus.Tests.Presentation.Services;
 /// </summary>
 public sealed class LeavePolymorphismChangeCoordinatorTests
 {
+    [Theory]
+    [InlineData(true, true, 1, 1)]
+    [InlineData(false, false, 0, 0)]
+    public async Task FillFromParentAsync_AppliesOnlyConfirmedFill(
+        bool confirmed,
+        bool expectedApplied,
+        int expectedFillCount,
+        int expectedResolveCount)
+    {
+        var (parentLeave, childLeave) = CreateLeaves();
+        var plan = new LeavePolymorphismPropagationPlan(parentLeave, []);
+        var polymorphism = new FakeLeavePolymorphismService(plan)
+        {
+            ManualFillChangedAttributeCount = 2
+        };
+        var confirmation = new FakeLeavePolymorphismConfirmationService(
+            propagationConfirmed: true,
+            manualFillConfirmed: confirmed);
+        var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
+
+        var result = await coordinator.FillFromParentAsync(childLeave, parentLeave);
+
+        result.Applied.Should().Be(expectedApplied);
+        confirmation.ManualFillCallCount.Should().Be(1);
+        confirmation.LastManualFillChangedAttributeCount.Should().Be(2);
+        polymorphism.ManualFillCount.Should().Be(expectedFillCount);
+        polymorphism.ResolveCount.Should().Be(expectedResolveCount);
+    }
+
+    [Fact]
+    public async Task FillFromParentAsync_WithoutChanges_SkipsConfirmation()
+    {
+        var (parentLeave, childLeave) = CreateLeaves();
+        var plan = new LeavePolymorphismPropagationPlan(parentLeave, []);
+        var polymorphism = new FakeLeavePolymorphismService(plan);
+        var confirmation = new FakeLeavePolymorphismConfirmationService(
+            propagationConfirmed: true,
+            manualFillConfirmed: false);
+        var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
+
+        var result = await coordinator.FillFromParentAsync(childLeave, parentLeave);
+
+        result.Applied.Should().BeTrue();
+        result.ChangedAttributes.Should().BeEmpty();
+        confirmation.ManualFillCallCount.Should().Be(0);
+        polymorphism.ManualFillCount.Should().Be(1);
+        polymorphism.ResolveCount.Should().Be(1);
+    }
+
+    [Fact]
+    public void CreateParentChain_RefreshesCreatedRuntimeLinksWithoutConfirmation()
+    {
+        var (parentLeave, childLeave) = CreateLeaves();
+        var plan = new LeavePolymorphismPropagationPlan(parentLeave, []);
+        var polymorphism = new FakeLeavePolymorphismService(plan)
+        {
+            CreatedParentChainLeaves = [parentLeave]
+        };
+        var confirmation = new FakeLeavePolymorphismConfirmationService(true);
+        var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
+
+        var result = coordinator.CreateParentChain(childLeave);
+
+        result.CascadeProcessed.Should().BeFalse();
+        result.CreatedLeaves.Should().Equal(parentLeave);
+        polymorphism.CreateParentChainCount.Should().Be(1);
+        polymorphism.RefreshLinksCount.Should().Be(1);
+        confirmation.ManualFillCallCount.Should().Be(0);
+        confirmation.PropagationCallCount.Should().Be(0);
+    }
+
     [Fact]
     public async Task HandleChangedLeaveAsync_WithoutAffectedLeaves_OnlyResolvesChangedLeave()
     {

@@ -35,6 +35,61 @@ public sealed class LeavePolymorphismChangeCoordinator
     }
 
     /// <inheritdoc />
+    public async Task<LeavePolymorphismManualFillResult> FillFromParentAsync(
+        TreeLeaveModel recipientLeave,
+        TreeLeaveModel parentLeave)
+    {
+        ArgumentNullException.ThrowIfNull(recipientLeave);
+        ArgumentNullException.ThrowIfNull(parentLeave);
+
+        if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) != 0)
+            return new(false, []);
+
+        try
+        {
+            var changedAttributeCount = _leavePolymorphismService
+                .CountFillFromParentChanges(recipientLeave, parentLeave);
+            if (changedAttributeCount > 0
+                && await _confirmationService.ConfirmManualFillAsync(
+                    recipientLeave,
+                    changedAttributeCount) == false)
+            {
+                return new(false, []);
+            }
+
+            var fillResult = _leavePolymorphismService.FillFromParent(
+                recipientLeave,
+                parentLeave);
+            _leavePolymorphismService.ResolveParent(recipientLeave);
+            return new(true, fillResult.ChangedAttributes);
+        }
+        finally
+        {
+            Volatile.Write(ref _isProcessing, 0);
+        }
+    }
+
+    /// <inheritdoc />
+    public LeavePolymorphismChangeResult CreateParentChain(TreeLeaveModel childLeave)
+    {
+        ArgumentNullException.ThrowIfNull(childLeave);
+
+        if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) != 0)
+            return new(false, []);
+
+        try
+        {
+            var createdLeaves = _leavePolymorphismService.CreateParentChain(childLeave);
+            _leavePolymorphismService.RefreshLinks(createdLeaves.Prepend(childLeave));
+            return new(false, createdLeaves);
+        }
+        finally
+        {
+            Volatile.Write(ref _isProcessing, 0);
+        }
+    }
+
+    /// <inheritdoc />
     public async Task<LeavePolymorphismChangeResult> HandleChangedLeaveAsync(
         TreeLeaveModel changedLeave)
     {
