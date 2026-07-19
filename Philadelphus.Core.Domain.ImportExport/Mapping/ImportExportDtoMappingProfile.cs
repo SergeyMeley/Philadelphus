@@ -134,8 +134,7 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
             LinkAttributesToRealEntities(service, treeRoot, attributeLinkMap, refreshProgress);
 
             refreshProcess("Заполняем унаследованные атрибуты");
-            FillImportedPolymorphicParents(
-                leavePolymorphismService,
+            new ImportLeavePolymorphismLinker(leavePolymorphismService).Fill(
                 importedLeavesByCorrelationId,
                 parentCorrelationIdByLeave,
                 refreshProgress);
@@ -290,58 +289,6 @@ namespace Philadelphus.Core.Domain.ImportExport.Mapping
 
             if (leaveDto.PolymorphicParentImportCorrelationId is Guid parentCorrelationId)
                 parentCorrelationIdByLeave.Add(leaf, parentCorrelationId);
-        }
-
-        /// <summary>
-        /// Разрешает временные FK-корреляции и сверху вниз заполняет листья
-        /// значениями унаследованных атрибутов их родительских листов.
-        /// </summary>
-        private static void FillImportedPolymorphicParents(
-            ILeavePolymorphismService service,
-            IReadOnlyDictionary<Guid, TreeLeaveModel> leavesByCorrelationId,
-            IReadOnlyDictionary<TreeLeaveModel, Guid> parentCorrelationIdByLeave,
-            Action<int, int> refreshProgress)
-        {
-            var links = parentCorrelationIdByLeave
-                .OrderBy(x => GetNodeDepth(x.Key.ParentNode))
-                .ToList();
-
-            // UI прогресса не допускает нулевой totalCount. Отсутствие FK-связей
-            // означает, что этап уже завершён, а не что у него нулевой диапазон.
-            if (links.Count == 0)
-            {
-                refreshProgress(1, 1);
-                return;
-            }
-
-            refreshProgress(0, links.Count);
-
-            for (var i = 0; i < links.Count; i++)
-            {
-                var (childLeave, parentCorrelationId) = links[i];
-                if (leavesByCorrelationId.TryGetValue(parentCorrelationId, out var parentLeave) == false)
-                {
-                    throw new InvalidOperationException(
-                        $"Для листа '{childLeave.Name}' [{childLeave.Uuid}] не найдена "
-                        + $"родительская строка импорта '{parentCorrelationId}'.");
-                }
-
-                service.FillFromParent(childLeave, parentLeave);
-                service.ResolveParent(childLeave);
-                refreshProgress(i + 1, links.Count);
-            }
-        }
-
-        /// <summary>
-        /// Возвращает глубину узла для детерминированного заполнения связей сверху вниз.
-        /// </summary>
-        private static int GetNodeDepth(TreeNodeModel node)
-        {
-            var depth = 0;
-            for (var current = node.ParentNode; current != null; current = current.ParentNode)
-                depth++;
-
-            return depth;
         }
 
         private static void CreateAttributesFromElement(
