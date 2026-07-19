@@ -63,6 +63,29 @@ public sealed class LeavePolymorphismChangeCoordinatorTests
         polymorphism.ResolveCount.Should().Be(1);
     }
 
+    /// <summary>
+    /// Подтверждённый выбор родителя для узла должен заполнить сам узел и пересчитать его runtime-связь.
+    /// </summary>
+    [Fact]
+    public async Task FillFromParentAsync_NodeRecipient_FillsAndResolvesNode()
+    {
+        var (parentLeave, childNode) = CreateNodeRecipient();
+        var plan = new LeavePolymorphismPropagationPlan(parentLeave, []);
+        var polymorphism = new FakeLeavePolymorphismService(plan)
+        {
+            ManualFillChangedAttributeCount = 1
+        };
+        var confirmation = new FakeLeavePolymorphismConfirmationService(true);
+        var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
+
+        var result = await coordinator.FillFromParentAsync(childNode, parentLeave);
+
+        result.Applied.Should().BeTrue();
+        polymorphism.LastManualFillOwner.Should().BeSameAs(childNode);
+        polymorphism.LastResolvedNode.Should().BeSameAs(childNode);
+        confirmation.ManualFillCallCount.Should().Be(1);
+    }
+
     [Fact]
     public void CreateParentChain_RefreshesCreatedRuntimeLinksWithoutConfirmation()
     {
@@ -81,6 +104,51 @@ public sealed class LeavePolymorphismChangeCoordinatorTests
         result.CreatedLeaves.Should().Equal(parentLeave);
         polymorphism.CreateParentChainCount.Should().Be(1);
         polymorphism.RefreshLinksCount.Should().Be(1);
+        confirmation.ManualFillCallCount.Should().Be(0);
+        confirmation.PropagationCallCount.Should().Be(0);
+    }
+
+    /// <summary>
+    /// Создание родителя узла должно разрешить связь узла и восстановить связи созданной цепочки.
+    /// </summary>
+    [Fact]
+    public void CreateParentChain_NodeRecipient_RefreshesChainAndResolvesNode()
+    {
+        var (parentLeave, childNode) = CreateNodeRecipient();
+        var plan = new LeavePolymorphismPropagationPlan(parentLeave, []);
+        var polymorphism = new FakeLeavePolymorphismService(plan)
+        {
+            CreatedParentChainLeaves = [parentLeave]
+        };
+        var confirmation = new FakeLeavePolymorphismConfirmationService(true);
+        var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
+
+        var result = coordinator.CreateParentChain(childNode);
+
+        result.CreatedLeaves.Should().Equal(parentLeave);
+        polymorphism.LastRefreshedLeaves.Should().Equal(parentLeave);
+        polymorphism.LastResolvedNode.Should().BeSameAs(childNode);
+        confirmation.ManualFillCallCount.Should().Be(0);
+        confirmation.PropagationCallCount.Should().Be(0);
+    }
+
+    /// <summary>
+    /// Изменение обычного атрибута узла должно пересчитать сам узел и его непосредственные листья.
+    /// </summary>
+    [Fact]
+    public void HandleChangedNode_ResolvesNodeAndItsDirectLeaves()
+    {
+        var (parentLeave, childNode) = CreateNodeRecipient();
+        var plan = new LeavePolymorphismPropagationPlan(parentLeave, []);
+        var polymorphism = new FakeLeavePolymorphismService(plan);
+        var confirmation = new FakeLeavePolymorphismConfirmationService(true);
+        var coordinator = new LeavePolymorphismChangeCoordinator(polymorphism, confirmation);
+
+        var result = coordinator.HandleChangedNode(childNode);
+
+        result.CascadeProcessed.Should().BeFalse();
+        polymorphism.LastResolvedNode.Should().BeSameAs(childNode);
+        polymorphism.LastRefreshedLeaves.Should().Equal(childNode.ChildLeaves);
         confirmation.ManualFillCallCount.Should().Be(0);
         confirmation.PropagationCallCount.Should().Be(0);
     }
@@ -169,5 +237,45 @@ public sealed class LeavePolymorphismChangeCoordinatorTests
                 tree,
                 notificationService,
                 new EmptyPropertiesPolicy<TreeLeaveModel>()));
+    }
+
+    /// <summary>
+    /// Создаёт родительский лист и дочерний узел с непосредственным листом.
+    /// </summary>
+    private static (TreeLeaveModel ParentLeave, TreeNodeModel ChildNode) CreateNodeRecipient()
+    {
+        var tree = new FakeWorkingTreeModel();
+        var notificationService = new FakeNotificationService();
+        var root = new TreeRootModel(
+            Guid.CreateVersion7(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var parentNode = new TreeNodeModel(
+            Guid.CreateVersion7(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var parentLeave = new TreeLeaveModel(
+            Guid.CreateVersion7(),
+            parentNode,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var childNode = new TreeNodeModel(
+            Guid.CreateVersion7(),
+            parentNode,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        _ = new TreeLeaveModel(
+            Guid.CreateVersion7(),
+            childNode,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+
+        return (parentLeave, childNode);
     }
 }

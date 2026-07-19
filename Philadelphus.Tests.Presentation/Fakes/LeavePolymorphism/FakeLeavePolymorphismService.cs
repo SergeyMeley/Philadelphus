@@ -43,6 +43,15 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
     /// <summary>Количество массовых обновлений runtime-связей.</summary>
     internal int RefreshLinksCount { get; private set; }
 
+    /// <summary>Последний получатель ручного заполнения.</summary>
+    internal IAttributeOwnerModel? LastManualFillOwner { get; private set; }
+
+    /// <summary>Последний узел, для которого пересчитывалась runtime-связь.</summary>
+    internal TreeNodeModel? LastResolvedNode { get; private set; }
+
+    /// <summary>Последний набор листов, переданный для массового пересчёта runtime-связей.</summary>
+    internal IReadOnlyList<TreeLeaveModel> LastRefreshedLeaves { get; private set; } = [];
+
     /// <summary>Листы, которые fake-сервис возвращает из ветки сохранения.</summary>
     internal IReadOnlyList<TreeLeaveModel> PreservedCreatedLeaves { get; init; } = [];
 
@@ -57,6 +66,7 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
     public LeavePolymorphismStatus ResolveParent(TreeNodeModel childNode)
     {
         ResolveCount++;
+        LastResolvedNode = childNode;
         return LeavePolymorphismStatus.NotFound;
     }
 
@@ -71,6 +81,7 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
         TreeLeaveModel parentLeave)
     {
         ManualFillCount++;
+        LastManualFillOwner = childOwner;
         return new([]);
     }
 
@@ -112,6 +123,7 @@ internal sealed class FakeLeavePolymorphismService : ILeavePolymorphismService
         IEnumerable<TreeLeaveModel> leaves)
     {
         RefreshLinksCount++;
+        LastRefreshedLeaves = leaves.ToList();
         return [];
     }
 
