@@ -1,6 +1,8 @@
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
@@ -13,7 +15,11 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 public sealed class AttributeValuesCollectionVM : ViewModelBase
 {
     private readonly ElementAttributeModel _attribute;
+    private readonly ILeaveAttributeValueService? _attributeValueService;
     private ElementAttributeVM? _attributeVM;
+    private string? _systemSearchValue;
+    private LeaveAttributeMatchResult _searchResult =
+        new(LeaveAttributeMatchStatus.Invalid, []);
 
     /// <summary>
     /// Инициализирует редактор значений коллекционного атрибута.
@@ -23,12 +29,25 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// Атрибут не является коллекционным.
     /// </exception>
     public AttributeValuesCollectionVM(ElementAttributeModel attribute)
+        : this(attribute, null)
+    {
+    }
+
+    /// <summary>
+    /// Инициализирует редактор с сервисом поиска значений листьев.
+    /// </summary>
+    /// <param name="attribute">Доменная модель редактируемого атрибута.</param>
+    /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
+    public AttributeValuesCollectionVM(
+        ElementAttributeModel attribute,
+        ILeaveAttributeValueService? attributeValueService)
     {
         ArgumentNullException.ThrowIfNull(attribute);
         if (attribute.IsCollectionValue == false)
             throw new ArgumentException("Редактор значений доступен только для коллекционного атрибута.", nameof(attribute));
 
         _attribute = attribute;
+        _attributeValueService = attributeValueService;
         Refresh();
     }
 
@@ -38,6 +57,21 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// <param name="attribute">Модель представления редактируемого атрибута.</param>
     public AttributeValuesCollectionVM(ElementAttributeVM attribute)
         : this(attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)))
+    {
+        _attributeVM = attribute;
+    }
+
+    /// <summary>
+    /// Инициализирует редактор для атрибута и подключает сервис поиска.
+    /// </summary>
+    /// <param name="attribute">Модель представления редактируемого атрибута.</param>
+    /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
+    public AttributeValuesCollectionVM(
+        ElementAttributeVM attribute,
+        ILeaveAttributeValueService attributeValueService)
+        : this(
+            attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)),
+            attributeValueService ?? throw new ArgumentNullException(nameof(attributeValueService)))
     {
         _attributeVM = attribute;
     }
@@ -61,6 +95,46 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// Строки таблицы допустимых значений.
     /// </summary>
     public IReadOnlyList<ChildCollectionTableRow> Rows { get; private set; } = [];
+
+    /// <summary>
+    /// Строковое значение для автоматического поиска по системному типу.
+    /// </summary>
+    public string? SystemSearchValue
+    {
+        get => _systemSearchValue;
+        set
+        {
+            if (SetProperty(ref _systemSearchValue, value))
+                RefreshSystemSearch();
+        }
+    }
+
+    /// <summary>
+    /// Указывает, доступен ли поиск системного значения.
+    /// </summary>
+    public bool CanSearchSystemValues =>
+        _attributeValueService != null
+        && _attribute.ValueType is SystemBaseTreeNodeModel;
+
+    /// <summary>
+    /// Текущий статус поиска системного значения.
+    /// </summary>
+    public LeaveAttributeMatchStatus SearchStatus => _searchResult.Status;
+
+    /// <summary>
+    /// Количество найденных значений.
+    /// </summary>
+    public int SearchMatchCount => _searchResult.Matches.Count;
+
+    /// <summary>
+    /// Однозначно найденный лист.
+    /// </summary>
+    public TreeLeaveModel? ResolvedSearchMatch => _searchResult.ResolvedMatch;
+
+    /// <summary>
+    /// Строка таблицы однозначно найденного листа.
+    /// </summary>
+    public ChildCollectionTableRow? ResolvedSearchRow { get; private set; }
 
     /// <summary>
     /// Указывает, можно ли изменять эффективную коллекцию значений.
@@ -90,19 +164,22 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         Values = leaves
             .Select(x => new AttributeValueSelectionItemVM(this, x))
             .ToArray();
+        UpdateSearchResult();
 
         Columns =
         [
             CreateSelectionColumn(),
-            .. LeaveTableProjectionBuilder.buildLeaveTableColumns(leaves, startOrder: 1),
+            CreateSearchMatchColumn(),
+            .. LeaveTableProjectionBuilder.buildLeaveTableColumns(leaves, startOrder: 2),
         ];
-        Rows = LeaveTableProjectionBuilder.buildLeaveTableRows(leaves, Columns);
+        RebuildRows(leaves);
 
         OnPropertyChanged(nameof(Values));
         OnPropertyChanged(nameof(Columns));
         OnPropertyChanged(nameof(Rows));
         OnPropertyChanged(nameof(CanSelectValues));
         OnPropertyChanged(nameof(SelectionToolTip));
+        NotifySearchProperties();
     }
 
     internal bool IsSelected(TreeLeaveModel value) =>
@@ -138,6 +215,54 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         columnType: ChildCollectionTableColumnType.CheckBox,
         cellEnabledGetter: _ => CanSelectValues,
         cellToolTipGetter: _ => SelectionToolTip);
+
+    private ChildCollectionTableColumn CreateSearchMatchColumn() => new(
+        "IsSearchMatch",
+        "Подходит",
+        1,
+        child => child is TreeLeaveModel leave ? IsSearchMatch(leave) : null,
+        columnType: ChildCollectionTableColumnType.CheckBox,
+        cellEnabledGetter: _ => false,
+        headerToolTip: "Соответствие текущим условиям поиска.");
+
+    private bool? IsSearchMatch(TreeLeaveModel leave) =>
+        SearchStatus == LeaveAttributeMatchStatus.Invalid
+            ? null
+            : _searchResult.Matches.Any(x => x.Uuid == leave.Uuid);
+
+    private void RefreshSystemSearch()
+    {
+        UpdateSearchResult();
+        RebuildRows(Values.Select(x => x.Value));
+        OnPropertyChanged(nameof(Rows));
+        NotifySearchProperties();
+    }
+
+    private void UpdateSearchResult()
+    {
+        _searchResult = CanSearchSystemValues
+            ? _attributeValueService!.FindSystemValue(
+                (SystemBaseTreeNodeModel)_attribute.ValueType!,
+                _systemSearchValue)
+            : new(LeaveAttributeMatchStatus.Invalid, []);
+    }
+
+    private void RebuildRows(IEnumerable<TreeLeaveModel> leaves)
+    {
+        Rows = LeaveTableProjectionBuilder.buildLeaveTableRows(leaves, Columns);
+        ResolvedSearchRow = ResolvedSearchMatch == null
+            ? null
+            : Rows.SingleOrDefault(x => x.SourceUuid == ResolvedSearchMatch.Uuid);
+    }
+
+    private void NotifySearchProperties()
+    {
+        OnPropertyChanged(nameof(CanSearchSystemValues));
+        OnPropertyChanged(nameof(SearchStatus));
+        OnPropertyChanged(nameof(SearchMatchCount));
+        OnPropertyChanged(nameof(ResolvedSearchMatch));
+        OnPropertyChanged(nameof(ResolvedSearchRow));
+    }
 
     private static bool IsActive(TreeLeaveModel value) =>
         value.AuditInfo.IsDeleted == false

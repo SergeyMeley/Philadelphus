@@ -1,8 +1,10 @@
 using FluentAssertions;
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
@@ -26,8 +28,54 @@ public class AttributeValuesCollectionVMTests
         sut.Values.Single(x => x.Value == graph.First).IsSelected.Should().BeTrue();
         sut.Values.Single(x => x.Value == graph.Second).IsSelected.Should().BeFalse();
         sut.Columns.First().ColumnType.Should().Be(ChildCollectionTableColumnType.CheckBox);
+        sut.Columns[1].Key.Should().Be("IsSearchMatch");
         sut.Rows.Select(x => x.SourceUuid).Should().Equal(graph.First.Uuid, graph.Second.Uuid);
         sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)["IsSelected"].Should().Be(true);
+        sut.Rows.Should().OnlyContain(x => x["IsSearchMatch"] == null);
+    }
+
+    [Fact]
+    public void SystemSearch_AutomaticallyUpdatesStatusMatchesAndResolvedRow()
+    {
+        var graph = CreateGraph();
+        var valueType = new SystemBaseTreeNodeModel(
+            graph.Owner.Parent,
+            graph.Tree,
+            SystemBaseType.INTEGER,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var first = CreateSystemLeave(graph, valueType, "1");
+        var second = CreateSystemLeave(graph, valueType, "2");
+        graph.Attribute.ValueType = valueType;
+        var service = new StubLeaveAttributeValueService(
+            (_, value) => value switch
+            {
+                "1" => new(LeaveAttributeMatchStatus.Resolved, [first]),
+                "оба" => new(LeaveAttributeMatchStatus.Ambiguous, [first, second]),
+                "нет" => new(LeaveAttributeMatchStatus.NotFound, []),
+                _ => new(LeaveAttributeMatchStatus.Invalid, []),
+            });
+        var sut = new AttributeValuesCollectionVM(graph.Attribute, service);
+
+        sut.SystemSearchValue = "1";
+
+        sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.Resolved);
+        sut.SearchMatchCount.Should().Be(1);
+        sut.ResolvedSearchMatch.Should().BeSameAs(first);
+        sut.ResolvedSearchRow!.SourceUuid.Should().Be(first.Uuid);
+        sut.Rows.Single(x => x.SourceUuid == first.Uuid)["IsSearchMatch"].Should().Be(true);
+        sut.Rows.Single(x => x.SourceUuid == second.Uuid)["IsSearchMatch"].Should().Be(false);
+
+        sut.SystemSearchValue = "оба";
+        sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.Ambiguous);
+        sut.SearchMatchCount.Should().Be(2);
+        sut.ResolvedSearchRow.Should().BeNull();
+        sut.Rows.Should().OnlyContain(x => Equals(x["IsSearchMatch"], true));
+
+        sut.SystemSearchValue = "нет";
+        sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.NotFound);
+        sut.Rows.Should().OnlyContain(x => Equals(x["IsSearchMatch"], false));
+        graph.Attribute.Values.Should().BeEmpty();
     }
 
     [Fact]
@@ -125,6 +173,18 @@ public class AttributeValuesCollectionVMTests
         return result;
     }
 
+    private static SystemBaseTreeLeaveModel CreateSystemLeave(
+        TestGraph graph,
+        SystemBaseTreeNodeModel parent,
+        string value)
+    {
+        var result = new SystemBaseTreeLeaveModel(
+            Guid.NewGuid(), parent, graph.Tree, parent.SystemBaseType,
+            graph.Notifications, new EmptyPropertiesPolicy<TreeLeaveModel>());
+        result.StringValue = value;
+        return result;
+    }
+
     private sealed record TestGraph(
         FakeWorkingTreeModel Tree,
         FakeNotificationService Notifications,
@@ -133,4 +193,35 @@ public class AttributeValuesCollectionVMTests
         TreeLeaveModel First,
         TreeLeaveModel Second,
         TreeLeaveModel Deleted);
+
+    private sealed class StubLeaveAttributeValueService(
+        Func<SystemBaseTreeNodeModel, string?, LeaveAttributeMatchResult> findSystemValue)
+        : ILeaveAttributeValueService
+    {
+        public LeaveAttributeMatchResult FindSystemValue(
+            SystemBaseTreeNodeModel valueType,
+            string? expectedValue) => findSystemValue(valueType, expectedValue);
+
+        public LeaveAttributeMatchResult FindMatches(
+            IEnumerable<ElementAttributeModel> expectedAttributes,
+            IEnumerable<TreeLeaveModel> candidates) => throw new NotSupportedException();
+
+        public LeaveAttributeFillResult FillFromLeave(
+            Philadelphus.Core.Domain.Interfaces.IAttributeOwnerModel targetOwner,
+            TreeLeaveModel sourceLeave,
+            IEnumerable<Guid> declaringUuids) => throw new NotSupportedException();
+
+        public int CountFillChanges(
+            Philadelphus.Core.Domain.Interfaces.IAttributeOwnerModel targetOwner,
+            TreeLeaveModel sourceLeave,
+            IEnumerable<Guid> declaringUuids) => throw new NotSupportedException();
+
+        public TreeLeaveModel CreateLeave(
+            TreeNodeModel parentNode,
+            IEnumerable<ElementAttributeModel> sourceAttributes) => throw new NotSupportedException();
+
+        public SystemBaseTreeLeaveModel CreateSystemValue(
+            SystemBaseTreeNodeModel valueType,
+            string value) => throw new NotSupportedException();
+    }
 }
