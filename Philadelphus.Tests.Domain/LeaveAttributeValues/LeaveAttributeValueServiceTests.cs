@@ -100,6 +100,48 @@ public class LeaveAttributeValueServiceTests
     }
 
     [Fact]
+    public void FindMatches_DraftsCompareCompleteSetAndRejectValueErrors()
+    {
+        var graph = CreateGraph();
+        var scalar = CreateDeclaration(graph);
+        var collection = CreateDeclaration(graph, isCollection: true);
+        var extra = CreateDeclaration(graph);
+        var candidate = CreateLeave(graph);
+        AddValues(candidate, collection, graph.SecondValue, graph.FirstValue);
+        SetValue(candidate, extra, graph.FirstValue);
+        var scalarDraft = LeaveAttributeValueDraft.Scalar(scalar.DeclaringUuid, null);
+        var collectionDraft = LeaveAttributeValueDraft.Collection(
+            collection.DeclaringUuid,
+            [graph.FirstValue.Uuid, graph.SecondValue.Uuid, graph.FirstValue.Uuid]);
+        var extraDraft = LeaveAttributeValueDraft.Scalar(
+            extra.DeclaringUuid,
+            graph.FirstValue.Uuid);
+        var service = CreateService();
+
+        var resolved = service.FindMatches(
+            [scalarDraft, collectionDraft, extraDraft],
+            [candidate]);
+
+        scalarDraft.ValueUuid.Should().BeNull();
+        collectionDraft.ValueUuids.Should().BeEquivalentTo(
+            [graph.FirstValue.Uuid, graph.SecondValue.Uuid]);
+        resolved.Status.Should().Be(LeaveAttributeMatchStatus.Resolved);
+        resolved.ResolvedMatch.Should().BeSameAs(candidate);
+        service.FindMatches([scalarDraft, collectionDraft], [candidate])
+            .Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
+
+        GetAttribute(candidate, extra).ValueFormulaErrorCode = "FORMULA_ERROR";
+        service.FindMatches([scalarDraft, collectionDraft, extraDraft], [candidate])
+            .Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
+        GetAttribute(candidate, extra).ValueFormulaErrorCode = string.Empty;
+        GetAttribute(candidate, collection).LoadValues(
+            [graph.FirstValue, graph.SecondValue],
+            [Guid.NewGuid()]);
+        service.FindMatches([scalarDraft, collectionDraft, extraDraft], [candidate])
+            .Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
+    }
+
+    [Fact]
     public void FindSystemValue_ComparesTypedValuesAndDetectsAmbiguity()
     {
         var graph = CreateGraph();

@@ -21,6 +21,16 @@ public interface ILeaveAttributeValueService
         IEnumerable<TreeLeaveModel> candidates);
 
     /// <summary>
+    /// Находит листы по точному полному набору нерuntime-атрибутов.
+    /// </summary>
+    /// <param name="expectedValues">Независимые черновики ожидаемых значений.</param>
+    /// <param name="candidates">Листы, среди которых выполняется поиск.</param>
+    /// <returns>Статус поиска и найденные листы.</returns>
+    LeaveAttributeMatchResult FindMatches(
+        IEnumerable<LeaveAttributeValueDraft> expectedValues,
+        IEnumerable<TreeLeaveModel> candidates);
+
+    /// <summary>
     /// Находит активные системные листья с типизированным значением переданной строки.
     /// </summary>
     /// <param name="valueType">Системный узел искомого значения.</param>

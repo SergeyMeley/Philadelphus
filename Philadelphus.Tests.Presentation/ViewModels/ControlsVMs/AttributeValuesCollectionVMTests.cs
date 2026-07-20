@@ -206,6 +206,10 @@ public class AttributeValuesCollectionVMTests
             IEnumerable<ElementAttributeModel> expectedAttributes,
             IEnumerable<TreeLeaveModel> candidates) => throw new NotSupportedException();
 
+        public LeaveAttributeMatchResult FindMatches(
+            IEnumerable<LeaveAttributeValueDraft> expectedValues,
+            IEnumerable<TreeLeaveModel> candidates) => throw new NotSupportedException();
+
         public LeaveAttributeFillResult FillFromLeave(
             Philadelphus.Core.Domain.Interfaces.IAttributeOwnerModel targetOwner,
             TreeLeaveModel sourceLeave,

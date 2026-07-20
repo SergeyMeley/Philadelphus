@@ -1,3 +1,4 @@
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 
 namespace Philadelphus.Core.Domain.LeaveAttributeValues.Signatures;
@@ -54,6 +55,27 @@ internal sealed class LeaveAttributeValueSignature
     }
 
     /// <summary>
+    /// Создаёт нормализованную сигнатуру из независимых черновиков значений.
+    /// </summary>
+    /// <param name="drafts">Черновики, сопоставляемые по <c>DeclaringUuid</c>.</param>
+    /// <returns>Сигнатура с признаком возможности дальнейшего сравнения.</returns>
+    public static LeaveAttributeValueSignature Create(
+        IEnumerable<LeaveAttributeValueDraft> drafts)
+    {
+        ArgumentNullException.ThrowIfNull(drafts);
+
+        var values = new Dictionary<Guid, AttributeValue>();
+        foreach (var draft in drafts)
+        {
+            ArgumentNullException.ThrowIfNull(draft);
+            if (values.TryAdd(draft.DeclaringUuid, CreateValue(draft)) == false)
+                return new(false, values);
+        }
+
+        return new(true, values);
+    }
+
+    /// <summary>
     /// Сравнивает две валидные сигнатуры по объявлениям и UUID значений.
     /// </summary>
     /// <param name="other">Сигнатура потенциального совпадения.</param>
@@ -91,6 +113,17 @@ internal sealed class LeaveAttributeValueSignature
                 : [attribute.Value.Uuid];
 
         return new(attribute.IsCollectionValue, valueUuids.ToHashSet());
+    }
+
+    private static AttributeValue CreateValue(LeaveAttributeValueDraft draft)
+    {
+        IEnumerable<Guid> valueUuids = draft.IsCollection
+            ? draft.ValueUuids
+            : draft.ValueUuid is Guid valueUuid
+                ? [valueUuid]
+                : [];
+
+        return new(draft.IsCollection, valueUuids.ToHashSet());
     }
 
     private sealed record AttributeValue(

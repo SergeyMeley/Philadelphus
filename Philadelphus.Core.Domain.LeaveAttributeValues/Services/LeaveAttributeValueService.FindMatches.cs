@@ -50,6 +50,46 @@ public sealed partial class LeaveAttributeValueService
                 matches.Add(candidate);
         }
 
+        return CreateMatchResult(matches);
+    }
+
+    /// <summary>
+    /// Находит кандидатов по точному полному набору нерuntime-атрибутов.
+    /// </summary>
+    /// <param name="expectedValues">Независимые черновики ожидаемых значений.</param>
+    /// <param name="candidates">Кандидаты для поиска.</param>
+    /// <returns>Результат поиска или невалидный результат при ошибке значения.</returns>
+    public LeaveAttributeMatchResult FindMatches(
+        IEnumerable<LeaveAttributeValueDraft> expectedValues,
+        IEnumerable<TreeLeaveModel> candidates)
+    {
+        ArgumentNullException.ThrowIfNull(expectedValues);
+        ArgumentNullException.ThrowIfNull(candidates);
+
+        var expectedSignature = LeaveAttributeValueSignature.Create(expectedValues);
+        if (expectedSignature.IsValid == false)
+            return new(LeaveAttributeMatchStatus.Invalid, []);
+
+        var matches = new List<TreeLeaveModel>();
+        foreach (var candidate in candidates)
+        {
+            ArgumentNullException.ThrowIfNull(candidate);
+
+            var candidateSignature = LeaveAttributeValueSignature.Create(
+                candidate.Attributes.Where(x => x.IsRuntime == false));
+            if (candidateSignature.IsValid == false)
+                return new(LeaveAttributeMatchStatus.Invalid, []);
+
+            if (expectedSignature.Matches(candidateSignature))
+                matches.Add(candidate);
+        }
+
+        return CreateMatchResult(matches);
+    }
+
+    private static LeaveAttributeMatchResult CreateMatchResult(
+        IReadOnlyList<TreeLeaveModel> matches)
+    {
         var status = matches.Count switch
         {
             0 => LeaveAttributeMatchStatus.NotFound,
