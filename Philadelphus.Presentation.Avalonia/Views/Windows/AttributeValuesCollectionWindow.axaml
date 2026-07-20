@@ -22,6 +22,18 @@
         <DataGrid Grid.Row="2"
                   AutoGenerateColumns="False"
                   ItemsSource="{Binding Rows}"
-                  beh:DataGridColumnsBehavior.ColumnsSource="{Binding Columns}" />
+                  beh:DataGridColumnsBehavior.ColumnsSource="{Binding Columns}"
+                  beh:DataGridSearchResultsBehavior.IsEnabled="True"
+                  beh:DataGridSearchResultsBehavior.ResolvedRow="{Binding ResolvedSearchRow}">
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow.search-match">
+                    <Setter Property="Background" Value="#403CB371" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </Style>
+                <Style Selector="DataGridRow.search-mismatch">
+                    <Setter Property="Opacity" Value="0.45" />
+                </Style>
+            </DataGrid.Styles>
+        </DataGrid>
     </Grid>
 </Window>
