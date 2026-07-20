@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.Enums;
+using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -160,6 +161,24 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
     /// Атрибут, с которым было открыто окно. Смена выделения его не заменяет.
     /// </summary>
     public ElementAttributeModel Attribute => _attribute;
+
+    /// <summary>
+    /// Отображаемое имя зафиксированного атрибута.
+    /// </summary>
+    public string AttributeName => _attribute.Name;
+
+    /// <summary>
+    /// Имя и UUID локального владельца зафиксированного атрибута.
+    /// </summary>
+    public string AttributeOwnerDisplayName => _attribute.Owner is IMainEntityModel owner
+        ? $"{owner.Name} [{owner.Uuid}]"
+        : _attribute.Owner.Uuid.ToString();
+
+    /// <summary>
+    /// Заголовок окна редактора значений массива.
+    /// </summary>
+    public string WindowTitle =>
+        $"Значения атрибута «{AttributeName}» — {AttributeOwnerDisplayName}";
 
     /// <summary>
     /// Активные листья прямого типа данных атрибута.
@@ -398,6 +417,11 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
             RebuildValueLookup();
             Refresh();
             OnPropertyChanged(nameof(SystemSearchValue));
+        }
+        else if (eventArgs.PropertyName == nameof(ElementAttributeVM.Name))
+        {
+            OnPropertyChanged(nameof(AttributeName));
+            OnPropertyChanged(nameof(WindowTitle));
         }
     }
 

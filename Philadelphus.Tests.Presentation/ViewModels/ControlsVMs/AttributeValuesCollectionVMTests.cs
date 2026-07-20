@@ -20,12 +20,17 @@ public class AttributeValuesCollectionVMTests
     public void Constructor_UsesActiveDirectLeavesAndInitialSelection()
     {
         var graph = CreateGraph();
+        graph.Owner.Name = "Владелец";
+        graph.Attribute.Name = "Атрибут";
         graph.Deleted.AuditInfo.IsDeleted = true;
         graph.Attribute.TryAddValueToValuesCollection(graph.First).Should().BeTrue();
 
         var sut = new AttributeValuesCollectionVM(graph.Attribute);
 
         sut.Attribute.Should().BeSameAs(graph.Attribute);
+        sut.AttributeName.Should().Be("Атрибут");
+        sut.AttributeOwnerDisplayName.Should().Be($"Владелец [{graph.Owner.Uuid}]");
+        sut.WindowTitle.Should().Be($"Значения атрибута «Атрибут» — Владелец [{graph.Owner.Uuid}]");
         sut.Values.Select(x => x.Value).Should().Equal(graph.First, graph.Second);
         sut.Values.Single(x => x.Value == graph.First).IsSelected.Should().BeTrue();
         sut.Values.Single(x => x.Value == graph.Second).IsSelected.Should().BeFalse();

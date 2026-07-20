@@ -3,16 +3,22 @@
         xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
         xmlns:controls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.AttributeValuesCollectionWindow"
-        Title="Список значений атрибута"
+        Title="{Binding WindowTitle}"
         Width="1000"
         Height="650"
         MinWidth="700"
         MinHeight="400"
         WindowStartupLocation="CenterOwner">
     <Grid RowDefinitions="Auto,Auto,*" Margin="8">
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-            <TextBlock Text="Атрибут: " FontWeight="SemiBold" />
-            <TextBlock Text="{Binding Attribute.Name}" />
+        <StackPanel Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Владелец: " FontWeight="SemiBold" />
+                <TextBlock Text="{Binding AttributeOwnerDisplayName}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Атрибут: " FontWeight="SemiBold" />
+                <TextBlock Text="{Binding AttributeName}" />
+            </StackPanel>
         </StackPanel>
 
         <controls:LeaveValueLookupControl Grid.Row="1"
