@@ -62,6 +62,24 @@ public sealed class AutoNameAssignmentTests
     }
 
     /// <summary>
+    /// Параллельный подбор должен возвращать уникальные имена без ошибок общей коллекции.
+    /// </summary>
+    [Fact]
+    public void GetNewName_ParallelCalls_ReturnUniqueNames()
+    {
+        const int namesCount = 100;
+        var fixedPart = $"Параллельное имя {Guid.CreateVersion7()}";
+
+        var names = Enumerable.Range(0, namesCount)
+            .AsParallel()
+            .Select(_ => NamingHelper.GetNewName(fixedPart))
+            .ToArray();
+
+        names.Should().HaveCount(namesCount)
+            .And.OnlyHaveUniqueItems();
+    }
+
+    /// <summary>
     /// Создаёт политику с управляемым результатом проверки записи.
     /// </summary>
     private static IPropertiesPolicy<AutoNameTestModel> CreatePolicy(

@@ -10,13 +10,23 @@ namespace Philadelphus.Core.Domain.Helpers
     /// </summary>
     public static class NamingHelper
     {
-        private static HashSet<string> _existNames = new HashSet<string>();
-        private static Dictionary<string, int> _indexesByFixedParts = new Dictionary<string, int>();
+        private static readonly object SyncRoot = new();
+        private static readonly HashSet<string> _existNames = new();
+        private static readonly Dictionary<string, int> _indexesByFixedParts = new();
 
         /// <summary>
         /// Использованные (занятые) наименования
         /// </summary>
-        public static ReadOnlySet<string> ExistNames { get => _existNames.AsReadOnly(); }
+        public static ReadOnlySet<string> ExistNames
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return _existNames.ToHashSet().AsReadOnly();
+                }
+            }
+        }
 
         /// <summary>
         /// Получить новое наименование
@@ -26,31 +36,32 @@ namespace Philadelphus.Core.Domain.Helpers
         /// <returns>Результат выполнения операции.</returns>
         public static string GetNewName(string fixedPartOfName = "Новое наименование")
         {
-            if (_indexesByFixedParts.ContainsKey(fixedPartOfName) == false)
+            lock (SyncRoot)
             {
-                _indexesByFixedParts.Add(fixedPartOfName, 1);
-            }
-
-            int index = _indexesByFixedParts[fixedPartOfName];
-            string newName = string.Empty;
-
-            while (true)
-            {
-                newName = $"{fixedPartOfName} {index}";
-
-                if (CheckName(newName))
+                if (_indexesByFixedParts.ContainsKey(fixedPartOfName) == false)
                 {
-                    _existNames.Add(newName);
-                    _indexesByFixedParts[fixedPartOfName] = index;
-                    return newName;
+                    _indexesByFixedParts.Add(fixedPartOfName, 1);
                 }
 
-                if (index == int.MaxValue)
-                {
-                    throw new Exception();
-                }
+                int index = _indexesByFixedParts[fixedPartOfName];
 
-                index++;
+                while (true)
+                {
+                    var newName = $"{fixedPartOfName} {index}";
+
+                    if (_existNames.Add(newName))
+                    {
+                        _indexesByFixedParts[fixedPartOfName] = index;
+                        return newName;
+                    }
+
+                    if (index == int.MaxValue)
+                    {
+                        throw new Exception();
+                    }
+
+                    index++;
+                }
             }
         }
 
@@ -61,7 +72,10 @@ namespace Philadelphus.Core.Domain.Helpers
         /// <returns>Результат выполнения операции.</returns>
         public static bool CheckName(string name)
         {
-            return ExistNames.Any(x => x == name) == false;
+            lock (SyncRoot)
+            {
+                return _existNames.Contains(name) == false;
+            }
         }
 
         /// <summary>
@@ -71,10 +85,14 @@ namespace Philadelphus.Core.Domain.Helpers
         /// <returns>Результат выполнения операции.</returns>
         public static bool AddExistNames(IEnumerable<string> existNames)
         {
-            foreach (string name in existNames?.Where(x => ExistNames.Contains(x) == false))
+            lock (SyncRoot)
             {
-                _existNames.Add(name);
+                foreach (string name in existNames)
+                {
+                    _existNames.Add(name);
+                }
             }
+
             return true;
         }
     }
