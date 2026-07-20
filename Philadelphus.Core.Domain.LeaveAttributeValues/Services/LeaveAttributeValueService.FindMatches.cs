@@ -26,7 +26,7 @@ public sealed partial class LeaveAttributeValueService
 
         var expectedSignature = LeaveAttributeValueSignature.Create(expectedAttributes);
         if (expectedSignature.IsValid == false)
-            return new(false, []);
+            return new(LeaveAttributeMatchStatus.Invalid, []);
 
         var declaringUuids = expectedSignature.DeclaringUuids.ToHashSet();
         var matches = new List<TreeLeaveModel>();
@@ -44,12 +44,18 @@ public sealed partial class LeaveAttributeValueService
             // Невалидный кандидат нельзя безопасно отбросить: после исправления
             // ссылки или формулы он может оказаться дополнительным совпадением.
             if (candidateSignature.IsValid == false)
-                return new(false, []);
+                return new(LeaveAttributeMatchStatus.Invalid, []);
 
             if (expectedSignature.Matches(candidateSignature))
                 matches.Add(candidate);
         }
 
-        return new(true, matches);
+        var status = matches.Count switch
+        {
+            0 => LeaveAttributeMatchStatus.NotFound,
+            1 => LeaveAttributeMatchStatus.Resolved,
+            _ => LeaveAttributeMatchStatus.Ambiguous
+        };
+        return new(status, matches);
     }
 }

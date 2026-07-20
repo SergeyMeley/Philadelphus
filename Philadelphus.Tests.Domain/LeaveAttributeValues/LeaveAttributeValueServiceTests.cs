@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentAssertions;
 using Moq;
 
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
@@ -44,7 +45,37 @@ public class LeaveAttributeValueServiceTests
             [different, matching]);
 
         result.IsValid.Should().BeTrue();
+        result.Status.Should().Be(LeaveAttributeMatchStatus.Resolved);
         result.Matches.Should().Equal(matching);
+        result.ResolvedMatch.Should().BeSameAs(matching);
+    }
+
+    [Theory]
+    [InlineData(0, LeaveAttributeMatchStatus.NotFound)]
+    [InlineData(1, LeaveAttributeMatchStatus.Resolved)]
+    [InlineData(2, LeaveAttributeMatchStatus.Ambiguous)]
+    public void FindMatches_ReturnsStatusForMatchCount(
+        int matchCount,
+        LeaveAttributeMatchStatus expectedStatus)
+    {
+        var graph = CreateGraph();
+        var declaration = CreateDeclaration(graph);
+        var expected = CreateLeave(graph);
+        SetValue(expected, declaration, graph.FirstValue);
+        var candidates = Enumerable.Range(0, matchCount)
+            .Select(_ => CreateLeave(graph))
+            .ToList();
+        foreach (var candidate in candidates)
+            SetValue(candidate, declaration, graph.FirstValue);
+
+        var result = CreateService().FindMatches(
+            [GetAttribute(expected, declaration)],
+            candidates);
+
+        result.Status.Should().Be(expectedStatus);
+        result.Matches.Should().Equal(candidates);
+        result.ResolvedMatch.Should().BeSameAs(
+            matchCount == 1 ? candidates[0] : null);
     }
 
     [Fact]
@@ -63,7 +94,9 @@ public class LeaveAttributeValueServiceTests
             [candidate]);
 
         result.IsValid.Should().BeFalse();
+        result.Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
         result.Matches.Should().BeEmpty();
+        result.ResolvedMatch.Should().BeNull();
     }
 
     [Fact]

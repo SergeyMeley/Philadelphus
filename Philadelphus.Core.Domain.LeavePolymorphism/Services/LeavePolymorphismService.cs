@@ -39,15 +39,7 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
             return Complete(childLeave, LeavePolymorphismStatus.Invalid, []);
 
         var matchResult = FindParentCandidates(childLeave, parentNode);
-        if (matchResult.IsValid == false)
-            return Complete(childLeave, LeavePolymorphismStatus.Invalid, []);
-
-        var status = matchResult.Matches.Count switch
-        {
-            0 => LeavePolymorphismStatus.NotFound,
-            1 => LeavePolymorphismStatus.Resolved,
-            _ => LeavePolymorphismStatus.Ambiguous
-        };
+        var status = ToPolymorphismStatus(matchResult.Status);
         return Complete(childLeave, status, matchResult.Matches);
     }
 
@@ -60,14 +52,7 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
             return Complete(childNode, LeavePolymorphismStatus.Invalid, []);
 
         var matchResult = FindParentCandidates(childNode, childNode.ParentNode);
-        var status = matchResult.IsValid == false
-            ? LeavePolymorphismStatus.Invalid
-            : matchResult.Matches.Count switch
-            {
-                0 => LeavePolymorphismStatus.NotFound,
-                1 => LeavePolymorphismStatus.Resolved,
-                _ => LeavePolymorphismStatus.Ambiguous
-            };
+        var status = ToPolymorphismStatus(matchResult.Status);
         return Complete(childNode, status, matchResult.Matches);
     }
 
@@ -144,6 +129,19 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
         || node.State is State.ForSoftDelete or State.ForHardDelete or State.SoftDeleted;
 
     /// <summary>
+    /// Преобразует универсальный статус поиска в статус полиморфной связи.
+    /// </summary>
+    private static LeavePolymorphismStatus ToPolymorphismStatus(
+        LeaveAttributeMatchStatus status) => status switch
+        {
+            LeaveAttributeMatchStatus.Invalid => LeavePolymorphismStatus.Invalid,
+            LeaveAttributeMatchStatus.NotFound => LeavePolymorphismStatus.NotFound,
+            LeaveAttributeMatchStatus.Resolved => LeavePolymorphismStatus.Resolved,
+            LeaveAttributeMatchStatus.Ambiguous => LeavePolymorphismStatus.Ambiguous,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
+
+    /// <summary>
     /// Ищет активные листья заданного родительского узла по его полному набору атрибутов.
     /// </summary>
     private LeaveAttributeMatchResult FindParentCandidates(
@@ -157,7 +155,7 @@ public sealed partial class LeavePolymorphismService : ILeavePolymorphismService
         var expectedAttributes = GetExpectedParentAttributes(sourceOwner, declaringUuids);
 
         if (expectedAttributes.Count != declaringUuids.Count)
-            return new(false, []);
+            return new(LeaveAttributeMatchStatus.Invalid, []);
 
         return _attributeValueService.FindMatches(
             expectedAttributes,
