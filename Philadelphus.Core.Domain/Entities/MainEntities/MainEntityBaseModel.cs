@@ -1,7 +1,6 @@
 ﻿using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.Infrastructure.DataStorages;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
-using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -27,6 +26,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
         /// Фиксированная часть наименования по умолчанию
         /// </summary>
         protected virtual string _defaultFixedPartOfName => "Новая основная сущность";
+
+        /// <summary>
+        /// Фиксированная часть автоматически генерируемого имени.
+        /// </summary>
+        internal string AutoNameFixedPart => _defaultFixedPartOfName;
 
         protected IPropertiesPolicy<T> _propertiesPolicy;
         private static readonly AsyncLocal<PropertiesPolicyContext> _context = new();
@@ -177,16 +181,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntities
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Присвоить автоматически сгенерированное наименование
-        /// </summary>
-        /// <returns>Результат выполнения операции.</returns>
-        public string AssignAutoName()
-        {
-            Name = NamingHelper.GetNewName(fixedPartOfName: _defaultFixedPartOfName);
-            return Name;
         }
 
         protected TValue GetValue<TValue>(

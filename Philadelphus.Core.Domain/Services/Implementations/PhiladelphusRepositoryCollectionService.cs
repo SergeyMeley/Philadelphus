@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
+using Philadelphus.Core.Domain.Helpers;
 using Philadelphus.Core.Domain.Mapping;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
@@ -189,7 +190,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
             if (needAutoName)
             {
-                result.AssignAutoName();
+                NewEntityAutoNameAssignmentHelper.TryAssign(result, _notificationService);
             }
 
             result.ContentShrub.ContentWorkingTreesUuids.Add(WorkingTreeModel.SystemBaseUuid);

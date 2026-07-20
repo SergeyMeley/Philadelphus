@@ -625,7 +625,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 if (needAutoName)
                 {
-                    result.AssignAutoName();
+                    NewEntityAutoNameAssignmentHelper.TryAssign(result, _notificationService);
                     result.AssignAutoSequence(owner.ContentShrub.ContentWorkingTrees.Select(x => x.Sequence));
                 }
 
@@ -702,7 +702,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 if (needAutoName)
                 {
-                    result.AssignAutoName();
+                    NewEntityAutoNameAssignmentHelper.TryAssign(result, _notificationService);
                     result.AssignAutoSequence(owner.ContentRoot != null
                         ? new[] { owner.ContentRoot.Sequence }
                         : Enumerable.Empty<long>());
@@ -758,7 +758,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                 if (needAutoName)
                 {
-                    result.AssignAutoName();
+                    NewEntityAutoNameAssignmentHelper.TryAssign(result, _notificationService);
                     result.AssignAutoSequence(parent.Childs.Values
                         .OfType<TreeNodeModel>()
                         .Select(x => x.Sequence));
@@ -851,7 +851,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
                 }
                 else if (needAutoName)
                 {
-                    result.AssignAutoName();
+                    NewEntityAutoNameAssignmentHelper.TryAssign(result, _notificationService);
                 }
 
                 if (needAutoName)
@@ -926,7 +926,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
 
                     if (needAutoName)
                     {
-                        result.AssignAutoName();
+                        NewEntityAutoNameAssignmentHelper.TryAssign(result, _notificationService);
                         result.AssignAutoSequence(owner.Attributes.Select(x => x.Sequence));
                     }
 
