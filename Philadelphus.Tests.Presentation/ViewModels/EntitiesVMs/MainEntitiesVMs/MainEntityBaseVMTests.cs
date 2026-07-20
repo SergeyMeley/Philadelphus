@@ -28,6 +28,8 @@ public class MainEntityBaseVMTests
             new EmptyPropertiesPolicy<TreeRootModel>());
         var valueType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
             new EmptyPropertiesPolicy<TreeNodeModel>());
+        var replacementType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
         var value = new TreeLeaveModel(Guid.NewGuid(), valueType, tree, notificationService,
             new EmptyPropertiesPolicy<TreeLeaveModel>())
         {
@@ -43,6 +45,8 @@ public class MainEntityBaseVMTests
             DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
             notificationService);
         var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+        attributeVM.SelectedValueType = replacementType;
+        attributeVM.SelectedValueType = valueType;
         var changedProperties = new List<string?>();
         attributeVM.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
         var sut = new AttributeValuesCollectionVM(attributeVM);

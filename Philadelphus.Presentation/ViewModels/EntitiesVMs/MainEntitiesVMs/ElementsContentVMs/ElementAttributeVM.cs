@@ -23,7 +23,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         private readonly IPhiladelphusRepositoryService _service;
 
         private readonly ElementAttributeModel _model;
-        private ObservableCollection<TreeLeaveModel> _assignedValues = new ObservableCollection<TreeLeaveModel>();
+        private readonly ObservableCollection<TreeLeaveModel> _assignedValues = new ObservableCollection<TreeLeaveModel>();
 
         /// <summary>
         /// Специализированное UI-состояние runtime-атрибута полиморфного родителя.
@@ -62,7 +62,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                     OnPropertyChanged(nameof(SelectedValue));
                     AssignedValue = null;
                     OnPropertyChanged(nameof(AssignedValue)); 
-                    _assignedValues = null;
+                    _assignedValues.Clear();
                     OnPropertyChanged(nameof(AssignedValues));
                     OnPropertyChanged(nameof(IsValueOverridden));
                     OnPropertyChanged(nameof(ValueOverrideToolTip));
@@ -94,12 +94,12 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
                 if (value == true)
                 {
                     AssignedValue = null;
-                    _assignedValues = new ObservableCollection<TreeLeaveModel>();
+                    _assignedValues.Clear();
                     OnPropertyChanged(nameof(AssignedValue));
                 }
                 else
                 {
-                    _assignedValues = null;
+                    _assignedValues.Clear();
                     OnPropertyChanged(nameof(AssignedValues));
                     OnPropertyChanged(nameof(AssignedValuesString));
                 }
