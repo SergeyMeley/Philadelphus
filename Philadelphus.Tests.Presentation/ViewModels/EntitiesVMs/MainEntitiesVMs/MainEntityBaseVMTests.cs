@@ -61,6 +61,40 @@ public class MainEntityBaseVMTests
     }
 
     [Fact]
+    public void AttributeValuesCollectionVM_RemainsBoundToOpenedAttributeAfterSelectionChanges()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(Guid.NewGuid(), tree, notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var valueType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var value = new TreeLeaveModel(Guid.NewGuid(), valueType, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var openedAttribute = CreateAttribute(root, tree, notificationService);
+        openedAttribute.ValueType = valueType;
+        openedAttribute.IsCollectionValue = true;
+        var selectedAttribute = CreateAttribute(root, tree, notificationService);
+        selectedAttribute.ValueType = valueType;
+        selectedAttribute.IsCollectionValue = true;
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var openedAttributeVM = rootVM.AttributesVMs.Single(x => x.Model == openedAttribute);
+        var sut = new AttributeValuesCollectionVM(openedAttributeVM);
+
+        rootVM.SelectedAttributeVM = rootVM.AttributesVMs.Single(x => x.Model == selectedAttribute);
+        sut.Rows.Single(x => x.SourceUuid == value.Uuid)["IsSelected"] = true;
+
+        sut.Attribute.Should().BeSameAs(openedAttribute);
+        openedAttribute.Values.Should().Equal(value);
+        selectedAttribute.Values.Should().BeEmpty();
+    }
+
+    [Fact]
     public void AttributeValuesCollectionVM_TracksTypeAndStopsAfterDispose()
     {
         var notificationService = new FakeNotificationService();
@@ -69,6 +103,8 @@ public class MainEntityBaseVMTests
             new EmptyPropertiesPolicy<TreeRootModel>());
         var initialType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
             new EmptyPropertiesPolicy<TreeNodeModel>());
+        _ = new TreeLeaveModel(Guid.NewGuid(), initialType, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
         var replacementType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
             new EmptyPropertiesPolicy<TreeNodeModel>());
         var replacementValue = new TreeLeaveModel(Guid.NewGuid(), replacementType, tree,
@@ -102,8 +138,10 @@ public class MainEntityBaseVMTests
         closeRequests.Should().Be(1);
 
         sut.Dispose();
+        attributeVM.SelectedValueType = initialType;
         attributeVM.IsCollectionValue = false;
 
+        sut.Values.Should().BeEmpty();
         closeRequests.Should().Be(1);
     }
 
