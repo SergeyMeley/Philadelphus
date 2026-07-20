@@ -320,6 +320,52 @@ public class LeaveAttributeValueServiceTests
             .Should().Equal(graph.FirstValue, graph.SecondValue);
     }
 
+    [Fact]
+    public void CreateLeave_DraftsFillByDeclaringUuidAndRejectDuplicates()
+    {
+        var graph = CreateGraph();
+        var emptyScalar = CreateDeclaration(graph);
+        var emptyCollection = CreateDeclaration(graph, isCollection: true);
+        var assignedScalar = CreateDeclaration(graph);
+        emptyScalar.Value = graph.FirstValue;
+        emptyCollection.TryAddValueToValuesCollection(graph.FirstValue).Should().BeTrue();
+        var drafts = new[]
+        {
+            LeaveAttributeValueDraft.Collection(emptyCollection.DeclaringUuid, []),
+            LeaveAttributeValueDraft.Scalar(assignedScalar.DeclaringUuid, graph.SecondValue.Uuid),
+            LeaveAttributeValueDraft.Scalar(emptyScalar.DeclaringUuid, null),
+        };
+        var repositoryService = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(), Mock.Of<ILogger>(), graph.NotificationService);
+        var service = new LeaveAttributeValueService(repositoryService);
+
+        var created = service.CreateLeave(graph.CandidateNode, drafts);
+
+        created.State.Should().Be(State.Initialized);
+        GetAttribute(created, emptyScalar).Value.Should().BeNull();
+        GetAttribute(created, emptyScalar).ValueFormula.Should().BeEmpty();
+        GetAttribute(created, emptyCollection).Values.Should().BeEmpty();
+        GetAttribute(created, assignedScalar).Value.Should().BeSameAs(graph.SecondValue);
+        GetAttribute(created, assignedScalar).ValueFormula
+            .Should().Be($"=[{graph.SecondValue.Uuid}]");
+        service.FindMatches(drafts, [created]).ResolvedMatch.Should().BeSameAs(created);
+
+        var duplicateAction = () => service.CreateLeave(graph.CandidateNode, drafts);
+        duplicateAction.Should().Throw<InvalidOperationException>()
+            .WithMessage("*уже представлен*");
+        graph.CandidateNode.ChildLeaves.Should().ContainSingle();
+
+        var invalidDrafts = drafts
+            .Select(x => x.DeclaringUuid == assignedScalar.DeclaringUuid
+                ? LeaveAttributeValueDraft.Scalar(x.DeclaringUuid, Guid.NewGuid())
+                : x)
+            .ToArray();
+        var invalidAction = () => service.CreateLeave(graph.CandidateNode, invalidDrafts);
+        invalidAction.Should().Throw<InvalidOperationException>()
+            .WithMessage("*не все значения*");
+        graph.CandidateNode.ChildLeaves.Should().ContainSingle();
+    }
+
     private static LeaveAttributeValueService CreateService() =>
         new(Mock.Of<IPhiladelphusRepositoryService>());
 

@@ -76,6 +76,16 @@ public interface ILeaveAttributeValueService
         IEnumerable<ElementAttributeModel> sourceAttributes);
 
     /// <summary>
+    /// Создаёт отсутствующий пользовательский лист по полному набору черновиков.
+    /// </summary>
+    /// <param name="parentNode">Узел создаваемого листа.</param>
+    /// <param name="sourceValues">Черновики значений всех нерuntime-атрибутов.</param>
+    /// <returns>Созданный без немедленного сохранения лист.</returns>
+    TreeLeaveModel CreateLeave(
+        TreeNodeModel parentNode,
+        IEnumerable<LeaveAttributeValueDraft> sourceValues);
+
+    /// <summary>
     /// Явно создаёт отсутствующий системный лист без немедленного сохранения.
     /// </summary>
     /// <param name="valueType">Родительский системный узел.</param>

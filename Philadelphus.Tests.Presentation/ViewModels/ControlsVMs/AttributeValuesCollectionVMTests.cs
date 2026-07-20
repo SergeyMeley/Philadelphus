@@ -224,6 +224,10 @@ public class AttributeValuesCollectionVMTests
             TreeNodeModel parentNode,
             IEnumerable<ElementAttributeModel> sourceAttributes) => throw new NotSupportedException();
 
+        public TreeLeaveModel CreateLeave(
+            TreeNodeModel parentNode,
+            IEnumerable<LeaveAttributeValueDraft> sourceValues) => throw new NotSupportedException();
+
         public SystemBaseTreeLeaveModel CreateSystemValue(
             SystemBaseTreeNodeModel valueType,
             string value) => throw new NotSupportedException();
