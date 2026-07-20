@@ -37,7 +37,22 @@ public sealed class LeaveValueLookupVM : ViewModelBase
         ArgumentNullException.ThrowIfNull(commandFactory);
 
         _createCommand = commandFactory.Create(_ => Create(), _ => CanCreate);
-        Refresh();
+        if (IsSystemValue)
+        {
+            Refresh();
+        }
+        else
+        {
+            AttributeCriteria = ValueType.Attributes
+                .Where(x => x.IsRuntime == false)
+                .OrderBy(x => x.Sequence)
+                .ThenBy(x => x.Name)
+                .ThenBy(x => x.DeclaringUuid)
+                .Select(x => new LeaveValueLookupCriterionVM(
+                    x, RefreshAttributeCriteria, commandFactory))
+                .ToArray();
+            RefreshAttributeCriteria();
+        }
     }
 
     /// <summary>
@@ -67,6 +82,11 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     /// Независимые критерии поиска пользовательского значения.
     /// </summary>
     public IReadOnlyList<LeaveAttributeValueDraft> AttributeValues => _attributeValues;
+
+    /// <summary>
+    /// Полный набор редактируемых нерuntime-критериев пользовательского значения.
+    /// </summary>
+    public IReadOnlyList<LeaveValueLookupCriterionVM> AttributeCriteria { get; } = [];
 
     /// <summary>
     /// Текущий статус поиска.
@@ -144,7 +164,7 @@ public sealed class LeaveValueLookupVM : ViewModelBase
         {
             SystemBaseTreeNodeModel systemType =>
                 _attributeValueService.FindSystemValue(systemType, SystemValue),
-            _ when _hasAttributeValues =>
+            _ when _hasAttributeValues && AttributeCriteria.All(x => x.IsValid) =>
                 _attributeValueService.FindMatches(
                     AttributeValues,
                     ValueType.ChildLeaves.Where(IsActive)),
@@ -159,6 +179,9 @@ public sealed class LeaveValueLookupVM : ViewModelBase
         OnPropertyChanged(nameof(CanCreate));
         _createCommand.RaiseCanExecuteChanged();
     }
+
+    private void RefreshAttributeCriteria() =>
+        SetAttributeValues(AttributeCriteria.Select(x => x.CreateDraft()));
 
     private void Create()
     {

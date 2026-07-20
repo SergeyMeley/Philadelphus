@@ -192,7 +192,7 @@ public class AttributeValuesCollectionVMTests
         var sut = new LeaveValueLookupVM(
             graph.Attribute.ValueType!, service, new DefaultRelayCommandFactory());
 
-        sut.Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
+        sut.Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
         sut.SetAttributeValues([draft]);
 
         sut.Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
@@ -201,6 +201,68 @@ public class AttributeValuesCollectionVMTests
         createdFrom.Should().Equal(draft);
         sut.CreatedLeave.Should().BeSameAs(created);
         sut.Status.Should().Be(LeaveAttributeMatchStatus.Resolved);
+    }
+
+    [Fact]
+    public void LeaveValueLookup_CustomCriteriaBuildFullDraftSetAndStayIndependent()
+    {
+        var graph = CreateGraph();
+        var valueType = graph.Attribute.ValueType!;
+        var scalarUuid = Guid.NewGuid();
+        var scalar = new ElementAttributeModel(
+            scalarUuid,
+            valueType,
+            scalarUuid,
+            valueType,
+            graph.Tree,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<ElementAttributeModel>())
+        {
+            Name = "Скаляр",
+            ValueType = valueType,
+        };
+        var collectionUuid = Guid.NewGuid();
+        var collection = new ElementAttributeModel(
+            collectionUuid,
+            valueType,
+            collectionUuid,
+            valueType,
+            graph.Tree,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<ElementAttributeModel>())
+        {
+            Name = "Коллекция",
+            ValueType = valueType,
+            IsCollectionValue = true,
+        };
+        IReadOnlyList<LeaveAttributeValueDraft>? observed = null;
+        var service = new StubLeaveAttributeValueService(
+            (_, _) => new(LeaveAttributeMatchStatus.Invalid, []),
+            findDrafts: (drafts, _) =>
+            {
+                observed = drafts.ToArray();
+                return new(LeaveAttributeMatchStatus.NotFound, []);
+            });
+
+        var sut = new LeaveValueLookupVM(
+            valueType, service, new DefaultRelayCommandFactory());
+        var scalarCriterion = sut.AttributeCriteria.Single(
+            x => x.DeclaringUuid == scalarUuid);
+        var collectionCriterion = sut.AttributeCriteria.Single(
+            x => x.DeclaringUuid == collectionUuid);
+
+        scalarCriterion.SelectedValue = scalarCriterion.AvailableValues.Single(
+            x => x.Value == graph.First);
+        collectionCriterion.AvailableValues.Single(x => x.Value == graph.Second)
+            .IsSelected = true;
+
+        observed.Should().HaveCount(2);
+        observed!.Single(x => x.DeclaringUuid == scalarUuid).ValueUuid
+            .Should().Be(graph.First.Uuid);
+        observed.Single(x => x.DeclaringUuid == collectionUuid).ValueUuids
+            .Should().BeEquivalentTo([graph.Second.Uuid]);
+        scalar.Value.Should().BeNull();
+        collection.Values.Should().BeEmpty();
     }
 
     [Fact]

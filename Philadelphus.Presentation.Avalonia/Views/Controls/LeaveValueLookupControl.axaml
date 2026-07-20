@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.LeaveValueLookupControl"
-             IsVisible="{Binding IsSystemValue}">
+             x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.LeaveValueLookupControl">
     <Border Padding="8"
             BorderThickness="1"
             CornerRadius="4"
@@ -10,23 +9,72 @@
             <TextBlock Text="Поиск значения"
                        FontWeight="SemiBold" />
 
-            <Grid ColumnDefinitions="Auto,*,Auto"
-                  ColumnSpacing="8">
+            <Grid ColumnDefinitions="Auto,*"
+                  ColumnSpacing="8"
+                  IsVisible="{Binding IsSystemValue}">
                 <TextBlock VerticalAlignment="Center"
                            Text="Значение:" />
                 <TextBox Grid.Column="1"
                          Text="{Binding SystemValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Watermark="Введите значение для поиска" />
-                <Button Grid.Column="2"
-                        Command="{Binding CreateCommand}"
-                        Content="Создать" />
             </Grid>
 
-            <Grid ColumnDefinitions="*,Auto"
+            <ItemsControl ItemsSource="{Binding AttributeCriteria}"
+                          IsVisible="{Binding !IsSystemValue}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="180,*"
+                              ColumnSpacing="8"
+                              Margin="0,2">
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding Name}"
+                                       ToolTip.Tip="{Binding DeclaringUuid}" />
+                            <ComboBox Grid.Column="1"
+                                      Margin="0,0,90,0"
+                                      IsVisible="{Binding !IsCollection}"
+                                      ItemsSource="{Binding AvailableValues}"
+                                      SelectedItem="{Binding SelectedValue, Mode=TwoWay}"
+                                      PlaceholderText="Пустое значение">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    IsVisible="{Binding !IsCollection}"
+                                    Command="{Binding ClearCommand}"
+                                    Content="Очистить" />
+                            <ItemsControl Grid.Column="1"
+                                          IsVisible="{Binding IsCollection}"
+                                          ItemsSource="{Binding AvailableValues}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Margin="0,0,12,2"
+                                                  Content="{Binding DisplayName}"
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Grid ColumnDefinitions="*,Auto,Auto"
                   ColumnSpacing="8">
                 <TextBlock Text="{Binding StatusText}" />
                 <TextBlock Grid.Column="1"
                            Text="{Binding MatchCount, StringFormat='Совпадений: {0}'}" />
+                <Button Grid.Column="2"
+                        Command="{Binding CreateCommand}"
+                        Content="Создать" />
             </Grid>
         </StackPanel>
     </Border>
