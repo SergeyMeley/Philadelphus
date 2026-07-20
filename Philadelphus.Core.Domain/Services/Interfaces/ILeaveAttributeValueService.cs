@@ -21,6 +21,16 @@ public interface ILeaveAttributeValueService
         IEnumerable<TreeLeaveModel> candidates);
 
     /// <summary>
+    /// Находит активные системные листья с типизированным значением переданной строки.
+    /// </summary>
+    /// <param name="valueType">Системный узел искомого значения.</param>
+    /// <param name="expectedValue">Строковое представление искомого значения.</param>
+    /// <returns>Статус поиска и совпавшие системные листья.</returns>
+    LeaveAttributeMatchResult FindSystemValue(
+        SystemBaseTreeNodeModel valueType,
+        string? expectedValue);
+
+    /// <summary>
     /// Заполняет выбранные атрибуты целевого элемента значениями исходного листа.
     /// </summary>
     /// <param name="targetOwner">Заполняемый узел или лист.</param>
@@ -54,4 +64,14 @@ public interface ILeaveAttributeValueService
     TreeLeaveModel CreateLeave(
         TreeNodeModel parentNode,
         IEnumerable<ElementAttributeModel> sourceAttributes);
+
+    /// <summary>
+    /// Явно создаёт отсутствующий системный лист без немедленного сохранения.
+    /// </summary>
+    /// <param name="valueType">Родительский системный узел.</param>
+    /// <param name="value">Валидное строковое представление значения.</param>
+    /// <returns>Созданный системный лист в состоянии <c>Initialized</c>.</returns>
+    SystemBaseTreeLeaveModel CreateSystemValue(
+        SystemBaseTreeNodeModel valueType,
+        string value);
 }

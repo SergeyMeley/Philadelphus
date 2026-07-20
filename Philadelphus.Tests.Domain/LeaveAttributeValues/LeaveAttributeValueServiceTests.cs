@@ -100,6 +100,83 @@ public class LeaveAttributeValueServiceTests
     }
 
     [Fact]
+    public void FindSystemValue_ComparesTypedValuesAndDetectsAmbiguity()
+    {
+        var graph = CreateGraph();
+        var valueType = CreateSystemNode(graph, SystemBaseType.INTEGER);
+        var first = CreateSystemLeave(graph, valueType, "1");
+        var service = CreateService();
+
+        var resolved = service.FindSystemValue(valueType, "01");
+
+        resolved.Status.Should().Be(LeaveAttributeMatchStatus.Resolved);
+        resolved.ResolvedMatch.Should().BeSameAs(first);
+
+        var second = CreateSystemLeave(graph, valueType, "001");
+        var ambiguous = service.FindSystemValue(valueType, "1");
+
+        ambiguous.Status.Should().Be(LeaveAttributeMatchStatus.Ambiguous);
+        ambiguous.Matches.Should().Equal(first, second);
+        ambiguous.ResolvedMatch.Should().BeNull();
+
+        second.AuditInfo.IsDeleted = true;
+        service.FindSystemValue(valueType, "1").ResolvedMatch
+            .Should().BeSameAs(first);
+    }
+
+    [Fact]
+    public void FindSystemValue_IsInvalidForWrongFormat()
+    {
+        var graph = CreateGraph();
+        var valueType = CreateSystemNode(graph, SystemBaseType.DATE);
+
+        var result = CreateService().FindSystemValue(valueType, "31.12.2025");
+
+        result.Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
+        result.Matches.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CreateSystemValue_CreatesOnlyForNotFoundValue()
+    {
+        var graph = CreateGraph();
+        var valueType = CreateSystemNode(graph, SystemBaseType.INTEGER);
+        var repositoryService = new PhiladelphusRepositoryService(
+            Mock.Of<IMapper>(), Mock.Of<ILogger>(), graph.NotificationService);
+        var service = new LeaveAttributeValueService(repositoryService);
+
+        var created = service.CreateSystemValue(valueType, "01");
+
+        created.ParentNode.Should().BeSameAs(valueType);
+        created.StringValue.Should().Be("01");
+        created.TypedValue.Should().Be(1L);
+        created.State.Should().Be(State.Initialized);
+        var duplicateAction = () => service.CreateSystemValue(valueType, "1");
+        duplicateAction.Should().Throw<InvalidOperationException>()
+            .WithMessage("*уже представлено*");
+    }
+
+    [Fact]
+    public void CreateSystemValue_RejectsInvalidAndBoolValues()
+    {
+        var graph = CreateGraph();
+        var repositoryService = new Mock<IPhiladelphusRepositoryService>();
+        var service = new LeaveAttributeValueService(repositoryService.Object);
+        var integerType = CreateSystemNode(graph, SystemBaseType.INTEGER);
+        var boolType = CreateSystemNode(graph, SystemBaseType.BOOL);
+
+        var invalidAction = () => service.CreateSystemValue(integerType, "не число");
+        var boolAction = () => service.CreateSystemValue(boolType, "Истина");
+
+        invalidAction.Should().Throw<InvalidOperationException>()
+            .WithMessage("*не соответствует системному типу*");
+        boolAction.Should().Throw<InvalidOperationException>()
+            .WithMessage("*BOOL запрещено*");
+        repositoryService.Verify(x => x.CreateTreeLeave(
+            It.IsAny<TreeNodeModel>(), true, true), Times.Never);
+    }
+
+    [Fact]
     public void FillFromLeave_ReplacesScalarWithReferenceAndClearsEmptyValue()
     {
         var graph = CreateGraph();
@@ -220,6 +297,24 @@ public class LeaveAttributeValueServiceTests
     private static TreeLeaveModel CreateLeave(TestGraph graph) =>
         new(Guid.NewGuid(), graph.CandidateNode, graph.Tree, graph.NotificationService,
             new EmptyPropertiesPolicy<TreeLeaveModel>());
+
+    private static SystemBaseTreeNodeModel CreateSystemNode(
+        TestGraph graph,
+        SystemBaseType type) =>
+        new(graph.CandidateNode.Parent, graph.Tree, type, graph.NotificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+
+    private static SystemBaseTreeLeaveModel CreateSystemLeave(
+        TestGraph graph,
+        SystemBaseTreeNodeModel parent,
+        string value)
+    {
+        var leave = new SystemBaseTreeLeaveModel(
+            Guid.NewGuid(), parent, graph.Tree, parent.SystemBaseType,
+            graph.NotificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
+        leave.StringValue = value;
+        return leave;
+    }
 
     private static ElementAttributeModel GetAttribute(
         TreeLeaveModel leave,
