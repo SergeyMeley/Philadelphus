@@ -48,8 +48,8 @@ namespace Philadelphus.Presentation.Services.Tables
         /// </summary>
         /// <remarks>
         /// Динамические атрибуты берутся только с текущего выбранного элемента и проходят проверку Visibility
-        /// относительно фактических наследников. Пользовательское имя атрибута остается логическим ключом,
-        /// а для WPF binding-а создается отдельный безопасный BindingKey.
+        /// относительно фактических наследников. Логическим ключом атрибута служит DeclaringUuid,
+        /// пользовательское имя остается заголовком, а для binding-а создается отдельный BindingKey.
         /// </remarks>
         public static IReadOnlyList<ChildCollectionTableColumn> buildChildCollectionTableColumns(
             IAttributeOwnerModel? currentElement,
@@ -106,26 +106,19 @@ namespace Philadelphus.Presentation.Services.Tables
             var order = 6;
             var attributes = GetTableAttributes(currentElement, children).ToList();
             var reservedBindingKeys = new HashSet<string>(
-                result.Select(x => x.Key).Concat(attributes.Select(GetAttributeHeader)),
+                result.Select(x => x.Key).Concat(attributes.SelectMany(x => new[]
+                {
+                    GetAttributeKey(x),
+                    GetAttributeHeader(x),
+                })),
                 StringComparer.Ordinal);
 
             foreach (var attribute in attributes)
             {
-                var header = GetAttributeHeader(attribute);
-                var bindingKey = CreateAttributeBindingKey(order, reservedBindingKeys);
-
-                result.Add(new ChildCollectionTableColumn(
-                    header,
-                    header,
+                result.Add(CreateAttributeColumn(
+                    attribute,
                     order++,
-                    child => GetAttributeValue(child, header),
-                    isReadOnly: attribute.IsCollectionValue,
-                    isAttribute: true,
-                    setterFactory: child => GetAttributeValueSetter(child, header),
-                    valueOptionsGetter: attribute.IsCollectionValue
-                        ? null
-                        : child => GetAttributeValueOptions(child, header),
-                    bindingKey: bindingKey));
+                    reservedBindingKeys));
             }
 
             result.AddRange(new[]
@@ -192,7 +185,7 @@ namespace Philadelphus.Presentation.Services.Tables
         /// <summary>
         /// Создает колонку свойства модели с заголовком и tooltip из DisplayAttribute, если он задан.
         /// </summary>
-        private static ChildCollectionTableColumn CreateColumn(
+        internal static ChildCollectionTableColumn CreateColumn(
             string key,
             int order,
             Func<IChildrenModel, object?> valueGetter,
@@ -217,6 +210,31 @@ namespace Philadelphus.Presentation.Services.Tables
                 valueOptionsGetter,
                 bindingKey,
                 display.Description);
+        }
+
+        /// <summary>
+        /// Создает колонку эффективного атрибута с логическим ключом по UUID объявления.
+        /// </summary>
+        internal static ChildCollectionTableColumn CreateAttributeColumn(
+            ElementAttributeModel attribute,
+            int order,
+            ISet<string> reservedBindingKeys,
+            bool isReadOnly = false)
+        {
+            var key = GetAttributeKey(attribute);
+
+            return new ChildCollectionTableColumn(
+                key,
+                GetAttributeHeader(attribute),
+                order,
+                child => GetAttributeValue(child, key),
+                isReadOnly: isReadOnly || attribute.IsCollectionValue,
+                isAttribute: true,
+                setterFactory: isReadOnly ? null : child => GetAttributeValueSetter(child, key),
+                valueOptionsGetter: isReadOnly || attribute.IsCollectionValue
+                    ? null
+                    : child => GetAttributeValueOptions(child, key),
+                bindingKey: CreateAttributeBindingKey(order, reservedBindingKeys));
         }
 
         /// <summary>
@@ -421,15 +439,15 @@ namespace Philadelphus.Presentation.Services.Tables
             IAttributeOwnerModel? currentElement,
             IEnumerable<IChildrenModel>? children)
         {
-            var attributesByName = new Dictionary<string, ElementAttributeModel>(StringComparer.Ordinal);
+            var attributesByUuid = new Dictionary<Guid, ElementAttributeModel>();
             var childrenList = children?.ToList() ?? new List<IChildrenModel>();
 
             AddVisibleAttributesForChildren(
-                attributesByName,
+                attributesByUuid,
                 currentElement,
                 childrenList);
 
-            return attributesByName.Values
+            return attributesByUuid.Values
                 .OrderBy(x => x.DeclaringOwner is ISequencableModel sequencable ? sequencable.Sequence : long.MaxValue)
                 .ThenBy(x => x.InheritanceDepth)
                 .ThenBy(x => x.Name)
@@ -437,7 +455,7 @@ namespace Philadelphus.Presentation.Services.Tables
         }
 
         private static void AddVisibleAttributesForChildren(
-            IDictionary<string, ElementAttributeModel> attributesByName,
+            IDictionary<Guid, ElementAttributeModel> attributesByUuid,
             IAttributeOwnerModel? currentElement,
             IReadOnlyList<IChildrenModel> children)
         {
@@ -455,7 +473,7 @@ namespace Philadelphus.Presentation.Services.Tables
 
                 if (CanAnyChildSeeAttribute(currentElement, attribute, children))
                 {
-                    attributesByName.TryAdd(GetAttributeHeader(attribute), attribute);
+                    attributesByUuid.TryAdd(attribute.DeclaringUuid, attribute);
                 }
             }
         }
@@ -789,16 +807,20 @@ namespace Philadelphus.Presentation.Services.Tables
             attribute.SetFormulaText(value);
         }
 
-        private static ElementAttributeModel? GetAttribute(IChildrenModel child, string attributeName)
+        private static ElementAttributeModel? GetAttribute(IChildrenModel child, string attributeKey)
         {
-            if (child is not IAttributeOwnerModel attributeOwner)
+            if (child is not IAttributeOwnerModel attributeOwner
+                || Guid.TryParse(attributeKey, out var declaringUuid) == false)
             {
                 return null;
             }
 
             return attributeOwner.Attributes?
-                .FirstOrDefault(x => string.Equals(x.Name, attributeName, StringComparison.Ordinal));
+                .FirstOrDefault(x => x.DeclaringUuid == declaringUuid);
         }
+
+        private static string GetAttributeKey(ElementAttributeModel attribute)
+            => attribute.DeclaringUuid.ToString();
 
         private static string GetAttributeHeader(ElementAttributeModel attribute)
         {

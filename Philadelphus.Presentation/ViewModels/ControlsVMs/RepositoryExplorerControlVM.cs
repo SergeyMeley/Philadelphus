@@ -1139,9 +1139,10 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             OnPropertyChanged(nameof(PropertyList));
 
             if (target.Model is IAttributeOwnerModel attributeOwner
-                && attributeOwner.Attributes?.Any(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal)) == true)
+                && Guid.TryParse(columnKey, out var declaringUuid)
+                && attributeOwner.Attributes?.Any(x => x.DeclaringUuid == declaringUuid) == true)
             {
-                var changedAttribute = attributeOwner.Attributes.First(x => string.Equals(x.Name, columnKey, StringComparison.Ordinal));
+                var changedAttribute = attributeOwner.Attributes.First(x => x.DeclaringUuid == declaringUuid);
                 await FormulaBarVM.NotifyAttributeValueChangedAsync(changedAttribute);
                 targetVM.OnPropertyChanged(nameof(IMainEntityVM<IMainEntityModel>.AttributesVMs));
             }

@@ -41,7 +41,7 @@ namespace Philadelphus.Presentation.Models.Tables
         }
 
         /// <summary>
-        /// Логический ключ колонки: имя свойства модели, полный путь свойства или имя атрибута.
+        /// Логический ключ колонки: имя свойства, полный путь свойства или DeclaringUuid атрибута.
         /// </summary>
         public string Key { get; }
 
@@ -49,8 +49,8 @@ namespace Philadelphus.Presentation.Models.Tables
         /// Технический ключ для binding-индексаторов WPF.
         /// </summary>
         /// <remarks>
-        /// Для пользовательских атрибутов отличается от <see cref="Key"/>, потому что имя атрибута
-        /// может содержать пробелы, запятые, скобки и другие символы, небезопасные для пути binding-а.
+        /// Для динамических атрибутов отличается от <see cref="Key"/>, чтобы отделить доменную
+        /// идентификацию колонки от технического пути binding-а.
         /// </remarks>
         public string BindingKey { get; }
 

@@ -32,7 +32,7 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
                 nameof(IMainEntityModel.Name),
                 nameof(IMainEntityModel.Description),
                 nameof(IWorkingTreeMemberModel.CustomCode),
-                "Цена, руб",
+                fixture.Root.Attributes.Single(x => x.Name == "Цена, руб").DeclaringUuid.ToString(),
             });
 
             columns.Select(x => x.Key).Should().ContainInOrder(
@@ -42,15 +42,31 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
         }
 
         [Fact]
-        public void buildChildCollectionTableColumns_Deduplicates_Dynamic_Attributes_By_Name()
+        public void buildChildCollectionTableColumns_Identifies_Same_Name_Attributes_By_DeclaringUuid()
         {
             var fixture = CreateFixture();
+            var secondUuid = Guid.CreateVersion7();
+            _ = new ElementAttributeModel(
+                secondUuid,
+                fixture.Root,
+                secondUuid,
+                fixture.Root,
+                fixture.Root.OwningWorkingTree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<ElementAttributeModel>())
+            {
+                Name = "Цена, руб",
+                Visibility = VisibilityScope.Public,
+            };
 
             var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(
                 fixture.Root,
                 fixture.Root.Childs.Values);
 
-            columns.Count(x => x.Header == "Цена, руб").Should().Be(1);
+            var attributeColumns = columns.Where(x => x.Header == "Цена, руб").ToList();
+            attributeColumns.Should().HaveCount(2);
+            attributeColumns.Select(x => x.Key).Should().OnlyHaveUniqueItems();
+            attributeColumns.Select(x => Guid.Parse(x.Key)).Should().Contain(secondUuid);
         }
 
         [Fact]
@@ -71,7 +87,8 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
             columns.Single(x => x.Key == $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}").Header.Should().NotBeNullOrWhiteSpace();
             columns.Single(x => x.Key == $"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedAt)}").Header.Should().NotBeNullOrWhiteSpace();
             var attributeColumn = columns.Single(x => x.Order == 6);
-            attributeColumn.Key.Should().Be(attributeColumn.Header);
+            Guid.Parse(attributeColumn.Key).Should().NotBeEmpty();
+            attributeColumn.Header.Should().Be("Цена, руб");
             attributeColumn.BindingKey.Should().NotBe(attributeColumn.Key);
             attributeColumn.BindingKey.Should().StartWith("attribute_");
             attributeColumn.BindingKey.Should().NotContain(",");
@@ -101,9 +118,53 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
                 fixture.Root,
                 fixture.Root.Childs.Values);
 
-            var collisionColumn = columns.Single(x => x.Key == "attribute_6");
+            var collisionColumn = columns.Single(x => x.Header == "attribute_6");
             collisionColumn.BindingKey.Should().NotBe(collisionColumn.Key);
             columns.Select(x => x.BindingKey).Should().OnlyHaveUniqueItems();
+        }
+
+        [Fact]
+        public void buildLeaveTableProjection_Returns_Readonly_System_Attribute_And_Audit_Values()
+        {
+            var fixture = CreateFixture();
+            var attribute = fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб");
+            var secondUuid = Guid.CreateVersion7();
+            _ = new ElementAttributeModel(
+                secondUuid,
+                fixture.Node,
+                secondUuid,
+                fixture.Node,
+                fixture.Node.OwningWorkingTree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<ElementAttributeModel>())
+            {
+                Name = "Цена, руб",
+                ValueType = fixture.Node,
+                Value = fixture.Leave,
+            };
+
+            var columns = LeaveTableProjectionBuilder.buildLeaveTableColumns([fixture.Leave]);
+            var row = LeaveTableProjectionBuilder
+                .buildLeaveTableRows([fixture.Leave], columns)
+                .Single();
+
+            columns.Select(x => x.Key).Should().StartWith(new[]
+            {
+                nameof(ISequencableModel.Sequence),
+                nameof(ILinkableByUuidModel.Uuid),
+                nameof(IMainEntityModel.Name),
+                nameof(IMainEntityModel.Description),
+                attribute.DeclaringUuid.ToString(),
+                secondUuid.ToString(),
+            });
+            columns.Should().OnlyContain(x => x.IsReadOnly);
+            columns.Where(x => x.Header == "Цена, руб").Should().HaveCount(2);
+            row[nameof(ISequencableModel.Sequence)].Should().Be(10L);
+            row[nameof(ILinkableByUuidModel.Uuid)].Should().Be(fixture.Leave.Uuid);
+            row[attribute.DeclaringUuid.ToString()].Should().Be(fixture.PriceValue);
+            row[secondUuid.ToString()].Should().Be(fixture.Leave);
+            row[$"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}"]
+                .Should().Be("user123");
         }
 
         [Fact]
