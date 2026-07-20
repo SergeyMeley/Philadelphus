@@ -437,12 +437,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
             if (_model.TryAddValueToValuesCollection(SelectedValue))
             {
-                _assignedValues?.Add(SelectedValue);
-                OnPropertyChanged(nameof(AssignedValues)); 
-                OnPropertyChanged(nameof(AssignedValuesString));
-                OnPropertyChanged(nameof(AreValuesOverridden));
-                OnPropertyChanged(nameof(ValuesOverrideToolTip));
-                NotifyStateVisibilityPropertiesChanged();
+                RefreshAssignedValues();
                 return true;
             }
             
@@ -464,16 +459,27 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
             if (_model.TryRemoveValueFromValuesCollection(SelectedValue))
             {
-                _assignedValues?.Remove(SelectedValue);
-                OnPropertyChanged(nameof(AssignedValues));
-                OnPropertyChanged(nameof(AssignedValuesString));
-                OnPropertyChanged(nameof(AreValuesOverridden));
-                OnPropertyChanged(nameof(ValuesOverrideToolTip));
-                NotifyStateVisibilityPropertiesChanged();
+                RefreshAssignedValues();
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Синхронизирует отображаемую коллекцию с эффективными значениями доменной модели.
+        /// </summary>
+        internal void RefreshAssignedValues()
+        {
+            _assignedValues.Clear();
+            foreach (var value in _model.Values)
+                _assignedValues.Add(value);
+
+            OnPropertyChanged(nameof(AssignedValues));
+            OnPropertyChanged(nameof(AssignedValuesString));
+            OnPropertyChanged(nameof(AreValuesOverridden));
+            OnPropertyChanged(nameof(ValuesOverrideToolTip));
+            NotifyStateVisibilityPropertiesChanged();
         }
 
         /// <summary>

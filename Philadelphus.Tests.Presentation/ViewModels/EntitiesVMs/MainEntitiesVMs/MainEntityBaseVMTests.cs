@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
+using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
@@ -18,6 +19,41 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
 public class MainEntityBaseVMTests
 {
+    [Fact]
+    public void AttributeValuesCollectionVM_RefreshesAssignedValuesInAttributeVM()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(Guid.NewGuid(), tree, notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var valueType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var value = new TreeLeaveModel(Guid.NewGuid(), valueType, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>())
+        {
+            Name = "Значение",
+        };
+        var attribute = CreateAttribute(root, tree, notificationService);
+        attribute.ValueType = valueType;
+        attribute.IsCollectionValue = true;
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+        var changedProperties = new List<string?>();
+        attributeVM.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+        var sut = new AttributeValuesCollectionVM(attributeVM);
+
+        sut.Rows.Single(x => x.SourceUuid == value.Uuid)["IsSelected"] = true;
+
+        attributeVM.AssignedValuesString.Should().Be("Значение");
+        attributeVM.AssignedValues.Should().Equal(value);
+        changedProperties.Should().Contain(nameof(attributeVM.AssignedValuesString));
+    }
+
     /// <summary>
     /// Изменение выбранного атрибута должно уведомлять вложенные Avalonia-привязки.
     /// </summary>

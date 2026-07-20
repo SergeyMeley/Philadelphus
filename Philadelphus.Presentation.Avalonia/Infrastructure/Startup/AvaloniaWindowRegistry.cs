@@ -15,7 +15,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
             windowService.Register<MainWindowVM, MainWindow>();
             windowService.Register<LaunchWindowVM, LaunchWindow>();
             windowService.Register<FormulaTestControlVM, FormulaEditorWindow>();
-            windowService.Register<RepositoryExplorerControlVM, AttributeValuesCollectionWindow>();
+            windowService.Register<AttributeValuesCollectionVM, AttributeValuesCollectionWindow>();
             windowService.Register<DetailsWindowVM, DetailsWindow>();
             windowService.Register<AboutWindowVM, AboutWindow>();
             windowService.Register<ExcelImportDesignerVM, ExcelImportDesignerWindow>();

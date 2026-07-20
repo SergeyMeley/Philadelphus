@@ -3,6 +3,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -24,6 +25,9 @@ public class AttributeValuesCollectionVMTests
         sut.Values.Select(x => x.Value).Should().Equal(graph.First, graph.Second);
         sut.Values.Single(x => x.Value == graph.First).IsSelected.Should().BeTrue();
         sut.Values.Single(x => x.Value == graph.Second).IsSelected.Should().BeFalse();
+        sut.Columns.First().ColumnType.Should().Be(ChildCollectionTableColumnType.CheckBox);
+        sut.Rows.Select(x => x.SourceUuid).Should().Equal(graph.First.Uuid, graph.Second.Uuid);
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)["IsSelected"].Should().Be(true);
     }
 
     [Fact]
@@ -31,18 +35,18 @@ public class AttributeValuesCollectionVMTests
     {
         var graph = CreateGraph();
         var sut = new AttributeValuesCollectionVM(graph.Attribute);
-        var item = sut.Values.Single(x => x.Value == graph.Second);
+        var row = sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid);
 
-        item.IsSelected = true;
-        item.IsSelected = true;
+        row["IsSelected"] = true;
+        row["IsSelected"] = true;
 
         graph.Attribute.Values.Should().Equal(graph.Second);
-        item.IsSelected.Should().BeTrue();
+        row["IsSelected"].Should().Be(true);
 
-        item.IsSelected = false;
+        row["IsSelected"] = false;
 
         graph.Attribute.Values.Should().BeEmpty();
-        item.IsSelected.Should().BeFalse();
+        row["IsSelected"].Should().Be(false);
     }
 
     [Fact]
@@ -76,6 +80,10 @@ public class AttributeValuesCollectionVMTests
         sut.CanSelectValues.Should().BeFalse();
         item.IsEnabled.Should().BeFalse();
         item.ToolTip.Should().Contain("запечатана");
+        sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid)
+            .CellEnabledStates["IsSelected"].Should().BeFalse();
+        sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid)
+            .CellToolTips["IsSelected"].Should().Contain("запечатана");
         inherited.Values.Should().BeEmpty();
     }
 

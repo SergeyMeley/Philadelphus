@@ -15,32 +15,33 @@ public static class LeaveTableProjectionBuilder
     /// Формирует системные, атрибутные и audit-колонки листьев.
     /// </summary>
     public static IReadOnlyList<ChildCollectionTableColumn> buildLeaveTableColumns(
-        IEnumerable<TreeLeaveModel>? leaves)
+        IEnumerable<TreeLeaveModel>? leaves,
+        int startOrder = 0)
     {
         var leavesList = leaves?.ToList() ?? [];
         var result = new List<ChildCollectionTableColumn>
         {
             ChildCollectionTableBuilder.CreateColumn(
                 nameof(ISequencableModel.Sequence),
-                0,
+                startOrder,
                 child => child is TreeLeaveModel leave ? leave.Sequence : null,
                 typeof(ISequencableModel),
                 nameof(ISequencableModel.Sequence)),
             ChildCollectionTableBuilder.CreateColumn(
                 nameof(ILinkableByUuidModel.Uuid),
-                1,
+                startOrder + 1,
                 child => child.Uuid,
                 typeof(ILinkableByUuidModel),
                 nameof(ILinkableByUuidModel.Uuid)),
             ChildCollectionTableBuilder.CreateColumn(
                 nameof(IMainEntityModel.Name),
-                2,
+                startOrder + 2,
                 child => child is IMainEntityModel entity ? entity.Name : null,
                 typeof(IMainEntityModel),
                 nameof(IMainEntityModel.Name)),
             ChildCollectionTableBuilder.CreateColumn(
                 nameof(IMainEntityModel.Description),
-                3,
+                startOrder + 3,
                 child => child is IMainEntityModel entity ? entity.Description : null,
                 typeof(IMainEntityModel),
                 nameof(IMainEntityModel.Description)),
@@ -54,7 +55,7 @@ public static class LeaveTableProjectionBuilder
                 string.IsNullOrWhiteSpace(x.Name) ? x.DeclaringUuid.ToString() : x.Name,
             })),
             StringComparer.Ordinal);
-        var order = result.Count;
+        var order = startOrder + result.Count;
 
         foreach (var attribute in attributes)
         {

@@ -53,6 +53,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly IRepositoryRelationsService _relationsService;
         private readonly ILeavePolymorphismService _leavePolymorphismService;
         private readonly ILeavePolymorphismChangeCoordinator _leavePolymorphismChangeCoordinator;
+        private readonly IAttributeValuesCollectionVMFactory _attributeValuesCollectionVMFactory;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -302,6 +303,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="relationDeletionConfirmationService">Сервис подтверждения удаления связанных элементов.</param>
         /// <param name="leavePolymorphismService">Сервис runtime-связей полиморфных листов.</param>
         /// <param name="leavePolymorphismChangeCoordinator">Координатор интерактивных полиморфных изменений.</param>
+        /// <param name="attributeValuesCollectionVMFactory">Фабрика редактора коллекционного атрибута.</param>
         /// <param name="dialogService">Сервис диалогов подтверждения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
@@ -330,6 +332,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             IRelationDeletionConfirmationService relationDeletionConfirmationService,
             ILeavePolymorphismService leavePolymorphismService,
             ILeavePolymorphismChangeCoordinator leavePolymorphismChangeCoordinator,
+            IAttributeValuesCollectionVMFactory attributeValuesCollectionVMFactory,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -354,6 +357,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(relationDeletionConfirmationService);
             ArgumentNullException.ThrowIfNull(leavePolymorphismService);
             ArgumentNullException.ThrowIfNull(leavePolymorphismChangeCoordinator);
+            ArgumentNullException.ThrowIfNull(attributeValuesCollectionVMFactory);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -366,6 +370,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _relationDeletionConfirmationService = relationDeletionConfirmationService;
             _leavePolymorphismService = leavePolymorphismService;
             _leavePolymorphismChangeCoordinator = leavePolymorphismChangeCoordinator;
+            _attributeValuesCollectionVMFactory = attributeValuesCollectionVMFactory;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -627,7 +632,9 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _openModifyAttributesListWindowCommand ??= _commandFactory.Create(
                 obj =>
                 {
-                    _windowService.Show(this);
+                    var attribute = _selectedRepositoryMember?.SelectedAttributeVM;
+                    if (attribute != null)
+                        _windowService.Show(_attributeValuesCollectionVMFactory.Create(attribute));
                 },
                 ce =>
                 {

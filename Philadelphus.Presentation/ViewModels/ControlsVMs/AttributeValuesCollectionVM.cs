@@ -1,6 +1,9 @@
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Services.Tables;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 
 namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 
@@ -10,6 +13,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 public sealed class AttributeValuesCollectionVM : ViewModelBase
 {
     private readonly ElementAttributeModel _attribute;
+    private ElementAttributeVM? _attributeVM;
 
     /// <summary>
     /// Инициализирует редактор значений коллекционного атрибута.
@@ -29,6 +33,16 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     }
 
     /// <summary>
+    /// Инициализирует редактор для зафиксированной модели представления атрибута.
+    /// </summary>
+    /// <param name="attribute">Модель представления редактируемого атрибута.</param>
+    public AttributeValuesCollectionVM(ElementAttributeVM attribute)
+        : this(attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)))
+    {
+        _attributeVM = attribute;
+    }
+
+    /// <summary>
     /// Атрибут, с которым было открыто окно. Смена выделения его не заменяет.
     /// </summary>
     public ElementAttributeModel Attribute => _attribute;
@@ -37,6 +51,16 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// Активные листья прямого типа данных атрибута.
     /// </summary>
     public IReadOnlyList<AttributeValueSelectionItemVM> Values { get; private set; } = [];
+
+    /// <summary>
+    /// Дескрипторы колонок таблицы допустимых значений.
+    /// </summary>
+    public IReadOnlyList<ChildCollectionTableColumn> Columns { get; private set; } = [];
+
+    /// <summary>
+    /// Строки таблицы допустимых значений.
+    /// </summary>
+    public IReadOnlyList<ChildCollectionTableRow> Rows { get; private set; } = [];
 
     /// <summary>
     /// Указывает, можно ли изменять эффективную коллекцию значений.
@@ -56,16 +80,27 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// </summary>
     public void Refresh()
     {
-        Values = _attribute.ValueType?.ChildLeaves
+        var leaves = _attribute.ValueType?.ChildLeaves
             .Where(IsActive)
             .OrderBy(x => x.Sequence)
             .ThenBy(x => x.Name)
             .ThenBy(x => x.Uuid)
-            .Select(x => new AttributeValueSelectionItemVM(this, x))
             .ToArray()
             ?? [];
+        Values = leaves
+            .Select(x => new AttributeValueSelectionItemVM(this, x))
+            .ToArray();
+
+        Columns =
+        [
+            CreateSelectionColumn(),
+            .. LeaveTableProjectionBuilder.buildLeaveTableColumns(leaves, startOrder: 1),
+        ];
+        Rows = LeaveTableProjectionBuilder.buildLeaveTableRows(leaves, Columns);
 
         OnPropertyChanged(nameof(Values));
+        OnPropertyChanged(nameof(Columns));
+        OnPropertyChanged(nameof(Rows));
         OnPropertyChanged(nameof(CanSelectValues));
         OnPropertyChanged(nameof(SelectionToolTip));
     }
@@ -78,10 +113,31 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         if (CanSelectValues == false || selected == IsSelected(value))
             return false;
 
-        return selected
+        var changed = selected
             ? _attribute.TryAddValueToValuesCollection(value)
             : _attribute.TryRemoveValueFromValuesCollection(value);
+        if (changed)
+            _attributeVM?.RefreshAssignedValues();
+
+        return changed;
     }
+
+    private ChildCollectionTableColumn CreateSelectionColumn() => new(
+        "IsSelected",
+        "В массиве",
+        0,
+        child => child is TreeLeaveModel leave && IsSelected(leave),
+        isReadOnly: false,
+        setterFactory: child => child is TreeLeaveModel leave
+            ? value =>
+            {
+                TrySetSelected(leave, value is true);
+                return IsSelected(leave);
+            }
+            : null,
+        columnType: ChildCollectionTableColumnType.CheckBox,
+        cellEnabledGetter: _ => CanSelectValues,
+        cellToolTipGetter: _ => SelectionToolTip);
 
     private static bool IsActive(TreeLeaveModel value) =>
         value.AuditInfo.IsDeleted == false

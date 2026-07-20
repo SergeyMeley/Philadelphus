@@ -66,6 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IRepositoryRelationsControlVMFactory, RepositoryRelationsControlVMFactory>();
             services.AddTransient<IExtensionsControlVMFactory, ExtensionsControlVMFactory>();
             services.AddTransient<IExcelImportDesignerVMFactory, ExcelImportDesignerVMFactory>();
+            services.AddTransient<IAttributeValuesCollectionVMFactory, AttributeValuesCollectionVMFactory>();
 
             // Excel-импорт (презентация)
             services.AddTransient<ExcelImportPresentationPipeline>();
