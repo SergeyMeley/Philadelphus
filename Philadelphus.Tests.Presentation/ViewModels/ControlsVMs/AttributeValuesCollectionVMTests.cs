@@ -5,6 +5,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
@@ -76,6 +77,87 @@ public class AttributeValuesCollectionVMTests
         sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.NotFound);
         sut.Rows.Should().OnlyContain(x => Equals(x["IsSearchMatch"], false));
         graph.Attribute.Values.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void LeaveValueLookup_SystemSearchCreatesOnlyMissingNonBoolValue()
+    {
+        var graph = CreateGraph();
+        var valueType = new SystemBaseTreeNodeModel(
+            graph.Owner.Parent,
+            graph.Tree,
+            SystemBaseType.INTEGER,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        SystemBaseTreeLeaveModel? created = null;
+        var service = new StubLeaveAttributeValueService(
+            (parent, value) => parent.SystemBaseType == SystemBaseType.BOOL
+                ? new(LeaveAttributeMatchStatus.NotFound, [])
+                : value switch
+                {
+                    null => new(LeaveAttributeMatchStatus.Invalid, []),
+                    "дубль" => new(LeaveAttributeMatchStatus.Ambiguous, [graph.First, graph.Second]),
+                    _ when created != null => new(LeaveAttributeMatchStatus.Resolved, [created]),
+                    _ => new(LeaveAttributeMatchStatus.NotFound, []),
+                },
+            createSystemValue: (parent, value) =>
+                created = CreateSystemLeave(graph, parent, value));
+        var sut = new LeaveValueLookupVM(
+            valueType, service, new DefaultRelayCommandFactory());
+
+        sut.SystemValue = "3";
+
+        sut.Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
+        sut.CreateCommand.CanExecute(null).Should().BeTrue();
+        sut.CreateCommand.Execute(null);
+        sut.CreatedLeave.Should().BeSameAs(created);
+        sut.ResolvedMatch.Should().BeSameAs(created);
+        sut.CreateCommand.CanExecute(null).Should().BeFalse();
+
+        sut.SystemValue = "дубль";
+        sut.CreateCommand.CanExecute(null).Should().BeFalse();
+
+        var boolType = new SystemBaseTreeNodeModel(
+            graph.Owner.Parent,
+            graph.Tree,
+            SystemBaseType.BOOL,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var boolLookup = new LeaveValueLookupVM(
+            boolType, service, new DefaultRelayCommandFactory()) { SystemValue = "новое" };
+        boolLookup.Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
+        boolLookup.CreateCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void LeaveValueLookup_DraftsRecalculateAndCreateExplicitly()
+    {
+        var graph = CreateGraph();
+        var draft = LeaveAttributeValueDraft.Scalar(Guid.NewGuid(), graph.First.Uuid);
+        IReadOnlyList<LeaveAttributeValueDraft>? createdFrom = null;
+        TreeLeaveModel? created = null;
+        var service = new StubLeaveAttributeValueService(
+            (_, _) => new(LeaveAttributeMatchStatus.Invalid, []),
+            findDrafts: (_, _) => created == null
+                ? new(LeaveAttributeMatchStatus.NotFound, [])
+                : new(LeaveAttributeMatchStatus.Resolved, [created]),
+            createLeave: (parent, drafts) =>
+            {
+                createdFrom = drafts.ToArray();
+                return created = CreateLeave(parent, graph.Tree, graph.Notifications, "создан");
+            });
+        var sut = new LeaveValueLookupVM(
+            graph.Attribute.ValueType!, service, new DefaultRelayCommandFactory());
+
+        sut.Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
+        sut.SetAttributeValues([draft]);
+
+        sut.Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
+        sut.CreatedLeave.Should().BeNull();
+        sut.CreateCommand.Execute(null);
+        createdFrom.Should().Equal(draft);
+        sut.CreatedLeave.Should().BeSameAs(created);
+        sut.Status.Should().Be(LeaveAttributeMatchStatus.Resolved);
     }
 
     [Fact]
@@ -195,7 +277,10 @@ public class AttributeValuesCollectionVMTests
         TreeLeaveModel Deleted);
 
     private sealed class StubLeaveAttributeValueService(
-        Func<SystemBaseTreeNodeModel, string?, LeaveAttributeMatchResult> findSystemValue)
+        Func<SystemBaseTreeNodeModel, string?, LeaveAttributeMatchResult> findSystemValue,
+        Func<IEnumerable<LeaveAttributeValueDraft>, IEnumerable<TreeLeaveModel>, LeaveAttributeMatchResult>? findDrafts = null,
+        Func<SystemBaseTreeNodeModel, string, SystemBaseTreeLeaveModel>? createSystemValue = null,
+        Func<TreeNodeModel, IEnumerable<LeaveAttributeValueDraft>, TreeLeaveModel>? createLeave = null)
         : ILeaveAttributeValueService
     {
         public LeaveAttributeMatchResult FindSystemValue(
@@ -208,7 +293,8 @@ public class AttributeValuesCollectionVMTests
 
         public LeaveAttributeMatchResult FindMatches(
             IEnumerable<LeaveAttributeValueDraft> expectedValues,
-            IEnumerable<TreeLeaveModel> candidates) => throw new NotSupportedException();
+            IEnumerable<TreeLeaveModel> candidates) =>
+            findDrafts?.Invoke(expectedValues, candidates) ?? throw new NotSupportedException();
 
         public LeaveAttributeFillResult FillFromLeave(
             Philadelphus.Core.Domain.Interfaces.IAttributeOwnerModel targetOwner,
@@ -226,10 +312,12 @@ public class AttributeValuesCollectionVMTests
 
         public TreeLeaveModel CreateLeave(
             TreeNodeModel parentNode,
-            IEnumerable<LeaveAttributeValueDraft> sourceValues) => throw new NotSupportedException();
+            IEnumerable<LeaveAttributeValueDraft> sourceValues) =>
+            createLeave?.Invoke(parentNode, sourceValues) ?? throw new NotSupportedException();
 
         public SystemBaseTreeLeaveModel CreateSystemValue(
             SystemBaseTreeNodeModel valueType,
-            string value) => throw new NotSupportedException();
+            string value) =>
+            createSystemValue?.Invoke(valueType, value) ?? throw new NotSupportedException();
     }
 }
