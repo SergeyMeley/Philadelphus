@@ -244,6 +244,9 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
     /// </summary>
     public void Refresh()
     {
+        if (_isDisposed)
+            return;
+
         var leaves = _attribute.ValueType?.ChildLeaves
             .Where(IsActive)
             .OrderBy(x => x.Sequence)
@@ -286,6 +289,10 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
         if (ValueLookup != null)
             ValueLookup.PropertyChanged -= HandleValueLookupPropertyChanged;
     }
+
+    internal bool IsDisposed => _isDisposed;
+
+    internal void RequestClose() => CloseRequested?.Invoke(this, EventArgs.Empty);
 
     internal bool IsSelected(TreeLeaveModel value) =>
         _attribute.Values.Any(x => x.Uuid == value.Uuid);
@@ -383,7 +390,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
         if (eventArgs.PropertyName == nameof(ElementAttributeVM.IsCollectionValue)
             && _attribute.IsCollectionValue == false)
         {
-            CloseRequested?.Invoke(this, EventArgs.Empty);
+            RequestClose();
         }
         else if (eventArgs.PropertyName == nameof(ElementAttributeVM.SelectedValueType))
         {

@@ -14,4 +14,14 @@ public interface IAttributeValuesCollectionVMFactory
     /// <param name="attribute">Модель представления коллекционного атрибута.</param>
     /// <returns>Созданная модель представления редактора.</returns>
     AttributeValuesCollectionVM Create(ElementAttributeVM attribute);
+
+    /// <summary>
+    /// Обновляет открытые редакторы после изменения дерева репозитория.
+    /// </summary>
+    void RefreshOpenEditors();
+
+    /// <summary>
+    /// Закрывает редакторы перед полной перестройкой моделей представления репозитория.
+    /// </summary>
+    void CloseOpenEditors();
 }

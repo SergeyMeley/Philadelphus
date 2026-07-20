@@ -15,6 +15,7 @@ public sealed class AttributeValuesCollectionVMFactory : IAttributeValuesCollect
     private readonly ILeaveAttributeValueService _attributeValueService;
     private readonly IRelayCommandFactory _commandFactory;
     private readonly IAttributeValueCreationConfirmationService _creationConfirmationService;
+    private readonly List<WeakReference<AttributeValuesCollectionVM>> _openEditors = [];
 
     /// <summary>
     /// Инициализирует фабрику редактора коллекционного атрибута.
@@ -40,10 +41,38 @@ public sealed class AttributeValuesCollectionVMFactory : IAttributeValuesCollect
     {
         ArgumentNullException.ThrowIfNull(attribute);
 
-        return new AttributeValuesCollectionVM(
+        var result = new AttributeValuesCollectionVM(
             attribute,
             _attributeValueService,
             _commandFactory,
             _creationConfirmationService);
+        _openEditors.Add(new WeakReference<AttributeValuesCollectionVM>(result));
+        return result;
+    }
+
+    /// <inheritdoc />
+    public void RefreshOpenEditors() =>
+        ForEachOpenEditor(editor => editor.Refresh());
+
+    /// <inheritdoc />
+    public void CloseOpenEditors()
+    {
+        ForEachOpenEditor(editor => editor.RequestClose());
+        _openEditors.Clear();
+    }
+
+    private void ForEachOpenEditor(Action<AttributeValuesCollectionVM> action)
+    {
+        for (var index = _openEditors.Count - 1; index >= 0; index--)
+        {
+            if (_openEditors[index].TryGetTarget(out var editor) == false
+                || editor.IsDisposed)
+            {
+                _openEditors.RemoveAt(index);
+                continue;
+            }
+
+            action(editor);
+        }
     }
 }

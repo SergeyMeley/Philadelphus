@@ -7,6 +7,8 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Factories.Implementations;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
@@ -81,17 +83,24 @@ public class MainEntityBaseVMTests
             DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
             notificationService);
         var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
-        var sut = new AttributeValuesCollectionVM(attributeVM);
+        var factory = new AttributeValuesCollectionVMFactory(
+            DispatchProxy.Create<ILeaveAttributeValueService, DefaultDispatchProxy>(),
+            new DefaultRelayCommandFactory(),
+            DispatchProxy.Create<IAttributeValueCreationConfirmationService, DefaultDispatchProxy>());
+        var sut = factory.Create(attributeVM);
         var closeRequests = 0;
         sut.CloseRequested += (_, _) => closeRequests++;
 
         attributeVM.SelectedValueType = replacementType;
 
         sut.Values.Select(x => x.Value).Should().Equal(replacementValue);
-        attributeVM.IsCollectionValue = false;
+        replacementValue.AuditInfo.IsDeleted = true;
+        factory.RefreshOpenEditors();
+        sut.Values.Should().BeEmpty();
+
+        factory.CloseOpenEditors();
         closeRequests.Should().Be(1);
 
-        attributeVM.IsCollectionValue = true;
         sut.Dispose();
         attributeVM.IsCollectionValue = false;
 

@@ -831,6 +831,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(newRepo.ContentShrub);
             ArgumentNullException.ThrowIfNull(newRepo.ContentShrub.ContentWorkingTrees);
 
+            _attributeValuesCollectionVMFactory.CloseOpenEditors();
+
             var selectedUuid = SelectedRepositoryMember?.Uuid;
 
             SelectedRepositoryMember = null;
@@ -921,6 +923,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.ChildsCount));
             _philadelphusRepositoryVM.OnPropertyChanged(nameof(PhiladelphusRepositoryVM.State));
             NotifyChildsPropertyChangedRecursive();
+            _attributeValuesCollectionVMFactory.RefreshOpenEditors();
         }
 
         private void UpdateCurrentLeavesOwner(IMainEntityVM<IMainEntityModel>? selectedRepositoryMember)
