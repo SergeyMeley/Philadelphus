@@ -86,7 +86,19 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridCheckBoxColumn Header="Массив" Binding="{Binding IsCollectionValue}" CellStyleClasses="runtimeMetadata" />
+                <DataGridTemplateColumn Header="Массив" CellStyleClasses="runtimeMetadata">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <!-- DataGridCheckBoxColumn включает флажок только в режиме редактирования ячейки.
+                                 Обычный CheckBox остаётся доступным сразу и явно записывает значение в VM. -->
+                            <CheckBox HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding IsCollectionValue, Mode=TwoWay}"
+                                      IsEnabled="{Binding CanChangeCollectionMode}"
+                                      ToolTip.Tip="{Binding CollectionModeToolTip}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <!-- Значение: подсветка «переопределено» (Moccasin, статусный цвет; текст чёрный для
                      читаемости в обеих темах) + редактируемый ввод через AutoCompleteBox

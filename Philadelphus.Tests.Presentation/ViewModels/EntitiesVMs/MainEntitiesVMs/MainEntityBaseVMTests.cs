@@ -48,6 +48,62 @@ public class MainEntityBaseVMTests
         changedProperties.Should().Contain(nameof(rootVM.SelectedAttributeVM));
     }
 
+    /// <summary>
+    /// Собственный атрибут должен разрешать переключение между одиночным и коллекционным значением.
+    /// </summary>
+    [Fact]
+    public void OwnAttributeVM_CollectionMode_CanBeEnabled()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+
+        attributeVM.IsCollectionValue = true;
+
+        attributeVM.CanChangeCollectionMode.Should().BeTrue();
+        attributeVM.IsCollectionValue.Should().BeTrue();
+        attribute.IsCollectionValue.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Вид значения унаследованного атрибута изменяется только через его объявление.
+    /// </summary>
+    [Fact]
+    public void InheritedAttributeVM_CollectionMode_IsUnavailable()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        _ = CreateAttribute(root, tree, notificationService);
+        var child = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var childVM = CreateNodeVM(child, tree, notificationService);
+        var attributeVM = childVM.AttributesVMs.Single();
+
+        attributeVM.CanChangeCollectionMode.Should().BeFalse();
+        attributeVM.CollectionModeToolTip.Should().Contain("где он объявлен");
+    }
+
     [Fact]
     public void AttributesVMs_NewChildNode_InheritsExistingParentAttribute()
     {

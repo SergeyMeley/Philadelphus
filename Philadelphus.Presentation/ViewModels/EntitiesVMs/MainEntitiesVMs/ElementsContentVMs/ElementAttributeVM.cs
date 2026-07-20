@@ -112,6 +112,20 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             }
         }
 
+        /// <summary>
+        /// Указывает, можно ли изменить вид значения атрибута между одиночным и коллекционным.
+        /// </summary>
+        public bool CanChangeCollectionMode => _model.IsOwn && IsRuntime == false;
+
+        /// <summary>
+        /// Объясняет ограничение изменения признака коллекционного значения.
+        /// </summary>
+        public string CollectionModeToolTip => IsRuntime
+            ? "Вид значения служебного runtime-атрибута изменить нельзя."
+            : _model.IsOwn == false
+                ? "Признак «Массив» задаётся у атрибута в узле, где он объявлен."
+                : string.Empty;
+
         public TreeLeaveModel AssignedValue
         {
             get
