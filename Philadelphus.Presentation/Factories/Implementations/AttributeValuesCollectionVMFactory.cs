@@ -1,6 +1,7 @@
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Factories.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 
@@ -13,20 +14,25 @@ public sealed class AttributeValuesCollectionVMFactory : IAttributeValuesCollect
 {
     private readonly ILeaveAttributeValueService _attributeValueService;
     private readonly IRelayCommandFactory _commandFactory;
+    private readonly IAttributeValueCreationConfirmationService _creationConfirmationService;
 
     /// <summary>
     /// Инициализирует фабрику редактора коллекционного атрибута.
     /// </summary>
     /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
     /// <param name="commandFactory">Фабрика команды создания значения.</param>
+    /// <param name="creationConfirmationService">Подтверждение добавления созданного значения.</param>
     public AttributeValuesCollectionVMFactory(
         ILeaveAttributeValueService attributeValueService,
-        IRelayCommandFactory commandFactory)
+        IRelayCommandFactory commandFactory,
+        IAttributeValueCreationConfirmationService creationConfirmationService)
     {
         _attributeValueService = attributeValueService
             ?? throw new ArgumentNullException(nameof(attributeValueService));
         _commandFactory = commandFactory
             ?? throw new ArgumentNullException(nameof(commandFactory));
+        _creationConfirmationService = creationConfirmationService
+            ?? throw new ArgumentNullException(nameof(creationConfirmationService));
     }
 
     /// <inheritdoc />
@@ -37,6 +43,7 @@ public sealed class AttributeValuesCollectionVMFactory : IAttributeValuesCollect
         return new AttributeValuesCollectionVM(
             attribute,
             _attributeValueService,
-            _commandFactory);
+            _commandFactory,
+            _creationConfirmationService);
     }
 }

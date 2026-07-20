@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 
@@ -18,6 +19,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
 {
     private readonly ElementAttributeModel _attribute;
     private readonly ILeaveAttributeValueService? _attributeValueService;
+    private readonly IAttributeValueCreationConfirmationService? _creationConfirmationService;
     private ElementAttributeVM? _attributeVM;
     private string? _systemSearchValue;
     private LeaveAttributeMatchResult _searchResult =
@@ -102,6 +104,24 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     }
 
     /// <summary>
+    /// Инициализирует редактор с подтверждением включения созданного значения в массив.
+    /// </summary>
+    /// <param name="attribute">Доменная модель редактируемого атрибута.</param>
+    /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
+    /// <param name="commandFactory">Фабрика команды явного создания значения.</param>
+    /// <param name="creationConfirmationService">Подтверждение добавления созданного значения.</param>
+    public AttributeValuesCollectionVM(
+        ElementAttributeModel attribute,
+        ILeaveAttributeValueService attributeValueService,
+        IRelayCommandFactory commandFactory,
+        IAttributeValueCreationConfirmationService creationConfirmationService)
+        : this(attribute, attributeValueService, commandFactory)
+    {
+        _creationConfirmationService = creationConfirmationService
+            ?? throw new ArgumentNullException(nameof(creationConfirmationService));
+    }
+
+    /// <summary>
     /// Инициализирует редактор для зафиксированной модели представления атрибута.
     /// </summary>
     /// <param name="attribute">Модель представления редактируемого атрибута.</param>
@@ -115,6 +135,27 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
             attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)),
             attributeValueService,
             commandFactory)
+    {
+        _attributeVM = attribute;
+    }
+
+    /// <summary>
+    /// Инициализирует редактор модели представления с подтверждением созданного значения.
+    /// </summary>
+    /// <param name="attribute">Модель представления редактируемого атрибута.</param>
+    /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
+    /// <param name="commandFactory">Фабрика команды явного создания значения.</param>
+    /// <param name="creationConfirmationService">Подтверждение добавления созданного значения.</param>
+    public AttributeValuesCollectionVM(
+        ElementAttributeVM attribute,
+        ILeaveAttributeValueService attributeValueService,
+        IRelayCommandFactory commandFactory,
+        IAttributeValueCreationConfirmationService creationConfirmationService)
+        : this(
+            attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)),
+            attributeValueService,
+            commandFactory,
+            creationConfirmationService)
     {
         _attributeVM = attribute;
     }
@@ -327,6 +368,11 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.CreatedLeave))
         {
             Refresh();
+            if (_creationConfirmationService != null
+                && ValueLookup.CreatedLeave is { } createdLeave)
+            {
+                _ = ConfirmCreatedValueAdditionAsync(createdLeave);
+            }
         }
         else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.Status))
         {
@@ -335,6 +381,20 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
             OnPropertyChanged(nameof(Rows));
             NotifySearchProperties();
         }
+    }
+
+    private async Task ConfirmCreatedValueAdditionAsync(TreeLeaveModel createdLeave)
+    {
+        if (CanSelectValues == false
+            || await _creationConfirmationService!.ConfirmAdditionAsync(
+                createdLeave,
+                _attribute) == false)
+        {
+            return;
+        }
+
+        if (TrySetSelected(createdLeave, selected: true))
+            Refresh();
     }
 
     private static bool IsActive(TreeLeaveModel value) =>

@@ -7,6 +7,7 @@ using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -130,6 +131,45 @@ public class AttributeValuesCollectionVMTests
             boolType, service, new DefaultRelayCommandFactory()) { SystemValue = "новое" };
         boolLookup.Status.Should().Be(LeaveAttributeMatchStatus.NotFound);
         boolLookup.CreateCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CreatedValue_IsAddedToArrayOnlyAfterConfirmation(bool confirmed)
+    {
+        var graph = CreateGraph();
+        var valueType = new SystemBaseTreeNodeModel(
+            graph.Owner.Parent,
+            graph.Tree,
+            SystemBaseType.INTEGER,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        graph.Attribute.ValueType = valueType;
+        SystemBaseTreeLeaveModel? created = null;
+        var service = new StubLeaveAttributeValueService(
+            (_, value) => created == null
+                ? value == null
+                    ? new(LeaveAttributeMatchStatus.Invalid, [])
+                    : new(LeaveAttributeMatchStatus.NotFound, [])
+                : new(LeaveAttributeMatchStatus.Resolved, [created]),
+            createSystemValue: (parent, value) =>
+                created = CreateSystemLeave(graph, parent, value));
+        var confirmation = new StubCreationConfirmationService(confirmed);
+        var sut = new AttributeValuesCollectionVM(
+            graph.Attribute,
+            service,
+            new DefaultRelayCommandFactory(),
+            confirmation);
+
+        sut.ValueLookup!.SystemValue = "3";
+        sut.ValueLookup.CreateCommand.Execute(null);
+
+        confirmation.CallCount.Should().Be(1);
+        graph.Attribute.Values.Should().Equal(
+            confirmed ? new TreeLeaveModel[] { created! } : []);
+        sut.Rows.Single(x => x.SourceUuid == created!.Uuid)["IsSelected"]
+            .Should().Be(confirmed);
     }
 
     [Fact]
@@ -322,5 +362,19 @@ public class AttributeValuesCollectionVMTests
             SystemBaseTreeNodeModel valueType,
             string value) =>
             createSystemValue?.Invoke(valueType, value) ?? throw new NotSupportedException();
+    }
+
+    private sealed class StubCreationConfirmationService(bool confirmed)
+        : IAttributeValueCreationConfirmationService
+    {
+        public int CallCount { get; private set; }
+
+        public Task<bool> ConfirmAdditionAsync(
+            TreeLeaveModel createdLeave,
+            ElementAttributeModel attribute)
+        {
+            CallCount++;
+            return Task.FromResult(confirmed);
+        }
     }
 }

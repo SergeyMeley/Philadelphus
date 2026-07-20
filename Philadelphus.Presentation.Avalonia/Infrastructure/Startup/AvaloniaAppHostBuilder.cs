@@ -190,6 +190,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
                     services.AddSingleton<IDataStorageSelectionDialogService, AvaloniaDataStorageSelectionDialogService>();
                     services.AddSingleton<IRelationDeletionConfirmationService, AvaloniaRelationDeletionConfirmationService>();
                     services.AddSingleton<ILeavePolymorphismConfirmationService, AvaloniaLeavePolymorphismConfirmationService>();
+                    services.AddSingleton<IAttributeValueCreationConfirmationService, AvaloniaAttributeValueCreationConfirmationService>();
                     services.AddSingleton<IDispatcherService, AvaloniaDispatcherService>();
                     services.AddSingleton<AvaloniaWindowService>();
                     services.AddSingleton<IWindowService>(sp => sp.GetRequiredService<AvaloniaWindowService>());
