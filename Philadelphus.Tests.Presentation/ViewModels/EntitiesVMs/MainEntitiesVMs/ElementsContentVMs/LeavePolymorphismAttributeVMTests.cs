@@ -60,7 +60,6 @@ public sealed class LeavePolymorphismAttributeVMTests
         viewModel.SelectedCandidate.Should().BeNull();
         viewModel.Status.Should().Be(LeavePolymorphismStatus.Resolved);
         viewModel.DisplayText.Should().Be(secondCandidate.Name);
-        viewModel.CanCreateParent.Should().BeFalse();
     }
 
     [Fact]
@@ -80,6 +79,35 @@ public sealed class LeavePolymorphismAttributeVMTests
         viewModel.Recipient.Should().BeSameAs(attribute.Owner);
         viewModel.CanApplyCandidate.Should().BeTrue();
         selectionCallCount.Should().Be(1);
+    }
+
+    /// <summary>
+    /// Причина отказа в создании родителя должна соответствовать текущему статусу разрешения связи.
+    /// </summary>
+    [Theory]
+    [InlineData(LeavePolymorphismStatus.NotFound, null)]
+    [InlineData(LeavePolymorphismStatus.Resolved, "уже найден")]
+    [InlineData(LeavePolymorphismStatus.Ambiguous, "неоднозначно")]
+    [InlineData(LeavePolymorphismStatus.Invalid, "содержат ошибки")]
+    public void ParentCreationBlockReason_ExplainsUnavailableOperation(
+        LeavePolymorphismStatus status,
+        string? expectedReasonFragment)
+    {
+        var (attribute, firstCandidate, secondCandidate, _) = CreateFixture();
+        IReadOnlyList<TreeLeaveModel> candidates = status switch
+        {
+            LeavePolymorphismStatus.Resolved => [firstCandidate],
+            LeavePolymorphismStatus.Ambiguous => [firstCandidate, secondCandidate],
+            _ => Array.Empty<TreeLeaveModel>()
+        };
+        attribute.SetResolution(status, candidates);
+
+        var viewModel = new LeavePolymorphismAttributeVM(attribute);
+
+        if (expectedReasonFragment == null)
+            viewModel.ParentCreationBlockReason.Should().BeNull();
+        else
+            viewModel.ParentCreationBlockReason.Should().Contain(expectedReasonFragment);
     }
 
     /// <summary>

@@ -518,10 +518,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 parameter =>
                 {
                     if (parameter is LeavePolymorphismAttributeVM attribute)
+                    {
                         CreatePolymorphicParent(attribute);
+                        return;
+                    }
+
+                    NotifyPolymorphicParentCreationUnavailable(
+                        "Выберите служебный атрибут полиморфного родителя в таблице атрибутов.");
                 },
-                parameter => CanModifyRepository()
-                    && parameter is LeavePolymorphismAttributeVM);
+                _ => CanModifyRepository());
 
         public IAsyncRelayCommand SoftDeleteRepositoryMemberCommand =>
             _softDeleteRepositoryMemberCommand ??= _asyncCommandFactory.Create(
@@ -634,7 +639,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _addAttributeValueCommand ??= _commandFactory.Create(
                 obj =>
                 {
-                    SelectedRepositoryMember.SelectedAttributeVM.AddSelectedValue();
+                    SelectedRepositoryMember?.SelectedAttributeVM?.AddSelectedValue();
                     RebuildChildCollectionTable();
                 },
                 ce =>
@@ -646,7 +651,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _removeAttributeValueCommand ??= _commandFactory.Create(
                 obj =>
                 {
-                    SelectedRepositoryMember.SelectedAttributeVM.RemoveSelectedValue();
+                    SelectedRepositoryMember?.SelectedAttributeVM?.RemoveSelectedValue();
                     RebuildChildCollectionTable();
                 },
                 ce =>
@@ -1317,6 +1322,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _softDeleteRepositoryMemberCommand?.RaiseCanExecuteChanged();
             _softDeleteRepositoryMemberAttributeCommand?.RaiseCanExecuteChanged();
             _openModifyAttributesListWindowCommand?.RaiseCanExecuteChanged();
+            _createPolymorphicParentCommand?.RaiseCanExecuteChanged();
             _addAttributeValueCommand?.RaiseCanExecuteChanged();
             _removeAttributeValueCommand?.RaiseCanExecuteChanged();
             _rebuildChildCollectionTableIfOrderStaleCommand?.RaiseCanExecuteChanged();
@@ -1391,20 +1397,41 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </summary>
         private void CreatePolymorphicParent(LeavePolymorphismAttributeVM attribute)
         {
-            if (attribute.Recipient == null || attribute.CanCreateParent == false)
-                return;
-
-            var result = attribute.Recipient switch
+            if (string.IsNullOrWhiteSpace(attribute.ParentCreationBlockReason) == false)
             {
-                TreeLeaveModel recipientLeave => _leavePolymorphismChangeCoordinator
-                    .CreateParentChain(recipientLeave),
-                TreeNodeModel recipientNode => _leavePolymorphismChangeCoordinator
-                    .CreateParentChain(recipientNode),
-                _ => new LeavePolymorphismChangeResult(false, [])
-            };
-            if (result.CreatedLeaves.Count > 0)
-                FormulaBarVM.RecalculateLoadedFormulas();
-            RefreshLeavePolymorphismView(result);
+                NotifyPolymorphicParentCreationUnavailable(attribute.ParentCreationBlockReason);
+                return;
+            }
+
+            try
+            {
+                var result = attribute.Recipient switch
+                {
+                    TreeLeaveModel recipientLeave => _leavePolymorphismChangeCoordinator
+                        .CreateParentChain(recipientLeave),
+                    TreeNodeModel recipientNode => _leavePolymorphismChangeCoordinator
+                        .CreateParentChain(recipientNode),
+                    _ => throw new InvalidOperationException(
+                        "Операция поддерживается только для узлов и листов рабочего дерева.")
+                };
+                if (result.CreatedLeaves.Count > 0)
+                    FormulaBarVM.RecalculateLoadedFormulas();
+                RefreshLeavePolymorphismView(result);
+            }
+            catch (InvalidOperationException exception)
+            {
+                NotifyPolymorphicParentCreationUnavailable(exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Сообщает пользователю причину отказа в создании полиморфного родителя.
+        /// </summary>
+        private void NotifyPolymorphicParentCreationUnavailable(string reason)
+        {
+            _notificationService.SendTextMessage<RepositoryExplorerControlVM>(
+                $"Не удалось создать полиморфного родителя. {reason}",
+                NotificationCriticalLevelModel.Warning);
         }
 
         /// <summary>

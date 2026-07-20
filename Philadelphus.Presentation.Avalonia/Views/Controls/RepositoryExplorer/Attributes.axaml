@@ -18,7 +18,6 @@
                 </Button>
                 <Button Command="{Binding CreatePolymorphicParentCommand}"
                         CommandParameter="{Binding SelectedRepositoryMember.SelectedAttributeVM.LeavePolymorphism}"
-                        IsEnabled="{Binding SelectedRepositoryMember.SelectedAttributeVM.LeavePolymorphism.CanCreateParent}"
                         ToolTip.Tip="Создать отсутствующего полиморфного родителя"
                         Margin="1" Height="25" Width="25" Padding="2" Background="Transparent">
                     <localControls:ThemedSvg Icon="leave" />

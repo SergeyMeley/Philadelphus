@@ -88,10 +88,23 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
     public bool CanApplyCandidate => Recipient != null && SelectedCandidate != null;
 
     /// <summary>
-    /// Указывает, что для листа можно создать отсутствующую цепочку родителей.
+    /// Объясняет, почему для текущего состояния нельзя создать полиморфного родителя.
+    /// Пустое значение означает, что операция доступна.
     /// </summary>
-    public bool CanCreateParent =>
-        Recipient != null && Status == LeavePolymorphismStatus.NotFound;
+    public string? ParentCreationBlockReason =>
+        Recipient == null
+            ? "Не удалось определить узел или лист, для которого требуется создать родителя."
+            : Status switch
+            {
+                LeavePolymorphismStatus.NotFound => null,
+                LeavePolymorphismStatus.Resolved =>
+                    "Полиморфный родитель уже найден. Создание дополнительного листа не требуется.",
+                LeavePolymorphismStatus.Ambiguous =>
+                    "Полиморфный родитель определён неоднозначно. Сначала устраните дубликаты или измените значения атрибутов.",
+                LeavePolymorphismStatus.Invalid =>
+                    "Невозможно создать полиморфного родителя: значения унаследованных атрибутов содержат ошибки или неразрешённые ссылки.",
+                _ => "Невозможно создать полиморфного родителя в текущем состоянии."
+            };
 
     /// <summary>
     /// Выбирает родителя по ссылке, введённой стандартным редактором значения атрибута.
@@ -134,6 +147,6 @@ public sealed class LeavePolymorphismAttributeVM : ViewModelBase
         OnPropertyChanged(nameof(Status));
         OnPropertyChanged(nameof(DisplayText));
         OnPropertyChanged(nameof(AvailableParents));
-        OnPropertyChanged(nameof(CanCreateParent));
+        OnPropertyChanged(nameof(ParentCreationBlockReason));
     }
 }

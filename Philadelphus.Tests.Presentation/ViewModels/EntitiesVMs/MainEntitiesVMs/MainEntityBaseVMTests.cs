@@ -9,6 +9,7 @@ using Philadelphus.Core.Domain.Policies;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -17,6 +18,36 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
 public class MainEntityBaseVMTests
 {
+    /// <summary>
+    /// Изменение выбранного атрибута должно уведомлять вложенные Avalonia-привязки.
+    /// </summary>
+    [Fact]
+    public void SelectedAttributeVM_Changed_RaisesPropertyChanged()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+        var changedProperties = new List<string?>();
+        rootVM.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+
+        rootVM.SelectedAttributeVM = attributeVM;
+
+        rootVM.SelectedAttributeVM.Should().BeSameAs(attributeVM);
+        changedProperties.Should().Contain(nameof(rootVM.SelectedAttributeVM));
+    }
+
     [Fact]
     public void AttributesVMs_NewChildNode_InheritsExistingParentAttribute()
     {

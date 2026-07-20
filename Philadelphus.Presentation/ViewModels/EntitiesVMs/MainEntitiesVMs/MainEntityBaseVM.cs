@@ -31,6 +31,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         protected readonly T _model;
         private bool? _isTreeExpanded;
         private readonly ObservableCollection<ElementAttributeVM> _attributesVMs = new();
+        private ElementAttributeVM? _selectedAttributeVM;
         public T Model 
         { 
             get 
@@ -165,7 +166,11 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
         /// <summary>
         /// Выбранная модель представления атрибута.
         /// </summary>
-        public ElementAttributeVM SelectedAttributeVM { get; set; }
+        public ElementAttributeVM? SelectedAttributeVM
+        {
+            get => _selectedAttributeVM;
+            set => SetProperty(ref _selectedAttributeVM, value);
+        }
 
         private DataStorageVM _storageVM;
 

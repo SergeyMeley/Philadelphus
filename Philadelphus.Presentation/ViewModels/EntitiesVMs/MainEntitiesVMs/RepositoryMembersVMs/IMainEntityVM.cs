@@ -61,7 +61,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Repos
         /// <summary>
         /// Выбранная модель представления атрибута.
         /// </summary>
-        public ElementAttributeVM SelectedAttributeVM { get; set; }
+        public ElementAttributeVM? SelectedAttributeVM { get; set; }
        
         /// <summary>
         /// Модель представления хранилища данных.
