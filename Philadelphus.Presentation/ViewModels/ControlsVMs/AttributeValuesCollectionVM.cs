@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Services.Interfaces;
+using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
@@ -77,6 +79,47 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     }
 
     /// <summary>
+    /// Инициализирует редактор атрибута с общим редактором поиска и создания листа.
+    /// </summary>
+    /// <param name="attribute">Доменная модель редактируемого атрибута.</param>
+    /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
+    /// <param name="commandFactory">Фабрика команды явного создания значения.</param>
+    public AttributeValuesCollectionVM(
+        ElementAttributeModel attribute,
+        ILeaveAttributeValueService attributeValueService,
+        IRelayCommandFactory commandFactory)
+        : this(attribute, attributeValueService)
+    {
+        ArgumentNullException.ThrowIfNull(commandFactory);
+        if (_attribute.ValueType == null)
+            return;
+
+        ValueLookup = new LeaveValueLookupVM(
+            _attribute.ValueType,
+            attributeValueService,
+            commandFactory);
+        ValueLookup.PropertyChanged += HandleValueLookupPropertyChanged;
+    }
+
+    /// <summary>
+    /// Инициализирует редактор для зафиксированной модели представления атрибута.
+    /// </summary>
+    /// <param name="attribute">Модель представления редактируемого атрибута.</param>
+    /// <param name="attributeValueService">Сервис поиска значений листьев.</param>
+    /// <param name="commandFactory">Фабрика команды явного создания значения.</param>
+    public AttributeValuesCollectionVM(
+        ElementAttributeVM attribute,
+        ILeaveAttributeValueService attributeValueService,
+        IRelayCommandFactory commandFactory)
+        : this(
+            attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)),
+            attributeValueService,
+            commandFactory)
+    {
+        _attributeVM = attribute;
+    }
+
+    /// <summary>
     /// Атрибут, с которым было открыто окно. Смена выделения его не заменяет.
     /// </summary>
     public ElementAttributeModel Attribute => _attribute;
@@ -135,6 +178,11 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// Строка таблицы однозначно найденного листа.
     /// </summary>
     public ChildCollectionTableRow? ResolvedSearchRow { get; private set; }
+
+    /// <summary>
+    /// Общий редактор поиска и явного создания значения атрибута.
+    /// </summary>
+    public LeaveValueLookupVM? ValueLookup { get; }
 
     /// <summary>
     /// Указывает, можно ли изменять эффективную коллекцию значений.
@@ -262,6 +310,31 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         OnPropertyChanged(nameof(SearchMatchCount));
         OnPropertyChanged(nameof(ResolvedSearchMatch));
         OnPropertyChanged(nameof(ResolvedSearchRow));
+    }
+
+    private void HandleValueLookupPropertyChanged(
+        object? sender,
+        PropertyChangedEventArgs eventArgs)
+    {
+        if (ValueLookup == null)
+            return;
+
+        if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.SystemValue))
+        {
+            _systemSearchValue = ValueLookup.SystemValue;
+            OnPropertyChanged(nameof(SystemSearchValue));
+        }
+        else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.CreatedLeave))
+        {
+            Refresh();
+        }
+        else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.Status))
+        {
+            _searchResult = new(ValueLookup.Status, ValueLookup.Matches);
+            RebuildRows(Values.Select(x => x.Value));
+            OnPropertyChanged(nameof(Rows));
+            NotifySearchProperties();
+        }
     }
 
     private static bool IsActive(TreeLeaveModel value) =>

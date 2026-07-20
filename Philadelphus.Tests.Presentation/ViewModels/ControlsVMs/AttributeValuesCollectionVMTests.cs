@@ -56,9 +56,12 @@ public class AttributeValuesCollectionVMTests
                 "нет" => new(LeaveAttributeMatchStatus.NotFound, []),
                 _ => new(LeaveAttributeMatchStatus.Invalid, []),
             });
-        var sut = new AttributeValuesCollectionVM(graph.Attribute, service);
+        var sut = new AttributeValuesCollectionVM(
+            graph.Attribute,
+            service,
+            new DefaultRelayCommandFactory());
 
-        sut.SystemSearchValue = "1";
+        sut.ValueLookup!.SystemValue = "1";
 
         sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.Resolved);
         sut.SearchMatchCount.Should().Be(1);
@@ -67,13 +70,13 @@ public class AttributeValuesCollectionVMTests
         sut.Rows.Single(x => x.SourceUuid == first.Uuid)["IsSearchMatch"].Should().Be(true);
         sut.Rows.Single(x => x.SourceUuid == second.Uuid)["IsSearchMatch"].Should().Be(false);
 
-        sut.SystemSearchValue = "оба";
+        sut.ValueLookup.SystemValue = "оба";
         sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.Ambiguous);
         sut.SearchMatchCount.Should().Be(2);
         sut.ResolvedSearchRow.Should().BeNull();
         sut.Rows.Should().OnlyContain(x => Equals(x["IsSearchMatch"], true));
 
-        sut.SystemSearchValue = "нет";
+        sut.ValueLookup.SystemValue = "нет";
         sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.NotFound);
         sut.Rows.Should().OnlyContain(x => Equals(x["IsSearchMatch"], false));
         graph.Attribute.Values.Should().BeEmpty();

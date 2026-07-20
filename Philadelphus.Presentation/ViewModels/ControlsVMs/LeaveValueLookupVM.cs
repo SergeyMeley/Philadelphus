@@ -79,6 +79,23 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     public IReadOnlyList<TreeLeaveModel> Matches => _result.Matches;
 
     /// <summary>
+    /// Количество найденных листьев.
+    /// </summary>
+    public int MatchCount => Matches.Count;
+
+    /// <summary>
+    /// Локализованное описание текущего результата поиска.
+    /// </summary>
+    public string StatusText => Status switch
+    {
+        LeaveAttributeMatchStatus.Invalid => "Условия поиска не заполнены или невалидны",
+        LeaveAttributeMatchStatus.NotFound => "Подходящие значения не найдены",
+        LeaveAttributeMatchStatus.Resolved => "Найдено одно подходящее значение",
+        LeaveAttributeMatchStatus.Ambiguous => "Найдено несколько подходящих значений",
+        _ => string.Empty,
+    };
+
+    /// <summary>
     /// Единственный найденный лист при однозначном результате.
     /// </summary>
     public TreeLeaveModel? ResolvedMatch => _result.ResolvedMatch;
@@ -136,6 +153,8 @@ public sealed class LeaveValueLookupVM : ViewModelBase
 
         OnPropertyChanged(nameof(Status));
         OnPropertyChanged(nameof(Matches));
+        OnPropertyChanged(nameof(MatchCount));
+        OnPropertyChanged(nameof(StatusText));
         OnPropertyChanged(nameof(ResolvedMatch));
         OnPropertyChanged(nameof(CanCreate));
         _createCommand.RaiseCanExecuteChanged();
