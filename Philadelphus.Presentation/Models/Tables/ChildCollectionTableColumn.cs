@@ -3,6 +3,16 @@ using Philadelphus.Core.Domain.Interfaces;
 namespace Philadelphus.Presentation.Models.Tables
 {
     /// <summary>
+    /// Определяет способ отображения динамической колонки.
+    /// </summary>
+    public enum ChildCollectionTableColumnType
+    {
+        Text,
+        ComboBox,
+        CheckBox,
+    }
+
+    /// <summary>
     /// Описывает колонку таблицы наследников выбранного элемента.
     /// </summary>
     /// <remarks>
@@ -21,7 +31,10 @@ namespace Philadelphus.Presentation.Models.Tables
             Func<IChildrenModel, Func<object?, object?>?>? setterFactory = null,
             Func<IChildrenModel, IEnumerable<object>?>? valueOptionsGetter = null,
             string? bindingKey = null,
-            string? headerToolTip = null)
+            string? headerToolTip = null,
+            ChildCollectionTableColumnType columnType = ChildCollectionTableColumnType.Text,
+            Func<IChildrenModel, bool>? cellEnabledGetter = null,
+            Func<IChildrenModel, string?>? cellToolTipGetter = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentException.ThrowIfNullOrWhiteSpace(header);
@@ -38,6 +51,9 @@ namespace Philadelphus.Presentation.Models.Tables
             IsAttribute = isAttribute;
             SetterFactory = setterFactory;
             ValueOptionsGetter = valueOptionsGetter;
+            ColumnType = columnType;
+            CellEnabledGetter = cellEnabledGetter;
+            CellToolTipGetter = cellToolTipGetter;
         }
 
         /// <summary>
@@ -79,11 +95,20 @@ namespace Philadelphus.Presentation.Models.Tables
         /// </summary>
         public bool IsAttribute { get; }
 
+        /// <summary>
+        /// Способ отображения динамической колонки.
+        /// </summary>
+        public ChildCollectionTableColumnType ColumnType { get; }
+
         private Func<IChildrenModel, object?> ValueGetter { get; }
 
         private Func<IChildrenModel, Func<object?, object?>?>? SetterFactory { get; }
 
         private Func<IChildrenModel, IEnumerable<object>?>? ValueOptionsGetter { get; }
+
+        private Func<IChildrenModel, bool>? CellEnabledGetter { get; }
+
+        private Func<IChildrenModel, string?>? CellToolTipGetter { get; }
 
         /// <summary>
         /// Возвращает true, если колонка должна отображаться как выбор из списка.
@@ -120,6 +145,26 @@ namespace Philadelphus.Presentation.Models.Tables
             ArgumentNullException.ThrowIfNull(child);
 
             return ValueOptionsGetter?.Invoke(child);
+        }
+
+        /// <summary>
+        /// Указывает, доступно ли интерактивное содержимое ячейки для конкретной строки.
+        /// </summary>
+        public bool IsCellEnabled(IChildrenModel child)
+        {
+            ArgumentNullException.ThrowIfNull(child);
+
+            return CellEnabledGetter?.Invoke(child) ?? true;
+        }
+
+        /// <summary>
+        /// Возвращает пояснение состояния ячейки для конкретной строки.
+        /// </summary>
+        public string? GetCellToolTip(IChildrenModel child)
+        {
+            ArgumentNullException.ThrowIfNull(child);
+
+            return CellToolTipGetter?.Invoke(child);
         }
     }
 }

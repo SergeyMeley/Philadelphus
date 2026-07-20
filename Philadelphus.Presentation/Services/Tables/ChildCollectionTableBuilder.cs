@@ -234,7 +234,10 @@ namespace Philadelphus.Presentation.Services.Tables
                 valueOptionsGetter: isReadOnly || attribute.IsCollectionValue
                     ? null
                     : child => GetAttributeValueOptions(child, key),
-                bindingKey: CreateAttributeBindingKey(order, reservedBindingKeys));
+                bindingKey: CreateAttributeBindingKey(order, reservedBindingKeys),
+                columnType: isReadOnly || attribute.IsCollectionValue
+                    ? ChildCollectionTableColumnType.Text
+                    : ChildCollectionTableColumnType.ComboBox);
         }
 
         /// <summary>
@@ -322,6 +325,14 @@ namespace Philadelphus.Presentation.Services.Tables
                         x => x.BindingKey,
                         x => x.GetValueOptions(child));
 
+                var cellEnabledStates = columnsList.ToDictionary(
+                    x => x.BindingKey,
+                    x => x.IsCellEnabled(child));
+
+                var cellToolTips = columnsList.ToDictionary(
+                    x => x.BindingKey,
+                    x => x.GetCellToolTip(child));
+
                 var refreshers = columnsList.ToDictionary(
                     x => x.BindingKey,
                     x => new Func<object?>(() => x.GetValue(child)));
@@ -388,7 +399,9 @@ namespace Philadelphus.Presentation.Services.Tables
                     () => GetStateVisibilityInfo(child).ParentOwnerState ?? State.SavedOrLoaded,
                     () => child is IMainEntityModel entity ? entity.State : State.SavedOrLoaded,
                     () => GetStateVisibilityInfo(child).ChildContentState ?? State.SavedOrLoaded,
-                    () => child is IMainEntityModel entity ? StateVisibilityInfoBuilder.Build(entity).ToolTip : string.Empty));
+                    () => child is IMainEntityModel entity ? StateVisibilityInfoBuilder.Build(entity).ToolTip : string.Empty,
+                    cellEnabledStates,
+                    cellToolTips));
             }
 
             return rows;

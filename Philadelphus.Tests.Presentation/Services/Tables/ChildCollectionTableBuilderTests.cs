@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Properties;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Policies;
+using Philadelphus.Presentation.Models.Tables;
 using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Tests.Common.Fakes.Entities;
 using Philadelphus.Tests.Common.Fakes.Services;
@@ -165,6 +166,40 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
             row[secondUuid.ToString()].Should().Be(fixture.Leave);
             row[$"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}"]
                 .Should().Be("user123");
+        }
+
+        [Fact]
+        public void buildChildCollectionTableRows_Provides_CheckBox_Cell_State()
+        {
+            var fixture = CreateFixture();
+            var isSelected = false;
+            var column = new ChildCollectionTableColumn(
+                "Selected",
+                "Выбрано",
+                0,
+                _ => isSelected,
+                isReadOnly: false,
+                setterFactory: _ => value =>
+                {
+                    isSelected = value is true;
+                    return isSelected;
+                },
+                columnType: ChildCollectionTableColumnType.CheckBox,
+                cellEnabledGetter: _ => false,
+                cellToolTipGetter: _ => "Выбор заблокирован");
+
+            var row = ChildCollectionTableBuilder
+                .buildChildCollectionTableRows([fixture.Leave], [column])
+                .Single();
+
+            column.ColumnType.Should().Be(ChildCollectionTableColumnType.CheckBox);
+            row.CellEnabledStates[column.BindingKey].Should().BeFalse();
+            row.CellToolTips[column.BindingKey].Should().Be("Выбор заблокирован");
+
+            row[column.Key] = true;
+
+            isSelected.Should().BeTrue();
+            row[column.Key].Should().Be(true);
         }
 
         [Fact]

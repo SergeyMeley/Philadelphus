@@ -19,6 +19,8 @@ namespace Philadelphus.Presentation.Models.Tables
         private readonly Dictionary<string, object?> _cells;
         private readonly IReadOnlyDictionary<string, Func<object?, object?>?> _setters;
         private readonly Dictionary<string, IEnumerable<object>?> _valueOptions;
+        private readonly Dictionary<string, bool> _cellEnabledStates;
+        private readonly Dictionary<string, string?> _cellToolTips;
         private readonly IReadOnlyDictionary<string, Func<object?>> _refreshers;
         private readonly Dictionary<string, bool> _valueOverrideStates;
         private readonly IReadOnlyDictionary<string, Func<bool>> _valueOverrideStateRefreshers;
@@ -61,7 +63,9 @@ namespace Philadelphus.Presentation.Models.Tables
             Func<State>? parentOwnerAggregateStateGetter = null,
             Func<State>? stateGetter = null,
             Func<State>? childContentAggregateStateGetter = null,
-            Func<string>? stateVisibilityToolTipGetter = null)
+            Func<string>? stateVisibilityToolTipGetter = null,
+            IReadOnlyDictionary<string, bool>? cellEnabledStates = null,
+            IReadOnlyDictionary<string, string?>? cellToolTips = null)
         {
             ArgumentNullException.ThrowIfNull(cells);
 
@@ -72,6 +76,12 @@ namespace Philadelphus.Presentation.Models.Tables
             _valueOptions = valueOptions == null
                 ? new Dictionary<string, IEnumerable<object>?>()
                 : new Dictionary<string, IEnumerable<object>?>(valueOptions);
+            _cellEnabledStates = cellEnabledStates == null
+                ? new Dictionary<string, bool>()
+                : new Dictionary<string, bool>(cellEnabledStates);
+            _cellToolTips = cellToolTips == null
+                ? new Dictionary<string, string?>()
+                : new Dictionary<string, string?>(cellToolTips);
             _refreshers = refreshers == null
                 ? new ReadOnlyDictionary<string, Func<object?>>(new Dictionary<string, Func<object?>>())
                 : new ReadOnlyDictionary<string, Func<object?>>(new Dictionary<string, Func<object?>>(refreshers));
@@ -113,6 +123,8 @@ namespace Philadelphus.Presentation.Models.Tables
 
             Cells = new ReadOnlyDictionary<string, object?>(_cells);
             ValueOptions = new ReadOnlyDictionary<string, IEnumerable<object>?>(_valueOptions);
+            CellEnabledStates = new ReadOnlyDictionary<string, bool>(_cellEnabledStates);
+            CellToolTips = new ReadOnlyDictionary<string, string?>(_cellToolTips);
             ValueOverrideStates = new ReadOnlyDictionary<string, bool>(_valueOverrideStates);
             ValueOverrideToolTips = new ReadOnlyDictionary<string, string?>(_valueOverrideToolTips);
             DisplayTexts = new ReadOnlyDictionary<string, string?>(_displayTexts);
@@ -137,6 +149,16 @@ namespace Philadelphus.Presentation.Models.Tables
         /// Допустимые значения combo-box ячеек, индексированные техническими binding-ключами.
         /// </summary>
         public IReadOnlyDictionary<string, IEnumerable<object>?> ValueOptions { get; }
+
+        /// <summary>
+        /// Доступность интерактивного содержимого ячеек, индексированная binding-ключами.
+        /// </summary>
+        public IReadOnlyDictionary<string, bool> CellEnabledStates { get; }
+
+        /// <summary>
+        /// Подсказки состояния ячеек, индексированные binding-ключами.
+        /// </summary>
+        public IReadOnlyDictionary<string, string?> CellToolTips { get; }
 
         /// <summary>
         /// Признаки переопределения значений атрибутов, индексированные техническими binding-ключами.

@@ -7,6 +7,7 @@ using global::Avalonia.Controls;
 using global::Avalonia.Controls.Primitives;
 using global::Avalonia.Controls.Templates;
 using global::Avalonia.Data;
+using global::Avalonia.Input;
 using global::Avalonia.Layout;
 
 using Philadelphus.Core.Domain.Entities.MainEntities;
@@ -79,9 +80,43 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                 return CreateStateColumn(column);
             }
 
-            return column.HasValueOptions
-                ? CreateComboBoxColumn(column)
-                : CreateTextColumn(column);
+            return column.ColumnType switch
+            {
+                ChildCollectionTableColumnType.ComboBox => CreateComboBoxColumn(column),
+                ChildCollectionTableColumnType.CheckBox => CreateCheckBoxColumn(column),
+                _ => CreateTextColumn(column),
+            };
+        }
+
+        /// <summary>
+        /// Интерактивная boolean-колонка с доступностью и подсказкой отдельной ячейки.
+        /// </summary>
+        private static DataGridColumn CreateCheckBoxColumn(ChildCollectionTableColumn column)
+        {
+            var template = new FuncDataTemplate<ChildCollectionTableRow>((_, _) =>
+            {
+                var checkBox = new CheckBox
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                checkBox.Bind(ToggleButton.IsCheckedProperty, new Binding($"[{column.BindingKey}]")
+                {
+                    Mode = BindingMode.TwoWay,
+                });
+                checkBox.Bind(InputElement.IsEnabledProperty, new Binding($"CellEnabledStates[{column.BindingKey}]"));
+                checkBox.Bind(ToolTip.TipProperty, new Binding($"CellToolTips[{column.BindingKey}]"));
+                return checkBox;
+            });
+
+            return new DataGridTemplateColumn
+            {
+                Header = CreateHeader(column),
+                IsReadOnly = column.IsReadOnly,
+                Width = DataGridLength.Auto,
+                MinWidth = 60,
+                CellTemplate = template,
+            };
         }
 
         /// <summary>Узкая цветовая колонка состояния (как в TreeView и таблице атрибутов).</summary>
