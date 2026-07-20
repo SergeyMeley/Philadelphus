@@ -151,7 +151,30 @@ namespace Philadelphus.Presentation.Avalonia.Services
                 ?? throw new InvalidOperationException($"DI не смог создать {windowType.Name}.");
 
             window.DataContext = viewModel;
+            AttachViewModelLifecycle(window, viewModel);
             return window;
+        }
+
+        private static void AttachViewModelLifecycle(Window window, ViewModelBase viewModel)
+        {
+            EventHandler? closeRequestedHandler = null;
+            if (viewModel is IWindowCloseRequestSource closeRequestSource)
+            {
+                closeRequestedHandler = (_, _) => window.Close();
+                closeRequestSource.CloseRequested += closeRequestedHandler;
+            }
+
+            window.Closed += (_, _) =>
+            {
+                if (viewModel is IWindowCloseRequestSource closeRequestSource
+                    && closeRequestedHandler != null)
+                {
+                    closeRequestSource.CloseRequested -= closeRequestedHandler;
+                }
+
+                if (viewModel is IDisposable disposable)
+                    disposable.Dispose();
+            };
         }
 
         /// <summary>

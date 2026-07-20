@@ -58,6 +58,46 @@ public class MainEntityBaseVMTests
         changedProperties.Should().Contain(nameof(attributeVM.AssignedValuesString));
     }
 
+    [Fact]
+    public void AttributeValuesCollectionVM_TracksTypeAndStopsAfterDispose()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(Guid.NewGuid(), tree, notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var initialType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var replacementType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var replacementValue = new TreeLeaveModel(Guid.NewGuid(), replacementType, tree,
+            notificationService, new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        attribute.ValueType = initialType;
+        attribute.IsCollectionValue = true;
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+        var sut = new AttributeValuesCollectionVM(attributeVM);
+        var closeRequests = 0;
+        sut.CloseRequested += (_, _) => closeRequests++;
+
+        attributeVM.SelectedValueType = replacementType;
+
+        sut.Values.Select(x => x.Value).Should().Equal(replacementValue);
+        attributeVM.IsCollectionValue = false;
+        closeRequests.Should().Be(1);
+
+        attributeVM.IsCollectionValue = true;
+        sut.Dispose();
+        attributeVM.IsCollectionValue = false;
+
+        closeRequests.Should().Be(1);
+    }
+
     /// <summary>
     /// Изменение выбранного атрибута должно уведомлять вложенные Avalonia-привязки.
     /// </summary>

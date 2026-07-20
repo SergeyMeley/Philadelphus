@@ -15,12 +15,14 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 /// <summary>
 /// Хранит презентационное состояние выбора листов для одного зафиксированного коллекционного атрибута.
 /// </summary>
-public sealed class AttributeValuesCollectionVM : ViewModelBase
+public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IWindowCloseRequestSource
 {
     private readonly ElementAttributeModel _attribute;
     private readonly ILeaveAttributeValueService? _attributeValueService;
     private readonly IAttributeValueCreationConfirmationService? _creationConfirmationService;
+    private readonly IRelayCommandFactory? _commandFactory;
     private ElementAttributeVM? _attributeVM;
+    private bool _isDisposed;
     private string? _systemSearchValue;
     private LeaveAttributeMatchResult _searchResult =
         new(LeaveAttributeMatchStatus.Invalid, []);
@@ -62,7 +64,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     public AttributeValuesCollectionVM(ElementAttributeVM attribute)
         : this(attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)))
     {
-        _attributeVM = attribute;
+        AttachToAttribute(attribute);
     }
 
     /// <summary>
@@ -77,7 +79,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
             attribute?.Model ?? throw new ArgumentNullException(nameof(attribute)),
             attributeValueService ?? throw new ArgumentNullException(nameof(attributeValueService)))
     {
-        _attributeVM = attribute;
+        AttachToAttribute(attribute);
     }
 
     /// <summary>
@@ -92,15 +94,9 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         IRelayCommandFactory commandFactory)
         : this(attribute, attributeValueService)
     {
-        ArgumentNullException.ThrowIfNull(commandFactory);
-        if (_attribute.ValueType == null)
-            return;
-
-        ValueLookup = new LeaveValueLookupVM(
-            _attribute.ValueType,
-            attributeValueService,
-            commandFactory);
-        ValueLookup.PropertyChanged += HandleValueLookupPropertyChanged;
+        _commandFactory = commandFactory
+            ?? throw new ArgumentNullException(nameof(commandFactory));
+        RebuildValueLookup();
     }
 
     /// <summary>
@@ -136,7 +132,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
             attributeValueService,
             commandFactory)
     {
-        _attributeVM = attribute;
+        AttachToAttribute(attribute);
     }
 
     /// <summary>
@@ -157,7 +153,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
             commandFactory,
             creationConfirmationService)
     {
-        _attributeVM = attribute;
+        AttachToAttribute(attribute);
     }
 
     /// <summary>
@@ -223,7 +219,12 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
     /// <summary>
     /// Общий редактор поиска и явного создания значения атрибута.
     /// </summary>
-    public LeaveValueLookupVM? ValueLookup { get; }
+    public LeaveValueLookupVM? ValueLookup { get; private set; }
+
+    /// <summary>
+    /// Возникает, когда атрибут перестаёт быть коллекционным и окно редактора нужно закрыть.
+    /// </summary>
+    public event EventHandler? CloseRequested;
 
     /// <summary>
     /// Указывает, можно ли изменять эффективную коллекцию значений.
@@ -269,6 +270,21 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         OnPropertyChanged(nameof(CanSelectValues));
         OnPropertyChanged(nameof(SelectionToolTip));
         NotifySearchProperties();
+    }
+
+    /// <summary>
+    /// Освобождает подписки редактора на зафиксированный атрибут и блок поиска.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_isDisposed)
+            return;
+
+        _isDisposed = true;
+        if (_attributeVM != null)
+            _attributeVM.PropertyChanged -= HandleAttributePropertyChanged;
+        if (ValueLookup != null)
+            ValueLookup.PropertyChanged -= HandleValueLookupPropertyChanged;
     }
 
     internal bool IsSelected(TreeLeaveModel value) =>
@@ -353,11 +369,54 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase
         OnPropertyChanged(nameof(ResolvedSearchRow));
     }
 
+    private void AttachToAttribute(ElementAttributeVM attribute)
+    {
+        _attributeVM = attribute;
+        _attributeVM.PropertyChanged += HandleAttributePropertyChanged;
+    }
+
+    private void HandleAttributePropertyChanged(object? sender, PropertyChangedEventArgs eventArgs)
+    {
+        if (_isDisposed)
+            return;
+
+        if (eventArgs.PropertyName == nameof(ElementAttributeVM.IsCollectionValue)
+            && _attribute.IsCollectionValue == false)
+        {
+            CloseRequested?.Invoke(this, EventArgs.Empty);
+        }
+        else if (eventArgs.PropertyName == nameof(ElementAttributeVM.SelectedValueType))
+        {
+            _systemSearchValue = null;
+            RebuildValueLookup();
+            Refresh();
+            OnPropertyChanged(nameof(SystemSearchValue));
+        }
+    }
+
+    private void RebuildValueLookup()
+    {
+        if (ValueLookup != null)
+            ValueLookup.PropertyChanged -= HandleValueLookupPropertyChanged;
+
+        ValueLookup = _attribute.ValueType != null
+            && _attributeValueService != null
+            && _commandFactory != null
+                ? new LeaveValueLookupVM(
+                    _attribute.ValueType,
+                    _attributeValueService,
+                    _commandFactory)
+                : null;
+        if (ValueLookup != null)
+            ValueLookup.PropertyChanged += HandleValueLookupPropertyChanged;
+        OnPropertyChanged(nameof(ValueLookup));
+    }
+
     private void HandleValueLookupPropertyChanged(
         object? sender,
         PropertyChangedEventArgs eventArgs)
     {
-        if (ValueLookup == null)
+        if (_isDisposed || ValueLookup == null)
             return;
 
         if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.SystemValue))
