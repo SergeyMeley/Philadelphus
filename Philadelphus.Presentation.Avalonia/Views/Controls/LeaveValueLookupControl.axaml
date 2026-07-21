@@ -79,9 +79,24 @@
                                 <DataTemplate>
                                     <Grid Margin="4,2">
                                         <ComboBox HorizontalAlignment="Stretch"
-                                                  IsVisible="{Binding !IsCollection}"
+                                                  IsVisible="{Binding CanSelectValueFromList}"
                                                   ItemsSource="{Binding AvailableValues}"
                                                   SelectedItem="{Binding SelectedValue, Mode=TwoWay}"
+                                                  PlaceholderText="Пустое значение">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <ComboBox HorizontalAlignment="Stretch"
+                                                  IsVisible="{Binding CanEnterValueManually}"
+                                                  IsEditable="True"
+                                                  IsTextSearchEnabled="False"
+                                                  ItemsSource="{Binding AvailableValues}"
+                                                  Text="{Binding ValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                  TextSearch.TextBinding="{Binding DisplayName}"
                                                   PlaceholderText="Пустое значение">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>

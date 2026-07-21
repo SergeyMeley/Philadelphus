@@ -1,7 +1,9 @@
+using System.Collections.ObjectModel;
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 
 namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
@@ -12,35 +14,43 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 public sealed class LeaveValueLookupCriterionVM : ViewModelBase
 {
     private readonly Action _changed;
+    private readonly ILeaveAttributeValueService _attributeValueService;
     private readonly IRelayCommandFactory _commandFactory;
+    private readonly ObservableCollection<LeaveValueLookupOptionVM> _availableValues;
     private IRelayCommand? _clearCommand;
     private LeaveValueLookupOptionVM? _selectedValue;
+    private string _valueText = string.Empty;
+    private bool _isValueInputValid = true;
 
     /// <summary>
     /// Инициализирует критерий по эффективному объявлению атрибута.
     /// </summary>
     /// <param name="attribute">Атрибут типа искомого листа.</param>
     /// <param name="changed">Обработчик изменения критерия.</param>
+    /// <param name="attributeValueService">Сервис поиска и создания системных значений.</param>
     /// <param name="commandFactory">Фабрика команд редактора критерия.</param>
     public LeaveValueLookupCriterionVM(
         ElementAttributeModel attribute,
-        Action changed, IRelayCommandFactory commandFactory)
+        Action changed,
+        ILeaveAttributeValueService attributeValueService,
+        IRelayCommandFactory commandFactory)
     {
         ArgumentNullException.ThrowIfNull(attribute);
         ArgumentNullException.ThrowIfNull(changed);
+        ArgumentNullException.ThrowIfNull(attributeValueService);
         ArgumentNullException.ThrowIfNull(commandFactory);
 
         Attribute = attribute;
         _changed = changed;
+        _attributeValueService = attributeValueService;
         _commandFactory = commandFactory;
-        AvailableValues = attribute.ValueType?.ChildLeaves
+        _availableValues = new(attribute.ValueType?.ChildLeaves
             .Where(IsActive)
             .OrderBy(x => x.Sequence)
             .ThenBy(x => x.Name)
             .ThenBy(x => x.Uuid)
             .Select(x => new LeaveValueLookupOptionVM(this, x))
-            .ToArray()
-            ?? [];
+            ?? []);
     }
 
     /// <summary>
@@ -64,16 +74,28 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
     public bool IsCollection => Attribute.IsCollectionValue;
 
     /// <summary>
+    /// Указывает, что одиночное значение системного базового типа можно ввести вручную.
+    /// </summary>
+    public bool CanEnterValueManually =>
+        IsCollection == false && Attribute.ValueType is SystemBaseTreeNodeModel;
+
+    /// <summary>
+    /// Указывает, что одиночное значение выбирается только из выпадающего списка.
+    /// </summary>
+    public bool CanSelectValueFromList => IsCollection == false && CanEnterValueManually == false;
+
+    /// <summary>
     /// Указывает, что тип значений критерия разрешён.
     /// </summary>
     public bool IsValid =>
         Attribute.ValueType != null
-        && string.IsNullOrEmpty(Attribute.ValueTypeReferenceErrorCode);
+        && string.IsNullOrEmpty(Attribute.ValueTypeReferenceErrorCode)
+        && _isValueInputValid;
 
     /// <summary>
     /// Активные значения прямого типа атрибута.
     /// </summary>
-    public IReadOnlyList<LeaveValueLookupOptionVM> AvailableValues { get; }
+    public IReadOnlyList<LeaveValueLookupOptionVM> AvailableValues => _availableValues;
 
     /// <summary>
     /// Команда очистки выбранных значений критерия.
@@ -89,10 +111,25 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
         get => _selectedValue;
         set
         {
-            if (value != null && AvailableValues.Contains(value) == false)
-                throw new ArgumentException("Значение отсутствует среди вариантов критерия.", nameof(value));
-            if (SetProperty(ref _selectedValue, value))
+            var changed = SetSelectedValue(value, synchronizeText: true);
+            changed |= SetValueInputValid(true);
+            if (changed)
                 _changed();
+        }
+    }
+
+    /// <summary>
+    /// Текст системного базового значения для ручного ввода в редактируемом списке.
+    /// </summary>
+    public string ValueText
+    {
+        get => _valueText;
+        set
+        {
+            if (SetProperty(ref _valueText, value ?? string.Empty) == false)
+                return;
+
+            ApplyValueText();
         }
     }
 
@@ -134,7 +171,89 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
             return;
         }
 
-        SelectedValue = null;
+        if (CanEnterValueManually)
+            ValueText = string.Empty;
+        else
+            SelectedValue = null;
+    }
+
+    private void ApplyValueText()
+    {
+        if (CanEnterValueManually == false)
+            return;
+
+        var normalizedText = ValueText.Trim();
+        if (normalizedText.Length == 0)
+        {
+            var changed = SetSelectedValue(null, synchronizeText: false);
+            changed |= SetValueInputValid(true);
+            if (changed)
+                _changed();
+            return;
+        }
+
+        var valueType = (SystemBaseTreeNodeModel)Attribute.ValueType!;
+        var result = _attributeValueService.FindSystemValue(valueType, normalizedText);
+        var resolvedValue = result.Matches
+            .OfType<SystemBaseTreeLeaveModel>()
+            .FirstOrDefault(x => string.Equals(
+                x.StringValue,
+                normalizedText,
+                StringComparison.Ordinal));
+        resolvedValue ??= result.ResolvedMatch as SystemBaseTreeLeaveModel;
+
+        if (result.Status == LeaveAttributeMatchStatus.NotFound
+            && valueType.SystemBaseType != SystemBaseType.BOOL)
+        {
+            resolvedValue = _attributeValueService.CreateSystemValue(valueType, normalizedText);
+        }
+
+        var isValid = resolvedValue != null;
+        var valueChanged = SetSelectedValue(
+            isValid ? GetOrAddOption(resolvedValue!) : null,
+            synchronizeText: isValid);
+        valueChanged |= SetValueInputValid(isValid);
+        if (valueChanged || isValid == false)
+            _changed();
+    }
+
+    private bool SetSelectedValue(
+        LeaveValueLookupOptionVM? value,
+        bool synchronizeText)
+    {
+        if (value != null && AvailableValues.Contains(value) == false)
+            throw new ArgumentException("Значение отсутствует среди вариантов критерия.", nameof(value));
+
+        var changed = SetProperty(ref _selectedValue, value, nameof(SelectedValue));
+        if (synchronizeText && CanEnterValueManually)
+        {
+            changed |= SetProperty(
+                ref _valueText,
+                value?.DisplayName ?? string.Empty,
+                nameof(ValueText));
+        }
+        return changed;
+    }
+
+    private bool SetValueInputValid(bool value)
+    {
+        if (_isValueInputValid == value)
+            return false;
+
+        _isValueInputValid = value;
+        OnPropertyChanged(nameof(IsValid));
+        return true;
+    }
+
+    private LeaveValueLookupOptionVM GetOrAddOption(TreeLeaveModel value)
+    {
+        var option = AvailableValues.SingleOrDefault(x => x.Value.Uuid == value.Uuid);
+        if (option != null)
+            return option;
+
+        option = new LeaveValueLookupOptionVM(this, value);
+        _availableValues.Add(option);
+        return option;
     }
 
     private static bool IsActive(TreeLeaveModel leave) =>

@@ -337,6 +337,85 @@ public class AttributeValuesCollectionVMTests
     }
 
     [Fact]
+    public void LeaveValueLookup_SystemBaseCriterionAcceptsManualInput()
+    {
+        var graph = CreateGraph();
+        var valueType = graph.Attribute.ValueType!;
+        var systemType = new SystemBaseTreeNodeModel(
+            graph.Owner.Parent,
+            graph.Tree,
+            SystemBaseType.INTEGER,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var existing = CreateSystemLeave(graph, systemType, "15");
+        var declarationUuid = Guid.NewGuid();
+        _ = new ElementAttributeModel(
+            declarationUuid,
+            valueType,
+            declarationUuid,
+            valueType,
+            graph.Tree,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<ElementAttributeModel>())
+        {
+            Name = "Число",
+            ValueType = systemType,
+        };
+        SystemBaseTreeLeaveModel? created = null;
+        LeaveAttributeValueDraft? observed = null;
+        var findDraftCalls = 0;
+        var service = new StubLeaveAttributeValueService(
+            (_, value) => value switch
+            {
+                "15" => new(LeaveAttributeMatchStatus.Resolved, [existing]),
+                "20" when created == null => new(LeaveAttributeMatchStatus.NotFound, []),
+                "20" => new(LeaveAttributeMatchStatus.Resolved, [created!]),
+                _ => new(LeaveAttributeMatchStatus.Invalid, []),
+            },
+            findDrafts: (drafts, _) =>
+            {
+                findDraftCalls++;
+                observed = drafts.Single();
+                return new(LeaveAttributeMatchStatus.NotFound, []);
+            },
+            createSystemValue: (parent, value) =>
+                created = CreateSystemLeave(graph, parent, value));
+        var sut = new LeaveValueLookupVM(
+            valueType,
+            service,
+            new DefaultRelayCommandFactory(),
+            enablePartialMatch: true);
+        var criterion = sut.AttributeCriteria.Single();
+
+        criterion.CanEnterValueManually.Should().BeTrue();
+        criterion.CanSelectValueFromList.Should().BeFalse();
+
+        criterion.ValueText = "15";
+
+        criterion.SelectedValue!.Value.Should().BeSameAs(existing);
+        observed!.ValueUuid.Should().Be(existing.Uuid);
+
+        criterion.ValueText = "20";
+
+        criterion.SelectedValue!.Value.Should().BeSameAs(created);
+        criterion.AvailableValues.Select(x => x.Value).Should().Contain(created!);
+        observed!.ValueUuid.Should().Be(created!.Uuid);
+
+        var callsBeforeInvalidInput = findDraftCalls;
+        criterion.ValueText = "не число";
+
+        criterion.IsValid.Should().BeFalse();
+        criterion.SelectedValue.Should().BeNull();
+        sut.Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
+        findDraftCalls.Should().Be(callsBeforeInvalidInput);
+
+        criterion.ValueText = string.Empty;
+
+        criterion.IsValid.Should().BeTrue();
+        observed!.MatchesAnyValue.Should().BeTrue();
+    }
+
+    [Fact]
     public void LeaveValueLookup_EmptyCriteriaMatchAnyByDefaultAndCanRequireExactMatch()
     {
         var graph = CreateGraph();

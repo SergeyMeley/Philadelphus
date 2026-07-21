@@ -60,7 +60,10 @@ public sealed class LeaveValueLookupVM : ViewModelBase
                 .ThenBy(x => x.Name)
                 .ThenBy(x => x.DeclaringUuid)
                 .Select(x => new LeaveValueLookupCriterionVM(
-                    x, RefreshAttributeCriteria, commandFactory))
+                    x,
+                    RefreshAttributeCriteria,
+                    attributeValueService,
+                    commandFactory))
                 .ToArray();
             RefreshAttributeCriteria();
         }
