@@ -54,6 +54,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly ILeavePolymorphismService _leavePolymorphismService;
         private readonly ILeavePolymorphismChangeCoordinator _leavePolymorphismChangeCoordinator;
         private readonly IAttributeValuesCollectionVMFactory _attributeValuesCollectionVMFactory;
+        private readonly ILeaveAttributeValueService _attributeValueService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -66,6 +67,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private ILeaveParent? _currentLeavesOwner;
         private IReadOnlyList<ChildCollectionTableColumn> _childCollectionTableColumns = Array.Empty<ChildCollectionTableColumn>();
         private IReadOnlyList<ChildCollectionTableRow> _childCollectionTableRows = Array.Empty<ChildCollectionTableRow>();
+        private AttributeValueLookupHostVM? _attributeValueLookup;
 
         // Sequence редактируется прямо в таблице. Пересортировку откладываем до ухода фокуса,
         // чтобы строка не меняла позицию во время ввода значения.
@@ -234,6 +236,15 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// </summary>
         public RepositoryFormulaBarVM FormulaBarVM { get; }
 
+        /// <summary>
+        /// Расширенный поиск значения выбранного одиночного пользовательского атрибута.
+        /// </summary>
+        public AttributeValueLookupHostVM? AttributeValueLookup
+        {
+            get => _attributeValueLookup;
+            private set => SetProperty(ref _attributeValueLookup, value);
+        }
+
         private bool _isRepositoryLoading;
         public bool IsRepositoryLoading
         {
@@ -333,6 +344,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ILeavePolymorphismService leavePolymorphismService,
             ILeavePolymorphismChangeCoordinator leavePolymorphismChangeCoordinator,
             IAttributeValuesCollectionVMFactory attributeValuesCollectionVMFactory,
+            ILeaveAttributeValueService attributeValueService,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -358,6 +370,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(leavePolymorphismService);
             ArgumentNullException.ThrowIfNull(leavePolymorphismChangeCoordinator);
             ArgumentNullException.ThrowIfNull(attributeValuesCollectionVMFactory);
+            ArgumentNullException.ThrowIfNull(attributeValueService);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -371,6 +384,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _leavePolymorphismService = leavePolymorphismService;
             _leavePolymorphismChangeCoordinator = leavePolymorphismChangeCoordinator;
             _attributeValuesCollectionVMFactory = attributeValuesCollectionVMFactory;
+            _attributeValueService = attributeValueService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -1351,6 +1365,19 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
 
             _isDisposed = true;
             Interlocked.Increment(ref _repositoryLoadVersion);
+            AttributeValueLookup?.Dispose();
+            AttributeValueLookup = null;
+        }
+
+        internal void UpdateAttributeValueLookup(ElementAttributeVM? attribute)
+        {
+            AttributeValueLookup?.Dispose();
+            AttributeValueLookup = AttributeValueLookupHostVM.IsAvailableFor(attribute)
+                ? new AttributeValueLookupHostVM(
+                    attribute!,
+                    _attributeValueService,
+                    _commandFactory)
+                : null;
         }
 
         internal void NotifyFormulaPropertyListChanged()

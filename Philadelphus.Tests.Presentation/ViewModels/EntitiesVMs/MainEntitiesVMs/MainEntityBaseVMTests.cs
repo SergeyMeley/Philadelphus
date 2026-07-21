@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using FluentAssertions;
 using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
@@ -13,6 +14,7 @@ using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Services.Interfaces;
 using Philadelphus.Presentation.ViewModels.ControlsVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.InfrastructureVMs;
+using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.RepositoryMembersVMs.RootMembersVMs;
 using Philadelphus.Tests.Common.Fakes.Entities;
@@ -58,6 +60,27 @@ public class MainEntityBaseVMTests
 
         graph.Attribute.Value.Should().BeSameAs(graph.Second);
         graph.Attribute.ValueFormula.Should().Be($"=[{graph.Second.Uuid}]");
+    }
+
+    [Fact]
+    public void AttributeValueLookupHost_IsAvailableOnlyForScalarCustomType()
+    {
+        var graph = CreateLookupHostGraph(LeaveAttributeMatchStatus.Resolved);
+        using var sut = graph.Host;
+
+        AttributeValueLookupHostVM.IsAvailableFor(graph.AttributeVM).Should().BeTrue();
+
+        graph.AttributeVM.IsCollectionValue = true;
+        AttributeValueLookupHostVM.IsAvailableFor(graph.AttributeVM).Should().BeFalse();
+
+        graph.AttributeVM.IsCollectionValue = false;
+        graph.AttributeVM.SelectedValueType = new SystemBaseTreeNodeModel(
+            graph.Attribute.OwningWorkingTree.ContentRoot,
+            graph.Attribute.OwningWorkingTree,
+            SystemBaseType.STRING,
+            new FakeNotificationService(),
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        AttributeValueLookupHostVM.IsAvailableFor(graph.AttributeVM).Should().BeFalse();
     }
 
     [Fact]
@@ -446,7 +469,12 @@ public class MainEntityBaseVMTests
             rootVM.AttributesVMs.Single(x => x.Model == attribute),
             service,
             new DefaultRelayCommandFactory());
-        return new(attribute, first, second, host);
+        return new(
+            attribute,
+            rootVM.AttributesVMs.Single(x => x.Model == attribute),
+            first,
+            second,
+            host);
     }
 
     private static TreeNodeVM CreateNodeVM(
@@ -485,6 +513,7 @@ public class MainEntityBaseVMTests
 
     private sealed record LookupHostGraph(
         ElementAttributeModel Attribute,
+        ElementAttributeVM AttributeVM,
         TreeLeaveModel First,
         TreeLeaveModel Second,
         AttributeValueLookupHostVM Host);

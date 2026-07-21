@@ -95,6 +95,27 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
             AvailableValues.Where(x => x.IsSelected).Select(x => x.Value.Uuid))
         : LeaveAttributeValueDraft.Scalar(DeclaringUuid, SelectedValue?.Value.Uuid);
 
+    internal void SetValue(ElementAttributeModel? source)
+    {
+        if (source != null && source.DeclaringUuid != DeclaringUuid)
+            throw new ArgumentException(
+                "Значение относится к другому объявлению атрибута.",
+                nameof(source));
+
+        if (IsCollection)
+        {
+            var selectedUuids = source?.Values.Select(x => x.Uuid).ToHashSet() ?? [];
+            foreach (var option in AvailableValues)
+                option.IsSelected = selectedUuids.Contains(option.Value.Uuid);
+        }
+        else
+        {
+            SelectedValue = source?.Value == null
+                ? null
+                : AvailableValues.SingleOrDefault(x => x.Value.Uuid == source.Value.Uuid);
+        }
+    }
+
     internal void NotifyCollectionChanged() => _changed();
 
     private static bool IsActive(TreeLeaveModel leave) =>

@@ -16,6 +16,7 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     private string? _systemValue;
     private IReadOnlyList<LeaveAttributeValueDraft> _attributeValues = [];
     private bool _hasAttributeValues;
+    private bool _isUpdatingAttributeCriteria;
     private LeaveAttributeMatchResult _result =
         new(LeaveAttributeMatchStatus.Invalid, []);
     private TreeLeaveModel? _createdLeave;
@@ -156,6 +157,41 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     }
 
     /// <summary>
+    /// Предварительно заполняет критерии эффективными значениями указанного листа.
+    /// </summary>
+    /// <param name="source">Текущий лист или null для точных пустых значений.</param>
+    public void SetAttributeValuesFrom(TreeLeaveModel? source)
+    {
+        if (IsSystemValue)
+            throw new InvalidOperationException(
+                "Атрибутные критерии недоступны для системного типа.");
+
+        var sourceAttributes = source?.Attributes
+            .Where(x => x.IsRuntime == false)
+            .ToDictionary(x => x.DeclaringUuid);
+        _isUpdatingAttributeCriteria = true;
+        try
+        {
+            foreach (var criterion in AttributeCriteria)
+            {
+                var value = sourceAttributes != null
+                    && sourceAttributes.TryGetValue(
+                        criterion.DeclaringUuid,
+                        out var sourceAttribute)
+                            ? sourceAttribute
+                            : null;
+                criterion.SetValue(value);
+            }
+        }
+        finally
+        {
+            _isUpdatingAttributeCriteria = false;
+        }
+
+        RefreshAttributeCriteria();
+    }
+
+    /// <summary>
     /// Повторяет поиск по текущим критериям и прямым активным листьям.
     /// </summary>
     public void Refresh()
@@ -180,8 +216,13 @@ public sealed class LeaveValueLookupVM : ViewModelBase
         _createCommand.RaiseCanExecuteChanged();
     }
 
-    private void RefreshAttributeCriteria() =>
+    private void RefreshAttributeCriteria()
+    {
+        if (_isUpdatingAttributeCriteria)
+            return;
+
         SetAttributeValues(AttributeCriteria.Select(x => x.CreateDraft()));
+    }
 
     private void Create()
     {

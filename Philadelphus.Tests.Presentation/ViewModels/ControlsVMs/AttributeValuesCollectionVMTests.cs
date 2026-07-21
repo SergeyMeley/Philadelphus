@@ -268,6 +268,22 @@ public class AttributeValuesCollectionVMTests
             .Should().BeEquivalentTo([graph.Second.Uuid]);
         scalar.Value.Should().BeNull();
         collection.Values.Should().BeEmpty();
+
+        var source = CreateLeave(valueType, graph.Tree, graph.Notifications, "Источник");
+        var sourceScalar = source.Attributes.Single(x => x.DeclaringUuid == scalarUuid);
+        var sourceCollection = source.Attributes.Single(x => x.DeclaringUuid == collectionUuid);
+        sourceScalar.Value = graph.Second;
+        sourceCollection.TryAddValueToValuesCollection(graph.First).Should().BeTrue();
+
+        sut.SetAttributeValuesFrom(source);
+
+        scalarCriterion.SelectedValue!.Value.Should().BeSameAs(graph.Second);
+        collectionCriterion.AvailableValues.Single(x => x.Value == graph.First)
+            .IsSelected.Should().BeTrue();
+        observed!.Single(x => x.DeclaringUuid == scalarUuid).ValueUuid
+            .Should().Be(graph.Second.Uuid);
+        observed.Single(x => x.DeclaringUuid == collectionUuid).ValueUuids
+            .Should().BeEquivalentTo([graph.First.Uuid]);
     }
 
     [Fact]

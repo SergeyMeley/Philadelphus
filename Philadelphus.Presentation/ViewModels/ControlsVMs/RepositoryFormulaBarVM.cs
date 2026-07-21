@@ -170,6 +170,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                         _repositoryExplorerVM.SelectedRepositoryMember.SelectedAttributeVM = value;
                     }
 
+                    _repositoryExplorerVM.UpdateAttributeValueLookup(value);
                     SelectAttributeFormulaCell(value);
                     _repositoryExplorerVM.NavigationVM.NotifySelectedAttributeChanged(value);
                 }
@@ -692,6 +693,13 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 || sender is not ElementAttributeVM attributeVM)
             {
                 return;
+            }
+
+            if (e.PropertyName is nameof(ElementAttributeVM.AssignedValue)
+                or nameof(ElementAttributeVM.SelectedValueType)
+                or nameof(ElementAttributeVM.IsCollectionValue))
+            {
+                _repositoryExplorerVM.UpdateAttributeValueLookup(attributeVM);
             }
 
             if (e.PropertyName is nameof(ElementAttributeVM.AssignedValue)

@@ -29,6 +29,10 @@ public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
         Attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
         ArgumentNullException.ThrowIfNull(attributeValueService);
         ArgumentNullException.ThrowIfNull(commandFactory);
+        if (IsAvailableFor(attribute) == false)
+            throw new ArgumentException(
+                "Расширенный поиск доступен только одиночному пользовательскому атрибуту.",
+                nameof(attribute));
         var valueType = attribute.SelectedValueType
             ?? throw new ArgumentException("Тип значения атрибута не задан.", nameof(attribute));
 
@@ -38,8 +42,19 @@ public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
             commandFactory);
         _selectCommand = commandFactory.Create(_ => Select(), _ => CanSelect);
         ValueLookup.PropertyChanged += HandleLookupPropertyChanged;
+        ValueLookup.SetAttributeValuesFrom(Attribute.AssignedValue);
         SynchronizeSelectedMatch();
     }
+
+    /// <summary>
+    /// Проверяет доступность расширенного поиска для атрибута.
+    /// </summary>
+    public static bool IsAvailableFor(ElementAttributeVM? attribute) =>
+        attribute != null
+        && attribute.IsRuntime == false
+        && attribute.IsCollectionValue == false
+        && attribute.SelectedValueType is not null and not SystemBaseTreeNodeModel
+        && string.IsNullOrEmpty(attribute.ValueTypeReferenceErrorCode);
 
     /// <summary>
     /// Атрибут, значение которого изменяется только явной командой выбора.
