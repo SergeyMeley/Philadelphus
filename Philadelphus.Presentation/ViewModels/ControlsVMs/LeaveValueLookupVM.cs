@@ -13,9 +13,11 @@ public sealed class LeaveValueLookupVM : ViewModelBase
 {
     private readonly ILeaveAttributeValueService _attributeValueService;
     private readonly IRelayCommand _createCommand;
+    private readonly bool _enablePartialMatch;
     private string? _systemValue;
     private IReadOnlyList<LeaveAttributeValueDraft> _attributeValues = [];
     private bool _hasAttributeValues;
+    private bool _onlyExactMatch;
     private bool _isUpdatingAttributeCriteria;
     private LeaveAttributeMatchResult _result =
         new(LeaveAttributeMatchStatus.Invalid, []);
@@ -30,12 +32,14 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     public LeaveValueLookupVM(
         TreeNodeModel valueType,
         ILeaveAttributeValueService attributeValueService,
-        IRelayCommandFactory commandFactory)
+        IRelayCommandFactory commandFactory,
+        bool enablePartialMatch = false)
     {
         ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
         _attributeValueService = attributeValueService
             ?? throw new ArgumentNullException(nameof(attributeValueService));
         ArgumentNullException.ThrowIfNull(commandFactory);
+        _enablePartialMatch = enablePartialMatch;
 
         _createCommand = commandFactory.Create(_ => Create(), _ => CanCreate);
         if (IsSystemValue)
@@ -88,6 +92,24 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     /// Полный набор редактируемых нерuntime-критериев пользовательского значения.
     /// </summary>
     public IReadOnlyList<LeaveValueLookupCriterionVM> AttributeCriteria { get; } = [];
+
+    /// <summary>
+    /// Указывает, что для текущего сценария доступно неполное совпадение.
+    /// </summary>
+    public bool CanConfigureExactMatch => _enablePartialMatch && IsSystemValue == false;
+
+    /// <summary>
+    /// Указывает, что пустые критерии сравниваются как точные пустые значения.
+    /// </summary>
+    public bool OnlyExactMatch
+    {
+        get => _onlyExactMatch;
+        set
+        {
+            if (SetProperty(ref _onlyExactMatch, value))
+                Refresh();
+        }
+    }
 
     /// <summary>
     /// Текущий статус поиска.
@@ -202,7 +224,7 @@ public sealed class LeaveValueLookupVM : ViewModelBase
                 _attributeValueService.FindSystemValue(systemType, SystemValue),
             _ when _hasAttributeValues && AttributeCriteria.All(x => x.IsValid) =>
                 _attributeValueService.FindMatches(
-                    AttributeValues,
+                    CreateSearchValues(),
                     ValueType.ChildLeaves.Where(IsActive)),
             _ => new(LeaveAttributeMatchStatus.Invalid, []),
         };
@@ -223,6 +245,13 @@ public sealed class LeaveValueLookupVM : ViewModelBase
 
         SetAttributeValues(AttributeCriteria.Select(x => x.CreateDraft()));
     }
+
+    private IEnumerable<LeaveAttributeValueDraft> CreateSearchValues() =>
+        CanConfigureExactMatch && OnlyExactMatch == false
+            ? AttributeValues.Select(x => x.IsEmpty
+                ? LeaveAttributeValueDraft.Any(x.DeclaringUuid, x.IsCollection)
+                : x)
+            : AttributeValues;
 
     private void Create()
     {

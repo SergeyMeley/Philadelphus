@@ -11,12 +11,14 @@ public sealed record LeaveAttributeValueDraft
         Guid declaringUuid,
         bool isCollection,
         Guid? valueUuid,
-        IReadOnlySet<Guid> valueUuids)
+        IReadOnlySet<Guid> valueUuids,
+        bool matchesAnyValue = false)
     {
         DeclaringUuid = declaringUuid;
         IsCollection = isCollection;
         ValueUuid = valueUuid;
         ValueUuids = valueUuids;
+        MatchesAnyValue = matchesAnyValue;
     }
 
     /// <summary>
@@ -38,6 +40,17 @@ public sealed record LeaveAttributeValueDraft
     /// Множество UUID коллекционного значения.
     /// </summary>
     public IReadOnlySet<Guid> ValueUuids { get; }
+
+    /// <summary>
+    /// Указывает, что значение объявления не участвует в сравнении.
+    /// </summary>
+    public bool MatchesAnyValue { get; }
+
+    /// <summary>
+    /// Указывает, что черновик содержит точное пустое значение.
+    /// </summary>
+    public bool IsEmpty => MatchesAnyValue == false
+        && (IsCollection ? ValueUuids.Count == 0 : ValueUuid is null);
 
     /// <summary>
     /// Создаёт черновик скалярного значения.
@@ -74,6 +87,20 @@ public sealed record LeaveAttributeValueDraft
             throw new ArgumentException("UUID значения не может быть пустым.", nameof(valueUuids));
 
         return new(declaringUuid, true, null, values);
+    }
+
+    /// <summary>
+    /// Создаёт критерий, принимающий любое значение указанного объявления.
+    /// </summary>
+    public static LeaveAttributeValueDraft Any(Guid declaringUuid, bool isCollection)
+    {
+        ValidateDeclaringUuid(declaringUuid);
+        return new(
+            declaringUuid,
+            isCollection,
+            null,
+            Array.Empty<Guid>().ToFrozenSet(),
+            matchesAnyValue: true);
     }
 
     private static void ValidateDeclaringUuid(Guid declaringUuid)

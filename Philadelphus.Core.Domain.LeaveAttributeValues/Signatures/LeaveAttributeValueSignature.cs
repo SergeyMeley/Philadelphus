@@ -68,7 +68,8 @@ internal sealed class LeaveAttributeValueSignature
         foreach (var draft in drafts)
         {
             ArgumentNullException.ThrowIfNull(draft);
-            if (values.TryAdd(draft.DeclaringUuid, CreateValue(draft)) == false)
+            if (draft.MatchesAnyValue
+                || values.TryAdd(draft.DeclaringUuid, CreateValue(draft)) == false)
                 return new(false, values);
         }
 

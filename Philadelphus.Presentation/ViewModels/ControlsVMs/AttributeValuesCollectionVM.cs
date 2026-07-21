@@ -458,7 +458,8 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
                 ? new LeaveValueLookupVM(
                     _attribute.ValueType,
                     _attributeValueService,
-                    _commandFactory)
+                    _commandFactory,
+                    enablePartialMatch: true)
                 : null;
         if (ValueLookup != null)
             ValueLookup.PropertyChanged += HandleValueLookupPropertyChanged;

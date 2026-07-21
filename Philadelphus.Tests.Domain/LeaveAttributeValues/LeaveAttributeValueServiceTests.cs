@@ -142,6 +142,35 @@ public class LeaveAttributeValueServiceTests
     }
 
     [Fact]
+    public void FindMatches_AnyDraftIgnoresEmptyDeclaration()
+    {
+        var graph = CreateGraph();
+        var ignored = CreateDeclaration(graph);
+        var compared = CreateDeclaration(graph);
+        var first = CreateLeave(graph);
+        var second = CreateLeave(graph);
+        SetValue(first, ignored, graph.FirstValue);
+        SetValue(second, ignored, graph.SecondValue);
+        SetValue(first, compared, graph.FirstValue);
+        SetValue(second, compared, graph.FirstValue);
+
+        var anyDraft = LeaveAttributeValueDraft.Any(
+            ignored.DeclaringUuid,
+            isCollection: false);
+        var result = CreateService().FindMatches(
+            [
+                anyDraft,
+                LeaveAttributeValueDraft.Scalar(compared.DeclaringUuid, graph.FirstValue.Uuid),
+            ],
+            [first, second]);
+
+        anyDraft.MatchesAnyValue.Should().BeTrue();
+        anyDraft.IsEmpty.Should().BeFalse();
+        result.Status.Should().Be(LeaveAttributeMatchStatus.Ambiguous);
+        result.Matches.Should().Equal(first, second);
+    }
+
+    [Fact]
     public void FindSystemValue_ComparesTypedValuesAndDetectsAmbiguity()
     {
         var graph = CreateGraph();

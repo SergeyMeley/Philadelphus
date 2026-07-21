@@ -67,6 +67,10 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <CheckBox IsVisible="{Binding CanConfigureExactMatch}"
+                      IsChecked="{Binding OnlyExactMatch, Mode=TwoWay}"
+                      Content="Только полное совпадение" />
+
             <Grid ColumnDefinitions="*,Auto,Auto"
                   ColumnSpacing="8">
                 <TextBlock Text="{Binding StatusText}" />

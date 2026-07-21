@@ -66,17 +66,25 @@ public sealed partial class LeaveAttributeValueService
         ArgumentNullException.ThrowIfNull(expectedValues);
         ArgumentNullException.ThrowIfNull(candidates);
 
-        var expectedSignature = LeaveAttributeValueSignature.Create(expectedValues);
+        var drafts = expectedValues.ToArray();
+        if (drafts.GroupBy(x => x.DeclaringUuid).Any(x => x.Count() > 1))
+            return new(LeaveAttributeMatchStatus.Invalid, []);
+        var comparedDrafts = drafts.Where(x => x.MatchesAnyValue == false).ToArray();
+        var expectedSignature = LeaveAttributeValueSignature.Create(comparedDrafts);
         if (expectedSignature.IsValid == false)
             return new(LeaveAttributeMatchStatus.Invalid, []);
 
+        var usesWildcardCriteria = drafts.Any(x => x.MatchesAnyValue);
+        var declaringUuids = expectedSignature.DeclaringUuids.ToHashSet();
         var matches = new List<TreeLeaveModel>();
         foreach (var candidate in candidates)
         {
             ArgumentNullException.ThrowIfNull(candidate);
 
-            var candidateSignature = LeaveAttributeValueSignature.Create(
-                candidate.Attributes.Where(x => x.IsRuntime == false));
+            var candidateAttributes = candidate.Attributes.Where(x =>
+                x.IsRuntime == false
+                && (usesWildcardCriteria == false || declaringUuids.Contains(x.DeclaringUuid)));
+            var candidateSignature = LeaveAttributeValueSignature.Create(candidateAttributes);
             if (candidateSignature.IsValid == false)
                 return new(LeaveAttributeMatchStatus.Invalid, []);
 

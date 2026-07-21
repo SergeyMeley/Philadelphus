@@ -327,6 +327,56 @@ public class AttributeValuesCollectionVMTests
     }
 
     [Fact]
+    public void LeaveValueLookup_EmptyCriteriaMatchAnyByDefaultAndCanRequireExactMatch()
+    {
+        var graph = CreateGraph();
+        var valueType = graph.Attribute.ValueType!;
+        var declarationUuid = Guid.NewGuid();
+        _ = new ElementAttributeModel(
+            declarationUuid,
+            valueType,
+            declarationUuid,
+            valueType,
+            graph.Tree,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<ElementAttributeModel>())
+        {
+            Name = "Criterion",
+            ValueType = valueType,
+        };
+        LeaveAttributeValueDraft? observed = null;
+        var service = new StubLeaveAttributeValueService(
+            (_, _) => new(LeaveAttributeMatchStatus.Invalid, []),
+            findDrafts: (drafts, _) =>
+            {
+                observed = drafts.Single();
+                return new(LeaveAttributeMatchStatus.NotFound, []);
+            });
+        var exactLookup = new LeaveValueLookupVM(
+            valueType, service, new DefaultRelayCommandFactory());
+
+        exactLookup.CanConfigureExactMatch.Should().BeFalse();
+        observed.Should().NotBeNull();
+        observed!.MatchesAnyValue.Should().BeFalse();
+
+        var sut = new LeaveValueLookupVM(
+            valueType,
+            service,
+            new DefaultRelayCommandFactory(),
+            enablePartialMatch: true);
+
+        sut.CanConfigureExactMatch.Should().BeTrue();
+        sut.OnlyExactMatch.Should().BeFalse();
+        observed!.MatchesAnyValue.Should().BeTrue();
+        observed.DeclaringUuid.Should().Be(declarationUuid);
+
+        sut.OnlyExactMatch = true;
+
+        observed.MatchesAnyValue.Should().BeFalse();
+        observed.IsEmpty.Should().BeTrue();
+    }
+
+    [Fact]
     public void Selection_ImmediatelyUpdatesCollectionWithoutDuplicates()
     {
         var graph = CreateGraph();
