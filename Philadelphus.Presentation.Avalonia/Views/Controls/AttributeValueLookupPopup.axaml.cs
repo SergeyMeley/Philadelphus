@@ -1,4 +1,5 @@
 using global::Avalonia.Controls.Primitives;
+using global::Avalonia.Interactivity;
 
 namespace Philadelphus.Presentation.Avalonia.Views.Controls;
 
@@ -14,4 +15,7 @@ public partial class AttributeValueLookupPopup : Popup
     {
         InitializeComponent();
     }
+
+    private void ClosePopup(object? sender, RoutedEventArgs eventArgs) =>
+        IsOpen = false;
 }

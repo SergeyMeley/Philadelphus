@@ -46,6 +46,7 @@
                   ItemsSource="{Binding SelectedRepositoryMember.AttributesVMs}"
                   SelectedItem="{Binding FormulaBarVM.SelectedFormulaAttribute, Mode=TwoWay}"
                   beh:DataGridRowSelectionBehavior.IsEnabled="True"
+                  beh:AttributeValueLookupPopupBehavior.Popup="{Binding #AttributeValueLookupPopup}"
                   SelectionMode="Single"
                   AutoGenerateColumns="False">
             <DataGrid.Styles>
@@ -106,7 +107,8 @@
                 <!-- Значение: подсветка «переопределено» (Moccasin, статусный цвет; текст чёрный для
                      читаемости в обеих темах) + редактируемый ввод через AutoCompleteBox
                      (Avalonia ComboBox не editable): ввод формулы — Text=FormulaValueText, выбор из ValuesList. -->
-                <DataGridTemplateColumn Header="Значение">
+                <DataGridTemplateColumn Header="Значение"
+                                        CellStyleClasses="attributeValue">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"

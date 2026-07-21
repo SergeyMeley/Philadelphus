@@ -2,7 +2,8 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
        xmlns:controls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
        x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.AttributeValueLookupPopup"
-       Placement="Pointer">
+       Placement="Bottom"
+       VerticalOffset="2">
     <Border Width="560"
             MaxHeight="620"
             Padding="10"
@@ -45,11 +46,17 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <Button Grid.Row="4"
-                    MinWidth="110"
-                    HorizontalAlignment="Right"
-                    Command="{Binding SelectCommand}"
-                    Content="Выбрать" />
+            <StackPanel Grid.Row="4"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                <Button MinWidth="90"
+                        Click="ClosePopup"
+                        Content="Закрыть" />
+                <Button MinWidth="110"
+                        Command="{Binding SelectCommand}"
+                        Content="Выбрать" />
+            </StackPanel>
         </Grid>
     </Border>
 </Popup>
