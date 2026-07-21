@@ -593,6 +593,23 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет вычисление фигурных скобок как короткого псевдонима МАССИВ.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Array_Brace_Alias_Returns_Leaves()
+        {
+            var first = CreateTreeLeave();
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"={{[{first.Uuid}]}}",
+                new FormulaExecutionContext { WorkingTree = first.OwningWorkingTree });
+
+            result.IsSuccess.Should().BeTrue();
+            result.TreeLeaves.Should().Equal(first);
+        }
+
+        /// <summary>
         /// Создает вычислитель с пустым реестром формул.
         /// </summary>
         /// <returns>Вычислитель AST формул.</returns>

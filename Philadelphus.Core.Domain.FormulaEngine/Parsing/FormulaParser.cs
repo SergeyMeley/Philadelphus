@@ -170,6 +170,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                 case FormulaTokenKind.OpenParenthesis:
                     expression = ParseParenthesizedExpression();
                     break;
+                case FormulaTokenKind.OpenBrace:
+                    expression = ParseArrayExpression();
+                    break;
                 default:
                     AddError($"Ожидалось выражение, но получен токен '{token.Text}'.", token);
                     Advance();
@@ -191,7 +194,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             var identifier = Consume(FormulaTokenKind.Identifier, "Ожидался идентификатор.");
             if (Match(FormulaTokenKind.OpenParenthesis))
             {
-                var arguments = ParseArguments();
+                var arguments = ParseArguments(FormulaTokenKind.CloseParenthesis);
                 var closeParenthesis = Consume(FormulaTokenKind.CloseParenthesis, "Вызов функции должен завершаться ')'.");
 
                 return new FunctionCallFormulaExpression(
@@ -217,6 +220,23 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
         }
 
         /// <summary>
+        /// Разбирает короткую запись массива в фигурных скобках как вызов функции МАССИВ.
+        /// </summary>
+        private FormulaExpression ParseArrayExpression()
+        {
+            var openBrace = Consume(FormulaTokenKind.OpenBrace, "Ожидалась '{'.");
+            var arguments = ParseArguments(FormulaTokenKind.CloseBrace);
+            var closeBrace = Consume(
+                FormulaTokenKind.CloseBrace,
+                "Массив должен завершаться '}'.");
+
+            return new FunctionCallFormulaExpression(
+                "МАССИВ",
+                arguments,
+                Merge(openBrace.Span, closeBrace.Span));
+        }
+
+        /// <summary>
         /// Разбирает постфиксные объектные вызовы вида target.МЕТОД(...).
         /// </summary>
         /// <param name="target">Выражение, от которого вызывается объектная функция.</param>
@@ -229,7 +249,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
             {
                 var methodName = Consume(FormulaTokenKind.Identifier, "После '.' должно идти имя объектной функции.");
                 Consume(FormulaTokenKind.OpenParenthesis, "Объектная функция должна содержать список аргументов в скобках.");
-                var arguments = ParseArguments();
+                var arguments = ParseArguments(FormulaTokenKind.CloseParenthesis);
                 var closeParenthesis = Consume(FormulaTokenKind.CloseParenthesis, "Объектная функция должна завершаться ')'.");
 
                 expression = new ObjectMethodCallFormulaExpression(
@@ -246,10 +266,10 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
         /// Разбирает список аргументов до закрывающей скобки.
         /// </summary>
         /// <returns>Список выражений-аргументов.</returns>
-        private IReadOnlyList<FormulaExpression> ParseArguments()
+        private IReadOnlyList<FormulaExpression> ParseArguments(FormulaTokenKind closingTokenKind)
         {
             var arguments = new List<FormulaExpression>();
-            if (Current.Kind == FormulaTokenKind.CloseParenthesis)
+            if (Current.Kind == closingTokenKind)
             {
                 return arguments;
             }

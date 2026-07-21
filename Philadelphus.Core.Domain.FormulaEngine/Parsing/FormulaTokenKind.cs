@@ -13,6 +13,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
         TreeLeaveReference,
         OpenParenthesis,
         CloseParenthesis,
+        OpenBrace,
+        CloseBrace,
         Dot,
         Semicolon,
         Plus,

@@ -40,6 +40,35 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет преобразование короткой записи массива в вызов МАССИВ.
+        /// </summary>
+        [Fact]
+        public void Parse_Builds_Array_Function_From_Brace_Alias()
+        {
+            var result = FormulaParser.Parse("{ЛИСТ(1;\"A\");ЛИСТ(1;\"B\")}");
+
+            result.IsSuccess.Should().BeTrue();
+            var expression = result.Expression.Should()
+                .BeOfType<FunctionCallFormulaExpression>().Subject;
+            expression.Name.Should().Be("МАССИВ");
+            expression.Arguments.Should().HaveCount(2)
+                .And.OnlyContain(x => x is FunctionCallFormulaExpression);
+        }
+
+        /// <summary>
+        /// Проверяет поддержку пустого массива.
+        /// </summary>
+        [Fact]
+        public void Parse_Builds_Empty_Array_Function()
+        {
+            var result = FormulaParser.Parse("{}");
+
+            result.IsSuccess.Should().BeTrue();
+            result.Expression.Should().BeOfType<FunctionCallFormulaExpression>()
+                .Which.Arguments.Should().BeEmpty();
+        }
+
+        /// <summary>
         /// Проверяет приоритет умножения над сложением.
         /// </summary>
         [Fact]

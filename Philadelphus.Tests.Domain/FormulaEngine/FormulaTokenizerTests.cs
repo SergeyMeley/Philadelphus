@@ -30,6 +30,25 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет распознавание фигурных скобок короткой записи массива.
+        /// </summary>
+        [Fact]
+        public void Tokenize_Recognizes_Array_Alias()
+        {
+            var result = FormulaTokenizer.Tokenize("={1;2}");
+
+            result.IsSuccess.Should().BeTrue();
+            result.Tokens.Select(x => x.Kind).Should().ContainInOrder(
+                FormulaTokenKind.FormulaStart,
+                FormulaTokenKind.OpenBrace,
+                FormulaTokenKind.Number,
+                FormulaTokenKind.Semicolon,
+                FormulaTokenKind.Number,
+                FormulaTokenKind.CloseBrace,
+                FormulaTokenKind.End);
+        }
+
+        /// <summary>
         /// Проверяет разбор операторов сравнения, арифметики, конкатенации и условия.
         /// </summary>
         [Fact]

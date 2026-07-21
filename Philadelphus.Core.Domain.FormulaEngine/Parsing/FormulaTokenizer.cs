@@ -274,6 +274,14 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Parsing
                     _position++;
                     AddToken(FormulaTokenKind.CloseParenthesis, start, _position);
                     break;
+                case '{':
+                    _position++;
+                    AddToken(FormulaTokenKind.OpenBrace, start, _position);
+                    break;
+                case '}':
+                    _position++;
+                    AddToken(FormulaTokenKind.CloseBrace, start, _position);
+                    break;
                 case '.':
                     _position++;
                     AddToken(FormulaTokenKind.Dot, start, _position);
