@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
              xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.Attributes">
@@ -43,6 +44,7 @@
                   Grid.Row="2"
                   ItemsSource="{Binding SelectedRepositoryMember.AttributesVMs}"
                   SelectedItem="{Binding FormulaBarVM.SelectedFormulaAttribute, Mode=TwoWay}"
+                  beh:DataGridRowSelectionBehavior.IsEnabled="True"
                   SelectionMode="Single"
                   AutoGenerateColumns="False">
             <DataGrid.Styles>
