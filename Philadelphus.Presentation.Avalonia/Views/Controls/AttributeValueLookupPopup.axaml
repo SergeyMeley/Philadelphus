@@ -1,0 +1,55 @@
+<Popup xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:controls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
+       x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.AttributeValueLookupPopup"
+       Placement="Pointer">
+    <Border Width="560"
+            MaxHeight="620"
+            Padding="10"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+            BorderThickness="1"
+            CornerRadius="4">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
+              RowSpacing="8">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="4">
+                <TextBlock FontWeight="SemiBold"
+                           Text="Расширенный выбор значения:" />
+                <TextBlock Text="{Binding Attribute.Name}" />
+            </StackPanel>
+
+            <controls:LeaveValueLookupControl Grid.Row="1"
+                                              DataContext="{Binding ValueLookup}" />
+
+            <TextBlock Grid.Row="2"
+                       FontWeight="SemiBold"
+                       Text="Найденные кандидаты" />
+
+            <ListBox Grid.Row="3"
+                     MinHeight="72"
+                     MaxHeight="180"
+                     ItemsSource="{Binding Matches}"
+                     SelectedItem="{Binding SelectedMatch, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto"
+                              Margin="4,3">
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Grid.Column="1"
+                                       Margin="12,0,0,0"
+                                       Opacity="0.65"
+                                       Text="{Binding Uuid}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Button Grid.Row="4"
+                    MinWidth="110"
+                    HorizontalAlignment="Right"
+                    Command="{Binding SelectCommand}"
+                    Content="Выбрать" />
+        </Grid>
+    </Border>
+</Popup>

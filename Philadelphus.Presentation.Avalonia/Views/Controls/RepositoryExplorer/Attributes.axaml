@@ -3,6 +3,7 @@
              xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
              xmlns:local="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer"
              xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
+             xmlns:views="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.RepositoryExplorer.Attributes">
     <Grid RowDefinitions="Auto,Auto,*,Auto">
         <!-- Тулбар атрибутов -->
@@ -192,6 +193,9 @@
                 <DataGridTextColumn Header="Владелец" Binding="{Binding DeclaringOwner.Name}" IsReadOnly="True" CellStyleClasses="runtimeMetadata" />
             </DataGrid.Columns>
         </DataGrid>
+
+        <views:AttributeValueLookupPopup x:Name="AttributeValueLookupPopup"
+                                         DataContext="{Binding AttributeValueLookup}" />
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding #SelectedElementAttributesDataGrid.SelectedIndex, Converter={StaticResource selectedIndexConverter}}" FontSize="10" />
