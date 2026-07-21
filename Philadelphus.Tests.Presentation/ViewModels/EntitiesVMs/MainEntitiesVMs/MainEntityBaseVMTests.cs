@@ -63,6 +63,31 @@ public class MainEntityBaseVMTests
     }
 
     [Fact]
+    public void AttributeValueLookupHost_CreatedMatchRequiresSeparateSelection()
+    {
+        var graph = CreateLookupHostGraph(
+            LeaveAttributeMatchStatus.NotFound,
+            canCreate: true);
+        using var sut = graph.Host;
+
+        sut.ValueLookup.CreateCommand.CanExecute(null).Should().BeTrue();
+        graph.Attribute.Value.Should().BeNull();
+
+        sut.ValueLookup.CreateCommand.Execute(null);
+
+        sut.ValueLookup.CreatedLeave.Should().BeSameAs(graph.First);
+        sut.SelectedMatch.Should().BeSameAs(graph.First);
+        sut.SelectCommand.CanExecute(null).Should().BeTrue();
+        graph.Attribute.Value.Should().BeNull();
+        graph.Attribute.ValueFormula.Should().BeEmpty();
+
+        sut.SelectCommand.Execute(null);
+
+        graph.Attribute.Value.Should().BeSameAs(graph.First);
+        graph.Attribute.ValueFormula.Should().Be($"=[{graph.First.Uuid}]");
+    }
+
+    [Fact]
     public void AttributeValueLookupHost_IsAvailableOnlyForScalarCustomType()
     {
         var graph = CreateLookupHostGraph(LeaveAttributeMatchStatus.Resolved);
@@ -441,7 +466,8 @@ public class MainEntityBaseVMTests
     }
 
     private static LookupHostGraph CreateLookupHostGraph(
-        LeaveAttributeMatchStatus status)
+        LeaveAttributeMatchStatus status,
+        bool canCreate = false)
     {
         var notificationService = new FakeNotificationService();
         var tree = new FakeWorkingTreeModel();
@@ -461,10 +487,15 @@ public class MainEntityBaseVMTests
             DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
             DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
             notificationService);
-        var matches = status == LeaveAttributeMatchStatus.Resolved
-            ? new[] { first }
-            : [first, second];
-        var service = new LookupServiceStub(new(status, matches));
+        IReadOnlyList<TreeLeaveModel> matches = status switch
+        {
+            LeaveAttributeMatchStatus.Resolved => [first],
+            LeaveAttributeMatchStatus.Ambiguous => [first, second],
+            _ => [],
+        };
+        var service = new LookupServiceStub(
+            new(status, matches),
+            canCreate ? first : null);
         var host = new AttributeValueLookupHostVM(
             rootVM.AttributesVMs.Single(x => x.Model == attribute),
             service,
@@ -518,12 +549,16 @@ public class MainEntityBaseVMTests
         TreeLeaveModel Second,
         AttributeValueLookupHostVM Host);
 
-    private sealed class LookupServiceStub(LeaveAttributeMatchResult result)
+    private sealed class LookupServiceStub(
+        LeaveAttributeMatchResult result,
+        TreeLeaveModel? createdLeave = null)
         : ILeaveAttributeValueService
     {
+        private LeaveAttributeMatchResult _result = result;
+
         public LeaveAttributeMatchResult FindMatches(
             IEnumerable<LeaveAttributeValueDraft> expectedValues,
-            IEnumerable<TreeLeaveModel> candidates) => result;
+            IEnumerable<TreeLeaveModel> candidates) => _result;
 
         public LeaveAttributeMatchResult FindMatches(
             IEnumerable<ElementAttributeModel> expectedAttributes,
@@ -549,7 +584,14 @@ public class MainEntityBaseVMTests
 
         public TreeLeaveModel CreateLeave(
             TreeNodeModel parentNode,
-            IEnumerable<LeaveAttributeValueDraft> sourceValues) => throw new NotSupportedException();
+            IEnumerable<LeaveAttributeValueDraft> sourceValues)
+        {
+            if (createdLeave == null)
+                throw new NotSupportedException();
+
+            _result = new(LeaveAttributeMatchStatus.Resolved, [createdLeave]);
+            return createdLeave;
+        }
 
         public SystemBaseTreeLeaveModel CreateSystemValue(
             SystemBaseTreeNodeModel valueType,
