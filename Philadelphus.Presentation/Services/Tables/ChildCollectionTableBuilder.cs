@@ -353,26 +353,29 @@ namespace Philadelphus.Presentation.Services.Tables
                     x => x.BindingKey,
                     x => new Func<string?>(() => GetAttributeValueOverrideToolTip(child, x)));
 
-                // Каналы «отображаемый текст» и «текст редактирования» только для редактируемых
-                // одиночных атрибутных колонок (HasValueOptions) — чтобы ячейка значения работала
-                // идентично таблице атрибутов (формула / ссылка / системное значение / код ошибки).
-                var attributeValueColumns = columnsList
-                    .Where(x => x.IsAttribute && x.HasValueOptions)
+                // Отображаемый текст нужен всем атрибутным колонкам, включая readonly-проекции.
+                // Текст редактирования остаётся только у редактируемых одиночных атрибутов.
+                var attributeColumns = columnsList
+                    .Where(x => x.IsAttribute)
                     .ToList();
 
-                var displayTexts = attributeValueColumns.ToDictionary(
+                var editableAttributeValueColumns = attributeColumns
+                    .Where(x => x.HasValueOptions)
+                    .ToList();
+
+                var displayTexts = attributeColumns.ToDictionary(
                     x => x.BindingKey,
                     x => GetAttributeDisplayText(child, x.Key));
 
-                var displayTextRefreshers = attributeValueColumns.ToDictionary(
+                var displayTextRefreshers = attributeColumns.ToDictionary(
                     x => x.BindingKey,
                     x => new Func<string?>(() => GetAttributeDisplayText(child, x.Key)));
 
-                var editTextGetters = attributeValueColumns.ToDictionary(
+                var editTextGetters = editableAttributeValueColumns.ToDictionary(
                     x => x.BindingKey,
                     x => new Func<string?>(() => GetAttributeEditText(child, x.Key)));
 
-                var editTextSetters = attributeValueColumns.ToDictionary(
+                var editTextSetters = editableAttributeValueColumns.ToDictionary(
                     x => x.BindingKey,
                     x => new Action<string?>(value => SetAttributeEditText(child, x.Key, value)));
 
@@ -669,16 +672,7 @@ namespace Philadelphus.Presentation.Services.Tables
 
             if (attribute.IsCollectionValue)
             {
-                var values = attribute.Values
-                    .Select(x => x.Name)
-                    .Where(x => string.IsNullOrWhiteSpace(x) == false)
-                    .ToList();
-                if (string.IsNullOrWhiteSpace(attribute.ValuesReferenceErrorCode) == false)
-                {
-                    values.Add(attribute.ValuesReferenceErrorCode);
-                }
-
-                return values.Count == 0 ? null : string.Join("; ", values);
+                return GetCollectionAttributeDisplayText(attribute);
             }
 
             if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false
@@ -789,9 +783,28 @@ namespace Philadelphus.Presentation.Services.Tables
         private static string? GetAttributeDisplayText(IChildrenModel child, string attributeName)
         {
             var attribute = GetAttribute(child, attributeName);
-            return attribute == null
-                ? null
+            if (attribute == null)
+            {
+                return null;
+            }
+
+            return attribute.IsCollectionValue
+                ? GetCollectionAttributeDisplayText(attribute)
                 : AttributeValueText.GetDisplayText(attribute);
+        }
+
+        private static string? GetCollectionAttributeDisplayText(ElementAttributeModel attribute)
+        {
+            var values = attribute.Values
+                .Select(x => x.Name)
+                .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                .ToList();
+            if (string.IsNullOrWhiteSpace(attribute.ValuesReferenceErrorCode) == false)
+            {
+                values.Add(attribute.ValuesReferenceErrorCode);
+            }
+
+            return values.Count == 0 ? null : string.Join("; ", values);
         }
 
         /// <summary>

@@ -129,6 +129,22 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
         {
             var fixture = CreateFixture();
             var attribute = fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб");
+            var stringNode = new SystemBaseTreeNodeModel(
+                fixture.Root,
+                fixture.Root.OwningWorkingTree,
+                SystemBaseType.STRING,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeNodeModel>());
+            var stringValue = new SystemBaseTreeLeaveModel(
+                Guid.CreateVersion7(),
+                stringNode,
+                fixture.Root.OwningWorkingTree,
+                SystemBaseType.STRING,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>())
+            {
+                StringValue = "Отображаемый текст",
+            };
             var secondUuid = Guid.CreateVersion7();
             _ = new ElementAttributeModel(
                 secondUuid,
@@ -140,8 +156,8 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
                 new EmptyPropertiesPolicy<ElementAttributeModel>())
             {
                 Name = "Цена, руб",
-                ValueType = fixture.Node,
-                Value = fixture.Leave,
+                ValueType = stringNode,
+                Value = stringValue,
             };
 
             var columns = LeaveTableProjectionBuilder.buildLeaveTableColumns([fixture.Leave]);
@@ -163,7 +179,11 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
             row[nameof(ISequencableModel.Sequence)].Should().Be(10L);
             row[nameof(ILinkableByUuidModel.Uuid)].Should().Be(fixture.Leave.Uuid);
             row[attribute.DeclaringUuid.ToString()].Should().Be(fixture.PriceValue);
-            row[secondUuid.ToString()].Should().Be(fixture.Leave);
+            row[secondUuid.ToString()].Should().Be(stringValue);
+            var priceColumn = columns.Single(x => x.Key == attribute.DeclaringUuid.ToString());
+            var stringColumn = columns.Single(x => x.Key == secondUuid.ToString());
+            row.DisplayTexts[priceColumn.BindingKey].Should().Be("10000");
+            row.DisplayTexts[stringColumn.BindingKey].Should().Be("Отображаемый текст");
             row[$"{nameof(IMainEntityModel.AuditInfo)}.{nameof(AuditInfoModel.CreatedBy)}"]
                 .Should().Be("user123");
         }

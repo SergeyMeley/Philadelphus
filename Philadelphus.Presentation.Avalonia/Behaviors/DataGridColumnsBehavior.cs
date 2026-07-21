@@ -291,7 +291,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(4, 0),
                 };
-                text.Bind(TextBlock.TextProperty, new Binding($"[{column1.BindingKey}]"));
+                text.Bind(TextBlock.TextProperty, new Binding($"DisplayTexts[{column1.BindingKey}]"));
                 text.Bind(TextBlock.ForegroundProperty, OverrideForegroundBinding(column1.BindingKey));
                 return WrapWithOverride(column1, text);
             });
