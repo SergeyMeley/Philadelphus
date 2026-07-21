@@ -25,17 +25,18 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 public class MainEntityBaseVMTests
 {
     [Fact]
-    public void AttributeValueLookupHost_AssignsResolvedMatchOnlyByExplicitCommand()
+    public void AttributeValueLookupHost_AssignsResolvedMatchBySelectionCheckBox()
     {
         var graph = CreateLookupHostGraph(LeaveAttributeMatchStatus.Resolved);
         using var sut = graph.Host;
 
-        sut.SelectedMatch.Should().BeSameAs(graph.First);
-        sut.SelectCommand.CanExecute(null).Should().BeTrue();
+        sut.ValueLookup.CanConfigureExactMatch.Should().BeTrue();
+        sut.ValueLookup.OnlyExactMatch.Should().BeFalse();
         graph.Attribute.Value.Should().BeNull();
         graph.Attribute.ValueFormula.Should().BeEmpty();
 
-        sut.SelectCommand.Execute(null);
+        var selectionKey = sut.Columns[0].BindingKey;
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)[selectionKey] = true;
 
         graph.Attribute.Value.Should().BeSameAs(graph.First);
         graph.Attribute.ValueFormula.Should().Be($"=[{graph.First.Uuid}]");
@@ -47,23 +48,30 @@ public class MainEntityBaseVMTests
         var graph = CreateLookupHostGraph(LeaveAttributeMatchStatus.Ambiguous);
         using var sut = graph.Host;
 
-        sut.SelectedMatch.Should().BeNull();
-        sut.SelectCommand.CanExecute(null).Should().BeFalse();
         graph.Attribute.Value.Should().BeNull();
+        sut.Columns.First().Header.Should().Be("Выбрано");
+        sut.Columns[1].Header.Should().Be("Подходит");
+        sut.Columns.Select(x => x.Header).Should().NotContain("В массиве");
+        sut.Rows.Select(x => x.SourceUuid).Should().Contain(graph.First.Uuid)
+            .And.Contain(graph.Second.Uuid);
 
-        sut.SelectedMatch = graph.Second;
-
-        sut.SelectCommand.CanExecute(null).Should().BeTrue();
-        graph.Attribute.Value.Should().BeNull();
-
-        sut.SelectCommand.Execute(null);
+        var selectionKey = sut.Columns[0].BindingKey;
+        sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid)[selectionKey] = true;
 
         graph.Attribute.Value.Should().BeSameAs(graph.Second);
-        graph.Attribute.ValueFormula.Should().Be($"=[{graph.Second.Uuid}]");
+        sut.Rows.Count(x => Equals(x[selectionKey], true)).Should().Be(1);
+        sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid)[selectionKey].Should().Be(true);
+
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)[selectionKey] = true;
+
+        graph.Attribute.Value.Should().BeSameAs(graph.First);
+        graph.Attribute.ValueFormula.Should().Be($"=[{graph.First.Uuid}]");
+        sut.Rows.Count(x => Equals(x[selectionKey], true)).Should().Be(1);
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)[selectionKey].Should().Be(true);
     }
 
     [Fact]
-    public void AttributeValueLookupHost_CreatedMatchRequiresSeparateSelection()
+    public void AttributeValueLookupHost_CreatedMatchIsAssignedImmediately()
     {
         var graph = CreateLookupHostGraph(
             LeaveAttributeMatchStatus.NotFound,
@@ -76,15 +84,10 @@ public class MainEntityBaseVMTests
         sut.ValueLookup.CreateCommand.Execute(null);
 
         sut.ValueLookup.CreatedLeave.Should().BeSameAs(graph.First);
-        sut.SelectedMatch.Should().BeSameAs(graph.First);
-        sut.SelectCommand.CanExecute(null).Should().BeTrue();
-        graph.Attribute.Value.Should().BeNull();
-        graph.Attribute.ValueFormula.Should().BeEmpty();
-
-        sut.SelectCommand.Execute(null);
-
         graph.Attribute.Value.Should().BeSameAs(graph.First);
         graph.Attribute.ValueFormula.Should().Be($"=[{graph.First.Uuid}]");
+        var selectionKey = sut.Columns[0].BindingKey;
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)[selectionKey].Should().Be(true);
     }
 
     [Fact]

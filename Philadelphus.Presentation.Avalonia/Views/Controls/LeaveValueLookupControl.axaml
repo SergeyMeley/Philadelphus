@@ -1,87 +1,155 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
+             xmlns:localControls="clr-namespace:Philadelphus.Presentation.Avalonia.Controls"
              x:Class="Philadelphus.Presentation.Avalonia.Views.Controls.LeaveValueLookupControl">
-    <Border Padding="8"
-            BorderThickness="1"
-            CornerRadius="4"
-            BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-        <StackPanel Spacing="6">
-            <TextBlock Text="Поиск значения"
-                       FontWeight="SemiBold" />
+    <Grid RowDefinitions="Auto,*"
+          RowSpacing="8">
+        <HeaderedContentControl Header="Найти / Создать">
+            <Grid Margin="8"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="8">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="4"
+                            HorizontalAlignment="Left">
+                    <Button Width="25"
+                            Height="25"
+                            Padding="2,0"
+                            Classes="logbtn"
+                            Command="{Binding ValueLookup.CreateCommand}"
+                            ToolTip.Tip="Создать лист по условиям поиска">
+                        <localControls:ThemedSvg Icon="leave"
+                                                 Width="15"
+                                                 Height="15" />
+                    </Button>
+                    <Button Width="25"
+                            Height="25"
+                            Padding="2,0"
+                            Classes="logbtn"
+                            IsVisible="{Binding !ValueLookup.IsSystemValue}"
+                            Command="{Binding ValueLookup.ClearSelectedAttributeCriterionCommand}"
+                            ToolTip.Tip="Очистить значение выбранного атрибута">
+                        <localControls:ThemedSvg Icon="broom"
+                                                 Width="15"
+                                                 Height="15" />
+                    </Button>
+                </StackPanel>
 
-            <Grid ColumnDefinitions="180,320"
-                  ColumnSpacing="8"
-                  HorizontalAlignment="Left"
-                  IsVisible="{Binding IsSystemValue}">
-                <TextBlock VerticalAlignment="Center"
-                           Text="Значение:" />
-                <TextBox Grid.Column="1"
-                         Text="{Binding SystemValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Watermark="Введите значение для поиска" />
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="180,*"
+                      ColumnSpacing="8"
+                      IsVisible="{Binding ValueLookup.IsSystemValue}">
+                    <TextBlock VerticalAlignment="Center"
+                               Text="Значение:" />
+                    <TextBox Grid.Column="1"
+                             Text="{Binding ValueLookup.SystemValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Watermark="Введите значение для поиска" />
+                </Grid>
+
+                <DataGrid Grid.Row="1"
+                          IsVisible="{Binding !ValueLookup.IsSystemValue}"
+                          ItemsSource="{Binding ValueLookup.AttributeCriteria}"
+                          SelectedItem="{Binding ValueLookup.SelectedAttributeCriterion, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          CanUserResizeColumns="True"
+                          MinHeight="96"
+                          MaxHeight="240">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Атрибут"
+                                                Width="2*"
+                                                MinWidth="140"
+                                                IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding Name}"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip.Tip="{Binding DeclaringUuid}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Значение для поиска"
+                                                Width="3*"
+                                                MinWidth="240"
+                                                IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="4,2">
+                                        <ComboBox HorizontalAlignment="Stretch"
+                                                  IsVisible="{Binding !IsCollection}"
+                                                  ItemsSource="{Binding AvailableValues}"
+                                                  SelectedItem="{Binding SelectedValue, Mode=TwoWay}"
+                                                  PlaceholderText="Пустое значение">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding DisplayName}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <ItemsControl IsVisible="{Binding IsCollection}"
+                                                      ItemsSource="{Binding AvailableValues}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox Margin="0,0,12,2"
+                                                              Content="{Binding DisplayName}"
+                                                              IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
             </Grid>
+        </HeaderedContentControl>
 
-            <ItemsControl ItemsSource="{Binding AttributeCriteria}"
-                          IsVisible="{Binding !IsSystemValue}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid ColumnDefinitions="180,320,Auto"
-                              ColumnSpacing="8"
-                              HorizontalAlignment="Left"
-                              Margin="0,2">
-                            <TextBlock VerticalAlignment="Center"
-                                       Text="{Binding Name}"
-                                       ToolTip.Tip="{Binding DeclaringUuid}" />
-                            <ComboBox Grid.Column="1"
-                                      IsVisible="{Binding !IsCollection}"
-                                      ItemsSource="{Binding AvailableValues}"
-                                      SelectedItem="{Binding SelectedValue, Mode=TwoWay}"
-                                      PlaceholderText="Пустое значение">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding DisplayName}" />
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                            <Button Grid.Column="2"
-                                    IsVisible="{Binding !IsCollection}"
-                                    Command="{Binding ClearCommand}"
-                                    Content="Очистить" />
-                            <ItemsControl Grid.Column="1"
-                                          Grid.ColumnSpan="2"
-                                          IsVisible="{Binding IsCollection}"
-                                          ItemsSource="{Binding AvailableValues}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <CheckBox Margin="0,0,12,2"
-                                                  Content="{Binding DisplayName}"
-                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+        <HeaderedContentControl Grid.Row="1"
+                                Header="Доступные значения">
+            <Grid Margin="8"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="16">
+                        <CheckBox IsChecked="{Binding ShowOnlyMatches, Mode=TwoWay}"
+                                  Content="Показывать только подходящие"
+                                  ToolTip.Tip="При ошибке условий поиска отображаются все значения." />
+                        <CheckBox IsVisible="{Binding ValueLookup.CanConfigureExactMatch}"
+                                  IsChecked="{Binding ValueLookup.OnlyExactMatch, Mode=TwoWay}"
+                                  Content="Только полное совпадение" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               VerticalAlignment="Center"
+                               Text="{Binding SearchMatchCount, StringFormat='Совпадений: {0}'}" />
+                </Grid>
 
-            <CheckBox IsVisible="{Binding CanConfigureExactMatch}"
-                      IsChecked="{Binding OnlyExactMatch, Mode=TwoWay}"
-                      Content="Только полное совпадение" />
-
-            <Grid ColumnDefinitions="Auto,Auto,Auto"
-                  ColumnSpacing="16"
-                  HorizontalAlignment="Left">
-                <TextBlock Text="{Binding StatusText}" />
-                <TextBlock Grid.Column="1"
-                           Text="{Binding MatchCount, StringFormat='Совпадений: {0}'}" />
-                <Button Grid.Column="2"
-                        Command="{Binding CreateCommand}"
-                        Content="Создать" />
+                <DataGrid Grid.Row="1"
+                          MinHeight="140"
+                          AutoGenerateColumns="False"
+                          ItemsSource="{Binding Rows}"
+                          beh:DataGridColumnsBehavior.ColumnsSource="{Binding Columns}"
+                          beh:DataGridSearchResultsBehavior.IsEnabled="True"
+                          beh:DataGridSearchResultsBehavior.ResolvedRow="{Binding ResolvedSearchRow}">
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridRow.search-match">
+                            <Setter Property="Background" Value="#403CB371" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Style>
+                    </DataGrid.Styles>
+                </DataGrid>
             </Grid>
-        </StackPanel>
-    </Border>
+        </HeaderedContentControl>
+    </Grid>
 </UserControl>

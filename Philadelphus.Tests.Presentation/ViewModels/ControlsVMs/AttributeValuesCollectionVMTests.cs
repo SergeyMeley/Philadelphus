@@ -324,6 +324,16 @@ public class AttributeValuesCollectionVMTests
             .Should().Be(graph.Second.Uuid);
         observed.Single(x => x.DeclaringUuid == collectionUuid).ValueUuids
             .Should().BeEquivalentTo([graph.First.Uuid]);
+
+        sut.ClearSelectedAttributeCriterionCommand.CanExecute(null).Should().BeFalse();
+        sut.SelectedAttributeCriterion = scalarCriterion;
+        sut.ClearSelectedAttributeCriterionCommand.CanExecute(null).Should().BeTrue();
+        sut.ClearSelectedAttributeCriterionCommand.Execute(null);
+        scalarCriterion.SelectedValue.Should().BeNull();
+
+        sut.SelectedAttributeCriterion = collectionCriterion;
+        sut.ClearSelectedAttributeCriterionCommand.Execute(null);
+        collectionCriterion.AvailableValues.Should().OnlyContain(x => x.IsSelected == false);
     }
 
     [Fact]

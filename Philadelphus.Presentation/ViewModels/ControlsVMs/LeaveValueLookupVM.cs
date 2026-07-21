@@ -12,13 +12,16 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 public sealed class LeaveValueLookupVM : ViewModelBase
 {
     private readonly ILeaveAttributeValueService _attributeValueService;
-    private readonly IRelayCommand _createCommand;
+    private readonly IRelayCommandFactory _commandFactory;
     private readonly bool _enablePartialMatch;
+    private IRelayCommand? _createCommand;
+    private IRelayCommand? _clearSelectedAttributeCriterionCommand;
     private string? _systemValue;
     private IReadOnlyList<LeaveAttributeValueDraft> _attributeValues = [];
     private bool _hasAttributeValues;
     private bool _onlyExactMatch;
     private bool _isUpdatingAttributeCriteria;
+    private LeaveValueLookupCriterionVM? _selectedAttributeCriterion;
     private LeaveAttributeMatchResult _result =
         new(LeaveAttributeMatchStatus.Invalid, []);
     private TreeLeaveModel? _createdLeave;
@@ -29,19 +32,22 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     /// <param name="valueType">Узел, среди прямых листьев которого выполняется поиск.</param>
     /// <param name="attributeValueService">Сервис поиска и создания значений.</param>
     /// <param name="commandFactory">Фабрика команды явного создания.</param>
+    /// <param name="enablePartialMatch">Разрешает режим неполного совпадения.</param>
     public LeaveValueLookupVM(
         TreeNodeModel valueType,
         ILeaveAttributeValueService attributeValueService,
         IRelayCommandFactory commandFactory,
         bool enablePartialMatch = false)
     {
-        ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
-        _attributeValueService = attributeValueService
-            ?? throw new ArgumentNullException(nameof(attributeValueService));
+        ArgumentNullException.ThrowIfNull(valueType);
+        ArgumentNullException.ThrowIfNull(attributeValueService);
         ArgumentNullException.ThrowIfNull(commandFactory);
+
+        ValueType = valueType;
+        _attributeValueService = attributeValueService;
+        _commandFactory = commandFactory;
         _enablePartialMatch = enablePartialMatch;
 
-        _createCommand = commandFactory.Create(_ => Create(), _ => CanCreate);
         if (IsSystemValue)
         {
             Refresh();
@@ -92,6 +98,23 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     /// Полный набор редактируемых нерuntime-критериев пользовательского значения.
     /// </summary>
     public IReadOnlyList<LeaveValueLookupCriterionVM> AttributeCriteria { get; } = [];
+
+    /// <summary>
+    /// Выбранный в таблице критерий поиска.
+    /// </summary>
+    public LeaveValueLookupCriterionVM? SelectedAttributeCriterion
+    {
+        get => _selectedAttributeCriterion;
+        set
+        {
+            if (value != null && AttributeCriteria.Contains(value) == false)
+                throw new ArgumentException(
+                    "Критерий отсутствует в текущей таблице поиска.",
+                    nameof(value));
+            if (SetProperty(ref _selectedAttributeCriterion, value))
+                _clearSelectedAttributeCriterionCommand?.RaiseCanExecuteChanged();
+        }
+    }
 
     /// <summary>
     /// Указывает, что для текущего сценария доступно неполное совпадение.
@@ -163,7 +186,16 @@ public sealed class LeaveValueLookupVM : ViewModelBase
     /// <summary>
     /// Команда явного создания отсутствующего значения.
     /// </summary>
-    public IRelayCommand CreateCommand => _createCommand;
+    public IRelayCommand CreateCommand =>
+        _createCommand ??= _commandFactory.Create(_ => Create(), _ => CanCreate);
+
+    /// <summary>
+    /// Очищает значение выбранного критерия поиска.
+    /// </summary>
+    public IRelayCommand ClearSelectedAttributeCriterionCommand =>
+        _clearSelectedAttributeCriterionCommand ??= _commandFactory.Create(
+            _ => SelectedAttributeCriterion?.Clear(),
+            _ => SelectedAttributeCriterion != null);
 
     /// <summary>
     /// Заменяет критерии пользовательского значения и сразу повторяет поиск.
@@ -235,7 +267,7 @@ public sealed class LeaveValueLookupVM : ViewModelBase
         OnPropertyChanged(nameof(StatusText));
         OnPropertyChanged(nameof(ResolvedMatch));
         OnPropertyChanged(nameof(CanCreate));
-        _createCommand.RaiseCanExecuteChanged();
+        _createCommand?.RaiseCanExecuteChanged();
     }
 
     private void RefreshAttributeCriteria()

@@ -1,7 +1,11 @@
 using System.ComponentModel;
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
+using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
+using Philadelphus.Presentation.Models.Tables;
+using Philadelphus.Presentation.Services.Tables;
 using Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.ElementsContentVMs;
 
 namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
@@ -11,8 +15,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 /// </summary>
 public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
 {
-    private readonly IRelayCommand _selectCommand;
-    private TreeLeaveModel? _selectedMatch;
+    private bool _showOnlyMatches;
     private bool _isDisposed;
 
     /// <summary>
@@ -26,9 +29,11 @@ public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
         ILeaveAttributeValueService attributeValueService,
         IRelayCommandFactory commandFactory)
     {
-        Attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
+        ArgumentNullException.ThrowIfNull(attribute);
         ArgumentNullException.ThrowIfNull(attributeValueService);
         ArgumentNullException.ThrowIfNull(commandFactory);
+
+        Attribute = attribute;
         if (IsAvailableFor(attribute) == false)
             throw new ArgumentException(
                 "Расширенный поиск доступен только одиночному пользовательскому атрибуту.",
@@ -39,11 +44,11 @@ public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
         ValueLookup = new LeaveValueLookupVM(
             valueType,
             attributeValueService,
-            commandFactory);
-        _selectCommand = commandFactory.Create(_ => Select(), _ => CanSelect);
+            commandFactory,
+            enablePartialMatch: true);
         ValueLookup.PropertyChanged += HandleLookupPropertyChanged;
         ValueLookup.SetAttributeValuesFrom(Attribute.AssignedValue);
-        SynchronizeSelectedMatch();
+        RebuildTable();
     }
 
     /// <summary>
@@ -72,36 +77,37 @@ public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
     public IReadOnlyList<TreeLeaveModel> Matches => ValueLookup.Matches;
 
     /// <summary>
-    /// Кандидат, выбранный пользователем или однозначно разрешённый поиском.
+    /// Дескрипторы колонок таблицы доступных значений без колонки включения в массив.
     /// </summary>
-    public TreeLeaveModel? SelectedMatch
+    public IReadOnlyList<ChildCollectionTableColumn> Columns { get; private set; } = [];
+
+    /// <summary>
+    /// Строки таблицы доступных значений.
+    /// </summary>
+    public IReadOnlyList<ChildCollectionTableRow> Rows { get; private set; } = [];
+
+    /// <summary>
+    /// Количество значений, соответствующих текущим критериям.
+    /// </summary>
+    public int SearchMatchCount => ValueLookup.MatchCount;
+
+    /// <summary>
+    /// Строка единственного найденного значения.
+    /// </summary>
+    public ChildCollectionTableRow? ResolvedSearchRow { get; private set; }
+
+    /// <summary>
+    /// Указывает, что таблица должна скрывать неподходящие значения.
+    /// </summary>
+    public bool ShowOnlyMatches
     {
-        get => _selectedMatch;
+        get => _showOnlyMatches;
         set
         {
-            var match = value == null
-                ? null
-                : Matches.SingleOrDefault(x => x.Uuid == value.Uuid)
-                    ?? throw new ArgumentException(
-                        "Лист отсутствует среди текущих результатов поиска.",
-                        nameof(value));
-            if (SetProperty(ref _selectedMatch, match))
-            {
-                OnPropertyChanged(nameof(CanSelect));
-                _selectCommand.RaiseCanExecuteChanged();
-            }
+            if (SetProperty(ref _showOnlyMatches, value))
+                RebuildRows();
         }
     }
-
-    /// <summary>
-    /// Указывает, можно ли явно присвоить выбранного кандидата.
-    /// </summary>
-    public bool CanSelect => _isDisposed == false && SelectedMatch != null;
-
-    /// <summary>
-    /// Явно записывает выбранный лист формулой-ссылкой в исходный атрибут.
-    /// </summary>
-    public IRelayCommand SelectCommand => _selectCommand;
 
     /// <summary>
     /// Освобождает подписку на общий редактор поиска.
@@ -113,30 +119,111 @@ public sealed class AttributeValueLookupHostVM : ViewModelBase, IDisposable
 
         _isDisposed = true;
         ValueLookup.PropertyChanged -= HandleLookupPropertyChanged;
-        OnPropertyChanged(nameof(CanSelect));
-        _selectCommand.RaiseCanExecuteChanged();
-    }
-
-    private void Select()
-    {
-        if (CanSelect && SelectedMatch is { } selectedMatch)
-            Attribute.AssignedValue = selectedMatch;
     }
 
     private void HandleLookupPropertyChanged(
         object? sender,
         PropertyChangedEventArgs eventArgs)
     {
-        if (_isDisposed || eventArgs.PropertyName != nameof(LeaveValueLookupVM.Status))
+        if (_isDisposed)
             return;
 
-        OnPropertyChanged(nameof(Matches));
-        SynchronizeSelectedMatch();
+        if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.CreatedLeave)
+            && ValueLookup.CreatedLeave is { } createdLeave)
+        {
+            Attribute.AssignedValue = createdLeave;
+        }
+        else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.Matches))
+        {
+            OnPropertyChanged(nameof(Matches));
+            OnPropertyChanged(nameof(SearchMatchCount));
+            RebuildRows();
+        }
     }
 
-    private void SynchronizeSelectedMatch()
+    private void RebuildTable()
     {
-        SelectedMatch = ValueLookup.ResolvedMatch
-            ?? Matches.SingleOrDefault(x => x.Uuid == SelectedMatch?.Uuid);
+        var leaves = GetAvailableLeaves();
+        Columns =
+        [
+            CreateSelectionColumn(),
+            CreateSearchMatchColumn(),
+            .. LeaveTableProjectionBuilder.buildLeaveTableColumns(leaves, startOrder: 2),
+        ];
+        OnPropertyChanged(nameof(Columns));
+        RebuildRows(leaves);
     }
+
+    private void RebuildRows(IEnumerable<TreeLeaveModel>? leaves = null)
+    {
+        var values = leaves?.ToArray() ?? GetAvailableLeaves();
+        var rows = LeaveTableProjectionBuilder.buildLeaveTableRows(values, Columns);
+        var matchingUuids = Matches.Select(x => x.Uuid).ToHashSet();
+        Rows = ShowOnlyMatches && ValueLookup.Status != LeaveAttributeMatchStatus.Invalid
+            ? rows.Where(x => matchingUuids.Contains(x.SourceUuid)).ToArray()
+            : rows;
+        ResolvedSearchRow = ValueLookup.ResolvedMatch == null
+            ? null
+            : Rows.SingleOrDefault(x => x.SourceUuid == ValueLookup.ResolvedMatch.Uuid);
+        OnPropertyChanged(nameof(Rows));
+        OnPropertyChanged(nameof(ResolvedSearchRow));
+    }
+
+    private ChildCollectionTableColumn CreateSearchMatchColumn() => new(
+        "IsSearchMatch",
+        "Подходит",
+        1,
+        child => child is TreeLeaveModel leave
+            ? IsSearchMatch(leave)
+            : null,
+        columnType: ChildCollectionTableColumnType.CheckBox,
+        cellEnabledGetter: _ => false,
+        headerToolTip: "Соответствие текущим условиям поиска.");
+
+    private ChildCollectionTableColumn CreateSelectionColumn() => new(
+        "IsSelected",
+        "Выбрано",
+        0,
+        child => child is TreeLeaveModel leave && IsSelected(leave),
+        isReadOnly: false,
+        setterFactory: child => child is TreeLeaveModel leave
+            ? value =>
+            {
+                TrySetSelected(leave, value is true);
+                return IsSelected(leave);
+            }
+            : null,
+        columnType: ChildCollectionTableColumnType.CheckBox,
+        headerToolTip: "Для одиночного атрибута может быть выбрано только одно значение.");
+
+    private bool IsSelected(TreeLeaveModel leave) =>
+        Attribute.AssignedValue?.Uuid == leave.Uuid;
+
+    private void TrySetSelected(TreeLeaveModel leave, bool selected)
+    {
+        if (selected == IsSelected(leave))
+            return;
+
+        Attribute.AssignedValue = selected ? leave : null;
+        RebuildRows();
+    }
+
+    private bool? IsSearchMatch(TreeLeaveModel leave) =>
+        ValueLookup.Status == LeaveAttributeMatchStatus.Invalid
+            ? null
+            : Matches.Any(x => x.Uuid == leave.Uuid);
+
+    private TreeLeaveModel[] GetAvailableLeaves() =>
+        ValueLookup.ValueType.ChildLeaves
+            .Where(IsActive)
+            .OrderBy(x => x.Sequence)
+            .ThenBy(x => x.Name)
+            .ThenBy(x => x.Uuid)
+            .ToArray();
+
+    private static bool IsActive(TreeLeaveModel value) =>
+        value.AuditInfo.IsDeleted == false
+        && value.State is not State.ForSoftDelete
+            and not State.ForHardDelete
+            and not State.SoftDeleted;
 }

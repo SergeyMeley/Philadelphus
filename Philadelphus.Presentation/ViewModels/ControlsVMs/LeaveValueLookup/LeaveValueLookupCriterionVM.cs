@@ -12,6 +12,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs;
 public sealed class LeaveValueLookupCriterionVM : ViewModelBase
 {
     private readonly Action _changed;
+    private readonly IRelayCommandFactory _commandFactory;
+    private IRelayCommand? _clearCommand;
     private LeaveValueLookupOptionVM? _selectedValue;
 
     /// <summary>
@@ -24,9 +26,13 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
         ElementAttributeModel attribute,
         Action changed, IRelayCommandFactory commandFactory)
     {
-        Attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
-        _changed = changed ?? throw new ArgumentNullException(nameof(changed));
-        ClearCommand = (commandFactory ?? throw new ArgumentNullException(nameof(commandFactory))).Create(_ => SelectedValue = null);
+        ArgumentNullException.ThrowIfNull(attribute);
+        ArgumentNullException.ThrowIfNull(changed);
+        ArgumentNullException.ThrowIfNull(commandFactory);
+
+        Attribute = attribute;
+        _changed = changed;
+        _commandFactory = commandFactory;
         AvailableValues = attribute.ValueType?.ChildLeaves
             .Where(IsActive)
             .OrderBy(x => x.Sequence)
@@ -70,9 +76,10 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
     public IReadOnlyList<LeaveValueLookupOptionVM> AvailableValues { get; }
 
     /// <summary>
-    /// Команда очистки скалярного критерия.
+    /// Команда очистки выбранных значений критерия.
     /// </summary>
-    public IRelayCommand ClearCommand { get; }
+    public IRelayCommand ClearCommand =>
+        _clearCommand ??= _commandFactory.Create(_ => Clear());
 
     /// <summary>
     /// Выбранное значение скалярного критерия или null для пустого значения.
@@ -117,6 +124,18 @@ public sealed class LeaveValueLookupCriterionVM : ViewModelBase
     }
 
     internal void NotifyCollectionChanged() => _changed();
+
+    internal void Clear()
+    {
+        if (IsCollection)
+        {
+            foreach (var option in AvailableValues.Where(x => x.IsSelected).ToArray())
+                option.IsSelected = false;
+            return;
+        }
+
+        SelectedValue = null;
+    }
 
     private static bool IsActive(TreeLeaveModel leave) =>
         leave.AuditInfo.IsDeleted == false

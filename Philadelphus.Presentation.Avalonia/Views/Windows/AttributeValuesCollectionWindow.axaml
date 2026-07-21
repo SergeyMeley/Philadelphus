@@ -1,6 +1,5 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:beh="clr-namespace:Philadelphus.Presentation.Avalonia.Behaviors"
         xmlns:controls="clr-namespace:Philadelphus.Presentation.Avalonia.Views.Controls"
         x:Class="Philadelphus.Presentation.Avalonia.Views.Windows.AttributeValuesCollectionWindow"
         Title="{Binding WindowTitle}"
@@ -9,7 +8,7 @@
         MinWidth="700"
         MinHeight="400"
         WindowStartupLocation="CenterOwner">
-    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="8">
+    <Grid RowDefinitions="Auto,*" Margin="8">
         <StackPanel Margin="0,0,0,8">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Владелец: " FontWeight="SemiBold" />
@@ -21,28 +20,6 @@
             </StackPanel>
         </StackPanel>
 
-        <controls:LeaveValueLookupControl Grid.Row="1"
-                                          Margin="0,0,0,8"
-                                          DataContext="{Binding ValueLookup}" />
-
-        <CheckBox Grid.Row="2"
-                  Margin="0,0,0,8"
-                  IsChecked="{Binding ShowOnlyMatches, Mode=TwoWay}"
-                  Content="Показывать только подходящие"
-                  ToolTip.Tip="При ошибке условий поиска отображаются все значения." />
-
-        <DataGrid Grid.Row="3"
-                  AutoGenerateColumns="False"
-                  ItemsSource="{Binding Rows}"
-                  beh:DataGridColumnsBehavior.ColumnsSource="{Binding Columns}"
-                  beh:DataGridSearchResultsBehavior.IsEnabled="True"
-                  beh:DataGridSearchResultsBehavior.ResolvedRow="{Binding ResolvedSearchRow}">
-            <DataGrid.Styles>
-                <Style Selector="DataGridRow.search-match">
-                    <Setter Property="Background" Value="#403CB371" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                </Style>
-            </DataGrid.Styles>
-        </DataGrid>
+        <controls:LeaveValueLookupControl Grid.Row="1" />
     </Grid>
 </Window>
