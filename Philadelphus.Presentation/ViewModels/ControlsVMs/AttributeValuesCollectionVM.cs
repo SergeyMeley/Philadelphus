@@ -24,6 +24,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
     private readonly IRelayCommandFactory? _commandFactory;
     private ElementAttributeVM? _attributeVM;
     private bool _isDisposed;
+    private bool _showOnlyMatches;
     private string? _systemSearchValue;
     private LeaveAttributeMatchResult _searchResult =
         new(LeaveAttributeMatchStatus.Invalid, []);
@@ -236,6 +237,23 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
     public ChildCollectionTableRow? ResolvedSearchRow { get; private set; }
 
     /// <summary>
+    /// Указывает, что таблица должна скрывать строки, не соответствующие текущему поиску.
+    /// </summary>
+    public bool ShowOnlyMatches
+    {
+        get => _showOnlyMatches;
+        set
+        {
+            if (SetProperty(ref _showOnlyMatches, value) == false)
+                return;
+
+            RebuildRows(Values.Select(x => x.Value));
+            OnPropertyChanged(nameof(Rows));
+            OnPropertyChanged(nameof(ResolvedSearchRow));
+        }
+    }
+
+    /// <summary>
     /// Общий редактор поиска и явного создания значения атрибута.
     /// </summary>
     public LeaveValueLookupVM? ValueLookup { get; private set; }
@@ -348,7 +366,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
         cellToolTipGetter: _ => SelectionToolTip);
 
     private ChildCollectionTableColumn CreateSearchMatchColumn() => new(
-        "IsSearchMatch",
+        nameof(IsSearchMatch),
         "Подходит",
         1,
         child => child is TreeLeaveModel leave ? IsSearchMatch(leave) : null,
@@ -380,7 +398,11 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
 
     private void RebuildRows(IEnumerable<TreeLeaveModel> leaves)
     {
-        Rows = LeaveTableProjectionBuilder.buildLeaveTableRows(leaves, Columns);
+        var rows = LeaveTableProjectionBuilder.buildLeaveTableRows(leaves, Columns);
+        var matchingUuids = _searchResult.Matches.Select(x => x.Uuid).ToHashSet();
+        Rows = ShowOnlyMatches && SearchStatus != LeaveAttributeMatchStatus.Invalid
+            ? rows.Where(x => matchingUuids.Contains(x.SourceUuid)).ToArray()
+            : rows;
         ResolvedSearchRow = ResolvedSearchMatch == null
             ? null
             : Rows.SingleOrDefault(x => x.SourceUuid == ResolvedSearchMatch.Uuid);
