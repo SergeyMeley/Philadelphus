@@ -139,7 +139,8 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
                     new ComparisonFormulaProvider(),
                     new TextFormulaProvider(),
                     new ConditionalFormulaProvider(),
-                    new TreeLeaveFormulaProvider()
+                    new TreeLeaveFormulaProvider(),
+                    new CollectionFormulaProvider()
                 }
                 .SelectMany(provider => provider.GetFormulas())
                 .ToList();

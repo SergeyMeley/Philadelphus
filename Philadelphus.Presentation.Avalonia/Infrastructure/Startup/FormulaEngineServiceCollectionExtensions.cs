@@ -18,6 +18,7 @@ namespace Philadelphus.Presentation.Avalonia.Infrastructure.Startup
             services.AddSingleton<IFormulaProvider, TextFormulaProvider>();
             services.AddSingleton<IFormulaProvider, ConditionalFormulaProvider>();
             services.AddSingleton<IFormulaProvider, TreeLeaveFormulaProvider>();
+            services.AddSingleton<IFormulaProvider, CollectionFormulaProvider>();
 
             services.AddSingleton(serviceProvider =>
             {

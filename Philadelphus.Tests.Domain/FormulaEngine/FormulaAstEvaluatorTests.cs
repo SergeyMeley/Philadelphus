@@ -549,6 +549,50 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет, что МАССИВ принимает любые выражения, возвращающие листья дерева.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Array_Returns_Leaves_From_Expressions()
+        {
+            var first = CreateTreeLeave();
+            var second = new TreeLeaveModel(
+                Guid.NewGuid(),
+                first.ParentNode,
+                first.OwningWorkingTree,
+                new FakeNotificationService(),
+                new EmptyPropertiesPolicy<TreeLeaveModel>());
+            var evaluator = CreateEvaluator();
+            var formula = $"=МАССИВ([{first.Uuid}];ЛИСТ(0;\"{second.Uuid}\"))";
+
+            var result = evaluator.Evaluate(formula, new FormulaExecutionContext
+            {
+                WorkingTree = first.OwningWorkingTree
+            });
+
+            result.IsSuccess.Should().BeTrue();
+            result.TreeLeave.Should().BeNull();
+            result.TreeLeaves.Should().Equal(first, second);
+        }
+
+        /// <summary>
+        /// Проверяет отказ МАССИВ принимать результат, не являющийся листом дерева.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Array_Returns_TypeMismatch_For_Non_Leave_Argument()
+        {
+            var first = CreateTreeLeave();
+            var evaluator = CreateEvaluator();
+
+            var result = evaluator.Evaluate(
+                $"=МАССИВ([{first.Uuid}];\"не лист\")",
+                new FormulaExecutionContext { WorkingTree = first.OwningWorkingTree });
+
+            result.IsSuccess.Should().BeFalse();
+            result.Error!.Code.Should().Be(FormulaErrorCode.TypeMismatch);
+            result.Error.FunctionOrOperator.Should().Be("МАССИВ");
+        }
+
+        /// <summary>
         /// Создает вычислитель с пустым реестром формул.
         /// </summary>
         /// <returns>Вычислитель AST формул.</returns>
@@ -556,6 +600,7 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         {
             var registry = new FormulaRegistry();
             registry.RegisterProvider(new TreeLeaveFormulaProvider());
+            registry.RegisterProvider(new CollectionFormulaProvider());
 
             return new FormulaAstEvaluator(registry);
         }

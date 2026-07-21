@@ -27,7 +27,9 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
             ArgumentNullException.ThrowIfNull(result);
             ArgumentNullException.ThrowIfNull(context);
 
-            if (result.IsSuccess == false || result.TreeLeave is not null)
+            if (result.IsSuccess == false
+                || result.TreeLeave is not null
+                || result.TreeLeaves is not null)
             {
                 return result;
             }

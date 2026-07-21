@@ -15,16 +15,19 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         /// <param name="value">Значение результата.</param>
         /// <param name="valueType">Системный тип результата.</param>
         /// <param name="treeLeave">Лист дерева, если результатом является лист.</param>
+        /// <param name="treeLeaves">Листья дерева, если результатом является коллекция листьев.</param>
         /// <param name="error">Ошибка вычисления, если результат неуспешный.</param>
         private FormulaResult(
             object? value,
             SystemBaseType valueType,
             TreeLeaveModel? treeLeave,
+            IReadOnlyList<TreeLeaveModel>? treeLeaves,
             FormulaError? error)
         {
             Value = value;
             ValueType = valueType;
             TreeLeave = treeLeave;
+            TreeLeaves = treeLeaves;
             Error = error;
         }
 
@@ -49,6 +52,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         public TreeLeaveModel? TreeLeave { get; }
 
         /// <summary>
+        /// Листья дерева, если результатом формулы является коллекция листьев.
+        /// </summary>
+        public IReadOnlyList<TreeLeaveModel>? TreeLeaves { get; }
+
+        /// <summary>
         /// Ошибка вычисления, если формула завершилась неуспешно.
         /// </summary>
         public FormulaError? Error { get; }
@@ -65,7 +73,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
             SystemBaseType valueType,
             TreeLeaveModel? treeLeave = null)
         {
-            return new FormulaResult(value, valueType, treeLeave, null);
+            return new FormulaResult(value, valueType, treeLeave, null, null);
         }
 
         /// <summary>
@@ -82,7 +90,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
                 return FromSystemBaseTreeLeave(systemBaseTreeLeave);
             }
 
-            return new FormulaResult(treeLeave, treeLeave.SystemBaseType, treeLeave, null);
+            return new FormulaResult(treeLeave, treeLeave.SystemBaseType, treeLeave, null, null);
         }
 
         /// <summary>
@@ -94,7 +102,20 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         {
             ArgumentNullException.ThrowIfNull(treeLeave);
 
-            return new FormulaResult(treeLeave.TypedValue, treeLeave.SystemBaseType, treeLeave, null);
+            return new FormulaResult(treeLeave.TypedValue, treeLeave.SystemBaseType, treeLeave, null, null);
+        }
+
+        /// <summary>
+        /// Создаёт успешный результат, содержащий коллекцию листьев дерева.
+        /// </summary>
+        /// <param name="treeLeaves">Вычисленные листья в порядке аргументов формулы.</param>
+        /// <returns>Успешный результат с коллекцией листьев.</returns>
+        public static FormulaResult FromTreeLeaves(IEnumerable<TreeLeaveModel> treeLeaves)
+        {
+            ArgumentNullException.ThrowIfNull(treeLeaves);
+
+            var values = treeLeaves.ToArray();
+            return new FormulaResult(values, SystemBaseType.USER_DEFINED, null, values, null);
         }
 
         /// <summary>
@@ -106,7 +127,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Execution
         {
             ArgumentNullException.ThrowIfNull(error);
 
-            return new FormulaResult(null, SystemBaseType.USER_DEFINED, null, error);
+            return new FormulaResult(null, SystemBaseType.USER_DEFINED, null, null, error);
         }
     }
 }
