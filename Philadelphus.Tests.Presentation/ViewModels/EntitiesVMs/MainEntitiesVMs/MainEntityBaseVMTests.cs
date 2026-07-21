@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using FluentAssertions;
+using Philadelphus.Core.Domain.Contracts.LeaveAttributeValues;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.Interfaces;
@@ -21,6 +22,44 @@ namespace Philadelphus.Tests.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs
 
 public class MainEntityBaseVMTests
 {
+    [Fact]
+    public void AttributeValueLookupHost_AssignsResolvedMatchOnlyByExplicitCommand()
+    {
+        var graph = CreateLookupHostGraph(LeaveAttributeMatchStatus.Resolved);
+        using var sut = graph.Host;
+
+        sut.SelectedMatch.Should().BeSameAs(graph.First);
+        sut.SelectCommand.CanExecute(null).Should().BeTrue();
+        graph.Attribute.Value.Should().BeNull();
+        graph.Attribute.ValueFormula.Should().BeEmpty();
+
+        sut.SelectCommand.Execute(null);
+
+        graph.Attribute.Value.Should().BeSameAs(graph.First);
+        graph.Attribute.ValueFormula.Should().Be($"=[{graph.First.Uuid}]");
+    }
+
+    [Fact]
+    public void AttributeValueLookupHost_AmbiguousMatchRequiresCandidateSelection()
+    {
+        var graph = CreateLookupHostGraph(LeaveAttributeMatchStatus.Ambiguous);
+        using var sut = graph.Host;
+
+        sut.SelectedMatch.Should().BeNull();
+        sut.SelectCommand.CanExecute(null).Should().BeFalse();
+        graph.Attribute.Value.Should().BeNull();
+
+        sut.SelectedMatch = graph.Second;
+
+        sut.SelectCommand.CanExecute(null).Should().BeTrue();
+        graph.Attribute.Value.Should().BeNull();
+
+        sut.SelectCommand.Execute(null);
+
+        graph.Attribute.Value.Should().BeSameAs(graph.Second);
+        graph.Attribute.ValueFormula.Should().Be($"=[{graph.Second.Uuid}]");
+    }
+
     [Fact]
     public void AttributeValuesCollectionVM_RefreshesAssignedValuesInAttributeVM()
     {
@@ -378,6 +417,38 @@ public class MainEntityBaseVMTests
             new EmptyPropertiesPolicy<ElementAttributeModel>());
     }
 
+    private static LookupHostGraph CreateLookupHostGraph(
+        LeaveAttributeMatchStatus status)
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(Guid.NewGuid(), tree, notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var valueType = new TreeNodeModel(Guid.NewGuid(), root, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var first = new TreeLeaveModel(Guid.NewGuid(), valueType, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var second = new TreeLeaveModel(Guid.NewGuid(), valueType, tree, notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        attribute.ValueType = valueType;
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var matches = status == LeaveAttributeMatchStatus.Resolved
+            ? new[] { first }
+            : [first, second];
+        var service = new LookupServiceStub(new(status, matches));
+        var host = new AttributeValueLookupHostVM(
+            rootVM.AttributesVMs.Single(x => x.Model == attribute),
+            service,
+            new DefaultRelayCommandFactory());
+        return new(attribute, first, second, host);
+    }
+
     private static TreeNodeVM CreateNodeVM(
         TreeNodeModel node,
         FakeWorkingTreeModel tree,
@@ -410,6 +481,50 @@ public class MainEntityBaseVMTests
         target.GetType()
             .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(target, value);
+    }
+
+    private sealed record LookupHostGraph(
+        ElementAttributeModel Attribute,
+        TreeLeaveModel First,
+        TreeLeaveModel Second,
+        AttributeValueLookupHostVM Host);
+
+    private sealed class LookupServiceStub(LeaveAttributeMatchResult result)
+        : ILeaveAttributeValueService
+    {
+        public LeaveAttributeMatchResult FindMatches(
+            IEnumerable<LeaveAttributeValueDraft> expectedValues,
+            IEnumerable<TreeLeaveModel> candidates) => result;
+
+        public LeaveAttributeMatchResult FindMatches(
+            IEnumerable<ElementAttributeModel> expectedAttributes,
+            IEnumerable<TreeLeaveModel> candidates) => throw new NotSupportedException();
+
+        public LeaveAttributeMatchResult FindSystemValue(
+            SystemBaseTreeNodeModel valueType,
+            string? expectedValue) => throw new NotSupportedException();
+
+        public LeaveAttributeFillResult FillFromLeave(
+            IAttributeOwnerModel targetOwner,
+            TreeLeaveModel sourceLeave,
+            IEnumerable<Guid> declaringUuids) => throw new NotSupportedException();
+
+        public int CountFillChanges(
+            IAttributeOwnerModel targetOwner,
+            TreeLeaveModel sourceLeave,
+            IEnumerable<Guid> declaringUuids) => throw new NotSupportedException();
+
+        public TreeLeaveModel CreateLeave(
+            TreeNodeModel parentNode,
+            IEnumerable<ElementAttributeModel> sourceAttributes) => throw new NotSupportedException();
+
+        public TreeLeaveModel CreateLeave(
+            TreeNodeModel parentNode,
+            IEnumerable<LeaveAttributeValueDraft> sourceValues) => throw new NotSupportedException();
+
+        public SystemBaseTreeLeaveModel CreateSystemValue(
+            SystemBaseTreeNodeModel valueType,
+            string value) => throw new NotSupportedException();
     }
 
     public class DefaultDispatchProxy : DispatchProxy
