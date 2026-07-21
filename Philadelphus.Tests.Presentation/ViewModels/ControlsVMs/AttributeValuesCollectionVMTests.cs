@@ -377,6 +377,66 @@ public class AttributeValuesCollectionVMTests
     }
 
     [Fact]
+    public void OnlyExactMatch_RefreshesRowsWhenMatchSetChangesWithoutStatusChange()
+    {
+        var graph = CreateGraph();
+        var valueType = graph.Attribute.ValueType!;
+        var comparedUuid = Guid.NewGuid();
+        _ = new ElementAttributeModel(
+            comparedUuid,
+            valueType,
+            comparedUuid,
+            valueType,
+            graph.Tree,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<ElementAttributeModel>())
+        {
+            Name = "Compared",
+            ValueType = valueType,
+        };
+        var emptyUuid = Guid.NewGuid();
+        _ = new ElementAttributeModel(
+            emptyUuid,
+            valueType,
+            emptyUuid,
+            valueType,
+            graph.Tree,
+            graph.Notifications,
+            new EmptyPropertiesPolicy<ElementAttributeModel>())
+        {
+            Name = "Empty",
+            ValueType = valueType,
+        };
+        var service = new StubLeaveAttributeValueService(
+            (_, _) => new(LeaveAttributeMatchStatus.Invalid, []),
+            findDrafts: (drafts, _) => drafts.Any(x => x.MatchesAnyValue)
+                ? new(LeaveAttributeMatchStatus.Ambiguous, [graph.First, graph.Second])
+                : new(LeaveAttributeMatchStatus.Ambiguous, [graph.Second, graph.Deleted]));
+        var sut = new AttributeValuesCollectionVM(
+            graph.Attribute,
+            service,
+            new DefaultRelayCommandFactory());
+        var matchKey = sut.Columns[1].BindingKey;
+        var comparedCriterion = sut.ValueLookup!.AttributeCriteria.Single(
+            x => x.DeclaringUuid == comparedUuid);
+
+        comparedCriterion.SelectedValue = comparedCriterion.AvailableValues.Single(
+            x => x.Value == graph.First);
+
+        sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.Ambiguous);
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)[matchKey].Should().Be(true);
+        sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid)[matchKey].Should().Be(true);
+        sut.Rows.Single(x => x.SourceUuid == graph.Deleted.Uuid)[matchKey].Should().Be(false);
+
+        sut.ValueLookup.OnlyExactMatch = true;
+
+        sut.SearchStatus.Should().Be(LeaveAttributeMatchStatus.Ambiguous);
+        sut.Rows.Single(x => x.SourceUuid == graph.First.Uuid)[matchKey].Should().Be(false);
+        sut.Rows.Single(x => x.SourceUuid == graph.Second.Uuid)[matchKey].Should().Be(true);
+        sut.Rows.Single(x => x.SourceUuid == graph.Deleted.Uuid)[matchKey].Should().Be(true);
+    }
+
+    [Fact]
     public void Selection_ImmediatelyUpdatesCollectionWithoutDuplicates()
     {
         var graph = CreateGraph();

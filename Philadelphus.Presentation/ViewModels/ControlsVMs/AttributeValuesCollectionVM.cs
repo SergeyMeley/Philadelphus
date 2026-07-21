@@ -487,7 +487,7 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
                 _ = ConfirmCreatedValueAdditionAsync(createdLeave);
             }
         }
-        else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.Status))
+        else if (eventArgs.PropertyName == nameof(LeaveValueLookupVM.Matches))
         {
             _searchResult = new(ValueLookup.Status, ValueLookup.Matches);
             RebuildRows(Values.Select(x => x.Value));

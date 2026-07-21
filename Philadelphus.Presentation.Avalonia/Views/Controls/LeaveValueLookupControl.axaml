@@ -9,8 +9,9 @@
             <TextBlock Text="Поиск значения"
                        FontWeight="SemiBold" />
 
-            <Grid ColumnDefinitions="Auto,*"
+            <Grid ColumnDefinitions="180,320"
                   ColumnSpacing="8"
+                  HorizontalAlignment="Left"
                   IsVisible="{Binding IsSystemValue}">
                 <TextBlock VerticalAlignment="Center"
                            Text="Значение:" />
@@ -23,14 +24,14 @@
                           IsVisible="{Binding !IsSystemValue}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid ColumnDefinitions="180,*"
+                        <Grid ColumnDefinitions="180,320,Auto"
                               ColumnSpacing="8"
+                              HorizontalAlignment="Left"
                               Margin="0,2">
                             <TextBlock VerticalAlignment="Center"
                                        Text="{Binding Name}"
                                        ToolTip.Tip="{Binding DeclaringUuid}" />
                             <ComboBox Grid.Column="1"
-                                      Margin="0,0,90,0"
                                       IsVisible="{Binding !IsCollection}"
                                       ItemsSource="{Binding AvailableValues}"
                                       SelectedItem="{Binding SelectedValue, Mode=TwoWay}"
@@ -41,12 +42,12 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <Button Grid.Column="1"
-                                    HorizontalAlignment="Right"
+                            <Button Grid.Column="2"
                                     IsVisible="{Binding !IsCollection}"
                                     Command="{Binding ClearCommand}"
                                     Content="Очистить" />
                             <ItemsControl Grid.Column="1"
+                                          Grid.ColumnSpan="2"
                                           IsVisible="{Binding IsCollection}"
                                           ItemsSource="{Binding AvailableValues}">
                                 <ItemsControl.ItemsPanel>
@@ -71,8 +72,9 @@
                       IsChecked="{Binding OnlyExactMatch, Mode=TwoWay}"
                       Content="Только полное совпадение" />
 
-            <Grid ColumnDefinitions="*,Auto,Auto"
-                  ColumnSpacing="8">
+            <Grid ColumnDefinitions="Auto,Auto,Auto"
+                  ColumnSpacing="16"
+                  HorizontalAlignment="Left">
                 <TextBlock Text="{Binding StatusText}" />
                 <TextBlock Grid.Column="1"
                            Text="{Binding MatchCount, StringFormat='Совпадений: {0}'}" />
