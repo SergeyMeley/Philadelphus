@@ -242,17 +242,15 @@ namespace Philadelphus.Core.Domain.Mapping
         /// <param name="attributes">Атрибуты для маппинга</param>
         /// <param name="owners">Коллекция владельцев.</param>
         /// <param name="valueTypesByUuid">Все типы данных атрибутов, сгруппированные по идентификатору</param>
-        /// <param name="valuesByUuid">Все значения атрибутов, сгруппированные по идентификатору</param>
-        /// <returns>Результат выполнения операции.</returns>
         /// <param name="owningWorkingTree">Владеющее рабочее дерево.</param>
         /// <param name="notificationService">Сервис уведомлений.</param>
         /// <param name="propertiesPolicy">Политика свойств.</param>
+        /// <returns>Результат выполнения операции.</returns>
         public static IEnumerable<ElementAttributeModel> MapAttributes(
             this IMapper mapper,
             IEnumerable<ElementAttribute> attributes,
             IEnumerable<IAttributeOwnerModel> owners,
             IReadOnlyDictionary<Guid, TreeNodeModel> valueTypesByUuid,
-            IReadOnlyDictionary<Guid, TreeLeaveModel> valuesByUuid,
             WorkingTreeModel owningWorkingTree,
             INotificationService notificationService,
             IPropertiesPolicy<ElementAttributeModel> propertiesPolicy)
@@ -272,7 +270,6 @@ namespace Philadelphus.Core.Domain.Mapping
                 {
                     opt.Items.Add("OwnersByUuid", ownersByUuid);
                     opt.Items.Add("ValueTypesByUuid", valueTypesByUuid);
-                    opt.Items.Add("ValuesByUuid", valuesByUuid);
                     opt.Items.Add("OwningWorkingTree", owningWorkingTree);
                     opt.Items.Add(nameof(INotificationService), notificationService);
                     opt.Items.Add(nameof(IPropertiesPolicy<ElementAttributeModel>), propertiesPolicy);

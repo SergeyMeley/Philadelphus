@@ -197,7 +197,6 @@ public class AttributeFormulaServiceTests
         var fixture = CreateFixture();
         fixture.Attribute.IsCollectionValue = true;
         var formula = $"={{[{fixture.Value.Uuid}]}}";
-        fixture.Attribute.LoadPersistedMaterializedValuesUuids([fixture.Value.Uuid]);
         fixture.Attribute.LoadValueFormula(formula);
         ((IMainEntityWritableModel)fixture.Attribute).SetState(State.SavedOrLoaded);
 
@@ -232,7 +231,6 @@ public class AttributeFormulaServiceTests
         var fixture = CreateFixture();
         fixture.Attribute.IsCollectionValue = true;
         var formula = $"={{[{Guid.CreateVersion7()}]}}";
-        fixture.Attribute.LoadPersistedMaterializedValuesUuids([fixture.Value.Uuid]);
         fixture.Attribute.LoadValueFormula(formula);
         ((IMainEntityWritableModel)fixture.Attribute).SetState(State.SavedOrLoaded);
 
@@ -268,7 +266,6 @@ public class AttributeFormulaServiceTests
         // Arrange
         var fixture = CreateFixture();
         var formula = $"=[{Guid.CreateVersion7()}]";
-        fixture.Attribute.LoadPersistedMaterializedValueUuid(fixture.Value.Uuid);
         fixture.Attribute.LoadValueFormula(formula);
         ((IMainEntityWritableModel)fixture.Attribute).SetState(State.SavedOrLoaded);
 

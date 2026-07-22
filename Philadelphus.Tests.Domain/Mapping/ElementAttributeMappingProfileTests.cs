@@ -51,8 +51,7 @@ public class ElementAttributeMappingProfileTests
             mapper,
             entity,
             tree,
-            new Dictionary<Guid, TreeNodeModel> { [valueType.Uuid] = valueType },
-            new Dictionary<Guid, TreeLeaveModel> { [materializedValue.Uuid] = materializedValue });
+            new Dictionary<Guid, TreeNodeModel> { [valueType.Uuid] = valueType });
 
         // Assert
         model.ValueType.Should().BeSameAs(valueType);
@@ -155,14 +154,12 @@ public class ElementAttributeMappingProfileTests
         IMapper mapper,
         ElementAttribute entity,
         FakeWorkingTreeModel tree,
-        IReadOnlyDictionary<Guid, TreeNodeModel>? valueTypesByUuid = null,
-        IReadOnlyDictionary<Guid, TreeLeaveModel>? valuesByUuid = null)
+        IReadOnlyDictionary<Guid, TreeNodeModel>? valueTypesByUuid = null)
     {
         return mapper.MapAttributes(
                 [entity],
                 [tree],
                 valueTypesByUuid ?? new Dictionary<Guid, TreeNodeModel>(),
-                valuesByUuid ?? new Dictionary<Guid, TreeLeaveModel>(),
                 tree,
                 new FakeNotificationService(),
                 new EmptyPropertiesPolicy<ElementAttributeModel>())

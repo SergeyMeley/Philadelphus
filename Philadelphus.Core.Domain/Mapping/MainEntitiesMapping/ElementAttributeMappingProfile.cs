@@ -141,23 +141,10 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         dest.LoadValueType(null, null);
                     }
 
-                    // Value или Values
-                    if (src.IsCollectionValue == false)
-                    {
-                        dest.LoadValues(Array.Empty<TreeLeaveModel>(), Array.Empty<Guid>());
-                        dest.LoadPersistedMaterializedValueUuid(src.ValueUuid);
-
-                        // Никогда не восстанавливаем Value из материализованного ValueUuid: сохраненный
-                        // результат мог устареть. Runtime-значение будет вычислено только по ValueFormula.
-                        // Если формулы нет, значение после загрузки намеренно остается пустым.
-                        dest.LoadValueFormula(src.ValueFormula);
-                    }
-                    else
-                    {
-                        dest.LoadPersistedMaterializedValueUuid(null);
-                        dest.LoadPersistedMaterializedValuesUuids(src.ValuesUuids);
-                        dest.LoadValueFormula(src.ValueFormula);
-                    }
+                    // ValueUuid и ValuesUuids намеренно игнорируются: runtime-значения
+                    // будут восстановлены исключительно пересчетом ValueFormula.
+                    dest.LoadValues(Array.Empty<TreeLeaveModel>(), Array.Empty<Guid>());
+                    dest.LoadValueFormula(src.ValueFormula);
                 });
         }
     }

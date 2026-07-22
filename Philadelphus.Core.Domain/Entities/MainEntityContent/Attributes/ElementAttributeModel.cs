@@ -33,12 +33,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private TreeNodeModel _valueType;
         private Guid? _unresolvedValueTypeUuid;
         private TreeLeaveModel _value;
-        private Guid? _persistedMaterializedValueUuid;
         private string _valueFormula = string.Empty;
         private string _valueFormulaErrorCode = string.Empty;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private List<Guid> _unresolvedValuesUuids = new List<Guid>();
-        private IReadOnlyList<Guid>? _persistedMaterializedValuesUuids;
+        private bool _isAwaitingInitialFormulaMaterialization;
         private bool _isValueOverridden;    // Признак того, что одиночное значение унаследованного атрибута было переопределено локально.
         private bool _areValuesOverridden;  // Признак того, что коллекция значений унаследованного атрибута была переопределена локально.
         private VisibilityScope _visibility;
@@ -112,25 +111,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 var alreadyLocalValue = SameValue(value, _value);
                 bool valueChanged;
 
-                // ValueUuid в БД — лишь материализованный результат для отчетов, поэтому при загрузке
-                // сам лист в Value не восстанавливается. Если вычисленная по формуле ссылка совпала с
-                // сохраненным результатом, заполняем runtime-значение без перевода атрибута в Changed.
-                if (_value == null
-                    && value?.Uuid == _persistedMaterializedValueUuid
+                if (_isAwaitingInitialFormulaMaterialization
                     && State == State.SavedOrLoaded)
                 {
                     _value = value;
-                    _persistedMaterializedValueUuid = null;
+                    _isAwaitingInitialFormulaMaterialization = false;
                     valueChanged = false;
                 }
                 else
                 {
                     valueChanged = SetValue(ref _value, value);
-
-                    if (ReferenceEquals(_value, value))
-                    {
-                        _persistedMaterializedValueUuid = null;
-                    }
                 }
 
                 if (_isOwn == false
@@ -154,6 +144,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 var inheritedFormula = _inheritedAttributeFromParent?.ValueFormula ?? string.Empty;
                 var alreadyLocalFormula = string.Equals(value, _valueFormula, StringComparison.Ordinal);
                 var formulaChanged = SetValue(ref _valueFormula, value);
+                _isAwaitingInitialFormulaMaterialization = false;
 
                 if (_isOwn == false
                     && (formulaChanged || alreadyLocalFormula))
@@ -459,7 +450,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
 
             _values?.Add(value);
-            _persistedMaterializedValuesUuids = null;
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange();
             return true;
@@ -479,17 +469,18 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (materializedValues.Any(x => IsCompatibleCollectionValue(x) == false))
                 return false;
 
-            var materializedUuids = materializedValues.Select(x => x.Uuid).ToArray();
-            var previousUuids = _persistedMaterializedValuesUuids
-                ?? _values.Select(x => x.Uuid).ToArray();
-            var valuesChanged = previousUuids.SequenceEqual(materializedUuids) == false;
+            var valuesChanged = _values
+                .Select(x => x.Uuid)
+                .SequenceEqual(materializedValues.Select(x => x.Uuid)) == false;
+            var preserveLoadedState = _isAwaitingInitialFormulaMaterialization
+                && State == State.SavedOrLoaded;
 
             _values = materializedValues;
             _unresolvedValuesUuids.Clear();
-            _persistedMaterializedValuesUuids = null;
+            _isAwaitingInitialFormulaMaterialization = false;
             MarkValuesOverriddenIfNeeded();
 
-            if (valuesChanged)
+            if (valuesChanged && preserveLoadedState == false)
             {
                 UpdateStateStateAfterChange();
             }
@@ -506,12 +497,14 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
 
             var valuesChanged = _values.Count > 0 || _unresolvedValuesUuids.Count > 0;
+            var preserveLoadedState = _isAwaitingInitialFormulaMaterialization
+                && State == State.SavedOrLoaded;
             _values.Clear();
             _unresolvedValuesUuids.Clear();
-            _persistedMaterializedValuesUuids = null;
+            _isAwaitingInitialFormulaMaterialization = false;
             MarkValuesOverriddenIfNeeded();
 
-            if (valuesChanged)
+            if (valuesChanged && preserveLoadedState == false)
             {
                 UpdateStateStateAfterChange();
             }
@@ -564,7 +557,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (_values != null && _values.Any(x => x == value) == false)
                 return false;
             _values?.Remove(value);
-            _persistedMaterializedValuesUuids = null;
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
@@ -585,7 +577,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
             _values?.Clear();
             _unresolvedValuesUuids.Clear();
-            _persistedMaterializedValuesUuids = null;
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
@@ -616,12 +607,11 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _unresolvedValueTypeUuid = this._unresolvedValueTypeUuid,
                 _isCollectionValue = this._isCollectionValue,
                 _value = this._value,
-                _persistedMaterializedValueUuid = this._persistedMaterializedValueUuid,
                 _valueFormula = this._valueFormula,
                 _valueFormulaErrorCode = this._valueFormulaErrorCode,
                 _values = new List<TreeLeaveModel>(this._values),
                 _unresolvedValuesUuids = new List<Guid>(this._unresolvedValuesUuids),
-                _persistedMaterializedValuesUuids = this._persistedMaterializedValuesUuids?.ToArray(),
+                _isAwaitingInitialFormulaMaterialization = this._isAwaitingInitialFormulaMaterialization,
                 _visibility = this._visibility,
                 _inheritedAttributeFromParent = this,
             };
@@ -646,6 +636,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         internal void LoadValueFormula(string? valueFormula)
         {
             _valueFormula = valueFormula ?? string.Empty;
+            _isAwaitingInitialFormulaMaterialization = string.IsNullOrWhiteSpace(_valueFormula) == false;
 
             if (_isOwn == false
                 && _inheritedAttributeFromParent != null
@@ -669,30 +660,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
-        /// Запомнить идентификатор материализованного результата, не загружая его в runtime-значение.
-        /// </summary>
-        /// <remarks>
-        /// Идентификатор используется только для сравнения результата последующего вычисления формулы,
-        /// чтобы неизменившийся результат не помечал только что загруженный атрибут как Changed.
-        /// Источником Value он не является.
-        /// </remarks>
-        internal void LoadPersistedMaterializedValueUuid(Guid? valueUuid)
-        {
-            _value = null!;
-            _persistedMaterializedValueUuid = valueUuid;
-        }
-
-        /// <summary>
-        /// Запомнить идентификаторы материализованного результата, не загружая их в runtime-коллекцию.
-        /// </summary>
-        internal void LoadPersistedMaterializedValuesUuids(IEnumerable<Guid>? valuesUuids)
-        {
-            _values.Clear();
-            _unresolvedValuesUuids.Clear();
-            _persistedMaterializedValuesUuids = valuesUuids?.ToArray() ?? Array.Empty<Guid>();
-        }
-
-        /// <summary>
         /// Загрузить коллекцию значений и сохранить ссылки на отсутствующие значения.
         /// </summary>
         internal void LoadValues(
@@ -701,7 +668,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             _values = new List<TreeLeaveModel>(values);
             _unresolvedValuesUuids = new List<Guid>(unresolvedValuesUuids);
-            _persistedMaterializedValuesUuids = null;
         }
 
         /// <summary>

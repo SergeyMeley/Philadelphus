@@ -1692,7 +1692,7 @@ namespace Philadelphus.Core.Domain.Services.Implementations
             owners.ForEach(x => x.SuspendAttributesListRecalculation());
             try
             {
-                var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodesByUuid, allShrubLeavesByUuid, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
+                var allAttributes = _mapper.MapAttributes(dbTree.ContentAttributes.ToList(), owners, allShrubNodesByUuid, tree, _notificationService, AttributePolicyBuilder.CreateDefault(_notificationService));
             }
             finally
             {
