@@ -38,6 +38,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private string _valueFormulaErrorCode = string.Empty;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
         private List<Guid> _unresolvedValuesUuids = new List<Guid>();
+        private IReadOnlyList<Guid>? _persistedMaterializedValuesUuids;
         private bool _isValueOverridden;    // Признак того, что одиночное значение унаследованного атрибута было переопределено локально.
         private bool _areValuesOverridden;  // Признак того, что коллекция значений унаследованного атрибута была переопределена локально.
         private VisibilityScope _visibility;
@@ -454,25 +455,67 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             PrepareValuesCollectionForOverride();
             if (_values != null && _values.Any(x => x.Uuid == value.Uuid))
                 return false;
-            if (SystemBaseAttributeValueCompatibilityValidator.IsCompatible(
-                    ValueType,
-                    value,
-                    out var systemBaseType,
-                    out var stringValue,
-                    out var expectedFormat) == false)
-            {
-                _notificationService.SendTextMessage<ElementAttributeModel>(
-                    $"Для коллекционного атрибута '{Name}' [{Uuid}] элемента '{(Owner as IMainEntityModel)?.Name}' [{(Owner as IMainEntityModel)?.Uuid}] " +
-                    $"значение '{stringValue ?? "<null>"}' не соответствует системному типу '{systemBaseType}'. " +
-                    $"Ожидаемый формат: {expectedFormat}.",
-                    criticalLevel: NotificationCriticalLevelModel.Warning);
-
+            if (IsCompatibleCollectionValue(value) == false)
                 return false;
-            }
 
             _values?.Add(value);
+            _persistedMaterializedValuesUuids = null;
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange();
+            return true;
+        }
+
+        /// <summary>
+        /// Атомарно заменить материализованный результат формулы коллекционного атрибута.
+        /// </summary>
+        public bool TrySetValuesFromFormula(IEnumerable<TreeLeaveModel> values)
+        {
+            ArgumentNullException.ThrowIfNull(values);
+
+            if (CanWriteValuesCollection() == false || _isCollectionValue == false)
+                return false;
+
+            var materializedValues = values.DistinctBy(x => x.Uuid).ToList();
+            if (materializedValues.Any(x => IsCompatibleCollectionValue(x) == false))
+                return false;
+
+            var materializedUuids = materializedValues.Select(x => x.Uuid).ToArray();
+            var previousUuids = _persistedMaterializedValuesUuids
+                ?? _values.Select(x => x.Uuid).ToArray();
+            var valuesChanged = previousUuids.SequenceEqual(materializedUuids) == false;
+
+            _values = materializedValues;
+            _unresolvedValuesUuids.Clear();
+            _persistedMaterializedValuesUuids = null;
+            MarkValuesOverriddenIfNeeded();
+
+            if (valuesChanged)
+            {
+                UpdateStateStateAfterChange();
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Очистить runtime-результат коллекционной формулы без изменения состояния модели.
+        /// </summary>
+        public bool ClearValuesFromFormula()
+        {
+            if (CanWriteValuesCollection() == false || _isCollectionValue == false)
+                return false;
+
+            var valuesChanged = _values.Count > 0 || _unresolvedValuesUuids.Count > 0;
+            _values.Clear();
+            _unresolvedValuesUuids.Clear();
+            _persistedMaterializedValuesUuids = null;
+            MarkValuesOverriddenIfNeeded();
+
+            if (valuesChanged)
+            {
+                UpdateStateStateAfterChange();
+            }
+
             return true;
         }
 
@@ -521,6 +564,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (_values != null && _values.Any(x => x == value) == false)
                 return false;
             _values?.Remove(value);
+            _persistedMaterializedValuesUuids = null;
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
@@ -541,6 +585,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 return false;
             _values?.Clear();
             _unresolvedValuesUuids.Clear();
+            _persistedMaterializedValuesUuids = null;
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
@@ -576,6 +621,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _valueFormulaErrorCode = this._valueFormulaErrorCode,
                 _values = new List<TreeLeaveModel>(this._values),
                 _unresolvedValuesUuids = new List<Guid>(this._unresolvedValuesUuids),
+                _persistedMaterializedValuesUuids = this._persistedMaterializedValuesUuids?.ToArray(),
                 _visibility = this._visibility,
                 _inheritedAttributeFromParent = this,
             };
@@ -637,6 +683,16 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
+        /// Запомнить идентификаторы материализованного результата, не загружая их в runtime-коллекцию.
+        /// </summary>
+        internal void LoadPersistedMaterializedValuesUuids(IEnumerable<Guid>? valuesUuids)
+        {
+            _values.Clear();
+            _unresolvedValuesUuids.Clear();
+            _persistedMaterializedValuesUuids = valuesUuids?.ToArray() ?? Array.Empty<Guid>();
+        }
+
+        /// <summary>
         /// Загрузить коллекцию значений и сохранить ссылки на отсутствующие значения.
         /// </summary>
         internal void LoadValues(
@@ -645,6 +701,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         {
             _values = new List<TreeLeaveModel>(values);
             _unresolvedValuesUuids = new List<Guid>(unresolvedValuesUuids);
+            _persistedMaterializedValuesUuids = null;
         }
 
         /// <summary>
@@ -738,6 +795,27 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private bool CanWriteValuesCollection()
         {
             return _propertiesPolicy?.CanWrite(this, nameof(Values), _values.AsReadOnly()) != false;
+        }
+
+        private bool IsCompatibleCollectionValue(TreeLeaveModel value)
+        {
+            if (SystemBaseAttributeValueCompatibilityValidator.IsCompatible(
+                    ValueType,
+                    value,
+                    out var systemBaseType,
+                    out var stringValue,
+                    out var expectedFormat))
+            {
+                return true;
+            }
+
+            _notificationService.SendTextMessage<ElementAttributeModel>(
+                $"Для коллекционного атрибута '{Name}' [{Uuid}] элемента '{(Owner as IMainEntityModel)?.Name}' [{(Owner as IMainEntityModel)?.Uuid}] " +
+                $"значение '{stringValue ?? "<null>"}' не соответствует системному типу '{systemBaseType}'. " +
+                $"Ожидаемый формат: {expectedFormat}.",
+                criticalLevel: NotificationCriticalLevelModel.Warning);
+
+            return false;
         }
 
         /// <summary>

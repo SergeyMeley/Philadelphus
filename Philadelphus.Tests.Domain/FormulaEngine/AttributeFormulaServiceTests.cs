@@ -192,11 +192,29 @@ public class AttributeFormulaServiceTests
     }
 
     [Fact]
+    public void RecalculateAttribute_MaterializesLoadedCollectionWithoutChangingState()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+        var formula = $"={{[{fixture.Value.Uuid}]}}";
+        fixture.Attribute.LoadPersistedMaterializedValuesUuids([fixture.Value.Uuid]);
+        fixture.Attribute.LoadValueFormula(formula);
+        ((IMainEntityWritableModel)fixture.Attribute).SetState(State.SavedOrLoaded);
+
+        var result = Recalculate(fixture.Attribute, formula);
+
+        result.Should().BeTrue();
+        fixture.Attribute.Values.Should().ContainSingle().Which.Should().BeSameAs(fixture.Value);
+        fixture.Attribute.State.Should().Be(State.SavedOrLoaded);
+    }
+
+    [Fact]
     public void RecalculateAttribute_InvalidCollectionFormula_ClearsMaterializedValues()
     {
         var fixture = CreateFixture();
         fixture.Attribute.IsCollectionValue = true;
         fixture.Attribute.TryAddValueToValuesCollection(fixture.Value).Should().BeTrue();
+        ((IMainEntityWritableModel)fixture.Attribute).SetState(State.SavedOrLoaded);
         var formula = $"={{[{Guid.CreateVersion7()}]}}";
 
         var result = Recalculate(fixture.Attribute, formula);
@@ -205,6 +223,25 @@ public class AttributeFormulaServiceTests
         fixture.Attribute.Values.Should().BeEmpty();
         fixture.Attribute.ValueFormula.Should().Be(formula);
         fixture.Attribute.ValueFormulaErrorCode.Should().NotBeEmpty();
+        fixture.Attribute.State.Should().Be(State.Changed);
+    }
+
+    [Fact]
+    public void RecalculateAttribute_InvalidLoadedCollectionFormula_DoesNotChangeState()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+        var formula = $"={{[{Guid.CreateVersion7()}]}}";
+        fixture.Attribute.LoadPersistedMaterializedValuesUuids([fixture.Value.Uuid]);
+        fixture.Attribute.LoadValueFormula(formula);
+        ((IMainEntityWritableModel)fixture.Attribute).SetState(State.SavedOrLoaded);
+
+        var result = Recalculate(fixture.Attribute, formula);
+
+        result.Should().BeTrue();
+        fixture.Attribute.Values.Should().BeEmpty();
+        fixture.Attribute.ValueFormulaErrorCode.Should().NotBeEmpty();
+        fixture.Attribute.State.Should().Be(State.SavedOrLoaded);
     }
 
     [Fact]

@@ -129,8 +129,6 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .AfterMap((src, dest, ctx) =>
                 {
                     var valueTypesByUuid = ctx.Items["ValueTypesByUuid"] as IReadOnlyDictionary<Guid, TreeNodeModel>;
-                    var valuesByUuid = ctx.Items["ValuesByUuid"] as IReadOnlyDictionary<Guid, TreeLeaveModel>;
-
                     // ValueType
                     if (src.ValueTypeUuid != null)
                     {
@@ -157,27 +155,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                     else
                     {
                         dest.LoadPersistedMaterializedValueUuid(null);
-
-                        // Коллекционные формулы пока отсутствуют, поэтому ValuesUuids остается временным
-                        // исключением из правила formula-only и продолжает загружаться в доменную модель.
-                        var values = new List<TreeLeaveModel>();
-                        var unresolvedValuesUuids = new List<Guid>();
-                        if (src.ValuesUuids != null)
-                        {
-                            foreach (var valueUuid in src.ValuesUuids)
-                            {
-                                if (valuesByUuid != null && valuesByUuid.TryGetValue(valueUuid, out var value))
-                                {
-                                    values.Add(value);
-                                }
-                                else
-                                {
-                                    unresolvedValuesUuids.Add(valueUuid);
-                                }
-                            }
-                        }
-
-                        dest.LoadValues(values, unresolvedValuesUuids);
+                        dest.LoadPersistedMaterializedValuesUuids(src.ValuesUuids);
                         dest.LoadValueFormula(src.ValueFormula);
                     }
                 });

@@ -175,18 +175,8 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
                     return false;
                 }
 
-                if (targetAttribute.ClearValuesCollection() == false)
-                {
+                if (targetAttribute.TrySetValuesFromFormula(result.TreeLeaves) == false)
                     return false;
-                }
-
-                foreach (var value in result.TreeLeaves.DistinctBy(x => x.Uuid))
-                {
-                    if (targetAttribute.TryAddValueToValuesCollection(value) == false)
-                    {
-                        return false;
-                    }
-                }
 
                 targetAttribute.ValueFormula = formulaText;
                 targetAttribute.ValueFormulaErrorCode = string.Empty;
@@ -239,7 +229,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
         {
             if (attribute.IsCollectionValue)
             {
-                attribute.ClearValuesCollection();
+                attribute.ClearValuesFromFormula();
             }
             else
             {

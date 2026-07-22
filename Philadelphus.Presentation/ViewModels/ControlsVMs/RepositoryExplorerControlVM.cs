@@ -860,8 +860,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             NotifyRepositoryTreeChanged();
             NavigationVM.ResetHistory();
 
-            // Значения одиночных атрибутов из БД намеренно не загружаются: ValueUuid хранится только
-            // для SQL-запросов и отчетов. После перестроения модели представления восстанавливаем
+            // Значения атрибутов из БД намеренно не загружаются: ValueUuid и ValuesUuids хранятся
+            // только для SQL-запросов и отчетов. После перестроения модели представления восстанавливаем
             // runtime-значения вычислением ValueFormula.
             FormulaBarVM.RecalculateLoadedFormulas();
             RefreshLoadedLeavePolymorphismLinks();

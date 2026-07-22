@@ -108,7 +108,7 @@ public class ElementAttributeMappingProfileTests
     }
 
     [Fact]
-    public void Map_MissingCollectionValues_SetsErrorAndPreservesReferences()
+    public void Map_CollectionValues_IgnoresMaterializedValuesFromDatabase()
     {
         // Arrange
         var tree = new FakeWorkingTreeModel();
@@ -118,6 +118,7 @@ public class ElementAttributeMappingProfileTests
         var entity = CreateAttribute(tree, valueTypeUuid, valueUuid: null);
         entity.IsCollectionValue = true;
         entity.ValuesUuids = [firstValueUuid, secondValueUuid];
+        entity.ValueFormula = $"={{[{firstValueUuid}];[{secondValueUuid}]}}";
         var mapper = CreateMapper();
 
         // Act
@@ -126,8 +127,9 @@ public class ElementAttributeMappingProfileTests
 
         // Assert
         model.Values.Should().BeEmpty();
-        model.ValuesReferenceErrorCode.Should().Be(AttributeReferenceErrorCodes.ValueNotFound);
-        mappedBackEntity.ValuesUuids.Should().Equal(firstValueUuid, secondValueUuid);
+        model.ValuesReferenceErrorCode.Should().BeEmpty();
+        model.ValueFormula.Should().Be(entity.ValueFormula);
+        mappedBackEntity.ValuesUuids.Should().BeEmpty();
     }
 
     private static ElementAttribute CreateAttribute(
