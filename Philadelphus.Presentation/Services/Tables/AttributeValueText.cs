@@ -30,6 +30,17 @@ namespace Philadelphus.Presentation.Services.Tables
                 return attribute.ValueFormulaErrorCode;
             }
 
+            if (attribute.IsCollectionValue)
+            {
+                var values = attribute.Values.Select(x => x.Name).ToList();
+                if (string.IsNullOrWhiteSpace(attribute.ValuesReferenceErrorCode) == false)
+                {
+                    values.Add(attribute.ValuesReferenceErrorCode);
+                }
+
+                return string.Join("; ", values);
+            }
+
             return GetAssignedValueText(attribute);
         }
 

@@ -479,6 +479,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
             OnPropertyChanged(nameof(AssignedValues));
             OnPropertyChanged(nameof(AssignedValuesString));
+            OnPropertyChanged(nameof(DisplayedValueText));
             OnPropertyChanged(nameof(AreValuesOverridden));
             OnPropertyChanged(nameof(ValuesOverrideToolTip));
             NotifyStateVisibilityPropertiesChanged();

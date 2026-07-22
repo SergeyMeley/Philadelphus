@@ -146,8 +146,10 @@ public class MainEntityBaseVMTests
         sut.Rows.Single(x => x.SourceUuid == value.Uuid)["IsSelected"] = true;
 
         attributeVM.AssignedValuesString.Should().Be("Значение");
+        attributeVM.DisplayedValueText.Should().Be("Значение");
         attributeVM.AssignedValues.Should().Equal(value);
         changedProperties.Should().Contain(nameof(attributeVM.AssignedValuesString));
+        changedProperties.Should().Contain(nameof(attributeVM.DisplayedValueText));
     }
 
     [Fact]

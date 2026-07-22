@@ -141,20 +141,6 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
 
-                <!-- Присвоенные значения: подсветка «переопределено» коллекции. -->
-                <DataGridTemplateColumn Header="Присвоенные значения" IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                    Background="{Binding AreValuesOverridden, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Moccasin|}"
-                                    ToolTip.Tip="{Binding ValuesOverrideToolTip}">
-                                <TextBlock Text="{Binding AssignedValuesString, Mode=OneWay}" VerticalAlignment="Center" Margin="2,0"
-                                           Foreground="{Binding AreValuesOverridden, Converter={StaticResource boolToBrushConverter}, ConverterParameter=Black|}" />
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
                 <!-- Область видимости -->
                 <DataGridTemplateColumn Header="Область видимости" CellStyleClasses="runtimeMetadata">
                     <DataGridTemplateColumn.CellTemplate>
