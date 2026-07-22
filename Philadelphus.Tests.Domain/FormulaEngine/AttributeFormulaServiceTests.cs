@@ -226,6 +226,22 @@ public class AttributeFormulaServiceTests
     }
 
     [Fact]
+    public void RecalculateAttribute_CollectionTypeMismatch_ClearsMaterializedValuesAndKeepsFormula()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+        fixture.Attribute.TryAddValueToValuesCollection(fixture.Value).Should().BeTrue();
+        var formula = $"=[{fixture.Value.Uuid}]";
+
+        var result = Recalculate(fixture.Attribute, formula);
+
+        result.Should().BeTrue();
+        fixture.Attribute.Values.Should().BeEmpty();
+        fixture.Attribute.ValueFormula.Should().Be(formula);
+        fixture.Attribute.ValueFormulaErrorCode.Should().Be("#TypeMismatch!");
+    }
+
+    [Fact]
     public void RecalculateAttribute_InvalidLoadedCollectionFormula_DoesNotChangeState()
     {
         var fixture = CreateFixture();

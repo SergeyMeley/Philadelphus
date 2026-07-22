@@ -6,6 +6,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Evaluation;
+using Philadelphus.Core.Domain.FormulaEngine.Errors;
 using Philadelphus.Core.Domain.FormulaEngine.Execution;
 using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 using Philadelphus.Core.Domain.Helpers;
@@ -171,8 +172,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
                 if (result.TreeLeaves == null
                     || result.TreeLeaves.Any(x => IsTreeLeaveCompatible(targetAttribute, x) == false))
                 {
+                    ClearMaterializedFormulaResult(targetAttribute);
+                    targetAttribute.ValueFormula = formulaText;
+                    targetAttribute.ValueFormulaErrorCode = $"#{FormulaErrorCode.TypeMismatch}!";
                     SendFormulaTypeMismatch(targetAttribute, result.ValueType.ToString());
-                    return false;
+                    return true;
                 }
 
                 if (targetAttribute.TrySetValuesFromFormula(result.TreeLeaves) == false)
