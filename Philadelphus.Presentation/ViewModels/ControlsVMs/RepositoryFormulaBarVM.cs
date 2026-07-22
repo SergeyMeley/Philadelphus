@@ -778,16 +778,6 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             string address,
             bool requireTargetInsideSelectedBranch)
         {
-            if (sourceAttribute.IsCollectionValue)
-            {
-                return new FormulaBarTarget(
-                    address,
-                    sourceAttribute,
-                    null,
-                    Enabled: false,
-                    BlockReason: "Формулы для коллекционных значений атрибутов пока не поддерживаются.");
-            }
-
             var targetAttribute = ResolveWritableAttribute(sourceAttribute);
             if (requireTargetInsideSelectedBranch
                 && IsAttributeOwnerInsideSelectedBranch(targetAttribute.Owner) == false)
