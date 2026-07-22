@@ -36,7 +36,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         private string _valueFormula = string.Empty;
         private string _valueFormulaErrorCode = string.Empty;
         private List<TreeLeaveModel> _values = new List<TreeLeaveModel>();
-        private List<Guid> _unresolvedValuesUuids = new List<Guid>();
         private bool _isAwaitingInitialFormulaMaterialization;
         private bool _isValueOverridden;    // Признак того, что одиночное значение унаследованного атрибута было переопределено локально.
         private bool _areValuesOverridden;  // Признак того, что коллекция значений унаследованного атрибута была переопределена локально.
@@ -166,14 +165,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             get => GetValue(GetEffectiveValueFormulaErrorCode());
             set => _valueFormulaErrorCode = value ?? string.Empty;
         }
-
-        /// <summary>
-        /// Код ошибки привязки значения коллекционного атрибута.
-        /// </summary>
-        public string ValuesReferenceErrorCode => _isCollectionValue
-            && _unresolvedValuesUuids.Count > 0
-                ? AttributeReferenceErrorCodes.ValueNotFound
-                : string.Empty;
 
         /// <summary>
         /// Значения (листы выбранного узла дерева репозитория Чубушника)
@@ -476,7 +467,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 && State == State.SavedOrLoaded;
 
             _values = materializedValues;
-            _unresolvedValuesUuids.Clear();
             _isAwaitingInitialFormulaMaterialization = false;
             MarkValuesOverriddenIfNeeded();
 
@@ -496,11 +486,10 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (CanWriteValuesCollection() == false || _isCollectionValue == false)
                 return false;
 
-            var valuesChanged = _values.Count > 0 || _unresolvedValuesUuids.Count > 0;
+            var valuesChanged = _values.Count > 0;
             var preserveLoadedState = _isAwaitingInitialFormulaMaterialization
                 && State == State.SavedOrLoaded;
             _values.Clear();
-            _unresolvedValuesUuids.Clear();
             _isAwaitingInitialFormulaMaterialization = false;
             MarkValuesOverriddenIfNeeded();
 
@@ -576,7 +565,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
             if (_values == null)
                 return false;
             _values?.Clear();
-            _unresolvedValuesUuids.Clear();
             MarkValuesOverriddenIfNeeded();
             UpdateStateStateAfterChange(); 
             return true;
@@ -610,7 +598,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
                 _valueFormula = this._valueFormula,
                 _valueFormulaErrorCode = this._valueFormulaErrorCode,
                 _values = new List<TreeLeaveModel>(this._values),
-                _unresolvedValuesUuids = new List<Guid>(this._unresolvedValuesUuids),
                 _isAwaitingInitialFormulaMaterialization = this._isAwaitingInitialFormulaMaterialization,
                 _visibility = this._visibility,
                 _inheritedAttributeFromParent = this,
@@ -660,28 +647,9 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
-        /// Загрузить коллекцию значений и сохранить ссылки на отсутствующие значения.
-        /// </summary>
-        internal void LoadValues(
-            IEnumerable<TreeLeaveModel> values,
-            IEnumerable<Guid> unresolvedValuesUuids)
-        {
-            _values = new List<TreeLeaveModel>(values);
-            _unresolvedValuesUuids = new List<Guid>(unresolvedValuesUuids);
-        }
-
-        /// <summary>
         /// Получить ссылку на тип данных, включая отсутствующий тип.
         /// </summary>
         internal Guid? ValueTypeReferenceUuid => _valueType?.Uuid ?? _unresolvedValueTypeUuid;
-
-        /// <summary>
-        /// Получить ссылки на значения коллекции, включая отсутствующие значения.
-        /// </summary>
-        internal IReadOnlyList<Guid> ValuesReferenceUuids => _values
-            .Select(x => x.Uuid)
-            .Concat(_unresolvedValuesUuids)
-            .ToArray();
 
         protected override bool AddContentDetailed(IContentModel content)
         {

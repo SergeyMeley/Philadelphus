@@ -100,8 +100,7 @@ internal sealed class LeaveAttributeValueSignature
     private static bool HasInvalidReference(ElementAttributeModel attribute) =>
         attribute.ValueType == null
         || string.IsNullOrEmpty(attribute.ValueTypeReferenceErrorCode) == false
-        || string.IsNullOrEmpty(attribute.ValueFormulaErrorCode) == false
-        || string.IsNullOrEmpty(attribute.ValuesReferenceErrorCode) == false;
+        || string.IsNullOrEmpty(attribute.ValueFormulaErrorCode) == false;
 
     private static AttributeValue CreateValue(ElementAttributeModel attribute)
     {

@@ -126,7 +126,6 @@ public class ElementAttributeMappingProfileTests
 
         // Assert
         model.Values.Should().BeEmpty();
-        model.ValuesReferenceErrorCode.Should().BeEmpty();
         model.ValueFormula.Should().Be(entity.ValueFormula);
         mappedBackEntity.ValuesUuids.Should().BeEmpty();
     }

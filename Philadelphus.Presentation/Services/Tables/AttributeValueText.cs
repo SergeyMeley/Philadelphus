@@ -32,13 +32,7 @@ namespace Philadelphus.Presentation.Services.Tables
 
             if (attribute.IsCollectionValue)
             {
-                var values = attribute.Values.Select(x => x.Name).ToList();
-                if (string.IsNullOrWhiteSpace(attribute.ValuesReferenceErrorCode) == false)
-                {
-                    values.Add(attribute.ValuesReferenceErrorCode);
-                }
-
-                return string.Join("; ", values);
+                return string.Join("; ", attribute.Values.Select(x => x.Name));
             }
 
             return GetAssignedValueText(attribute);

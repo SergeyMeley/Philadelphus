@@ -52,7 +52,6 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                 .ForSourceMember(src => src.IsRuntime, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ValueFormulaErrorCode, opt => opt.DoNotValidate())
                 .ForSourceMember(src => src.ValueTypeReferenceErrorCode, opt => opt.DoNotValidate())
-                .ForSourceMember(src => src.ValuesReferenceErrorCode, opt => opt.DoNotValidate())
                 .ForMember(dest => dest.IsCollectionValue, opt => opt.MapFrom(src => src.IsCollectionValue))
                 .ForMember(dest => dest.ValuesUuids, opt => opt.Ignore())       // Сложная логика
                 .ForMember(dest => dest.VisibilityId, opt => opt.MapFrom(src => (int)src.Visibility))
@@ -76,7 +75,7 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
                         {
                             dest.ValueUuid = null;
 
-                            dest.ValuesUuids = src.ValuesReferenceUuids.ToArray();
+                            dest.ValuesUuids = src.Values.Select(x => x.Uuid).ToArray();
                         }
                     }
                 });
@@ -143,7 +142,6 @@ namespace Philadelphus.Core.Domain.Mapping.MainEntitiesMapping
 
                     // ValueUuid и ValuesUuids намеренно игнорируются: runtime-значения
                     // будут восстановлены исключительно пересчетом ValueFormula.
-                    dest.LoadValues(Array.Empty<TreeLeaveModel>(), Array.Empty<Guid>());
                     dest.LoadValueFormula(src.ValueFormula);
                 });
         }

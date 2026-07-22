@@ -63,20 +63,16 @@ public class LeaveAttributeValueSignatureTests
     }
 
     [Fact]
-    public void Create_IsInvalidForFormulaAndUnresolvedReferences()
+    public void Create_IsInvalidForFormulaAndUnresolvedTypeReferences()
     {
         var graph = CreateGraph();
         var formulaError = CreateAttribute(graph.FirstOwner, graph, Guid.NewGuid());
         formulaError.ValueFormulaErrorCode = "FORMULA_ERROR";
         var unresolvedType = CreateAttribute(graph.FirstOwner, graph, Guid.NewGuid());
         unresolvedType.LoadValueType(null, Guid.NewGuid());
-        var unresolvedCollection = CreateAttribute(
-            graph.FirstOwner, graph, Guid.NewGuid(), isCollection: true);
-        unresolvedCollection.LoadValues([], [Guid.NewGuid()]);
 
         CreateSignature(formulaError).IsValid.Should().BeFalse();
         CreateSignature(unresolvedType).IsValid.Should().BeFalse();
-        CreateSignature(unresolvedCollection).IsValid.Should().BeFalse();
     }
 
     [Fact]

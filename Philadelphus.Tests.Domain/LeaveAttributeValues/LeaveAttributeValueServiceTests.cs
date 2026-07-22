@@ -134,12 +134,6 @@ public class LeaveAttributeValueServiceTests
         GetAttribute(candidate, extra).ValueFormulaErrorCode = "FORMULA_ERROR";
         service.FindMatches([scalarDraft, collectionDraft, extraDraft], [candidate])
             .Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
-        GetAttribute(candidate, extra).ValueFormulaErrorCode = string.Empty;
-        GetAttribute(candidate, collection).LoadValues(
-            [graph.FirstValue, graph.SecondValue],
-            [Guid.NewGuid()]);
-        service.FindMatches([scalarDraft, collectionDraft, extraDraft], [candidate])
-            .Status.Should().Be(LeaveAttributeMatchStatus.Invalid);
     }
 
     [Fact]

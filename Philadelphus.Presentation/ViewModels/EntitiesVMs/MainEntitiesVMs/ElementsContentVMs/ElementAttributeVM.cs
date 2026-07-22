@@ -250,13 +250,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
         {
             get
             {
-                var values = _assignedValues?.Select(x => x.Name).ToList() ?? new List<string>();
-                if (string.IsNullOrWhiteSpace(_model.ValuesReferenceErrorCode) == false)
-                {
-                    values.Add(_model.ValuesReferenceErrorCode);
-                }
-
-                return string.Join("; ", values);
+                return string.Join("; ", _assignedValues?.Select(x => x.Name) ?? []);
             }
         }
 

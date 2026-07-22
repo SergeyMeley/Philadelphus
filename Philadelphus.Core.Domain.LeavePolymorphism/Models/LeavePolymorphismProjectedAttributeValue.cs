@@ -18,8 +18,7 @@ internal sealed class LeavePolymorphismProjectedAttributeValue
 
         if (attribute.ValueType == null
             || string.IsNullOrEmpty(attribute.ValueTypeReferenceErrorCode) == false
-            || string.IsNullOrEmpty(attribute.ValueFormulaErrorCode) == false
-            || string.IsNullOrEmpty(attribute.ValuesReferenceErrorCode) == false)
+            || string.IsNullOrEmpty(attribute.ValueFormulaErrorCode) == false)
         {
             throw new InvalidOperationException(
                 $"Невозможно спроецировать атрибут '{attribute.Name}' [{attribute.LocalUuid}]: "
