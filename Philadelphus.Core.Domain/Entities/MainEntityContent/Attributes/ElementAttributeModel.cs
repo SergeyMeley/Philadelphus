@@ -163,7 +163,7 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         }
 
         /// <summary>
-        /// Код ошибки последнего вычисления формулы одиночного значения.
+        /// Код ошибки последнего вычисления формулы значения.
         /// </summary>
         /// <remarks>
         /// Runtime-диагностика не сохраняется в БД, поэтому ее изменение не должно переводить
@@ -178,10 +178,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Код ошибки привязки значения коллекционного атрибута.
         /// </summary>
-        /// <remarks>
-        /// Для одиночного значения аналогичная ошибка возвращается вычислителем формулы.
-        /// Коллекции пока загружаются из ValuesUuids, так как формулы коллекций не реализованы.
-        /// </remarks>
         public string ValuesReferenceErrorCode => _isCollectionValue
             && _unresolvedValuesUuids.Count > 0
                 ? AttributeReferenceErrorCodes.ValueNotFound
@@ -190,13 +186,6 @@ namespace Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes
         /// <summary>
         /// Значения (листы выбранного узла дерева репозитория Чубушника)
         /// </summary>
-        /// <remarks>
-        /// TODO: реализовать формулу массива с синтаксисом <c>={[uuid1],[uuid2],...,[uuidn]}</c>.
-        /// Каждый элемент внутри фигурных скобок должен быть самостоятельным выражением формулы,
-        /// возвращающим лист; UUID-ссылка <c>[uuid]</c> является только простейшим таким выражением.
-        /// После этого ValuesUuids должен стать лишь материализованным результатом для запросов и отчетов
-        /// и, аналогично ValueUuid одиночного значения, не должен использоваться как источник при загрузке.
-        /// </remarks>
         public IReadOnlyList<TreeLeaveModel> Values
         {
             get => GetValue(GetEffectiveValues());

@@ -780,9 +780,12 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         {
             if (sourceAttribute.IsCollectionValue)
             {
-                // TODO: поддержать формулу массива ={expr1,expr2,...,exprN}, где каждое выражение
-                // (в том числе [uuid]) возвращает лист допустимого для атрибута типа.
-                return CreateBlockedFormulaTarget(address, "Формулы для коллекционных значений атрибутов пока не поддерживаются.");
+                return new FormulaBarTarget(
+                    address,
+                    sourceAttribute,
+                    null,
+                    Enabled: false,
+                    BlockReason: "Формулы для коллекционных значений атрибутов пока не поддерживаются.");
             }
 
             var targetAttribute = ResolveWritableAttribute(sourceAttribute);
@@ -1929,19 +1932,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 return string.Empty;
             }
 
-            if (string.IsNullOrWhiteSpace(attribute.ValueFormula) == false)
-            {
-                return attribute.ValueFormula;
-            }
-
-            if (attribute.IsCollectionValue)
-            {
-                return string.Join("; ", attribute.Values.Select(x => x.Name));
-            }
-
-            return attribute.Value?.Uuid == null
-                ? string.Empty
-                : FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);
+            return AttributeValueText.GetFormulaText(attribute);
         }
 
         private sealed record FormulaBarTarget(
