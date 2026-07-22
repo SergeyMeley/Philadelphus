@@ -26,6 +26,7 @@ namespace Philadelphus.Presentation.Models.Tables
         private readonly IReadOnlyDictionary<string, Func<bool>> _valueOverrideStateRefreshers;
         private readonly Dictionary<string, string?> _valueOverrideToolTips;
         private readonly IReadOnlyDictionary<string, Func<string?>> _valueOverrideToolTipRefreshers;
+        private readonly Action<Action>? _cellChangedDispatcher;
 
         // Канал «отображаемый текст значения атрибута» (результат формулы / код ошибки / значение) —
         // для режима просмотра ячейки. Обновляется тем же каскадом, что и _cells.
@@ -65,7 +66,8 @@ namespace Philadelphus.Presentation.Models.Tables
             Func<State>? childContentAggregateStateGetter = null,
             Func<string>? stateVisibilityToolTipGetter = null,
             IReadOnlyDictionary<string, bool>? cellEnabledStates = null,
-            IReadOnlyDictionary<string, string?>? cellToolTips = null)
+            IReadOnlyDictionary<string, string?>? cellToolTips = null,
+            Action<Action>? cellChangedDispatcher = null)
         {
             ArgumentNullException.ThrowIfNull(cells);
 
@@ -120,6 +122,7 @@ namespace Philadelphus.Presentation.Models.Tables
             _stateGetter = stateGetter;
             _childContentAggregateStateGetter = childContentAggregateStateGetter;
             _stateVisibilityToolTipGetter = stateVisibilityToolTipGetter;
+            _cellChangedDispatcher = cellChangedDispatcher;
 
             Cells = new ReadOnlyDictionary<string, object?>(_cells);
             ValueOptions = new ReadOnlyDictionary<string, IEnumerable<object>?>(_valueOptions);
@@ -297,7 +300,30 @@ namespace Philadelphus.Presentation.Models.Tables
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ChildContentAggregateState)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StateVisibilityToolTip)));
             EditText.RaiseChanged();
-            CellChanged?.Invoke(SourceUuid, ResolveLogicalKey(cellKey));
+            NotifyCellChanged(cellKey);
+        }
+
+        private void NotifyCellChanged(string cellKey)
+        {
+            var cellChanged = CellChanged;
+            if (cellChanged == null)
+            {
+                return;
+            }
+
+            var sourceUuid = SourceUuid;
+            var logicalKey = ResolveLogicalKey(cellKey);
+            void Notify() => cellChanged(sourceUuid, logicalKey);
+
+            if (_cellChangedDispatcher == null)
+            {
+                Notify();
+                return;
+            }
+
+            // Обновление VM может заменить ItemsSource таблицы. Откладываем его до завершения
+            // текущего цикла ввода, чтобы DataGrid успел штатно закрыть редактор ячейки.
+            _cellChangedDispatcher(Notify);
         }
 
         private string ResolveCellKey(string key)

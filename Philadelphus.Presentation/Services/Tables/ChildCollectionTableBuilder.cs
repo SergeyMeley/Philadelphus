@@ -298,7 +298,8 @@ namespace Philadelphus.Presentation.Services.Tables
         public static IReadOnlyList<ChildCollectionTableRow> buildChildCollectionTableRows(
             IEnumerable<IChildrenModel>? children,
             IEnumerable<ChildCollectionTableColumn>? columns,
-            Action<Guid, string>? cellChanged = null)
+            Action<Guid, string>? cellChanged = null,
+            Action<Action>? cellChangedDispatcher = null)
         {
             var columnsList = columns?.OrderBy(x => x.Order).ToList()
                 ?? new List<ChildCollectionTableColumn>();
@@ -404,7 +405,8 @@ namespace Philadelphus.Presentation.Services.Tables
                     () => GetStateVisibilityInfo(child).ChildContentState ?? State.SavedOrLoaded,
                     () => child is IMainEntityModel entity ? StateVisibilityInfoBuilder.Build(entity).ToolTip : string.Empty,
                     cellEnabledStates,
-                    cellToolTips));
+                    cellToolTips,
+                    cellChangedDispatcher));
             }
 
             return rows;

@@ -402,7 +402,7 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
         }
 
         [Fact]
-        public void buildChildCollectionTableRows_Allows_Formula_Input_Via_EditText()
+        public void buildChildCollectionTableRows_Applies_Formula_Input_Before_Deferred_Cell_Notification()
         {
             var fixture = CreateFixture();
             var children = new IChildrenModel[] { fixture.Leave };
@@ -410,15 +410,28 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
                 fixture.Root,
                 children);
             var priceColumn = columns.Single(x => x.Header == "Цена, руб");
-            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+            var pendingNotifications = new Queue<Action>();
+            var changedCells = new List<(Guid SourceUuid, string ColumnKey)>();
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(
+                children,
+                columns,
+                (sourceUuid, columnKey) => changedCells.Add((sourceUuid, columnKey)),
+                pendingNotifications.Enqueue).Single();
 
             row.EditText[priceColumn.BindingKey] = "=1+2";
 
             fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб").ValueFormula.Should().Be("=1+2");
+            changedCells.Should().BeEmpty();
+            pendingNotifications.Should().ContainSingle();
+
+            pendingNotifications.Dequeue().Invoke();
+
+            changedCells.Should().ContainSingle()
+                .Which.Should().Be((fixture.Leave.Uuid, priceColumn.Key));
         }
 
         [Fact]
-        public void buildChildCollectionTableRows_Resolves_Leaf_Reference_Via_EditText()
+        public void buildChildCollectionTableRows_Resolves_Leaf_Reference_Before_Deferred_Cell_Notification()
         {
             var fixture = CreateFixture();
             var newPriceValue = new TreeLeaveModel(
@@ -435,7 +448,13 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
                 fixture.Root,
                 children);
             var priceColumn = columns.Single(x => x.Header == "Цена, руб");
-            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+            var pendingNotifications = new Queue<Action>();
+            var changedCells = new List<(Guid SourceUuid, string ColumnKey)>();
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(
+                children,
+                columns,
+                (sourceUuid, columnKey) => changedCells.Add((sourceUuid, columnKey)),
+                pendingNotifications.Enqueue).Single();
 
             row.ValueOptions[priceColumn.BindingKey].Should().Contain(newPriceValue);
 
@@ -443,10 +462,17 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
             row.EditText[priceColumn.BindingKey] = $"[{newPriceValue.Uuid}]";
 
             fixture.Leave.Attributes.Single(x => x.Name == "Цена, руб").Value.Should().Be(newPriceValue);
+            changedCells.Should().BeEmpty();
+            pendingNotifications.Should().ContainSingle();
+
+            pendingNotifications.Dequeue().Invoke();
+
+            changedCells.Should().ContainSingle()
+                .Which.Should().Be((fixture.Leave.Uuid, priceColumn.Key));
         }
 
         [Fact]
-        public void buildChildCollectionTableRows_Allows_Manual_SystemBase_Attribute_Value_Input()
+        public void buildChildCollectionTableRows_Applies_Manual_SystemBase_Input_Before_Deferred_Cell_Notification()
         {
             var notificationService = new FakeNotificationService();
             var tree = new FakeWorkingTreeModel();
@@ -503,9 +529,15 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
             var children = new IChildrenModel[] { child };
             var columns = ChildCollectionTableBuilder.buildChildCollectionTableColumns(root, children);
             var textColumn = columns.Single(x => x.Header == "Text");
-            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(children, columns).Single();
+            var pendingNotifications = new Queue<Action>();
+            var changedCells = new List<(Guid SourceUuid, string ColumnKey)>();
+            var row = ChildCollectionTableBuilder.buildChildCollectionTableRows(
+                children,
+                columns,
+                (sourceUuid, columnKey) => changedCells.Add((sourceUuid, columnKey)),
+                pendingNotifications.Enqueue).Single();
 
-            row[textColumn.BindingKey] = "Manual";
+            row.EditText[textColumn.BindingKey] = "Manual";
 
             var assignedValue = child.Attributes.Single(x => x.Name == "Text").Value;
             assignedValue.Should().BeOfType<SystemBaseTreeLeaveModel>();
@@ -514,6 +546,13 @@ namespace Philadelphus.Tests.Presentation.Services.Tables
             stringNode.ChildLeaves.OfType<SystemBaseTreeLeaveModel>()
                 .Count(x => x.StringValue == "Manual")
                 .Should().Be(1);
+            changedCells.Should().BeEmpty();
+            pendingNotifications.Should().ContainSingle();
+
+            pendingNotifications.Dequeue().Invoke();
+
+            changedCells.Should().ContainSingle()
+                .Which.Should().Be((child.Uuid, textColumn.Key));
         }
 
         [Fact]

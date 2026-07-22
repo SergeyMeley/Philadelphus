@@ -55,6 +55,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private readonly ILeavePolymorphismChangeCoordinator _leavePolymorphismChangeCoordinator;
         private readonly IAttributeValuesCollectionVMFactory _attributeValuesCollectionVMFactory;
         private readonly ILeaveAttributeValueService _attributeValueService;
+        private readonly IDispatcherService _dispatcherService;
         private readonly SemaphoreSlim _repositoryLoadSemaphore = new SemaphoreSlim(1, 1);
         private readonly DataStoragesCollectionVM _dataStoragesCollectionVM;
        
@@ -316,6 +317,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         /// <param name="leavePolymorphismService">Сервис runtime-связей полиморфных листов.</param>
         /// <param name="leavePolymorphismChangeCoordinator">Координатор интерактивных полиморфных изменений.</param>
         /// <param name="attributeValuesCollectionVMFactory">Фабрика редактора коллекционного атрибута.</param>
+        /// <param name="dispatcherService">Сервис постановки обновлений интерфейса в очередь UI.</param>
         /// <param name="dialogService">Сервис диалогов подтверждения.</param>
         /// <exception cref="ArgumentNullException">Если обязательный аргумент равен null.</exception>
         public RepositoryExplorerControlVM(
@@ -346,6 +348,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ILeavePolymorphismChangeCoordinator leavePolymorphismChangeCoordinator,
             IAttributeValuesCollectionVMFactory attributeValuesCollectionVMFactory,
             ILeaveAttributeValueService attributeValueService,
+            IDispatcherService dispatcherService,
             bool loadOnStartup = true)
             : base(serviceProvider, mapper, logger, notificationService, applicationCommandsVM)
         {
@@ -372,6 +375,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             ArgumentNullException.ThrowIfNull(leavePolymorphismChangeCoordinator);
             ArgumentNullException.ThrowIfNull(attributeValuesCollectionVMFactory);
             ArgumentNullException.ThrowIfNull(attributeValueService);
+            ArgumentNullException.ThrowIfNull(dispatcherService);
 
             _service = service;
             _fileDialogService = fileDialogService;
@@ -386,6 +390,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _leavePolymorphismChangeCoordinator = leavePolymorphismChangeCoordinator;
             _attributeValuesCollectionVMFactory = attributeValuesCollectionVMFactory;
             _attributeValueService = attributeValueService;
+            _dispatcherService = dispatcherService;
             _extensionsControlVM = extensionVMFactory.Create(this);
             _philadelphusRepositoryVM = PhiladelphusRepositoryVM;
             _dataStoragesCollectionVM = dataStoragesCollectionVM;
@@ -1159,7 +1164,8 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
             _childCollectionTableRows = ChildCollectionTableBuilder.buildChildCollectionTableRows(
                 children,
                 _childCollectionTableColumns,
-                OnChildCollectionTableCellChanged);
+                OnChildCollectionTableCellChanged,
+                _dispatcherService.BeginInvoke);
 
             OnPropertyChanged(nameof(ChildCollectionTableColumns));
             OnPropertyChanged(nameof(ChildCollectionTableRows));
