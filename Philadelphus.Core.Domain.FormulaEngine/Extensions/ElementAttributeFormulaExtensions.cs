@@ -24,6 +24,18 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
         }
 
         /// <summary>
+        /// Сохраняет текущую коллекцию значений как короткую формулу массива.
+        /// </summary>
+        public static void AssignValuesAsFormula(this ElementAttributeModel attribute)
+        {
+            ArgumentNullException.ThrowIfNull(attribute);
+
+            attribute.ValueFormula = FormulaReferenceFormatter.CreateTreeLeaveCollectionFormula(
+                attribute.Values.Select(x => x.Uuid));
+            attribute.ValueFormulaErrorCode = string.Empty;
+        }
+
+        /// <summary>
         /// Пытается назначить строковое значение системного базового типа через формулу-ссылку.
         /// </summary>
         public static bool TrySetSystemBaseValueAsFormula(
@@ -57,7 +69,14 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
 
             attribute.ValueFormula = string.Empty;
             attribute.ValueFormulaErrorCode = string.Empty;
-            attribute.Value = null!;
+            if (attribute.IsCollectionValue)
+            {
+                attribute.ClearValuesCollection();
+            }
+            else
+            {
+                attribute.Value = null!;
+            }
         }
 
         /// <summary>
@@ -67,11 +86,6 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
         public static void SetFormulaText(this ElementAttributeModel attribute, string? value)
         {
             ArgumentNullException.ThrowIfNull(attribute);
-
-            if (attribute.IsCollectionValue)
-            {
-                return;
-            }
 
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -84,6 +98,11 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Extensions
             {
                 attribute.ValueFormula = trimmedValue;
                 attribute.ValueFormulaErrorCode = string.Empty;
+                return;
+            }
+
+            if (attribute.IsCollectionValue)
+            {
                 return;
             }
 

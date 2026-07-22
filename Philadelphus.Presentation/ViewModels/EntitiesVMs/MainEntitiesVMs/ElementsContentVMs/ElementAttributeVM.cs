@@ -437,6 +437,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
             if (_model.TryAddValueToValuesCollection(SelectedValue))
             {
+                _model.AssignValuesAsFormula();
                 RefreshAssignedValues();
                 return true;
             }
@@ -459,6 +460,7 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
 
             if (_model.TryRemoveValueFromValuesCollection(SelectedValue))
             {
+                _model.AssignValuesAsFormula();
                 RefreshAssignedValues();
                 return true;
             }

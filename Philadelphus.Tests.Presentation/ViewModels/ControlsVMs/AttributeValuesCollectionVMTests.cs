@@ -536,11 +536,13 @@ public class AttributeValuesCollectionVMTests
         row["IsSelected"] = true;
 
         graph.Attribute.Values.Should().Equal(graph.Second);
+        graph.Attribute.ValueFormula.Should().Be($"={{[{graph.Second.Uuid}]}}");
         row["IsSelected"].Should().Be(true);
 
         row["IsSelected"] = false;
 
         graph.Attribute.Values.Should().BeEmpty();
+        graph.Attribute.ValueFormula.Should().Be("={}");
         row["IsSelected"].Should().Be(false);
     }
 

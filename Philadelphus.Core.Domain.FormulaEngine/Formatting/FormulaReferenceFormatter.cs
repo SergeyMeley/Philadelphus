@@ -21,6 +21,18 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Formatting
             => $"={CreateTreeLeaveReference(uuid)}";
 
         /// <summary>
+        /// Формирует короткую формулу коллекции ссылок на листья рабочего дерева.
+        /// </summary>
+        /// <param name="uuids">UUID листьев в порядке элементов коллекции.</param>
+        /// <returns>Формула вида <c>={[uuid1];[uuid2]}</c>.</returns>
+        public static string CreateTreeLeaveCollectionFormula(IEnumerable<Guid> uuids)
+        {
+            ArgumentNullException.ThrowIfNull(uuids);
+
+            return $"={{{string.Join(";", uuids.Select(CreateTreeLeaveReference))}}}";
+        }
+
+        /// <summary>
         /// Формирует относительную ссылку на атрибут текущего элемента.
         /// </summary>
         /// <param name="attributeName">Наименование атрибута.</param>

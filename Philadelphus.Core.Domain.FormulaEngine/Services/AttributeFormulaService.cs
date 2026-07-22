@@ -77,7 +77,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             {
                 // Вычисленное Value — лишь материализованный результат. При ошибке старый результат
                 // необходимо удалить, иначе в БД и отчетах останется значение от предыдущей формулы.
-                attribute.Value = null!;
+                ClearMaterializedFormulaResult(attribute);
                 attribute.ValueFormula = formulaText;
                 attribute.ValueFormulaErrorCode = "#CYCLE!";
                 onAttributeChanged(attribute);
@@ -93,7 +93,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             {
                 if (RecalculateAttribute(dependency, null, stack, recalculated, contextFactory, onAttributeChanged) == false)
                 {
-                    attribute.Value = null!;
+                    ClearMaterializedFormulaResult(attribute);
                     attribute.ValueFormula = formulaText;
                     attribute.ValueFormulaErrorCode = "#DEPENDENCY!";
                     onAttributeChanged(attribute);
@@ -105,7 +105,7 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
             var result = _formulaEvaluator.Evaluate(formulaText, contextFactory(attribute));
             if (result.IsSuccess == false)
             {
-                attribute.Value = null!;
+                ClearMaterializedFormulaResult(attribute);
                 attribute.ValueFormula = formulaText;
                 attribute.ValueFormulaErrorCode = FormatFormulaErrorCode(result);
                 onAttributeChanged(attribute);
@@ -166,6 +166,33 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
 
         private bool TryApplyFormulaResult(ElementAttributeModel targetAttribute, FormulaResult result, string formulaText)
         {
+            if (targetAttribute.IsCollectionValue)
+            {
+                if (result.TreeLeaves == null
+                    || result.TreeLeaves.Any(x => IsTreeLeaveCompatible(targetAttribute, x) == false))
+                {
+                    SendFormulaTypeMismatch(targetAttribute, result.ValueType.ToString());
+                    return false;
+                }
+
+                if (targetAttribute.ClearValuesCollection() == false)
+                {
+                    return false;
+                }
+
+                foreach (var value in result.TreeLeaves.DistinctBy(x => x.Uuid))
+                {
+                    if (targetAttribute.TryAddValueToValuesCollection(value) == false)
+                    {
+                        return false;
+                    }
+                }
+
+                targetAttribute.ValueFormula = formulaText;
+                targetAttribute.ValueFormulaErrorCode = string.Empty;
+                return true;
+            }
+
             if (result.TreeLeave != null)
             {
                 if (IsTreeLeaveCompatible(targetAttribute, result.TreeLeave) == false)
@@ -206,6 +233,18 @@ namespace Philadelphus.Core.Domain.FormulaEngine.Services
         private static bool IsTreeLeaveCompatible(ElementAttributeModel attribute, TreeLeaveModel value)
         {
             return attribute.ValueType?.Uuid == value.ParentNode.Uuid;
+        }
+
+        private static void ClearMaterializedFormulaResult(ElementAttributeModel attribute)
+        {
+            if (attribute.IsCollectionValue)
+            {
+                attribute.ClearValuesCollection();
+            }
+            else
+            {
+                attribute.Value = null!;
+            }
         }
 
         private static bool IsSystemBaseResultCompatible(SystemBaseType expectedType, SystemBaseType actualType)

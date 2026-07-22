@@ -46,6 +46,12 @@ namespace Philadelphus.Presentation.Services.Tables
                 return attribute.ValueFormula;
             }
 
+            if (attribute.IsCollectionValue)
+            {
+                return FormulaReferenceFormatter.CreateTreeLeaveCollectionFormula(
+                    attribute.Values.Select(x => x.Uuid));
+            }
+
             return attribute.Value?.Uuid == null
                 ? string.Empty
                 : FormulaReferenceFormatter.CreateTreeLeaveReferenceFormula(attribute.Value.Uuid);

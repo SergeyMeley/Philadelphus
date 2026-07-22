@@ -123,6 +123,30 @@ public class AttributeFormulaServiceTests
     }
 
     [Fact]
+    public void AssignValuesAsFormula_SetsShortCollectionFormula()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+        fixture.Attribute.TryAddValueToValuesCollection(fixture.Value).Should().BeTrue();
+
+        fixture.Attribute.AssignValuesAsFormula();
+
+        fixture.Attribute.ValueFormula.Should().Be($"={{[{fixture.Value.Uuid}]}}");
+        fixture.Attribute.ValueFormulaErrorCode.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SetFormulaText_CollectionFormula_SetsTrimmedFormula()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+
+        fixture.Attribute.SetFormulaText($"  ={{[{fixture.Value.Uuid}]}}  ");
+
+        fixture.Attribute.ValueFormula.Should().Be($"={{[{fixture.Value.Uuid}]}}");
+    }
+
+    [Fact]
     public void ClearFormulaValue_ClearsFormulaErrorAndMaterializedValue()
     {
         var fixture = CreateFixture();
@@ -150,6 +174,37 @@ public class AttributeFormulaServiceTests
         fixture.Attribute.ValueFormula.Should().Be($"=[{fixture.Value.Uuid}]");
         fixture.Attribute.ValueFormulaErrorCode.Should().BeEmpty();
         fixture.Attribute.Value.Should().BeSameAs(fixture.Value);
+    }
+
+    [Fact]
+    public void RecalculateAttribute_MaterializesCollectionFromShortFormula()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+        var formula = $"={{[{fixture.Value.Uuid}]}}";
+
+        var result = Recalculate(fixture.Attribute, formula);
+
+        result.Should().BeTrue();
+        fixture.Attribute.ValueFormula.Should().Be(formula);
+        fixture.Attribute.ValueFormulaErrorCode.Should().BeEmpty();
+        fixture.Attribute.Values.Should().ContainSingle().Which.Should().BeSameAs(fixture.Value);
+    }
+
+    [Fact]
+    public void RecalculateAttribute_InvalidCollectionFormula_ClearsMaterializedValues()
+    {
+        var fixture = CreateFixture();
+        fixture.Attribute.IsCollectionValue = true;
+        fixture.Attribute.TryAddValueToValuesCollection(fixture.Value).Should().BeTrue();
+        var formula = $"={{[{Guid.CreateVersion7()}]}}";
+
+        var result = Recalculate(fixture.Attribute, formula);
+
+        result.Should().BeTrue();
+        fixture.Attribute.Values.Should().BeEmpty();
+        fixture.Attribute.ValueFormula.Should().Be(formula);
+        fixture.Attribute.ValueFormulaErrorCode.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -213,6 +268,7 @@ public class AttributeFormulaServiceTests
     {
         var registry = new FormulaRegistry();
         registry.RegisterProvider(new TreeLeaveFormulaProvider());
+        registry.RegisterProvider(new CollectionFormulaProvider());
         var evaluator = new FormulaAstEvaluator(registry);
         var service = new AttributeFormulaService(evaluator, new FakeNotificationService());
 

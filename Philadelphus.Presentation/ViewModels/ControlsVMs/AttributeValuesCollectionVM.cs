@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntities;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Infrastructure;
 using Philadelphus.Presentation.Models.Tables;
@@ -343,7 +344,10 @@ public sealed class AttributeValuesCollectionVM : ViewModelBase, IDisposable, IW
             ? _attribute.TryAddValueToValuesCollection(value)
             : _attribute.TryRemoveValueFromValuesCollection(value);
         if (changed)
+        {
+            _attribute.AssignValuesAsFormula();
             _attributeVM?.RefreshAssignedValues();
+        }
 
         return changed;
     }

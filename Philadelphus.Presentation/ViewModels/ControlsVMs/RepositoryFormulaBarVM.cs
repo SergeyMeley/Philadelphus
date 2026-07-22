@@ -1030,6 +1030,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 _isFormulaAttributeNotificationInProgress = true;
                 try
                 {
+                    _selectedFormulaAttribute.RefreshAssignedValues();
                     _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValue));
                     _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.AssignedValueText));
                     _selectedFormulaAttribute.OnPropertyChanged(nameof(ElementAttributeVM.DisplayedValueText));
