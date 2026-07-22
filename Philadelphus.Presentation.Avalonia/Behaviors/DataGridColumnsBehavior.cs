@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using global::Avalonia;
 using global::Avalonia.Controls;
@@ -38,6 +40,7 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
         private static readonly StateToColorConverter StateToColor = new();
         private static readonly EnumDisplayAttributeConverter EnumDisplay = new();
         private static readonly BoolToBrushConverter BoolToBrush = new();
+        private static readonly ConditionalWeakTable<DataGrid, ColumnsState> ColumnsStates = new();
 
         // Подсветка «переопределено» (Moccasin, статусный цвет) + чёрный текст для читаемости в Dark,
         // как в таблице атрибутов (см. Attributes.axaml). Пустая часть параметра → UnsetValue (дефолт темы).
@@ -60,16 +63,58 @@ namespace Philadelphus.Presentation.Avalonia.Behaviors
 
         private static void RebuildColumns(DataGrid dataGrid, IEnumerable? columnsSource)
         {
-            dataGrid.Columns.Clear();
+            var columns = columnsSource?
+                .OfType<ChildCollectionTableColumn>()
+                .OrderBy(x => x.Order)
+                .ToArray() ?? [];
+            var signatures = columns.Select(ColumnSignature.Create).ToArray();
+            var state = ColumnsStates.GetValue(dataGrid, _ => new ColumnsState());
 
-            if (columnsSource == null)
+            // При обновлении значений VM создаёт новые дескрипторы той же схемы. Не очищаем
+            // Columns во время завершения редактирования ячейки: Avalonia DataGrid в этот момент
+            // ещё использует текущую колонку и падает внутри EndCellEdit/PopulateCellContent.
+            if (dataGrid.Columns.Count == signatures.Length
+                && state.Signatures.SequenceEqual(signatures))
             {
                 return;
             }
 
-            foreach (var column in columnsSource.OfType<ChildCollectionTableColumn>().OrderBy(x => x.Order))
+            dataGrid.Columns.Clear();
+
+            foreach (var column in columns)
             {
                 dataGrid.Columns.Add(CreateColumn(column));
+            }
+
+            state.Signatures = signatures;
+        }
+
+        private sealed class ColumnsState
+        {
+            public IReadOnlyList<ColumnSignature> Signatures { get; set; } = [];
+        }
+
+        private sealed record ColumnSignature(
+            string Key,
+            string BindingKey,
+            string Header,
+            string? HeaderToolTip,
+            int Order,
+            bool IsReadOnly,
+            bool IsAttribute,
+            ChildCollectionTableColumnType ColumnType)
+        {
+            public static ColumnSignature Create(ChildCollectionTableColumn column)
+            {
+                return new ColumnSignature(
+                    column.Key,
+                    column.BindingKey,
+                    column.Header,
+                    column.HeaderToolTip,
+                    column.Order,
+                    column.IsReadOnly,
+                    column.IsAttribute,
+                    column.ColumnType);
             }
         }
 
