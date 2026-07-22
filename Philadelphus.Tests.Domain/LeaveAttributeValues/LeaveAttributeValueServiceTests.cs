@@ -8,6 +8,7 @@ using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembe
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.Enums;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
+using Philadelphus.Core.Domain.FormulaEngine.Extensions;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.LeaveAttributeValues.Services;
 using Philadelphus.Core.Domain.Policies;
@@ -295,10 +296,32 @@ public class LeaveAttributeValueServiceTests
         var cleared = GetAttribute(target, clearedDeclaration);
         result.ChangedAttributes.Should().Equal(replaced, cleared);
         replaced.Values.Should().Equal(graph.SecondValue);
+        replaced.ValueFormula.Should().Be($"={{[{graph.SecondValue.Uuid}]}}");
         cleared.Values.Should().BeEmpty();
+        cleared.ValueFormula.Should().Be("={}");
         service.FillFromLeave(target, source,
                 [replacedDeclaration.DeclaringUuid, clearedDeclaration.DeclaringUuid])
             .ChangedAttributes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void FillFromLeave_AddsFormulaWhenCollectionValuesAlreadyMatch()
+    {
+        var graph = CreateGraph();
+        var declaration = CreateDeclaration(graph, isCollection: true);
+        var source = CreateLeave(graph);
+        var target = CreateLeave(graph);
+        AddValues(source, declaration, graph.FirstValue);
+        AddValues(target, declaration, graph.FirstValue);
+        GetAttribute(target, declaration).ValueFormula = string.Empty;
+
+        var result = CreateService().FillFromLeave(
+            target, source, [declaration.DeclaringUuid]);
+
+        var changed = GetAttribute(target, declaration);
+        result.ChangedAttributes.Should().Equal(changed);
+        changed.Values.Should().Equal(graph.FirstValue);
+        changed.ValueFormula.Should().Be($"={{[{graph.FirstValue.Uuid}]}}");
     }
 
     [Fact]
@@ -347,6 +370,8 @@ public class LeaveAttributeValueServiceTests
             .Should().Be($"=[{graph.FirstValue.Uuid}]");
         GetAttribute(created, collectionDeclaration).Values
             .Should().Equal(graph.FirstValue, graph.SecondValue);
+        GetAttribute(created, collectionDeclaration).ValueFormula
+            .Should().Be($"={{[{graph.FirstValue.Uuid}];[{graph.SecondValue.Uuid}]}}");
     }
 
     [Fact]
@@ -374,6 +399,7 @@ public class LeaveAttributeValueServiceTests
         GetAttribute(created, emptyScalar).Value.Should().BeNull();
         GetAttribute(created, emptyScalar).ValueFormula.Should().BeEmpty();
         GetAttribute(created, emptyCollection).Values.Should().BeEmpty();
+        GetAttribute(created, emptyCollection).ValueFormula.Should().Be("={}");
         GetAttribute(created, assignedScalar).Value.Should().BeSameAs(graph.SecondValue);
         GetAttribute(created, assignedScalar).ValueFormula
             .Should().Be($"=[{graph.SecondValue.Uuid}]");
@@ -451,6 +477,8 @@ public class LeaveAttributeValueServiceTests
     {
         foreach (var value in values)
             GetAttribute(leave, declaration).TryAddValueToValuesCollection(value).Should().BeTrue();
+
+        GetAttribute(leave, declaration).AssignValuesAsFormula();
     }
 
     private static TestGraph CreateGraph()

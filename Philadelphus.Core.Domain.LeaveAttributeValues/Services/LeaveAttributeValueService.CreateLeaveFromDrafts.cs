@@ -121,7 +121,7 @@ public sealed partial class LeaveAttributeValueService
             var targetAttribute = targetAttributes[resolvedValue.DeclaringUuid];
             if (resolvedValue.IsCollection)
             {
-                if (ValuesMatch(targetAttribute.Values, resolvedValue.Values))
+                if (CollectionMatches(targetAttribute, resolvedValue.Values))
                     continue;
 
                 targetAttribute.ClearValuesCollection();
@@ -132,6 +132,10 @@ public sealed partial class LeaveAttributeValueService
                     if (targetAttribute.TryAddValueToValuesCollection(value) == false)
                         throw CreateFillException(targetAttribute, $"значение [{value.Uuid}] добавить не удалось");
                 }
+
+                targetAttribute.AssignValuesAsFormula();
+                if (CollectionMatches(targetAttribute, resolvedValue.Values) == false)
+                    throw CreateFillException(targetAttribute, "коллекционное значение отклонено политикой модели");
 
                 continue;
             }

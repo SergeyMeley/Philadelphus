@@ -121,8 +121,7 @@ public sealed partial class LeaveAttributeValueService
     {
         if (targetAttribute.IsCollectionValue)
         {
-            return string.IsNullOrEmpty(targetAttribute.ValuesReferenceErrorCode) == false
-                || ValuesMatch(targetAttribute.Values, sourceAttribute.Values) == false;
+            return CollectionMatches(targetAttribute, sourceAttribute.Values) == false;
         }
 
         var sourceValue = sourceAttribute.Value;
@@ -166,8 +165,7 @@ public sealed partial class LeaveAttributeValueService
         ElementAttributeModel sourceAttribute)
     {
         var sourceValues = sourceAttribute.Values.ToList();
-        if (string.IsNullOrEmpty(targetAttribute.ValuesReferenceErrorCode)
-            && ValuesMatch(targetAttribute.Values, sourceValues))
+        if (CollectionMatches(targetAttribute, sourceValues))
         {
             return false;
         }
@@ -181,8 +179,19 @@ public sealed partial class LeaveAttributeValueService
                 throw CreateFillException(targetAttribute, $"значение '{value.Name}' [{value.Uuid}] добавить не удалось");
         }
 
+        targetAttribute.AssignValuesAsFormula();
+        if (CollectionMatches(targetAttribute, sourceValues) == false)
+            throw CreateFillException(targetAttribute, "коллекционное значение отклонено политикой модели");
+
         return true;
     }
+
+    private static bool CollectionMatches(
+        ElementAttributeModel targetAttribute,
+        IEnumerable<TreeLeaveModel> sourceValues) =>
+        ValuesMatch(targetAttribute.Values, sourceValues)
+        && string.IsNullOrWhiteSpace(targetAttribute.ValueFormula) == false
+        && string.IsNullOrEmpty(targetAttribute.ValueFormulaErrorCode);
 
     /// <summary>
     /// Проверяет равенство материализованного значения, формулы-ссылки и ошибки вычисления.
