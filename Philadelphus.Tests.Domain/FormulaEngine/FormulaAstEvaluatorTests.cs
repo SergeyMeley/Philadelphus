@@ -593,6 +593,25 @@ namespace Philadelphus.Tests.Domain.FormulaEngine
         }
 
         /// <summary>
+        /// Проверяет материализацию вычисляемого базового значения внутри массива.
+        /// </summary>
+        [Fact]
+        public void Evaluate_Array_Materializes_Numeric_Expression_To_Leave()
+        {
+            var registry = new FormulaRegistry();
+            registry.RegisterProvider(new ArithmeticFormulaProvider());
+            registry.RegisterProvider(new CollectionFormulaProvider());
+            var evaluator = new FormulaAstEvaluator(registry);
+
+            var result = evaluator.Evaluate("={1+1}", FormulaEngineTestContextFactory.Create());
+
+            result.IsSuccess.Should().BeTrue();
+            result.TreeLeaves.Should().ContainSingle()
+                .Which.Should().BeOfType<SystemBaseTreeLeaveModel>()
+                .Which.StringValue.Should().Be("2");
+        }
+
+        /// <summary>
         /// Проверяет вычисление фигурных скобок как короткого псевдонима МАССИВ.
         /// </summary>
         [Fact]

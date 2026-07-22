@@ -97,7 +97,9 @@
                                  Обычный CheckBox остаётся доступным сразу и явно записывает значение в VM. -->
                             <CheckBox HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
-                                      IsChecked="{Binding IsCollectionValue, Mode=TwoWay}"
+                                      IsChecked="{Binding IsCollectionValue, Mode=OneWay}"
+                                      Command="{Binding $parent[UserControl].DataContext.ToggleAttributeCollectionModeCommand}"
+                                      CommandParameter="{Binding}"
                                       IsEnabled="{Binding CanChangeCollectionMode}"
                                       ToolTip.Tip="{Binding CollectionModeToolTip}" />
                         </DataTemplate>

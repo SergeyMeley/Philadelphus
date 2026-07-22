@@ -296,6 +296,108 @@ public class MainEntityBaseVMTests
         attribute.IsCollectionValue.Should().BeTrue();
     }
 
+    [Fact]
+    public void OwnAttributeVM_CollectionMode_RoundTripPreservesScalarFormula()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var valueType = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var value = new TreeLeaveModel(
+            Guid.NewGuid(),
+            valueType,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        attribute.ValueType = valueType;
+        attribute.Value = value;
+        attribute.ValueFormula = "=АТРИБУТ(\"Источник\")";
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+
+        attributeVM.IsCollectionValue = true;
+
+        attribute.IsCollectionValue.Should().BeTrue();
+        attribute.Values.Should().ContainSingle().Which.Should().BeSameAs(value);
+        attribute.ValueFormula.Should().Be("={АТРИБУТ(\"Источник\")}");
+        attributeVM.FormulaValueText.Should().Be("={АТРИБУТ(\"Источник\")}");
+        attributeVM.RequiresCollectionModeChangeConfirmation.Should().BeFalse();
+
+        attributeVM.IsCollectionValue = false;
+
+        attribute.IsCollectionValue.Should().BeFalse();
+        attribute.Value.Should().BeSameAs(value);
+        attribute.ValueFormula.Should().Be("=АТРИБУТ(\"Источник\")");
+    }
+
+    [Fact]
+    public void OwnAttributeVM_DisablingCollectionMode_RetainsFirstCollectionValue()
+    {
+        var notificationService = new FakeNotificationService();
+        var tree = new FakeWorkingTreeModel();
+        var root = new TreeRootModel(
+            Guid.NewGuid(),
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeRootModel>());
+        var valueType = new TreeNodeModel(
+            Guid.NewGuid(),
+            root,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeNodeModel>());
+        var firstValue = new TreeLeaveModel(
+            Guid.NewGuid(),
+            valueType,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var secondValue = new TreeLeaveModel(
+            Guid.NewGuid(),
+            valueType,
+            tree,
+            notificationService,
+            new EmptyPropertiesPolicy<TreeLeaveModel>());
+        var attribute = CreateAttribute(root, tree, notificationService);
+        attribute.ValueType = valueType;
+        attribute.IsCollectionValue = true;
+        attribute.TryAddValueToValuesCollection(firstValue).Should().BeTrue();
+        attribute.TryAddValueToValuesCollection(secondValue).Should().BeTrue();
+        attribute.ValueFormula = $"={{[{firstValue.Uuid}];[{secondValue.Uuid}]}}";
+        var rootVM = new TreeRootVM(
+            root,
+            CreateDataStoragesCollectionVM(tree.DataStorage),
+            DispatchProxy.Create<IPhiladelphusRepositoryService, DefaultDispatchProxy>(),
+            DispatchProxy.Create<IFileDialogService, DefaultDispatchProxy>(),
+            notificationService);
+        var attributeVM = rootVM.AttributesVMs.Single(x => x.Model == attribute);
+
+        attributeVM.RequiresCollectionModeChangeConfirmation.Should().BeTrue();
+        attributeVM.IsCollectionValue = false;
+
+        attribute.IsCollectionValue.Should().BeFalse();
+        attribute.Value.Should().BeSameAs(firstValue);
+        attribute.Values.Should().BeEmpty();
+        attribute.ValueFormula.Should().Be($"=[{firstValue.Uuid}]");
+        attributeVM.DisplayedValueText.Should().BeEmpty();
+        attributeVM.FormulaValueText.Should().Be($"=[{firstValue.Uuid}]");
+    }
+
     /// <summary>
     /// Вид значения унаследованного атрибута изменяется только через его объявление.
     /// </summary>

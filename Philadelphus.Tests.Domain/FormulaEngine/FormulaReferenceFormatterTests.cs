@@ -23,6 +23,32 @@ public class FormulaReferenceFormatterTests
     }
 
     [Fact]
+    public void CreateCollectionFormulaFromScalarFormula_WrapsExpression()
+    {
+        FormulaReferenceFormatter.CreateCollectionFormulaFromScalarFormula("=ФУНКЦИЯ(1; 2)")
+            .Should().Be("={ФУНКЦИЯ(1; 2)}");
+    }
+
+    [Fact]
+    public void TryCreateScalarFormulaFromCollectionFormula_UnwrapsSingleExpression()
+    {
+        FormulaReferenceFormatter.TryCreateScalarFormulaFromCollectionFormula(
+                $"={{ЛИСТ(0;\"{TreeLeaveUuid}\")}}",
+                out var scalarFormula)
+            .Should().BeTrue();
+        scalarFormula.Should().Be($"=ЛИСТ(0;\"{TreeLeaveUuid}\")");
+    }
+
+    [Fact]
+    public void TryCreateScalarFormulaFromCollectionFormula_RejectsMultipleExpressions()
+    {
+        FormulaReferenceFormatter.TryCreateScalarFormulaFromCollectionFormula(
+                "={1+1;2+2}",
+                out _)
+            .Should().BeFalse();
+    }
+
+    [Fact]
     public void CreateRelativeAttributeReference_EscapesQuotes()
     {
         FormulaReferenceFormatter.CreateRelativeAttributeReference("Цвет \"основной\"")

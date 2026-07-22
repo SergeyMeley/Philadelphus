@@ -79,6 +79,7 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
         private IRelayCommand? _createNodeCommand;
         private IRelayCommand? _createLeaveCommand;
         private IRelayCommand? _createAttributeCommand;
+        private IAsyncRelayCommand? _toggleAttributeCollectionModeCommand;
         private IAsyncRelayCommand? _applyPolymorphicParentCommand;
         private IRelayCommand? _createPolymorphicParentCommand;
         private IAsyncRelayCommand? _softDeleteRepositoryMemberCommand;
@@ -515,6 +516,35 @@ namespace Philadelphus.Presentation.ViewModels.ControlsVMs
                 {
                     return CanModifyRepository();
                 });
+
+        /// <summary>
+        /// Переключает атрибут между одиночным и коллекционным значением.
+        /// </summary>
+        public IAsyncRelayCommand ToggleAttributeCollectionModeCommand =>
+            _toggleAttributeCollectionModeCommand ??= _asyncCommandFactory.Create(
+                async parameter =>
+                {
+                    if (parameter is not ElementAttributeVM attribute)
+                        return;
+
+                    if (attribute.RequiresCollectionModeChangeConfirmation)
+                    {
+                        var confirmed = await _dialogService.ConfirmAsync(
+                            $"Формулу массива атрибута «{attribute.Name}» нельзя преобразовать в одиночную без потерь.\n\n"
+                            + "После изменения режима будет сохранён только первый материализованный результат вычисления (если он есть) в виде ссылки на лист. Остальные выражения и значения будут утрачены.\n\n"
+                            + "Продолжить?",
+                            "Изменение формулы атрибута");
+                        if (confirmed == false)
+                        {
+                            attribute.RefreshCollectionModeSelection();
+                            return;
+                        }
+                    }
+
+                    attribute.IsCollectionValue = !attribute.IsCollectionValue;
+                },
+                parameter => CanModifyRepository()
+                    && parameter is ElementAttributeVM { CanChangeCollectionMode: true });
 
         /// <summary>
         /// Подтверждает и применяет временно выбранный полиморфный родительский лист.

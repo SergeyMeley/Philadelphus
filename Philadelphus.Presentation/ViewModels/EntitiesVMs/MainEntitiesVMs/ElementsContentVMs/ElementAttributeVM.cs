@@ -4,6 +4,7 @@ using Philadelphus.Core.Domain.Entities.LeavePolymorphism;
 using Philadelphus.Core.Domain.Entities.MainEntities.PhiladelphusRepositoryMembers.ShrubMembers.WorkingTreeMembers;
 using Philadelphus.Core.Domain.Entities.MainEntityContent.Attributes;
 using Philadelphus.Core.Domain.FormulaEngine.Extensions;
+using Philadelphus.Core.Domain.FormulaEngine.Formatting;
 using Philadelphus.Core.Domain.Interfaces;
 using Philadelphus.Core.Domain.Services.Interfaces;
 using Philadelphus.Presentation.Services.Interfaces;
@@ -91,20 +92,60 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             }
             set
             {
-                if (value == true)
-                {
-                    AssignedValue = null;
-                    _assignedValues.Clear();
-                    OnPropertyChanged(nameof(AssignedValue));
-                }
-                else
-                {
-                    _assignedValues.Clear();
-                    OnPropertyChanged(nameof(AssignedValues));
-                    OnPropertyChanged(nameof(AssignedValuesString));
-                }
+                if (value == _model.IsCollectionValue || CanChangeCollectionMode == false)
+                    return;
+
+                var formula = _model.ValueFormula;
+                var scalarValue = _model.Value;
+                var firstCollectionValue = _model.Values.FirstOrDefault();
+                var preservedScalarFormula = string.Empty;
+                var canPreserveCollectionFormula = _model.IsCollectionValue
+                    && FormulaReferenceFormatter.TryCreateScalarFormulaFromCollectionFormula(
+                        formula,
+                        out preservedScalarFormula);
+                _model.ClearFormulaValue();
+                _assignedValues.Clear();
+                SelectedValue = null;
                 _model.IsCollectionValue = value;
+
+                if (value)
+                {
+                    if (string.IsNullOrWhiteSpace(formula) == false)
+                    {
+                        _model.ValueFormula = FormulaReferenceFormatter
+                            .CreateCollectionFormulaFromScalarFormula(formula);
+                        _model.ValueFormulaErrorCode = string.Empty;
+                        if (scalarValue != null && _model.TryAddValueToValuesCollection(scalarValue))
+                            _assignedValues.Add(scalarValue);
+                    }
+                    else if (scalarValue != null && _model.TryAddValueToValuesCollection(scalarValue))
+                    {
+                        _model.AssignValuesAsFormula();
+                        _assignedValues.Add(scalarValue);
+                    }
+                }
+                else if (canPreserveCollectionFormula
+                    && string.IsNullOrWhiteSpace(preservedScalarFormula) == false)
+                {
+                    _model.ValueFormula = preservedScalarFormula;
+                    _model.ValueFormulaErrorCode = string.Empty;
+                    if (firstCollectionValue != null)
+                        _model.Value = firstCollectionValue;
+                }
+                else if (firstCollectionValue != null)
+                {
+                    _model.AssignValueAsFormula(firstCollectionValue);
+                }
+
+                NotifyStateVisibilityPropertiesChanged();
                 OnPropertyChanged(nameof(IsCollectionValue));
+                OnPropertyChanged(nameof(SelectedValue));
+                OnPropertyChanged(nameof(AssignedValue));
+                OnPropertyChanged(nameof(AssignedValueText));
+                OnPropertyChanged(nameof(AssignedValues));
+                OnPropertyChanged(nameof(AssignedValuesString));
+                OnPropertyChanged(nameof(DisplayedValueText));
+                OnPropertyChanged(nameof(FormulaValueText));
                 OnPropertyChanged(nameof(IsValueOverridden));
                 OnPropertyChanged(nameof(ValueOverrideToolTip));
                 OnPropertyChanged(nameof(AreValuesOverridden));
@@ -252,6 +293,23 @@ namespace Philadelphus.Presentation.ViewModels.EntitiesVMs.MainEntitiesVMs.Eleme
             {
                 return string.Join("; ", _assignedValues?.Select(x => x.Name) ?? []);
             }
+        }
+
+        /// <summary>
+        /// Указывает, что преобразование массива в одиночное значение может потерять данные.
+        /// </summary>
+        public bool RequiresCollectionModeChangeConfirmation => IsCollectionValue
+            && (_model.Values.Count > 1
+                || FormulaReferenceFormatter.TryCreateScalarFormulaFromCollectionFormula(
+                    _model.ValueFormula,
+                    out _) == false);
+
+        /// <summary>
+        /// Восстанавливает отображаемое состояние переключателя после отмены изменения.
+        /// </summary>
+        public void RefreshCollectionModeSelection()
+        {
+            OnPropertyChanged(nameof(IsCollectionValue));
         }
 
         /// <summary>
